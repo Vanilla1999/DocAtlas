@@ -1,0 +1,14 @@
+module_definition_supported: TARGET-CLOSED
+module_behavior_named_gap: TARGET-CLOSED
+module_requirements_named_gap: TARGET-CLOSED
+project_policy_supported: TARGET-CLOSED
+module_plus_project_two_call_trajectory: TARGET-CLOSED
+cross_module_comparison_supported: TARGET-CLOSED
+wrong_module_isolation: TARGET-CLOSED
+autodiscovery_module_supported: TARGET-CLOSED
+ambiguous_module_recovery_named_gap: TARGET-CLOSED
+stale_module_docs_recovery: TARGET-CLOSED
+dependency_prefetch_recovery: TARGET-CLOSED
+target closure: 11/11 tasks; named target gaps=0; false-supported=0; forbidden-source-contamination=0
+target metrics: {"cross_module_scope_accuracy": 1.0, "false_supported": 0, "forbidden_source_contamination": 0, "module_dependency_scope_accuracy": 1.0, "module_only_expected_evidence_rate": 1.0, "module_project_max_context_calls": 2, "recovery_contract_accuracy": 1.0, "unsupported_edit_ready_false_rate": 1.0}
+Agent Developer Protocol v1: TARGET PASS

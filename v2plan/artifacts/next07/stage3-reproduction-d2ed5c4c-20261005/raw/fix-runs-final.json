@@ -1,0 +1,137 @@
+[
+  {
+    "conclusion": "success",
+    "databaseId": 37310499336,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499336",
+    "workflowName": "P1.5 mixed-evidence provenance"
+  },
+  {
+    "conclusion": "skipped",
+    "databaseId": 37310499447,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499447",
+    "workflowName": "Direct question validation"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499263,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499263",
+    "workflowName": "P2 Product Truth protocol"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499367,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499367",
+    "workflowName": "P2.1B positive controls"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499284,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499284",
+    "workflowName": "P2.2B/C execution gate"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499282,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499282",
+    "workflowName": "P1.4 paraphrase and proofability"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499274,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499274",
+    "workflowName": "P2.3 Product Truth decision"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499311,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499311",
+    "workflowName": "P2.1C task pack"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499390,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499390",
+    "workflowName": "P2 federated task-pack reopening"
+  },
+  {
+    "conclusion": "",
+    "databaseId": 37310499558,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "in_progress",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558",
+    "workflowName": "CI"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499335,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499335",
+    "workflowName": "P2.2A comparative harness"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499436,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436",
+    "workflowName": "Release artifact gate and publish"
+  },
+  {
+    "conclusion": "failure",
+    "databaseId": 37310499372,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499372",
+    "workflowName": "P1.6 evidence is data"
+  },
+  {
+    "conclusion": "success",
+    "databaseId": 37310499577,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499577",
+    "workflowName": "P1 Agent Truth closure"
+  },
+  {
+    "conclusion": "failure",
+    "databaseId": 37310499356,
+    "event": "pull_request",
+    "headSha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "status": "completed",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356",
+    "workflowName": "P1 stack exact validation"
+  }
+]

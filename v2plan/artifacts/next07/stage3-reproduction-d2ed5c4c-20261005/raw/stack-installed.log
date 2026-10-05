@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/docatlas-stage3-stack/scripts/run_installed_mcp_agent_benchmark.py", line 486, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/tmp/opencode/docatlas-stage3-stack/scripts/run_installed_mcp_agent_benchmark.py", line 449, in main
+    commit = _source_commit(args.source_commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/docatlas-stage3-stack/scripts/run_installed_mcp_agent_benchmark.py", line 93, in _source_commit
+    raise ValueError("source commit must be a lowercase 40-character SHA")
+ValueError: source commit must be a lowercase 40-character SHA

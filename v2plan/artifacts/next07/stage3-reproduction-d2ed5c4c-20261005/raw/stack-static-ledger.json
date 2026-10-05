@@ -1,0 +1,61 @@
+[
+  {
+    "command": [
+      "uv",
+      "lock",
+      "--check"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-stack-env/bin/python",
+      "-m",
+      "compileall",
+      "-q",
+      "docmancer",
+      "eval",
+      "scripts",
+      "tests"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-stack-env/bin/python",
+      "scripts/check_python_module_size.py"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-stack-env/bin/python",
+      "scripts/verify_agent_developer_model_report.py",
+      "--self-test"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-stack-env/bin/python",
+      "scripts/main_ruleset.py",
+      "--self-test"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "/tmp/opencode/docatlas-stage3-stack-env/bin/python",
+      "scripts/release_request_self_test.py"
+    ],
+    "exit": 0
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit": 0
+  }
+]

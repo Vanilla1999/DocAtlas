@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/docatlas-stage3-pr1/scripts/run_project_context_quality_v2_gate.py", line 117, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/tmp/opencode/docatlas-stage3-pr1/scripts/run_project_context_quality_v2_gate.py", line 94, in main
+    if args.report else run_live()
+                        ^^^^^^^^^^
+  File "/tmp/opencode/docatlas-stage3-pr1/eval/project_context_quality_v2_protocol.py", line 423, in run_live
+    report = evaluate(responses)
+             ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/docatlas-stage3-pr1/eval/project_context_quality_v2_protocol.py", line 371, in evaluate
+    validation = validate_corpus()
+                 ^^^^^^^^^^^^^^^^^
+  File "/tmp/opencode/docatlas-stage3-pr1/eval/project_context_quality_v2_protocol.py", line 180, in validate_corpus
+    raise ValueError("active witness document revision mismatch")
+ValueError: active witness document revision mismatch

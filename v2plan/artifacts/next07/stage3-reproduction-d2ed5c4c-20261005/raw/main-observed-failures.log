@@ -1,0 +1,440 @@
+..F..FF..FF..FF                                                          [100%]
+=================================== FAILURES ===================================
+_ test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip] _
+
+loss = 'projection_clip'
+
+    @pytest.mark.parametrize("loss", [None, "clip", "projection_clip", "budget", "unknown"])
+    def test_visible_component_novelty_follows_exact_constraints_before_public_queries(loss):
+        question = "What should I read in OrionRepo and what should I test?"
+        plan = build_documentation_query_plan(
+            question, requirements=build_requirements(question, profile="project_docs_answer"),
+        ).as_payload()
+        # Use a compact public plan to put four competing sources under the real cap.
+        plan.update(
+            public_query_ids=["query-anchor", "query-original", "query-lookup-1"],
+            queries=[
+                {"query_id": "query-anchor", "text": "EXACT_KEY", "origin": "exact_anchor"},
+                {"query_id": "query-original", "text": "contributor overview", "origin": "original"},
+                {"query_id": "query-lookup-1", "text": "general background", "origin": "host_lookup"},
+            ],
+        )
+        reading = "For OrionRepo, first read README.md, then read docs/architecture.md."
+        testing = "For OrionRepo, run pytest tests/docs before opening a pull request."
+        components = {row["relation"]: row["component_id"] for row in plan["_component_contract"]}
+    
+        def source(identity, content, matches):
+            return {
+                "stable_id": identity, "source_class": "project_doc", "path": f"docs/{identity}.md",
+                "content": content, "project_identity": "repo", "authority": "source_of_truth",
+                "freshness": "current", "index_freshness": "synchronized", "lifecycle_status": "active",
+                "line_start": 1, "retrieval_query_matches": matches,
+            }
+    
+        candidates = [
+            source("reading", reading + " Contributor overview.", {"query-original": {"query_text": "contributor overview"}}),
+            source("duplicate", reading + " General background.", {"query-lookup-1": {"query_text": "general background"}}),
+            source("testing", testing, {components["testing"]: {"query_text": "OrionRepo testing"}}),
+            source("exact", "EXACT_KEY selects the local contributor configuration.", {"query-anchor": {"query_text": "EXACT_KEY"}}),
+        ]
+        if loss == "clip":
+            candidates[2]["content"] = "For OrionRepo, run"
+        elif loss == "projection_clip":
+            candidates[2]["content"] = "For OrionRepo, " + "background " * 55 + "run pytest tests/docs before opening a pull request."
+        elif loss == "budget":
+            candidates[2]["path"] = "docs/" + "oversized" * 500 + ".md"
+        elif loss == "unknown":
+            plan["_component_contract"] = [row for row in plan["_component_contract"] if row["relation"] != "testing"]
+        diagnostics = {}
+        projection, snapshot = project_docs_context(retrieval={
+            "context_pack": candidates, "documentation_query_plan": plan,
+        }, selection_diagnostics=diagnostics)
+        paths = [source["path_or_url"] for source in projection["sources"]]
+        assert paths[0] == "docs/exact.md"
+        assert len(paths) == 3
+        assert projection["estimated_tokens"] <= 800
+        assert projection["answer_supported"] is False and projection["edit_ready"] is False
+        assert "project_answer:" not in str(projection)
+        if loss is None:
+            assert set(paths) == {"docs/exact.md", "docs/reading.md", "docs/testing.md"}
+            assert diagnostics["component_coverage"]["status"] == "full"
+            assert "query-lookup-1" in projection["missing_query_ids"]
+        else:
+>           assert "docs/testing.md" not in paths
+E           AssertionError: assert 'docs/testing.md' not in ['docs/exact.md', 'docs/reading.md', 'docs/testing.md']
+
+candidates = [{'stable_id': 'reading', 'source_class': 'project_doc', 'path': 'docs/reading.md', 'content': 'For OrionRepo, first r...ss': 'project_doc', 'path': 'docs/exact.md', 'content': 'EXACT_KEY selects the local contributor configuration.', ...}]
+components = {'reading': 'project_answer:0:workflow:1bdf9374513cf9cb', 'testing': 'project_answer:1:workflow:3bcd82be05168bfd'}
+diagnostics = {'component_coverage': {'mandatory_component_ids': ['project_answer:0:workflow:1bdf9374513cf9cb', 'project_answer:1:wo...:3bcd82be05168bfd'], 'missing_component_ids': [], 'evidence_ids': ['ev-a76c0fbfa99f7a2d', 'ev-eade0df87ef4d8f1'], ...}}
+loss       = 'projection_clip'
+paths      = ['docs/exact.md', 'docs/reading.md', 'docs/testing.md']
+plan       = {'schema_version': 'documentation-query-plan-v2', 'original_question': 'What should I read in OrionRepo and what shoul...y-anchor-1', 'query-intent-1', 'query-intent-2', 'query-intent-3', 'query-hint-1', ...], 'required_query_ids': [], ...}
+projection = {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}
+question   = 'What should I read in OrionRepo and what should I test?'
+reading    = 'For OrionRepo, first read README.md, then read docs/architecture.md.'
+snapshot   = {'ev-76df2898d0b23de9': {'source': {'stable_id': 'exact', 'source_class': 'project_doc', 'path': 'docs/exact.md', 'con...cs before opening a pull request.', ...}, 'evidence_id': 'ev-eade0df87ef4d8f1', 'path_or_url': 'docs/testing.md', ...}}
+source     = <function test_visible_component_novelty_follows_exact_constraints_before_public_queries.<locals>.source at 0x7c9b9dec79c0>
+testing    = 'For OrionRepo, run pytest tests/docs before opening a pull request.'
+
+tests/docs/test_component_coverage.py:278: AssertionError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1] _
+
+aliases = 1, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+aliases    = 1
+budget     = 256
+diverse    = {'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content': 'Indigo cobalt.', ...}
+payload    = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['No safe, current, project-scoped documentation context was retrieved.'], 'estimated_tokens': 98, ...}
+queries    = [{'query_id': 'query-original', 'origin': 'original', 'text': 'Explain the processing directions.'}, {'query_id': 'que...query_id': 'query-host-rewrite-1', 'origin': 'canonical_intent', 'text': 'copper', 'relation': 'audited_rewrite', ...}]
+query      = {'query_id': 'query-host-rewrite-1', 'origin': 'canonical_intent', 'text': 'copper', 'relation': 'audited_rewrite', ...}
+retrieval  = {'context_pack': [{'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amb....md', 'evidence_id': 'ev-c84c78e772979eb3', 'qualified_query_ids': ['query-host-rewrite-1', 'query-lookup-1']}], ...}}}
+reverse    = False
+single     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+snapshot   = {}
+source     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2] _
+
+aliases = 2, budget = 256, reverse = False
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+aliases    = 2
+budget     = 256
+diverse    = {'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content': 'Indigo cobalt.', ...}
+payload    = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['No safe, current, project-scoped documentation context was retrieved.'], 'estimated_tokens': 98, ...}
+queries    = [{'query_id': 'query-original', 'origin': 'original', 'text': 'Explain the processing directions.'}, {'query_id': 'que...query_id': 'query-host-rewrite-2', 'origin': 'canonical_intent', 'text': 'silver', 'relation': 'audited_rewrite', ...}]
+query      = {'query_id': 'query-host-rewrite-2', 'origin': 'canonical_intent', 'text': 'silver', 'relation': 'audited_rewrite', ...}
+retrieval  = {'context_pack': [{'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amb...-c84c78e772979eb3', 'qualified_query_ids': ['query-host-rewrite-1', 'query-host-rewrite-2', 'query-lookup-1']}], ...}}}
+reverse    = False
+single     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+snapshot   = {}
+source     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1] _
+
+aliases = 1, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+aliases    = 1
+budget     = 256
+diverse    = {'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content': 'Indigo cobalt.', ...}
+payload    = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['No safe, current, project-scoped documentation context was retrieved.'], 'estimated_tokens': 98, ...}
+queries    = [{'query_id': 'query-original', 'origin': 'original', 'text': 'Explain the processing directions.'}, {'query_id': 'que...query_id': 'query-host-rewrite-1', 'origin': 'canonical_intent', 'text': 'copper', 'relation': 'audited_rewrite', ...}]
+query      = {'query_id': 'query-host-rewrite-1', 'origin': 'canonical_intent', 'text': 'copper', 'relation': 'audited_rewrite', ...}
+retrieval  = {'context_pack': [{'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content'....md', 'evidence_id': 'ev-c84c78e772979eb3', 'qualified_query_ids': ['query-host-rewrite-1', 'query-lookup-1']}], ...}}}
+reverse    = True
+single     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+snapshot   = {}
+source     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+_ test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2] _
+
+aliases = 2, budget = 256, reverse = True
+
+    @pytest.mark.parametrize("aliases", [1, 2])
+    @pytest.mark.parametrize("budget", [256, 800])
+    @pytest.mark.parametrize("reverse", [False, True])
+    def test_public_projection_prioritizes_public_queries_not_audited_alias_count(aliases, budget, reverse):
+        retrieval = _host_lookup_context_retrieval()
+        single, diverse = retrieval["context_pack"][:2]
+        queries = [{"query_id": "query-original", "origin": "original", "text": "Explain the processing directions."}]
+        queries.extend({"query_id": f"query-lookup-{index}", "origin": "host_lookup", "text": text}
+                       for index, text in enumerate(("amber", "indigo", "cobalt"), 1))
+        queries.extend({
+            "query_id": f"query-host-rewrite-{index}", "origin": "canonical_intent", "text": text,
+            "relation": "audited_rewrite", "public_parent_query_id": "query-lookup-1",
+        } for index, text in enumerate(("copper", "silver")[:aliases], 1))
+        single.update(path="docs/single.md", content="Amber copper silver.", retrieval_query_matches={})
+        diverse.update(path="docs/diverse.md", content="Indigo cobalt.", retrieval_query_matches={})
+        for query in queries[1:]:
+            source = single if query.get("public_parent_query_id") or query["text"] == "amber" else diverse
+            source["retrieval_query_matches"][query["query_id"]] = {
+                "query_text": query["text"], "qualified": True,
+                "relation": query.get("relation", "host_lookup"),
+                "public_parent_query_id": query.get("public_parent_query_id"),
+            }
+        retrieval["context_pack"] = [diverse, single] if reverse else [single, diverse]
+        retrieval["documentation_query_plan"] = {"queries": queries, "required_query_ids": []}
+        payload, snapshot = project_docs_context(retrieval=retrieval, max_tokens=budget)
+>       assert payload["sources"][0]["path_or_url"] == "docs/diverse.md"
+               ^^^^^^^^^^^^^^^^^^
+E       KeyError: 'sources'
+
+aliases    = 2
+budget     = 256
+diverse    = {'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content': 'Indigo cobalt.', ...}
+payload    = {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['No safe, current, project-scoped documentation context was retrieved.'], 'estimated_tokens': 98, ...}
+queries    = [{'query_id': 'query-original', 'origin': 'original', 'text': 'Explain the processing directions.'}, {'query_id': 'que...query_id': 'query-host-rewrite-2', 'origin': 'canonical_intent', 'text': 'silver', 'relation': 'audited_rewrite', ...}]
+query      = {'query_id': 'query-host-rewrite-2', 'origin': 'canonical_intent', 'text': 'silver', 'relation': 'audited_rewrite', ...}
+retrieval  = {'context_pack': [{'source_class': 'project_doc', 'path': 'docs/diverse.md', 'heading_path': 'Architecture', 'content'...-c84c78e772979eb3', 'qualified_query_ids': ['query-host-rewrite-1', 'query-host-rewrite-2', 'query-lookup-1']}], ...}}}
+reverse    = True
+single     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+snapshot   = {}
+source     = {'source_class': 'project_doc', 'path': 'docs/single.md', 'heading_path': 'Purpose', 'content': 'Amber copper silver.', ...}
+
+tests/docs/test_review_boundary_semantics.py:141: KeyError
+____________ test_v2_inventory_lock_witnesses_and_report_only_lanes ____________
+
+    def test_v2_inventory_lock_witnesses_and_report_only_lanes():
+>       validation = protocol.validate_corpus()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+tests/test_project_context_quality_v2_protocol.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_corpus() -> dict[str, Any]:
+        rows = load_cases()
+        catalog = _catalog()
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        migration = json.loads(MIGRATION_PATH.read_text(encoding="utf-8"))["crosswalk"]
+        if {row["v2_id"] for row in migration} != {row["id"] for row in rows}:
+            raise ValueError("v2 migration crosswalk is incomplete")
+        witness_paths: set[str] = set()
+        lane_counts: Counter[str] = Counter()
+        type_counts: Counter[str] = Counter()
+        for case in rows:
+            lane_counts[case["lane"]] += 1
+            case_type = case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative")
+            type_counts[case_type] += 1
+            if case["question"] != case["original_question"]:
+                raise ValueError(f"original prompt changed: {case['id']}")
+            if case.get("case_type", "positive" if case["expected_kind"] == "docs_context" else "strict_negative") == "positive" and not case["obligations"]:
+                raise ValueError(f"positive case has no obligations: {case['id']}")
+            if len(case["lookup_queries"]) != len(case["lookup_query_ids"]):
+                raise ValueError(f"lookup inventory mismatch: {case['id']}")
+            for obligation in case["obligations"]:
+                if not obligation.get("accepted_witnesses") or not obligation.get("lookup_query_ids"):
+                    raise ValueError(f"incomplete obligation: {case['id']}/{obligation['id']}")
+                if obligation["id"] in case["lookup_query_ids"]:
+                    raise ValueError(f"semantic obligation reuses a lookup id: {case['id']}/{obligation['id']}")
+                for witness in obligation["accepted_witnesses"]:
+                    path = witness["path"]
+                    metadata = catalog.get(path)
+                    if metadata is None:
+                        raise ValueError(f"witness is not an active catalog document: {path}")
+                    if metadata["authority"] not in obligation["accepted_authorities"] or metadata["scope"] not in obligation["accepted_scopes"]:
+                        raise ValueError(f"witness authority/scope mismatch: {path}")
+                    if normalize_prose(witness["text"]) not in normalize_prose((ROOT / path).read_text(encoding="utf-8")):
+                        raise ValueError(f"witness text is absent from active document: {path}")
+                    witness_paths.add(path)
+        if dict(lane_counts) != lock["inventory"]["lanes"]:
+            raise ValueError("v2 lane inventory mismatch")
+        expected_type_counts = {
+            "positive": lock["inventory"]["positive_count"],
+            "strict_negative": lock["inventory"]["negative_count"],
+            "unsupported_answer_control": lock["inventory"]["unsupported_answer_control_count"],
+        }
+        if dict(type_counts) != expected_type_counts:
+            raise ValueError("v2 case-type inventory mismatch")
+        if {path: _sha256(ROOT / path) for path in sorted(witness_paths)} != lock["active_document_sha256"]:
+>           raise ValueError("active witness document revision mismatch")
+E           ValueError: active witness document revision mismatch
+
+case       = {'id': 'v2-paraphrase-negative-martian', 'migrated_from': 'paraphrase-negative-martian', 'lane': 'exposed_paraphrases', 'question': 'Which Martian telepathic retention standard governs this documentation runtime?', ...}
+case_type  = 'strict_negative'
+catalog    = {'.hermes/plans/2026-08-25-ru-semantic-and-patch-context-completion.md': {'path': '.hermes/plans/2026-08-25-ru-semanti...'CHANGELOG.md', 'role': 'other', 'scope': 'project', 'description': 'Released and pending project changes.', ...}, ...}
+expected_type_counts = {'positive': 20, 'strict_negative': 3, 'unsupported_answer_control': 2}
+lane_counts = Counter({'natural': 19, 'exposed_paraphrases': 6})
+lock       = {'schema_version': 'project-context-quality-v2-lock-4', 'evaluator_version': '2.4.0', 'mode': 'report_only_baseline', 'thresholds': None, ...}
+metadata   = {'path': 'README.md', 'role': 'overview', 'scope': 'project', 'description': 'Project overview, capabilities, and entry points.', ...}
+migration  = [{'v1_id': 'natural-install-verify', 'v2_id': 'v2-natural-install-verify', 'expectation_change': 'the authoritative on...f, gateway output, and visible selection are all mandatory; query-anchor-1 remains in the public plan inventory'}, ...]
+obligation = {'id': 'orphans', 'accepted_authorities': ['source_of_truth'], 'accepted_scopes': ['project'], 'accepted_witnesses': [..., 'text': 'prunes** orphaned indexed sources'}, {'path': 'README.md', 'text': 'prunes orphaned indexed sources'}], ...}
+path       = 'README.md'
+rows       = ({'id': 'v2-natural-install-verify', 'migrated_from': 'natural-install-verify', 'lane': 'natural', 'question': 'Я впер...', 'lane': 'natural', 'question': 'Как проходит запрос get_docs_context от MCP-входа до выбора источников?', ...}, ...)
+type_counts = Counter({'positive': 20, 'strict_negative': 3, 'unsupported_answer_control': 2})
+witness    = {'path': 'README.md', 'text': 'prunes orphaned indexed sources'}
+witness_paths = {'CONTRIBUTING.md', 'README.md', 'docs/PROJECT_MAP.md', 'docs/index-cleanup.md', 'docs/mcp-docs-server.md', 'docs/modules/evidence-selection.md', ...}
+
+eval/project_context_quality_v2_protocol.py:180: ValueError
+______________ test_protocol_lock_and_corpus_shape_are_validated _______________
+
+    def test_protocol_lock_and_corpus_shape_are_validated():
+>       validate_protocol_lock()
+
+
+tests/test_multilingual_retrieval_quality_protocol.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+=========================== short test summary info ============================
+FAILED tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1]
+FAILED tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2]
+FAILED tests/test_project_context_quality_v2_protocol.py::test_v2_inventory_lock_witnesses_and_report_only_lanes
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_protocol_lock_and_corpus_shape_are_validated
+7 failed, 8 passed in 0.59s

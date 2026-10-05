@@ -1,0 +1,692 @@
+{
+  "total_count": 9,
+  "jobs": [
+    {
+      "id": 111764458525,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5MHQ",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764458525",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111764458525",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:36:11Z",
+      "completed_at": "2026-10-05T12:36:27Z",
+      "name": "build",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:36:12Z",
+          "completed_at": "2026-10-05T12:36:12Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:36:12Z",
+          "completed_at": "2026-10-05T12:36:17Z"
+        },
+        {
+          "name": "Verify dispatched release source is on main",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 3,
+          "started_at": "2026-10-05T12:36:17Z",
+          "completed_at": "2026-10-05T12:36:17Z"
+        },
+        {
+          "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:36:17Z",
+          "completed_at": "2026-10-05T12:36:17Z"
+        },
+        {
+          "name": "Run python -m pip install build \"hatchling<1.27\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:36:17Z",
+          "completed_at": "2026-10-05T12:36:18Z"
+        },
+        {
+          "name": "Run python -m build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:36:18Z",
+          "completed_at": "2026-10-05T12:36:22Z"
+        },
+        {
+          "name": "Run if [ -n \"$RELEASE_TAG\" ]; then",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T12:36:22Z",
+          "completed_at": "2026-10-05T12:36:23Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-05T12:36:23Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764458525",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044790,
+      "runner_name": "GitHub Actions 1000044790",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111765113838,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbhL7g",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111765113838",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765113838",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:36:28Z",
+      "started_at": "2026-10-05T12:39:01Z",
+      "completed_at": "2026-10-05T12:39:38Z",
+      "name": "sdist-and-installer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:39:02Z",
+          "completed_at": "2026-10-05T12:39:04Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:39:04Z",
+          "completed_at": "2026-10-05T12:39:05Z"
+        },
+        {
+          "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:39:05Z",
+          "completed_at": "2026-10-05T12:39:05Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:39:05Z",
+          "completed_at": "2026-10-05T12:39:06Z"
+        },
+        {
+          "name": "Run mkdir sdist-wheel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:39:06Z",
+          "completed_at": "2026-10-05T12:39:09Z"
+        },
+        {
+          "name": "Run python -m pip install --force-reinstall sdist-wheel/*.whl",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:39:09Z",
+          "completed_at": "2026-10-05T12:39:25Z"
+        },
+        {
+          "name": "Run cd \"$(mktemp -d)\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T12:39:25Z",
+          "completed_at": "2026-10-05T12:39:29Z"
+        },
+        {
+          "name": "Run EXPECTED_VERSION=\"$(python -c 'from docmancer._version import __version__; print(__version__)')\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-05T12:39:29Z",
+          "completed_at": "2026-10-05T12:39:36Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T12:39:36Z",
+          "completed_at": "2026-10-05T12:39:36Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-05T12:39:36Z",
+          "completed_at": "2026-10-05T12:39:37Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-05T12:39:37Z",
+          "completed_at": "2026-10-05T12:39:37Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111765113838",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044827,
+      "runner_name": "GitHub Actions 1000044827",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111765114019,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbhMow",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111765114019",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114019",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:36:29Z",
+      "started_at": "2026-10-05T12:38:59Z",
+      "completed_at": "2026-10-05T12:39:33Z",
+      "name": "wheel (3.13)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:39:00Z",
+          "completed_at": "2026-10-05T12:39:01Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:39:01Z",
+          "completed_at": "2026-10-05T12:39:03Z"
+        },
+        {
+          "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:39:03Z",
+          "completed_at": "2026-10-05T12:39:03Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:39:03Z",
+          "completed_at": "2026-10-05T12:39:05Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:39:05Z",
+          "completed_at": "2026-10-05T12:39:06Z"
+        },
+        {
+          "name": "Run python -m pip install dist/*.whl",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:39:06Z",
+          "completed_at": "2026-10-05T12:39:25Z"
+        },
+        {
+          "name": "Run cd \"$(mktemp -d)\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T12:39:25Z",
+          "completed_at": "2026-10-05T12:39:30Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:39:30Z",
+          "completed_at": "2026-10-05T12:39:30Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-05T12:39:30Z",
+          "completed_at": "2026-10-05T12:39:31Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T12:39:31Z",
+          "completed_at": "2026-10-05T12:39:31Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111765114019",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044826,
+      "runner_name": "GitHub Actions 1000044826",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111765114080,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbhM4A",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111765114080",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114080",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:36:29Z",
+      "started_at": "2026-10-05T12:38:55Z",
+      "completed_at": "2026-10-05T12:39:31Z",
+      "name": "wheel (3.11)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:38:56Z",
+          "completed_at": "2026-10-05T12:38:57Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:38:57Z",
+          "completed_at": "2026-10-05T12:38:59Z"
+        },
+        {
+          "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:38:59Z",
+          "completed_at": "2026-10-05T12:38:59Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:38:59Z",
+          "completed_at": "2026-10-05T12:39:01Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:39:01Z",
+          "completed_at": "2026-10-05T12:39:02Z"
+        },
+        {
+          "name": "Run python -m pip install dist/*.whl",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:39:02Z",
+          "completed_at": "2026-10-05T12:39:23Z"
+        },
+        {
+          "name": "Run cd \"$(mktemp -d)\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T12:39:23Z",
+          "completed_at": "2026-10-05T12:39:28Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:39:28Z",
+          "completed_at": "2026-10-05T12:39:28Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-05T12:39:28Z",
+          "completed_at": "2026-10-05T12:39:29Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T12:39:29Z",
+          "completed_at": "2026-10-05T12:39:29Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111765114080",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044825,
+      "runner_name": "GitHub Actions 1000044825",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111765114147,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbhNIw",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111765114147",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114147",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:36:29Z",
+      "started_at": "2026-10-05T12:39:07Z",
+      "completed_at": "2026-10-05T12:39:36Z",
+      "name": "wheel (3.12)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:39:08Z",
+          "completed_at": "2026-10-05T12:39:09Z"
+        },
+        {
+          "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:39:09Z",
+          "completed_at": "2026-10-05T12:39:11Z"
+        },
+        {
+          "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:39:11Z",
+          "completed_at": "2026-10-05T12:39:11Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:39:11Z",
+          "completed_at": "2026-10-05T12:39:12Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:39:12Z",
+          "completed_at": "2026-10-05T12:39:12Z"
+        },
+        {
+          "name": "Run python -m pip install dist/*.whl",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:39:12Z",
+          "completed_at": "2026-10-05T12:39:30Z"
+        },
+        {
+          "name": "Run cd \"$(mktemp -d)\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-05T12:39:30Z",
+          "completed_at": "2026-10-05T12:39:34Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:39:34Z",
+          "completed_at": "2026-10-05T12:39:35Z"
+        },
+        {
+          "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-05T12:39:35Z",
+          "completed_at": "2026-10-05T12:39:35Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-05T12:39:35Z",
+          "completed_at": "2026-10-05T12:39:35Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111765114147",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044828,
+      "runner_name": "GitHub Actions 1000044828",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111766346049,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBcsZQQ",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111766346049",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766346049",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:39:39Z",
+      "started_at": "2026-10-05T12:39:42Z",
+      "completed_at": "2026-10-05T12:39:44Z",
+      "name": "required-release",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:39:42Z",
+          "completed_at": "2026-10-05T12:39:42Z"
+        },
+        {
+          "name": "Enforce required release validation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:39:42Z",
+          "completed_at": "2026-10-05T12:39:43Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:39:43Z",
+          "completed_at": "2026-10-05T12:39:43Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111766346049",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044830,
+      "runner_name": "GitHub Actions 1000044830",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111766387536,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBcu7UA",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111766387536",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766387536",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-05T12:39:45Z",
+      "started_at": "2026-10-05T12:39:45Z",
+      "completed_at": "2026-10-05T12:39:45Z",
+      "name": "publish",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111766387536",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 111766388919,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBcvAtw",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111766388919",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766388919",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-05T12:39:45Z",
+      "started_at": "2026-10-05T12:39:45Z",
+      "completed_at": "2026-10-05T12:39:45Z",
+      "name": "public-platform-smoke (${{ matrix.os }})",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111766388919",
+      "labels": [],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    },
+    {
+      "id": 111766389401,
+      "run_id": 37310504880,
+      "workflow_name": "Release artifact gate and publish",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310504880",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBcvCmQ",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111766389401",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766389401",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-10-05T12:39:45Z",
+      "started_at": "2026-10-05T12:39:45Z",
+      "completed_at": "2026-10-05T12:39:45Z",
+      "name": "publish-official-mcp-registry",
+      "steps": [],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111766389401",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    }
+  ]
+}

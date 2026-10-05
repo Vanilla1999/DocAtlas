@@ -1,0 +1,1 @@
+PASS: parser/retrieval failures expose bounded non-automatic recovery; 100 unknown contract modifiers do not create hard stops; rephrase is limited to one retry; eligibility/documentation/conflict classes remain distinct; exact indexed documents recover bounded retrieval-only context; public context projection stays <=800 tokens

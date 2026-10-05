@@ -1,0 +1,5 @@
+Agent Developer adversarial v2: 27/28 cases; v1=11 target-green; v1-max-tokens=757; v2-max-tokens=790; violations=3
+- module_scope_rejects_project_policy_detail: call 1: context projection 380>300 tokens
+- module_scope_rejects_project_policy_detail: call 1: status='ok' expected='insufficient_evidence'
+- module_scope_rejects_project_policy_detail: trajectory projection 380>300 tokens
+Agent Developer adversarial v2: FAIL

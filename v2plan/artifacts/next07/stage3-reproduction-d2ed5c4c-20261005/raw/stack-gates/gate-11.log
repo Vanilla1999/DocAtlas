@@ -1,0 +1,10 @@
+KILLED: agent_projection_budget_guard
+KILLED: agent_trajectory_budget_guard
+KILLED: agent_forbidden_source_guard
+KILLED: agent_exact_scope_guard
+KILLED: agent_retry_candidate_guard
+KILLED: agent_edit_readiness_guard
+KILLED: project_module_ambiguity_guard
+KILLED: project_status_module_projection_guard
+KILLED: module_recovery_reason_projection_guard
+PASS: Agent Developer adversarial baseline green; 9 critical mutants killed

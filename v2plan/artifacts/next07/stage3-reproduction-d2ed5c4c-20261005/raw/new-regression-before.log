@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+  File "/tmp/opencode/docatlas-stage3-fix/tests/test_frozen_fastembed_dependency.py", line 23, in test_install_dependency_matches_frozen_fastembed_version
+    assert str(dependency.specifier) == f"=={expected}"
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+test_install_dependency_matches_frozen_fastembed_version FAIL
+test_uv_dependency_matches_install_dependency PASS
+read-only candidate regression against pinned main configuration; not native pytest collection

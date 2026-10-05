@@ -1,0 +1,2 @@
+3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]
+/tmp/opencode/docatlas-stage3-stack/docmancer/__init__.py

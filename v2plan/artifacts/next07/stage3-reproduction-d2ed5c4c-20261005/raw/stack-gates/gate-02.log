@@ -1,0 +1,7 @@
+KILLED: rephrase-auto-executes
+KILLED: authoritative-conflict-does-not-stop
+KILLED: unbounded-rephrase-loop
+KILLED: rephrase-invents-domain-fact
+KILLED: eligibility-treated-as-retrieval
+KILLED: exact-document-fallback-disabled
+PASS: recoverable documentation failure mutation gate killed 6/6 mutants

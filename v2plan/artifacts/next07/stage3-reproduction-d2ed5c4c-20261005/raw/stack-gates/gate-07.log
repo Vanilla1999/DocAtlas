@@ -1,0 +1,16 @@
+comparison_location: 10/10
+compound: 10/10
+condition: 10/10
+general: 10/10
+inventory: 10/10
+ownership: 9/10
+premise: 10/10
+public_tools: 7/10
+russian: 10/10
+workflow: 10/10
+owners: legacy=7, question_plan=77, unsupported=16
+question surface gate: FAIL
+- case 022 'Which public Docs MCP tools are available?': owner='unsupported', expected='legacy'; unresolved=['legacy_unresolved:unreviewed_frame:Which public Docs MCP tools are available?'], expected=[]
+- case 023 'List the public Docs MCP tools.': owner='unsupported', expected='legacy'; unresolved=['legacy_unresolved:unreviewed_frame:List the public Docs MCP tools.'], expected=[]
+- case 030 'Какие публичные инструменты есть у Docs MCP?': owner='unsupported', expected='legacy'; unresolved=['legacy_unresolved:unreviewed_frame:Какие публичные инструменты есть у Docs MCP?'], expected=[]
+- case 078 'What is the architecture of the MCP server?': owner='unsupported', expected='legacy'; unresolved=['legacy_unresolved:unreviewed_frame:What is the architecture of the MCP server?'], expected=[]

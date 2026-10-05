@@ -1,0 +1,16 @@
+{
+  "lock": "eval/project_context_quality_v2/protocol.lock.json",
+  "lock_sha256": "8bb5e41709cd6bb361661ada92b604396bb8e4c6c05bf77ce0b7c11a130deca4",
+  "mismatches": [
+    {
+      "path": "README.md",
+      "expected": "4bc778b1dfaf72dcd1058427a8477841fea62e500b20913471ae05e74e9be2d9",
+      "actual": "82975e09e63a5897c0f0867fbf370af4038360e489a3baa71d6378b98f2498bb"
+    },
+    {
+      "path": "docs/project-docs-mcp-workflow.md",
+      "expected": "8900b87204a72862432f11f1f9433c6646d55663330c590044a947a5050c0f36",
+      "actual": "4478411a57217bd30378f232641481a5b8773dadda37f555204f724753c6fafa"
+    }
+  ]
+}

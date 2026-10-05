@@ -1,0 +1,443 @@
+{
+  "schema_version": "project-context-quality-contract-result-v1",
+  "case_count": 16,
+  "passed_count": 16,
+  "results": [
+    {
+      "id": "ru-install",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "installation_verification"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "installation_verification",
+            "local_development"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-overview",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "product_overview"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "product_overview"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-first-commands",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "getting_started",
+            "installation_verification"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "getting_started",
+            "installation_verification"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-contributor",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "contributor_start"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "contributor_start"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-mcp-flow",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "docs_mcp_workflow"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "docs_mcp_workflow"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-sync",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "project_docs_sync"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "project_docs_sync"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-config",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "project_docs_configuration"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "project_docs_configuration"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-clean",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "index_cleanup"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "index_cleanup"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-troubleshoot",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "troubleshooting"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "troubleshooting"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-storage",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "project_storage"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "project_storage"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-chunks",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "index_chunking"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "index_chunking"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-selection",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "evidence_selection"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "evidence_selection"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-tests",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "testing_contribution"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "testing_contribution"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-offline",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "offline_usage"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "offline_usage"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "ru-server-command",
+      "languages": {
+        "ru": {
+          "intent_ids": [
+            "docs_mcp_server_command",
+            "instruction_trust"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original",
+            "query-lookup-1"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [
+            "docs_mcp_server_command"
+          ],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    },
+    {
+      "id": "negative-quantum",
+      "languages": {
+        "ru": {
+          "intent_ids": [],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        },
+        "en": {
+          "intent_ids": [],
+          "public_tools": false,
+          "public_query_ids": [
+            "query-original"
+          ],
+          "passed": true
+        }
+      },
+      "passed": true
+    }
+  ],
+  "lane": "legacy",
+  "report_only": false,
+  "evaluation_kind": "alias_and_query_plan_contract",
+  "retrieval_executed": false,
+  "verdict": "PASS"
+}

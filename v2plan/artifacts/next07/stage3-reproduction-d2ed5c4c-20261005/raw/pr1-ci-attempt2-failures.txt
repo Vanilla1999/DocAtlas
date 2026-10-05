@@ -1,0 +1,36 @@
+tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip] - AssertionError: assert 'docs/testing.md' not in ['docs/exact.md', 'docs/reading.md', 'docs/testing.md']
+tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses - AssertionError: [{'id': 'flow_mcp', 'met': False, 'lookup_query_ids': ['query-lookup-1'], 'visible_witnesses': []}, {'id': 'flow_application', 'met': True, 'lookup_query_ids': ['query-lookup-2'], 'visible_witnesses': [{'path_or_url': 'docs/modules/project-context-retrieval.md', 'evidence_id': 'ev-8ae1789c9c28bae9'}]}, {'id': 'flow_gateway', 'met': False, 'lookup_query_ids': ['query-lookup-3'], 'visible_witnesses': []}, {'id': 'flow_selection', 'met': True, 'lookup_query_ids': ['query-lookup-3'], 'visible_witnesses': [{'path_or_url': 'docs/modules/project-context-retrieval.md', 'evidence_id': 'ev-8ae1789c9c28bae9'}]}]
+tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts - AssertionError: README.md
+tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_first_session_live_query - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_contributor_live_reading_and_tests - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection] - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-offline] - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-paraphrase-local-trial] - ValueError: active witness document revision mismatch
+tests/docs/test_generic_context_workflows.py::test_catalog_live_invalid_behavior - ValueError: active witness document revision mismatch
+tests/docs/test_project_answer_contract_v3.py::test_v3_does_not_reclassify_frozen_v2_config_questions - AssertionError: assert '2a14b99f1a7e...47131635d5c66' == 'fdc51fc23588...0a7d02d98ad20'
+tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets - AssertionError: assert [('What are t...ical_intent')] == [('What are t..., 'original')]
+tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe - AssertionError: assert {'flow_applic...ow_selection'} == {'flow_applic...ow_selection'}
+tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1] - KeyError: 'sources'
+tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2] - KeyError: 'sources'
+tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1] - KeyError: 'sources'
+tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2] - KeyError: 'sources'
+tests/evidence_quality_v2/test_readme_neutral_context.py::test_retrieved_safe_context_survives_unknown_question_class[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way] - AssertionError: assert False is True
+tests/evidence_quality_v2/test_readme_neutral_context.py::test_lookup_identical_to_original_is_not_a_new_requirement[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\nin a composable way] - assert False is True
+tests/test_docs_service_part02.py::test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original - AssertionError: assert 'query-hint-1' in ('query-anchor-1', 'query-original')
+tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms - AssertionError: [{'evidence_id': 'ev-8950dcb8d23569a3', 'path_or_url': 'zz-authoritative-plan.md', 'section': 'Approved retrieval plan > Phase 2.3: presentation-only snippets', 'snippet': '## Phase 2.3: presentation-only snippets
+tests/test_multilingual_retrieval_quality_protocol.py::test_protocol_lock_and_corpus_shape_are_validated - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_corpus_rejects_external_project_evidence - AssertionError: Regex pattern did not match.
+tests/test_multilingual_retrieval_quality_protocol.py::test_passing_candidate_must_beat_baseline_without_fallback - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_lexical_fallback_cannot_count_as_hybrid_success - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_wrong_project_evidence_fails_closed - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_missing_source_provenance_fails_gate - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_retrieved_sources_require_visible_provenance - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_absent_fact_retrieval_is_scored_separately_from_recall - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_missing_ru_dense_contribution_fails_gate - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_every_retrieved_span_requires_visible_provenance - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_frozen_corpus_binds_all_files_and_source_spans - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_matrix_documents_have_unique_identity_for_spans_from_the_same_path - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_matrix_executes_locked_systems_without_changing_default - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_multilingual_retrieval_quality_protocol.py::test_protocol_freezes_supported_multilingual_mpnet_model - ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+tests/test_project_context_quality_v2_protocol.py::test_v2_inventory_lock_witnesses_and_report_only_lanes - ValueError: active witness document revision mismatch

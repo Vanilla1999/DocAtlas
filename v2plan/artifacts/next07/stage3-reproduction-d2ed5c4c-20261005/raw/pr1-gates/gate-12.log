@@ -1,0 +1,3 @@
+Lifecycle fixture readiness: 1 read-only storage checks; one MCP job-status call follows (not a model or latency measurement)
+Installed lifecycle smoke: clean guard / confirmation / unchanged retry / ready stop / async status / terminal stop PASS (scripted, no live model)
+Docs MCP installed-artifact stdio smoke: PASS

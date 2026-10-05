@@ -1,0 +1,97 @@
+{
+  "total_count": 1,
+  "jobs": [
+    {
+      "id": 111764445236,
+      "run_id": 37310499372,
+      "workflow_name": "P1.6 evidence is data",
+      "head_branch": "fix/stage3-fastembed-protocol-pin",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310499372",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa4YNA",
+      "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764445236",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499372/job/111764445236",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:34:46Z",
+      "started_at": "2026-10-05T12:36:24Z",
+      "completed_at": "2026-10-05T12:37:05Z",
+      "name": "p1-6-adversarial",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:36:26Z",
+          "completed_at": "2026-10-05T12:36:29Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:36:29Z",
+          "completed_at": "2026-10-05T12:36:29Z"
+        },
+        {
+          "name": "Install DocAtlas evaluator dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:36:29Z",
+          "completed_at": "2026-10-05T12:36:54Z"
+        },
+        {
+          "name": "Verify hostile documents cannot control the agent boundary",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-05T12:36:54Z",
+          "completed_at": "2026-10-05T12:37:03Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-05T12:37:03Z",
+          "completed_at": "2026-10-05T12:37:03Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:37:03Z",
+          "completed_at": "2026-10-05T12:37:03Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:37:03Z",
+          "completed_at": "2026-10-05T12:37:03Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764445236",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044793,
+      "runner_name": "GitHub Actions 1000044793",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

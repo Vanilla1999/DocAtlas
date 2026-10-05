@@ -1,0 +1,1093 @@
+{
+  "total_count": 12,
+  "jobs": [
+    {
+      "id": 111764458758,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5NBg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764458758",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764458758",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:35:29Z",
+      "completed_at": "2026-10-05T12:35:46Z",
+      "name": "p1-stack-release-build",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:35:30Z",
+          "completed_at": "2026-10-05T12:35:32Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:35:32Z",
+          "completed_at": "2026-10-05T12:35:36Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:35:36Z",
+          "completed_at": "2026-10-05T12:35:36Z"
+        },
+        {
+          "name": "Run python -m pip install build \"hatchling<1.27\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:35:36Z",
+          "completed_at": "2026-10-05T12:35:37Z"
+        },
+        {
+          "name": "Run rm -rf dist",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:35:37Z",
+          "completed_at": "2026-10-05T12:35:42Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:35:42Z",
+          "completed_at": "2026-10-05T12:35:44Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:35:44Z",
+          "completed_at": "2026-10-05T12:35:44Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-05T12:35:44Z",
+          "completed_at": "2026-10-05T12:35:44Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:35:44Z",
+          "completed_at": "2026-10-05T12:35:44Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764458758",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044780,
+      "runner_name": "GitHub Actions 1000044780",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459075,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5OQw",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459075",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459075",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:37:07Z",
+      "completed_at": "2026-10-05T12:42:41Z",
+      "name": "p1-stack-core (3.11)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:37:08Z",
+          "completed_at": "2026-10-05T12:37:08Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:37:08Z",
+          "completed_at": "2026-10-05T12:37:12Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:37:12Z",
+          "completed_at": "2026-10-05T12:37:13Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:37:13Z",
+          "completed_at": "2026-10-05T12:37:37Z"
+        },
+        {
+          "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-05T12:37:37Z",
+          "completed_at": "2026-10-05T12:42:38Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-05T12:42:38Z",
+          "completed_at": "2026-10-05T12:42:38Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:42:38Z",
+          "completed_at": "2026-10-05T12:42:39Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:42:39Z",
+          "completed_at": "2026-10-05T12:42:39Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459075",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044803,
+      "runner_name": "GitHub Actions 1000044803",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459110,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5OZg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459110",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459110",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:35:56Z",
+      "completed_at": "2026-10-05T12:37:26Z",
+      "name": "p1-stack-platform (windows-latest)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:35:57Z",
+          "completed_at": "2026-10-05T12:35:58Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:35:58Z",
+          "completed_at": "2026-10-05T12:36:06Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:36:06Z",
+          "completed_at": "2026-10-05T12:36:06Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:36:06Z",
+          "completed_at": "2026-10-05T12:37:11Z"
+        },
+        {
+          "name": "Run python -m compileall -q docmancer eval scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:37:11Z",
+          "completed_at": "2026-10-05T12:37:23Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T12:37:23Z",
+          "completed_at": "2026-10-05T12:37:23Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:37:23Z",
+          "completed_at": "2026-10-05T12:37:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:37:25Z",
+          "completed_at": "2026-10-05T12:37:25Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459110",
+      "labels": [
+        "windows-latest"
+      ],
+      "runner_id": 1000044787,
+      "runner_name": "GitHub Actions 1000044787",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459148,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5OjA",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459148",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459148",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:37:23Z",
+      "completed_at": "2026-10-05T12:43:54Z",
+      "name": "p1-stack-core (3.12)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:37:24Z",
+          "completed_at": "2026-10-05T12:37:25Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:37:25Z",
+          "completed_at": "2026-10-05T12:37:29Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:37:29Z",
+          "completed_at": "2026-10-05T12:37:29Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:37:29Z",
+          "completed_at": "2026-10-05T12:37:58Z"
+        },
+        {
+          "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-05T12:37:58Z",
+          "completed_at": "2026-10-05T12:43:51Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-05T12:43:51Z",
+          "completed_at": "2026-10-05T12:43:51Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:43:51Z",
+          "completed_at": "2026-10-05T12:43:51Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:43:51Z",
+          "completed_at": "2026-10-05T12:43:51Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459148",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044808,
+      "runner_name": "GitHub Actions 1000044808",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459181,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5OrQ",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459181",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459181",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:37:23Z",
+      "completed_at": "2026-10-05T12:39:54Z",
+      "name": "p1-stack-advanced-security",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:37:24Z",
+          "completed_at": "2026-10-05T12:37:25Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:37:25Z",
+          "completed_at": "2026-10-05T12:37:28Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:37:28Z",
+          "completed_at": "2026-10-05T12:37:28Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:37:28Z",
+          "completed_at": "2026-10-05T12:37:49Z"
+        },
+        {
+          "name": "Run production-path contracts",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-05T12:37:49Z",
+          "completed_at": "2026-10-05T12:39:53Z"
+        },
+        {
+          "name": "Run every P1 evidence contract present on this ref",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-10-05T12:39:53Z",
+          "completed_at": "2026-10-05T12:39:53Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-10-05T12:39:53Z",
+          "completed_at": "2026-10-05T12:39:53Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-05T12:39:53Z",
+          "completed_at": "2026-10-05T12:39:53Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:39:53Z",
+          "completed_at": "2026-10-05T12:39:53Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459181",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044809,
+      "runner_name": "GitHub Actions 1000044809",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459186,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5Osg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459186",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459186",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:35:42Z",
+      "completed_at": "2026-10-05T12:36:29Z",
+      "name": "p1-stack-platform (macos-latest)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:35:43Z",
+          "completed_at": "2026-10-05T12:35:44Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:35:44Z",
+          "completed_at": "2026-10-05T12:35:50Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:35:50Z",
+          "completed_at": "2026-10-05T12:35:52Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:35:52Z",
+          "completed_at": "2026-10-05T12:36:17Z"
+        },
+        {
+          "name": "Run python -m compileall -q docmancer eval scripts",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:36:17Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:36:25Z",
+          "completed_at": "2026-10-05T12:36:26Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:36:26Z",
+          "completed_at": "2026-10-05T12:36:26Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459186",
+      "labels": [
+        "macos-latest"
+      ],
+      "runner_id": 1000044782,
+      "runner_name": "GitHub Actions 1000044782",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764459306,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBa5PKg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764459306",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459306",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:34:49Z",
+      "started_at": "2026-10-05T12:37:38Z",
+      "completed_at": "2026-10-05T12:43:12Z",
+      "name": "p1-stack-core (3.13)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:37:38Z",
+          "completed_at": "2026-10-05T12:37:39Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:37:39Z",
+          "completed_at": "2026-10-05T12:37:44Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:37:44Z",
+          "completed_at": "2026-10-05T12:37:44Z"
+        },
+        {
+          "name": "Run python -m pip install -e \".[dev]\"",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:37:44Z",
+          "completed_at": "2026-10-05T12:38:09Z"
+        },
+        {
+          "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-05T12:38:09Z",
+          "completed_at": "2026-10-05T12:43:10Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 9,
+          "started_at": "2026-10-05T12:43:10Z",
+          "completed_at": "2026-10-05T12:43:10Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:43:10Z",
+          "completed_at": "2026-10-05T12:43:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:43:10Z",
+          "completed_at": "2026-10-05T12:43:10Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764459306",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044813,
+      "runner_name": "GitHub Actions 1000044813",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764839926,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbQd9g",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764839926",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764839926",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:35:47Z",
+      "started_at": "2026-10-05T12:37:44Z",
+      "completed_at": "2026-10-05T12:38:10Z",
+      "name": "p1-stack-release-wheel (3.12)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:37:45Z",
+          "completed_at": "2026-10-05T12:37:46Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:37:46Z",
+          "completed_at": "2026-10-05T12:37:47Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:37:47Z",
+          "completed_at": "2026-10-05T12:37:47Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:37:47Z",
+          "completed_at": "2026-10-05T12:37:49Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:37:49Z",
+          "completed_at": "2026-10-05T12:38:07Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T12:38:07Z",
+          "completed_at": "2026-10-05T12:38:07Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:38:07Z",
+          "completed_at": "2026-10-05T12:38:07Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:38:07Z",
+          "completed_at": "2026-10-05T12:38:07Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764839926",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044814,
+      "runner_name": "GitHub Actions 1000044814",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764840090,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbQemg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764840090",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840090",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:35:47Z",
+      "started_at": "2026-10-05T12:38:03Z",
+      "completed_at": "2026-10-05T12:38:31Z",
+      "name": "p1-stack-release-wheel (3.13)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:38:04Z",
+          "completed_at": "2026-10-05T12:38:04Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:38:04Z",
+          "completed_at": "2026-10-05T12:38:06Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:38:06Z",
+          "completed_at": "2026-10-05T12:38:06Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:38:06Z",
+          "completed_at": "2026-10-05T12:38:07Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:38:07Z",
+          "completed_at": "2026-10-05T12:38:30Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T12:38:30Z",
+          "completed_at": "2026-10-05T12:38:30Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:38:30Z",
+          "completed_at": "2026-10-05T12:38:30Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:38:30Z",
+          "completed_at": "2026-10-05T12:38:30Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764840090",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044818,
+      "runner_name": "GitHub Actions 1000044818",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764840134,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbQexg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764840134",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840134",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:35:47Z",
+      "started_at": "2026-10-05T12:38:12Z",
+      "completed_at": "2026-10-05T12:38:48Z",
+      "name": "p1-stack-release-wheel (3.11)",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:38:13Z",
+          "completed_at": "2026-10-05T12:38:15Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:38:15Z",
+          "completed_at": "2026-10-05T12:38:18Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:38:18Z",
+          "completed_at": "2026-10-05T12:38:18Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:38:18Z",
+          "completed_at": "2026-10-05T12:38:20Z"
+        },
+        {
+          "name": "Run python scripts/release_gate.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:38:20Z",
+          "completed_at": "2026-10-05T12:38:46Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-05T12:38:46Z",
+          "completed_at": "2026-10-05T12:38:46Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-05T12:38:46Z",
+          "completed_at": "2026-10-05T12:38:46Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:38:46Z",
+          "completed_at": "2026-10-05T12:38:46Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764840134",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044820,
+      "runner_name": "GitHub Actions 1000044820",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111764840187,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBbQe-w",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111764840187",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840187",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-05T12:35:47Z",
+      "started_at": "2026-10-05T12:38:13Z",
+      "completed_at": "2026-10-05T12:38:50Z",
+      "name": "p1-stack-release-sdist-installer",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:38:14Z",
+          "completed_at": "2026-10-05T12:38:15Z"
+        },
+        {
+          "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-05T12:38:15Z",
+          "completed_at": "2026-10-05T12:38:17Z"
+        },
+        {
+          "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:38:17Z",
+          "completed_at": "2026-10-05T12:38:17Z"
+        },
+        {
+          "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-05T12:38:17Z",
+          "completed_at": "2026-10-05T12:38:19Z"
+        },
+        {
+          "name": "Run mkdir sdist-wheel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-05T12:38:19Z",
+          "completed_at": "2026-10-05T12:38:45Z"
+        },
+        {
+          "name": "Verify installer against the exact built wheel",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-05T12:38:45Z",
+          "completed_at": "2026-10-05T12:38:48Z"
+        },
+        {
+          "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-05T12:38:48Z",
+          "completed_at": "2026-10-05T12:38:48Z"
+        },
+        {
+          "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-05T12:38:48Z",
+          "completed_at": "2026-10-05T12:38:48Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-05T12:38:48Z",
+          "completed_at": "2026-10-05T12:38:48Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111764840187",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044821,
+      "runner_name": "GitHub Actions 1000044821",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 111767964178,
+      "run_id": 37310505044,
+      "workflow_name": "P1 stack exact validation",
+      "head_branch": "integration/stage3-fastembed-pr1",
+      "run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/37310505044",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOS5hCr88AAAAaBePKEg",
+      "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+      "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/111767964178",
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111767964178",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-05T12:43:54Z",
+      "started_at": "2026-10-05T12:43:57Z",
+      "completed_at": "2026-10-05T12:44:00Z",
+      "name": "p1-stack-exact",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-05T12:43:58Z",
+          "completed_at": "2026-10-05T12:43:58Z"
+        },
+        {
+          "name": "Require every exact-head lane",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 2,
+          "started_at": "2026-10-05T12:43:58Z",
+          "completed_at": "2026-10-05T12:43:58Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-05T12:43:58Z",
+          "completed_at": "2026-10-05T12:43:58Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/check-runs/111767964178",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000044832,
+      "runner_name": "GitHub Actions 1000044832",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    }
+  ]
+}

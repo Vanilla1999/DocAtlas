@@ -1,0 +1,8 @@
+...............................................................          [100%]
+=============================== warnings summary ===============================
+tests/docs/test_finalized_mcp_output_integrity.py::test_dispatcher_and_sdk_use_the_same_terminal_contract[False-False]
+  /tmp/opencode/docatlas-stage3-stack-env/lib/python3.12/site-packages/starlette/formparsers.py:12: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+63 passed, 1 warning in 1.58s

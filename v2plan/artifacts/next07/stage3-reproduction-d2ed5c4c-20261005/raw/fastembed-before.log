@@ -1,0 +1,1671 @@
+FFFFFFFFFFFFF..F...                                                      [100%]
+=================================== FAILURES ===================================
+______________ test_protocol_lock_and_corpus_shape_are_validated _______________
+
+    def test_protocol_lock_and_corpus_shape_are_validated():
+>       validate_protocol_lock()
+
+
+tests/test_multilingual_retrieval_quality_protocol.py:145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+________________ test_corpus_rejects_external_project_evidence _________________
+
+    def test_corpus_rejects_external_project_evidence():
+        rows = _corpus()
+        rows[0]["project_id"] = "external-project"
+        rows[0]["self_hosting_control"] = False
+>       with pytest.raises(ValueError, match="project_count, self_hosting_only"):
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'project_count, self_hosting_only'
+E         Actual message: 'invalid multilingual retrieval protocol lock: fastembed_version'
+
+rows       = [{'id': 'docatlas-en-en-0', 'project_id': 'external-project', 'language_pair': 'en-en', 'split': 'development', ...}, ......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:154: AssertionError
+__________ test_passing_candidate_must_beat_baseline_without_fallback __________
+
+    def test_passing_candidate_must_beat_baseline_without_fallback():
+>       report = evaluate_results(_result_rows(), _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+tests/test_multilingual_retrieval_quality_protocol.py:159: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+_____________ test_lexical_fallback_cannot_count_as_hybrid_success _____________
+
+    def test_lexical_fallback_cannot_count_as_hybrid_success():
+        candidate = _result_rows()
+        candidate[0]["mode_used"] = "lexical"
+        candidate[0]["fallback_used"] = True
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+___________________ test_wrong_project_evidence_fails_closed ___________________
+
+    def test_wrong_project_evidence_fails_closed():
+        candidate = _result_rows()
+        candidate[0]["wrong_project_evidence_accepted"] = 1
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:177: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+__________________ test_missing_source_provenance_fails_gate ___________________
+
+    def test_missing_source_provenance_fails_gate():
+        candidate = _result_rows()
+        candidate[0]["visible_sources"] = [{"project_identity": "project-0"}]
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:184: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+______________ test_retrieved_sources_require_visible_provenance _______________
+
+    def test_retrieved_sources_require_visible_provenance():
+        candidate = _result_rows()
+        candidate[0]["visible_sources"] = []
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+_________ test_absent_fact_retrieval_is_scored_separately_from_recall __________
+
+    def test_absent_fact_retrieval_is_scored_separately_from_recall():
+        candidate = _result_rows()
+        absent = next(row for row in candidate if row.get("absent_fact"))
+        absent["retrieved_source_spans"] = ["misleading:1"]
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+absent     = {'id': 'docatlas-en-en-2', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'adversarial', ...}
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+________________ test_missing_ru_dense_contribution_fails_gate _________________
+
+    def test_missing_ru_dense_contribution_fails_gate():
+        candidate = _result_rows()
+        ru_row = next(row for row in candidate if row["language_pair"] == "ru-en" and not row.get("absent_fact"))
+        ru_row["candidate_counts"] = {"dense": 0}
+        ru_row["dense_contributed"] = False
+    
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+ru_row     = {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}
+
+tests/test_multilingual_retrieval_quality_protocol.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+____________ test_every_retrieved_span_requires_visible_provenance _____________
+
+    def test_every_retrieved_span_requires_visible_provenance():
+        candidate = _result_rows()
+        candidate[0]["retrieved_source_spans"].append("hidden:span")  # type: ignore[union-attr]
+>       report = evaluate_results(candidate, _result_rows(candidate=False))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+candidate  = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+
+tests/test_multilingual_retrieval_quality_protocol.py:220: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus = None
+
+    def evaluate_results(
+        candidate_rows: Iterable[dict[str, Any]], baseline_rows: Iterable[dict[str, Any]],
+        *, corpus: FrozenCorpus | None = None,
+    ) -> dict[str, Any]:
+>       lock = validate_protocol_lock()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+
+baseline_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+candidate_rows = [{'id': 'docatlas-en-en-0', 'project_id': 'docatlas', 'language_pair': 'en-en', 'split': 'development', ...}, {'id': '......}, {'id': 'docatlas-ru-en-0', 'project_id': 'docatlas', 'language_pair': 'ru-en', 'split': 'development', ...}, ...]
+corpus     = None
+
+eval/multilingual_retrieval_quality_protocol.py:473: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+_____________ test_frozen_corpus_binds_all_files_and_source_spans ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0')
+
+    def test_frozen_corpus_binds_all_files_and_source_spans(tmp_path):
+        _write_frozen_corpus(tmp_path)
+>       corpus = load_frozen_corpus(tmp_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tmp_path   = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0')
+
+tests/test_multilingual_retrieval_quality_protocol.py:226: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data_root = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0')
+
+    def load_frozen_corpus(data_root: Path = DATA_ROOT) -> FrozenCorpus:
+        digests_path = data_root / "digests.json"
+        if not digests_path.is_file():
+            raise ValueError("frozen multilingual corpus requires digests.json")
+        digest_lock = json.loads(digests_path.read_text(encoding="utf-8"))
+        if digest_lock.get("schema_version") != "multilingual-retrieval-quality-digests-v1":
+            raise ValueError("unsupported multilingual corpus digest schema")
+        locked_files = dict(digest_lock.get("files") or {})
+        required_files = ("corpus.json", *(f"{split}.json" for split in EXPECTED_SPLITS))
+        if set(locked_files) != set(required_files):
+            raise ValueError("digest lock must bind the corpus and every protocol split")
+        payloads: dict[str, dict[str, Any]] = {}
+        for relative_path in required_files:
+            path = data_root / relative_path
+            if not path.is_file() or file_sha256(path) != locked_files[relative_path]:
+                raise ValueError(f"frozen corpus digest mismatch: {relative_path}")
+            payloads[relative_path] = json.loads(path.read_text(encoding="utf-8"))
+    
+        corpus = payloads["corpus.json"]
+        if corpus.get("schema_version") != "multilingual-retrieval-quality-corpus-v1":
+            raise ValueError("unsupported multilingual corpus schema")
+        projects = tuple(dict(row) for row in corpus.get("projects") or ())
+        project_ids = [str(row.get("id") or "") for row in projects]
+        if not project_ids or any(not value for value in project_ids) or len(project_ids) != len(set(project_ids)):
+            raise ValueError("frozen corpus requires unique project IDs")
+        projects_by_id = {str(row["id"]): row for row in projects}
+        if len(projects) != 1 or not projects[0].get("self_hosting_control"):
+            raise ValueError("frozen corpus requires exactly one self-hosting project")
+    
+        spans: dict[str, str] = {}
+        for project in projects:
+            project_id = str(project["id"])
+            if not str(project.get("project_identity") or "") or not str(project.get("revision") or ""):
+                raise ValueError(f"{project_id}: project identity and immutable revision are required")
+>           if project.get("revision") != validate_protocol_lock()["frozen_artifacts"]["repository_revision"]:
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^
+
+corpus     = {'projects': [{'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c88...sion': '5da60e24cacebf6350411087eb4983597774895a', ...}], 'schema_version': 'multilingual-retrieval-quality-corpus-v1'}
+data_root  = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0')
+digest_lock = {'files': {'adversarial.json': '9aaef7376feb7af4eea0129972fe6ac8a74e611db7cd996dd3eac35d878558f1', 'corpus.json': 'aaf...79a60a1656ddb8690936684b507588bf51839fb5f54a4c45f88ae'}, 'schema_version': 'multilingual-retrieval-quality-digests-v1'}
+digests_path = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0/digests.json')
+locked_files = {'adversarial.json': '9aaef7376feb7af4eea0129972fe6ac8a74e611db7cd996dd3eac35d878558f1', 'corpus.json': 'aaf58cdd5ca89...14448d0da217acc08fd16c6cb775f4734', 'holdout.json': '14d2fcf032079a60a1656ddb8690936684b507588bf51839fb5f54a4c45f88ae'}
+path       = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_frozen_corpus_binds_all_f0/adversarial.json')
+payloads   = {'corpus.json': {'projects': [{'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d7...age_pair': 'ru-en', 'project_id': 'docatlas', ...}, ...], 'schema_version': 'multilingual-retrieval-quality-cases-v1'}}
+project    = {'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c8831d7e8ed6c9ffa...'project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...}
+project_id = 'docatlas'
+project_ids = ['docatlas']
+projects   = ({'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c8831d7e8ed6c9ff...roject_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...},)
+projects_by_id = {'docatlas': {'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c883...project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...}}
+relative_path = 'adversarial.json'
+required_files = ('corpus.json', 'development.json', 'holdout.json', 'adversarial.json')
+spans      = {}
+
+eval/multilingual_retrieval_quality_protocol.py:217: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+___ test_matrix_documents_have_unique_identity_for_spans_from_the_same_path ____
+
+    def test_matrix_documents_have_unique_identity_for_spans_from_the_same_path():
+>       corpus = load_frozen_corpus()
+                 ^^^^^^^^^^^^^^^^^^^^
+
+
+tests/test_multilingual_retrieval_quality_protocol.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data_root = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality')
+
+    def load_frozen_corpus(data_root: Path = DATA_ROOT) -> FrozenCorpus:
+        digests_path = data_root / "digests.json"
+        if not digests_path.is_file():
+            raise ValueError("frozen multilingual corpus requires digests.json")
+        digest_lock = json.loads(digests_path.read_text(encoding="utf-8"))
+        if digest_lock.get("schema_version") != "multilingual-retrieval-quality-digests-v1":
+            raise ValueError("unsupported multilingual corpus digest schema")
+        locked_files = dict(digest_lock.get("files") or {})
+        required_files = ("corpus.json", *(f"{split}.json" for split in EXPECTED_SPLITS))
+        if set(locked_files) != set(required_files):
+            raise ValueError("digest lock must bind the corpus and every protocol split")
+        payloads: dict[str, dict[str, Any]] = {}
+        for relative_path in required_files:
+            path = data_root / relative_path
+            if not path.is_file() or file_sha256(path) != locked_files[relative_path]:
+                raise ValueError(f"frozen corpus digest mismatch: {relative_path}")
+            payloads[relative_path] = json.loads(path.read_text(encoding="utf-8"))
+    
+        corpus = payloads["corpus.json"]
+        if corpus.get("schema_version") != "multilingual-retrieval-quality-corpus-v1":
+            raise ValueError("unsupported multilingual corpus schema")
+        projects = tuple(dict(row) for row in corpus.get("projects") or ())
+        project_ids = [str(row.get("id") or "") for row in projects]
+        if not project_ids or any(not value for value in project_ids) or len(project_ids) != len(set(project_ids)):
+            raise ValueError("frozen corpus requires unique project IDs")
+        projects_by_id = {str(row["id"]): row for row in projects}
+        if len(projects) != 1 or not projects[0].get("self_hosting_control"):
+            raise ValueError("frozen corpus requires exactly one self-hosting project")
+    
+        spans: dict[str, str] = {}
+        for project in projects:
+            project_id = str(project["id"])
+            if not str(project.get("project_identity") or "") or not str(project.get("revision") or ""):
+                raise ValueError(f"{project_id}: project identity and immutable revision are required")
+>           if project.get("revision") != validate_protocol_lock()["frozen_artifacts"]["repository_revision"]:
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^
+
+corpus     = {'schema_version': 'multilingual-retrieval-quality-corpus-v1', 'projects': [{'id': 'docatlas', 'project_identity': 'gi...com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', 'self_hosting_control': True, ...}]}
+data_root  = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality')
+digest_lock = {'schema_version': 'multilingual-retrieval-quality-digests-v1', 'files': {'corpus.json': 'e02b5433e09c0aeaeb032005ad91...4cfd01cffbc9949415cf83e85ac1', 'adversarial.json': 'f5da11a43501f345796c3b09f01d5ab79bc2f6742b896b065a54ab8336f34e8e'}}
+digests_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+locked_files = {'corpus.json': 'e02b5433e09c0aeaeb032005ad91fa960c4f9fb7d871407c199bf90661961c38', 'development.json': 'b42f2eb0bc6a9...24cfd01cffbc9949415cf83e85ac1', 'adversarial.json': 'f5da11a43501f345796c3b09f01d5ab79bc2f6742b896b065a54ab8336f34e8e'}
+path       = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/adversarial.json')
+payloads   = {'corpus.json': {'schema_version': 'multilingual-retrieval-quality-corpus-v1', 'projects': [{'id': 'docatlas', 'projec...language_pair': 'ru-ru', 'query': 'На каких локальных источниках основан контекст DocAtlas для coding agents?', ...}]}}
+project    = {'id': 'docatlas', 'project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', 'self_hosting_control': True, ...}
+project_id = 'docatlas'
+project_ids = ['docatlas']
+projects   = ({'id': 'docatlas', 'project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', 'self_hosting_control': True, ...},)
+projects_by_id = {'docatlas': {'id': 'docatlas', 'project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', 'self_hosting_control': True, ...}}
+relative_path = 'adversarial.json'
+required_files = ('corpus.json', 'development.json', 'holdout.json', 'adversarial.json')
+spans      = {}
+
+eval/multilingual_retrieval_quality_protocol.py:217: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+_________ test_matrix_executes_locked_systems_without_changing_default _________
+
+tmp_path = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+
+    def test_matrix_executes_locked_systems_without_changing_default(tmp_path):
+        _write_frozen_corpus(tmp_path)
+    
+        def adapter(system, case, corpus):
+            assert "expected_source_spans" not in case
+            assert "absent_fact" not in case
+            assert "split" not in case
+            assert not corpus.cases
+            retrieved = [] if system["id"] == "open-lexical" or "Unknown fact" in case["query"] else [
+                corpus.projects[0]["documents"][0]["span_id"]
+            ]
+            document = corpus.projects[0]["documents"][0]
+            return {
+                "id": case["id"],
+                "retrieved_source_spans": retrieved,
+                "mode_used": system["requested_mode"],
+                "fallback_used": False,
+                "candidate_counts": {"dense": 5},
+                "dense_contributed": True,
+                "answer_kind": "docs_context",
+                "wrong_project_evidence_accepted": 0,
+                "visible_sources": [] if not retrieved else [{
+                    "project_identity": corpus.projects[0]["project_identity"],
+                    "content_sha256": document["content_sha256"],
+                    "line_start": document["line_start"],
+                    "line_end": document["line_end"],
+                    "span_id": document["span_id"],
+                    "path": document["path"],
+                    "section": document["section"],
+                }],
+            }
+    
+>       report = run_matrix(adapter, tmp_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+adapter    = <function test_matrix_executes_locked_systems_without_changing_default.<locals>.adapter at 0x75b39ea2fb00>
+tmp_path   = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+
+tests/test_multilingual_retrieval_quality_protocol.py:274: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+adapter = <function test_matrix_executes_locked_systems_without_changing_default.<locals>.adapter at 0x75b39ea2fb00>
+data_root = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+splits = None
+
+    def run_matrix(
+        adapter: MatrixAdapter,
+        data_root: Path = DATA_ROOT,
+        *,
+        splits: tuple[str, ...] | None = None,
+    ) -> dict[str, Any]:
+>       frozen_corpus = load_frozen_corpus(data_root)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+adapter    = <function test_matrix_executes_locked_systems_without_changing_default.<locals>.adapter at 0x75b39ea2fb00>
+data_root  = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+splits     = None
+
+eval/multilingual_retrieval_quality_protocol.py:295: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+data_root = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+
+    def load_frozen_corpus(data_root: Path = DATA_ROOT) -> FrozenCorpus:
+        digests_path = data_root / "digests.json"
+        if not digests_path.is_file():
+            raise ValueError("frozen multilingual corpus requires digests.json")
+        digest_lock = json.loads(digests_path.read_text(encoding="utf-8"))
+        if digest_lock.get("schema_version") != "multilingual-retrieval-quality-digests-v1":
+            raise ValueError("unsupported multilingual corpus digest schema")
+        locked_files = dict(digest_lock.get("files") or {})
+        required_files = ("corpus.json", *(f"{split}.json" for split in EXPECTED_SPLITS))
+        if set(locked_files) != set(required_files):
+            raise ValueError("digest lock must bind the corpus and every protocol split")
+        payloads: dict[str, dict[str, Any]] = {}
+        for relative_path in required_files:
+            path = data_root / relative_path
+            if not path.is_file() or file_sha256(path) != locked_files[relative_path]:
+                raise ValueError(f"frozen corpus digest mismatch: {relative_path}")
+            payloads[relative_path] = json.loads(path.read_text(encoding="utf-8"))
+    
+        corpus = payloads["corpus.json"]
+        if corpus.get("schema_version") != "multilingual-retrieval-quality-corpus-v1":
+            raise ValueError("unsupported multilingual corpus schema")
+        projects = tuple(dict(row) for row in corpus.get("projects") or ())
+        project_ids = [str(row.get("id") or "") for row in projects]
+        if not project_ids or any(not value for value in project_ids) or len(project_ids) != len(set(project_ids)):
+            raise ValueError("frozen corpus requires unique project IDs")
+        projects_by_id = {str(row["id"]): row for row in projects}
+        if len(projects) != 1 or not projects[0].get("self_hosting_control"):
+            raise ValueError("frozen corpus requires exactly one self-hosting project")
+    
+        spans: dict[str, str] = {}
+        for project in projects:
+            project_id = str(project["id"])
+            if not str(project.get("project_identity") or "") or not str(project.get("revision") or ""):
+                raise ValueError(f"{project_id}: project identity and immutable revision are required")
+>           if project.get("revision") != validate_protocol_lock()["frozen_artifacts"]["repository_revision"]:
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^
+
+corpus     = {'projects': [{'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c88...sion': '5da60e24cacebf6350411087eb4983597774895a', ...}], 'schema_version': 'multilingual-retrieval-quality-corpus-v1'}
+data_root  = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0')
+digest_lock = {'files': {'adversarial.json': '9aaef7376feb7af4eea0129972fe6ac8a74e611db7cd996dd3eac35d878558f1', 'corpus.json': 'aaf...79a60a1656ddb8690936684b507588bf51839fb5f54a4c45f88ae'}, 'schema_version': 'multilingual-retrieval-quality-digests-v1'}
+digests_path = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0/digests.json')
+locked_files = {'adversarial.json': '9aaef7376feb7af4eea0129972fe6ac8a74e611db7cd996dd3eac35d878558f1', 'corpus.json': 'aaf58cdd5ca89...14448d0da217acc08fd16c6cb775f4734', 'holdout.json': '14d2fcf032079a60a1656ddb8690936684b507588bf51839fb5f54a4c45f88ae'}
+path       = PosixPath('/tmp/pytest-of-viadmin/pytest-5/test_matrix_executes_locked_sy0/adversarial.json')
+payloads   = {'corpus.json': {'projects': [{'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d7...age_pair': 'ru-en', 'project_id': 'docatlas', ...}, ...], 'schema_version': 'multilingual-retrieval-quality-cases-v1'}}
+project    = {'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c8831d7e8ed6c9ffa...'project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...}
+project_id = 'docatlas'
+project_ids = ['docatlas']
+projects   = ({'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c8831d7e8ed6c9ff...roject_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...},)
+projects_by_id = {'docatlas': {'documents': [{'content': 'Frozen DocAtlas documentation.', 'content_sha256': '68dac8d728f6e5ffa8997c883...project_identity': 'git:github.com/Vanilla1999/DocAtlas', 'revision': '5da60e24cacebf6350411087eb4983597774895a', ...}}
+relative_path = 'adversarial.json'
+required_files = ('corpus.json', 'development.json', 'holdout.json', 'adversarial.json')
+spans      = {}
+
+eval/multilingual_retrieval_quality_protocol.py:217: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+___________ test_protocol_freezes_supported_multilingual_mpnet_model ___________
+
+    def test_protocol_freezes_supported_multilingual_mpnet_model():
+>       model = validate_protocol_lock()["model_configuration"]
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+tests/test_multilingual_retrieval_quality_protocol.py:352: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def validate_protocol_lock() -> dict[str, Any]:
+        lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
+        errors: list[str] = []
+        if lock.get("schema_version") != "multilingual-retrieval-quality-protocol-v3":
+            errors.append("schema_version")
+        if tuple(lock.get("language_pairs") or ()) != EXPECTED_LANGUAGE_PAIRS:
+            errors.append("language_pairs")
+        if tuple(lock.get("splits") or ()) != EXPECTED_SPLITS:
+            errors.append("splits")
+        if tuple(row.get("id") for row in lock.get("systems") or ()) != EXPECTED_SYSTEMS:
+            errors.append("systems")
+        corpus = lock.get("corpus_gates") or {}
+        quality = lock.get("quality_gates") or {}
+        activation = lock.get("activation_policy") or {}
+        model = lock.get("model_configuration") or {}
+        artifacts = lock.get("frozen_artifacts") or {}
+        if corpus.get("project_scope") != "self_hosting_only":
+            errors.append("project_scope")
+        if corpus.get("required_project_count") != 1:
+            errors.append("required_project_count")
+        if int(corpus.get("minimum_cases_per_language_pair") or 0) < 5:
+            errors.append("minimum_cases_per_language_pair")
+        if int(corpus.get("minimum_cases_per_language_pair_per_split") or 0) < 1:
+            errors.append("minimum_cases_per_language_pair_per_split")
+        if float(quality.get("recall_at_5_overall_min") or 0) < 0.9:
+            errors.append("recall_at_5_overall_min")
+        if float(quality.get("recall_at_5_per_language_pair_min") or 0) < 0.85:
+            errors.append("recall_at_5_per_language_pair_min")
+        if quality.get("degraded_or_fallback_runs_max") != 0:
+            errors.append("degraded_or_fallback_runs_max")
+        if quality.get("absent_fact_candidate_source_spans_max") != 0:
+            errors.append("absent_fact_candidate_source_spans_max")
+        if quality.get("ru_dense_contribution_required") is not True:
+            errors.append("ru_dense_contribution_required")
+        if activation.get("change_default_retrieval") is not False:
+            errors.append("change_default_retrieval")
+        if activation.get("self_hosting_proves_external_generalization") is not False:
+            errors.append("self_hosting_proves_external_generalization")
+        if model != {
+            "dense_provider": "fastembed",
+            "fastembed_version": "0.8.0",
+            "dense_model": "sentence-transformers/paraphrase-multilingual-mpnet-base-v2",
+            "dense_dimensions": 768,
+            "sparse_model": "prithivida/Splade_PP_en_v1",
+            "fusion": "rrf",
+            "rrf_k": 60,
+            "allow_degraded": False,
+        }:
+            errors.append("model_configuration")
+        elif importlib.metadata.version("fastembed") != model["fastembed_version"]:
+            errors.append("fastembed_version")
+        repository_revision = str(artifacts.get("repository_revision") or "")
+        if len(repository_revision) != 40:
+            errors.append("repository_revision")
+        elif subprocess.run(
+            ["git", "merge-base", "--is-ancestor", repository_revision, "HEAD"],
+            cwd=ROOT,
+            check=False,
+            capture_output=True,
+        ).returncode != 0:
+            errors.append("repository_revision_reachability")
+        digest_manifest = DATA_ROOT / "digests.json"
+        if not digest_manifest.is_file() or artifacts.get("corpus_digest_manifest_sha256") != file_sha256(digest_manifest):
+            errors.append("corpus_digest_manifest_sha256")
+        if artifacts.get("runner_sha256") != file_sha256(Path(__file__)):
+            errors.append("runner_sha256")
+        adapter_path = ROOT / "eval" / "multilingual_retrieval_matrix_adapter.py"
+        if artifacts.get("adapter_sha256") != file_sha256(adapter_path):
+            errors.append("adapter_sha256")
+        if errors:
+>           raise ValueError("invalid multilingual retrieval protocol lock: " + ", ".join(errors))
+E           ValueError: invalid multilingual retrieval protocol lock: fastembed_version
+
+activation = {'change_default_retrieval': False, 'profile_requires_passing_holdout': True, 'self_hosting_proves_external_generalization': False}
+adapter_path = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_matrix_adapter.py')
+artifacts  = {'repository_revision': '5da60e24cacebf6350411087eb4983597774895a', 'corpus_digest_manifest_sha256': 'e7616692e496a8fe...81803e5e264bec68c930d2ec54acede', 'adapter_sha256': 'b15fcc9052aaef5a978dd0f145374d805aff73ba2e6427638fde241bb9e53709'}
+corpus     = {'project_scope': 'self_hosting_only', 'required_project_count': 1, 'minimum_cases_per_language_pair': 5, 'minimum_cases_per_language_pair_per_split': 1, ...}
+digest_manifest = PosixPath('/tmp/opencode/docatlas-stage3-main/eval/multilingual_retrieval_quality/digests.json')
+errors     = ['fastembed_version']
+lock       = {'schema_version': 'multilingual-retrieval-quality-protocol-v3', 'language_pairs': ['en-en', 'ru-en', 'ru-ru'], 'taxon...on', 'constraints', 'location', 'ownership', 'purpose', ...], 'splits': ['development', 'holdout', 'adversarial'], ...}
+model      = {'dense_provider': 'fastembed', 'fastembed_version': '0.8.0', 'dense_model': 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2', 'dense_dimensions': 768, ...}
+quality    = {'recall_at_5_overall_min': 0.9, 'recall_at_5_per_language_pair_min': 0.85, 'improvement_percentage_points_min': 10.0, 'paired_bootstrap_iterations': 10000, ...}
+repository_revision = '5da60e24cacebf6350411087eb4983597774895a'
+
+eval/multilingual_retrieval_quality_protocol.py:128: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_protocol_lock_and_corpus_shape_are_validated
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_corpus_rejects_external_project_evidence
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_passing_candidate_must_beat_baseline_without_fallback
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_lexical_fallback_cannot_count_as_hybrid_success
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_wrong_project_evidence_fails_closed
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_missing_source_provenance_fails_gate
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_retrieved_sources_require_visible_provenance
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_absent_fact_retrieval_is_scored_separately_from_recall
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_missing_ru_dense_contribution_fails_gate
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_every_retrieved_span_requires_visible_provenance
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_frozen_corpus_binds_all_files_and_source_spans
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_matrix_documents_have_unique_identity_for_spans_from_the_same_path
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_matrix_executes_locked_systems_without_changing_default
+FAILED tests/test_multilingual_retrieval_quality_protocol.py::test_protocol_freezes_supported_multilingual_mpnet_model
+14 failed, 5 passed in 0.63s

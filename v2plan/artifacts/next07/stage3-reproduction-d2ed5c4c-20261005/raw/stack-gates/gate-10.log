@@ -1,0 +1,4 @@
+KILLED: normative_code_declaration_guard
+KILLED: active_task33_actionability_contract
+KILLED: github_models_host_turn_limit
+PASS: baseline green; 3 critical mutants killed

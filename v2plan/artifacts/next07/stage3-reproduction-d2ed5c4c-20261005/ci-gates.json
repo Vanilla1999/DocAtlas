@@ -1,0 +1,3868 @@
+[
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1.5 mixed-evidence provenance",
+    "run": 37310499336,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499336",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Direct question validation",
+    "run": 37310499447,
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499447",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2 Product Truth protocol",
+    "run": 37310499263,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499263",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2.1B positive controls",
+    "run": 37310499367,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499367",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2.2B/C execution gate",
+    "run": 37310499284,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499284",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1.4 paraphrase and proofability",
+    "run": 37310499282,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499282",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2.3 Product Truth decision",
+    "run": 37310499274,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499274",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2.1C task pack",
+    "run": 37310499311,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499311",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2 federated task-pack reopening",
+    "run": 37310499390,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499390",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441289,
+    "name": "test (3.12)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441289",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441336,
+    "name": "platform-smoke (macos-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441336",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install cross-platform smoke dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify package and CLI surface",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installed Docs MCP over stdio",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441371,
+    "name": "test (3.11)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441371",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.11",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.11",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441372,
+    "name": "docs-contract",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441372",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify documented CLI and public Docs MCP contracts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441423,
+    "name": "advanced-contract",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441423",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline advanced contract and shared-security tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run recoverable documentation failure gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run recoverable documentation failure mutation gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run hermetic Context7-style project chat gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run Legacy live compatibility report and lineage floor",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Run V2 project-context acceptance gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Upload Project Docs quality reports",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run question surface regression gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer Protocol gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer adversarial/token gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run critical mutation gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer adversarial mutation gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Upload critical mutation gate artifacts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441426,
+    "name": "static-contract",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441426",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify lock and static repository contracts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441438,
+    "name": "platform-smoke (windows-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441438",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install cross-platform smoke dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify package and CLI surface",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installed Docs MCP over stdio",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441446,
+    "name": "test (3.13)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441446",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441449,
+    "name": "installer-smoke",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441449",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Installer smoke tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441532,
+    "name": "docs-impact",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441532",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install DocAtlas",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Report documentation impact",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441633,
+    "name": "installed-mcp-harness",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441633",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build exact reviewed wheel and install evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Exercise real stdio MCP and bounded schema repair",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify evidence attribution, hash chain, and privacy",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764441767,
+    "name": "retrieval-evidence",
+    "status": "in_progress",
+    "conclusion": null,
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764441767",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify frozen retrieval evidence and independent sample",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "pending",
+        "conclusion": null
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "pending",
+        "conclusion": null
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "pending",
+        "conclusion": null
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "CI",
+    "run": 37310499558,
+    "attempt": 1,
+    "job": 111764442673,
+    "name": "p1-harden-branch",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499558/job/111764442673",
+    "steps": []
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P2.2A comparative harness",
+    "run": 37310499335,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499335",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111764440059,
+    "name": "build",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111764440059",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify dispatched release source is on main",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install build \"hatchling<1.27\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run if [ -n \"$RELEASE_TAG\" ]; then",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111764900466,
+    "name": "wheel (3.11)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111764900466",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111764900483,
+    "name": "wheel (3.13)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111764900483",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111764900539,
+    "name": "sdist-and-installer",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111764900539",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run mkdir sdist-wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install --force-reinstall sdist-wheel/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run EXPECTED_VERSION=\"$(python -c 'from docmancer._version import __version__; print(__version__)')\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111764900608,
+    "name": "wheel (3.12)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111764900608",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111766300119,
+    "name": "required-release",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111766300119",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Enforce required release validation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111766349433,
+    "name": "publish",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111766349433",
+    "steps": []
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111766349792,
+    "name": "public-platform-smoke (${{ matrix.os }})",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111766349792",
+    "steps": []
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310499436,
+    "attempt": 1,
+    "job": 111766350601,
+    "name": "publish-official-mcp-registry",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499436/job/111766350601",
+    "steps": []
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1.6 evidence is data",
+    "run": 37310499372,
+    "attempt": 1,
+    "job": 111764445236,
+    "name": "p1-6-adversarial",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499372/job/111764445236",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install DocAtlas evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify hostile documents cannot control the agent boundary",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 Agent Truth closure",
+    "run": 37310499577,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499577",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440004,
+    "name": "p1-stack-advanced-security",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440004",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run production-path contracts",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Run every P1 evidence contract present on this ref",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440278,
+    "name": "p1-stack-platform (windows-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440278",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m compileall -q docmancer eval scripts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440349,
+    "name": "p1-stack-platform (macos-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440349",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m compileall -q docmancer eval scripts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440376,
+    "name": "p1-stack-core (3.11)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440376",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440403,
+    "name": "p1-stack-core (3.12)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440403",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440432,
+    "name": "p1-stack-release-build",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440432",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install build \"hatchling<1.27\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run rm -rf dist",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764440519,
+    "name": "p1-stack-core (3.13)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764440519",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764562753,
+    "name": "p1-stack-release-wheel (3.12)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764562753",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764562782,
+    "name": "p1-stack-release-wheel (3.11)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764562782",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764562834,
+    "name": "p1-stack-release-sdist-installer",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764562834",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run mkdir sdist-wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installer against the exact built wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111764562911,
+    "name": "p1-stack-release-wheel (3.13)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111764562911",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "fix/stage3-fastembed-protocol-pin",
+    "head_sha": "31997db9323c2df8f3f5a18b323dcbfda9328bb1",
+    "workflow": "P1 stack exact validation",
+    "run": 37310499356,
+    "attempt": 1,
+    "job": 111766838346,
+    "name": "p1-stack-exact",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310499356/job/111766838346",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Require every exact-head lane",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Direct question validation",
+    "run": 37310505080,
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505080",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2.2A comparative harness",
+    "run": 37310505116,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505116",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1.4 paraphrase and proofability",
+    "run": 37310504879,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504879",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2.3 Product Truth decision",
+    "run": 37310504938,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504938",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2 Product Truth protocol",
+    "run": 37310504893,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504893",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 Agent Truth closure",
+    "run": 37310504859,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504859",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2 federated task-pack reopening",
+    "run": 37310505019,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505019",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1.6 evidence is data",
+    "run": 37310504917,
+    "attempt": 1,
+    "job": 111764457745,
+    "name": "p1-6-adversarial",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504917/job/111764457745",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install DocAtlas evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify hostile documents cannot control the agent boundary",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1.5 mixed-evidence provenance",
+    "run": 37310504889,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504889",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111764458525,
+    "name": "build",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111764458525",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify dispatched release source is on main",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install build \"hatchling<1.27\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m build",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run if [ -n \"$RELEASE_TAG\" ]; then",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111765113838,
+    "name": "sdist-and-installer",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765113838",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run mkdir sdist-wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install --force-reinstall sdist-wheel/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run EXPECTED_VERSION=\"$(python -c 'from docmancer._version import __version__; print(__version__)')\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111765114019,
+    "name": "wheel (3.13)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114019",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111765114080,
+    "name": "wheel (3.11)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114080",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111765114147,
+    "name": "wheel (3.12)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111765114147",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install dist/*.whl",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run cd \"$(mktemp -d)\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111766346049,
+    "name": "required-release",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766346049",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Enforce required release validation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111766387536,
+    "name": "publish",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766387536",
+    "steps": []
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111766388919,
+    "name": "public-platform-smoke (${{ matrix.os }})",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766388919",
+    "steps": []
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "Release artifact gate and publish",
+    "run": 37310504880,
+    "attempt": 1,
+    "job": 111766389401,
+    "name": "publish-official-mcp-registry",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504880/job/111766389401",
+    "steps": []
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2.1B positive controls",
+    "run": 37310504925,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310504925",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2.1C task pack",
+    "run": 37310505147,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505147",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P2.2B/C execution gate",
+    "run": 37310505037,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505037",
+    "job_details": "not individually inspected"
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764458758,
+    "name": "p1-stack-release-build",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764458758",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install build \"hatchling<1.27\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run rm -rf dist",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459075,
+    "name": "p1-stack-core (3.11)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459075",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459110,
+    "name": "p1-stack-platform (windows-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459110",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m compileall -q docmancer eval scripts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459148,
+    "name": "p1-stack-core (3.12)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459148",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459181,
+    "name": "p1-stack-advanced-security",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459181",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run production-path contracts",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Run every P1 evidence contract present on this ref",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459186,
+    "name": "p1-stack-platform (macos-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459186",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m compileall -q docmancer eval scripts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764459306,
+    "name": "p1-stack-core (3.13)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764459306",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python -m pip install -e \".[dev]\"",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764839926,
+    "name": "p1-stack-release-wheel (3.12)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764839926",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764840090,
+    "name": "p1-stack-release-wheel (3.13)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840090",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764840134,
+    "name": "p1-stack-release-wheel (3.11)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840134",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python scripts/release_gate.py",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111764840187,
+    "name": "p1-stack-release-sdist-installer",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111764840187",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run mkdir sdist-wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installer against the exact built wheel",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "P1 stack exact validation",
+    "run": 37310505044,
+    "attempt": 1,
+    "job": 111767964178,
+    "name": "p1-stack-exact",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505044/job/111767964178",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Require every exact-head lane",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458848,
+    "name": "installed-mcp-harness",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458848",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build exact reviewed wheel and install evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Exercise real stdio MCP and bounded schema repair",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify evidence attribution, hash chain, and privacy",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458873,
+    "name": "retrieval-evidence",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458873",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install evaluator dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify frozen retrieval evidence and independent sample",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458887,
+    "name": "advanced-contract",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458887",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline advanced contract and shared-security tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run recoverable documentation failure gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run recoverable documentation failure mutation gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run hermetic Context7-style project chat gate",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run Legacy live compatibility report and lineage floor",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Run V2 project-context acceptance gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Upload Project Docs quality reports",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run question surface regression gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer Protocol gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer adversarial/token gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run critical mutation gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run Agent Developer adversarial mutation gate",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Upload critical mutation gate artifacts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458925,
+    "name": "test (3.12)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458925",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458971,
+    "name": "test (3.11)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458971",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.11",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.11",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458986,
+    "name": "platform-smoke (macos-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458986",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install cross-platform smoke dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify package and CLI surface",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installed Docs MCP over stdio",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764458999,
+    "name": "static-contract",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764458999",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify lock and static repository contracts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764459015,
+    "name": "docs-contract",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764459015",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify documented CLI and public Docs MCP contracts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764459016,
+    "name": "installer-smoke",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764459016",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Installer smoke tests",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764459080,
+    "name": "docs-impact",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764459080",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install DocAtlas",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Report documentation impact",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764459162,
+    "name": "platform-smoke (windows-latest)",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764459162",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install cross-platform smoke dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify package and CLI surface",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify installed Docs MCP over stdio",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Set up Python 3.12",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764459270,
+    "name": "test (3.13)",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764459270",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install dependencies",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run offline core tests",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Post Set up Python 3.13",
+        "status": "completed",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111764460817,
+    "name": "p1-harden-branch",
+    "status": "completed",
+    "conclusion": "skipped",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111764460817",
+    "steps": []
+  },
+  {
+    "branch": "integration/stage3-fastembed-pr1",
+    "head_sha": "462c769210cdd46c50b035d151d8b7f9d6450391",
+    "workflow": "CI",
+    "run": 37310505012,
+    "attempt": 1,
+    "job": 111768116192,
+    "name": "required-ci",
+    "status": "completed",
+    "conclusion": "failure",
+    "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37310505012/job/111768116192",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "Enforce required CI jobs",
+        "status": "completed",
+        "conclusion": "failure"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+]

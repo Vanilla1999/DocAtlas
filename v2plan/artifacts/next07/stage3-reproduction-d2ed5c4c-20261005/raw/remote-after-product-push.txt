@@ -1,0 +1,5 @@
+bf89ee4a15c76bbbd96a3c65015d01d80d5a92e5	refs/heads/diagnostic/main-gates-d2ed5c4c
+596eeb36b66a474b2b5d246fd6bd834b6dcbb5c6	refs/heads/fix/next07-pr1-output-integrity
+31997db9323c2df8f3f5a18b323dcbfda9328bb1	refs/heads/fix/stage3-fastembed-protocol-pin
+462c769210cdd46c50b035d151d8b7f9d6450391	refs/heads/integration/stage3-fastembed-pr1
+d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c	refs/heads/main
