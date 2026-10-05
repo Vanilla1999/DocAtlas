@@ -179,6 +179,20 @@ def compact_mcp_payload(
     if json_bytes(payload) <= max_bytes:
         return payload
 
+    # Canonical projections bind citations, coordinates and support decisions.
+    # Once finalized, the entire projection is indivisible: terminal transport
+    # must not shorten text or lists while retaining the original source claims.
+    # Keep the existing finite default and explicit caller-supplied byte limit.
+    if payload.get("kind") in {"docs_context", "docs_answer", "patch_context"}:
+        failure = {
+            "status": "failed",
+            "reason_code": "transport_size_limit",
+            "message": "MCP payload exceeded the transport size limit.",
+        }
+        if json_bytes(failure) > max_bytes:
+            raise ValueError("transport limit cannot fit the minimal error payload")
+        return failure
+
     original_bytes = json_bytes(payload)
     compact = deepcopy(payload)
     if include_sections:
