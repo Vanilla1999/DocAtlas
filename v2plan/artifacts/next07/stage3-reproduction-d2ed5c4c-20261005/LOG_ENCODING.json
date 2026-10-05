@@ -1,0 +1,16 @@
+{
+  "method": "Lossless JSON raw_text encoding; decode raw_text to restore original stdout bytes. Original SHA256 recorded in each wrapper.",
+  "paths": {
+    "raw/main-observed-failures.log": "raw/main-observed-failures.log.json",
+    "raw/control-ci-core312.log": "raw/control-ci-core312.log.json",
+    "raw/stack-ci-final-core312.log": "raw/stack-ci-final-core312.log.json",
+    "raw/stack-ci-final-advanced.log": "raw/stack-ci-final-advanced.log.json",
+    "raw/fastembed-before.log": "raw/fastembed-before.log.json",
+    "raw/pr1-ci-attempt2-core312.log": "raw/pr1-ci-attempt2-core312.log.json",
+    "raw/control-ci-advanced.log": "raw/control-ci-advanced.log.json",
+    "raw/pr1-ci-attempt2-advanced.log": "raw/pr1-ci-attempt2-advanced.log.json",
+    "raw/stack-static.log": "raw/stack-static.log.json",
+    "raw/stack-core.log": "raw/stack-core.log.json",
+    "raw/main-core-attempt2.log": "raw/main-core-attempt2.log.json"
+  }
+}

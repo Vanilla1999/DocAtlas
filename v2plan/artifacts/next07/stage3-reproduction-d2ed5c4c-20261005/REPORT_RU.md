@@ -168,6 +168,14 @@ job **111766300119 PASS**. Технического общего допуска 
 ## Evidence и ограничения исполнения
 
 Index: `EVIDENCE_INDEX.json`; remote CI: `ci-gates.json`.
+Часть raw logs опубликована как lossless JSON `raw_text`, чтобы сохранить
+исходные пробелы и одновременно пройти git diff --check. `LOG_ENCODING.json`
+сопоставляет исходные log paths из таблиц/ledger с опубликованными wrappers;
+original SHA256 проверяется после декодирования. Первый research-коммит f8f5aabe
+ошибочно был отправлен после whitespace FAIL из-за продолжения shell после
+ошибки. Это исправлено отдельным publication commit без переписывания истории,
+нормализации stdout или изменения проверенных product SHA. Final aggregate diff
+проверяется повторно. Первоначальный контроль не объявляется PASS.
 `raw/main-source-manifest.json` содержит полный tracked manifest и SHA256;
 runtime/environment manifests связывают actual imports с checkout.
 `raw/main-observed-failures.jsonl` содержит source hashes, fixtures, node IDs,
