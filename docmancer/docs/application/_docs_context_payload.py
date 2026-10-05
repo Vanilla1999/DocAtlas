@@ -12,6 +12,19 @@ def _payload(
     sources: list[dict[str, Any]], *, decision: Any = None,
     query_plan: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if not sources:
+        # Empty selection is a valid outcome, not a successful empty context.
+        # Do not infer that a fact/document does not exist from this result.
+        from .model_visible_projection import project_insufficient
+        payload = project_insufficient(
+            kind="docs_context", missing=["No source context was selected for this request."],
+            recommended_next_action=None,
+        )
+        payload.update(context_available=False, answer_supported=False,
+                       answer_available=False, edit_ready=False,
+                       support_status="insufficient_evidence", sources=[])
+        _refresh_estimate(payload)
+        return payload
     query_plan = query_plan or {}
     plan_queries = {
         str(item.get("query_id") or ""): item
