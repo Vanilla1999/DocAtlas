@@ -1,0 +1,36 @@
+[
+  {
+    "operation": "finish",
+    "body": {
+      "finish": {
+        "status": "answered",
+        "answer": "Yes. A TrellisQueue worker can be a normal `def` function instead of an `async def` function.",
+        "citations": [
+          {
+            "evidence_id": "ev-6f70db18728b4cfd",
+            "quote": "A worker can be a normal `def` or an `async def` function."
+          }
+        ],
+        "missing": "",
+        "question_for_user": ""
+      },
+      "reader_result": {
+        "status": "answered",
+        "answer": "Yes. A TrellisQueue worker can be a normal `def` function instead of an `async def` function.",
+        "citations": [
+          {
+            "evidence_id": "ev-6f70db18728b4cfd",
+            "quote": "A worker can be a normal `def` or an `async def` function."
+          }
+        ],
+        "missing": "",
+        "question_for_user": ""
+      },
+      "reader_metadata": {
+        "model": "openai/gpt-6.1-sol",
+        "host": "general-subagent"
+      }
+    },
+    "time": 1791189709.562196
+  }
+]

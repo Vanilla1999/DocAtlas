@@ -1,0 +1,36 @@
+[
+  {
+    "operation": "finish",
+    "body": {
+      "finish": {
+        "status": "unknown",
+        "answer": "The provided documentation does not specify the retry interval for DeltoraQueue.",
+        "citations": [
+          {
+            "evidence_id": "ev-451d27e8a5e1d238",
+            "quote": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project."
+          }
+        ],
+        "missing": "DeltoraQueue retry interval documentation or its applicable configuration.",
+        "question_for_user": ""
+      },
+      "reader_result": {
+        "status": "unknown",
+        "answer": "The provided documentation does not specify the retry interval for DeltoraQueue.",
+        "citations": [
+          {
+            "evidence_id": "ev-451d27e8a5e1d238",
+            "quote": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project."
+          }
+        ],
+        "missing": "DeltoraQueue retry interval documentation or its applicable configuration.",
+        "question_for_user": ""
+      },
+      "reader_metadata": {
+        "model": "openai/gpt-6.1-sol",
+        "host": "general-subagent"
+      }
+    },
+    "time": 1791189834.6381288
+  }
+]

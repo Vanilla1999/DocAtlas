@@ -1,0 +1,9 @@
+{
+  "case_id": "case-00",
+  "category": "frozen_development_fastapi",
+  "rubric": "Ordinary def and async def are both allowed for the task function. Require a verbatim supporting quote actually delivered. Prior knowledge alone is not success.",
+  "source_hashes": {
+    "docs/en/docs/tutorial/background-tasks.md": "d59a2e7da8f947e53a509efda0acf74dee093799710878dfc7abf09e3e4de89a",
+    "docs/en/docs/tutorial/cors.md": "8ef62d49193d8cce86697211badd2a71e720b3d56cdde6266c516f432c152b76"
+  }
+}

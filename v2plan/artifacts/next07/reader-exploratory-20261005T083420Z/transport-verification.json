@@ -1,0 +1,21 @@
+{
+  "health": {
+    "status": "EXPLORATORY_TRANSPORT_READY",
+    "initial_native_packets": 10,
+    "model_calls": 0,
+    "quality": "NOT_MEASURED"
+  },
+  "unknown_route_status": 404,
+  "initial_native_packets": 10,
+  "audit_clean": 10,
+  "independent_session_routes": 20,
+  "reader_inputs_started": 0,
+  "pre_reads": 0,
+  "native_payload_case_ids_absent": true,
+  "frozen_hashes_unchanged": true,
+  "preexisting_tracked_dirty_patch_unchanged": true,
+  "model_calls": 0,
+  "exit_code": 0,
+  "command": ".venv/bin/python inline transport verification (no input/read/finish)",
+  "python_executable": "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python"
+}

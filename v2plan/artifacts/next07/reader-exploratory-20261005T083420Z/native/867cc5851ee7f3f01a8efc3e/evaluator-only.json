@@ -1,0 +1,8 @@
+{
+  "case_id": "case-04",
+  "category": "two_api_subjects",
+  "rubric": "83 seconds for DeltoraQueue, never 37 from MistralQueue. Preserve source attribution and examine scope of statements.",
+  "source_hashes": {
+    "guide.md": "cf3f310bd183446a7e4c2548dbfc1ef03e8a0778f794571050b0436ec443dc1d"
+  }
+}

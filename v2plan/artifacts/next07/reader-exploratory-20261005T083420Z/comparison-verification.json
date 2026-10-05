@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+    "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/reader-exploratory-20261005T083420Z/verify_comparison.py"
+  ],
+  "exit_code": 0,
+  "frozen_unchanged": true,
+  "reader_exports_id_model_agent_transport_confirmed": 20,
+  "reviewer_export_id_model_confirmed": true,
+  "native_read_snippet_chars": [
+    515,
+    100
+  ],
+  "provider_callcount": "UNKNOWN",
+  "new_model_calls": 0
+}

@@ -1,0 +1,23 @@
+{
+  "seconds": 0.02719769599934807,
+  "expected_paths": [
+    "guide.md"
+  ],
+  "indexed_paths": [
+    "guide.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-5f2884f9e9d069c4870c6d1b8f6a0c6d9cdce734",
+      "source_path": "guide.md",
+      "display_text": "# TrellisQueue\n\nA TrellisQueue worker can be a normal `def` or an `async def` function.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "a1264818e6c23bfdd8032a7493a9be800bf2be8ee7d15f0a4506938756ba20c9",
+  "config_sha256": "957295375cec1945aace4bb157ba55861d0f40d0690abea25b496fd44e82dd3e"
+}

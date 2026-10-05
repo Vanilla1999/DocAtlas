@@ -1,0 +1,26 @@
+[
+  {
+    "operation": "finish",
+    "body": {
+      "finish": {
+        "status": "unknown",
+        "answer": "The provided documentation does not specify the retry interval for TrellisQueue.",
+        "citations": [],
+        "missing": "Documentation specifying the TrellisQueue retry interval.",
+        "question_for_user": ""
+      },
+      "reader_result": {
+        "status": "unknown",
+        "answer": "The provided documentation does not specify the retry interval for TrellisQueue.",
+        "citations": [],
+        "missing": "Documentation specifying the TrellisQueue retry interval.",
+        "question_for_user": ""
+      },
+      "reader_metadata": {
+        "model": "openai/gpt-6.1-sol",
+        "host": "general-subagent"
+      }
+    },
+    "time": 1791189886.281724
+  }
+]

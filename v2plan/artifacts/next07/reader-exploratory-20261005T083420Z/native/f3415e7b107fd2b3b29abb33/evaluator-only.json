@@ -1,0 +1,8 @@
+{
+  "case_id": "case-06",
+  "category": "answer_absent",
+  "rubric": "The documents do not state a retry interval. Unknown/partial; no numeric invention.",
+  "source_hashes": {
+    "guide.md": "9d4601a7ff6279a233ee97c0cfa4e05c8bf149d5814923a0e5fadbdea5ee15a1"
+  }
+}

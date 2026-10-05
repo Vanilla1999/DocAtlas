@@ -1,0 +1,8 @@
+{
+  "case_id": "case-02",
+  "category": "earlier_section",
+  "rubric": "Both normal def and async def are allowed; not necessarily a forward read.",
+  "source_hashes": {
+    "guide.md": "8b9f26a00f3f982df00b4ff65e7c50e426d7e103b9d1bfb8fddbc3bfdbd77e62"
+  }
+}

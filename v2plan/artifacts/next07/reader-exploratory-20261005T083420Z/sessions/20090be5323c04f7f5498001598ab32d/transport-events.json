@@ -1,0 +1,36 @@
+[
+  {
+    "operation": "finish",
+    "body": {
+      "finish": {
+        "status": "answered",
+        "answer": "TrellisQueue raises TaskExpired only when the operation expires, not when it is cancelled.",
+        "citations": [
+          {
+            "evidence_id": "ev-7b45c18ab08f16cf",
+            "quote": "The queue raises TaskExpired. This occurs only when the operation expires. It does not raise TaskExpired when the operation is cancelled."
+          }
+        ],
+        "missing": "",
+        "question_for_user": ""
+      },
+      "reader_result": {
+        "status": "answered",
+        "answer": "TrellisQueue raises TaskExpired only when the operation expires, not when it is cancelled.",
+        "citations": [
+          {
+            "evidence_id": "ev-7b45c18ab08f16cf",
+            "quote": "The queue raises TaskExpired. This occurs only when the operation expires. It does not raise TaskExpired when the operation is cancelled."
+          }
+        ],
+        "missing": "",
+        "question_for_user": ""
+      },
+      "reader_metadata": {
+        "model": "openai/gpt-6.1-sol",
+        "host": "general-subagent"
+      }
+    },
+    "time": 1791189827.7763102
+  }
+]

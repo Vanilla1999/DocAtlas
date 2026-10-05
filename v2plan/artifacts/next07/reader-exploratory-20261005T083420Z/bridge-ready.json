@@ -1,0 +1,10 @@
+{
+  "host": "127.0.0.1",
+  "port": 45583,
+  "pid": 328292,
+  "evidence": "/home/viadmin/StudioProjects/hermes/docmancer/v2plan/artifacts/next07/reader-exploratory-20261005T083420Z",
+  "started_at_unix": 1791189515.3164222,
+  "native_initial_packets": 10,
+  "pre_reads": 0,
+  "published_live": "NOT_RUN"
+}

@@ -1,0 +1,2 @@
+ .../next07/reader-review-20261005/SUMMARY_RU.md    | 90 ++++++++++++++++++++++
+ 1 file changed, 90 insertions(+)

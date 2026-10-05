@@ -1,0 +1,36 @@
+[
+  {
+    "operation": "finish",
+    "body": {
+      "finish": {
+        "status": "needs_user_data",
+        "answer": "The configured retry interval in your production deployment is unknown from the provided documentation. The documented default is 83 seconds, but deployment configuration can override it.",
+        "citations": [
+          {
+            "evidence_id": "ev-25017818ffb1639e",
+            "quote": "The documented default retry interval is 83 seconds. An operator can override it in deployment configuration."
+          }
+        ],
+        "missing": "The effective retry interval setting in your production deployment configuration.",
+        "question_for_user": "Can you provide the retry interval setting from your production deployment configuration, including any overrides?"
+      },
+      "reader_result": {
+        "status": "needs_user_data",
+        "answer": "The configured retry interval in your production deployment is unknown from the provided documentation. The documented default is 83 seconds, but deployment configuration can override it.",
+        "citations": [
+          {
+            "evidence_id": "ev-25017818ffb1639e",
+            "quote": "The documented default retry interval is 83 seconds. An operator can override it in deployment configuration."
+          }
+        ],
+        "missing": "The effective retry interval setting in your production deployment configuration.",
+        "question_for_user": "Can you provide the retry interval setting from your production deployment configuration, including any overrides?"
+      },
+      "reader_metadata": {
+        "model": "openai/gpt-6.1-sol",
+        "host": "general-subagent"
+      }
+    },
+    "time": 1791189888.3723576
+  }
+]

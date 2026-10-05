@@ -1,0 +1,19 @@
+{
+  "review_queue_count": 20,
+  "execution_counts": {
+    "COMPLETE_EXPLORATORY": 20
+  },
+  "citation_error_counts": {},
+  "finish_contract_error_counts": {},
+  "read_attempts": 2,
+  "successful_reads": 2,
+  "host_read_events": 2,
+  "unavailable_read_reasons": {},
+  "initial_context_unchanged_all": true,
+  "frozen_hashes_unchanged": true,
+  "head_unchanged": true,
+  "tracked_dirty_patch_unchanged": true,
+  "provider_calls_usage": "UNKNOWN",
+  "semantic_review": "PENDING_NOT_PERFORMED",
+  "ab_comparison": "NOT_PERFORMED"
+}

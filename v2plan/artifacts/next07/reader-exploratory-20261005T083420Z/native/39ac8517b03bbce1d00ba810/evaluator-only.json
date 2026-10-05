@@ -1,0 +1,8 @@
+{
+  "case_id": "case-03",
+  "category": "already_answered",
+  "rubric": "Answer from initial evidence; an unnecessary read is recorded, not rewarded.",
+  "source_hashes": {
+    "guide.md": "48193495f48fd84c102c063c244f46ab8e7ce08dee1af7e9b200cc7169d9a2f5"
+  }
+}

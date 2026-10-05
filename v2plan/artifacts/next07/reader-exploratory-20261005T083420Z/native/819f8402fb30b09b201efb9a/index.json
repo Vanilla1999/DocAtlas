@@ -1,0 +1,65 @@
+{
+  "seconds": 0.020633297999665956,
+  "expected_paths": [
+    "guide.md"
+  ],
+  "indexed_paths": [
+    "guide.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-da37f3e9b82244d22d9571d01a13039b22358753",
+      "source_path": "guide.md",
+      "display_text": "## Worker functions\n\nA worker can be a normal `def` or an `async def` function.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-f3f165b0fc20ed7b57c3bc1746404a2568eb6d8c",
+      "source_path": "guide.md",
+      "display_text": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n",
+      "line_start": 5,
+      "line_end": 10
+    },
+    {
+      "stable_chunk_id": "child-ca8e40811ccd37885832f8b10dc3cfbc25b8f52a",
+      "source_path": "guide.md",
+      "display_text": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n",
+      "line_start": 11,
+      "line_end": 14
+    },
+    {
+      "stable_chunk_id": "child-2adeadcc08754c2dcce636c666eb06fe5ef4fdb8",
+      "source_path": "guide.md",
+      "display_text": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n",
+      "line_start": 15,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-451aea2f9dc74901fffa5d97d04a60ebc87941c6",
+      "source_path": "guide.md",
+      "display_text": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n",
+      "line_start": 19,
+      "line_end": 22
+    },
+    {
+      "stable_chunk_id": "child-23037fce838e7b2219d01aadc6ff86c91911ce5a",
+      "source_path": "guide.md",
+      "display_text": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n\n",
+      "line_start": 23,
+      "line_end": 25
+    },
+    {
+      "stable_chunk_id": "child-56848e246e4232ad34dbe6fe0f7ec203fa794064",
+      "source_path": "guide.md",
+      "display_text": "## Maintenance\n\nThe maintenance guide describes log rotation, file ownership, release records, and the location of diagnostic files.\n\n",
+      "line_start": 26,
+      "line_end": 29
+    }
+  ],
+  "sqlite_version": "3.50.4",
+  "schema_sha256": "a1264818e6c23bfdd8032a7493a9be800bf2be8ee7d15f0a4506938756ba20c9",
+  "config_sha256": "5ebf8d5df9c47be577cb7a5f7f80b1cffef7ecfa303a1bfb541b730d36362c80"
+}

@@ -1,0 +1,8 @@
+{
+  "case_id": "case-07",
+  "category": "needs_user_data",
+  "rubric": "Actual deployment value is unknown. May cite the documented default, but must request configuration or distinguish it from the actual value.",
+  "source_hashes": {
+    "guide.md": "407ee406969ff0d0ca1f5aacbf00ac4f5dff866e4751d7b8fbae92848322d4b2"
+  }
+}

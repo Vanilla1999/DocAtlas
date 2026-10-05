@@ -1,0 +1,82 @@
+{
+  "130aec1dedb071a3bea058da": {
+    "case": "case-00",
+    "arm": "A"
+  },
+  "0b64f55814d63cc4960806f9": {
+    "case": "case-00",
+    "arm": "B"
+  },
+  "759b08902c8dda6fae62ecbe": {
+    "case": "case-01",
+    "arm": "A"
+  },
+  "de141ec37e55be043d15d181": {
+    "case": "case-01",
+    "arm": "B"
+  },
+  "088b3e0f1b303c7a31fc1bd7": {
+    "case": "case-02",
+    "arm": "A"
+  },
+  "241214d83c731e9f36778033": {
+    "case": "case-02",
+    "arm": "B"
+  },
+  "86fe51219a8089914edc6df8": {
+    "case": "case-03",
+    "arm": "A"
+  },
+  "88df38f7805de918e4ac37e5": {
+    "case": "case-03",
+    "arm": "B"
+  },
+  "0110048930254338d0cc1024": {
+    "case": "case-04",
+    "arm": "A"
+  },
+  "915126c3e1dc012b7ede6658": {
+    "case": "case-04",
+    "arm": "B"
+  },
+  "96141668b3ab6578426f4f48": {
+    "case": "case-05",
+    "arm": "A"
+  },
+  "5002fef816d4b93fd88c76c2": {
+    "case": "case-05",
+    "arm": "B"
+  },
+  "69deeb7d63eb7a2e44279a86": {
+    "case": "case-06",
+    "arm": "A"
+  },
+  "9998077f7317c4095f75f15c": {
+    "case": "case-06",
+    "arm": "B"
+  },
+  "942d2913ab7b9843f05bb76c": {
+    "case": "case-07",
+    "arm": "A"
+  },
+  "094cce336e23c22a8e5ba451": {
+    "case": "case-07",
+    "arm": "B"
+  },
+  "e692eeceec02927d0eab3764": {
+    "case": "case-08",
+    "arm": "A"
+  },
+  "ab172def6172faf11dd8bd43": {
+    "case": "case-08",
+    "arm": "B"
+  },
+  "ed43fbe47e3c7bdc2aafd9dc": {
+    "case": "case-09",
+    "arm": "A"
+  },
+  "0624607f84cae306a40360e6": {
+    "case": "case-09",
+    "arm": "B"
+  }
+}

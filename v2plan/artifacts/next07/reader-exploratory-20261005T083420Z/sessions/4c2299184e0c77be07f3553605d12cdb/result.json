@@ -1,0 +1,45 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "unknown",
+    "answer": "The provided documentation does not specify the retry interval for TrellisQueue.",
+    "citations": [],
+    "missing": "Documentation specifying the TrellisQueue retry interval.",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-222c941fec9aaadf",
+      "path_or_url": "guide.md",
+      "section": "TrellisQueue",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n\n## Maintenance\n\nThe maintenance guide describes log rotation, file ownership, release records, and the location of diagnostic files.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9235d6244a7ea19a07849cdd0069c8d80b328c56795137da4201b6d8cc953a7e",
+      "project_identity": "local:80e7562acc48b7c66ab1ca672083392b6881774471ee6d4bb5b00c90c7cb6338",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 25
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "unknown",
+    "answer": "The provided documentation does not specify the retry interval for TrellisQueue.",
+    "citations": [],
+    "missing": "Documentation specifying the TrellisQueue retry interval.",
+    "question_for_user": ""
+  }
+}

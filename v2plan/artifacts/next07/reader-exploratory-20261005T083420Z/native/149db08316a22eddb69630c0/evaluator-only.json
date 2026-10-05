@@ -1,0 +1,8 @@
+{
+  "case_id": "case-05",
+  "category": "condition_and_negation",
+  "rubric": "Only expiration, not cancellation. Do not quote a positive fragment as unconditional.",
+  "source_hashes": {
+    "guide.md": "18485b236225695cb0f78858327e89890e7ee0f9ccc524d633468cdfebf4b8b7"
+  }
+}

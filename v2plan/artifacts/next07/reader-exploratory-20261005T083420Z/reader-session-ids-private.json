@@ -1,0 +1,102 @@
+[
+  {
+    "case": "case-00",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c67b64ffeBpcpa61ttpusRY"
+  },
+  {
+    "case": "case-00",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c67093ffejeKqVN0mH5v8Pz"
+  },
+  {
+    "case": "case-01",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c67089ffeOSo6uVg1KiCzyC"
+  },
+  {
+    "case": "case-01",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c6704bffekSUGavX4NfSF45"
+  },
+  {
+    "case": "case-02",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c562fbffee8jRYZtXlh3rCi"
+  },
+  {
+    "case": "case-02",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c562faffeGOtD2opVMXUOgb"
+  },
+  {
+    "case": "case-03",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c562f8ffeIeG0QfcaaWdcht"
+  },
+  {
+    "case": "case-03",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c56290ffebKppSV6dM9XpM5"
+  },
+  {
+    "case": "case-04",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c47ee3ffe27BpIV36aoJ2RM"
+  },
+  {
+    "case": "case-04",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c47edbffe7iHtFtBNhSTmgE"
+  },
+  {
+    "case": "case-05",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c47ed9ffec8xa1LqiOzNeB2"
+  },
+  {
+    "case": "case-05",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c47e75ffewxWKTuQG375La6"
+  },
+  {
+    "case": "case-06",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c39296ffeWOHr4VVVbk57dd"
+  },
+  {
+    "case": "case-06",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c39294ffeBcX1fEOpVD9Y5q"
+  },
+  {
+    "case": "case-07",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c3928affeGRWm9gRSXPN9It"
+  },
+  {
+    "case": "case-07",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c3922fffePoaI4KQjSno1q6"
+  },
+  {
+    "case": "case-08",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c2b583ffel4S7xAOH8bnUhW"
+  },
+  {
+    "case": "case-08",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c2b578ffeJKU3JBrOlE0018"
+  },
+  {
+    "case": "case-09",
+    "arm": "B",
+    "reader_session_id": "ses_ef4c2b577ffeYxeZ6WzS4AmioP"
+  },
+  {
+    "case": "case-09",
+    "arm": "A",
+    "reader_session_id": "ses_ef4c2b527ffe2MsayGsJLcUdoQ"
+  }
+]

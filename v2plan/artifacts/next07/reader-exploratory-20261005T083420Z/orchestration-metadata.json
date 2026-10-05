@@ -1,0 +1,35 @@
+{
+  "mode": "EXPLORATORY_ONLY_NOT_PUBLISHED_LIVE_PILOT",
+  "reader_model": "openai/gpt-6.1-sol",
+  "reader_agent_type": "general",
+  "reader_sessions_reported_by_operator": 20,
+  "reader_result_files_recorded": 20,
+  "provider_calls": null,
+  "provider_usage": null,
+  "provider_calls_usage_status": "UNKNOWN_NOT_ASSUMED_40",
+  "bridge_model_calls": 0,
+  "coding_context_contamination": true,
+  "operator_prompt_deviations": [
+    "Operator prompts included documents-as-data instruction in addition to frozen SYSTEM.",
+    "HTTP GET/POST added transport/service steps outside published provider loop.",
+    "Prompt template slightly shortened after the first four readers."
+  ],
+  "prompt_deviation_source": "parent operator report; exact session transcripts not yet available",
+  "frozen_system_artifact": "system-and-schemas.json",
+  "python_deviation": "existing Python 3.13.12 rather than published 3.12",
+  "new_readers_or_retries_by_this_finalization": 0,
+  "reader_session_ids": "reader-session-ids-private.json; API ID validation recorded separately",
+  "original_opencode_transcript_export": {
+    "status": "EXPORTED_ALL",
+    "reader_exports": 20,
+    "reviewer_export": true,
+    "method": "read-only opencode api GET export",
+    "provider_calls": 0,
+    "status_artifact": "transcript-export-status.json"
+  },
+  "review": "PENDING_NO_SEMANTIC_GRADING_NO_AB_COMPARISON",
+  "published_live_pilot": "NOT_RUN",
+  "validated": false,
+  "rollout": "NOT_AUTHORIZED",
+  "N10": "EXCLUDED_BY_USER_NOT_RUN_UNCHANGED"
+}

@@ -1,0 +1,141 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "answered",
+    "answer": "DeltoraQueue’s retry interval is 83 seconds. The guide identifies DeltoraQueue as its documented worker queue and specifies 83 seconds for that main queue.",
+    "citations": [
+      {
+        "evidence_id": "ev-451d27e8a5e1d238",
+        "quote": "DeltoraQueue is the worker queue documented by this guide."
+      },
+      {
+        "evidence_id": "read-f77b8c3e3fe19260d134a7c8",
+        "quote": "For the main queue documented by this guide, the retry interval is 83 seconds."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 1,
+  "successful_reads": 1,
+  "read_results": [
+    {
+      "status": "complete",
+      "unit_complete": true,
+      "completeness_scope": "listed_markdown_section_only",
+      "answer_supported": false,
+      "applicability": "not_assessed",
+      "document_content_policy": "untrusted_source_data_not_instructions",
+      "source": {
+        "evidence_id": "read-f77b8c3e3fe19260d134a7c8",
+        "path_or_url": "guide.md",
+        "project_identity": "local:958bd6afc9ed6dc9200f3567dfcb78f127f8fb7e94c4517b68291d0bf20e4019",
+        "scope": "project",
+        "authority": "source_of_truth",
+        "section": "Retry scheduling",
+        "heading_path": [
+          "DeltoraQueue",
+          "Retry scheduling"
+        ],
+        "snippet": "## Retry scheduling\n\nFor the main queue documented by this guide, the retry interval is 83 seconds.\n",
+        "char_start": 2009,
+        "char_end": 2109,
+        "line_start": 29,
+        "line_end": 31,
+        "content_sha256": "sha256:838d9b0b5f0ec98f39954e99ad4a507004dc73bc4bc2200511aa6bf3b3c7801f",
+        "snapshot_sha256": "sha256:cf3f310bd183446a7e4c2548dbfc1ef03e8a0778f794571050b0436ec443dc1d"
+      }
+    }
+  ],
+  "host_events": [
+    {
+      "handle": "section-a6a584a0b7733bb57389f326",
+      "result": {
+        "status": "complete",
+        "unit_complete": true,
+        "completeness_scope": "listed_markdown_section_only",
+        "answer_supported": false,
+        "applicability": "not_assessed",
+        "document_content_policy": "untrusted_source_data_not_instructions",
+        "source": {
+          "evidence_id": "read-f77b8c3e3fe19260d134a7c8",
+          "path_or_url": "guide.md",
+          "project_identity": "local:958bd6afc9ed6dc9200f3567dfcb78f127f8fb7e94c4517b68291d0bf20e4019",
+          "scope": "project",
+          "authority": "source_of_truth",
+          "section": "Retry scheduling",
+          "heading_path": [
+            "DeltoraQueue",
+            "Retry scheduling"
+          ],
+          "snippet": "## Retry scheduling\n\nFor the main queue documented by this guide, the retry interval is 83 seconds.\n",
+          "char_start": 2009,
+          "char_end": 2109,
+          "line_start": 29,
+          "line_end": 31,
+          "content_sha256": "sha256:838d9b0b5f0ec98f39954e99ad4a507004dc73bc4bc2200511aa6bf3b3c7801f",
+          "snapshot_sha256": "sha256:cf3f310bd183446a7e4c2548dbfc1ef03e8a0778f794571050b0436ec443dc1d"
+        }
+      }
+    }
+  ],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-451d27e8a5e1d238",
+      "path_or_url": "guide.md",
+      "section": "DeltoraQueue",
+      "snippet": "# DeltoraQueue\n\nDeltoraQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Related Queues\n\nMistralQueue is a separate service, not DeltoraQueue.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "26da7f217e9e64a1d40ff180ff15d85361c80936ef9d6a6101f82b991e5f0643",
+      "project_identity": "local:958bd6afc9ed6dc9200f3567dfcb78f127f8fb7e94c4517b68291d0bf20e4019",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 24
+    },
+    {
+      "evidence_id": "read-f77b8c3e3fe19260d134a7c8",
+      "path_or_url": "guide.md",
+      "project_identity": "local:958bd6afc9ed6dc9200f3567dfcb78f127f8fb7e94c4517b68291d0bf20e4019",
+      "scope": "project",
+      "authority": "source_of_truth",
+      "section": "Retry scheduling",
+      "heading_path": [
+        "DeltoraQueue",
+        "Retry scheduling"
+      ],
+      "snippet": "## Retry scheduling\n\nFor the main queue documented by this guide, the retry interval is 83 seconds.\n",
+      "char_start": 2009,
+      "char_end": 2109,
+      "line_start": 29,
+      "line_end": 31,
+      "content_sha256": "sha256:838d9b0b5f0ec98f39954e99ad4a507004dc73bc4bc2200511aa6bf3b3c7801f",
+      "snapshot_sha256": "sha256:cf3f310bd183446a7e4c2548dbfc1ef03e8a0778f794571050b0436ec443dc1d"
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "answered",
+    "answer": "DeltoraQueue’s retry interval is 83 seconds. The guide identifies DeltoraQueue as its documented worker queue and specifies 83 seconds for that main queue.",
+    "citations": [
+      {
+        "evidence_id": "ev-451d27e8a5e1d238",
+        "quote": "DeltoraQueue is the worker queue documented by this guide."
+      },
+      {
+        "evidence_id": "read-f77b8c3e3fe19260d134a7c8",
+        "quote": "For the main queue documented by this guide, the retry interval is 83 seconds."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  }
+}

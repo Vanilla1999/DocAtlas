@@ -1,0 +1,9 @@
+{
+  "argv": [
+    ".venv/bin/python",
+    "v2plan/artifacts/next07/reader-exploratory-20261005T083420Z/compare.py"
+  ],
+  "exit_code": 0,
+  "provider_calls": 0,
+  "read_only_API_exports": 21
+}

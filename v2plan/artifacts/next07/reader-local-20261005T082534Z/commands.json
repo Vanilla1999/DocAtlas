@@ -1,0 +1,69 @@
+[
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "exit_code": 0,
+    "stdout_file": "branch.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_file": "HEAD.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all"
+    ],
+    "exit_code": 0,
+    "stdout_file": "git-status.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--binary",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_file": "dirty.patch"
+  },
+  {
+    "argv": [
+      ".venv/bin/python",
+      "--version"
+    ],
+    "exit_code": 0,
+    "stdout_file": "interpreter.txt"
+  },
+  {
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pip",
+      "freeze"
+    ],
+    "exit_code": 1,
+    "stdout_file": "pip-freeze.txt"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--stat",
+      "1c326db1106998b84bb3b53eeda44c073dddfdff",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stdout_file": "verified-revision-diff.txt"
+  }
+]

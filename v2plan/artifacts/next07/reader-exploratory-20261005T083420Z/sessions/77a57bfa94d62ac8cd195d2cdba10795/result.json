@@ -1,0 +1,68 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "answered",
+    "answer": "Yes. A TrellisQueue worker can be a normal `def` instead of an `async def`.",
+    "citations": [
+      {
+        "evidence_id": "ev-25418fdb2adf2254",
+        "quote": "A worker can be a normal `def` or an `async def` function."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-25418fdb2adf2254",
+      "path_or_url": "reference.md",
+      "section": "TrellisQueue",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Worker functions\n\nA worker can be a normal `def` or an `async def` function.\n\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "849ddb5095839007de0d6487e6caf750d3383056ef963b467994f6edd7667bfb",
+      "project_identity": "local:b2c50b6b9d82a77a2fa8f95b55644d6b678c04ac0b58c8fa7a25a0b871a167be",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 25
+    },
+    {
+      "evidence_id": "ev-4d350c6727e10852",
+      "path_or_url": "guide.md",
+      "section": "TrellisQueue > Maintenance",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n\n## Maintenance\n\nThe maintenance guide describes log rotation, file ownership, release records, and the location of diagnostic files.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "18162e6a7439fe3f9ae07302f29b5950f83978e37163572d97d4bbc5a8b067f2",
+      "project_identity": "local:b2c50b6b9d82a77a2fa8f95b55644d6b678c04ac0b58c8fa7a25a0b871a167be",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 25
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "answered",
+    "answer": "Yes. A TrellisQueue worker can be a normal `def` instead of an `async def`.",
+    "citations": [
+      {
+        "evidence_id": "ev-25418fdb2adf2254",
+        "quote": "A worker can be a normal `def` or an `async def` function."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  }
+}

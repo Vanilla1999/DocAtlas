@@ -1,0 +1,25 @@
+{
+  "head": "f8805a5d696e4ed023fb96f2f7af5f23ccc3e480",
+  "branch": "next07-feasibility-audit",
+  "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+  "executable": "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+  "mode": "EXPLORATORY_GENERAL_SUBAGENT_TRANSPORT_ONLY",
+  "planned_reader_model": "openai/gpt-6.1-sol",
+  "model_calls_by_bridge": 0,
+  "deviations": [
+    "Python 3.13.12 rather than published Python 3.12",
+    "ordinary general coding subagents; coding-context contamination acknowledged",
+    "no API provider adapter/credentials; exploratory operator-mediated transport",
+    "no published test suite or scripted native follow-up reads rerun"
+  ],
+  "published_live_pilot": "NOT_RUN",
+  "validated": false,
+  "N10": "EXCLUDED_BY_USER_NOT_RUN_UNCHANGED",
+  "rollout": "NOT_AUTHORIZED",
+  "arm_contract": {
+    "A": "unchanged native initial packet only",
+    "B": "same packet plus unchanged SectionHost navigation and at most two reads"
+  },
+  "dependency_metadata": "installed distribution names/versions, no credential-bearing URLs",
+  "scope": "10 native initial C packets; 20 independent arm hosts created lazily; no pre-reads"
+}

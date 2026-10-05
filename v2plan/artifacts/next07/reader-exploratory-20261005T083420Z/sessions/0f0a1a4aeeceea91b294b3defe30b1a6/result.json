@@ -1,0 +1,55 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "unknown",
+    "answer": "The provided documentation does not specify the retry interval for DeltoraQueue.",
+    "citations": [
+      {
+        "evidence_id": "ev-451d27e8a5e1d238",
+        "quote": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project."
+      }
+    ],
+    "missing": "DeltoraQueue retry interval documentation or its applicable configuration.",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-451d27e8a5e1d238",
+      "path_or_url": "guide.md",
+      "section": "DeltoraQueue",
+      "snippet": "# DeltoraQueue\n\nDeltoraQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Related Queues\n\nMistralQueue is a separate service, not DeltoraQueue.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "26da7f217e9e64a1d40ff180ff15d85361c80936ef9d6a6101f82b991e5f0643",
+      "project_identity": "local:958bd6afc9ed6dc9200f3567dfcb78f127f8fb7e94c4517b68291d0bf20e4019",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 24
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "unknown",
+    "answer": "The provided documentation does not specify the retry interval for DeltoraQueue.",
+    "citations": [
+      {
+        "evidence_id": "ev-451d27e8a5e1d238",
+        "quote": "This guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project."
+      }
+    ],
+    "missing": "DeltoraQueue retry interval documentation or its applicable configuration.",
+    "question_for_user": ""
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "case_id": "case-01",
+  "category": "later_section",
+  "rubric": "Both normal def and async def are allowed; source quote required.",
+  "source_hashes": {
+    "guide.md": "e3f4a121f1d0017e8f60a52fdc2695b823e8b52422c1411d3cfc5776334e17fe"
+  }
+}

@@ -1,0 +1,338 @@
+[
+  {
+    "session_id": "ses_ef4c67b64ffeBpcpa61ttpusRY",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c67b64ffeBpcpa61ttpusRY/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c67b64ffeBpcpa61ttpusRY.json",
+    "sha256": "258bee67eacbd0d1bea74417e2c8645341e69d5c1281c7ca172f184a0690a515",
+    "bytes": 21674
+  },
+  {
+    "session_id": "ses_ef4c67093ffejeKqVN0mH5v8Pz",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c67093ffejeKqVN0mH5v8Pz/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c67093ffejeKqVN0mH5v8Pz.json",
+    "sha256": "0b65890e53cecd4f74f8ca812c696609b1ef83fcc951b688fe87e8d414d6e1dc",
+    "bytes": 27087
+  },
+  {
+    "session_id": "ses_ef4c67089ffeOSo6uVg1KiCzyC",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c67089ffeOSo6uVg1KiCzyC/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c67089ffeOSo6uVg1KiCzyC.json",
+    "sha256": "e76c0abbfd6a978044dd9bad01f8a802ee748a3343fbd56fdaefdbc8c91ccb90",
+    "bytes": 17500
+  },
+  {
+    "session_id": "ses_ef4c6704bffekSUGavX4NfSF45",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c6704bffekSUGavX4NfSF45/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c6704bffekSUGavX4NfSF45.json",
+    "sha256": "fe54e0f51a9a00b29bf7167665256766a93173bdc511078a86c1a59a4e2c9e1f",
+    "bytes": 15664
+  },
+  {
+    "session_id": "ses_ef4c562fbffee8jRYZtXlh3rCi",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c562fbffee8jRYZtXlh3rCi/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c562fbffee8jRYZtXlh3rCi.json",
+    "sha256": "9ec64937bfd9ea17e0e4f0e0798ef6ab14e1e00d98b0daf0397c9f7f625431a8",
+    "bytes": 16248
+  },
+  {
+    "session_id": "ses_ef4c562faffeGOtD2opVMXUOgb",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c562faffeGOtD2opVMXUOgb/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c562faffeGOtD2opVMXUOgb.json",
+    "sha256": "8314b012cd928a95304a99418c5d26595b0a41afab25f50b59da61e683956bf3",
+    "bytes": 17848
+  },
+  {
+    "session_id": "ses_ef4c562f8ffeIeG0QfcaaWdcht",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c562f8ffeIeG0QfcaaWdcht/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c562f8ffeIeG0QfcaaWdcht.json",
+    "sha256": "11d4321981bc16ab413912d9f63c4d04382ca11e1e4929e32142934037be02d9",
+    "bytes": 11858
+  },
+  {
+    "session_id": "ses_ef4c56290ffebKppSV6dM9XpM5",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c56290ffebKppSV6dM9XpM5/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c56290ffebKppSV6dM9XpM5.json",
+    "sha256": "aa77b4f615e370ccab83daf77ebf5fa5cfcdbfb0ae0ec87a57dd78d449e128b6",
+    "bytes": 11403
+  },
+  {
+    "session_id": "ses_ef4c47ee3ffe27BpIV36aoJ2RM",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c47ee3ffe27BpIV36aoJ2RM/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c47ee3ffe27BpIV36aoJ2RM.json",
+    "sha256": "b522da09a3baa25fa6e87c96cae1b00d0ea4b8ce7dfe4f73972dc9f867937424",
+    "bytes": 13705
+  },
+  {
+    "session_id": "ses_ef4c47edbffe7iHtFtBNhSTmgE",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c47edbffe7iHtFtBNhSTmgE/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c47edbffe7iHtFtBNhSTmgE.json",
+    "sha256": "821d11f24d0f8da232194b971c8520a57507a8c7d456281c60fc6514ed88e6df",
+    "bytes": 18534
+  },
+  {
+    "session_id": "ses_ef4c47ed9ffec8xa1LqiOzNeB2",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c47ed9ffec8xa1LqiOzNeB2/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c47ed9ffec8xa1LqiOzNeB2.json",
+    "sha256": "dace4f2baa9242961763ac3c9f32542f560a6f70e40cfca683f575e35b9668c1",
+    "bytes": 14229
+  },
+  {
+    "session_id": "ses_ef4c47e75ffewxWKTuQG375La6",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c47e75ffewxWKTuQG375La6/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c47e75ffewxWKTuQG375La6.json",
+    "sha256": "1ef2676df63bff263e667185a4d742e25927fb1c64f1b205dafec9ab1276f905",
+    "bytes": 14404
+  },
+  {
+    "session_id": "ses_ef4c39296ffeWOHr4VVVbk57dd",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c39296ffeWOHr4VVVbk57dd/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c39296ffeWOHr4VVVbk57dd.json",
+    "sha256": "d2844f9501cf2682c8e207179466ab05e1b29d1796a2511dc60faead2e915c6a",
+    "bytes": 13557
+  },
+  {
+    "session_id": "ses_ef4c39294ffeBcX1fEOpVD9Y5q",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c39294ffeBcX1fEOpVD9Y5q/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c39294ffeBcX1fEOpVD9Y5q.json",
+    "sha256": "20d5b3080d261826f44b603f4ba7b2d426462587b08969ed76482e491348aa2d",
+    "bytes": 14762
+  },
+  {
+    "session_id": "ses_ef4c3928affeGRWm9gRSXPN9It",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c3928affeGRWm9gRSXPN9It/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c3928affeGRWm9gRSXPN9It.json",
+    "sha256": "2832189f1e190015a50b5b21ae4efc09bfe0f654855f82345ca5adddc9aca5e4",
+    "bytes": 15114
+  },
+  {
+    "session_id": "ses_ef4c3922fffePoaI4KQjSno1q6",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c3922fffePoaI4KQjSno1q6/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c3922fffePoaI4KQjSno1q6.json",
+    "sha256": "85423c153945b09a171c0939cf15d693f94cc85b2f4798f87a829b64a3634dd9",
+    "bytes": 13889
+  },
+  {
+    "session_id": "ses_ef4c2b583ffel4S7xAOH8bnUhW",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c2b583ffel4S7xAOH8bnUhW/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c2b583ffel4S7xAOH8bnUhW.json",
+    "sha256": "c8e9d3c1e195afeb78279243349807e826b5dca4998cf33dd327d97a19f00ad2",
+    "bytes": 13189
+  },
+  {
+    "session_id": "ses_ef4c2b578ffeJKU3JBrOlE0018",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c2b578ffeJKU3JBrOlE0018/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c2b578ffeJKU3JBrOlE0018.json",
+    "sha256": "4f9d50ff0e781b5890b0a13770a24d7eef14b2127ae07510d8dfcabe10a2de85",
+    "bytes": 15036
+  },
+  {
+    "session_id": "ses_ef4c2b577ffeYxeZ6WzS4AmioP",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c2b577ffeYxeZ6WzS4AmioP/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c2b577ffeYxeZ6WzS4AmioP.json",
+    "sha256": "0fa3c6b6b3913449e04f31fc2f1eca8e09129c3b84a32b543fec9ece51c2e628",
+    "bytes": 18390
+  },
+  {
+    "session_id": "ses_ef4c2b527ffe2MsayGsJLcUdoQ",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4c2b527ffe2MsayGsJLcUdoQ/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4c2b527ffe2MsayGsJLcUdoQ.json",
+    "sha256": "5c66c74660d16b49d27c0e883c7cae0bee2f7e7ee885ef5b8fa6fe746751f4b7",
+    "bytes": 16439
+  },
+  {
+    "session_id": "ses_ef4bf8501ffe2SmpVI7xlSVaKH",
+    "argv": [
+      "opencode",
+      "api",
+      "get",
+      "/api/experimental/session/ses_ef4bf8501ffe2SmpVI7xlSVaKH/export"
+    ],
+    "method": "GET",
+    "provider_calls": 0,
+    "exit_code": 0,
+    "status": "EXPORTED_ID_CONFIRMED",
+    "artifact": "transcripts/ses_ef4bf8501ffe2SmpVI7xlSVaKH.json",
+    "sha256": "951000a48a47129f62b7dfc3d2fb055f00055ae623769810a08bb5865bd6f3fa",
+    "bytes": 159972
+  }
+]

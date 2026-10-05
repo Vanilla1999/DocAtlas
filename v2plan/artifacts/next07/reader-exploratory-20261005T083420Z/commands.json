@@ -1,0 +1,71 @@
+[
+  {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "head.txt",
+    "stderr": "head.txt.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "branch",
+      "--show-current"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "branch.txt",
+    "stderr": "branch.txt.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "-uall"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "dirty-status.txt",
+    "stderr": "dirty-status.txt.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "diff",
+      "--binary",
+      "HEAD"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "dirty.patch",
+    "stderr": "dirty.patch.stderr"
+  },
+  {
+    "argv": [
+      "git",
+      "ls-files",
+      "--others",
+      "--exclude-standard",
+      "-z"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "untracked-paths.raw",
+    "stderr": "untracked-paths.raw.stderr"
+  },
+  {
+    "argv": [
+      "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+      "--version"
+    ],
+    "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+    "exit_code": 0,
+    "stdout": "interpreter.txt",
+    "stderr": "interpreter.txt.stderr"
+  }
+]

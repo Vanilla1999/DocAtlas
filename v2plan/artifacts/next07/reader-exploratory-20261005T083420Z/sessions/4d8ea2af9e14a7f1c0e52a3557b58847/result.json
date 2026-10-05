@@ -1,0 +1,55 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "needs_user_data",
+    "answer": "The configured retry interval in your production deployment is unknown from the provided documentation. The documented default is 83 seconds, but deployment configuration can override it.",
+    "citations": [
+      {
+        "evidence_id": "ev-25017818ffb1639e",
+        "quote": "The documented default retry interval is 83 seconds. An operator can override it in deployment configuration."
+      }
+    ],
+    "missing": "The effective retry interval setting in your production deployment configuration.",
+    "question_for_user": "Can you provide the production deployment configuration that sets or overrides the TrellisQueue retry interval?"
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-25017818ffb1639e",
+      "path_or_url": "guide.md",
+      "section": "TrellisQueue",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Defaults\n\nThe documented default retry interval is 83 seconds. An operator can override it in deployment configuration.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "b3147c07e85daa63164c72c88d6fb3e8d093efcc2f13e0fd5350d1545adffe50",
+      "project_identity": "local:230527e65cdcf5a82162c1e9f359affa3d93542a4efa7060d7cdd92fdb786448",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 23
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "needs_user_data",
+    "answer": "The configured retry interval in your production deployment is unknown from the provided documentation. The documented default is 83 seconds, but deployment configuration can override it.",
+    "citations": [
+      {
+        "evidence_id": "ev-25017818ffb1639e",
+        "quote": "The documented default retry interval is 83 seconds. An operator can override it in deployment configuration."
+      }
+    ],
+    "missing": "The effective retry interval setting in your production deployment configuration.",
+    "question_for_user": "Can you provide the production deployment configuration that sets or overrides the TrellisQueue retry interval?"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "v2plan/NEXT_07_READER_NAVIGATION_TEST_RU.md": true,
+  "v2plan/next07_reader_experiment/__init__.py": true,
+  "v2plan/next07_reader_experiment/cases.py": true,
+  "v2plan/test_next07_reader_experiment.py": true,
+  "v2plan/test_next07_reader_review.py": true,
+  "v2plan/NEXT_07_READER_REVIEW_AND_RUN_RU.md": true,
+  "v2plan/next07_reader_experiment/host.py": true,
+  "v2plan/next07_reader_experiment/run.py": true,
+  "v2plan/next07_reader_experiment/AGENTS.md": true,
+  "v2plan/next07_reader_experiment/model.py": true,
+  "v2plan/artifacts/next07/reader-review-20261005/REVIEW_RU.md": true
+}

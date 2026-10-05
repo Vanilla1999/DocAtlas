@@ -1,0 +1,10 @@
+{
+  "operation": "os.kill",
+  "pid": 328292,
+  "signal": "SIGTERM",
+  "signal_number": 15,
+  "exit_code": 0,
+  "unix_time": 1791190099.8423297,
+  "postflight_expected": "postflight-hashes.json",
+  "bridge_exit_expected": "bridge-exit.json"
+}

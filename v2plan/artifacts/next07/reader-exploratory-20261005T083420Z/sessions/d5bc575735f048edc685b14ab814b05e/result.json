@@ -1,0 +1,55 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "answered",
+    "answer": "Yes. A TrellisQueue worker can be a normal `def` function instead of an `async def` function.",
+    "citations": [
+      {
+        "evidence_id": "ev-e77d30c4eefc8fc3",
+        "quote": "A worker can be a normal `def` or an `async def` function."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-e77d30c4eefc8fc3",
+      "path_or_url": "guide.md",
+      "section": "TrellisQueue",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Worker functions\n\nA worker can be a normal `def` or an `async def` function.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "c09b77128c2017f93429c4f374e36691eb8484626bd57180fc7543f94a010212",
+      "project_identity": "local:330700b21d4fb1fb5051569b40241aa0162bfee76a5d46d1afd5ea45b4600d1e",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 24
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "answered",
+    "answer": "Yes. A TrellisQueue worker can be a normal `def` function instead of an `async def` function.",
+    "citations": [
+      {
+        "evidence_id": "ev-e77d30c4eefc8fc3",
+        "quote": "A worker can be a normal `def` or an `async def` function."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  }
+}

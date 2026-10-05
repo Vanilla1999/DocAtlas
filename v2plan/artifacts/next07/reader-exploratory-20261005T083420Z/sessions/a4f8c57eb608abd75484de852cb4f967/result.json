@@ -1,0 +1,55 @@
+{
+  "execution": "COMPLETE_EXPLORATORY",
+  "finish": {
+    "status": "answered",
+    "answer": "TrellisQueue raises TaskExpired only when the operation expires, not when it is cancelled.",
+    "citations": [
+      {
+        "evidence_id": "ev-7b45c18ab08f16cf",
+        "quote": "The queue raises TaskExpired. This occurs only when the operation expires. It does not raise TaskExpired when the operation is cancelled."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  },
+  "quality": "NOT_GRADED_REVIEW_PENDING",
+  "exploratory_only": true,
+  "read_attempts": 0,
+  "successful_reads": 0,
+  "read_results": [],
+  "host_events": [],
+  "visible_evidence": [
+    {
+      "evidence_id": "ev-7b45c18ab08f16cf",
+      "path_or_url": "guide.md",
+      "section": "TrellisQueue > Expiration",
+      "snippet": "# TrellisQueue\n\nTrellisQueue is the worker queue documented by this guide.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\nThis guide describes installation layout and maintenance of the worker service. Configuration files belong to the local project. Operators should keep the configuration and the source documentation under version control.\n\n## Expiration\n\nThe queue raises TaskExpired. This occurs only when the operation expires. It does not raise TaskExpired when the operation is cancelled.\n",
+      "version_binding": "unversioned",
+      "content_sha256": "aa7426c5743b22ee52c7eb16b284e298e6fd5956e8b4efecfb949decfe818911",
+      "project_identity": "local:84f24dba7a44b1ca42bbd1ac1e4d943cf42a82283f68e71aa174b5487391b5e7",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 1,
+      "line_end": 23
+    }
+  ],
+  "initial_context_unchanged": true,
+  "citation_errors": [],
+  "finish_contract_errors": [],
+  "reader_metadata": {
+    "model": "openai/gpt-6.1-sol",
+    "host": "general-subagent"
+  },
+  "reader_result": {
+    "status": "answered",
+    "answer": "TrellisQueue raises TaskExpired only when the operation expires, not when it is cancelled.",
+    "citations": [
+      {
+        "evidence_id": "ev-7b45c18ab08f16cf",
+        "quote": "The queue raises TaskExpired. This occurs only when the operation expires. It does not raise TaskExpired when the operation is cancelled."
+      }
+    ],
+    "missing": "",
+    "question_for_user": ""
+  }
+}

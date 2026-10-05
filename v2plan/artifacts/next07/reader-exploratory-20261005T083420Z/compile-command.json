@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python",
+    "-m",
+    "py_compile",
+    "v2plan/artifacts/next07/reader-exploratory-20261005T083420Z/bridge.py"
+  ],
+  "exit_code": 0
+}

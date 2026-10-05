@@ -1,0 +1,7 @@
+{
+  "command": "DOCATLAS_OFFLINE=1 .venv/bin/python v2plan/artifacts/next07/reader-exploratory-20261005T083420Z/bridge.py > v2plan/artifacts/next07/reader-exploratory-20261005T083420Z/bridge.log 2>&1",
+  "cwd": "/home/viadmin/StudioProjects/hermes/docmancer",
+  "background_shell_id": "sh_10b36e99e001NAwMPfsAe13J4N",
+  "process_exit_code": "RUNNING: bridge-exit.json will record final code",
+  "model_calls": 0
+}
