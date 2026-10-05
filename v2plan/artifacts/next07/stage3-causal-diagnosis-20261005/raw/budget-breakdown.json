@@ -1,0 +1,116 @@
+[
+  {
+    "path": "docs/diverse.md",
+    "bytes": 1013,
+    "bytes_div4": 254,
+    "codec": 268,
+    "admission": 268,
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "missing_query_ids": [
+        "query-original",
+        "query-lookup-1"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-855cd1f960b51f44",
+          "path_or_url": "docs/diverse.md",
+          "section": "Architecture",
+          "snippet": "Indigo cobalt.",
+          "version_binding": "unversioned",
+          "content_sha256": "371bc7f4fe6e4d70b536b6d4e53efbc53642e347ad8237fdad92bad8a7a7ff5a",
+          "project_identity": "git:example/project",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": null,
+          "line_end": null
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 254
+    },
+    "invalid_empty_snippet_lower_bound": 264
+  },
+  {
+    "path": "docs/single.md",
+    "bytes": 1013,
+    "bytes_div4": 254,
+    "codec": 263,
+    "admission": 263,
+    "payload": {
+      "status": "ok",
+      "kind": "docs_context",
+      "context_status": "ready",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "support_status": "retrieval_only",
+      "answer_policy": "cite_only",
+      "coverage_policy": "retrieval_attribution_only",
+      "query_coverage": "partial",
+      "retrieval_coverage": "partial",
+      "facet_coverage": "unverified",
+      "covered_query_ids": [
+        "query-lookup-1"
+      ],
+      "missing_query_ids": [
+        "query-original",
+        "query-lookup-2",
+        "query-lookup-3"
+      ],
+      "missing_facets": [],
+      "facets": [],
+      "sources": [
+        {
+          "evidence_id": "ev-c84c78e772979eb3",
+          "path_or_url": "docs/single.md",
+          "section": "Purpose",
+          "snippet": "Amber copper silver.",
+          "version_binding": "unversioned",
+          "content_sha256": "85b0d932e7fa0752f89f05502095654a8e5abb12446e4f1ff86616de54ef11ca",
+          "project_identity": "git:example/project",
+          "authority": "source_of_truth",
+          "scope": "project",
+          "line_start": null,
+          "line_end": null
+        }
+      ],
+      "context_quality": {
+        "status": "unverified",
+        "reasons": [
+          "coverage_unverified"
+        ]
+      },
+      "read_next": [],
+      "edit_ready": false,
+      "investigation_allowed": true,
+      "estimated_tokens": 254
+    },
+    "invalid_empty_snippet_lower_bound": 259
+  }
+]

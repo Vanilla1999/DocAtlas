@@ -1,0 +1,159 @@
+{
+  "candidate_head": "264694706ff3c521abaf616f366db02a014362ea",
+  "complete_causal_classification": "NOT_DONE",
+  "rows": [
+    {
+      "node_id": "tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip]",
+      "known_result": "FAIL",
+      "evidence_basis": "previous_verified_native_failure",
+      "group": "SHORT_COMPLETE_SOURCE_EXPECTATION",
+      "established_transition": "context_windows._projection_limits:27-37",
+      "limitations": "672-char source preserved under 704 cap; saved snapshot validates; source-exclusion expectation unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "WITNESS_VARIANT_BUDGET_AFTER_SELECTION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:528",
+      "limitations": "Exact variant rejection proven; prior selection ordering repair unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_direct_docatlas_questions_15.py::test_direct_docatlas_questions_15_visible_context_covers_all_required_facts",
+      "known_result": "FAIL",
+      "evidence_basis": "previous_verified_native_failure",
+      "group": "SEPARATE_FROZEN_SIDECAR_IDENTITY",
+      "established_transition": "tests.docs.test_direct_docatlas_questions_15._assert_direct_15_sidecar:45",
+      "limitations": "Prior verified evidence reused; owner decision remains required",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "WITNESS_VARIANT_BUDGET_AFTER_SELECTION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:528",
+      "limitations": "Exact variant rejection proven; prior selection ordering repair unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "WITNESS_VARIANT_BUDGET_AFTER_SELECTION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:528",
+      "limitations": "Exact variant rejection proven; prior selection ordering repair unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "WITNESS_VARIANT_BUDGET_AFTER_SELECTION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:528",
+      "limitations": "Exact variant rejection proven; prior selection ordering repair unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_project_answer_contract_v3.py::test_v3_does_not_reclassify_frozen_v2_config_questions",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "FROZEN_HASH_VS_FAIL_CLOSED_METADATA",
+      "established_transition": "project_answer_contract.build_project_answer_contract:356-363",
+      "limitations": "Both old hashes reproduced by excluding safety metadata in a detached dictionary; no contract change authorized",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "OPTIONAL_CONDITIONAL_PROBE_EXPECTATION",
+      "established_transition": "documentation_query_plan._subject_relation_groups:360-378",
+      "limitations": "Optional private query added; mandatory/public lists unchanged",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "WITNESS_VARIANT_BUDGET_AFTER_SELECTION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:528",
+      "limitations": "Exact variant rejection proven; prior selection ordering repair unresolved",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "DTO_CODEC_BUDGET",
+      "established_transition": "model_visible_projection_helpers.docs_context_budget_tokens -> _docs_context_projection_core.project_docs_context:528",
+      "limitations": "Size cause proven; safe representation fix unproven",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-2]",
+      "known_result": "FAIL",
+      "evidence_basis": "previous_verified_native_failure",
+      "group": "DTO_CODEC_BUDGET",
+      "established_transition": "model_visible_projection_helpers.docs_context_budget_tokens -> _docs_context_projection_core.project_docs_context:528",
+      "limitations": "Size cause proven; safe representation fix unproven",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-1]",
+      "known_result": "FAIL",
+      "evidence_basis": "previous_verified_native_failure",
+      "group": "DTO_CODEC_BUDGET",
+      "established_transition": "model_visible_projection_helpers.docs_context_budget_tokens -> _docs_context_projection_core.project_docs_context:528",
+      "limitations": "Size cause proven; safe representation fix unproven",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[True-256-2]",
+      "known_result": "FAIL",
+      "evidence_basis": "previous_verified_native_failure",
+      "group": "DTO_CODEC_BUDGET",
+      "established_transition": "model_visible_projection_helpers.docs_context_budget_tokens -> _docs_context_projection_core.project_docs_context:528",
+      "limitations": "Size cause proven; safe representation fix unproven",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_retrieved_safe_context_survives_unknown_question_class[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\\nin a composable way]",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "FOCUS_PRONOUN_AND_PREFIT_REJECTION",
+      "established_transition": "need_query_schedule._focal_texts:35; schedule_need_queries; project_doc_ranking.rerank_project_doc_chunks:685",
+      "limitations": "First scheduler anomaly and deletion proven; a focus-only fix has not been tested",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_lookup_identical_to_original_is_not_a_new_requirement[What kind of interfaces does Pebble create, and how is it intended to compose them?-command line interfaces\\nin a composable way]",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "FOCUS_PRONOUN_AND_PREFIT_REJECTION",
+      "established_transition": "need_query_schedule._focal_texts:35; schedule_need_queries; project_doc_ranking.rerank_project_doc_chunks:685",
+      "limitations": "Same failing base query; not a separately proven duplicate-lookup bug",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/test_docs_service_part02.py::test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "EXACT_ANCHOR_AND_ADMISSION_ONLY_IDS",
+      "established_transition": "documentation_query_plan.build_documentation_query_plan; _project_docs_service_part03._qualify_candidate_lookups:115-132",
+      "limitations": "Internal trace expectation mismatch; does not alone prove public attribution leak",
+      "product_fix": "NOT_ATTEMPTED"
+    },
+    {
+      "node_id": "tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms",
+      "known_result": "FAIL",
+      "evidence_basis": "native_failure_reproduced_in_this_diagnosis",
+      "group": "PARTIAL_SCOPE_AUTHORITY_DUPLICATE_ADMISSION",
+      "established_transition": "_docs_context_projection_core.project_docs_context:560-580",
+      "limitations": "Skip of authority duplicate guard proven; no foreign scope leak; policy fix unapproved",
+      "product_fix": "NOT_ATTEMPTED"
+    }
+  ]
+}

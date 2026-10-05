@@ -1,0 +1,15 @@
+{
+  "source_artifact": "/tmp/opencode/docatlas-stage3-audit/v2plan/artifacts/next07/stage3-v2-identity-20261005/raw/projection-returns.jsonl",
+  "node": "tests/docs/test_component_coverage.py::test_visible_component_novelty_follows_exact_constraints_before_public_queries[projection_clip]",
+  "source_characters": 672,
+  "visible_characters": 672,
+  "exact_source_preserved": true,
+  "projection_limits": [
+    160,
+    320,
+    520,
+    672
+  ],
+  "tokens": 598,
+  "validation_errors": []
+}

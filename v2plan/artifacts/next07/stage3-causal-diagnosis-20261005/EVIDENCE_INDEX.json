@@ -1,0 +1,98 @@
+{
+  "candidate_head": "264694706ff3c521abaf616f366db02a014362ea",
+  "research_base": "202e8df46fb4a0731c436c39ae4cb72aa04fc662",
+  "product_changes": false,
+  "push_merge": "NOT_DONE",
+  "complete_causal_classification": "NOT_DONE",
+  "prior_evidence_hashes_verified": 89,
+  "unique_native_tests": 25,
+  "native_fail": 12,
+  "native_pass": 13,
+  "known_failures_reused": 5,
+  "observer_limitations": "Read-only sys.setprofile; no replacement of return values or fixtures. Observer field/function capture expanded during diagnosis. Final observer is archived; first runs captured a subset. Nested wrappers/generator yields are not independent retrieval executions. Fact summaries use first nonempty 800-token core attempt, not recovery-budget trials.",
+  "encodings": {
+    "raw/contracts.jsonl.gz": {
+      "decoded_sha256": "b551f33eebb16454ddb986f7dda3a911e329ce246e2ac1aa50798de53062d624",
+      "decoded_bytes": 21060,
+      "encoding": "gzip of UTF-8 JSONL"
+    },
+    "raw/facts.jsonl.gz": {
+      "decoded_sha256": "a4fa6ef88cd118b9b434eebfb15edac121bf131f7a2d97361467e411b9dd577e",
+      "decoded_bytes": 96519055,
+      "encoding": "gzip of UTF-8 JSONL"
+    },
+    "raw/neutral.jsonl.gz": {
+      "decoded_sha256": "d5d003514898268e8141617d58e6f6d6e1bb88989043276223eec167c4e3c0ca",
+      "decoded_bytes": 6984387,
+      "encoding": "gzip of UTF-8 JSONL"
+    },
+    "raw/owners.jsonl.gz": {
+      "decoded_sha256": "6132a87014bf4bc33b11def009b263e77e3156e457da1c7e7e825434ef332db6",
+      "decoded_bytes": 10425161,
+      "encoding": "gzip of UTF-8 JSONL"
+    },
+    "raw/schedule-authority.jsonl.gz": {
+      "decoded_sha256": "525ce6e4c00d8427a8655def34b86365ea27de2b3a18464d484396ce517e1066",
+      "decoded_bytes": 4875398,
+      "encoding": "gzip of UTF-8 JSONL"
+    },
+    "raw/owners.log.json": {
+      "encoding": "JSON raw_text UTF-8 wrapper",
+      "decoded_sha256": "12d9c21f1c59e91f271f90b9e7e857c20cd855ec52e7c2a1dd82d1be5858fd40",
+      "decoded_bytes": 2066
+    },
+    "raw/schedule-authority.log.json": {
+      "encoding": "JSON raw_text UTF-8 wrapper",
+      "decoded_sha256": "6f75731003f196f27173d7a4ac86f58f1b04cf0bab9be5ae648847052ff3eaa8",
+      "decoded_bytes": 6871
+    },
+    "raw/neutral.log.json": {
+      "encoding": "JSON raw_text UTF-8 wrapper",
+      "decoded_sha256": "49e1c6269c4bf3c7ffac91937589c00b0343ff48fe38387c1a6564201a5678ba",
+      "decoded_bytes": 3430
+    },
+    "raw/contracts.log.json": {
+      "encoding": "JSON raw_text UTF-8 wrapper",
+      "decoded_sha256": "253ed17d4f54102579f1cf6256d959dcfb509d62e6d41a9505550214e1b977df",
+      "decoded_bytes": 7014
+    },
+    "raw/facts.log.json": {
+      "encoding": "JSON raw_text UTF-8 wrapper",
+      "decoded_sha256": "05eb9a851c85df510a12953e1863f55bbf21c613f6730045270e46a8f697c9ab",
+      "decoded_bytes": 19810
+    }
+  },
+  "source_manifest": {
+    "docmancer/docs/application/need_query_schedule.py": "6aa9c7b22ec4d78bd40c8cca26734f2b2f6513da621b5283b01ef2b6b5100af5",
+    "docmancer/docs/domain/project_doc_ranking.py": "f01591f4597083b8a667f7888b3c1128f23e25d689dbeeca84cb70a1172ac36b",
+    "docmancer/docs/application/_docs_context_projection_core.py": "3fabbd99b47bb964d253dea96f7ada5d88001e554d1426d4873ee8cfa683103d",
+    "docmancer/docs/application/_docs_context_payload.py": "ed9950c5f99a8dbc19e1f743987b50735a8c158cf7459462614e9dfb833e96d8",
+    "docmancer/docs/application/model_visible_projection_helpers.py": "fbe2530070c023d51d7aea27513c58aa469a52a48289e397651562489e8066f3",
+    "docmancer/docs/domain/project_answer_contract.py": "dbff39c4fabd592210f28b0da926a6d54135e350ac50078251f23b449952ca33",
+    "docmancer/docs/domain/documentation_query_plan.py": "97cde726a53ac6faa6fb27ec67cb780fa0345be541dd832a2d18ed3d5c77588b",
+    "docmancer/docs/application/_project_docs_service_part03.py": "e1c5d7f74599e5b96c9c1f6fa3d744b88fa16f308f74e028a80c2dfe5497a646",
+    "docmancer/docs/domain/context_windows.py": "9f9f999d83f844ec350add8cf2649311919247f4a6db9b5851c7c280cd8956e0"
+  },
+  "sha256": {
+    "FAILURE_CLASSIFICATION.json": "3d311ee1ca5ed04d36b00ab3790fe217be839fb008a2742a553a59ccbf12e73e",
+    "REPORT_RU.md": "45c60ec161d8818ea3a163d0ed2a99299dbb4c59a75790cd31189b906396db25",
+    "RUNS.json": "237ce1baa18a4996b0114699aa3326d1c3150f8b15c9793e79f3ebc926710673",
+    "raw/budget-breakdown.json": "0a0ac38490257239e647cf54f32d852de3c3bf814038a49f27852b56cf3f51eb",
+    "raw/contract-plan.json": "66c90327ba3bcce674a4a14eb462bfbc7f5ba0adeb72f5a7e89e063b663613bf",
+    "raw/contracts.jsonl.gz": "49487ba7e803b1262461fc0f2d58445e2ef66e34e5576cf2903309033f4f751c",
+    "raw/contracts.log.json": "8994e8a4299a43d61e2a74789c4136ad784f851696fe3965cd278be94ccc1edb",
+    "raw/diagnostic_observer.py": "f489b346dab1cb460fd7f4b9a16d8688a2cdef49de06a14565771a0cc7b1d093",
+    "raw/fact-variant-transitions.json": "e5cb62608e327dcb041473f1622ae39f660dbc8f6c42c90cd838aec1b99ed60e",
+    "raw/fact-witness-transitions.json": "2816ba6b5b6698fc30e461f3f2243b2e44e894a3f9246a141e2c1ff08649cc99",
+    "raw/facts.jsonl.gz": "fb448dd08abd353dd89a3745b605f4ae1493f4dc166c2c2c80897a90aa075e94",
+    "raw/facts.log.json": "5cf8ce1cd70293e8f16d5199c6d282ef887a2fee98ac42bb0e28685191c6082a",
+    "raw/neutral.jsonl.gz": "74cd75a03c8fdcb835b8b856b6df45b337eaacc0d87aa5682e4f6321ca1e9e19",
+    "raw/neutral.log.json": "b186c36a18e4b71a2080396e31042b901c262a064de5050200295ad876e46839",
+    "raw/owners.jsonl.gz": "a605e9e897aba50d7f6a11a7b8138519d66262b5f8287b11a31a8401ebeb482c",
+    "raw/owners.log.json": "c2332bfb426f428d9b92a21ed2fafdd2b936b444ee65c5f95eb9daffd894827f",
+    "raw/projection-clip.json": "8d25932e7304bf040e4afd7677b2d34b67c8d1306a9b366844a4c378969444c0",
+    "raw/schedule-authority-summary.json": "bbc2b57ff04c3bd48ea09434074111295977e5f70b58cba5412cde05f5148e29",
+    "raw/schedule-authority.jsonl.gz": "93580795d3d80ea33a2c9c0ad3987872cb8b2f82cf627747ac016fb5dc85b4f0",
+    "raw/schedule-authority.log.json": "b68ba296de0ee846f2e761ea723adb1d84a29d948e0ed19578de646de4844686"
+  }
+}

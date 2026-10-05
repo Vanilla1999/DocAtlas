@@ -1,0 +1,172 @@
+[
+  {
+    "question": "What is the default query budget in docmancer.yaml?",
+    "actual": "2a14b99f1a7e8ee520b742976057f21ccd7f10842d8f6830a4e47131635d5c66",
+    "expected": "fdc51fc235885c6af48517d9a85f653793ab3a5410d9e02c0a90a7d02d98ad20",
+    "actual_payload": {
+      "schema_version": "project-answer-contract-v2",
+      "question_hash": "1e79cacce5df36ad49ff3258c5e7caf75d3305854ac9f23fe735e31b46fc7bfb",
+      "retrieval_hints": [
+        "docmancer.yaml",
+        "default",
+        "query",
+        "budget",
+        "docmancer",
+        "yaml"
+      ],
+      "concept_queries": [
+        "docmancer.yaml",
+        "in"
+      ],
+      "subjects": [
+        "docmancer.yaml"
+      ],
+      "proof_obligations": [
+        {
+          "obligation_id": "project_answer:0:definition:a399686fdfa2c16b",
+          "kind": "definition",
+          "subject": "docmancer.yaml",
+          "attribute": null,
+          "relation": null,
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "mandatory": true,
+          "query_span_start": 36,
+          "query_span_end": 50,
+          "query_span_text": "docmancer.yaml",
+          "lifecycle_intent": "current"
+        }
+      ],
+      "lifecycle_intent": "current",
+      "input_limits": [],
+      "parse_trace": [
+        "fail_closed:legacy_coverage"
+      ],
+      "unresolved_parts": [
+        "legacy_unresolved:unreviewed_frame:What is the default query budget in docmancer.yaml?"
+      ],
+      "component_scope_complete": false
+    },
+    "without_safety_metadata_hash": "fdc51fc235885c6af48517d9a85f653793ab3a5410d9e02c0a90a7d02d98ad20",
+    "matches_expected": true
+  },
+  {
+    "question": "What is the default indexing provider in docmancer.yaml?",
+    "actual": "5dfbf047028016d40e4dd006be02533b1614dce76a797cd93fdb1ee9ca41c839",
+    "expected": "5a5b5fdd3cfc118d625d0d6c6e776a201a6116dff7ca38374c0f6030353d0577",
+    "actual_payload": {
+      "schema_version": "project-answer-contract-v2",
+      "question_hash": "15dc6cf002b62d3d2c7cc49a390e98e5e5f9a32703fc81cd397af2d94147fa86",
+      "retrieval_hints": [
+        "docmancer.yaml",
+        "default",
+        "indexing",
+        "provider",
+        "docmancer",
+        "yaml"
+      ],
+      "concept_queries": [
+        "docmancer.yaml",
+        "in"
+      ],
+      "subjects": [
+        "docmancer.yaml"
+      ],
+      "proof_obligations": [
+        {
+          "obligation_id": "project_answer:0:definition:a399686fdfa2c16b",
+          "kind": "definition",
+          "subject": "docmancer.yaml",
+          "attribute": null,
+          "relation": null,
+          "target": null,
+          "value_kind": "text",
+          "expected_value": null,
+          "item_kind": null,
+          "cardinality": null,
+          "response_mode": "value",
+          "mandatory": true,
+          "query_span_start": 41,
+          "query_span_end": 55,
+          "query_span_text": "docmancer.yaml",
+          "lifecycle_intent": "current"
+        }
+      ],
+      "lifecycle_intent": "current",
+      "input_limits": [],
+      "parse_trace": [
+        "fail_closed:legacy_coverage"
+      ],
+      "unresolved_parts": [
+        "legacy_unresolved:unreviewed_frame:What is the default indexing provider in docmancer.yaml?"
+      ],
+      "component_scope_complete": false
+    },
+    "without_safety_metadata_hash": "5a5b5fdd3cfc118d625d0d6c6e776a201a6116dff7ca38374c0f6030353d0577",
+    "matches_expected": true
+  },
+  {
+    "question": "What are the public tools and when should each tool be used?",
+    "relation_groups": [
+      "should each tool be used"
+    ],
+    "plan": {
+      "schema_version": "documentation-query-plan-v2",
+      "original_question": "What are the public tools and when should each tool be used?",
+      "query_ids": [
+        "query-original",
+        "query-relation-1"
+      ],
+      "required_query_ids": [
+        "query-original"
+      ],
+      "public_query_ids": [
+        "query-original"
+      ],
+      "queries": [
+        {
+          "query_id": "query-original",
+          "text": "What are the public tools and when should each tool be used?",
+          "origin": "original",
+          "coverage_required": true,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "direct",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        },
+        {
+          "query_id": "query-relation-1",
+          "text": "should each tool be used",
+          "origin": "canonical_intent",
+          "coverage_required": false,
+          "facet_id": null,
+          "requirement_id": null,
+          "relation": "host_lookup",
+          "public_parent_query_id": null,
+          "preferred_catalog_roles": [],
+          "forbidden_catalog_roles": [],
+          "forbidden_evidence_terms": [],
+          "parent_exact_terms": [],
+          "need_subject": null,
+          "need_relation": null,
+          "need_context": null
+        }
+      ],
+      "explicit_paths": [],
+      "unresolved_parts": [],
+      "_component_contract": [],
+      "component_scope_complete": false
+    }
+  }
+]

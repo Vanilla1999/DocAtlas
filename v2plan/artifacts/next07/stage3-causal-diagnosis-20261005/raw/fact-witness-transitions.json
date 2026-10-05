@@ -1,0 +1,1242 @@
+[
+  {
+    "node": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+    "case": "v2-natural-request-flow",
+    "counts": {
+      "candidate:prepared": 18,
+      "selection:accepted": 3,
+      "selection:token_budget": 32,
+      "selection:replacement_loses_query": 8
+    },
+    "obligations": [
+      {
+        "obligation": "flow_mcp",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 9,
+            "line_end": 14,
+            "candidate_key": "050442f89089436dcf58c7ed",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "135388737bb969b9cffa6336"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "b35064d602f89503b7492619",
+                "budget_tokens": 805
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "0e990c537d24520183772989",
+                "budget_tokens": 805
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "892bdef18f23da1cd10a210f",
+                "budget_tokens": 819
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "02942ce28e7354342cb71c9d",
+                "budget_tokens": 824
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_application",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 29,
+            "line_end": 41,
+            "candidate_key": "39e3108c7670847a98666052",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e553e2ed888b5a73519e0668"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "148d31205c3cad32887ebe5a"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "2f8babd512099c9ec91eadde"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "c5e7c3bf63c67a8989bcf376"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e6ba6f48f40c040bbb95bf3d"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "30753cc4b06b5b2673500d19"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "45a25819b3df2f20c42e811b"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "795d4a978767062fc30c4266"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_gateway",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 44,
+            "line_end": 51,
+            "candidate_key": "64af917c27a26ebec3ec096d",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "d2b3c57ddbcfacd1bda8af84"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "fdec2504ed1422808909e31e",
+                "budget_tokens": 872
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "77176ce351634a4fd0daf5e4",
+                "budget_tokens": 798
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "a9f941e9a24d11ecb5f4f2b1",
+                "budget_tokens": 821
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "507f692cb97b564f93571b12"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_selection",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 29,
+            "line_end": 41,
+            "candidate_key": "39e3108c7670847a98666052",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e553e2ed888b5a73519e0668"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "148d31205c3cad32887ebe5a"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "2f8babd512099c9ec91eadde"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "c5e7c3bf63c67a8989bcf376"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e6ba6f48f40c040bbb95bf3d"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "30753cc4b06b5b2673500d19"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "45a25819b3df2f20c42e811b"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "795d4a978767062fc30c4266"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+    "case": "v2-natural-request-flow",
+    "counts": {
+      "candidate:prepared": 18,
+      "selection:accepted": 3,
+      "selection:token_budget": 32,
+      "selection:replacement_loses_query": 8
+    },
+    "obligations": [
+      {
+        "obligation": "flow_mcp",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 9,
+            "line_end": 14,
+            "candidate_key": "050442f89089436dcf58c7ed",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "135388737bb969b9cffa6336"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "b35064d602f89503b7492619",
+                "budget_tokens": 805
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "0e990c537d24520183772989",
+                "budget_tokens": 805
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "892bdef18f23da1cd10a210f",
+                "budget_tokens": 819
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "02942ce28e7354342cb71c9d",
+                "budget_tokens": 824
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_application",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 29,
+            "line_end": 41,
+            "candidate_key": "39e3108c7670847a98666052",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e553e2ed888b5a73519e0668"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "148d31205c3cad32887ebe5a"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "2f8babd512099c9ec91eadde"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "c5e7c3bf63c67a8989bcf376"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e6ba6f48f40c040bbb95bf3d"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "30753cc4b06b5b2673500d19"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "45a25819b3df2f20c42e811b"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "795d4a978767062fc30c4266"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_gateway",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 44,
+            "line_end": 51,
+            "candidate_key": "64af917c27a26ebec3ec096d",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "d2b3c57ddbcfacd1bda8af84"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "fdec2504ed1422808909e31e",
+                "budget_tokens": 872
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "77176ce351634a4fd0daf5e4",
+                "budget_tokens": 798
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "a9f941e9a24d11ecb5f4f2b1",
+                "budget_tokens": 821
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "507f692cb97b564f93571b12"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "flow_selection",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "line_start": 29,
+            "line_end": 41,
+            "candidate_key": "39e3108c7670847a98666052",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e553e2ed888b5a73519e0668"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "148d31205c3cad32887ebe5a"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "2f8babd512099c9ec91eadde"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "c5e7c3bf63c67a8989bcf376"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e6ba6f48f40c040bbb95bf3d"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "30753cc4b06b5b2673500d19"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "45a25819b3df2f20c42e811b"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "795d4a978767062fc30c4266"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal",
+    "case": "v2-natural-stale-health",
+    "counts": {
+      "candidate:prepared": 17,
+      "candidate:visible_qualification": 2,
+      "selection:accepted": 3,
+      "selection:insufficient_new_host_terms": 2,
+      "selection:replacement_loses_mandatory": 1,
+      "selection:token_budget": 36
+    },
+    "obligations": [
+      {
+        "obligation": "health",
+        "input_witnesses": [
+          {
+            "path": "README.md",
+            "line_start": 120,
+            "line_end": 125,
+            "candidate_key": "449e603b5e2b5d194c009d58",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "449e603b5e2b5d194c009d58",
+                "variant_key": "e59728b12567f02266bf7c8a"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "449e603b5e2b5d194c009d58",
+                "variant_key": "920ebcc514248ea02d4adcc0",
+                "budget_tokens": 999
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "sync",
+        "input_witnesses": [
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "line_start": 23,
+            "line_end": 31,
+            "candidate_key": "1349482761bea07a41182c88",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "882e3e9016b7b36a041c380b"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "7b479a70712f4cb0230dc323",
+                "budget_tokens": 317
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "0e0ea6ef82562baf8c1529fe"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "1f8919e9aa6d1b23be90ca3d",
+                "budget_tokens": 824
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "623cac0a417f62548fb02f76",
+                "budget_tokens": 850
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "line_start": 142,
+            "line_end": 148,
+            "candidate_key": "f79e801f6bd7f795c17a3d0f",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "59339d7dad46467e68912cf6"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "cbfa9aaa3772c7fc3793bac3",
+                "budget_tokens": 890
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "c1883a30f3a87d5a5104f1c6",
+                "budget_tokens": 903
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "d6b78ae321920bdcba543131",
+                "budget_tokens": 949
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "ddc38a1d8fa9d721287e51b3",
+                "budget_tokens": 974
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "line_start": 44,
+            "line_end": 51,
+            "candidate_key": "a7720a1632d6b823be1852b2",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "55004260a655fee2cd8ea4a4"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "6281eadff50b1b68569c0575",
+                "budget_tokens": 891
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "2385f9a2a75952641b5a0386",
+                "budget_tokens": 908
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "b82dc8aeec0dc4ebfbd4e6b6",
+                "budget_tokens": 928
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "c56fd4db441b953cd5aa746f",
+                "budget_tokens": 938
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "line_start": 202,
+            "line_end": 203,
+            "candidate_key": "701dede4919a475960433f60",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "701dede4919a475960433f60",
+                "variant_key": "18b9eb6ecd239a2d92ab25b6"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "701dede4919a475960433f60",
+                "variant_key": "a9d1a16501ed9004ea249c5c",
+                "budget_tokens": 985
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "stale",
+        "input_witnesses": [
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "line_start": 23,
+            "line_end": 31,
+            "candidate_key": "1349482761bea07a41182c88",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "882e3e9016b7b36a041c380b"
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "7b479a70712f4cb0230dc323",
+                "budget_tokens": 317
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "0e0ea6ef82562baf8c1529fe"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "1f8919e9aa6d1b23be90ca3d",
+                "budget_tokens": 824
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "623cac0a417f62548fb02f76",
+                "budget_tokens": 850
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "line_start": 142,
+            "line_end": 148,
+            "candidate_key": "f79e801f6bd7f795c17a3d0f",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "59339d7dad46467e68912cf6"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "cbfa9aaa3772c7fc3793bac3",
+                "budget_tokens": 890
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "c1883a30f3a87d5a5104f1c6",
+                "budget_tokens": 903
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "d6b78ae321920bdcba543131",
+                "budget_tokens": 949
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "ddc38a1d8fa9d721287e51b3",
+                "budget_tokens": 974
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "line_start": 44,
+            "line_end": 51,
+            "candidate_key": "a7720a1632d6b823be1852b2",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "55004260a655fee2cd8ea4a4"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "6281eadff50b1b68569c0575",
+                "budget_tokens": 891
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "2385f9a2a75952641b5a0386",
+                "budget_tokens": 908
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "b82dc8aeec0dc4ebfbd4e6b6",
+                "budget_tokens": 928
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "c56fd4db441b953cd5aa746f",
+                "budget_tokens": 938
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+    "case": "v2-natural-first-session",
+    "counts": {
+      "candidate:prepared": 18,
+      "selection:accepted": 3,
+      "selection:replaced": 1,
+      "selection:insufficient_new_host_terms": 5,
+      "selection:token_budget": 62,
+      "selection:no_new_direction": 1,
+      "selection:replacement_loses_query": 2
+    },
+    "obligations": [
+      {
+        "obligation": "setup",
+        "input_witnesses": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 7,
+            "line_end": 22,
+            "candidate_key": "bc96bce5901b3ee53da223af",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3bf8ea83169fc44fc165bf13"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f6e3317cb7d6675be2c6676a",
+                "budget_tokens": 828
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "cba4c8f27fa1f3588d1f285f"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "72315659d747cbf0eb94447d",
+                "budget_tokens": 815
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3c8e11c434bfeb8ff0efa16f",
+                "budget_tokens": 1005
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f9f7e6e33517bace6540a4be",
+                "budget_tokens": 978
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "8415fd0844f2a9fdea7502bc",
+                "budget_tokens": 1006
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "5852f18b4ae653791db57255",
+                "budget_tokens": 1059
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "ingest",
+        "input_witnesses": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 7,
+            "line_end": 22,
+            "candidate_key": "bc96bce5901b3ee53da223af",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3bf8ea83169fc44fc165bf13"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f6e3317cb7d6675be2c6676a",
+                "budget_tokens": 828
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "cba4c8f27fa1f3588d1f285f"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "72315659d747cbf0eb94447d",
+                "budget_tokens": 815
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3c8e11c434bfeb8ff0efa16f",
+                "budget_tokens": 1005
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f9f7e6e33517bace6540a4be",
+                "budget_tokens": 978
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "8415fd0844f2a9fdea7502bc",
+                "budget_tokens": 1006
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "5852f18b4ae653791db57255",
+                "budget_tokens": 1059
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "line_start": 7,
+            "line_end": 8,
+            "candidate_key": "f1c7d3e76e37f00273f71bac",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "c6cc8833363a25e79ecc4891"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "ff2de8a7facae1a4dcd73295",
+                "budget_tokens": 825
+              },
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "11262ea936824cb51489bb3d",
+                "budget_tokens": 795
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "97c382575c0ea9b8d1ce2977"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "9aba95c4606caea32a9984b9"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "f30d643b1d06b4ca5b9b3cbc"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "65f15c3e86ef4204d8834738"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "obligation": "query",
+        "input_witnesses": [
+          {
+            "path": "wiki/Commands.md",
+            "line_start": 7,
+            "line_end": 22,
+            "candidate_key": "bc96bce5901b3ee53da223af",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3bf8ea83169fc44fc165bf13"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f6e3317cb7d6675be2c6676a",
+                "budget_tokens": 828
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "cba4c8f27fa1f3588d1f285f"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "72315659d747cbf0eb94447d",
+                "budget_tokens": 815
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3c8e11c434bfeb8ff0efa16f",
+                "budget_tokens": 1005
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f9f7e6e33517bace6540a4be",
+                "budget_tokens": 978
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "8415fd0844f2a9fdea7502bc",
+                "budget_tokens": 1006
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "5852f18b4ae653791db57255",
+                "budget_tokens": 1059
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]",
+    "case": "v2-natural-evidence-selection",
+    "counts": {
+      "candidate:prepared": 7,
+      "candidate:visible_qualification": 1,
+      "selection:accepted": 3,
+      "selection:token_budget": 10
+    },
+    "obligations": [
+      {
+        "obligation": "selection_proof",
+        "input_witnesses": [
+          {
+            "path": "docs/modules/evidence-selection.md",
+            "line_start": 13,
+            "line_end": 16,
+            "candidate_key": "acd478ea9b3cdc58da484af2",
+            "events": [
+              {
+                "stage": "candidate",
+                "decision": "prepared",
+                "reason": "prepared",
+                "candidate_key": "acd478ea9b3cdc58da484af2",
+                "variant_key": "a9b48b95408b52f297e4a49d"
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "acd478ea9b3cdc58da484af2",
+                "variant_key": "62fa99de25c1adeac3494334",
+                "budget_tokens": 976
+              },
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "acd478ea9b3cdc58da484af2",
+                "variant_key": "e5b95b98635359ae9fc03550",
+                "budget_tokens": 983
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

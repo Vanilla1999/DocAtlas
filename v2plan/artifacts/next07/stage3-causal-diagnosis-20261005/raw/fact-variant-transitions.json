@@ -1,0 +1,910 @@
+[
+  {
+    "node": "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+    "obligations": [
+      {
+        "id": "flow_mcp",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              9,
+              12
+            ],
+            "snippet": "## Public boundary\n\nThe MCP boundary is `get_docs_context(question, project_path, lookup_queries?,\nmodule_path?, scope?)`.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "b35064d602f89503b7492619",
+                "budget_tokens": 805
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              11,
+              12
+            ],
+            "snippet": "The MCP boundary is `get_docs_context(question, project_path, lookup_queries?,\nmodule_path?, scope?)`. The original question is authoritative.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "0e990c537d24520183772989",
+                "budget_tokens": 805
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              11,
+              13
+            ],
+            "snippet": "The MCP boundary is `get_docs_context(question, project_path, lookup_queries?,\nmodule_path?, scope?)`. The original question is authoritative. Optional host\nlookups contain one concept each and improve recall only.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "892bdef18f23da1cd10a210f",
+                "budget_tokens": 819
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              9,
+              13
+            ],
+            "snippet": "## Public boundary\n\nThe MCP boundary is `get_docs_context(question, project_path, lookup_queries?,\nmodule_path?, scope?)`. The original question is authoritative. Optional host\nlookups contain one concept each and improve recall only.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "050442f89089436dcf58c7ed",
+                "variant_key": "02942ce28e7354342cb71c9d",
+                "budget_tokens": 824
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "flow_application",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              29,
+              37
+            ],
+            "snippet": "`ProjectContextService` builds one query plan and passes it to project retrieval.\nCandidate allocation gives one opportunity to exact-anchor, original-question,\nand host-query lanes before consuming second candidates. Generated aliases use\nthe remaining capacity. Audited domain-owned aliases may attribute derived\nretrieval coverage to their public parent query, but never authorize an answer.\nExplicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              29,
+              29
+            ],
+            "snippet": "`ProjectContextService` builds one query plan and passes it to project retrieval.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "795d4a978767062fc30c4266"
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              29,
+              31
+            ],
+            "snippet": "`ProjectContextService` builds one query plan and passes it to project retrieval.\nCandidate allocation gives one opportunity to exact-anchor, original-question,\nand host-query lanes before consuming second candidates.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "30753cc4b06b5b2673500d19"
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              29,
+              33
+            ],
+            "snippet": "`ProjectContextService` builds one query plan and passes it to project retrieval.\nCandidate allocation gives one opportunity to exact-anchor, original-question,\nand host-query lanes before consuming second candidates. Generated aliases use\nthe remaining capacity. Audited domain-owned aliases may attribute derived\nretrieval coverage to their public parent query, but never authorize an answer.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "45a25819b3df2f20c42e811b"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "flow_gateway",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              44,
+              46
+            ],
+            "snippet": "The retrieval gateway provides filtered project chunks, field-level lexical\nmatch provenance, and exact-source indexed sections. Application code owns\norchestration and allocation.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "77176ce351634a4fd0daf5e4",
+                "budget_tokens": 798
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              44,
+              47
+            ],
+            "snippet": "The retrieval gateway provides filtered project chunks, field-level lexical\nmatch provenance, and exact-source indexed sections. Application code owns\norchestration and allocation. Domain policies own lineage, source-role\neligibility, and visible evidence qualification.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "a9f941e9a24d11ecb5f4f2b1",
+                "budget_tokens": 821
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              44,
+              50
+            ],
+            "snippet": "The retrieval gateway provides filtered project chunks, field-level lexical\nmatch provenance, and exact-source indexed sections. Application code owns\norchestration and allocation. Domain policies own lineage, source-role\neligibility, and visible evidence qualification. SQLite owns persistence and\ncandidate generation; metadata-only matching may discover a candidate but\ncannot qualify public evidence. Neither infrastructure nor the MCP adapter\ndecides answer support.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "fdec2504ed1422808909e31e",
+                "budget_tokens": 872
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              44,
+              45
+            ],
+            "snippet": "The retrieval gateway provides filtered project chunks, field-level lexical\nmatch provenance, and exact-source indexed sections.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "64af917c27a26ebec3ec096d",
+                "variant_key": "507f692cb97b564f93571b12"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "flow_selection",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              29,
+              37
+            ],
+            "snippet": "`ProjectContextService` builds one query plan and passes it to project retrieval.\nCandidate allocation gives one opportunity to exact-anchor, original-question,\nand host-query lanes before consuming second candidates. Generated aliases use\nthe remaining capacity. Audited domain-owned aliases may attribute derived\nretrieval coverage to their public parent query, but never authorize an answer.\nExplicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "5281f4711b587b798ce0b539",
+                "budget_tokens": 443
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              36,
+              37
+            ],
+            "snippet": "For compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "148d31205c3cad32887ebe5a"
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              34,
+              37
+            ],
+            "snippet": "Explicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "2f8babd512099c9ec91eadde"
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              32,
+              37
+            ],
+            "snippet": "Audited domain-owned aliases may attribute derived\nretrieval coverage to their public parent query, but never authorize an answer.\nExplicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "c5e7c3bf63c67a8989bcf376"
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/project-context-retrieval.md",
+            "lines": [
+              34,
+              40
+            ],
+            "snippet": "Explicit documents may hydrate bounded indexed sections,\nbut only sections matching user-visible technical terms enter context.\nFor compound reads, selection maximizes distinct user-visible query coverage\nbefore expanding snippets. It first admits compact witnesses, then spends any\nremaining token budget on deterministic snippet expansion. Generated canonical\nqueries may make a source eligible and populate facet diagnostics, but they do\nnot become public coverage IDs.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "39e3108c7670847a98666052",
+                "variant_key": "e6ba6f48f40c040bbb95bf3d"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal",
+    "obligations": [
+      {
+        "id": "health",
+        "witness_bearing_variants": [
+          {
+            "path": "README.md",
+            "lines": [
+              120,
+              124
+            ],
+            "snippet": "| Tool | Purpose |\n|---|---|\n| `get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions. It performs read-only preflight and returns the next action when preparation is required. |\n| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request. Network actions require approval. |\n| `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "449e603b5e2b5d194c009d58",
+                "variant_key": "920ebcc514248ea02d4adcc0",
+                "budget_tokens": 999
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "sync",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              23,
+              30
+            ],
+            "snippet": "`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:\n\n1. **discovers** current candidates from the filesystem;\n2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);\n5. **indexes** new and changed candidates;\n6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "623cac0a417f62548fb02f76",
+                "budget_tokens": 850
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              142,
+              147
+            ],
+            "snippet": "`prepare_docs(action=\"sync_project_docs\")` replaces the old two-step `inspect → ingest` loop. It:\n1. discovers current candidates from the filesystem;\n2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);\n4. indexes new and changed candidates;\n5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "ddc38a1d8fa9d721287e51b3",
+                "budget_tokens": 974
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              202,
+              202
+            ],
+            "snippet": "The report includes a bounded authoring brief for the host model: exact files/sections it may edit, repository facts it must verify, and claims it must not invent. After the documentation patch is reviewed and saved, `prepare_docs(action=\"sync_project_docs\", changed_paths=..., deleted_paths=..., renamed_paths=...)` updates only affected index rows. The optional `--sync-saved-docs` CI mode performs that local indexing step from an exact Git diff; it never edits, commits, comments, or fetches from the network.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "701dede4919a475960433f60",
+                "variant_key": "a9d1a16501ed9004ea249c5c",
+                "budget_tokens": 985
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "stale",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              28,
+              28
+            ],
+            "snippet": "4. **removes** stale indexed sections (files that changed on disk);",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "7b479a70712f4cb0230dc323",
+                "budget_tokens": 317
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              26,
+              28
+            ],
+            "snippet": "2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "0e0ea6ef82562baf8c1529fe"
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              25,
+              30
+            ],
+            "snippet": "1. **discovers** current candidates from the filesystem;\n2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);\n5. **indexes** new and changed candidates;\n6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "1f8919e9aa6d1b23be90ca3d",
+                "budget_tokens": 824
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              23,
+              30
+            ],
+            "snippet": "`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:\n\n1. **discovers** current candidates from the filesystem;\n2. **prunes** orphaned indexed sources (files that no longer exist);\n3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;\n4. **removes** stale indexed sections (files that changed on disk);\n5. **indexes** new and changed candidates;\n6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "1349482761bea07a41182c88",
+                "variant_key": "623cac0a417f62548fb02f76",
+                "budget_tokens": 850
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              48,
+              48
+            ],
+            "snippet": "- removes stale indexed sections for changed files;",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "6281eadff50b1b68569c0575",
+                "budget_tokens": 891
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              47,
+              48
+            ],
+            "snippet": "- removes orphaned indexed docs whose files were deleted or are no longer discovered;\n- removes stale indexed sections for changed files;",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "2385f9a2a75952641b5a0386",
+                "budget_tokens": 908
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              47,
+              50
+            ],
+            "snippet": "- removes orphaned indexed docs whose files were deleted or are no longer discovered;\n- removes stale indexed sections for changed files;\n- indexes new and changed reviewable docs;\n- verifies the final indexed state before reporting results.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "b82dc8aeec0dc4ebfbd4e6b6",
+                "budget_tokens": 928
+              }
+            ]
+          },
+          {
+            "path": "docs/project-docs-mcp-workflow.md",
+            "lines": [
+              46,
+              50
+            ],
+            "snippet": "- discovers current reviewable project-doc candidates;\n- removes orphaned indexed docs whose files were deleted or are no longer discovered;\n- removes stale indexed sections for changed files;\n- indexes new and changed reviewable docs;\n- verifies the final indexed state before reporting results.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "a7720a1632d6b823be1852b2",
+                "variant_key": "c56fd4db441b953cd5aa746f",
+                "budget_tokens": 938
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              145,
+              145
+            ],
+            "snippet": "3. removes stale indexed sections (changed files);",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "cbfa9aaa3772c7fc3793bac3",
+                "budget_tokens": 890
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              144,
+              145
+            ],
+            "snippet": "2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "c1883a30f3a87d5a5104f1c6",
+                "budget_tokens": 903
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              143,
+              147
+            ],
+            "snippet": "1. discovers current candidates from the filesystem;\n2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);\n4. indexes new and changed candidates;\n5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "d6b78ae321920bdcba543131",
+                "budget_tokens": 949
+              }
+            ]
+          },
+          {
+            "path": "README.md",
+            "lines": [
+              142,
+              147
+            ],
+            "snippet": "`prepare_docs(action=\"sync_project_docs\")` replaces the old two-step `inspect → ingest` loop. It:\n1. discovers current candidates from the filesystem;\n2. prunes orphaned indexed sources (deleted files);\n3. removes stale indexed sections (changed files);\n4. indexes new and changed candidates;\n5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f79e801f6bd7f795c17a3d0f",
+                "variant_key": "ddc38a1d8fa9d721287e51b3",
+                "budget_tokens": 974
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+    "obligations": [
+      {
+        "id": "setup",
+        "witness_bearing_variants": [
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              9,
+              10
+            ],
+            "snippet": "| `doc-atlas setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |\n| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f6e3317cb7d6675be2c6676a",
+                "budget_tokens": 828
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ingest",
+        "witness_bearing_variants": [
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              9,
+              10
+            ],
+            "snippet": "| `doc-atlas setup` | Create config and SQLite database, auto-detect installed agents, and install skill files. Use `--all` for non-interactive installation. |\n| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f6e3317cb7d6675be2c6676a",
+                "budget_tokens": 828
+              }
+            ]
+          },
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              10,
+              10
+            ],
+            "snippet": "| `doc-atlas ingest <path>` | Index local files or directories. Supports Markdown, text, HTML, PDF, DOCX, and RTF out of the box. Embeds and upserts vectors alongside FTS5 by default; add `--no-vectors` for FTS5-only. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "3c8e11c434bfeb8ff0efa16f",
+                "budget_tokens": 1005
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves compact context packs through the CLI or Docs MCP tools. No hosted query API; the only background process is the docmancer-owned Qdrant.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "ff2de8a7facae1a4dcd73295",
+                "budget_tokens": 825
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "f30d643b1d06b4ca5b9b3cbc"
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "9aba95c4606caea32a9984b9"
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "accepted",
+                "reason": "accepted",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "11262ea936824cb51489bb3d",
+                "budget_tokens": 795
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "The primary **DocAtlas Docs pipeline** fetches documentation with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections in a local SQLite FTS5 database plus a managed local Qdrant for dense and sparse vectors, and retrieves",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "insufficient_new_host_terms",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "97c382575c0ea9b8d1ce2977"
+              }
+            ]
+          },
+          {
+            "path": "wiki/Architecture.md",
+            "lines": [
+              7,
+              7
+            ],
+            "snippet": "with `doc-atlas add` (URL), `doc-atlas ingest` (local files), or the Docs MCP server's prefetch tools, normalizes it into sections, indexes those sections",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "replacement_loses_query",
+                "candidate_key": "f1c7d3e76e37f00273f71bac",
+                "variant_key": "65f15c3e86ef4204d8834738"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "query",
+        "witness_bearing_variants": [
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              13,
+              13
+            ],
+            "snippet": "| `doc-atlas query \"<text>\"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "f9f7e6e33517bace6540a4be",
+                "budget_tokens": 978
+              }
+            ]
+          },
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              13,
+              14
+            ],
+            "snippet": "| `doc-atlas query \"<text>\"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |\n| `doc-atlas list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "8415fd0844f2a9fdea7502bc",
+                "budget_tokens": 1006
+              }
+            ]
+          },
+          {
+            "path": "wiki/Commands.md",
+            "lines": [
+              13,
+              16
+            ],
+            "snippet": "| `doc-atlas query \"<text>\"` | Search the index and return a compact context pack within a token budget. Shows token savings and agentic runway. |\n| `doc-atlas list` | List indexed docsets with ingestion dates. Use `--all` to show individual sources. |\n| `doc-atlas inspect` | Show SQLite index stats, source counts, and extract locations. |\n| `doc-atlas remove [source]` | Remove an indexed source or docset root. Use `--all` to clear everything. |",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "bc96bce5901b3ee53da223af",
+                "variant_key": "5852f18b4ae653791db57255",
+                "budget_tokens": 1059
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "node": "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]",
+    "obligations": [
+      {
+        "id": "selection_proof",
+        "witness_bearing_variants": [
+          {
+            "path": "docs/modules/evidence-selection.md",
+            "lines": [
+              15,
+              15
+            ],
+            "snippet": "The module consumes the project-answer requirement contract emitted by question planning. It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation. It does not broaden subjects or replace unresolved question semantics.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "acd478ea9b3cdc58da484af2",
+                "variant_key": "62fa99de25c1adeac3494334",
+                "budget_tokens": 976
+              }
+            ]
+          },
+          {
+            "path": "docs/modules/evidence-selection.md",
+            "lines": [
+              13,
+              15
+            ],
+            "snippet": "## Contract with question planning\n\nThe module consumes the project-answer requirement contract emitted by question planning. It may only mark a mandatory facet covered when a model-visible answer unit locally proves that exact obligation. It does not broaden subjects or replace unresolved question semantics.",
+            "events": [
+              {
+                "stage": "selection",
+                "decision": "rejected",
+                "reason": "token_budget",
+                "candidate_key": "acd478ea9b3cdc58da484af2",
+                "variant_key": "e5b95b98635359ae9fc03550",
+                "budget_tokens": 983
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

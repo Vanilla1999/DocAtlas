@@ -1,0 +1,123 @@
+[
+  {
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "argv": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "diagnostic_observer",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py"
+    ],
+    "env": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/stage3-diagnosis:.",
+      "DIAGNOSTIC_OUTPUT": "/tmp/opencode/stage3-diagnosis/neutral.jsonl"
+    },
+    "exit": 1,
+    "result": "2 failed, 13 passed",
+    "raw_log": "raw/neutral.log.json",
+    "trace": "raw/neutral.jsonl.gz"
+  },
+  {
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "argv": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "diagnostic_observer",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py",
+      "-k",
+      "retrieved_safe_context or name_only"
+    ],
+    "env": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/stage3-diagnosis:.",
+      "DIAGNOSTIC_OUTPUT": "/tmp/opencode/stage3-diagnosis/owners.jsonl"
+    },
+    "exit": 1,
+    "result": "1 failed, 3 passed, 11 deselected",
+    "raw_log": "raw/owners.log.json",
+    "trace": "raw/owners.jsonl.gz"
+  },
+  {
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "argv": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "diagnostic_observer",
+      "tests/docs/test_context_projection_boundaries.py::test_frozen_request_flow_prefers_project_context_module_witnesses",
+      "tests/docs/test_request_flow_lineage.py::test_request_flow_public_contract_remains_four_fact_fail_safe",
+      "tests/docs/test_generic_context_workflows.py::test_stale_health_live_status_sync_and_removal",
+      "tests/docs/test_generic_context_workflows.py::test_first_session_live_query",
+      "tests/docs/test_generic_context_workflows.py::test_remaining_live_workflow_witnesses[v2-natural-evidence-selection]",
+      "tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms"
+    ],
+    "env": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/stage3-diagnosis:.",
+      "DIAGNOSTIC_OUTPUT": "/tmp/opencode/stage3-diagnosis/facts.jsonl",
+      "DIAGNOSTIC_FUNCTIONS": "project_docs_context,_qualified_fragments,qualified_fragments"
+    },
+    "exit": 1,
+    "result": "6 failed",
+    "raw_log": "raw/facts.log.json",
+    "trace": "raw/facts.jsonl.gz"
+  },
+  {
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "argv": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "diagnostic_observer",
+      "tests/docs/test_review_boundary_semantics.py::test_public_projection_prioritizes_public_queries_not_audited_alias_count[False-256-1]",
+      "tests/test_docs_service_part02.py::test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original",
+      "tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets",
+      "tests/docs/test_project_answer_contract_v3.py::test_v3_does_not_reclassify_frozen_v2_config_questions"
+    ],
+    "env": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/stage3-diagnosis:.",
+      "DIAGNOSTIC_OUTPUT": "/tmp/opencode/stage3-diagnosis/contracts.jsonl",
+      "DIAGNOSTIC_FUNCTIONS": "_payload,_qualify_candidate_lookups,build_documentation_query_plan"
+    },
+    "exit": 1,
+    "result": "4 failed",
+    "raw_log": "raw/contracts.log.json",
+    "trace": "raw/contracts.jsonl.gz"
+  },
+  {
+    "cwd": "/tmp/opencode/docatlas-stage3-candidate",
+    "argv": [
+      "/tmp/opencode/docatlas-stage3-candidate-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "diagnostic_observer",
+      "tests/evidence_quality_v2/test_readme_neutral_context.py",
+      "tests/test_docs_service_part03.py",
+      "-k",
+      "test_retrieved_safe_context_survives_unknown_question_class or test_project_query_does_not_return_non_project_docs_with_same_terms"
+    ],
+    "env": {
+      "DOCATLAS_OFFLINE": "1",
+      "PYTHONPATH": "/tmp/opencode/stage3-diagnosis:.",
+      "DIAGNOSTIC_OUTPUT": "/tmp/opencode/stage3-diagnosis/schedule-authority.jsonl",
+      "DIAGNOSTIC_FUNCTIONS": "record,_focal_texts,schedule_need_queries,_run"
+    },
+    "exit": 1,
+    "result": "2 failed, 1 passed, 36 deselected",
+    "raw_log": "raw/schedule-authority.log.json",
+    "trace": "raw/schedule-authority.jsonl.gz"
+  }
+]
