@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_frozen_fastembed_dependency.py": "serialization"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_frozen_fastembed_dependency.py": "a14f764e587a35c54e5bca1bd733a42f63244bc95ef5ae14c77ffe129ece682a"
+  }
+}
