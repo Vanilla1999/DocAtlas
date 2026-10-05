@@ -1,0 +1,13 @@
+{
+  "v2plan/NEXT_07_READER_NAVIGATION_TEST_RU.md": "b98ed5c6147134135de5fd93c06a001e613f347165db1416f15fe3e72f29445a",
+  "v2plan/next07_reader_experiment/__init__.py": "539f2e55696abbf8870079a813db3cef7140f89b0925d93f0cbd16d1614ed667",
+  "v2plan/next07_reader_experiment/cases.py": "56085bec4dcd7b2afae4f443709fe02fe7098314c2fe8603d596894a973627fc",
+  "v2plan/test_next07_reader_experiment.py": "e9d54c69f9ccf32863ecd80b12b0d856173295248cc21fee15c2e4907e4c94fe",
+  "v2plan/test_next07_reader_review.py": "4e211630fd58edb182bb9203c6be42ef65f1c408bea67904db517b90f97a10ff",
+  "v2plan/NEXT_07_READER_REVIEW_AND_RUN_RU.md": "bea13610ed11ad6f5f162f2950f774c78068bcce3f723157404863e162a40f4f",
+  "v2plan/next07_reader_experiment/host.py": "dfb9f3ecd4bfde858d82fe6116264172d55e644287c86bcbf12dae53383feae4",
+  "v2plan/next07_reader_experiment/run.py": "24127d41a29373355f45b4ccc3866d644b8f9ca50ff08edf6bfb783f6e690c74",
+  "v2plan/next07_reader_experiment/AGENTS.md": "4ab6a2d5a0adb242c99e7021185aed14b61530c720d5e05473eefdc9b14a9ee3",
+  "v2plan/next07_reader_experiment/model.py": "0350d62448e473bb1b156d8eccea80b2d775659a8f741eb5656192b59367c2a8",
+  "v2plan/artifacts/next07/reader-review-20261005/REVIEW_RU.md": "065d33b92a07673c6e1047c14989b4a63d6a9a793e78de96d3a312565a38bafe"
+}

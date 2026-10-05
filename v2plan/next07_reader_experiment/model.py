@@ -53,10 +53,20 @@ class ProviderError(RuntimeError):
     pass
 
 
+class ModelTermination(RuntimeError):
+    """A received but incomplete/refused model response is not a provider outage."""
+    def __init__(self, reason, message, usage):
+        super().__init__(reason)
+        self.message, self.usage = message, usage
+
+
 class OpenAIReader:
     """A pilot adapter, not evidence about every external host or model."""
     def __init__(self, *, model=DEFAULT_MODEL):
+        if not isinstance(model, str) or not model.strip():
+            raise ProviderError('explicit_model_required')
         self.model = model
+        self.returned_model = None
         self._key = os.environ.pop('OPENAI_API_KEY', '')
         if not self._key:
             raise ProviderError('provider_credential_not_configured')
@@ -88,23 +98,39 @@ class OpenAIReader:
             raise ProviderError(f'provider_http_{exc.code}') from None
         except (urllib.error.URLError, TimeoutError):
             raise ProviderError('provider_transport_failure') from None
+        except (ValueError, UnicodeDecodeError):
+            raise ProviderError('provider_invalid_json') from None
+        if not isinstance(result, dict):
+            raise ProviderError('provider_response_not_object')
         choices = result.get('choices') or []
-        if len(choices) != 1 or not request_id or not isinstance(result.get('usage'), dict):
+        if (not isinstance(choices, list) or len(choices) != 1
+                or not isinstance(choices[0], dict)
+                or not request_id or not isinstance(result.get('usage'), dict)):
             raise ProviderError('provider_response_missing_identity_or_usage')
         message = choices[0].get('message')
         if not isinstance(message, dict):
             raise ProviderError('provider_message_invalid')
-        if choices[0].get('finish_reason') not in {'stop', 'tool_calls'}:
-            raise ProviderError('provider_incomplete_output')
-        message = {k: deepcopy(message[k]) for k in ('role', 'content', 'tool_calls') if k in message}
+        message = {k: deepcopy(message[k]) for k in ('role', 'content', 'tool_calls', 'refusal') if k in message}
         usage = {k: deepcopy(result['usage'].get(k)) for k in ('prompt_tokens', 'completion_tokens', 'total_tokens')}
         for key in usage:
             if type(usage[key]) is not int or usage[key] < 0:
                 raise ProviderError('provider_usage_invalid')
-        return message, {'provider': 'openai-api', 'requested_model': self.model,
-            'returned_model': result.get('model'), 'request_id': request_id,
+        returned = result.get('model')
+        if not isinstance(returned, str) or not returned.strip():
+            raise ProviderError('provider_model_identity_missing')
+        if self.returned_model is not None and returned != self.returned_model:
+            raise ProviderError('provider_model_changed_during_trial')
+        self.returned_model = returned
+        info = {'provider': 'openai-api', 'requested_model': self.model,
+            'returned_model': returned, 'request_id': request_id,
             'request_sha256': hashlib.sha256(encoded).hexdigest(), 'usage': usage,
+            'finish_reason': choices[0].get('finish_reason'),
             'seconds': time.monotonic() - started}
+        reason = info['finish_reason']
+        if reason not in {'stop', 'tool_calls'} or message.get('refusal'):
+            status = 'MODEL_OUTPUT_LIMIT' if reason == 'length' else 'MODEL_REFUSAL_OR_INCOMPLETE'
+            raise ModelTermination(status, message, info)
+        return message, info
 
 
 def run_session(host, question, *, arm, provider, out):
@@ -119,25 +145,40 @@ def run_session(host, question, *, arm, provider, out):
         {'role': 'tool', 'tool_call_id': 'initial-docs', 'content': json.dumps(first, ensure_ascii=False)}]
     save(Path(out) / 'initial-view.json', first)
     transcript = []
+    seen_call_ids = {'initial-docs'}
     report = {'execution': 'NOT_FINISHED', 'quality': 'PENDING_INDEPENDENT_REVIEW',
         'first_context_sha256': hashlib.sha256(json.dumps(host.context, ensure_ascii=False,
             sort_keys=True).encode()).hexdigest(), 'arm': arm, 'finish': None}
     for turn in range(1 if arm == 'A' else 3):
+        # Exhausted actions are not advertised as callable. No extra model turn
+        # or corrective prompt is added; the declared pilot budget is unchanged.
+        definitions = [FINISH] + ([READ] if arm == 'B' and host.read_attempts < 2 else [])
+        tools = [{'type': 'function', 'function': deepcopy(d)} for d in definitions]
         # Only public question, schemas, first view and observed results go out.
         save(Path(out) / f'request-{turn}.json', {'messages': messages, 'tools': tools})
         try:
             message, usage = provider.complete(deepcopy(messages), deepcopy(tools))
+        except ModelTermination as exc:
+            transcript.append({'turn': turn, 'message': exc.message, 'provider': exc.usage})
+            report.update(execution=str(exc))
+            break
         except ProviderError as exc:
             report.update(execution='INVALID_PROVIDER', provider_error=str(exc))
             break
-        calls = message.get('tool_calls') or []
         transcript.append({'turn': turn, 'message': message, 'provider': usage})
         save(Path(out) / 'transcript.json', transcript)
-        if len(calls) != 1:
+        calls = message.get('tool_calls') if isinstance(message, dict) else None
+        if (not isinstance(message, dict) or message.get('role') != 'assistant'
+                or not isinstance(calls, list) or len(calls) != 1):
             report['execution'] = 'INVALID_MODEL_ACTION'
             break
         call = calls[0]
         try:
+            if (not isinstance(call, dict) or call.get('type') != 'function'
+                    or not isinstance(call.get('id'), str) or not call['id'].strip()
+                    or call['id'] in seen_call_ids
+                    or not isinstance(call.get('function'), dict)):
+                raise ValueError('malformed_or_reused_tool_call')
             function = call['function']
             spec = next(d for d in definitions if d['name'] == function['name'])
             arguments = json.loads(function['arguments'])
@@ -146,15 +187,23 @@ def run_session(host, question, *, arm, provider, out):
             # Deliberately no schema repair or new prompt after invalid actions.
             report.update(execution='INVALID_MODEL_ACTION', action_error=type(exc).__name__)
             break
+        seen_call_ids.add(call['id'])
         messages.append(message)
         if function['name'] == 'submit_answer':
             report.update(execution='COMPLETE', finish=arguments,
                           citation_errors=host.citation_errors(arguments['citations']))
             if arguments['status'] in {'answered', 'partial'} and not arguments['citations']:
                 report['citation_errors'].append('asserted_answer_without_citation')
+            # These are observable protocol inconsistencies, not a semantic judge.
+            report['finish_contract_errors'] = []
+            if arguments['status'] == 'needs_user_data' and not arguments['question_for_user'].strip():
+                report['finish_contract_errors'].append('user_data_status_without_question')
+            if arguments['status'] == 'answered' and not arguments['answer'].strip():
+                report['finish_contract_errors'].append('answered_without_answer')
             break
         result = host.read_section(arguments['handle'])
         transcript[-1]['tool_result'] = result
+        save(Path(out) / 'transcript.json', transcript)
         messages.append({'role': 'tool', 'tool_call_id': call['id'],
                          'content': json.dumps(result, ensure_ascii=False)})
     report['visible_evidence'] = list(deepcopy(host._evidence).values())

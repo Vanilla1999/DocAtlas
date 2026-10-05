@@ -84,10 +84,26 @@ class SectionHost:
             if reason:
                 self.omissions.append({'evidence_id': public['evidence_id'], 'reason': str(reason)})
                 continue
-            visible = sorted((s['char_start'], s['char_end'])
-                for b in snapshot.values() for s in [b.get('source') or {}]
-                if s.get('path') == reference.path and s.get('project_identity') == reference.project_identity
-                and s.get('_source_snapshot_sha256') == reference.content_sha256)
+            # Only initial PUBLIC citations count as seen. The private snapshot
+            # may contain other prepared sections that the model never received.
+            visible = []
+            for shown in context.get('sources', []):
+                binding = snapshot.get(shown['evidence_id']) or {}
+                original = binding.get('source') or {}
+                if (original.get('path') != reference.path
+                        or original.get('project_identity') != reference.project_identity
+                        or original.get('_source_snapshot_sha256') != reference.content_sha256):
+                    continue
+                a, b = original.get('char_start'), original.get('char_end')
+                if (binding.get('projected_source') != shown
+                        or type(a) is not int or type(b) is not int
+                        or not 0 <= a < b <= len(raw)
+                        or raw[a:b] != shown.get('snippet')):
+                    # This pilot starts from whole exact C windows, not arbitrary
+                    # clipped product DTOs. Do not find the quote elsewhere.
+                    raise ValueError('initial public span is not exact')
+                visible.append((a, b))
+            visible.sort()
             entries = []
             for parent in parse_markdown_parents(raw, reference.path):
                 if len(self._sections) >= SourceContinuationReader.max_references:
@@ -186,6 +202,6 @@ class SectionHost:
         errors = []
         for row in citations:
             source = self._evidence.get(row['evidence_id'])
-            if source is None or not row['quote'] or row['quote'] not in source.get('snippet', ''):
+            if source is None or not row['quote'].strip() or row['quote'] not in source.get('snippet', ''):
                 errors.append('quote_not_in_visible_evidence')
         return errors

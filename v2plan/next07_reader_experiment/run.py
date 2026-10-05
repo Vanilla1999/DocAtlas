@@ -13,13 +13,14 @@ import json
 import os
 from pathlib import Path
 import random
+import secrets
 import subprocess
 import sys
 import traceback
 
 from v2plan.next07_reader_experiment.cases import load_cases
 from v2plan.next07_reader_experiment.host import SectionHost
-from v2plan.next07_reader_experiment.model import DEFAULT_MODEL, OpenAIReader, save, run_session
+from v2plan.next07_reader_experiment.model import OpenAIReader, save, run_session
 
 BASELINE = '3195ff26090e71429feb4abf8e51d4fbbc4df994'
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,7 +32,8 @@ def hashes():
                     'v2plan/next07*.py', 'v2plan/third_party/**/*',
                     'v2plan/next07_reader_experiment/*.py'):
         paths.extend(p for p in ROOT.glob(pattern) if p.is_file() and '__pycache__' not in p.parts)
-    paths += [ROOT / 'v2plan/NEXT_07_READER_NAVIGATION_TEST_RU.md']
+    paths += [ROOT / 'v2plan/NEXT_07_READER_NAVIGATION_TEST_RU.md',
+              ROOT / 'v2plan/NEXT_07_READER_REVIEW_AND_RUN_RU.md']
     return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(set(paths))}
 
 
@@ -110,8 +112,10 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode', choices=('native', 'live'), required=True)
     parser.add_argument('--out', required=True, type=Path)
-    parser.add_argument('--model', default=DEFAULT_MODEL)
+    parser.add_argument('--model', help='Exact reader model chosen explicitly for a live run.')
     args = parser.parse_args(argv)
+    if args.mode == 'live' and (not args.model or not args.model.strip()):
+        parser.error('--mode live requires an explicit --model; no model is selected automatically')
     args.out.mkdir(parents=True, exist_ok=False)
     cases = load_cases()
     if len(cases) != 10 or len({c.case_id for c in cases}) != 10:
@@ -173,9 +177,15 @@ def main(argv=None):
         if complete != 20:
             result['status'] = 'MODEL_PILOT_PARTIAL'
         reviews = []
+        review_key = {}
         for row in rows:
             for arm, item in row.get('arms', {}).items():
-                reviews.append({'review_id': hashlib.sha256((row['case_id'] + arm).encode()).hexdigest()[:12],
+                review_id = secrets.token_hex(12)
+                review_key[review_id] = {'case': row['case_id'], 'arm': arm}
+                reviews.append({'review_id': review_id,
+                    'execution': item.get('execution'),
+                    'rubric': next(c.rubric for c in cases if c.case_id == row['case_id']),
+                    'finish_contract_errors': item.get('finish_contract_errors', []),
                     'question': next(c.question for c in cases if c.case_id == row['case_id']),
                     'finish': item.get('finish'), 'citation_errors': item.get('citation_errors'),
                     'visible_evidence': item.get('visible_evidence', []),
@@ -184,8 +194,7 @@ def main(argv=None):
                                  'honest_unknown_or_user_question', 'no_source_instruction_following']})
         random.Random(731).shuffle(reviews)
         save(args.out / 'blind-review-queue.json', reviews)
-        save(args.out / 'review-key-private.json', {hashlib.sha256((row['case_id'] + arm).encode()).hexdigest()[:12]:
-            {'case': row['case_id'], 'arm': arm} for row in rows for arm in row.get('arms', {})})
+        save(args.out / 'review-key-private.json', review_key)
     save(args.out / 'result.json', result)
     save(args.out / 'postflight-hashes.json', hashes())
     print(json.dumps({k: v for k, v in result.items() if k != 'rows'}, ensure_ascii=False, indent=2))

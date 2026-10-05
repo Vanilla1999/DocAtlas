@@ -6,10 +6,15 @@ on:
     paths: ['.github/workflows/next07-reader-navigation.yml']
   workflow_dispatch:
     inputs:
-      model:
-        description: 'Explicit OpenAI reader model for this run; no automatic substitution'
+      run_model:
+        description: 'Authorize up to 40 external model requests; technical-only by default'
+        type: boolean
         required: true
-        default: 'gpt-4o-mini-2024-07-18'
+        default: false
+      model:
+        description: 'Exact reader model, required only when run_model is true; no default'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -40,7 +45,7 @@ jobs:
           python - <<'PY'
           import hashlib, json
           from pathlib import Path
-          for name, expected in json.loads(Path('v2plan/artifacts/next07/reader-navigation-20261005/reviewed-hashes.json').read_text()).items():
+          for name, expected in json.loads(Path('v2plan/artifacts/next07/reader-review-20261005/reviewed-hashes.json').read_text()).items():
               assert hashlib.sha256(Path(name).read_bytes()).hexdigest() == expected, name
           PY
       - name: Install complete project environment
@@ -50,9 +55,10 @@ jobs:
       - name: Research host and unchanged initial-source contracts
         run: |
           set +e
-          python -m pytest -q v2plan/test_next07_reader_experiment.py v2plan/test_next07_grounded_first.py v2plan/test_next07_scope_native.py --junitxml="$RUNNER_TEMP/reader-pilot/tests.xml" > "$RUNNER_TEMP/reader-pilot/tests.log" 2>&1
+          python -m pytest -q v2plan/test_next07_reader_experiment.py v2plan/test_next07_reader_review.py v2plan/test_next07_grounded_first.py v2plan/test_next07_scope_native.py --junitxml="$RUNNER_TEMP/reader-pilot/tests.xml" > "$RUNNER_TEMP/reader-pilot/tests.log" 2>&1
           rc=$?
           echo "$rc" > "$RUNNER_TEMP/reader-pilot/tests-exit.txt"
+          tail -n 8 "$RUNNER_TEMP/reader-pilot/tests.log"
           exit "$rc"
       - name: Native first packets and scripted reachability NOT model evidence
         run: |
@@ -60,17 +66,26 @@ jobs:
           python -m v2plan.next07_reader_experiment.run --mode native --out "$RUNNER_TEMP/reader-pilot/native" > "$RUNNER_TEMP/reader-pilot/native.log" 2>&1
           rc=$?
           echo "$rc" > "$RUNNER_TEMP/reader-pilot/native-exit.txt"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path(os.environ['RUNNER_TEMP']) / 'reader-pilot/native/result.json'
+          if p.exists():
+              r = json.loads(p.read_text())
+              print(json.dumps({k: r.get(k) for k in ('status','cases_recorded','fastapi_scripted_path_verified_NOT_MODEL','frozen_inputs_unchanged')}, indent=2))
+          PY
           exit "$rc"
-      - name: External model pilot or explicit provider blocker
+      - name: Explicitly authorized external model pilot
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_model }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          PILOT_MODEL: ${{ inputs.model || 'gpt-4o-mini-2024-07-18' }}
+          PILOT_MODEL: ${{ inputs.model }}
         run: |
           set +e
           python -m v2plan.next07_reader_experiment.run --mode live --model "$PILOT_MODEL" --out "$RUNNER_TEMP/reader-pilot/model" > "$RUNNER_TEMP/reader-pilot/model.log" 2>&1
           rc=$?
           echo "$rc" > "$RUNNER_TEMP/reader-pilot/model-exit.txt"
-          exit 0
+          exit "$rc"
       - name: Record exact completion boundaries
         if: always()
         run: |
@@ -86,12 +101,14 @@ jobs:
               p = root / name / 'result.json'
               item = json.loads(p.read_text()) if p.exists() else {}
               result[name + '_status'] = item.get('status', 'NOT_RUN')
+              if name == 'tests' and result['tests_exit'] == 0:
+                  result['tests_status'] = 'PASSED'
               if name == 'model':
                   result['completed_model_sessions'] = item.get('completed_model_sessions', item.get('model_sessions', 0))
           (root / 'summary.json').write_text(json.dumps(result, indent=2) + '\n')
           print(json.dumps(result, indent=2))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
-              stream.write('### Reader pilot: technical and model results are separate\n```json\n' + json.dumps(result, indent=2) + '\n```\n')
+              stream.write('### Technical results are not model evidence\n```json\n' + json.dumps(result, indent=2) + '\n```\n')
           PY
       - name: Preserve raw public traces and model-visible transcripts
         if: always()
