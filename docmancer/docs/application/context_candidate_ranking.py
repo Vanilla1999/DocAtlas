@@ -111,10 +111,6 @@ def _facet_aware_candidates(
     term_weights = {term: math.log1p(len(source_paths) / (1 + len(paths)))
                     for term, paths in term_sources.items()}
 
-    from docmancer.docs.domain.need_composition import independent_sentence_spans
-    full_question = query_text.get("query-original", "")
-    independent_texts = {full_question[a:b] for a, b in independent_sentence_spans(full_question)}
-
     def candidate_key(source: Any) -> tuple[Any, ...]:
         qualified_ids = attributable_query_ids((source,))
         exact_count = len(qualified_ids & (exact_query_ids or set()))
@@ -159,14 +155,10 @@ def _facet_aware_candidates(
         original_body_overlap = sum(weight for term, weight in term_weights.items()
             if _visible_term_present(term, body_text.casefold(), exact=False)
         ) if qualified_ids & required_query_ids and not exact_count else 0
-        independent_ratio = max((float(trace.get("match_ratio") or 0.0)
-            for key, trace in eligible_traces.items()
-            if key in (need_query_ids or set()) and trace.get("query_text") in independent_texts
-            and not trace.get("public_parent_query_id")), default=0.0)
         # Keep all tuple dimensions, notably the fallback prefix key[:9]. No
         # removed semantic preference is replaced with manufactured coverage.
         return (
-            need_count, independent_ratio, 0, 0.0, (0.0,) * 9, 0,
+            need_count, 0.0, 0, 0.0, (0.0,) * 9, 0,
             relation_group_count, relation_group_match_ratio, relation_group_lexical,
             0, 0,
             (len(_fully_matched_query_ids((source,)) & required_query_ids & (host_query_ids or set()))

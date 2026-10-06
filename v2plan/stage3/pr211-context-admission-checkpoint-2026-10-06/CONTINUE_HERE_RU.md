@@ -2,6 +2,14 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Latest parallel slice:** [PARALLEL_REMAINING_EXIT_RU.md](PARALLEL_REMAINING_EXIT_RU.md).
+SDK/patch+standalonevalidator, corpus ranking/root inference, delivered MCP/static/
+dynamic policy и live read tails реализованы, independent scoped reviews approved.
+723newtestsPASS, stdioMCPsmokePASS, frozenpins13/13 unchanged. Technical45pass/1red,
+oldvalidator19pass/12red и прочие mixedreds сохранены; self-host qualityFAIL.
+Next OPEN: explicit bounded corpus contract/discovery priorities и dormant compiler/
+proof exit; ниже планы предыдущих slices исторические. Rawgzip остаётся внеGit.
+
 **Latest slice:** [LITERAL_NEEDS_FOLLOWUP_RU.md](LITERAL_NEEDS_FOLLOWUP_RU.md).
 Semantic needs и NL clause/context inheritance удалены из default needs producers;
 live recovery clause splitter отвязан. 447 новых tests PASS, MCP smoke PASS,

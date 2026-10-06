@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_dynamic_resources.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/test_dictionary_exit_dynamic_resources.py::test_actual_resource_examples_use_public_arguments_without_generated_question": "schema",
+    "tests/test_dictionary_exit_dynamic_resources.py::test_lifecycle_requires_explicit_or_returned_action_consent_readiness_and_success": "schema",
+    "tests/test_dictionary_exit_dynamic_resources.py::test_guidance_preserves_source_scope_version_and_no_proof_authority": "schema"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_dynamic_resources.py": "310c99991a1c13339143f1ecfd7f7316a38f39496fe45b23d33a9b12cb17792d"
+  }
+}

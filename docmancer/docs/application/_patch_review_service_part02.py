@@ -43,6 +43,8 @@ class _PatchReviewServicePart02:
         )
         return {
             "schema_version": PATCH_REVIEW_SCHEMA_VERSIONS["review_summary_quality.json"],
+            "policy_coverage": "unresolved",
+            "mutation_authorized": False,
             "attachable": quality["attachable"],
             "summary_mode": summary_mode,
             "actionable_items_limit": summary_max_items,
@@ -406,24 +408,17 @@ class _PatchReviewServicePart02:
         ctype = str(item.get("type") or "")
         confidence = str(item.get("confidence") or "low")
         haystack = f"{instruction} {evidence} {' '.join(item.get('symbols') or [])}".lower()
-        haystack_compact = re.sub(r"[^a-z0-9]+", "", haystack)
         changed = " ".join(changed_files).lower()
         task_lower = task.lower()
         priority = 50
-        if ctype in {"generated_file", "forbidden_edit"} or "generated" in haystack or "lockfile" in haystack:
+        if ctype in {"generated_file", "forbidden_edit"}:
             priority = min(priority, 10)
         if any(path and path.lower() in source.lower() for path in changed_files):
             priority = min(priority, 15)
-        if any(token in haystack or token in haystack_compact for token in PatchReviewService._task_symbol_tokens(task_lower)):
+        if any(re.search(rf"(?<![\w]){re.escape(token)}(?![\w])", haystack) for token in PatchReviewService._task_symbol_tokens(task_lower)):
             priority = min(priority, 20)
-        if "policy" in task_lower and ("provider" in haystack or "policy" in haystack or "ui" in haystack):
-            priority = min(priority, 22)
         if source.startswith("docs/research/docatlas-dogfood"):
             priority = max(priority, 80)
-        if PatchReviewService._is_broad_context_source(source, instruction):
-            priority = max(priority, 60)
-        if PatchReviewService._has_only_low_value_symbols(item) or PatchReviewService._has_low_value_matched_symbol(item):
-            priority = max(priority, 60)
         confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
         if source and source.lower() in changed:
             priority -= 3
@@ -454,37 +449,12 @@ class _PatchReviewServicePart02:
 
     @staticmethod
     def _task_symbol_tokens(task_lower: str) -> set[str]:
-        tokens = {
-            token
-            for token in re.findall(r"[a-zа-я0-9_]{3,}", task_lower, flags=re.IGNORECASE)
-            if token not in TASK_TOKEN_STOPWORDS
-            and token not in {value.lower() for value in LOW_VALUE_SYMBOLS}
-        }
-        compact_task = re.sub(r"[^a-zа-я0-9]+", "", task_lower, flags=re.IGNORECASE)
-        for token in ("openinfo", "closemenu", "gotoscandocinit", "generated", "lockfile", "provider", "policy"):
-            if token.lower() in task_lower:
-                tokens.add(token.lower())
-        for phrase in re.findall(r"[a-z][a-z0-9_]*(?:\s+[a-z][a-z0-9_]*)+", task_lower):
-            compact_phrase = re.sub(r"[^a-z0-9]+", "", phrase)
-            if len(compact_phrase) >= 6:
-                tokens.add(compact_phrase)
-        if compact_task and len(compact_task) <= 48:
-            tokens.add(compact_task)
-        if "быстрая информация" in task_lower or "quick-info" in task_lower or "quick info" in task_lower:
-            tokens.add("openinfo")
-        if "закры" in task_lower or "close menu" in task_lower or "штор" in task_lower:
-            tokens.add("closemenu")
-        if "scan" in task_lower or "скан" in task_lower:
-            tokens.add("gotoscandocinit")
-        return tokens
+        return set(re.findall(r"[\w]+", task_lower, flags=re.UNICODE))
 
     @staticmethod
     def _is_low_value_symbol_candidate(item: dict[str, Any], task: str) -> bool:
-        symbol = str(item.get("matched_symbol") or "")
-        task_lower = task.lower()
-        if symbol in LOW_VALUE_SYMBOLS or symbol.lower() in {value.lower() for value in LOW_VALUE_SYMBOLS}:
-            explicit = symbol.lower() in task_lower
-            return not explicit
+        if item.get("confidence") == "low":
+            return True
         evidence = str(item.get("evidence") or "").strip()
         if evidence.startswith(("import ", "export ", "part ")):
             return True
@@ -492,35 +462,18 @@ class _PatchReviewServicePart02:
 
     @staticmethod
     def _has_only_low_value_symbols(item: dict[str, Any]) -> bool:
-        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
-        if not symbols:
-            return False
-        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
-        return all(symbol in LOW_VALUE_SYMBOLS or symbol.lower() in low_value for symbol in symbols)
+        return item.get("confidence") == "low"
 
     @staticmethod
     def _has_low_value_matched_symbol(item: dict[str, Any]) -> bool:
-        symbols = [str(symbol or "") for symbol in item.get("symbols") or []]
-        if len(symbols) < 2:
-            return False
-        low_value = {value.lower() for value in LOW_VALUE_SYMBOLS}
-        matched_symbol = symbols[-1]
-        if matched_symbol not in LOW_VALUE_SYMBOLS and matched_symbol.lower() not in low_value:
-            return False
         evidence = str(item.get("evidence") or "").strip()
         if evidence.startswith(("import ", "export ", "part ")):
             return True
-        instruction = str(item.get("instruction") or "")
-        return "matches existing project symbol" in instruction
+        return item.get("confidence") == "low"
 
     @staticmethod
     def _is_broad_context_source(source: str, instruction: str) -> bool:
-        lowered = f"{source} {instruction}".lower()
-        return (
-            "external_oidc" in lowered
-            or "rules that must not be violated" in lowered
-            or "mainscreen owns global runtime" in lowered
-        )
+        return False
 
     @staticmethod
     def _unknown_buckets(unknowns: list[dict[str, Any]], constraints: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
@@ -529,17 +482,14 @@ class _PatchReviewServicePart02:
         for item in unknowns:
             constraint = by_id.get(item.get("constraint_id"), {})
             source = str(constraint.get("source") or "")
-            reason = str(item.get("reason") or "")
-            text = f"{item.get('constraint_id')} {reason} {source}".lower()
+            ctype = constraint.get("type")
             if source.startswith("docs/research/docatlas-dogfood"):
                 bucket = "Residual dogfood/research memo context"
-            elif "source-of-truth" in text or "source_of_truth" in text or "ownership" in text or "owns" in text:
+            elif ctype == "source_of_truth":
                 bucket = "Source-of-truth ownership unknowns"
-            elif "provider" in text or "ui" in text or "policy" in text or "presentation" in text:
-                bucket = "Provider/UI policy ownership unknowns"
-            elif "generated" in text or "lockfile" in text or "protected" in text:
+            elif ctype in {"generated_file", "forbidden_edit", "dependency_version"}:
                 bucket = "Generated/lockfile/protected-file unknowns"
-            elif "module" in text or "boundary" in text or "route" in text or "scan_doc" in text or "architecture" in text:
+            elif ctype == "architecture":
                 bucket = "Module-boundary context unknowns"
             else:
                 bucket = "Other low-confidence context"
@@ -563,34 +513,12 @@ class _PatchReviewServicePart02:
         }
         for item in unknowns:
             constraint = by_id.get(item.get("constraint_id"), {})
-            manual_text = " ".join(
-                str(value or "")
-                for value in (
-                    item.get("reason"),
-                    constraint.get("instruction"),
-                    constraint.get("evidence"),
-                    constraint.get("source"),
-                )
-            ).lower()
-            evidence_text = " ".join(
-                str(value or "")
-                for value in (
-                    item.get("constraint_id"),
-                    item.get("reason"),
-                    constraint.get("instruction"),
-                    constraint.get("evidence"),
-                    constraint.get("source"),
-                    constraint.get("type"),
-                )
-            ).lower()
-            if PatchReviewService._has_manual_unknown_signal(manual_text):
+            if item.get("status") == "manual_review":
                 code = "manual_review_required"
-            elif "test" in evidence_text or "coverage" in evidence_text or "regression" in evidence_text:
+            elif constraint.get("type") == "verification":
                 code = "missing_test_evidence"
-            elif PatchReviewService._has_missing_diff_unknown_signal(evidence_text):
-                code = "missing_diff_evidence"
             else:
-                code = "low_risk_unknown"
+                code = "manual_review_required"
             buckets[code].append(item)
         return [
             {
@@ -621,55 +549,12 @@ class _PatchReviewServicePart02:
 
     @staticmethod
     def _has_manual_unknown_signal(text: str) -> bool:
-        manual_tokens = (
-            "manual review",
-            "manual reviewer",
-            "manual approval",
-            "manual decision",
-            "manual triage",
-            "human review",
-            "human reviewer",
-            "designer",
-            "open question",
-            "ownership",
-            "source-of-truth",
-            "source of truth",
-            "policy",
-            "дизайнер",
-            "дизайнера",
-            "дизайнером",
-            "открытый вопрос",
-            "открыт вопрос",
-            "владель",
-            "ответствен",
-            "согласовать",
-            "уточнить",
-            "политик",
-        )
-        if any(token in text for token in manual_tokens):
-            return True
-        return bool(re.search(r"\bdesign\s+(?:input|question|approval|review|owner|dependency)\b", text))
+        # Unresolved prose cannot certify an automatic pass.
+        return bool(text)
 
     @staticmethod
     def _has_missing_diff_unknown_signal(text: str) -> bool:
-        if any(
-            token in text
-            for token in (
-                "diff",
-                "changed-file",
-                "changed file",
-                "patch",
-                "direct evidence",
-                "not found",
-                "missing evidence",
-                "changed files unavailable",
-                "changed files or diff unavailable",
-                "not deterministically checkable from changed files",
-                "not deterministic for this patch",
-            )
-        ):
-            return True
-        return any(token in text for token in ("source question", "source changed_files", "source changed files"))
+        return False
 
     @staticmethod
     def _summary_quality(

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import re
-from urllib.parse import urlparse, urljoin
+from urllib.parse import unquote, urlparse, urljoin
 
 from w3lib.url import canonicalize_url
 
@@ -80,7 +80,6 @@ def normalize_url(url: str) -> str:
     return url
 
 
-_ROOT_HINT_SEGMENTS = {"docs", "doc", "documentation", "api", "reference", "sdk", "cli"}
 _LOCALE_PREFIXES = {
     "ar",
     "bn",
@@ -113,65 +112,31 @@ def _starts_with_parts(parts: list[str], prefix: list[str]) -> bool:
 
 
 def infer_docset_root(url: str) -> str | None:
-    """Infer a high-level docs root for legacy URL records without explicit docset metadata."""
-    if not url.startswith(("http://", "https://")):
-        return None
+    """Legacy hook: a URL alone does not establish docset identity or scope.
 
-    normalized = normalize_url(url)
-    parsed = urlparse(normalized)
-    host_root = f"{parsed.scheme}://{parsed.netloc}"
-    path = parsed.path or ""
-
-    if path.endswith("/llms-full.txt"):
-        return host_root + path.removesuffix("/llms-full.txt")
-    if path.endswith("/llms.txt"):
-        return host_root + path.removesuffix("/llms.txt")
-
-    # Dedicated docs hosts usually represent a single doc library.
-    host = parsed.netloc.lower()
-    if host.startswith("docs.") or host.startswith("doc.") or host.startswith("api."):
-        return host_root
-
-    parts = [part for part in path.split("/") if part]
-    if parts and parts[0].lower() in _ROOT_HINT_SEGMENTS:
-        return f"{host_root}/{parts[0]}"
-
-    return host_root
+    Callers retain their exact source URL when explicit docset metadata is absent.
+    Neither host labels nor path words authorize a broader corpus root.
+    """
+    return None
 
 
 def _infer_scope_path(base_path: str) -> str:
-    """Widen a deep base path to the nearest docs section boundary.
+    """Retain the supplied path; never guess a parent section boundary."""
+    return base_path.rstrip("/")
 
-    When a user passes a URL like ``/docs/ai/overview``, we want to scope
-    the crawl to ``/docs/ai`` (the section root), not just ``/docs/ai/overview``.
-    This lets sibling pages like ``/docs/ai/agents`` be discovered from sitemaps.
 
-    The algorithm walks up from the deepest segment and stops at:
-    - A recognized docs root segment (``docs``, ``api``, ``reference``, etc.)
-      with at least one child segment (e.g. ``/docs/ai`` keeps ``ai``).
-    - One level above the leaf if no root hint is found (strips the leaf).
-
-    If the base path has two or fewer segments, it is returned unchanged.
-    """
-    parts = [p for p in base_path.strip("/").split("/") if p]
-
-    if len(parts) <= 2:
-        return base_path.rstrip("/")
-
-    # Find the deepest root-hint segment.
-    root_idx = None
-    for i, segment in enumerate(parts):
-        if segment.lower() in _ROOT_HINT_SEGMENTS:
-            root_idx = i
-
-    if root_idx is not None and root_idx + 1 < len(parts):
-        # Keep the root hint plus one child: /docs/ai
-        scope_parts = parts[: root_idx + 2]
+def _safe_scope_path(path: str) -> bool:
+    """Reject transport spellings that can escape a literal path boundary."""
+    decoded = path
+    for _ in range(3):
+        value = unquote(decoded)
+        if value == decoded:
+            break
+        decoded = value
     else:
-        # No root hint found; strip the leaf segment: /a/b/c -> /a/b
-        scope_parts = parts[:-1]
-
-    return "/" + "/".join(scope_parts)
+        if unquote(decoded) != decoded:
+            return False
+    return "\\" not in decoded and not any(part in {".", ".."} for part in decoded.split("/"))
 
 
 def is_docs_url(url: str, base_url: str, locale_skip_counter: list[int] | None = None) -> bool:
@@ -179,12 +144,10 @@ def is_docs_url(url: str, base_url: str, locale_skip_counter: list[int] | None =
 
     A URL is in scope if:
     - It shares the same domain as the base URL
-    - Its path starts at or below the inferred scope path
+    - Its path is exactly the supplied base path or a descendant
     - It does not match any blocklist pattern
 
-    The scope path is widened from the exact base URL to the nearest
-    docs section boundary so that sibling pages are included. For
-    example, ``/docs/ai/overview`` widens to ``/docs/ai``.
+    No parent root or sibling-page scope is inferred from path vocabulary.
 
     Args:
         url: The candidate URL to check.
@@ -203,17 +166,21 @@ def is_docs_url(url: str, base_url: str, locale_skip_counter: list[int] | None =
         return False
 
     # Must be HTTP(S)
-    if parsed.scheme not in ("http", "https"):
+    if parsed.scheme not in ("http", "https") or base_parsed.scheme not in ("http", "https"):
+        return False
+    if not parsed.netloc or parsed.username is not None or base_parsed.username is not None:
         return False
 
     # Must share domain
     if parsed.netloc.lower() != base_parsed.netloc.lower():
         return False
+    if not _safe_scope_path(parsed.path) or not _safe_scope_path(base_parsed.path):
+        return False
 
-    # Must be at or below the inferred scope path
+    # Exact segment boundary, not a lexical prefix such as /docs-other.
     scope_path = _infer_scope_path(base_parsed.path.rstrip("/"))
     url_path = parsed.path.rstrip("/")
-    if scope_path and not url_path.startswith(scope_path):
+    if scope_path and url_path != scope_path and not url_path.startswith(scope_path + "/"):
         return False
 
     # Default web/Docusaurus ingest should not pull translated mirrors when

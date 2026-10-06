@@ -41,7 +41,7 @@ class _PatchConstraintsServicePart01:
         constraints.extend(self._dependency_constraints(root))
         requirements = self._task_terms(question)
         for changed in changed_files:
-            stem = Path(changed).stem.replace("_", " ").replace("-", " ")
+            stem = Path(changed).stem
             if len(stem) >= 3:
                 requirements.append(stem)
         repo_map, source_evidence = self._code_evidence(root, question, requirements, changed_files)
@@ -57,6 +57,7 @@ class _PatchConstraintsServicePart01:
         constraints = self._sort_constraints(constraints)
         selected, truncated = self._apply_budget(constraints, max_constraints=max_constraints, max_tokens=max_tokens)
         warnings: list[str] = []
+        warnings.append("Policy coverage unresolved: prose is not compiled into patch rules; this packet does not authorize edits.")
         if truncated:
             warnings.append("constraints truncated by budget: must/high-confidence direct-source constraints were kept before lower-confidence guidance.")
         if any(c.confidence == "low" for c in selected):
@@ -348,8 +349,7 @@ class _PatchConstraintsServicePart01:
         normalized = path.replace("\\", "/").lower().strip("/")
         if not (normalized == "example" or normalized.startswith("example/")):
             return False
-        text = f"{self._question} {' '.join(self._changed_files)}".lower().replace("\\", "/")
-        return not any(token in text for token in ("example", "sample", "demo", "пример"))
+        return not any(path.replace("\\", "/").startswith("example/") for path in self._changed_files)
 
     @staticmethod
     def _under_root(path: Path, root: Path) -> bool:
@@ -398,35 +398,8 @@ class _PatchConstraintsServicePart01:
 
     @staticmethod
     def _source_authority(path: str) -> str:
-        """Return an authority class for extracting agent-obeyable patch rules."""
-        normalized = (path or "").replace("\\", "/").lower().strip("/")
-        name = Path(normalized).name
-        if not normalized:
-            return "low"
-        if any(part in normalized for part in (
-            "/eval/", "eval/", "/results/", "results/", "/dogfood/", "dogfood/",
-            "/patch-review/", "/patch_review/", ".docatlas/",
-        )):
-            return "risky"
-        if normalized.startswith("docs/research/") or "/docs/research/" in f"/{normalized}":
-            return "low"
-        if any(token in name for token in (
-            "comparison", "benchmark", "pilot", "experiment", "research", "roadmap", "prompt", "brief",
-        )):
-            return "low"
-        if name in {"agents.md", "contributing.md", "architecture.md", "project_map.md"}:
-            return "high"
-        if name.startswith("adr") or normalized.startswith("adr/") or normalized.startswith("adrs/"):
-            return "high"
-        if normalized == "readme.md" or name == "readme.md":
-            return "high"
-        if normalized.startswith("docs/") and any(token in normalized for token in (
-            "architecture", "index", "development", "contributing", "runbook", "operations", "policy",
-        )):
-            return "medium"
-        if normalized.startswith("docs/") or name.endswith(".md") or name.endswith(".txt"):
-            return "medium"
-        return "low"
+        """A filename does not establish normative authority."""
+        return "risky" if PatchConstraintsService._excluded_source(path) else "low"
 
     @staticmethod
     def _is_markdown_table_row(raw: str) -> bool:
@@ -441,43 +414,20 @@ class _PatchConstraintsServicePart01:
 
     @staticmethod
     def _example_marker_re() -> re.Pattern[str]:
-        return re.compile(
-            r"\b(statements?\s+like|for\s+example|e\.g\.|i\.e\.|example(?:s)?|sample|hypothetical|such\s+as|например)\b",
-            re.I,
-        )
+        return re.compile(r"(?!)")
 
     @classmethod
     def _is_example_line(cls, line: str) -> bool:
-        stripped = (line or "").strip()
-        if not stripped:
-            return False
-        if cls._example_marker_re().search(stripped):
-            return True
-        # Treat quoted symbol-only owners in explanatory prose as examples unless other evidence grounds them.
-        if re.search(r"[\"'“”«»][A-Z][A-Za-z0-9_]*(?:Service|Manager|Repository|Controller|Policy|Layer|Adapter)[\"'“”«»]", stripped):
-            if re.search(r"\b(can|could|may|would|like|example|extract|detect|recognize|распозна)\b", stripped, re.I):
-                return True
+        # No semantic classification; all prose remains non-authoritative.
         return False
 
     @staticmethod
     def _is_example_heading(heading: str) -> bool:
-        lowered = (heading or "").lower()
-        return any(token in lowered for token in (
-            "example", "examples", "sample", "tutorial", "hypothesis", "research", "benchmark",
-            "comparison", "experiment", "prompt", "roadmap", "appendix", "пример",
-        ))
+        return False
 
     @staticmethod
     def _has_normative_language(line: str) -> bool:
-        if is_python_declaration(line):
-            return False
-        return has_normative_language(line) or bool(re.search(
-            r"\b(must(?:\s+not)?|should(?:\s+not)?|do\s+not|don't|required|requires|forbidden|never|"
-            r"source[- ]of[- ]truth|single\s+source|canonical|owned\s+by|owns|belongs\s+in|"
-            r"delegate(?:s)?\s+to|do\s+not\s+duplicate|do\s+not\s+bypass|do\s+not\s+hardcode)\b",
-            line or "",
-            re.I,
-        ))
+        return False
 
     @staticmethod
     def _line_metadata_suffix(*, authority: str, block: str, heading: str, downgrade_reason: str | None = None) -> str:
@@ -494,10 +444,7 @@ class _PatchConstraintsServicePart01:
         in_code = False
         heading = ""
         authority = self._source_authority(source_path)
-        python_declaration_lines = python_declaration_line_indexes(text)
         for line_index, raw in enumerate((text or "").splitlines()):
-            if line_index in python_declaration_lines:
-                continue
             stripped = raw.strip()
             if stripped.startswith("```") or stripped.startswith("~~~"):
                 in_code = not in_code
@@ -619,21 +566,7 @@ class _PatchConstraintsServicePart01:
         return False
 
     def _safe_constraint_profile(self, *, source_path: str, line: str, owner: str | None, candidate: dict[str, str]) -> tuple[str, str, str | None]:
-        """Return severity, confidence, downgrade_reason after applying the safety gate."""
-        authority = candidate.get("authority") or self._source_authority(source_path)
-        if candidate.get("is_example") == "true":
-            return "should", "low", "example_context"
-        if candidate.get("block") == "table":
-            return "should", "low", "table_row"
-        if authority in {"low", "risky"}:
-            return "should", "medium" if authority == "low" else "low", "low_authority_source"
-        if not self._has_normative_language(line):
-            return "should", "medium", "non_normative_language"
-        if owner and not self._owner_is_repo_grounded(owner):
-            return "should", "medium", "ungrounded_owner"
-        severity = "must" if re.search(r"\b(must|must not|do not|source[- ]of[- ]truth|owned by|owns|single source|never|required)\b", line, re.I) else "should"
-        confidence = "high" if severity == "must" and authority in {"high", "medium"} else "medium"
-        return severity, confidence, None
+        return "should", "low", "unresolved_policy_authority"
 
     def _final_token_clamp(self, constraints: list[PatchConstraint], warnings: list[str], *, max_constraints: int, max_tokens: int) -> tuple[list[PatchConstraint], bool]:
         """Apply the token budget after warnings have been assembled."""

@@ -1,10 +1,9 @@
 """Bounded recovery guidance for failed project-document evidence proof.
 
 Recovery is diagnostic-only: it never changes canonical evidence selection or
-turns an unsupported documentation answer into a supported one.  It explains
-where proof failed and, for parser/retrieval/bounded-selection failures, offers
-one non-automatic retry assembled only from source question spans plus fixed
-neutral wrappers.
+turns an unsupported documentation answer into a supported one. It preserves
+bounded original diagnostic fragments and typed non-automatic recovery, without
+synthesizing a different question or certifying paraphrase equivalence.
 """
 from __future__ import annotations
 
@@ -19,27 +18,6 @@ RECOVERY_SCHEMA_VERSION = 1
 MAX_PROBLEM_SPANS = 2
 MAX_RECOGNIZED_SPANS = 6
 MAX_SUGGESTED_QUESTIONS = 2
-
-_GENERIC_REPHRASE_PREFIX = "What does the project documentation say about "
-_GENERATED_EXACT_REPHRASE_RE = re.compile(
-    r"^\s*according\s+to\s+[`\"']?(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*"
-    r"[A-Za-z0-9_.-]+\.(?:md|mdx|rst|txt|adoc)[`\"']?\s*,\s*"
-    r"what\s+does\s+it\s+say\s+about\s+",
-    re.I,
-)
-_IMPERATIVE_PREFIX_RE = re.compile(
-    r"^(?:implement|create|build|write|develop|introduce|replace|add|change|edit|"
-    r"modify|fix|refactor|remove|rename|update|patch|migrate|code|"
-    r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
-    r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b\s*",
-    re.I,
-)
-_LEADING_CODE_PATH_RE = re.compile(
-    r"^(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\."
-    r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp)"
-    r"(?:\s+(?:so|to|for|чтобы|для)\s+|\s+)",
-    re.I,
-)
 
 # These are operational states with a concrete recovery that is more precise
 # than changing the wording of the question.
@@ -112,67 +90,14 @@ def _problem_spans(question: str, requirements: Any) -> list[str]:
     return [text] if text else []
 
 
-def _already_rephrased(question: str) -> bool:
-    folded = question.strip().casefold()
-    return folded.startswith(_GENERIC_REPHRASE_PREFIX.casefold()) or bool(
-        _GENERATED_EXACT_REPHRASE_RE.search(question)
-    )
-
-
-def _rephrase_subject_fragment(value: object) -> str:
-    fragment = _clean_fragment(value, max_chars=220)
-    fragment = _IMPERATIVE_PREFIX_RE.sub("", fragment, count=1)
-    fragment = _LEADING_CODE_PATH_RE.sub("", fragment, count=1)
-    return _clean_fragment(fragment, max_chars=140)
-
-
 def _suggested_questions(
     question: str,
     requirements: Any,
     *,
     evidence_path: str | None,
 ) -> list[str]:
-    # The fixed English wrapper cannot preserve Russian grammar or semantics.
-    # Prefer the typed local-source recovery until a reviewed same-language
-    # rephrase family exists.
-    if re.search(r"[А-Яа-яЁё]", question):
-        return []
-    candidates = _requirement_spans(requirements, question)
-    for hint in _exact_question_hints(requirements, question):
-        if hint.casefold() not in {item.casefold() for item in candidates}:
-            candidates.append(hint)
-    if not candidates:
-        candidates = _problem_spans(question, requirements)
-    if evidence_path:
-        normalized_locator = evidence_path.replace("\\", "/").casefold()
-        locator_leaf = normalized_locator.rsplit("/", 1)[-1]
-        candidates = [
-            value for value in candidates
-            if _clean_fragment(value, max_chars=240).replace("\\", "/").casefold()
-            not in {normalized_locator, locator_leaf}
-        ]
-
-    result: list[str] = []
-    attempted_problem_fallback = False
-    while True:
-        for fragment in candidates:
-            fragment = _rephrase_subject_fragment(fragment)
-            if not fragment:
-                continue
-            if evidence_path:
-                suggestion = f"According to {evidence_path}, what does it say about {fragment}?"
-            else:
-                suggestion = f"{_GENERIC_REPHRASE_PREFIX}{fragment}?"
-            if suggestion.casefold() == question.strip().casefold():
-                continue
-            result.append(suggestion[:320])
-            if len(result) >= MAX_SUGGESTED_QUESTIONS:
-                break
-        if result or attempted_problem_fallback:
-            break
-        candidates = _problem_spans(question, requirements)
-        attempted_problem_fallback = True
-    return list(dict.fromkeys(result))[:MAX_SUGGESTED_QUESTIONS]
+    """Compatibility adapter: diagnostic fragments never synthesize a question."""
+    return []
 
 
 def build_recovery_diagnosis(
@@ -311,29 +236,8 @@ def build_recovery_diagnosis(
     if problems:
         result["problem_spans"] = problems[:MAX_PROBLEM_SPANS]
 
-    if _already_rephrased(question):
-        result.update({
-            "disposition": "search_local_source",
-            "rephrase_exhausted": True,
-        })
-        return result
-
-    suggestions = _suggested_questions(
-        question,
-        requirements,
-        evidence_path=evidence_path,
-    )
-    if suggestions:
-        result.update({
-            "disposition": "rephrase_question",
-            "suggested_questions": suggestions,
-            "rephrase_exhausted": False,
-        })
-    else:
-        result.update({
-            "disposition": "search_local_source",
-            "rephrase_exhausted": True,
-        })
+    # Uncertain proof permits bounded investigation, never a synthesized retry.
+    result["disposition"] = "search_local_source"
     return result
 
 
@@ -370,39 +274,8 @@ def recovery_action(
         return None
     disposition = str(diagnosis.get("disposition") or "")
     if disposition == "rephrase_question":
-        suggestions = [
-            str(value)[:320]
-            for value in diagnosis.get("suggested_questions") or []
-            if str(value).strip()
-        ][:MAX_SUGGESTED_QUESTIONS]
-        if not suggestions:
-            return None
-        arguments_patch: dict[str, Any] = {"question": suggestions[0]}
-        for key, value in (("project_path", project_path), ("scope", scope), ("mode", mode)):
-            if value:
-                arguments_patch[key] = value
-        return {
-            "type": "rephrase_question",
-            "tool": "get_docs_context",
-            "handled_by": "coding_agent",
-            "requires_confirmation": False,
-            "reason": str(diagnosis.get("reason_code") or "question_parse_uncertain"),
-            "agent_question": (
-                "DocAtlas could not complete documentation proof for the original wording. "
-                "Retry at most one suggested question without treating it as equivalent proof."
-            ),
-            "observations": [
-                *[f"problem_span: {value}" for value in diagnosis.get("problem_spans") or []],
-                *[f"recognized_span: {value}" for value in diagnosis.get("recognized_spans") or []],
-            ][:6],
-            "decision_options": [
-                {"question": value, "preserves_source_words": True}
-                for value in suggestions
-            ],
-            "arguments_patch": arguments_patch,
-            "repeat_docs_context": True,
-            "auto_execute": False,
-        }
+        # A legacy/supplied diagnosis cannot restore semantic retry authority.
+        return None
     if disposition == "search_local_source":
         terms = [
             str(value)[:160]

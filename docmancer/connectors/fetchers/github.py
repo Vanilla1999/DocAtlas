@@ -463,12 +463,8 @@ class GitHubFetcher:
                 clean_folder = folder.strip("./").strip("/")
                 if clean_folder and file_path.startswith(clean_folder + "/"):
                     return (idx, file_path)
-        if file_path.startswith(("docs/", "doc/", "documentation/")):
-            return (10, file_path)
-        if file_path.upper() == "README.MD":
-            return (30, file_path)
-        if "/" not in file_path:
-            return (20, file_path)
+        # Only explicitly ordered folders receive priority. Path vocabulary is
+        # not evidence that a file is more relevant or authoritative.
         return (40, file_path)
 
     def _load_context7_config(

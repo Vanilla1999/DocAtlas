@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_patch_boundary.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_patch_boundary.py": "4b1ce80f4d4e45566b13da8e39dba180c2dcb4dc13f7235d100c709f3d2a5835"
+  }
+}

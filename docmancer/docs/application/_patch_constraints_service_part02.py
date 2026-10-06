@@ -6,146 +6,23 @@ from ._patch_constraints_service_shared import *  # noqa: F401,F403
 
 class _PatchConstraintsServicePart02:
     def _architecture_constraints(self, sources: list[dict[str, str]]) -> list[PatchConstraint]:
-        constraints: list[PatchConstraint] = []
-
-        for source in sources:
-            source_path = source["path"]
-            if not self._source_relevant_to_task(source_path, source["text"]):
-                continue
-            for candidate in self._iter_constraint_lines(source["text"], source_path):
-                line = candidate["line"]
-                lowered = line.lower()
-
-                # Never turn examples/tutorial text into agent-obeyable patch rules.
-                if candidate.get("is_example") == "true":
-                    continue
-                if self._line_is_non_actionable_constraint(line):
-                    continue
-                if not (KEYWORD_RE.search(line) or self._owner_from_line(line)):
-                    continue
-
-                owner = self._owner_from_line(line)
-                ctype = "architecture"
-                if "source of truth" in lowered or "source-of-truth" in lowered or owner:
-                    ctype = "source_of_truth"
-                if "do not" in lowered or "must not" in lowered:
-                    ctype = "forbidden_edit" if "duplicate" in lowered or "bypass" in lowered or "hardcode" in lowered else ctype
-
-                severity, confidence, downgrade_reason = self._safe_constraint_profile(
-                    source_path=source_path,
-                    line=line,
-                    owner=owner,
-                    candidate=candidate,
-                )
-                evidence = line + self._line_metadata_suffix(
-                    authority=candidate.get("authority", "low"),
-                    block=candidate.get("block", "paragraph"),
-                    heading=candidate.get("heading", ""),
-                    downgrade_reason=downgrade_reason,
-                )
-
-                if "duplicate" in lowered and "policy" in lowered:
-                    constraints.append(self._constraint(
-                        id="do-not-duplicate-policy",
-                        type="forbidden_edit",
-                        instruction="Do not duplicate policy outside the documented owner/source of truth.",
-                        source=source_path,
-                        severity=severity,
-                        confidence=confidence,
-                        evidence=evidence,
-                        symbols=[owner] if owner else [],
-                    ))
-
-                if "provider" in lowered and "delegat" in lowered:
-                    target = owner or self._delegate_target(line) or "the documented service/domain/application owner"
-                    target_grounded = owner is None or self._owner_is_repo_grounded(owner)
-                    target_confidence = confidence if target_grounded else "medium"
-                    target_severity = severity if target_grounded else "should"
-                    constraints.append(self._constraint(
-                        id=f"provider-delegates-{self._slug(target)}",
-                        type="architecture",
-                        instruction=f"Provider/presentation code must delegate policy decisions to {target}; do not implement policy in provider/UI code.",
-                        source=source_path,
-                        severity=target_severity,
-                        confidence=target_confidence,
-                        evidence=evidence if target_grounded else evidence + " [downgrade=ungrounded_delegate_target]",
-                        symbols=[target],
-                        files=self._matching_changed_files(("provider", "presentation", "ui")),
-                    ))
-
-                if owner:
-                    constraints.append(self._constraint(
-                        id=f"source-of-truth-{self._slug(owner)}",
-                        type="source_of_truth",
-                        instruction=f"Keep behavior/policy changes in the documented source of truth: {owner}.",
-                        source=source_path,
-                        severity=severity,
-                        confidence=confidence,
-                        evidence=evidence,
-                        symbols=[owner],
-                        files=self._matching_changed_files(("service", "domain", "application", "provider", "presentation")),
-                    ))
-                    continue
-
-                if KEYWORD_RE.search(line):
-                    constraints.append(self._constraint(
-                        id=f"{ctype}-{self._slug(line[:50])}",
-                        type=ctype if ctype != "forbidden_edit" or ("do not" in lowered or "must not" in lowered) else "project_convention",
-                        instruction=self._instruction_from_line(line),
-                        source=source_path,
-                        severity=severity,
-                        confidence=confidence,
-                        evidence=evidence,
-                    ))
-
-        return constraints
+        # Prose is not an explicit policy schema or mutation authorization.
+        return []
 
     def _source_relevant_to_task(self, source_path: str, text: str) -> bool:
-        """Keep global docs, but do not import unrelated feature plans into a task contract."""
-        normalized_path = source_path.replace("\\", "/").lower()
-        name = Path(normalized_path).name
-        if self._source_authority(source_path) == "high":
-            return True
-        if name in {"architecture.md", "contributing.md", "readme.md", "agents.md", "project_map.md"}:
-            return True
-        if any(part in normalized_path for part in ("/adr/", "/adrs/", "docs/index.md", "docs/architecture")):
-            return True
-        question_text = (self._question or "").lower().replace("-", "_")
-        haystack = f"{normalized_path}\n{text[:3000]}".lower().replace("-", "_")
-        if "scandoc" in question_text and "scandoc" not in haystack and "scan_doc" not in haystack:
-            return False
+        """Bounded literal relevance only; an empty request is not a match."""
+        haystack = f"{source_path}\n{text[:3000]}"
         terms = self._source_relevance_terms(self._question)
         if not terms:
-            return True
+            return False
         for term in terms:
-            normalized_term = term.lower().replace("-", "_")
-            if normalized_term and normalized_term in haystack:
+            if term and term in haystack:
                 return True
         return False
 
     @staticmethod
     def _source_relevance_terms(question: str) -> list[str]:
-        stop = {
-            "update", "change", "patch", "fix", "without", "before", "after", "using", "use",
-            "policy", "behavior", "feature", "task", "code", "file", "files", "project",
-        }
-        terms: list[str] = []
-        for term in PatchConstraintsService._task_terms(question):
-            terms.append(term)
-            for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", term):
-                if len(word) >= 4 and word.lower() not in stop:
-                    terms.append(word)
-        for word in re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", question or ""):
-            if len(word) >= 4 and word.lower() not in stop:
-                terms.append(word)
-        out: list[str] = []
-        seen: set[str] = set()
-        for term in terms:
-            key = term.lower()
-            if key not in seen:
-                seen.add(key)
-                out.append(term)
-        return out
+        return PatchConstraintsService._task_terms(question)
 
     def _drop_non_actionable_constraints(self, constraints: list[PatchConstraint]) -> list[PatchConstraint]:
         kept: list[PatchConstraint] = []
@@ -173,12 +50,7 @@ class _PatchConstraintsServicePart02:
             return True
         if TREE_GLYPH_RE.search(stripped):
             return True
-        if NON_ACTIONABLE_CONSTRAINT_HEADING_RE.match(stripped):
-            return True
         if stripped.endswith(":") and len(stripped.split()) <= 8:
-            return True
-        owner = self._owner_from_line(stripped)
-        if owner and not self._owner_looks_like_code_owner(owner):
             return True
         return False
 
@@ -189,58 +61,10 @@ class _PatchConstraintsServicePart02:
             return False
         if re.search(r"\s|[:;?]|[│├└┬┴┼─]", value):
             return False
-        if value.startswith("_") and not OWNER_SUFFIX_RE.search(value):
-            return False
-        if "/" in value or "." in value:
-            return True
-        if OWNER_SUFFIX_RE.search(value):
-            return True
-        return bool(re.match(r"^[A-Z][A-Za-z0-9_]+$", value))
+        return bool(re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", value))
 
     def _generated_file_constraints(self, sources: list[dict[str, str]], changed_files: list[str]) -> list[PatchConstraint]:
         constraints: list[PatchConstraint] = []
-
-        for source in sources:
-            source_path = source["path"]
-            for candidate in self._iter_constraint_lines(source["text"], source_path):
-                line = candidate["line"]
-                generated_normative = bool(
-                    re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I)
-                    and self._has_normative_language(line)
-                )
-                if candidate.get("is_example") == "true" and not generated_normative:
-                    continue
-                if not re.search(r"generated|\.g\.dart|\.freezed\.dart|\.pb\.go|\.pb\.dart|build_runner|regenerate|dist/", line, re.I):
-                    continue
-                severity = "must" if candidate.get("authority") in {"high", "medium"} and self._has_normative_language(line) else "should"
-                confidence = "high" if severity == "must" else "medium"
-                evidence = line + self._line_metadata_suffix(
-                    authority=candidate.get("authority", "low"),
-                    block=candidate.get("block", "paragraph"),
-                    heading=candidate.get("heading", ""),
-                    downgrade_reason=None if confidence == "high" else "non_normative_or_low_authority",
-                )
-                constraints.append(self._constraint(
-                    id="generated-files-readonly",
-                    type="generated_file",
-                    instruction="Do not edit generated artifacts by hand; update the source model/input and regenerate instead.",
-                    source=source_path,
-                    severity=severity,
-                    confidence=confidence,
-                    evidence=evidence,
-                    files=list(GENERATED_PATTERNS),
-                ))
-                if "source" in line.lower() or "regenerate" in line.lower() or "build_runner" in line.lower():
-                    constraints.append(self._constraint(
-                        id="generated-source-of-truth",
-                        type="source_of_truth",
-                        instruction="For generated artifacts, change the documented source model/input and run the documented generator.",
-                        source=source_path,
-                        severity=severity,
-                        confidence=confidence,
-                        evidence=evidence,
-                        files=list(GENERATED_PATTERNS),
-                    ))
 
         generated_changed = [f for f in changed_files if self._is_generated_path(f) or self._path_looks_forbidden_artifact(f)]
         if generated_changed:
@@ -313,8 +137,7 @@ class _PatchConstraintsServicePart02:
         return constraints
 
     def _has_dependency_intent(self) -> bool:
-        text = f"{self._question} {' '.join(self._changed_files)}".lower()
-        return any(word in text for word in ("dependency", "dependencies", "version", "upgrade", "package", "pubspec", "lockfile", "requirements", "зависим"))
+        return any(Path(path).name in DEPENDENCY_FILES for path in self._changed_files)
 
     def _dependency_observations(self, root: Path) -> list[DependencyObservation]:
         observations: list[DependencyObservation] = []
@@ -404,7 +227,6 @@ class _PatchConstraintsServicePart02:
         terms = self._task_terms(question)
         if not terms:
             return []
-        asset_related_task = self._is_asset_related_task(question)
         source_files = self._symbol_source_files(root, changed_files)
         candidates: list[dict[str, Any]] = []
         seen: set[tuple[str, str, str]] = set()
@@ -415,29 +237,28 @@ class _PatchConstraintsServicePart02:
                 if self._excluded_source(rel):
                     continue
                 generated_asset_source = self._is_generated_asset_path(rel)
-                if generated_asset_source and not asset_related_task:
+                if generated_asset_source and rel not in changed_files:
                     continue
                 try:
-                    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+                    content = path.read_text(encoding="utf-8", errors="replace")
+                    lines = content.splitlines()
+                    code_lines = self._symbol_code_text(content).splitlines()
                 except OSError:
                     continue
                 for line_number, line in enumerate(lines, start=1):
-                    lowered = line.lower()
-                    if not any(variant and variant.lower() in lowered for variant in variants):
+                    if not any(re.search(rf"(?<![\w]){re.escape(variant)}(?![\w])", line) for variant in variants):
                         continue
-                    symbol = self._symbol_from_line(line, variants)
+                    symbol = self._symbol_from_line(code_lines[line_number - 1], variants)
                     if not symbol:
                         continue
-                    if symbol in GENERIC_CALL_SYMBOLS and not self._term_explicitly_mentions_symbol(term, symbol):
-                        continue
-                    key = (term.lower(), rel, symbol)
+                    key = (term, rel, symbol)
                     if key in seen:
                         continue
                     seen.add(key)
-                    confidence = self._symbol_confidence(line, symbol, generated_asset_source)
+                    confidence = self._symbol_confidence(code_lines[line_number - 1], symbol, generated_asset_source)
                     reason = "task term matched an existing source/docs symbol; prefer reusing source-attributed project behavior before inventing a new path."
                     if generated_asset_source:
-                        reason = "generated_asset_demoted: task explicitly mentions assets/resources, so generated asset registry evidence is kept at low confidence."
+                        reason = "Explicit changed path contains a generated registry; kept at low confidence."
                     elif self._is_broad_acronym_symbol_candidate(term, symbol):
                         confidence = "low"
                         reason = "broad_acronym_demoted: short project/product acronyms are too broad for the top PR-bot checklist unless tied to a more specific task symbol."
@@ -451,35 +272,27 @@ class _PatchConstraintsServicePart02:
                         "reason": reason,
                     })
                     break
-                if any(candidate["term"].lower() == term.lower() for candidate in candidates):
+                if any(candidate["term"] == term for candidate in candidates):
                     break
         return candidates[:12]
 
     @staticmethod
     def _task_terms(question: str) -> list[str]:
+        question = question or ""
         terms: list[str] = []
-        for match in re.finditer(r"[\"'“”«»](.*?)[\"'“”«»]", question):
-            value = match.group(1).strip()
+        for match in re.finditer(r"`([^`\n]+)`|[\"'“”«»]([^\"'“”«»\n]+)[\"'“”«»]", question or ""):
+            value = (match.group(1) or match.group(2)).strip()
             if 2 <= len(value) <= 60:
                 terms.append(value)
         terms.extend(re.findall(r"\b[A-Z][A-Z0-9_]{2,}\b", question))
         terms.extend(re.findall(r"\b[A-Za-z_][A-Za-z0-9_]*(?:[A-Z][A-Za-z0-9_]*)+\b", question))
-        terms.extend(re.findall(r"\b[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*(?:\s+[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*){1,2}\b", question))
-        for match in re.finditer(r"\b(open|close|show|hide|toggle|navigate|route|save|load)\s+([A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё0-9]*)\b", question, re.I):
-            terms.append(f"{match.group(1)} {match.group(2)}")
-        lowered_question = question.lower()
-        for phrase, aliases in PHRASE_ALIASES.items():
-            if phrase in lowered_question:
-                terms.append(phrase)
-                terms.extend(aliases)
         out: list[str] = []
         seen: set[str] = set()
-        stop = {"should", "existing", "button", "action", "menu", "project", "current", "текущая", "кнопка", "меню", "экран"}
         for term in terms:
             cleaned = term.strip(" .,:;()[]{}\n\t")
-            if len(cleaned) < 3 or len(cleaned) > 60 or cleaned.lower() in stop or PatchConstraintsService._is_noisy_task_term(cleaned):
+            if len(cleaned) < 2 or len(cleaned) > 60:
                 continue
-            key = cleaned.lower()
+            key = cleaned
             if key not in seen:
                 seen.add(key)
                 out.append(cleaned)
@@ -487,29 +300,11 @@ class _PatchConstraintsServicePart02:
 
     @staticmethod
     def _is_noisy_task_term(term: str) -> bool:
-        words = re.findall(r"[A-Za-zА-Яа-яЁё0-9_]+", term)
-        if not words:
-            return True
-        connector_words = {"and", "or", "и", "или"}
-        if words[0].lower() in connector_words or words[-1].lower() in connector_words:
-            return True
-        return False
+        return not bool((term or "").strip())
 
     @staticmethod
     def _term_variants(term: str) -> list[str]:
-        variants = {term, term.replace("_", " "), term.replace(" ", "_"), term.replace(" ", "")}
-        if term.isupper() and "_" in term:
-            variants.add(term.lower())
-        words = re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", term)
-        if words:
-            variants.add("".join(word[:1].upper() + word[1:] for word in words))
-            variants.add("".join([words[0].lower(), *[word[:1].upper() + word[1:] for word in words[1:]]]))
-            for left, right in zip(words, words[1:]):
-                variants.add(f"{left} {right}")
-                variants.add(f"{left.lower()}{right[:1].upper() + right[1:]}")
-        if term in PHRASE_ALIASES:
-            variants.update(PHRASE_ALIASES[term])
-        return [variant for variant in variants if len(variant) >= 3]
+        return [term] if term else []
 
     def _symbol_source_files(self, root: Path, changed_files: list[str]) -> list[Path]:
         files: list[Path] = []
@@ -539,9 +334,20 @@ class _PatchConstraintsServicePart02:
         return out
 
     @staticmethod
+    def _symbol_code_text(text: str) -> str:
+        """Mask quoted text/comments without changing source line coordinates.
+
+        Conservative lexical filtering, not a language parser or policy proof.
+        Unterminated strings/block comments consume the remaining input.
+        """
+        pattern = r'''(?s)"""(?:\\.|(?!""").)*(?:"""|\Z)|\x27\x27\x27(?:\\.|(?!\x27\x27\x27).)*(?:\x27\x27\x27|\Z)|"(?:\\.|[^"\\])*(?:"|\Z)|\x27(?:\\.|[^\x27\\])*(?:\x27|\Z)|`(?:\\.|[^`\\])*(?:`|\Z)|/\*.*?(?:\*/|\Z)|//[^\r\n]*|\#[^\r\n]*'''
+        return re.sub(pattern, lambda match: re.sub(r"[^\r\n]", " ", match[0]), text)
+
+    @staticmethod
     def extract_method_call_symbols(line: str) -> list[str]:
         symbols: list[str] = []
-        for match in re.finditer(r"\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(", line):
+        code = _PatchConstraintsServicePart02._symbol_code_text(line)
+        for match in re.finditer(r"\.\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(", code):
             symbol = match.group(1)
             if symbol not in symbols:
                 symbols.append(symbol)
@@ -549,28 +355,23 @@ class _PatchConstraintsServicePart02:
 
     @classmethod
     def _symbol_from_line(cls, line: str, variants: list[str] | None = None) -> str | None:
+        line = cls._symbol_code_text(line)
+        if line.lstrip().startswith(("#", "//", "/*", "*", "<!--")):
+            return None
         call_symbols = cls.extract_method_call_symbols(line)
-        variants_lower = {variant.lower() for variant in variants or []}
-        non_generic_calls = [symbol for symbol in call_symbols if symbol not in GENERIC_CALL_SYMBOLS]
-        for symbol in reversed(non_generic_calls):
-            if symbol.lower() in variants_lower:
+        requested = set(variants or [])
+        for symbol in reversed(call_symbols):
+            if symbol in requested:
                 return symbol
-        if non_generic_calls:
-            return non_generic_calls[-1]
-        if call_symbols:
-            explicit = [symbol for symbol in reversed(call_symbols) if symbol.lower() in variants_lower]
-            if explicit:
-                return explicit[0]
         patterns = [
-            r"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+([A-Za-z_][A-Za-z0-9_]*)",
+            r"\b(?:class|enum|mixin|extension|typedef|const|final|var|void)\s+([A-Za-z_][A-Za-z0-9_]*)",
             r"\b([A-Za-z_][A-Za-z0-9_]*)\s*\(",
             r"\b([A-Za-z_][A-Za-z0-9_]*)\s*[:=]",
         ]
         for pattern in patterns:
-            match = re.search(pattern, line)
-            if match:
+            for match in re.finditer(pattern, line):
                 symbol = match.group(1)
-                if symbol not in {"if", "for", "while", "switch", "return"}:
+                if symbol in requested and symbol not in {"if", "for", "while", "switch", "return"}:
                     return symbol
         return None
 
@@ -578,7 +379,7 @@ class _PatchConstraintsServicePart02:
     def _symbol_confidence(line: str, symbol: str, generated_asset_source: bool) -> str:
         if generated_asset_source:
             return "low"
-        if re.search(rf"\b(?:class|enum|mixin|extension|typedef|const|final|var|void|Future<[^>]+>|Future|Widget)\s+{re.escape(symbol)}\b", line):
+        if re.search(rf"\b(?:class|enum|mixin|extension|typedef|const|final|var|void)\s+{re.escape(symbol)}\b", line):
             return "high"
         return "medium"
 
@@ -595,8 +396,8 @@ class _PatchConstraintsServicePart02:
 
     @staticmethod
     def _is_asset_related_task(question: str) -> bool:
-        lowered = question.lower()
-        return any(term in lowered for term in ASSET_TASK_TERMS)
+        # Generated registries are scoped by explicit changed paths, not topic words.
+        return False
 
     @classmethod
     def _is_generated_asset_path(cls, rel: str) -> bool:
@@ -610,7 +411,7 @@ class _PatchConstraintsServicePart02:
             symbol = str(candidate.get("matched_symbol") or candidate.get("term") or "symbol")
             constraints.append(self._constraint(
                 id=f"symbol-candidate-{self._slug(str(candidate.get('term') or symbol))}-{self._slug(symbol)}",
-                type="source_of_truth" if candidate.get("confidence") == "medium" else "project_convention",
+                type="project_convention",
                 instruction=f"Task term `{candidate.get('term')}` matches existing project symbol `{symbol}`; prefer reusing that source-attributed path before adding a new implementation.",
                 source=str(candidate.get("source") or "project_source"),
                 severity="should",
@@ -618,6 +419,8 @@ class _PatchConstraintsServicePart02:
                 evidence=str(candidate.get("evidence") or ""),
                 symbols=[str(candidate.get("term") or ""), symbol],
                 files=[str(candidate.get("source") or "")],
+                line_start=candidate.get("line"),
+                line_end=candidate.get("line"),
             ))
         return constraints
 

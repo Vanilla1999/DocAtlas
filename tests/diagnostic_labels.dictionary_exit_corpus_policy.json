@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_corpus_policy.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/test_dictionary_exit_corpus_policy.py::test_delivered_contract_no_inferred_semantics_or_authority": "schema"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_corpus_policy.py": "d68011233a9555b3057ad4f67584670a1d6ae6d4815e34862e77532be0390b8e"
+  }
+}

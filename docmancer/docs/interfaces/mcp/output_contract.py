@@ -28,6 +28,7 @@ _SUPPORT_DECISION_KEYS = {
     "selector_config_hash", "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
     "assignment_hash", "decision_hash", "hard_stop", "next_action", "next_actions",
     "arguments_patch", "requires_confirmation", "confirmation_reason", "document_content_policy",
+    "mutation_authorized", "policy_coverage", "packet_available",
 }
 def json_bytes(payload: Any) -> int:
     return len(json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8"))
@@ -146,6 +147,7 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
         "mode", "reason", "message", "response_style", "primary_snippet", "context_pack", "supporting_snippets",
         "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction",
         "requires_confirmation", "confirmation_reason", "document_content_policy",
+        "mutation_authorized", "policy_coverage", "packet_available",
     }
     omitted = [key for key in compact if key not in keep_keys]
     compact = {key: value for key, value in compact.items() if key in keep_keys}
@@ -196,7 +198,7 @@ def compact_mcp_payload(
     original_bytes = json_bytes(payload)
     compact = deepcopy(payload)
     if include_sections:
-        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "document_content_policy", "mcp_compaction", *include_sections}
+        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "document_content_policy", "mcp_compaction", *_SUPPORT_DECISION_KEYS, *include_sections}
         compact = {key: value for key, value in compact.items() if key in allowed}
 
     has_context_pack = "context_pack" in compact

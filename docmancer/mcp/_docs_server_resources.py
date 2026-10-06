@@ -21,12 +21,7 @@ It is not:
 - a code generator;
 - an AST-perfect/LSP code intelligence engine.
 
-Use Docmancer before generic code search when the user asks about:
-- project architecture;
-- repo conventions;
-- dependency/library documentation;
-- Context7-like docs help;
-- source-grounded repository context.
+Use the unchanged original question and explicit project/library/version/scope/path bindings. Do not infer scope, translations, rewrites or subquestions from question wording.
 
 The default public surface has exactly three tools:
 - `get_docs_context`: first tool for content and coding questions;
@@ -38,32 +33,24 @@ The default public surface has exactly three tools:
 1. For coding and patch tasks, call once before the first edit:
    `get_docs_context(project_path=..., question=...)`
 
-   The server returns one bounded projection. Cite evidence from `trust_contract.sources`. Do not repeat retrieval before the first edit unless an explicit `prepare_docs` recovery action was completed.
+   The server returns one bounded projection. Cite its returned sources and evidence IDs. Context is not answer proof or edit readiness; mutation requires a separate explicit target and authorization.
 
-2. If and only if the response returns `prepare_docs` as its next action, follow it with the exact returned arguments. For example, lexical retrieval returns:
-   `prepare_docs(action="sync_project_docs", project_path=..., with_vectors=false)`
-   Dense, sparse, and hybrid retrieval return `with_vectors=true`.
+2. Use `prepare_docs` only for a returned `recommended_next_action` or an explicit lifecycle request. Preserve the exact returned arguments and obtain required network consent or confirmation; do not infer preparation flags from retrieval mode.
 
-3. Retry `get_docs_context` after successful preparation.
+3. Poll a returned `job_id` with `docs_status`; retry the unchanged request only after terminal success, not while running or after failure/cancellation.
 
 4. Interpret the bounded result:
-   - `status="ok"`: use the single canonical `docs_answer`, cited `docs_context`, or `patch_context` evidence. Only narrow relation-specific proof authorizes `docs_answer`; broad questions remain `docs_context`.
-   - `status="truncated"`: honor `omitted_counts`; only non-critical material was omitted.
-   - `status="insufficient_evidence"`: do not claim documentation support. Follow one typed recovery; a server-suggested rephrase is never automatic. If recovery is exhausted and `hard_stop=false`, investigate local source/tests while keeping documentary claims unproved. Stop before editing on `hard_stop=true` or when the task explicitly requires the still-unproved documentary contract.
+   - `status="ok"`: cite the returned `sources`; `kind` and status do not certify semantic completeness or grant answer/edit authority.
+   - `status="truncated"`: honor `omitted_counts`; do not infer completeness from a truncated packet.
+   - `status="insufficient_evidence"`: identify gaps without filling them from memory or absence of evidence. Diagnostic rephrases are not automatically executed lookups. `hard_stop=true` blocks editing; `hard_stop=false` is not permission.
 
-Use `docs_status(action="project", project_path=...)` only when the user asks
-whether documentation is indexed, stale, or healthy. Use `action="jobs"` or
-`action="job"` only for asynchronous job progress.
+Use `docs_status` only for explicit status requests, returned recommended actions or returned preparation job IDs, not discovery.
 
 ## Gap-directed follow-up
 
-Before retrieval, identify what the user actually requests without guessing the answer. Keep the root question unchanged. Preserve shared conditions, versions, negation, and both sides of a comparison. Start with one bounded `get_docs_context` call for that root question; do not pre-split a single compound or comparison question.
+Keep the original question unchanged. Use only explicitly supplied same-question `lookup_queries`, at most five; independent questions use separate calls. Lookup coverage does not transfer to the original question. Follow up only with explicit lookups or an issued bounded source read, within existing scope, freshness, provenance, consent, network and budget limits. Unverified flags alone do not require another read. Do not reread the same span or replenish budgets by renaming a question. Never infer equivalence, semantic proof, answer completeness or edit authorization from retrieval context.
 
-- Same need, different vocabulary: keep one concrete call and use narrow `lookup_queries`.
-- Split only after the first packet leaves a concrete, independently answerable requested part missing; then use a separate concrete `get_docs_context` call for that missing part. A comparison alone does not trigger a split.
-- Known source, concrete missing requested fact: use an issued bounded source read. If its source is unknown, make one targeted same-need query within existing limits.
-
-A later query may use a discovered bridge value only with its returned source reference. For a sufficient visible packet, stop even when `context_quality` is unverified; an unverified flag alone does not require another read. Stop on sufficient evidence or no progress. Do not reread the same span or replenish task budgets by renaming a subquestion.
+Explicit scope is authoritative: `scope="project"` selects repository-level docs, `scope="module"` selects one exact module, and `scope="all"` stays within the same repository without module filters. `module_path` implies module scope. For current project dependencies omit `version` unless an exact/historical version is explicitly requested; re-query after lockfile changes.
 
 ## Context7-like library workflow
 
@@ -71,7 +58,7 @@ For public/dependency docs, use the canonical public tool:
 
 `get_docs_context(question=..., library=..., version=...)`
 
-If docs are missing/stale and the user approves network access, use:
+Only for a returned preparation action or explicit lifecycle request, with required network approval, use:
 
 `prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=...)`
 
@@ -113,10 +100,11 @@ Always separate:
         "text": """# Project docs workflow
 
 1. For coding and patch tasks, call `get_docs_context(project_path=..., question=...)` once before the first edit. The server returns one bounded structured projection.
-2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, follow it and retry the same bounded request.
+2. If the response explicitly returns `prepare_docs` as `recommended_next_action`, preserve its exact arguments and required consent. Poll returned job IDs; retry the unchanged request only after terminal success.
 3. Inspect canonical `status`, `kind`, `sources`, `missing`, and `omitted_counts`.
-4. On `insufficient_evidence`, do not claim documentation support. Follow the bounded typed recovery; retry at most one server-suggested rephrase. If it still fails and `hard_stop=false`, use local source/tests for investigation. Stop before editing on `hard_stop=true` or when the task requires the unproved documentary contract.
-5. Use `prepare_docs` only after a typed recovery action or explicit user approval.
+4. Use only explicit same-question lookups (at most five) or an issued bounded source read. Do not execute inferred subquestions or diagnostic rephrases. Context and flags do not certify an answer or authorize editing; mutation requires a separate explicit target and authorization. `hard_stop=true` blocks editing; its absence is not permission.
+5. Use `prepare_docs` only after a returned typed recovery action or explicit lifecycle request, with required approval.
+6. Preserve explicit project/library/version/scope/path, freshness, provenance, network consent and budget limits. Never infer or widen scope from question wording; `module_path` implies module scope. Lookup coverage does not transfer to the unchanged original question.
 """,
     },
     {
@@ -126,9 +114,11 @@ Always separate:
         "mimeType": "text/markdown",
         "text": """# Public tool selection
 
-1. Natural documentation, API, dependency, architecture, convention, and coding questions → `get_docs_context`.
+1. One unchanged original documentation question with explicit scope and optional explicit lookups (at most five) → `get_docs_context`.
 2. Explicit sync/refresh/prefetch/prune/remove request or `recommended_next_action` → `prepare_docs`.
 3. Explicit index freshness, health, source-state, or async job-progress request → `docs_status`.
+
+Returned preparation/status actions may be followed within existing consent and budget limits. `docs_status` is not discovery. No tool selection, cited context or flag grants answer/edit authority; mutation requires a separate explicit target and authorization.
 
 For coding and patch tasks, make one pre-edit `get_docs_context` call; bounded structured delivery is the server default.
 
@@ -171,7 +161,7 @@ Use the public unified tool first:
 
 2. If `status="insufficient_evidence"` and `recommended_next_action.requires_confirmation=true`, ask the user before network access.
 
-3. If the returned source is exact and already trusted, call:
+3. Only when returned as a preparation action or explicitly requested, with required network consent, use:
    `prepare_docs(action="prefetch_library_docs", library=..., ecosystem=..., version=..., force_refresh=false)`
 
    If source accuracy or scope is uncertain, call bounded
@@ -182,15 +172,17 @@ Use the public unified tool first:
 4. After user confirmation, save and validate the v2 manifest, then call
    `prepare_docs(action="prefetch_docs_manifest", manifest_path=...)`.
 
-5. Retry:
+5. Poll returned preparation job IDs with `docs_status`; retry only after terminal success, never while running or after failure/cancellation:
    `get_docs_context(question=..., library=..., version=...)`
 
-6. If working inside a repository, call:
+6. For an explicitly supplied project binding, use:
    `get_docs_context(project_path=..., question=...)`
 
 Do not use WebFetch as a substitute for registered docs before Docmancer has returned no trusted route.
 
 Only the canonical `get_docs_context`, `prepare_docs`, and `docs_status` tools are part of this workflow.
+
+Keep the original question unchanged and use only explicit same-question lookups (at most five). Preserve exact library/version/source scope, freshness, provenance and budgets; re-query current project bindings after lockfile changes. Cited retrieval context does not certify an answer or authorize editing. Mutation requires a separate explicit target and authorization.
 """,
     },
 ]
