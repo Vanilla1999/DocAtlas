@@ -25,7 +25,7 @@ class DartDocsResolution:
     """Registered documentation URLs in deterministic URL order, not topic order."""
     
     pubdev_docs_url: str
-    """pub.dev API reference URL (always available as fallback)."""
+    """pub.dev API locator, or empty when registered identity is unresolved."""
     
     docs_strategy: str
     """Strategy used: 'official_docs' | 'pubdev_only' | 'mixed'."""
@@ -116,9 +116,10 @@ DART_PACKAGE_OFFICIAL_DOCS: dict[str, DartDocsSources] = {
         package_page="https://pub.dev/packages/firebase_core",
     ),
     "firebase_firestore": DartDocsSources(
+        # No explicit contract establishes identity with cloud_firestore.
+        # Keep this registered identity unresolved, without guessing a locator.
         official_guides=(),
-        pubdev_api="https://pub.dev/documentation/cloud_firestore/{version}/",
-        package_page="https://pub.dev/packages/cloud_firestore",
+        pubdev_api=None,
     ),
     "cloud_firestore": DartDocsSources(
         official_guides=(),
@@ -258,7 +259,7 @@ def resolve_dart_official_docs(
     
     if sources:
         urls = list(sources.official_guides)
-        pubdev_url = sources.pubdev_api.format(version=version_normalized) if sources.pubdev_api else pubdev_url
+        pubdev_url = sources.pubdev_api.format(version=version_normalized) if sources.pubdev_api else ""
         if include_pubdev and sources.pubdev_api:
             urls.append(pubdev_url)
         if sources.package_page:

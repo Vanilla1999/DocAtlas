@@ -2,6 +2,27 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Latest completed 2026-10-07:**
+[IDENTITY_ADMISSION_PARALLEL_RU.md](IDENTITY_ADMISSION_PARALLEL_RU.md).
+Source identity/preference, core/admission literal cleanup иunknown adapter flags
+implemented иindependently scopedapproved; corpus audit completed безmembershipdecision.
+Finalcombined1662PASS/6FAIL (1617dictionaryPASS/5newFAIL +45technicalPASS/1knownFAIL),
+stdioMCPPASS, self-hostqualityFAIL preserved. No full exit/releaseacceptance.
+Все workers/reviewers завершены; active/pending заметки ниже historical.
+Next: explicit corpuscontract ownerdecision/callerboundary prerequisite иremaining
+source-map/projectstate/nonownedhelper audit. Localgzip не добавлять/не удалять.
+
+**Active execution 2026-10-07:** пользователь разрешил handoff plan;
+[IDENTITY_ADMISSION_PARALLEL_RU.md](IDENTITY_ADMISSION_PARALLEL_RU.md).
+A identity / B admission / C read-only corpus auditor запущены в отдельных worktrees
+от `9488cb66`. Ниже «не запущены» относится к предыдущему handoff snapshot.
+
+**Handoff перед compaction 2026-10-07:**
+[NEXT_PARALLEL_HANDOFF_RU.md](NEXT_PARALLEL_HANDOFF_RU.md).
+Published baseline `9488cb66`, PR211. Следующий план: sourceidentity worker,
+core/admission worker и read-only corpus-contract auditor; worktrees/ownership,
+independent reviews и final integration у coordinator. Это план, не запущенные агенты.
+
 **Latest 2026-10-07:** [DISCOVERY_LEGACY_EXIT_RU.md](DISCOVERY_LEGACY_EXIT_RU.md).
 Discoverythematicranking/seeds, legacycompilerframes/composition, residualproof+
 unithelpers иselectorvisibility исправлены; independent scopedreviews approved.

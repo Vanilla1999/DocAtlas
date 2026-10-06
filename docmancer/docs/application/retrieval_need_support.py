@@ -118,18 +118,32 @@ def apply_retrieval_need_witness(
     query: Mapping[str, Any], trace: Mapping[str, Any], text: str, *,
     source: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Retain compatibility vetoes; guarded promotion is owned by qualify_evidence.
+    """Veto need traces without a fresh witness; never promote rejected traces.
 
-    This adapter cannot promote an arbitrary serialized trace. All retrieval and
-    crop paths obtain the same freshly guarded decision from the domain owner.
+    This compatibility adapter is not a source/provenance or answer-authority
+    gate. Unknown proof is not permission to retain inherited need credit.
     """
     result = dict(trace)
-    if query.get("query_origin") != "retrieval_need" or result.get("qualified") is not True:
+    if query.get("query_origin") != "retrieval_need":
+        return result
+    for key in (
+        "need_local_witness", "admission_route", "matched_need_ids",
+        "need_witness_spans", "need_witness_source_key", "_admission_demands",
+        "context_eligible", "context_need_ids", "_need_context",
+    ):
+        result.pop(key, None)
+    if result.get("qualified") is not True:
+        result["qualified"] = False
+        result.setdefault("qualification_reason", "unqualified_need_trace")
+        return result
+    if (not isinstance(text, str) or not text.strip()
+            or (source is not None and not isinstance(source, Mapping))):
+        result.update(qualified=False, qualification_reason="invalid_need_witness_input")
         return result
     proof = retrieval_need_local_witness(query, text, source=source)
-    if proof is False:
+    if proof is not True:
         result.update(qualified=False, qualification_reason="missing_need_local_witness")
-    elif proof is True:
+    else:
         result["need_local_witness"] = True
     return result
 

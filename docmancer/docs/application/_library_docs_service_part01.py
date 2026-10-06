@@ -163,11 +163,14 @@ class _LibraryDocsApplicationServicePart01:
         if record is None:
             discovery_candidates = discovery_candidates_for(library, ecosystem)
 
-            # Check if Dart/Flutter package has real official docs (non-pub.dev)
+            # Only the literal Dart identity selects this protocol lane.
             normalized_ecosystem = (canonical_dart_ecosystem(original_ecosystem) or "").lower().strip()
             is_dart_flutter = normalized_ecosystem == "dart"
-            if is_dart_flutter and (source_type or "").lower() == "api":
-                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
+            dart_resolution = (
+                resolve_dart_official_docs(library, version=normalized_version)
+                if is_dart_flutter and (source_type or "").lower() == "api" else None
+            )
+            if dart_resolution is not None and dart_resolution.pubdev_docs_url:
                 pubdev_url = dart_resolution.pubdev_docs_url
                 is_exact_snapshot = docs_snapshot_is_exact(normalized_version, pubdev_url)
                 target_spec = {
@@ -228,83 +231,8 @@ class _LibraryDocsApplicationServicePart01:
                     message=None,
                 )
 
-            has_real_official_docs = False
-            dart_docs_url = None
-
-            if is_dart_flutter and has_official_docs(library):
-                dart_resolution = resolve_dart_official_docs(library, version=normalized_version)
-                if dart_resolution.official_docs_available and dart_resolution.official_docs_urls:
-                    primary = next((url for url in dart_resolution.official_docs_urls if "pub.dev" not in url), None)
-                    primary_host = urlparse(primary).hostname if primary else None
-                    package_owned_host = primary_host in {"riverpod.dev", "bloclibrary.dev"}
-                    if primary and package_owned_host:
-                        has_real_official_docs = True
-                        dart_docs_url = primary
-
-            if has_real_official_docs and dart_docs_url:
-                seed_urls = [
-                    url for url in get_seed_urls_for_package(library, normalized_version, max_urls=100)
-                    if url != dart_docs_url
-                ]
-                urls_for_domains = [dart_docs_url, *seed_urls]
-                target_spec = {
-                    "id": f"dart:{library}",
-                    "library": library,
-                    "ecosystem": "dart",
-                    "version": normalized_version or "latest",
-                    "docs_url": dart_docs_url,
-                    "source_type": source_type or "web",
-                    "doc_format": "html",
-                    "allowed_domains": allowed_domains_for_urls(urls_for_domains),
-                    "seed_urls": seed_urls,
-                    "max_pages": 100,
-                    "dart_docs": {
-                        "requested_ecosystem": original_ecosystem,
-                        "docs_strategy": dart_resolution.docs_strategy,
-                        "version_binding": "unversioned_official_guide" if normalized_version else "latest_or_unversioned",
-                    },
-                }
-                record = self.registry.upsert(
-                    library=library,
-                    ecosystem="dart",
-                    version=normalized_version or "latest",
-                    docs_url=dart_docs_url,
-                    source_type=source_type or "web",
-                    now=self._now(),
-                    status="available",
-                    target_spec=target_spec,
-                    requested_version=normalized_version,
-                    resolved_version=None if normalized_version else "latest",
-                    version_source="official_docs" if normalized_version else None,
-                    version_confidence="low" if normalized_version else None,
-                    version_inferred=normalized_version is None,
-                    docs_snapshot_exact=False,
-                )
-                stale = self._is_stale(record.last_refreshed_at)
-                return LibraryInfo(
-                    library_id=record.library_id,
-                    source_id=record.source_id,
-                    canonical_id=record.canonical_id,
-                    library=record.name,
-                    ecosystem=record.ecosystem,
-                    version=record.version,
-                    source_type=record.source_type,
-                    docs_url=record.docs_url,
-                    docs_url_template=record.docs_url_template,
-                    docs_url_resolved=record.docs_url_resolved,
-                    docs_snapshot_exact=record.docs_snapshot_exact,
-                    requested_version=record.requested_version,
-                    resolved_version=record.resolved_version,
-                    version_source=record.version_source,
-                    version_confidence=record.version_confidence,
-                    version_inferred=record.version_inferred,
-                    status="needs_refresh" if stale else "available",
-                    local=record.last_refreshed_at is not None,
-                    stale=stale,
-                    last_refreshed_at=record.last_refreshed_at,
-                    message=None,
-                )
-
+            # Automatic roots/seeds come only from the explicit curated policy,
+            # not knowledge of an "official" host or a preferred guide lane.
             curated = curated_source_for(library, ecosystem, normalized_version)
             if curated:
                 target_spec = curated_target_spec(curated, version=normalized_version)
@@ -638,7 +566,10 @@ class _LibraryDocsApplicationServicePart01:
     ) -> dict[str, Any]:
         if canonical_dart_ecosystem(info.ecosystem) != "dart":
             return diagnostics
-        used_official_docs = bool(info.docs_url and "pub.dev" not in info.docs_url)
+        resolution = resolve_dart_official_docs(info.library, version=info.version, include_pubdev=False)
+        used_official_docs = bool(
+            resolution.official_docs_available and info.docs_url in resolution.official_docs_urls
+        )
         return {
             **diagnostics,
             "dartdoc": build_dart_diagnostics(
