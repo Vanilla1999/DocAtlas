@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "baseline_sha": "37bfd0668f819935dd9e027bd9d8bf767fcd185a",
+  "evidence_kind": "derived_summary_of_existing_runs_not_a_new_execution",
+  "candidate_kind": "in_memory_counterfactual_not_product_commit",
+  "environment": {
+    "python": "3.13.12 (main, Mar 24 2026, 22:49:35) [Clang 22.1.1 ]",
+    "packages": {
+      "pytest": "9.0.3",
+      "fastembed": "0.8.0",
+      "pydantic": "2.13.4"
+    }
+  },
+  "ci_baseline": {
+    "run_id": 37347840210,
+    "job": "p1-stack-core (3.11)",
+    "passed": 5282,
+    "failed": 17,
+    "skipped": 10,
+    "deselected": 622
+  },
+  "counterfactual_core": {
+    "no_fallback": {
+      "tests": 5309,
+      "passed": 5282,
+      "failures": 17,
+      "skipped": 10
+    },
+    "two_candidates_v1_invalid_harness": {
+      "tests": 5309,
+      "passed": 5280,
+      "failures": 19,
+      "skipped": 10
+    },
+    "two_candidates_v2": {
+      "tests": 5309,
+      "passed": 5283,
+      "failures": 16,
+      "skipped": 10
+    },
+    "deselected": 622
+  },
+  "paired_authority": {
+    "baseline": {
+      "tests": 85,
+      "passed": 83,
+      "failures": 2,
+      "skipped": 0
+    },
+    "candidate": {
+      "tests": 85,
+      "passed": 84,
+      "failures": 1,
+      "skipped": 0
+    }
+  },
+  "adversarial": {
+    "baseline": {
+      "passed": 27,
+      "total": 28,
+      "errors": [
+        "module_scope_rejects_project_policy_detail: call 1: context projection 380>300 tokens",
+        "module_scope_rejects_project_policy_detail: call 1: status='ok' expected='insufficient_evidence'",
+        "module_scope_rejects_project_policy_detail: trajectory projection 380>300 tokens"
+      ],
+      "target_case": {
+        "case_id": "module_scope_rejects_project_policy_detail",
+        "class": "scope_isolation",
+        "context_call_count": 1,
+        "errors": [
+          "call 1: context projection 380>300 tokens",
+          "call 1: status='ok' expected='insufficient_evidence'",
+          "trajectory projection 380>300 tokens"
+        ],
+        "events": [
+          {
+            "ceiling": 300,
+            "kind": "context",
+            "sources": [
+              "packages/orders/README.md"
+            ],
+            "status": "ok",
+            "tokens": 380
+          }
+        ],
+        "passed": false,
+        "trajectory_ceiling": 300,
+        "trajectory_tokens": 380
+      }
+    },
+    "two_candidates_v2": {
+      "passed": 28,
+      "total": 28,
+      "errors": [],
+      "target_case": {
+        "case_id": "module_scope_rejects_project_policy_detail",
+        "class": "scope_isolation",
+        "context_call_count": 1,
+        "errors": [],
+        "events": [
+          {
+            "ceiling": 300,
+            "kind": "context",
+            "sources": [],
+            "status": "insufficient_evidence",
+            "tokens": 244
+          }
+        ],
+        "passed": true,
+        "trajectory_ceiling": 300,
+        "trajectory_tokens": 244
+      }
+    }
+  },
+  "failure_id_comparison": {
+    "baseline_sha": "37bfd0668f819935dd9e027bd9d8bf767fcd185a",
+    "execution": "in_memory_counterfactual_v2_not_product_commit",
+    "baseline_ci_failures": 17,
+    "candidate_failures": 16,
+    "new_failure_ids": [],
+    "removed_failure_ids": [
+      "tests/test_docs_service_part03.py::test_project_query_does_not_return_non_project_docs_with_same_terms"
+    ]
+  },
+  "hint_trace_boundary": {
+    "qualified_ids": [
+      "query-anchor-1",
+      "query-original"
+    ],
+    "attributable_ids": [
+      "query-anchor-1"
+    ],
+    "original_qualification_route": "cross_lane_body",
+    "original_admission_only": true,
+    "end_to_end_public_contract_verified_for_this_fixture": false
+  },
+  "limitations": [
+    "Full same-environment unmodified baseline core was not rerun in this analysis; comparison used baseline CI and a separate no-fallback intervention.",
+    "622 core-deselected items were not covered by the core run; other jobs are not certified.",
+    "Authority supporting-positive probes selected supporting source first and did not exercise the risky authoritative-first branch.",
+    "No-fallback full core is an intervention, not an unmodified baseline.",
+    "No independent review, production patch, commit, or merge approval."
+  ],
+  "original_artifacts_location": "/tmp/opencode/pr211-red-analysis",
+  "original_artifacts_archived_here": false,
+  "original_artifacts_sha256": {
+    "DEEP_ANALYSIS_RU.md": "bb6e396fce55325c09b5cc78c4b870ae1256872803a63274338c50501e90a2a0",
+    "adversarial-baseline.json": "e48386e85caadc799009a8b030be7f85a77b5e4891efe529bc4cda896a83117e",
+    "adversarial-boundary-candidates-v2.json": "9a25dc067c75ac6093377bcb412c176800d882cae3f4b9952585b731056cab0e",
+    "deep-scope-trace.json": "6df797a2eae1277643dbff85d3cdada9a57cf132ed9fb23abf24a5e59f6e0ecd",
+    "deep-hint-trace.json": "fef35ce037d620a755009acb483f10ab40400381f7de4bbc211c8efb6d13150f",
+    "deep-notes-trace.json": "68a92596e6c83ec62fcc4034bfe6a7350aef5d972c014c778f6f79064ebcc0e1",
+    "boundary-candidates-core-v2.xml": "d516d89b1ce8943286ab1210a7c2d0337d300012534bff88407a0060c7612805",
+    "boundary-candidates-core.xml": "56df14675d7db4634f7698b74ff307c0f6f7079bd1309f03806a90aa51e5adaf",
+    "no-fallback-core.xml": "5d0db4f0ab5f4b3b7b8a0c3c8c41566ebb471d8ddf732dbcd57d831cf0dac51c",
+    "authority-baseline.xml": "8fb25f0ed10f9c44473e13394e4f25c84454f71f5d04316b7cddec67bf02c402",
+    "authority-authority.xml": "4c724f2b615b2a3cfad5800de92de1123532487757250e045c41fc35ab86b9ce",
+    "harness-baseline.log": "97006018801dc79a78d94ef34adc253f20ac5f728d665ea35af1e4d1d50e7ae6",
+    "harness-unchanged_copied_globals.log": "a6303ddeed701292415adb23f1b71885005a70627d9476efed75e477a66685c2",
+    "harness-corrected_authority.log": "dc1e9dc3661cec3bdaa5bfffd0dab5cef1a8c0c2d4e23fb70fcb8dcc17461df4",
+    "authority_probe.py": "57992633bda8a3c13c39ed8deead5d1b9b616524495d8ce0d75f11fbb159e4d2",
+    "authority_probe_v2.py": "ba71191b5afc50db4486ce4e4d221212f3c09bc1e5682ac8ab5fa120197a737e",
+    "strict_attribute_probe.py": "9dc4ab2dbccbf97c293a1967dc72aac98d737a974d35dc5747aca4bbbe1e949e"
+  }
+}
