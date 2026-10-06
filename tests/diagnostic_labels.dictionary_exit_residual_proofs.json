@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_residual_proofs.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_residual_proofs.py": "29d21900c07810586de35dead6d489d931a2ec2a61c75aaa710ad9c2c38bc2bc"
+  }
+}

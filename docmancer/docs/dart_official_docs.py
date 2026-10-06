@@ -1,14 +1,12 @@
-"""Official documentation resolvers for Dart/Flutter packages.
+"""Explicit package-to-documentation URL identities for Dart packages.
 
-Many Dart/Flutter packages have official guide-style documentation sites
-that provide better content for coding agents than bare pub.dev API reference.
-
-This module provides a registry of known packages with official docs,
-and resolvers that return seed URLs for comprehensive ingestion.
+Registered roots and API templates do not infer relevant topics or authorize
+network access. Topic pages are discovered only within the caller's source scope.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from urllib.parse import urlparse
 
@@ -24,13 +22,7 @@ class DartDocsResolution:
     """Whether official docs are available for this package."""
     
     official_docs_urls: list[str]
-    """List of official docs URLs (guides, concepts, API reference).
-    
-    Ordered by priority:
-    1. Official guide/concept pages
-    2. Official API reference
-    3. pub.dev API reference (fallback)
-    """
+    """Registered documentation URLs in deterministic URL order, not topic order."""
     
     pubdev_docs_url: str
     """pub.dev API reference URL (always available as fallback)."""
@@ -51,50 +43,36 @@ class DartDocsSources:
     package_page: str | None = None
 
 
-# Package-specific official docs seed URLs.
-# Ordered by priority: guides first, then API reference.
+# Explicit package-owned roots and pub.dev API templates. The legacy
+# official_guides field name is retained for consumers; no topic seeds are inferred.
 DART_PACKAGE_OFFICIAL_DOCS: dict[str, DartDocsSources] = {
     "riverpod": DartDocsSources(
         official_guides=(
             "https://riverpod.dev/",
-            "https://riverpod.dev/docs/introduction/getting_started",
-            "https://riverpod.dev/docs/concepts2/providers",
-            "https://riverpod.dev/docs/concepts2/auto_dispose",
-            "https://riverpod.dev/docs/concepts2/family",
-            "https://riverpod.dev/docs/essentials/first_request",
         ),
         pubdev_api="https://pub.dev/documentation/riverpod/{version}/",
     ),
     "flutter_riverpod": DartDocsSources(
         official_guides=(
             "https://riverpod.dev/",
-            "https://riverpod.dev/docs/introduction/getting_started",
-            "https://riverpod.dev/docs/concepts2/providers",
-            "https://riverpod.dev/docs/concepts2/auto_dispose",
         ),
         pubdev_api="https://pub.dev/documentation/flutter_riverpod/{version}/",
     ),
     "hooks_riverpod": DartDocsSources(
         official_guides=(
             "https://riverpod.dev/",
-            "https://riverpod.dev/docs/introduction/getting_started",
         ),
         pubdev_api="https://pub.dev/documentation/hooks_riverpod/{version}/",
     ),
     "flutter_bloc": DartDocsSources(
         official_guides=(
             "https://bloclibrary.dev/",
-            "https://bloclibrary.dev/getting-started/",
-            "https://bloclibrary.dev/flutter-bloc-concepts/",
-            "https://bloclibrary.dev/architecture/",
-            "https://bloclibrary.dev/tutorials/flutter-counter/",
         ),
         pubdev_api="https://pub.dev/documentation/flutter_bloc/{version}/",
     ),
     "bloc": DartDocsSources(
         official_guides=(
             "https://bloclibrary.dev/",
-            "https://bloclibrary.dev/bloc-concepts/",
         ),
         pubdev_api="https://pub.dev/documentation/bloc/{version}/",
     ),
@@ -103,7 +81,7 @@ DART_PACKAGE_OFFICIAL_DOCS: dict[str, DartDocsSources] = {
         pubdev_api="https://pub.dev/documentation/hydrated_bloc/{version}/",
     ),
     "go_router": DartDocsSources(
-        official_guides=("https://docs.flutter.dev/ui/navigation",),
+        official_guides=(),
         pubdev_api="https://pub.dev/documentation/go_router/{version}/",
         package_page="https://pub.dev/packages/go_router",
     ),
@@ -229,12 +207,15 @@ def normalize_package_name(package: str) -> str:
     """Normalize package name for lookup.
     
     Args:
-        package: Package name (may contain underscores, hyphens, mixed case).
+        package: Literal package identifier (underscores and mixed case accepted).
     
     Returns:
         Normalized package name (lowercase, underscores preserved).
     """
-    return package.lower().strip().replace("-", "_")
+    normalized = package.lower().strip()
+    if re.fullmatch(r"[a-z][a-z0-9_]*", normalized) is None:
+        raise ValueError("Expected a literal Dart package identifier")
+    return normalized
 
 
 def resolve_dart_official_docs(
@@ -246,8 +227,8 @@ def resolve_dart_official_docs(
     
     Args:
         package: Package name (e.g., "riverpod", "flutter_bloc").
-        version: Package version (e.g., "latest", "2.4.0"). Currently unused,
-                 but reserved for future version-specific docs resolution.
+        version: Literal API snapshot version (e.g., "latest", "2.4.0").
+                 Registered package-owned roots remain unversioned.
         include_pubdev: Whether to include pub.dev API reference as fallback.
     
     Returns:
@@ -257,8 +238,8 @@ def resolve_dart_official_docs(
         >>> resolution = resolve_dart_official_docs("riverpod")
         >>> resolution.official_docs_available
         True
-        >>> resolution.official_docs_urls[0]
-        'https://riverpod.dev/'
+        >>> 'https://riverpod.dev/' in resolution.official_docs_urls
+        True
         
         >>> resolution = resolve_dart_official_docs("unknown_package")
         >>> resolution.official_docs_available
@@ -296,7 +277,7 @@ def resolve_dart_official_docs(
         return DartDocsResolution(
             package=normalized,
             official_docs_available=has_guides,
-            official_docs_urls=urls,
+            official_docs_urls=sorted(set(urls)),
             pubdev_docs_url=pubdev_url,
             docs_strategy=strategy,
             confidence="high" if has_guides else "medium",
@@ -363,12 +344,10 @@ def allowed_domains_for_urls(urls: list[str]) -> list[str]:
 
 
 def canonical_dart_ecosystem(ecosystem: str | None) -> str | None:
-    """Collapse pub/flutter aliases to the single Dart registry identity."""
+    """Normalize literal spelling without collapsing distinct ecosystem identities."""
     if ecosystem is None:
         return None
     normalized = ecosystem.lower().strip()
-    if normalized in {"pub", "flutter", "dart"}:
-        return "dart"
     return normalized
 
 

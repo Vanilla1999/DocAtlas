@@ -74,23 +74,139 @@ def validate_assignment_binding(
     candidate: EvidenceCandidate,
     assignment: EvidenceAssignment,
 ) -> bool:
+    from ._evidence_selection_part02 import _legacy_requirement_matches_unit
+
+    if (
+        assignment.requirement_id != requirement.requirement_id
+        or assignment.evidence_id != candidate.stable_id
+        or assignment.path != candidate.path_or_url
+        or assignment.proof_role != requirement.proof_role
+        or requirement.qualifiers
+        or not _candidate_window_valid(candidate)
+        or not _candidate_lifecycle_valid(requirement, candidate)
+    ):
+        return False
     unit = resolve_assignment_unit(candidate, assignment)
     if unit is None:
-        return requirement.kind != "proof_obligation" and assignment.unit_id is None
+        return (
+            assignment.unit_id is None
+            and _technical_requirement_matches(requirement, candidate)
+            and assignment.char_start == candidate.char_start
+            and assignment.char_end == candidate.char_end
+            and assignment.line_start == candidate.line_start
+            and assignment.line_end == candidate.line_start
+            and assignment.projected_content_hash == hashlib.sha256(candidate.projected_text.encode("utf-8")).hexdigest()
+            and all(value is None for value in (
+                assignment.unit_kind, assignment.unit_char_start,
+                assignment.unit_char_end, assignment.unit_content_hash,
+            ))
+        )
+    if not _unit_matches_display(candidate, unit):
+        return False
+    absolute_start = (candidate.char_start or 0) + unit.char_start
+    absolute_end = (candidate.char_start or 0) + unit.char_end
+    line = (candidate.line_start or 0) + candidate.display_text[:unit.char_start].count("\n")
     if (
         assignment.unit_kind != unit.kind
         or assignment.unit_char_start != unit.char_start
         or assignment.unit_char_end != unit.char_end
         or assignment.unit_content_hash != unit.content_sha256
         or assignment.projected_content_hash != unit.content_sha256
+        or assignment.char_start != absolute_start
+        or assignment.char_end != absolute_end
+        or assignment.line_start != line or assignment.line_end != line
     ):
         return False
     obligation = requirement.as_proof_obligation()
-    return obligation is None or local_proof_for_obligation(
+    if obligation is None:
+        return _legacy_requirement_matches_unit(requirement, unit, candidate)
+    return local_proof_for_obligation(
         obligation,
         unit,
         source=_candidate_source_view(candidate),
     ).valid
+
+
+def _candidate_window_valid(candidate: EvidenceCandidate) -> bool:
+    """Bind local units to the normalized display, not authenticate a parent source."""
+    from .evidence_candidates import _span, authority, source_path, version_binding, resolved_version
+    from docmancer.docs.domain.answer_units import MAX_ANSWER_UNITS
+
+    digest = hashlib.sha256(candidate.display_text.encode("utf-8")).hexdigest()
+    supplied = candidate.original.get("display_content_hash")
+    metadata = candidate.original.get("metadata")
+    metadata = metadata if isinstance(metadata, Mapping) else {}
+    stable = (
+        candidate.original.get("stable_chunk_id") or candidate.original.get("stable_child_id")
+        or metadata.get("stable_chunk_id") or candidate.original.get("stable_id")
+    )
+    return (
+        digest == candidate.content_sha256
+        and len(candidate.answer_units) <= MAX_ANSWER_UNITS
+        and _display_text(candidate.original) == candidate.display_text
+        and source_path(candidate.original) == candidate.path_or_url
+        and authority(candidate.original) == candidate.authority
+        and (not stable or str(stable) == candidate.stable_id)
+        and str(candidate.original.get("parent_logical_id") or metadata.get("parent_logical_id") or "") == candidate.parent_logical_id
+        and str(candidate.original.get("project_identity") or "") == candidate.project_identity
+        and str(candidate.original.get("module_id") or "") == candidate.module_id
+        and version_binding(candidate.original) == candidate.version_binding
+        and resolved_version(candidate.original) == candidate.resolved_version
+        and (candidate.original.get("docs_snapshot_exact") if isinstance(candidate.original.get("docs_snapshot_exact"), bool) else None) == candidate.docs_snapshot_exact
+        and _span(candidate.original, "char") == (candidate.char_start, candidate.char_end)
+        and _span(candidate.original, "line") == (candidate.line_start, candidate.line_end)
+        and (not supplied or str(supplied).casefold() == digest)
+        and not candidate.instruction_risk_flags
+        and not candidate.original.get("risk_flags")
+        and not candidate.original.get("instruction_risk_flags")
+        and not candidate.original.get("stale")
+        and candidate.freshness == "current"
+        and str(candidate.original.get("freshness") or "current") == candidate.freshness
+        and str(candidate.original.get("index_freshness") or "synchronized") == "synchronized"
+    )
+
+
+def _candidate_lifecycle_valid(requirement: EvidenceRequirement, candidate: EvidenceCandidate) -> bool:
+    lifecycle = str(_candidate_source_view(candidate).get("project_doc_lifecycle_status") or "active").casefold()
+    current = lifecycle in {"active", "current", ""}
+    historical = lifecycle in {"completed", "historical", "closed", "superseded", "deprecated"}
+    return requirement.lifecycle_intent == "either" or (
+        current if requirement.lifecycle_intent == "current" else historical
+    )
+
+
+def _unit_matches_display(candidate: EvidenceCandidate, unit: AnswerUnit) -> bool:
+    if not _candidate_window_valid(candidate) or unit.source_field is not None:
+        return False
+    if unit.char_start is None or unit.char_end is None:
+        return False
+    # Re-extraction rejects forged kinds/IDs/windows; proposition is not authority.
+    return any(
+        (fresh.unit_id, fresh.kind, fresh.text, fresh.char_start, fresh.char_end, fresh.content_sha256)
+        == (unit.unit_id, unit.kind, unit.text, unit.char_start, unit.char_end, unit.content_sha256)
+        for fresh in extract_answer_units(candidate.display_text, include_soft_wrapped_prose=True)
+    )
+
+
+def _technical_requirement_matches(requirement: EvidenceRequirement, candidate: EvidenceCandidate) -> bool:
+    """Only explicit non-content scope bindings may have unit-less assignments."""
+    if not _candidate_window_valid(candidate) or not _candidate_lifecycle_valid(requirement, candidate):
+        return False
+    if requirement.qualifiers:
+        return False
+    kind, value = requirement.kind, requirement.value
+    if kind in {"evidence_path", "target_path"}:
+        source, wanted = _normalized_source(candidate.path_or_url), _normalized_source(value)
+        return bool(wanted) and (source == wanted or source.endswith("/" + wanted))
+    if kind == "project_identity":
+        return bool(value) and candidate.project_identity == value
+    if kind == "module_id":
+        return bool(value) and candidate.module_id == value
+    if kind == "exact_version":
+        return bool(value) and candidate.resolved_version == value and _version_rank(candidate.version_binding) == 0
+    if kind == "exact_snapshot":
+        return value == "true" and candidate.docs_snapshot_exact is True
+    return False
 
 
 @dataclass(frozen=True, slots=True)
@@ -448,6 +564,8 @@ def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
     metadata = metadata if isinstance(metadata, Mapping) else {}
     view = dict(metadata)
     view.update({
+        "content": candidate.display_text,
+        "text": candidate.display_text,
         "path": candidate.path_or_url,
         "source": candidate.path_or_url,
         "title": candidate.section,

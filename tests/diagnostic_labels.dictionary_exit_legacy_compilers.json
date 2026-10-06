@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_legacy_compilers.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_legacy_compilers.py": "2944f7ab116a07b2e801a52906335b0945538910de64791ae372dca2b6a00271"
+  }
+}

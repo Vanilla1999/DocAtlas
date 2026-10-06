@@ -356,13 +356,15 @@ def _rank_dartdoc_urls_for_query(urls: list[str], query: str) -> list[str]:
         re.sub(r"[^a-z0-9]", "", term.casefold())
         for term in re.findall(r"[A-Za-z][A-Za-z0-9_]{3,}", query)
     }
-    terms -= {"what", "when", "where", "which", "with", "should", "using", "implemented"}
 
     def score(item: tuple[int, str]) -> tuple[int, int, int]:
         index, url = item
         path = re.sub(r"[^a-z0-9]", "", urlparse(url).path.casefold())
         matches = sum(term in path for term in terms if len(term) >= 4)
-        entity = int(any(token in path for token in ("classhtml", "mixinhtml", "enumhtml", "functionhtml")))
+        # Dartdoc filename kinds are structural identities, not topic priorities.
+        entity = int(urlparse(url).path.casefold().endswith(
+            ("-class.html", "-mixin.html", "-enum.html", "-function.html")
+        ))
         return matches, entity, -index
 
     return [url for _, url in sorted(enumerate(urls), key=score, reverse=True)]
@@ -508,7 +510,7 @@ def _dedupe_and_rank(results: list[DiscoveredUrl]) -> list[DiscoveredUrl]:
         existing = by_url.get(key)
         if existing is None or _strategy_rank(result.strategy) < _strategy_rank(existing.strategy):
             by_url[key] = result
-    return sorted(by_url.values(), key=lambda item: (_strategy_rank(item.strategy), _path_rank(item.url), item.url))
+    return sorted(by_url.values(), key=lambda item: (_strategy_rank(item.strategy), item.url))
 
 
 def _rank_urls_for_query(results: list[DiscoveredUrl], query: str) -> list[DiscoveredUrl]:
@@ -516,7 +518,6 @@ def _rank_urls_for_query(results: list[DiscoveredUrl], query: str) -> list[Disco
         re.sub(r"[^a-z0-9]", "", term.casefold())
         for term in re.findall(r"[A-Za-z][A-Za-z0-9_.-]{2,}", query)
     }
-    terms -= {"and", "are", "for", "from", "how", "the", "this", "use", "what", "when", "where", "which", "with"}
 
     def score(item: tuple[int, DiscoveredUrl]) -> tuple[int, int, int]:
         index, candidate = item
@@ -537,13 +538,6 @@ def _strategy_rank(strategy: DiscoveryStrategy) -> int:
         DiscoveryStrategy.NAV_FALLBACK: 5,
         DiscoveryStrategy.SEED_URLS: 6,
     }.get(strategy, 10)
-
-
-def _path_rank(url: str) -> int:
-    path = urlparse(url).path.lower()
-    if any(part in path for part in ("/docs", "/documentation", "/reference", "/api", "/guide")):
-        return 0
-    return 1
 
 
 # ---------------------------------------------------------------------------

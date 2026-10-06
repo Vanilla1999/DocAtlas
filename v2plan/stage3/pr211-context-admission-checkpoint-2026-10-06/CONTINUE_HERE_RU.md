@@ -2,6 +2,14 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Latest 2026-10-07:** [DISCOVERY_LEGACY_EXIT_RU.md](DISCOVERY_LEGACY_EXIT_RU.md).
+Discoverythematicranking/seeds, legacycompilerframes/composition, residualproof+
+unithelpers иselectorvisibility исправлены; independent scopedreviews approved.
+1431newtestsPASS, MCPstdioPASS; technical45pass/1knownred иmixedreds unchanged,
+self-host qualityFAIL preserved. Nextremaining: curated/libraryidentity/preference,
+explicitcorpuscontract иunownedcore/admissionhelpers. Старыеnexttask записи ниже
+относятся кhistoricalsnapshots. Rawgzip остаётся локально внеGit, не удалять.
+
 **Latest parallel slice:** [PARALLEL_REMAINING_EXIT_RU.md](PARALLEL_REMAINING_EXIT_RU.md).
 SDK/patch+standalonevalidator, corpus ranking/root inference, delivered MCP/static/
 dynamic policy и live read tails реализованы, independent scoped reviews approved.

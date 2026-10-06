@@ -511,74 +511,26 @@ def _purpose_clause(
     *,
     max_words: int = 14,
 ) -> tuple[str, int] | None:
-    """Return the strongest clause that locally binds subject and purpose.
-
-    A direct ``subject -> predicate`` proposition is preferred to a reverse
-    imperative/example (``set ... with SUBJECT``).  Both remain valid, but the
-    direct form is the better model-visible answer when both are available.
-    """
-
-    matches: list[tuple[int, str]] = []
-    for _start, _end, clause in _bounded_clauses(text):
-        subject_spans = _subject_spans(obligation, clause)
-        if not subject_spans:
-            continue
-        predicate_spans = [
-            match.span()
-            for pattern in (_PURPOSE_RE, _PURPOSE_COPULA_RE)
-            for match in pattern.finditer(clause)
-            if _positive_relation_match(match, clause)
-        ]
-        for subject in subject_spans:
-            for predicate in predicate_spans:
-                if subject[0] < predicate[1] and predicate[0] < subject[1]:
-                    continue
-                if _word_distance(subject, predicate, clause) > max_words:
-                    continue
-                matches.append((4 if subject[0] < predicate[0] else 3, clause))
-    if not matches:
-        return None
-    score, clause = max(matches, key=lambda item: (item[0], len(item[1])))
-    return clause, score
+    """Compatibility helper: literal proximity does not prove purpose."""
+    return None
 
 
 def _context_score(context: str | None, text: str, source_text: str) -> int:
-    if not context:
-        return 1
-
-    def tokens(value: str) -> set[str]:
-        return {
-            token.casefold()
-            for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", value)
-            if len(token) > 2
-        }
-
-    wanted = tokens(context)
-    if not wanted:
-        return 1
-    haystack = tokens(f"{text}\n{source_text}")
-    return 3 if wanted.issubset(haystack) else 0
+    """Metadata/token overlap and empty context confer no semantic credit."""
+    return 0
 
 
 def _predicate_has_object(match: re.Match[str], text: str) -> bool:
-    tail = text[match.end():]
-    clause = re.split(r"[.;!?\n]", tail, maxsplit=1)[0]
-    return len(re.findall(r"[A-Za-zА-Яа-яЁё0-9_~-]+", clause)) >= 1
+    return False
 
 
 def _positive_relation_match(match: re.Match[str], text: str) -> bool:
-    prefix = text[max(0, match.start() - 30):match.start()]
-    if re.search(
-        r"\b(?:without|not|never|does\s+not|do\s+not|will\s+not)\s+(?:\w+\s+){0,2}$",
-        prefix,
-        re.I,
-    ):
-        return False
-    return _predicate_has_object(match, text)
+    """Compatibility helper: a caller-supplied predicate is not entailment."""
+    return False
 
 
 def _positive_relation(pattern: re.Pattern[str], text: str) -> bool:
-    return any(_positive_relation_match(match, text) for match in pattern.finditer(text))
+    return False
 
 
 def _effect_relation_valid(
@@ -587,35 +539,7 @@ def _effect_relation_valid(
     *,
     max_words: int = 16,
 ) -> bool:
-    """Require the requested effect and command subject in the same clause."""
-
-    relation = obligation.relation
-    for _start, _end, clause in _bounded_clauses(text):
-        subjects = _subject_spans(obligation, clause)
-        if not subjects:
-            continue
-        if relation == "delete":
-            matches = [
-                match for match in _DELETE_PREDICATE_RE.finditer(clause)
-                if _positive_relation_match(match, clause)
-            ]
-        elif relation == "preserve":
-            matches = [
-                match for match in _PRESERVE_PREDICATE_RE.finditer(clause)
-                if _positive_relation_match(match, clause)
-            ]
-            matches.extend(
-                match for match in _NEGATED_DELETE_RE.finditer(clause)
-                if _predicate_has_object(match, clause)
-            )
-        else:
-            return False
-        if any(
-            _word_distance(subject, match.span(), clause) <= max_words
-            for subject in subjects
-            for match in matches
-        ):
-            return True
+    """Compatibility helper: no effect vocabulary or negation inversion."""
     return False
 
 __all__=['_normal', '_bounded_text', 'AnswerUnit', 'materialize_answer_units', 'LocalProof', '_make_unit', '_make_source_field_unit', 'extract_answer_units', '_obligation_technical_term', '_contains_term', '_subject_spans', '_subject_present', '_bounded_clauses', '_word_distance', '_purpose_clause', '_context_score', '_predicate_has_object', '_positive_relation_match', '_positive_relation', '_effect_relation_valid']

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_selector_visibility.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_selector_visibility.py": "e88275ddba1e8b686f6bbe52b734b0978909bb40ce5359938e0666fb4cd300ac"
+  }
+}

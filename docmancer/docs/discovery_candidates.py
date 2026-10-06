@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-from docmancer.docs.resolver import normalize_lookup_key
-
 
 def _canonical_ecosystem(ecosystem: str | None) -> str | None:
     if ecosystem is None:
         return None
-    normalized = normalize_lookup_key(ecosystem)
-    if normalized in {"pub", "flutter", "dart"}:
-        return "dart"
-    return normalized
+    return ecosystem.strip().lower()
 
 
 _KNOWN_DISCOVERY_CANDIDATES = {
@@ -30,7 +25,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Riverpod official guide",
             "docs_url": "https://riverpod.dev/",
             "confidence": "high",
-            "why": "Official Riverpod guide documentation (preferred over pub.dev API)",
+            "why": "Registered package documentation URL",
         },
         {
             "library": "riverpod",
@@ -38,7 +33,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Riverpod pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/riverpod/latest/",
             "confidence": "medium",
-            "why": "pub.dev API reference (fallback)",
+            "why": "Registered package API URL",
         }
     ],
     ("dart", "flutter_riverpod"): [
@@ -48,7 +43,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Flutter Riverpod official guide",
             "docs_url": "https://riverpod.dev/",
             "confidence": "high",
-            "why": "Official Riverpod guide documentation (preferred over pub.dev API)",
+            "why": "Registered package documentation URL",
         },
         {
             "library": "flutter_riverpod",
@@ -56,7 +51,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Flutter Riverpod pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/flutter_riverpod/latest/",
             "confidence": "medium",
-            "why": "pub.dev API reference (fallback)",
+            "why": "Registered package API URL",
         }
     ],
     ("dart", "flutter_bloc"): [
@@ -66,7 +61,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Flutter BLoC official guide",
             "docs_url": "https://bloclibrary.dev/",
             "confidence": "high",
-            "why": "Official BLoC library guide documentation (preferred over pub.dev API)",
+            "why": "Registered package documentation URL",
         },
         {
             "library": "flutter_bloc",
@@ -74,7 +69,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "Flutter BLoC pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/flutter_bloc/latest/",
             "confidence": "medium",
-            "why": "pub.dev API reference (fallback)",
+            "why": "Registered package API URL",
         }
     ],
     ("dart", "bloc"): [
@@ -84,7 +79,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "BLoC official guide",
             "docs_url": "https://bloclibrary.dev/",
             "confidence": "high",
-            "why": "Official BLoC library guide documentation (preferred over pub.dev API)",
+            "why": "Registered package documentation URL",
         },
         {
             "library": "bloc",
@@ -92,7 +87,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
             "name": "BLoC pub.dev API reference",
             "docs_url": "https://pub.dev/documentation/bloc/latest/",
             "confidence": "medium",
-            "why": "pub.dev API reference (fallback)",
+            "why": "Registered package API URL",
         }
     ],
     ("dart", "go_router"): [
@@ -118,7 +113,7 @@ _KNOWN_DISCOVERY_CANDIDATES = {
 
 
 def discovery_candidates_for(library: str, ecosystem: str | None) -> list[dict]:
-    normalized_library = normalize_lookup_key(library)
+    normalized_library = library.strip().lower()
     normalized_ecosystem = _canonical_ecosystem(ecosystem)
     keys: list[tuple[str, str]] = []
     if normalized_ecosystem:
@@ -128,4 +123,5 @@ def discovery_candidates_for(library: str, ecosystem: str | None) -> list[dict]:
     candidates: list[dict] = []
     for key in keys:
         candidates.extend(dict(item) for item in _KNOWN_DISCOVERY_CANDIDATES.get(key, []))
-    return candidates
+    # URL order is deterministic; guide/API subject matter is not a rank signal.
+    return sorted(candidates, key=lambda item: (item["docs_url"], item["ecosystem"], item["library"]))

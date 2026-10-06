@@ -4,7 +4,7 @@ from __future__ import annotations
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import _candidate_preference, _candidate_source_view, _jaccard_millis, _marginal_utility, _repair_mandatory_selection, _selection_terms
-from .evidence_semantic_density import source_fact_unit_semantic_score, source_scoped_behavioral_match
+from ._evidence_selection_part01 import _candidate_window_valid, _candidate_lifecycle_valid, _unit_matches_display
 
 def _scope_requirement_value(
     requirements: Sequence[EvidenceRequirement], kind: str,
@@ -26,38 +26,26 @@ def _code_group_fragments(value: str) -> tuple[str, ...]:
         decoded = json.loads(value)
     except (TypeError, ValueError, json.JSONDecodeError):
         return ()
-    if not isinstance(decoded, list):
+    if not isinstance(decoded, list) or not decoded:
         return ()
-    return tuple(
-        str(fragment).strip()
-        for fragment in decoded
-        if str(fragment).strip()
-    )
+    if any(not isinstance(fragment, str) or not fragment.strip() for fragment in decoded):
+        return ()
+    return tuple(fragment.strip() for fragment in decoded)
 
 
 def _candidate_code_blocks(candidate: EvidenceCandidate) -> tuple[str, ...]:
-    metadata = candidate.original.get("metadata")
-    snippets = metadata.get("code_snippets") if isinstance(metadata, Mapping) else None
-    if not isinstance(snippets, (list, tuple)):
-        snippets = ()
-    blocks = [
-        str(item.get("code") or "").strip()
-        for item in snippets or ()
-        if isinstance(item, Mapping) and str(item.get("code") or "").strip()
-    ]
-    if blocks:
-        return tuple(blocks)
+    # Compatibility inspection only; hidden metadata/parent content is not visible.
     return tuple(match.group(1).strip() for match in re.finditer(
         r"```[^\n]*\n(.*?)```", candidate.display_text, re.DOTALL,
     ) if match.group(1).strip())
 
 
 def _code_group_requirement_matches(value: str, candidate: EvidenceCandidate) -> bool:
-    fragments = _code_group_fragments(value)
-    return bool(fragments) and any(
-        all(fragment.casefold() in block.casefold() for fragment in fragments)
-        for block in _candidate_code_blocks(candidate)
-    )
+    return _witness_for_requirement(EvidenceRequirement("code-group", "code_group", value), candidate) is not None
+
+
+def _literal_visible(value: str, text: str) -> bool:
+    return bool(value) and re.search(rf"(?<!\w){re.escape(value)}(?!\w)", text) is not None
 
 
 def _legacy_requirement_matches_unit(
@@ -65,65 +53,36 @@ def _legacy_requirement_matches_unit(
     unit: AnswerUnit,
     candidate: EvidenceCandidate,
 ) -> bool:
-    text = unit.text.casefold()
-    if not unit.proposition and requirement.kind not in {"code_group"}:
+    if not _unit_matches_display(candidate, unit) or requirement.qualifiers:
         return False
-    if requirement.kind in {"target_declaration", "preserve_declaration"}:
-        wanted = requirement.value.casefold().replace("\\", "/")
-        source = candidate.source_identity.casefold().replace("\\", "/")
-        matches = (
-            any(symbol.casefold() == wanted for symbol in candidate.symbols)
-            or source == wanted
-            or source.endswith("/" + wanted)
-        )
-    elif requirement.kind == "behavioral_contract":
-        if requirement.query_extraction_kind == "source_fact":
-            matches = source_scoped_behavioral_match(requirement, unit.text, candidate)
-        else:
-            terms = {
-                token for token in re.findall(r"[a-z0-9_]+", requirement.value.casefold())
-                if token not in {"a", "an", "and", "for", "in", "of", "the", "to"}
-            }
-            matches = len(terms & set(re.findall(r"[a-z0-9_]+", text))) >= min(3, len(terms))
-    elif requirement.kind == "cross_module_invariant":
-        targets = [value.casefold() for value in requirement.value.splitlines() if value]
-        matches = candidate.authority == "canonical" and any(
-            _PATCH_FACT_RE.search(segment)
-            and all(target in segment.casefold() for target in targets)
-            for segment in re.split(r"(?<=[.!?])\s+", unit.text)
-        )
-    elif requirement.kind in {"exact_term", "entity"}:
-        matches = requirement_value_visible(requirement.value, unit.text)
-    elif requirement.kind == "facet":
-        matches = _facet_requirement_matches(requirement.value, text)
-    elif requirement.kind == "code_group":
+    if requirement.kind in {"exact_term", "entity"}:
+        return _literal_visible(requirement.value, unit.text)
+    if requirement.kind == "code_group":
         fragments = _code_group_fragments(requirement.value)
-        matches = bool(fragments) and all(fragment.casefold() in text for fragment in fragments)
-    elif requirement.kind == "canonical_policy":
-        matches = bool(_PATCH_FACT_RE.search(unit.text))
-    elif requirement.kind in {"evidence_path", "target_path", "project_identity", "module_id", "exact_version", "exact_snapshot"}:
-        # These obligations are bound by source metadata.  They still need a
-        # concrete visible proposition so a successful answer never cites a
-        # heading-only or empty chunk.
-        matches = unit.proposition
-    elif requirement.kind == "unsupported_query":
-        matches = False
-    else:
-        matches = requirement.value.casefold() in text
-    if matches and requirement.qualifiers:
-        matches = all(_QUALIFIER_PATTERNS[value].search(unit.text) for value in requirement.qualifiers)
-    return bool(matches)
+        blocks = [unit.text] if unit.kind in {"code_block", "code_declaration"} else []
+        if unit.kind == "key_value" and re.fullmatch(
+            r"(?:const|let|var|final)\s+[A-Za-z_]\w*\s*=\s*\S.*", unit.text,
+        ):
+            blocks.append(unit.text)
+        blocks.extend(match.group(2) for match in re.finditer(r"(`+)([^`\n]+)\1", unit.text))
+        return bool(fragments) and any(all(_literal_visible(fragment, block) for fragment in fragments) for block in blocks)
+    if requirement.kind == "required_fact":
+        # A supplied exact quote is a mechanical match, not a behavioral claim.
+        return bool(requirement.value) and unit.text == requirement.value
+    return False
 
 
 def _witness_for_requirement(
     requirement: EvidenceRequirement,
     candidate: EvidenceCandidate,
 ) -> RequirementWitness | None:
+    if requirement.qualifiers or not _candidate_window_valid(candidate) or not _candidate_lifecycle_valid(requirement, candidate):
+        return None
     obligation = requirement.as_proof_obligation()
     if obligation is not None:
         matched = best_local_proof(
             obligation,
-            candidate.answer_units,
+            tuple(unit for unit in candidate.answer_units if _unit_matches_display(candidate, unit)),
             source=_candidate_source_view(candidate),
         )
         if matched is None:
@@ -136,26 +95,19 @@ def _witness_for_requirement(
         ]
         if not matching_units:
             return None
-        source_fact = (
-            requirement.kind == "behavioral_contract"
-            and requirement.query_extraction_kind == "source_fact"
-        )
         matching_units.sort(key=lambda unit: (
-            -source_fact_unit_semantic_score(unit.text) if source_fact else 0,
-            0 if unit.proposition else 1,
             len(unit.text),
             unit.char_start if unit.char_start is not None else 10**9,
             unit.unit_id,
         ))
         unit = matching_units[0]
-        semantic_score = source_fact_unit_semantic_score(unit.text) if source_fact else 0
         proof = LocalProof(
             True,
             subject_score=1,
-            relation_score=2 if source_fact else 1,
-            value_score=max(1, semantic_score) if source_fact else 1,
-            completeness_score=3 + semantic_score if source_fact else 3,
-            reason="source_scoped_behavioral_fact" if source_fact else "legacy_local_unit",
+            relation_score=1,
+            value_score=1,
+            completeness_score=3,
+            reason="visible_literal_only",
         )
     return RequirementWitness(
         requirement_id=requirement.requirement_id,
@@ -177,29 +129,8 @@ def _with_canonical_policy_requirements(
     candidates: Sequence[EvidenceCandidate],
     result_kind: str,
 ) -> tuple[EvidenceRequirement, ...]:
-    if result_kind != "patch_context":
-        return tuple(requirements)
-    additions = [
-        EvidenceRequirement(
-            requirement_id=f"canonical_policy:{candidate.stable_id}",
-            kind="canonical_policy",
-            value=candidate.stable_id,
-            public_provenance="canonical_policy_requirement",
-        )
-        for candidate in candidates
-        if candidate.authority == "canonical"
-        and str(candidate.original.get("authority") or "").casefold() in {
-            "source_of_truth", "project_rule", "explicit_agent_policy",
-        }
-        and _PATCH_FACT_RE.search(candidate.display_text)
-        and any(
-            requirement.kind != "canonical_policy"
-            and _witness_for_requirement(requirement, candidate) is not None
-            for requirement in requirements
-        )
-    ]
-    unique = {item.requirement_id: item for item in (*requirements, *additions)}
-    return tuple(unique[key] for key in sorted(unique))
+    # Normative vocabulary does not invent a policy obligation or witness.
+    return tuple(requirements)
 
 
 def _deduplicate(

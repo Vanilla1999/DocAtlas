@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_discovery_literals.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_discovery_literals.py": "39e354a715bb772dcdcf4beab1329dfeb2de0c990eef2358dc61d186f25aab50"
+  }
+}
