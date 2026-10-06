@@ -1,13 +1,10 @@
-"""Private original-span enrichment of existing RetrievalNeed; no source I/O."""
+"""Unresolved original-span literal contracts; no semantics or source I/O."""
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import re
 from typing import Literal
-from .admission_grammar import parse_admission_frame
-from .need_composition import independent_sentence_spans, mask_protected, compositional_parts
-from .query_reference_binding import ReferencePlan, query_mentions
-from .query_terms import query_constraint_roles
-from .question_retrieval_needs import RetrievalNeed, retrieval_needs
+from .query_reference_binding import ReferencePlan, ResolvedReference, ScopeKey, query_mentions
+from .question_retrieval_needs import RetrievalNeed, _literal_symbol_mentions, retrieval_needs
 
 
 @dataclass(frozen=True, slots=True)
@@ -29,51 +26,61 @@ class NeedContract:
     category_spans: tuple[QuerySpan, ...] = ()
 
 
-def compile_need_contracts(question: str, references: ReferencePlan) -> tuple[NeedContract, ...]:
-    """Retain unknown sentences rather than letting a known child consume them.
+def _verified_locator_ids(question: str, references: ReferencePlan) -> frozenset[str]:
+    """Accept only current, canonical resolved locator occurrences.
 
-    Interpretation is distinct from context eligibility. A full independent
-    request can be probed with the existing strict qualifier while its semantic
-    interpretation remains unresolved and cannot certify whole-root coverage.
+    This is placement, not proof of source identity: the qualifier still checks
+    the nominated source against its prepared snapshot. A symbol may be promoted
+    only by the resolver's double-quoted literal catalog-stem convention, never
+    by a supplied role on a backtick or qualified symbol.
     """
-    if not question.strip():
+    if (not isinstance(references, ReferencePlan) or references.question != question
+            or references.catalog_complete is not True
+            or not isinstance(references.scope, ScopeKey)
+            or not all(isinstance(value, str) for value in (
+                references.scope.project_id, references.scope.version, references.scope.snapshot_id))
+            or not references.scope.project_id or not references.scope.snapshot_id
+            or not isinstance(references.references, tuple)):
+        return frozenset()
+    mentions = query_mentions(question)
+    if len(references.references) != len(mentions):
+        return frozenset()
+    locators = set()
+    for ref, mention in zip(references.references, mentions):
+        if (not isinstance(ref, ResolvedReference) or ref.mention != mention
+                or type(ref.mention.start) is not int or type(ref.mention.end) is not int
+                or type(ref.mention.explicit) is not bool):
+            return frozenset()
+        if ref.role == 'source_locator':
+            quoted_stem = (mention.syntax_role == 'symbol_identity'
+                and mention.explicit and mention.start > 0 and mention.end < len(question)
+                and question[mention.start - 1] == question[mention.end] == '"'
+                and re.fullmatch(r'[\w-]+', mention.text) is not None)
+            if mention.syntax_role != 'source_locator' and not quoted_stem:
+                return frozenset()
+            if (ref.state == 'resolved' and ref.reason == 'unique_catalog_source'
+                    and isinstance(ref.source_ids, tuple) and len(ref.source_ids) == 1
+                    and isinstance(ref.source_ids[0], str) and ref.source_ids[0]):
+                locators.add(mention.mention_id)
+        elif ref.role != mention.syntax_role:
+            return frozenset()
+    return frozenset(locators)
+
+
+def compile_need_contracts(question: str, references: ReferencePlan) -> tuple[NeedContract, ...]:
+    """Retain original bytes without certifying any part or whole-root meaning.
+
+    Current canonical locator occurrences place constraints outside the body;
+    they never infer a subject, relation or requirement. Source-locator binding
+    remains the separate current-source qualifier's responsibility.
+    """
+    needs = retrieval_needs(question)
+    if not needs:
         return ()
-    ranges = independent_sentence_spans(question) or ((0, len(question)),)
-    rows = []
-    for index, (start, end) in enumerate(ranges, 1):
-        text = question[start:end]
-        frame = parse_admission_frame(text) if references.question == question else None
-        parts = compositional_parts(text) if references.question == question else ()
-        if parts:
-            old = retrieval_needs(text)
-            original_exact = tuple(dict.fromkeys((*query_constraint_roles(text).hard_exact,
-                *(m.text.casefold() for m in query_mentions(text) if m.syntax_role == 'symbol_identity'))))
-            ids = tuple(f'sentence-{index}:part-{i+1}' for i in range(len(parts)))
-            shift = lambda spans: tuple(QuerySpan(start+a, start+b) for a, b in spans)
-            for number, part in enumerate(parts):
-                context = '' if part.prerequisite is None else text[parts[part.prerequisite].start:parts[part.prerequisite].end]
-                need = RetrievalNeed(ids[number], start+part.start, start+part.end,
-                    text[part.start:part.end], old[0].subject if len(old) == 1 else '',
-                    part.relation, context, original_exact)
-                rows.append(NeedContract(need, shift(part.focus), shift(part.constraints),
-                    () if part.prerequisite is None else (ids[part.prerequisite],),
-                    part.requirement, part.expected_count, 'supported',
-                    shift(part.alternatives), shift(part.categories)))
-            continue
-        old = retrieval_needs(text)
-        subject = frame.subject if frame else old[0].subject if len(old) == 1 else ''
-        relation = frame.operator if frame else old[0].relation if len(old) == 1 else 'requested_part'
-        mentions = query_mentions(text)
-        # Existing normalized identities stay intact; explicit literal spelling
-        # with significant whitespace also stays in the original-span contract.
-        exact = tuple(dict.fromkeys((*query_constraint_roles(text).hard_exact,
-            *(m.text.casefold() for m in mentions if m.syntax_role == 'symbol_identity'))))
-        need = RetrievalNeed(f'sentence-{index}', start, end, text, subject, relation, '', exact)
-        focus = tuple(QuerySpan(start + m.start, start + m.end) for m in mentions
-                      if m.syntax_role in {'symbol_identity', 'semantic_subject', 'unresolved'})
-        condition = re.search(r'\b(?:when|if|unless|only|except|когда|если|только|кроме)\b',
-                              mask_protected(text), re.I)
-        constraints = ((QuerySpan(start + condition.start(), end),) if condition else ())
-        rows.append(NeedContract(need, focus, constraints, (),
-            'scalar' if frame else 'unknown', None, 'supported' if frame else 'unresolved'))
-    return tuple(rows)
+    locator_ids = _verified_locator_ids(needs[0].query_span_text, references)
+    symbols = tuple(mention for mention in _literal_symbol_mentions(needs[0].query_span_text)
+                    if mention.mention_id not in locator_ids)
+    exact = tuple(dict.fromkeys(mention.text.casefold() for mention in symbols))
+    need = replace(needs[0], need_id='sentence-1', hard_exact=exact)
+    focus = tuple(QuerySpan(mention.start, mention.end) for mention in symbols)
+    return (NeedContract(need, focus, (), (), 'unknown', None, 'unresolved'),)

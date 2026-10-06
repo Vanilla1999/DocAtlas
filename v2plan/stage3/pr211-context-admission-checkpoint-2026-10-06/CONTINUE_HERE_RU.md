@@ -2,6 +2,12 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Latest slice:** [LITERAL_NEEDS_FOLLOWUP_RU.md](LITERAL_NEEDS_FOLLOWUP_RU.md).
+Semantic needs и NL clause/context inheritance удалены из default needs producers;
+live recovery clause splitter отвязан. 447 новых tests PASS, MCP smoke PASS,
+independent scoped approval; self-host quality FAIL сохранён. Ниже next-task
+формулировки про эти два producers относятся к предыдущему snapshot.
+
 **Публикация выполнена:** reviewed partial slice `58750962` pushed в
 `origin/integration/stage3-v2-identity-pr1`. Следующий default-read slice запущен:
 [DEFAULT_READ_FOLLOWUP_RU.md](DEFAULT_READ_FOLLOWUP_RU.md).

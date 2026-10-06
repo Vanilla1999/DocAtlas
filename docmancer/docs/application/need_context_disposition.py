@@ -34,14 +34,16 @@ _CONTEXT_REASONS = frozenset({'visible_fields', 'insufficient_visible_match',
 
 def _probe(contract: NeedContract) -> dict[str, Any]:
     need = contract.need
-    text = ' '.join(part for part in (need.context, need.query_span_text) if part)
+    # The current compiler retains one full original span, not a derived lane.
+    # Keep this helper anonymous: no public query attribution or answer credit.
+    # classify_need_context checks membership in the freshly compiled contracts
+    # before this probe can reach the qualifier.
+    text = need.query_span_text
     roles = query_constraint_roles(text)
-    return {'query_text': text, 'query_origin': 'retrieval_need',
+    return {'query_text': text,
         'query_terms': list(documentation_query_terms(text)),
         'exact_terms': list(dict.fromkeys((*roles.hard_exact, *need.hard_exact))),
-        'bound_subjects': list(roles.bound_subjects),
-        'need_subject': need.subject, 'need_relation': need.relation,
-        'need_context': need.context}
+        'bound_subjects': list(roles.bound_subjects)}
 
 
 def _applicable_context(contract: NeedContract, question: str, body: str) -> bool:

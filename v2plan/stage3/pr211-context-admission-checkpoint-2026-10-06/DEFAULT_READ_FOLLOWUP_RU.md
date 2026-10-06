@@ -1,5 +1,10 @@
 # Default-read follow-up после публикации checkpoint
 
+**Следующий literal-needs срез реализован:**
+[LITERAL_NEEDS_FOLLOWUP_RU.md](LITERAL_NEEDS_FOLLOWUP_RU.md).
+447 новых tests PASS; scope review approved, quality остаётся red.
+Ниже сохранён исторический план следующего шага от baseline `c4add087`.
+
 2026-10-06. **ACTIVE / NOT DONE.**
 
 Первый reviewed partial dictionary-exit checkpoint committed/pushed:

@@ -252,6 +252,21 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
                 return result, str(ref.get("reason") or "unresolved_source_locator")
             if identity.get("document_id") not in ref.get("source_ids", ()):
                 return result, "source_locator_mismatch"
+            # Serialized role/IDs alone cannot turn an unrelated source into a
+            # locator witness. Recheck the literal against the current path,
+            # using the same filename/stem tiers as catalog resolution.
+            current_source = CatalogSource(
+                str(identity.get("document_id") or ""),
+                ScopeKey(str(scope.get("project_id") or ""),
+                         str(scope.get("version") or ""),
+                         str(scope.get("snapshot_id") or "")),
+                str(identity.get("canonical_path") or ""),
+                str(identity.get("content_sha256") or ""),
+            )
+            if current_source.document_id not in _source_ids(
+                str(mention.get("text") or ""), (current_source,), DOCUMENT_SUFFIXES
+            ):
+                return result, "source_locator_mismatch"
             bindings.append({"mention_id": mention["mention_id"], "role": "source_locator", "field": "path", **identity})
     if plan is not None:
         body_question = reference_body_question(plan)

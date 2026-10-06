@@ -13,7 +13,6 @@ from typing import Any
 
 from docmancer.docs.application.evidence_requirements import build_requirements
 from docmancer.docs.application.proofability import diagnose_proofability
-from docmancer.docs.domain.question_frame_core import split_question_clause_spans
 from docmancer.retrieval.query_planning import extract_document_locator
 
 RECOVERY_SCHEMA_VERSION = 1
@@ -104,29 +103,13 @@ def _exact_question_hints(requirements: Any, question: str) -> list[str]:
 
 
 def _problem_spans(question: str, requirements: Any) -> list[str]:
-    """Return exact source clauses that are not fully covered by known spans."""
+    """Bound the original request for diagnostics, without inferred clauses.
 
-    covered: list[tuple[int, int]] = [
-        (int(start), int(end))
-        for _, start, end, _ in getattr(requirements, "query_requirement_spans", ()) or ()
-        if 0 <= int(start) < int(end) <= len(question)
-    ]
-    clauses = split_question_clause_spans(question)
-    if not clauses:
-        return [_clean_fragment(question, max_chars=220)] if question.strip() else []
-
-    scored: list[tuple[float, int, str]] = []
-    for clause in clauses:
-        overlap = sum(
-            max(0, min(clause.end, end) - max(clause.start, start))
-            for start, end in covered
-        )
-        ratio = min(1.0, overlap / max(1, clause.end - clause.start))
-        text = _clean_fragment(clause.text, max_chars=220)
-        if text:
-            scored.append((ratio, clause.start, text))
-    scored.sort(key=lambda row: (row[0], row[1]))
-    return [row[2] for row in scored[:MAX_PROBLEM_SPANS]]
+    Requirement spans cannot establish semantic coverage of a clause. This
+    fragment is display/retry guidance only, never a generated retrieval lane.
+    """
+    text = question.strip()[:220]
+    return [text] if text else []
 
 
 def _already_rephrased(question: str) -> bool:
