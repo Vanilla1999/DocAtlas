@@ -1,5 +1,14 @@
 # Архив завершённых веток #211 — 2026-10-06
 
+## Дополнение: исследование retrieval aliases
+
+`retrieval-alias-ablation-2026-10-06.tar.gz` содержит runner, candidate patch,
+полные reports/logs и собственный `MANIFEST.json`. Этот новый архив не относится
+к семи историческим архивам удаления веток ниже. Методика, результаты и SHA-256:
+[RETRIEVAL_DICTIONARY_REVIEW_RU.md](../RETRIEVAL_DICTIONARY_REVIEW_RU.md).
+
+## Историческое удаление веток
+
 Удаление временных веток разрешено владельцем. Основная интеграционная ветка
 `integration/stage3-v2-identity-pr1` сохранена на
 `37bfd0668f819935dd9e027bd9d8bf767fcd185a`.

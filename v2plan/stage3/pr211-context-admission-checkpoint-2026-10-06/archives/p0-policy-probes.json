@@ -1,0 +1,183 @@
+{
+  "schema": "p0-policy-diagnostic-v1",
+  "python": "3.12.3",
+  "source_hashes": {
+    "docmancer/docs/domain/context_windows.py": "9f9f999d83f844ec350add8cf2649311919247f4a6db9b5851c7c280cd8956e0",
+    "docmancer/docs/domain/query_terms.py": "0ab8570d6eceb381a780edff9de6e84035fec9016246e86397af4b3b456bb106",
+    "docmancer/docs/domain/evidence_qualification.py": "f8746ccc7d09a9bc7d5e5c65947732989e632a1e120f666fca1636055be8f8c4",
+    "docmancer/docs/domain/_project_answer_contract_part01.py": "e25c986003302f29861e045ef57ffc34e4f091b7a22d8fc29c94fa2cc473770e",
+    "docmancer/docs/domain/_project_answer_contract_shared.py": "baabfc96063436fc5d2f6349851c3f6825013bde6b6482ec680ce09fb86a4b4f"
+  },
+  "policy_cases": [
+    {
+      "id": "current-source",
+      "probe": {},
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized"
+      },
+      "visible_text": "Ordinary source text.",
+      "catalog_role": "reference",
+      "rejection": null
+    },
+    {
+      "id": "wrong-project",
+      "probe": {},
+      "candidate": {
+        "project_identity": "other",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized"
+      },
+      "visible_text": "Ordinary source text.",
+      "catalog_role": "reference",
+      "rejection": "wrong_project_identity"
+    },
+    {
+      "id": "stale-source",
+      "probe": {},
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized",
+        "stale": true
+      },
+      "visible_text": "Ordinary source text.",
+      "catalog_role": "reference",
+      "rejection": "stale_evidence"
+    },
+    {
+      "id": "unsynchronized-source",
+      "probe": {},
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "pending"
+      },
+      "visible_text": "Ordinary source text.",
+      "catalog_role": "reference",
+      "rejection": "unsynchronized_index"
+    },
+    {
+      "id": "proposal-forbidden-role",
+      "probe": {
+        "forbidden_catalog_roles": [
+          "reference"
+        ]
+      },
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized"
+      },
+      "visible_text": "Ordinary source text.",
+      "catalog_role": "reference",
+      "rejection": "forbidden_catalog_role"
+    },
+    {
+      "id": "proposal-forbidden-term",
+      "probe": {
+        "forbidden_evidence_terms": [
+          "policy"
+        ]
+      },
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized"
+      },
+      "visible_text": "This policy is current.",
+      "catalog_role": "reference",
+      "rejection": "forbidden_evidence_term"
+    },
+    {
+      "id": "proposal-substring-term",
+      "probe": {
+        "forbidden_evidence_terms": [
+          "policy"
+        ]
+      },
+      "candidate": {
+        "project_identity": "fixture-project",
+        "source_class": "project_doc",
+        "freshness": "current",
+        "index_freshness": "synchronized"
+      },
+      "visible_text": "The identifier is policyCache.",
+      "catalog_role": "reference",
+      "rejection": "forbidden_evidence_term"
+    }
+  ],
+  "window_terms": [
+    {
+      "question": "When does project work after launch?",
+      "terms": [
+        "launch",
+        "work"
+      ]
+    },
+    {
+      "question": "Когда работает проект после запуска?",
+      "terms": [
+        "запуска",
+        "после"
+      ]
+    }
+  ],
+  "literal_cases": [
+    {
+      "text": "`DocAtlas`",
+      "anchors": [],
+      "supplemental_useful": true
+    },
+    {
+      "text": "`NovelProduct`",
+      "anchors": [
+        "NovelProduct"
+      ],
+      "supplemental_useful": true
+    },
+    {
+      "text": "if not",
+      "anchors": [],
+      "supplemental_useful": false
+    },
+    {
+      "text": "если не",
+      "anchors": [],
+      "supplemental_useful": false
+    },
+    {
+      "text": "`if`",
+      "anchors": [
+        "if"
+      ],
+      "supplemental_useful": true
+    }
+  ],
+  "cardinality_cases": [
+    {
+      "question": "two tools and nine attempts",
+      "cardinality": 2
+    },
+    {
+      "question": "nine attempts and two tools",
+      "cardinality": 2
+    },
+    {
+      "question": "два инструмента и девять попыток",
+      "cardinality": 2
+    },
+    {
+      "question": "девять попыток и два инструмента",
+      "cardinality": 2
+    }
+  ],
+  "limitations": "Synthetic unit probes of unchanged code; not final delivery, safety certification, or approved gold."
+}

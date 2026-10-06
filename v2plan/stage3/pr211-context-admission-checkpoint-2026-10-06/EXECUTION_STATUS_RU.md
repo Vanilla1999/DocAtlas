@@ -1,9 +1,27 @@
 # Выполнение плана #211
 
-Дата: 2026-10-06. Проверяемый product head: `755b33cd`.
-Статус: есть кандидат исправления Pebble; владелец разрешил его commit/push
-в активный #211 вместе с тестами и документами. Разрешения merge нет.
-Последний результат: [PREFIT_PATCH_RU.md](PREFIT_PATCH_RU.md).
+Дата: 2026-10-06. Опубликованный product head: `8d2381d8`.
+Pebble prefit patch опубликован. Разрешения merge нет.
+Последнее исследование по запросу владельца:
+[удаление retrieval-словаря](RETRIEVAL_DICTIONARY_REVIEW_RU.md).
+Общий план RU/EN и критерии завершения:
+[DICTIONARY_EXIT_PLAN_RU.md](DICTIONARY_EXIT_PLAN_RU.md);
+[реестр D01–D38](DICTIONARY_INVENTORY_RU.md). P0 ACTIVE, P1 PREPARATION, P2–P7 NOT STARTED;
+реализация нового pipeline и test-contract migrations ещё не выполнены.
+Продолжение P0: [caller map и baseline manifest](P0_READ_PATH_AUDIT_RU.md),
+[статус этапов](DICTIONARY_STAGE_STATUS_RU.md).
+Подготовлены [P1 acceptance и migration ledger](P1_ACCEPTANCE_DRAFT_RU.md),
+64-case bilingual draft; [P0→P1 entry gate](P0_TO_P1_GATE_RU.md) пока NOT READY.
+Итог parallel audit: [P0_PARALLEL_RESULT_RU.md](P0_PARALLEL_RESULT_RU.md).
+Classification и named consumer maps завершены в pinned grouped scope;
+P0 не закрыт формально из-за baseline execution-provenance linkage.
+Работу по согласованию P1 можно продолжать; approval/freeze ещё нет.
+Полное отключение aliases теряет recall; локальное удаление trust trigger тоже
+теряет настоящие trust quotes. Ни одно не принято как готовое исправление.
+
+Свежие checks `8d2381d8`: required-ci/core/advanced-contract/P1 stack/adversarial
+FAIL, required-release PASS. Ниже сохранены исторические проверки `755b33cd`;
+результаты опубликованного prefit — в [PREFIT_PATCH_RU.md](PREFIT_PATCH_RU.md).
 
 ## 1. Подтверждённый CI
 

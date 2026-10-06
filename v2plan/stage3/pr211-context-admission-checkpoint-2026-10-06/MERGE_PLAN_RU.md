@@ -49,6 +49,15 @@ Remote heads проверены через `git ls-remote`, PR — через Gi
 
 Текущее выполнение: [EXECUTION_STATUS_RU.md](EXECUTION_STATUS_RU.md).
 
+Последующее направление владельца: исследовать удаление
+`project_retrieval_intent.py`, не добавляя словарей/keyword triggers/regex-замен.
+Зависимости, измеренные потери и этапы замены:
+[RETRIEVAL_DICTIONARY_REVIEW_RU.md](RETRIEVAL_DICTIONARY_REVIEW_RU.md).
+Это уточняет направление реализации; тестовые миграции и готовность merge
+по-прежнему требуют отдельных проверок и согласований.
+Общий RU/EN scope, реестр других словарей, этапы P0–P7 и definition of DONE:
+[DICTIONARY_EXIT_PLAN_RU.md](DICTIONARY_EXIT_PLAN_RU.md).
+
 **Допустимо после согласования:** неполный полезный retrieval-only context,
 неидеальное ранжирование, неизвестная полнота ответа и отложенный redesign вне diff.
 Нужны честные flags, соблюдённые scope/source/budget contracts, отсутствие доказанной
