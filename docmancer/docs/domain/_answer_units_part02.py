@@ -161,7 +161,8 @@ def _value_score(value_kind: str, text: str, *, cardinality: int | None = None) 
     if value_kind == "duration":
         return 3 if _DURATION_RE.search(text) else 0
     if value_kind == "status":
-        return 3 if _STATUS_VALUE_RE.search(text) else 0
+        # Status vocabulary is not a typed value contract.
+        return 0
     if value_kind == "number":
         numeric = re.search(r"(?<!\w)\d+(?:\.\d+)?(?!\w)", text) is not None
         word_number = any(_contains_term(word, text) for word in _NUMBER_WORD_VALUES)
@@ -252,19 +253,6 @@ def _explicit_comparison_is_local(
     )
 
 
-_GENERIC_BEHAVIOR_RE = re.compile(
-    r"\b(?:returns?|reports?|shows?|reads?|writes?|loads?|indexes?|retrieves?|selects?|"
-    r"validates?|handles?|processes?|dispatches?|routes?|binds?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
-    r"invokes?|supplies?|calls?|replaces?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
-    r"owns?|manages?|controls?|stores?|persists?|saves?|delegates?|maps?|emits?|publishes?|enqueues?|"
-    r"accepts?|rejects?|allows?|denies?|coordinates?|schedules?|forwards?|assigns?|applies?|resolves?|"
-    r"возвращает|показывает|сообщает|читает|записывает|индексирует|извлекает|выбирает|"
-    r"проверяет|обрабатывает|маршрутизирует|создает|обновляет|удаляет|хранит|сохраняет|"
-    r"владеет|управляет|делегирует|публикует|отклоняет|разрешает|координирует)\b",
-    re.I,
-)
-
-
 def _predicate_has_local_value(match: re.Match[str], clause: str) -> bool:
     """Require a non-empty complement after one locally bound predicate."""
 
@@ -287,23 +275,7 @@ def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
 
 
 def _definition_clause(obligation: ProofObligation, text: str) -> str | None:
-    """Find one proposition that binds definition subject, predicate, and value."""
-
-    for _start, _end, clause in _bounded_clauses(text):
-        subject_spans = _subject_spans(obligation, clause)
-        if not subject_spans:
-            continue
-        for match in _COPULA_RE.finditer(clause):
-            if not _predicate_has_local_value(match, clause):
-                continue
-            if re.match(r"\s+(?:not|never|не)\b", clause[match.end():], re.I):
-                continue
-            if any(
-                subject[0] <= match.start()
-                and _word_distance(subject, match.span(), clause) <= 10
-                for subject in subject_spans
-            ):
-                return clause
+    """Compatibility helper: removed copula rules cannot certify a definition."""
     return None
 
 
@@ -311,21 +283,7 @@ def _behavior_clause(
     obligation: ProofObligation,
     text: str,
 ) -> tuple[str, bool] | None:
-    """Find one subject-bound generic behavior proposition and its local polarity."""
-
-    for _start, _end, clause in _bounded_clauses(text):
-        subject_spans = _subject_spans(obligation, clause)
-        if not subject_spans:
-            continue
-        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
-            if not _predicate_has_local_value(match, clause):
-                continue
-            if any(
-                subject[0] <= match.start()
-                and _word_distance(subject, match.span(), clause) <= 10
-                for subject in subject_spans
-            ):
-                return clause, _predicate_is_negated(match, clause)
+    """Compatibility helper: no generic behavior vocabulary remains."""
     return None
 
 
@@ -354,24 +312,7 @@ def _source_document_behavior_clause(
     text: str,
     source_text: str,
 ) -> tuple[str, bool] | None:
-    """Bind conventional document subjects to behavior stated by that document.
-
-    Queries such as ``What does the README say about X?`` name the source
-    document itself as the semantic subject. Preserve that source-subject
-    contract only for conventional maintained-document identities; arbitrary
-    code-shaped filenames must still carry their subject in the proposition.
-    """
-
-    if not _SOURCE_DOCUMENT_SUBJECT_RE.fullmatch(_normal(obligation.subject)):
-        return None
-    if not _subject_present(obligation, source_text):
-        return None
-    for _start, _end, clause in _bounded_clauses(text):
-        if obligation.context and not _contains_term(obligation.context, clause):
-            continue
-        for match in _GENERIC_BEHAVIOR_RE.finditer(clause):
-            if _predicate_has_local_value(match, clause):
-                return clause, _predicate_is_negated(match, clause)
+    """Source identity does not replace a removed semantic behavior proof."""
     return None
 
 
@@ -407,6 +348,48 @@ def _special_relation_valid(relation: str | None, text: str) -> bool:
     return False
 
 
+def _explicit_literal_value_proof(
+    obligation: ProofObligation,
+    unit: AnswerUnit,
+) -> LocalProof | None:
+    """Match a supplied typed literal against one exact key/value declaration.
+
+    This certifies literal equality only, not a natural-language relation or
+    answer authority.  No aliases, source-title binding, substring values,
+    neighboring lines, or inferred subject/attribute association are used.
+    """
+
+    if (
+        obligation.kind != "exact_fact"
+        or obligation.expected_value is None
+        or obligation.relation is not None
+        or obligation.target is not None
+        or obligation.context is not None
+        or obligation.subject_kind not in {"config_key", "env_var", "code_symbol"}
+        or obligation.value_kind not in {
+            "text", "status", "version_range", "duration", "number", "boolean", "path",
+        }
+        or unit.source_field is not None
+        or unit.kind not in {"key_value", "code_declaration"}
+        or "\n" in unit.text
+        or len(unit.text) >= MAX_ANSWER_UNIT_CHARS
+    ):
+        return None
+    declaration = _KEY_VALUE_RE.fullmatch(unit.text)
+    if declaration is None:
+        return None
+    key, value = declaration.groups()
+    expected_key = obligation.subject
+    if obligation.attribute is not None:
+        expected_key += "." + obligation.attribute
+    # A matched quote pair is syntax; do not normalize identity or literal case.
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "`\"'":
+        value = value[1:-1]
+    if key.strip() != expected_key or value != obligation.expected_value:
+        return None
+    return LocalProof(True, 3, 3, 3, 9, "explicit_literal_value_only")
+
+
 def local_proof_for_obligation(
     obligation: ProofObligation,
     unit: AnswerUnit,
@@ -431,6 +414,14 @@ def local_proof_for_obligation(
         # Historical queries may still cite an active status table, but it cannot
         # be the sole witness for a completed/historical fact.
         return LocalProof(False, reason="current_source_for_historical_obligation")
+
+    literal_proof = _explicit_literal_value_proof(obligation, unit)
+    if literal_proof is not None:
+        return literal_proof
+    if not unit.proposition:
+        return LocalProof(False, reason="structural_context_not_proposition")
+    if obligation.kind in {"definition", "behavior", "status", "workflow"}:
+        return LocalProof(False, reason="semantic_detector_removed")
 
     subject_local = _subject_present(obligation, text)
     authoritative_identity = (
@@ -595,10 +586,7 @@ def local_proof_for_obligation(
         return LocalProof(valid, min(3, overlap + 1), 3 if overlap else 0, value, overlap + value + 3, "location" if valid else "location_subject_not_bound_to_source")
 
     if obligation.kind == "status":
-        attribute = 2 if _attribute_present("status", text) else 1 if _STATUS_VALUE_RE.search(text) else 0
-        value = _value_score("status", text)
-        valid = subject_score > 0 and attribute > 0 and value > 0
-        return LocalProof(valid, subject_score, attribute, value, subject_score + attribute + value, "status" if valid else "status_subject_not_locally_bound")
+        return LocalProof(False, reason="semantic_detector_removed")
 
     if obligation.kind == "comparison":
         target = 3 if _contains_term(obligation.target, text) else 0
@@ -692,20 +680,7 @@ def local_proof_for_obligation(
                 effective_subject_score + (planned.relation_score if valid else 0) + (planned.value_score if valid else 0),
                 planned.reason if valid else f"{planned.reason}_subject_not_bound",
             )
-        negated = bool(_NEGATION_RE.search(text))
-        target_score = 3 if not obligation.target or _contains_term(obligation.target, text) else 0
-        sequence = bool(_SEQUENCE_RE.search(text)) or text.count("\n-") + len(re.findall(r"^\s*\d+[.)]\s+", text, re.M)) >= 2
-        action_count = len(_ACTION_RE.findall(text))
-        relation = 3 if (
-            not negated
-            and target_score > 0
-            and action_count >= 2
-            and (sequence or unit.kind in {"unit_group", "heading_context", "code_block"})
-        ) else 0
-        valid = subject_score > 0 and relation > 0 and unit.proposition and unit.kind in {
-            "unit_group", "heading_context", "code_block", "bullet", "sentence", "key_value",
-        }
-        return LocalProof(valid, subject_score, relation, action_count + target_score, subject_score + relation + action_count + target_score, "workflow" if valid else "workflow_subject_target_or_sequence_missing")
+        return LocalProof(False, reason="semantic_detector_removed")
 
     if obligation.kind == "relation":
         planned = planned_relation_proof(obligation, text, source=source)
@@ -722,27 +697,17 @@ def local_proof_for_obligation(
         target = 2 if not obligation.target or _contains_term(obligation.target, text) else 0
         relation = 3 if special_valid else 0
         if not obligation.relation or obligation.relation == "relation":
-            relation = 3 if (_BEHAVIOR_RE.search(text) or _SEQUENCE_RE.search(text) or _CONTRAST_RE.search(text)) else 0
+            relation = 0
         elif obligation.relation not in {
             "recall_mechanism", "authority_invariant", "request_handling",
             "architecture", "responsiveness",
         }:
-            relation = 3 if _contains_term(obligation.relation, text) else 0
+            relation = 0
         valid = subject_score > 0 and target > 0 and relation > 0 and unit.proposition
         return LocalProof(valid, subject_score, relation, target, subject_score + relation + target, "relation" if valid else f"{obligation.relation or 'relation'}_missing")
 
     if obligation.kind == "exact_fact":
-        relation = 2 if (not obligation.attribute or _attribute_present(obligation.attribute, text)) else 0
-        if obligation.relation == "contract_fact":
-            if _contract_fact_disclaimer(text):
-                relation = 0
-            elif _normal(obligation.attribute) == "response contract":
-                relation = 3 if relation and _contract_fact_relation_valid(text) else 0
-        value = _value_score(obligation.value_kind, text)
-        if obligation.expected_value:
-            value = max(value, 3 if _contains_term(obligation.expected_value, text) else 0)
-        valid = subject_score > 0 and relation > 0 and value > 0 and unit.proposition
-        return LocalProof(valid, subject_score, relation, value, subject_score + relation + value, "exact_fact" if valid else "exact_fact_missing")
+        return LocalProof(False, reason="explicit_literal_value_not_bound")
 
     return LocalProof(False, reason="unsupported_obligation")
 

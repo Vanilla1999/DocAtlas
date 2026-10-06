@@ -7,8 +7,8 @@ import re
 
 from docmancer.docs.domain.question_frame_core import split_question_clause_spans
 from docmancer.docs.domain.question_semantic_frames import match_comparison_frame
-from docmancer.docs.domain.query_terms import documentation_technical_anchors, query_constraint_roles
-from docmancer.docs.domain.query_reference_binding import _NON_ENTITY_ACTORS
+from docmancer.docs.domain.query_terms import query_constraint_roles
+from docmancer.docs.domain.query_reference_binding import query_mentions
 
 @dataclass(frozen=True, slots=True)
 class RetrievalNeed:
@@ -43,50 +43,10 @@ def _need_relation(text: str) -> str:
     return "requested_part"
 
 
-_RELATION_NOUNS = frozenset({
-    "behavior", "behaviour", "configuration", "default", "escape", "exception",
-    "hatch", "reason", "requirement", "result", "value",
-})
-
-
 def _need_subject(text: str) -> str:
-    # Prefer explicit grammatical subjects before lexical/technical anchors.
-    # This covers lowercase actors and hyphenated settings that are not exact
-    # technical identities by themselves.
-    gerund_actor = re.match(r"\s*does\s+(?:raising|calling|using)\s+([A-Za-z][A-Za-z0-9_.-]{1,80})", text, re.I)
-    if gerund_actor is not None:
-        return gerund_actor.group(1)
-    embedded_actor = re.match(
-        r"\s*which\b.+?\bdoes\s+([A-Za-z][A-Za-z0-9_.-]{1,80})\b", text, re.I,
-    )
-    if embedded_actor is not None:
-        candidate = embedded_actor.group(1)
-        if candidate.casefold() not in _RELATION_NOUNS:
-            return candidate
-    happens_to = re.match(
-        r"\s*what\s+happens?\s+to\s+(?:the\s+)?([A-Za-z][A-Za-z0-9_.-]{1,80})\b",
-        text, re.I,
-    )
-    if happens_to is not None:
-        candidate = happens_to.group(1)
-        if candidate.casefold() not in _RELATION_NOUNS:
-            return candidate
-    # An elided clause such as "and what is the default?" has no new subject;
-    # it inherits the prior concrete subject instead of treating "default" as one.
-    match = re.match(
-        r"\s*(?:how\s+does|what\s+is|what\s+does|can|is|are|does|do)\s+"
-        r"(?:the\s+)?([A-Za-z][A-Za-z0-9_.-]{1,80})\b",
-        text,
-        re.I,
-    )
-    if match is not None:
-        candidate = match.group(1)
-        if candidate.casefold() not in {
-            "which", "what", *_NON_ENTITY_ACTORS, *_RELATION_NOUNS,
-        }:
-            return candidate
-    anchors = documentation_technical_anchors(text)
-    return anchors[0] if anchors and anchors[0].casefold() not in _RELATION_NOUNS else ""
+    # Literal identity only: no actor dictionary or grammatical nomination.
+    return next((mention.text for mention in query_mentions(text)
+                 if mention.explicit and mention.syntax_role == "symbol_identity"), "")
 
 
 def _locate_need_span(question: str, text: str, *, start: int = 0) -> tuple[int, int]:

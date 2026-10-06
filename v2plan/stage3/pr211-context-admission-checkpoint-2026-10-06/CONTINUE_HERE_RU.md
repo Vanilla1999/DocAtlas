@@ -2,6 +2,16 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Публикация выполнена:** reviewed partial slice `58750962` pushed в
+`origin/integration/stage3-v2-identity-pr1`. Следующий default-read slice запущен:
+[DEFAULT_READ_FOLLOWUP_RU.md](DEFAULT_READ_FOLLOWUP_RU.md).
+**Follow-up reviewed:** reference/ranking и structural units реализованы,
+375 новых tests passed, stdio smoke PASS, оба scoped reviews approved.
+Next task теперь live semantic needs в `question_retrieval_needs.py` и
+`need_contracts.py`; original-coverage/quality red и advanced/corpus debt остаются.
+Ниже сохранена provenance исходного pre-commit checkpoint; формулировки о local diff
+и отсутствии commit описывают тот snapshot, не текущий опубликованный baseline.
+
 **Post-review update:** [PRECOMMIT_REVIEW_RU.md](PRECOMMIT_REVIEW_RU.md).
 228 новых tests passed; independent run 274 passed и scoped commit approval.
 Cached scope, explicit nondelivery/consent и serialized-contract blockers закрыты.

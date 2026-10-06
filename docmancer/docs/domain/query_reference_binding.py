@@ -46,47 +46,23 @@ class ReferencePlan:
 
 # Shared with the source catalog. Unknown extensions never create stem aliases.
 DOCUMENT_SUFFIXES = frozenset({".md", ".mdx", ".rst", ".txt", ".adoc"})
-_NAME = r'(?:`(?P<quoted>[^`\n]{1,160})`|"(?P<double>[^"\n]{1,160})"|(?P<bare>[\w~./\\:+-]+))'
-_CONTEXT = re.compile(
-    r"(?<!\w)(?P<context>file|document|файл(?:е|а|у|ом)?|документ(?:е|а|у|ом)?|"
-    r"constant|class|function|method|symbol|flag|key|констант(?:а|ы|е|у)|"
-    r"класс(?:а|е)?|функци(?:я|и|ю)|метод(?:а|е)?|library|package|"
-    r"библиотек(?:а|и|е|у)|пакет(?:а|е)?)(?!\w)\s+" + _NAME, re.I,
+_PATH = re.compile(
+    r"(?<![\w/\\])(?:(?:[A-Za-z]:|~)?[/\\](?:[\w.-]+[/\\])*[\w.-]+|"
+    r"(?:\.{1,2}[/\\])?(?:[\w.-]+[/\\])+[\w.-]+)"
 )
-_SOURCE_CONTEXT = re.compile(r"(?:file|document|файл\w*|документ\w*)\Z", re.I)
-_SUBJECT_CONTEXT = re.compile(r"(?:library|package|библиотек\w*|пакет\w*)\Z", re.I)
-_SOURCE_PREFIX = re.compile(
-    r"(?:\b(?:in|from|within|according\s+to|read|open|for|about|and|or|в|из|согласно)\s+(?:the\s+)?|^)$", re.I,
-)
-_WEAK_SOURCE = re.compile(r"(?<!\w)(?:in|from|according\s+to)\s+the\s+" + _NAME, re.I)
-_NAMED_DOCUMENT_SOURCE = re.compile(r"(?<!\w)according\s+to\s+(?:the\s+)?" + _NAME, re.I)
-_PATH = re.compile(r"(?<![\w/\\])(?:~?[/\\]|\.{1,2}[/\\])?(?:[\w.-]+[/\\])+[\w.-]+")
 _QUOTED = re.compile(r'`([^`\n]{1,160})`|"([^"\n]{1,160})"')
-# Grammatical anaphora/determiners are not newly named entities. A concrete
-# antecedent can still be retained by the existing exact/need lineage policy.
-_NON_ENTITY_ACTORS = frozenset({"a", "an", "the", "it", "its", "they", "their", "our", "your", "this", "that", "these", "those", "we", "you", "i"})
-_PREDICATES = frozenset({"is", "are", "was", "were", "does", "do", "returns", "return", "raises", "raise", "has", "have"})
-_ROLE_WORDS = frozenset({"file", "document", "constant", "class", "library", "package", "function", "method"})
-# A bare preposition followed by its complement describes a role, not a name.
-# Quoted names and technical spellings (for.run, with_retries) do not match.
-_ROLE_COMPLEMENT = re.compile(r"(?:for|with|without|in|from|для|с|без|в|из)\s+\S", re.I)
-
-
-def _name_span(match: re.Match[str]) -> tuple[int, int]:
-    group = next(key for key in ("quoted", "double", "bare") if match.group(key) is not None)
-    start, end = match.span(group)
-    if group == "bare":
-        end = start + len(match[group].rstrip(".:,"))
-    return start, end
+_DOCUMENT_NAME = re.compile(
+    r"(?<![\w./\\-])\w[\w.-]*\.(?:" + "|".join(sorted(suffix[1:] for suffix in DOCUMENT_SUFFIXES))
+    + r")(?![\w/\\-]|\.(?=\S))", re.I,
+)
 
 
 @lru_cache(maxsize=512)
 def query_mentions(question: str) -> tuple[QueryMention, ...]:
-    """Extract only declared grammatical relations; preserve original offsets.
+    """Extract literal paths/quotes and technical spellings at original offsets.
 
-    Role priority is contextual role > full path/quoted identity > lexical
-    nomination. Bare capitalization nominates an unresolved occurrence, never
-    a semantic subject. Unsupported natural-language forms remain unresolved.
+    No surrounding natural language assigns roles or nominates actors. Bare
+    capitalization remains unresolved, never a semantic subject.
     """
     spans: list[tuple[int, int, Role, bool]] = []
 
@@ -94,51 +70,19 @@ def query_mentions(question: str) -> tuple[QueryMention, ...]:
         if start < end and not any(start < b and a < end for a, b, _, _ in spans):
             spans.append((start, end, role, explicit))
 
-    for match in _CONTEXT.finditer(question):
-        start, end = _name_span(match)
-        if match.group("bare") and question[start:end].casefold() in _PREDICATES:
-            continue
-        if match.group("bare") and _ROLE_COMPLEMENT.match(question, start):
-            continue
-        if _SOURCE_CONTEXT.fullmatch(match["context"]):
-            literal = match.group("quoted") is not None or match.group("double") is not None
-            if not (literal or _SOURCE_PREFIX.search(question[:match.start()])):
-                continue  # "document headings" is not a named document.
-            role: Role = "source_locator"
-        elif _SUBJECT_CONTEXT.fullmatch(match["context"]):
-            role = "semantic_subject"
-        else:
-            role = "symbol_identity"
-        add(start, end, role, True)
-    # Declared actor relations also recognize lowercase names; bare casing is
-    # never sufficient and ordinary noun phrases are not promoted to entities.
-    for pattern in (r"\bif\s+(?:one|a|an|any)\s+(?P<actor>[\w.-]+)\s+(?:function|task|method)\b",
-                    r"\b(?:what\s+is|what\s+are)\s+(?P<actor>[\w.-]+)\s+default\b",
-                    r"\b(?:when\s+do|when\s+does)\s+(?P<actor>[\w.-]+)\s"):
-        for match in re.finditer(pattern, question, re.I):
-            if match["actor"].casefold() not in _NON_ENTITY_ACTORS and not any(c in match["actor"] for c in "._/\\:+-"):
-                add(*match.span("actor"), "semantic_subject", True)
-    # "According to Guide.md" names a document only when the spelling itself
-    # has a supported documentation suffix. Bare "in HTTPX" stays ambiguous.
-    for match in _NAMED_DOCUMENT_SOURCE.finditer(question):
-        start, end = _name_span(match)
-        if PurePosixPath(question[start:end].replace("\\", "/")).suffix.casefold() in DOCUMENT_SUFFIXES:
-            add(start, end, "source_locator", False)
-    for match in _WEAK_SOURCE.finditer(question):
-        start, end = _name_span(match)
-        if question[start:end].casefold() not in _ROLE_WORDS:
-            add(start, end, "source_locator", False)
     for match in _QUOTED.finditer(question):
         start, end = match.span(1 if match[1] is not None else 2)
         value = question[start:end]
         suffix = PurePosixPath(value.replace("\\", "/")).suffix.casefold()
-        path = ("/" in value or "\\" in value) and suffix in DOCUMENT_SUFFIXES
+        path = suffix in DOCUMENT_SUFFIXES
         add(start, end, "source_locator" if path else "symbol_identity", True)
     for match in _PATH.finditer(question):
         value = match[0].rstrip(".:,")
         suffix = PurePosixPath(value.replace("\\", "/")).suffix.casefold()
         add(match.start(), match.start() + len(value),
-            "source_locator" if suffix in DOCUMENT_SUFFIXES else "symbol_identity", True)
+             "source_locator" if suffix in DOCUMENT_SUFFIXES else "symbol_identity", True)
+    for match in _DOCUMENT_NAME.finditer(question):
+        add(*match.span(), "source_locator", True)
     for value in sorted(documentation_technical_anchors(question), key=lambda value: (-len(value), value)):
         for match in re.finditer(r"(?<!\w)" + re.escape(value) + r"(?!\w)", question):
             role = "symbol_identity" if any(c in value for c in "._/:+-") else "unresolved"
@@ -187,9 +131,22 @@ def resolve_references(
         ids: tuple[str, ...] = ()
         state: ResolutionState = "resolved"
         reason = "explicit_reference_role"
+        # A double-quoted simple stem is a literal catalog nomination. Backtick
+        # symbols and qualified spellings retain symbol identity on collision;
+        # explicit documentation paths/filenames already carry locator syntax.
+        # Basename/stem/casefold tiers are path resolution, not topic aliases.
+        quoted_stem = (
+            mention.start > 0 and mention.end < len(question)
+            and question[mention.start-1] == question[mention.end] == '"'
+            and re.fullmatch(r"[\w-]+", mention.text) is not None
+        )
+        if role == "symbol_identity" and mention.explicit and quoted_stem:
+            ids = _source_ids(mention.text, allowed, document_suffixes)
+            if ids:
+                role = "source_locator"
         if role == "source_locator":
             if not catalog_complete or not scope.project_id or not scope.snapshot_id:
-                state, reason = "unresolved", "incomplete_source_catalog"
+                ids, state, reason = (), "unresolved", "incomplete_source_catalog"
             else:
                 ids = _source_ids(mention.text, allowed, document_suffixes)
                 state = "resolved" if len(ids) == 1 else "ambiguous" if ids else "missing"
@@ -203,25 +160,8 @@ def resolve_references(
 
 
 def reference_body_question(plan: dict) -> str:
-    """Remove locator occurrences only from the body probe, not the source plan."""
-    question = str(plan.get("question") or "")
-    chars = list(question)
-    for reference in plan.get("references") or ():
-        if reference.get("role") != "source_locator":
-            continue
-        mention = reference.get("mention") or {}
-        start, end = mention.get("start"), mention.get("end")
-        if type(start) is not int or type(end) is not int or question[start:end] != mention.get("text"):
-            continue
-        prefix = re.search(r"(?:(?:in|from|within|according\s+to|в|из|согласно)\s+)?(?:the\s+)?(?:file|document|файл\w*|документ\w*)\s+[`\"]?$", question[:start], re.I)
-        if prefix:
-            start = prefix.start()
-        elif start and question[start-1] in '`"':
-            start -= 1
-        if end < len(question) and question[end] in '`"':
-            end += 1
-        chars[start:end] = " " * (end-start)
-    return "".join(chars)
+    """Retain the original retrieval text; references are separate constraints."""
+    return str(plan.get("question") or "")
 
 
 def _valid_reference_plan(plan: dict, scope: dict) -> bool:
@@ -246,7 +186,6 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
     their Python type or an incoming qualified/trusted flag. Trace bindings are
     recomputed; the application-owned raw source window supplies the evidence.
     """
-    from dataclasses import asdict
     from .query_terms import documentation_query_terms, query_constraint_roles
     from .technical_tokens import technical_term_pattern
     result = dict(probe)
@@ -316,21 +255,29 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
             bindings.append({"mention_id": mention["mention_id"], "role": "source_locator", "field": "path", **identity})
     if plan is not None:
         body_question = reference_body_question(plan)
+        exact_plan = plan
         if result.get("mode") == "exact_path":
             body_question = reference_body_question(root)
+            exact_plan = root
             result.pop("mode", None)
         roles = query_constraint_roles(body_question)
-        original_roles = query_constraint_roles(reference_body_question(root))
+        # Only verified source-locator occurrences are path constraints rather
+        # than body identities. Mask their coordinates for exact extraction;
+        # original query/body text and separately mentioned symbols stay intact.
+        exact_chars = list(body_question)
+        bound_locator_ids = {binding["mention_id"] for binding in bindings}
+        for ref in exact_plan.get("references") or ():
+            mention = ref["mention"]
+            if ref.get("role") == "source_locator" and mention["mention_id"] in bound_locator_ids:
+                start, end = mention["start"], mention["end"]
+                exact_chars[start:end] = " " * (end-start)
+        body_exact = query_constraint_roles("".join(exact_chars)).hard_exact
         # Independent lookup coverage is query-local. Root source constraints
         # above remain mandatory, but a host facet need not repeat every root
         # symbol. Audited parent coverage still uses the existing parent terms.
-        source_only_names = {ref["mention"]["text"].casefold() for ref in root["references"]
-            if ref["role"] == "source_locator"} - set(original_roles.hard_exact) - set(original_roles.bound_subjects)
-        parent_terms = [term for term in result.get("parent_exact_terms", ())
-            if term.casefold() not in source_only_names]
         result.update(query_terms=list(documentation_query_terms(body_question)),
-            exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects),
-            parent_exact_terms=parent_terms, retrieval_anchors=list(roles.retrieval_anchors),
+            exact_terms=list(body_exact), bound_subjects=list(roles.bound_subjects),
+            retrieval_anchors=list(roles.retrieval_anchors),
             reference_body_query=body_question)
     from .source_subject_binding import prepared_owner_rejection
     owner_reason = prepared_owner_rejection(evidence)

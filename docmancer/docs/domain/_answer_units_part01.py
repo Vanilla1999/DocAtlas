@@ -155,7 +155,7 @@ def _make_source_field_unit(name: str, value: Any) -> AnswerUnit | None:
         char_start=None,
         char_end=None,
         content_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        proposition=True,
+        proposition=False,
         source_field=name,
     )
 
@@ -166,13 +166,11 @@ def extract_answer_units(
     source_fields: Mapping[str, Any] | None = None,
     include_soft_wrapped_prose: bool = False,
 ) -> tuple[AnswerUnit, ...]:
-    """Extract deterministic local propositions without merging unrelated chunks.
+    """Extract deterministic bounded context, not certified propositions.
 
-    The default path preserves the v2 line-oriented unit surface.  New v3
-    obligations may opt into exact paragraph sentences and continued Markdown
-    bullets when source prose is hard-wrapped.  This keeps frozen v1/v2
-    selection traces stable while allowing a predicate or object to cross one
-    physical line boundary without becoming an incomplete witness.
+    Markdown/code structure and punctuation supply boundaries only.  Optional
+    soft-wrap handling preserves exact paragraph sentences and continued
+    bullets.  Neither length nor a recognized word grants proof authority.
     """
 
     source = str(text or "")
@@ -185,8 +183,8 @@ def extract_answer_units(
     fence_start = 0
     fence_lines: list[tuple[int, int, str]] = []
 
-    def add(kind: str, raw: str, start: int, end: int, proposition: bool = True) -> None:
-        unit = _make_unit(kind, raw, start, end, proposition=proposition)
+    def add(kind: str, raw: str, start: int, end: int) -> None:
+        unit = _make_unit(kind, raw, start, end, proposition=False)
         if unit is not None:
             units.append(unit)
 
@@ -245,43 +243,17 @@ def extract_answer_units(
                     block_end = continuation_end
                 consumed_until = block_end
             block = source[start:block_end]
-            add(
-                "bullet", block, start, block_end,
-                proposition=bool(
-                    _COPULA_RE.search(block) or _BEHAVIOR_RE.search(block)
-                    or _KEY_VALUE_RE.match(bullet.group(1))
-                    or len(block.split()) >= 2
-                ),
-            )
+            add("bullet", block, start, block_end)
             continue
         if "|" in line and not _TABLE_SEPARATOR_RE.match(line) and len([part for part in line.split("|") if part.strip()]) >= 2:
-            add("table_row", line, start, end, proposition=True)
+            add("table_row", line, start, end)
             continue
         if _KEY_VALUE_RE.match(line):
-            add("key_value", line, start, end, proposition=True)
+            add("key_value", line, start, end)
             continue
         if _CODE_DECL_RE.match(line):
-            add("code_declaration", line, start, end, proposition=True)
+            add("code_declaration", line, start, end)
             continue
-        next_line = (
-            lines[line_index + 1].group(0).rstrip("\n")
-            if line_index + 1 < len(lines) else ""
-        )
-        next_is_plain_prose = bool(
-            next_line.strip()
-            and not next_line.strip().startswith("```")
-            and not _HEADING_RE.match(next_line)
-            and not _BULLET_RE.match(next_line)
-            and not _TABLE_SEPARATOR_RE.match(next_line)
-            and not ("|" in next_line and len([part for part in next_line.split("|") if part.strip()]) >= 2)
-            and not _KEY_VALUE_RE.match(next_line)
-            and not _CODE_DECL_RE.match(next_line)
-        )
-        soft_wrapped_line = bool(
-            include_soft_wrapped_prose
-            and next_is_plain_prose
-            and not re.search(r"[.!?]\s*$", line)
-        )
         for sentence in _SENTENCE_RE.finditer(line):
             sentence_text = sentence.group(0).strip()
             if not sentence_text:
@@ -289,14 +261,6 @@ def extract_answer_units(
             sentence_start = start + sentence.start() + (len(sentence.group(0)) - len(sentence.group(0).lstrip()))
             add(
                 "sentence", sentence_text, sentence_start, sentence_start + len(sentence_text),
-                proposition=bool(
-                    not soft_wrapped_line
-                    and (
-                        _COPULA_RE.search(sentence_text) or _BEHAVIOR_RE.search(sentence_text)
-                        or _STATUS_VALUE_RE.search(sentence_text) or _VERSION_VALUE_RE.search(sentence_text)
-                        or _DURATION_RE.search(sentence_text) or len(sentence_text.split()) >= 4
-                    )
-                ),
             )
 
     if include_soft_wrapped_prose:
@@ -325,11 +289,6 @@ def extract_answer_units(
                 add(
                     "paragraph_sentence", stripped,
                     sentence_start, sentence_start + len(stripped),
-                    proposition=bool(
-                        _COPULA_RE.search(stripped) or _BEHAVIOR_RE.search(stripped)
-                        or _STATUS_VALUE_RE.search(stripped) or _VERSION_VALUE_RE.search(stripped)
-                        or _DURATION_RE.search(stripped) or len(stripped.split()) >= 4
-                    ),
                 )
                 paragraph_sentence_count += 1
                 if paragraph_sentence_count >= 16:
@@ -383,7 +342,7 @@ def extract_answer_units(
         if not body_text or candidate.strip() == heading_text:
             continue
         if len(candidate) <= MAX_ANSWER_UNIT_CHARS:
-            add("heading_context", candidate, heading_start, block_end, proposition=True)
+            add("heading_context", candidate, heading_start, block_end)
 
     positional = sorted(
         (unit for unit in units if unit.char_start is not None and unit.char_end is not None),
@@ -402,6 +361,7 @@ def extract_answer_units(
         if (
             len(current) < 6
             and not gap.strip()
+            and (unit.kind == "bullet") == (previous.kind == "bullet")
             and unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS
         ):
             current.append(unit)
@@ -425,8 +385,8 @@ def extract_answer_units(
                         continue
                     material = source[start:end]
                     bullet_count = sum(item.kind == "bullet" for item in window)
-                    if bullet_count >= 2 or _SEQUENCE_RE.search(material) or len(_ACTION_RE.findall(material)) >= 2:
-                        add("unit_group", material, start, end, proposition=True)
+                    if bullet_count == len(window):
+                        add("unit_group", material, start, end)
                         group_count += 1
                         if group_count >= 24:
                             break
@@ -442,8 +402,8 @@ def extract_answer_units(
                 continue
             material = source[start:end]
             bullet_count = sum(item.kind == "bullet" for item in run)
-            if bullet_count >= 2 or _SEQUENCE_RE.search(material) or len(_ACTION_RE.findall(material)) >= 2:
-                add("unit_group", material, start, end, proposition=True)
+            if bullet_count == len(run):
+                add("unit_group", material, start, end)
 
     for field_name, value in sorted((source_fields or {}).items()):
         unit = _make_source_field_unit(str(field_name), value)

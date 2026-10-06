@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_structural_units.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_structural_units.py": "19e2ddbbe9aecedd56fb19664a968c9a4677dfda01d928691f19d34e5f343d1a"
+  }
+}

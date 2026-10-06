@@ -56,33 +56,9 @@ _DURATION_RE = re.compile(
     r"(?<!\w)\d+(?:\.\d+)?\s*(?:ms|msec|milliseconds?|s|sec|seconds?|m|min|minutes?|h|hours?|мс|сек(?:унд[а-я]*)?|мин(?:ут[а-я]*)?|час(?:а|ов)?)\b",
     re.I,
 )
-_STATUS_VALUE_RE = re.compile(
-    r"\b(?:accepted|completed|done|active|in\s+progress|blocked|failed|cancelled|canceled|"
-    r"ready|partial|inconclusive|superseded|deprecated|принят[а-я]*|завершен[а-я]*|готов[а-я]*|"
-    r"активн[а-я]*|в\s+работе|заблокирован[а-я]*|отменен[а-я]*|неубедител[а-я]*)\b",
-    re.I,
-)
-_COPULA_RE = re.compile(
-    r"\b(?:is|are|means|refers\s+to|provides?|represents?|defines?|serves?\s+as|"
-    r"это|является|представляет|означает|служит|предоставляет)\b",
-    re.I,
-)
-_BEHAVIOR_RE = re.compile(
-    r"\b(?:returns?|reports?|shows?|reads?|writes?|loads?|indexes?|retrieves?|selects?|"
-    r"validates?|handles?|processes?|dispatches?|routes?|creates?|updates?|deletes?|use(?:s|d)?|exposes?|"
-    r"invokes?|supplies?|calls?|replaces?|preserves?|keeps?|sets?|configures?|requires?|governs?|"
-    r"возвращает|показывает|сообщает|читает|записывает|индексирует|извлекает|выбирает|"
-    r"проверяет|обрабатывает|маршрутизирует|создает|обновляет|удаляет)\b",
-    re.I,
-)
 _USAGE_RE = re.compile(
     r"\b(?:use[sd]?|using|should\s+be\s+used|when|recommended|reserved\s+for|"
     r"использ(?:овать|уется|ован)|применя(?:ть|ется)|когда|рекомендуется)\b",
-    re.I,
-)
-_SEQUENCE_RE = re.compile(
-    r"\b(?:first|then|next|after|before|finally|step\s*\d+|->|→|"
-    r"сначала|затем|далее|после|перед|наконец|шаг\s*\d+)\b",
     re.I,
 )
 _CONTRAST_RE = re.compile(
@@ -105,14 +81,6 @@ _NEGATION_RE = re.compile(
     r"\b(?:does|do|did|is|are|was|were|should|must|can|could|would|will)\s+not\b"
     r"|\b(?:never|cannot|can't|mustn't|shouldn't)\b"
     r"|\b(?:не\s+следует|не\s+нужно|нельзя|никогда\s+не)\b",
-    re.I,
-)
-_ACTION_RE = re.compile(
-    r"(?<![\w-])(?:runs?|follows?|retries?|prepares?|calls?|validates?|dispatches?|routes?|processes?|loads?|reads?|writes?|"
-    r"syncs?|synchronizes?|indexes?|reindexes?|discovers?|removes?|publishes?|activates?|creates?|updates?|deletes?|"
-    r"preserves?|keeps?|retains?|overrides?|acknowledges?|"
-    r"запустить|выполнить|повторить|подготовить|вызвать|проверить|обработать|"
-    r"синхронизировать|индексировать|удалить|опубликовать)(?![\w-])",
     re.I,
 )
 _PURPOSE_RE = re.compile(
