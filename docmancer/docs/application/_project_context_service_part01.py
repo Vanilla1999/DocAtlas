@@ -101,15 +101,29 @@ class _ProjectContextServicePart01:
                         ],
                     )
                 from .need_context_projection import set_context_variants
+                from docmancer.docs.domain.context_hint_policy import preserves_unresolved_context_candidate
+                prefit_candidates = project_context_pack(
+                    question=question, project_docs=project_docs, dependency_docs=None)
                 checked_sets = {
                     original.get('stable_chunk_id')
                     for original, _, _ in set_context_variants(
-                        project_context_pack(question=question, project_docs=project_docs, dependency_docs=None),
+                        prefit_candidates,
                         query_plan=documentation_query_plan.as_payload(),
                         expected_project_identity=project_docs.results[0].project_identity,
                         max_tokens=800, diagnostics={},
                     )
                 }
+                # Keep topical retrieval-only candidates until public admission;
+                # lack of answer proof alone must not erase useful source text.
+                if not checked_sets and not any(
+                    original.get('retrieval_query_ids') for original in prefit_candidates
+                ):
+                    checked_sets.update(original.get('stable_chunk_id')
+                        for original in prefit_candidates
+                        if preserves_unresolved_context_candidate(original,
+                            query_plan=documentation_query_plan.as_payload(),
+                            expected_project_identity=project_docs.results[0].project_identity,
+                            lifecycle_intent=canonical_requirements.lifecycle_intent))
                 context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
                                                  if chunk.stable_chunk_id in checked_sets)
                 project_docs = replace(

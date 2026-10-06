@@ -89,6 +89,11 @@ which allows nine retry attempts.` — проходит внутренний att
 
 ## Навигация по материалам
 
+- [План #211 → main с критериями завершения](MERGE_PLAN_RU.md)
+- [Выполнение: актуальный CI и адресные проверки](EXECUTION_STATUS_RU.md)
+- [Кандидат prefit fallback: patch, проверки и ограничения](PREFIT_PATCH_RU.md)
+- [Живое сравнение с Grounded MCP](GROUNDED_COMPARISON_RU.md)
+
 - [Критическое ревью первоначального анализа](../PR211_RED_ANALYSIS_REVIEW_RU.md)
 - [Сводка исходных доказательств](../PR211_RED_EVIDENCE_20261006.json)
 - [Первые параллельные задачи и независимое review](../PR211_PARALLEL_TASKS_RU.md)

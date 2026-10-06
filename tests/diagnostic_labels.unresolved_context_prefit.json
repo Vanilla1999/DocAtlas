@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_unresolved_context_prefit.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_unresolved_context_prefit.py": "91ffa55a6a768f62d0d427d3c4af68e7cd083f46f379666dd718fd897231fe88"
+  }
+}

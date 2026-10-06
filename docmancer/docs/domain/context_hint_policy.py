@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any
 from docmancer.docs.domain.project_retrieval_intent import _specific_contract_request, _tokens
-from docmancer.docs.domain.evidence_qualification import qualify_evidence
+from docmancer.docs.domain.evidence_qualification import qualify_evidence, evidence_policy_rejection_reason
 
 
 def fallback_context_query_ids(plan: dict[str, Any], retrieval: dict[str, Any], eligible_ids: set[str]) -> set[str]:
@@ -48,3 +48,27 @@ def has_context_hint_support(source: dict[str, Any], *, question: str = '') -> b
             visible_text=body, evidence_text=body).trace
     terms = {str(term).strip().casefold() for term in trace.get("body_matched_terms") or ()}
     return len(terms - {""}) >= 2
+
+
+def preserves_unresolved_context_candidate(
+    source: dict[str, Any], *, query_plan: dict[str, Any], expected_project_identity: str,
+    lifecycle_intent: str = 'current',
+) -> bool:
+    """Retain a topical candidate for public admission, not answer qualification.
+
+    Only unresolved broad requests use this preference. Recompute body matches:
+    cached retrieval traces do not establish relevance. Public projection still
+    owns source qualification, visible windows, attribution and the DTO budget.
+    """
+    if not query_plan.get('unresolved_parts'):
+        return False
+    plan = {**query_plan, 'broad_context_only': True}
+    if not fallback_context_query_ids(plan, {}, set()):
+        return False
+    body = str(source.get('content') or '')
+    if evidence_policy_rejection_reason({}, visible_text=body, candidate=source,
+            expected_project_identity=expected_project_identity,
+            lifecycle_intent=lifecycle_intent) is not None:
+        return False
+    return has_context_hint_support({'snippet': body},
+        question=str(query_plan.get('original_question') or ''))
