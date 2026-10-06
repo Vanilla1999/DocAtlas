@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_read_routing.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_read_routing.py": "e2ba0aa066ef545a0620a58e65ad4d39cbadbc73085492c17905483d44160853"
+  }
+}

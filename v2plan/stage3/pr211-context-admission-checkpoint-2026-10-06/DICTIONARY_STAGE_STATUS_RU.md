@@ -1,6 +1,12 @@
 # Выполнение dictionary-exit
 
-2026-10-06: **P0 ACTIVE**, P1–P7 NOT STARTED. Общий milestone не завершён.
+2026-10-06: **partial dictionary exit implemented, общий milestone ACTIVE / NOT DONE**.
+Latest status и next task: [CONTINUE_HERE_RU.md](CONTINUE_HERE_RU.md).
+Owner change и execution: [DICTIONARY_EXIT_EXECUTION_RU.md](DICTIONARY_EXIT_EXECUTION_RU.md).
+146 новых tests passed, stdio smoke PASS; quality gate FAIL, remaining live rules OPEN.
+P0 archival debt отдельный; P1 approval/freeze сохранён. Старый порядок P2→P3–P7
+superseded: реализация уже затронула retrieval/admission/read/public consumers.
+Исторические slices ниже не являются latest implementation status.
 
 | Stage | D-IDs | Evidence / результат | Checks | Unresolved / следующий шаг |
 |---|---|---|---|---|

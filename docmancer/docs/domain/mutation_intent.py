@@ -6,8 +6,7 @@ from pathlib import PurePosixPath
 import re
 from typing import Any, Iterable, Literal, Mapping
 
-from docmancer.docs.domain.patch_request_plan import PatchRequestPlan, build_patch_request_plan
-from docmancer.docs.domain.request_intent import is_change_request
+from docmancer.docs.domain.patch_request_plan import PatchRequestPlan
 from docmancer.docs.domain.canonical import canonical_hash
 
 
@@ -29,15 +28,6 @@ _SYMBOL_RE = re.compile(
     r"|\b([A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+)\b"
     r"|\b([A-Z][A-Za-z0-9]*(?:[A-Z][A-Za-z0-9]*)+)\b"
 )
-_CREATE_RE = re.compile(r"\b(?:create|add|new|generate|созда(?:ть|й)|добав(?:ить|ь)|нов(?:ый|ую|ое))\b", re.I)
-_DELETE_RE = re.compile(r"\b(?:delete|remove|drop|удал(?:ить|и)|убра(?:ть|ть))\b", re.I)
-_RENAME_RE = re.compile(r"\b(?:rename|move|перенес(?:ти|и)|переименова(?:ть|й))\b", re.I)
-_MODIFY_RE = re.compile(r"\b(?:modify|change|update|fix|patch|implement|refactor|исправ(?:ить|ь)|измен(?:ить|и)|обнов(?:ить|и)|реализова(?:ть|ть)|рефактор)\b", re.I)
-_CODE_WORD_RE = re.compile(r"\b(?:code|source|class|function|method|implementation|код|исходник|класс|функци|метод|реализаци)\b", re.I)
-_DOC_WORD_RE = re.compile(r"\b(?:readme|docs?|documentation|adr|roadmap|markdown|документаци|ридми|описани)\b", re.I)
-_CONFIG_WORD_RE = re.compile(r"\b(?:config|configuration|settings?|manifest|toml|yaml|json|конфиг|настройк|манифест)\b", re.I)
-_TEST_WORD_RE = re.compile(r"\b(?:tests?|specs?|fixture|pytest|тест(?:ы|ов|а)?|фикстур)\b", re.I)
-_ACCEPTANCE_SPLIT_RE = re.compile(r"[\n;]+|(?<=[.!?])\s+")
 
 
 def _normal_path(value: str) -> str:
@@ -62,16 +52,6 @@ def _artifact_from_question(question: str, targets: tuple[str, ...]) -> Artifact
     kinds = {_artifact_for_target(value) for value in targets} - {"unknown"}
     if len(kinds) == 1:
         return next(iter(kinds))
-    if _TEST_WORD_RE.search(question):
-        return "test"
-    if _CONFIG_WORD_RE.search(question):
-        return "config"
-    if _DOC_WORD_RE.search(question):
-        return "docs"
-    if _CODE_WORD_RE.search(question):
-        return "source"
-    if re.search(r"\b(?:example|snippet|answer|пример|сниппет|ответ)\b", question, re.I):
-        return "generated_answer"
     return "unknown"
 
 
@@ -169,47 +149,8 @@ class MutationReadiness:
 
 
 def build_mutation_intent(question: str) -> MutationIntentContract:
-    source = str(question or "")
-    raw = source[:4_000]
-    request_plan = build_patch_request_plan(source)
-    if request_plan.operation != "none" and (
-        request_plan.mutation_targets
-        or request_plan.operation in {"create", "rename"}
-    ):
-        operation: MutationOperation = request_plan.operation
-    else:
-        operation = "none"
-
-    requested = [RequestedTarget(
-        value=_normal_path(item.value) if item.kind == "path" else item.value,
-        kind=item.kind,
-        query_span_start=item.query_span_start,
-        query_span_end=item.query_span_end,
-    ) for item in request_plan.mutation_targets]
-    path_targets = tuple(item.value for item in requested if item.kind == "path")
-    artifact = _artifact_from_question(raw, path_targets)
-
-    destination: str | None = None
-    if request_plan.destination is not None:
-        destination = request_plan.destination.value
-
-    acceptance: list[str] = []
-    for clause in _ACCEPTANCE_SPLIT_RE.split(raw):
-        clause = " ".join(clause.split()).strip()
-        if len(clause) >= 8 and re.search(r"\b(?:must|should|without|so that|чтобы|долж|без)\b", clause, re.I):
-            acceptance.append(clause[:500])
-    return MutationIntentContract(
-        operation=operation,
-        artifact_kind=artifact,
-        requested_targets=tuple(requested),
-        destination=destination,
-        acceptance_conditions=(
-            tuple(item.text for item in request_plan.acceptance_conditions)
-            if request_plan.operation != "none"
-            else tuple(dict.fromkeys(acceptance))[:MAX_ACCEPTANCE_CONDITIONS]
-        ),
-        request_plan=request_plan if is_change_request(raw) else None,
-    )
+    """Conservative legacy ABI: an operation must be supplied as an SDK DTO."""
+    return MutationIntentContract("none", "unknown", ())
 
 
 def with_explicit_path_targets(
@@ -220,9 +161,8 @@ def with_explicit_path_targets(
 ) -> MutationIntentContract:
     """Bind caller-declared target paths without pretending they came from query text.
 
-    Public MCP ingress normally supplies a complete mutation contract built once
-    from the user request.  Direct/internal callers (for example frozen task
-    evaluation contracts) may instead provide explicit ``required_target_paths``.
+    Public MCP ingress is read-only. Direct/internal SDK callers may supply a
+    mutation contract and explicit ``required_target_paths``.
     Those paths are legitimate requested targets only when their provenance is
     retained; they must never be reconstructed from retrieved documentation.
     """

@@ -586,22 +586,9 @@ def _context_score(context: str | None, text: str, source_text: str) -> int:
     if not context:
         return 1
 
-    # Context matching is token based and intentionally uses only a tiny,
-    # domain-neutral derivational map.  This makes ``clear-index`` compatible
-    # with the source path ``index-cleanup.md`` without introducing a global
-    # stemmer that could corrupt API/config identities.
-    canonical = {
-        "cleanup": "clear",
-        "cleaning": "clear",
-        "clearing": "clear",
-        "indexes": "index",
-        "indices": "index",
-        "indexing": "index",
-    }
-
     def tokens(value: str) -> set[str]:
         return {
-            canonical.get(token.casefold(), token.casefold())
+            token.casefold()
             for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", value)
             if len(token) > 2
         }

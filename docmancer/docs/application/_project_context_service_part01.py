@@ -36,7 +36,9 @@ class _ProjectContextServicePart01:
         lookup_queries: tuple[str, ...] = (),
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
-        mutation_intent = mutation_intent or build_mutation_intent(question)
+        # This is a read boundary. Only a caller-supplied contract can request
+        # mutation guidance; unknown prose never constructs mutation authority.
+        mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
         routing_budget_issues: list[str] = []
         routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
@@ -52,7 +54,7 @@ class _ProjectContextServicePart01:
             and mutation_intent.operation in {"modify", "delete", "rename"}
             and target.value.casefold() != str(mutation_intent.destination or "").casefold()
         )
-        patch_request = is_change_request(question)
+        patch_request = mutation_intent.operation != "none"
         canonical_requirements = (
             build_patch_evidence_requirements(mutation_intent.request_plan)
             if patch_request and mutation_intent.request_plan is not None
@@ -145,8 +147,8 @@ class _ProjectContextServicePart01:
                     routing_budget_issues.append(f"project_docs: {budget_issue}")
 
         explicit_dependency = library or (libraries[0] if libraries else None)
-        inferred_dependency = self.dependency_mentioned_in_question(metadata, question)
-        selected_dependency = explicit_dependency or inferred_dependency
+        literal_dependency = self.dependency_mentioned_in_question(metadata, question)
+        selected_dependency = explicit_dependency or literal_dependency
         explicit_dependency_requested = bool(explicit_dependency or mode in {"deps-only", "public-docs"})
         dependency_docs: DocsResult | None = None
         dependency_confirmation: dict[str, Any] | None = None
@@ -227,7 +229,7 @@ class _ProjectContextServicePart01:
                 *mutation_intent.request_plan.scope_terms,
             ]
             if patch_request and mutation_intent.request_plan is not None
-            else extract_project_answer_requirements(question)
+            else list(documentation_query_terms(question))
         )
         retrieval_route = route_initial_stages(
             question=question,
@@ -414,17 +416,10 @@ class _ProjectContextServicePart01:
             trust_contract=trust_contract,
             requirements=canonical_requirements,
         )
-        assigned_ids = {
-            assignment.requirement_id for assignment in selection_decision.assignments
-        }
-        missing_component_queries = [
-            (requirement.requirement_id, probe)
-            for requirement in canonical_requirements
-            if requirement.mandatory
-            and requirement.as_proof_obligation() is not None
-            and requirement.requirement_id not in assigned_ids
-            and (probe := requirement_probe_query(requirement))
-        ][:4]
+        # Component proof obligations are not executable request lookups. Keep
+        # the guarded legacy rescue interface inert rather than manufacturing
+        # another query schedule from inferred proof targets/expected values.
+        missing_component_queries = ()
         observed_project_identity = (
             ProjectDocsService._repository_identity(root)
             if missing_component_queries and project_docs else ""
@@ -667,7 +662,7 @@ class _ProjectContextServicePart01:
                     "preferred_for": ["API calls", "agent actions", "installed packs"],
                 },
             ]
-        relevance_terms = [] if requirements else extract_query_relevance_terms(question, intent=intent)
+        relevance_terms = list(documentation_query_terms(question))
         source_evidence_answer_available = any(
             item.get("evidence_class") == "source_snippet"
             and _context_has_query_evidence([item], relevance_terms)
@@ -747,6 +742,8 @@ class _ProjectContextServicePart01:
         )
         answer_type = completeness_result["answer_type"]
         answer_completeness = completeness_result["answer_completeness"]
+        if not patch_request:
+            answer_completeness = {**answer_completeness, "edit_ready": False}
         recommended_next_actions = completeness_result["recommended_next_actions"]
         if recommended_next_actions:
             next_actions.extend(recommended_next_actions)
@@ -820,9 +817,18 @@ class _ProjectContextServicePart01:
             message = "Returned partial/navigational project context; search project source for missing story-specific terms."
         if dependency_confirmation_blocks_answer and not answer_available:
             message = f"Dependency docs for {selected_dependency} require network access; retry with allow_network=true after user confirmation."
+        read_context_eligible = bool(
+            context_pack and not project_docs_blocked and not requires_confirmation
+            and not dependency_confirmation_blocks_answer and not routing_budget_issues
+            and status != "stale"
+            and (project_docs is None or project_docs.status in {"success", "partial_success"})
+            and (dependency_docs is None or dependency_docs.status in {"success", "partial_success"})
+        )
         delivery_decision = DeliveryDecision(
-            deliverable=bool(answer_available),
-            reason_code=None if answer_available else str(reason or "operational_delivery_blocked"),
+            # Missing answer proof is not a reason to suppress an otherwise
+            # eligible read packet. Public admission still checks every source.
+            deliverable=bool(answer_available or read_context_eligible),
+            reason_code=None if answer_available or read_context_eligible else str(reason or "operational_delivery_blocked"),
         )
         return ProjectContextResult(
             project_path=str(root),
@@ -866,32 +872,12 @@ class _ProjectContextServicePart01:
 
     @staticmethod
     def dependency_mentioned_in_question(metadata: ProjectMetadata, question: str) -> str | None:
-        query = str(question or "")
-        dependency_context = bool(_DEPENDENCY_REFERENCE_CUE_RE.search(query))
-        for dependency in metadata.dependencies:
-            name = dependency.package_name
-            aliases = {name.casefold()}
-            if name.casefold().startswith("flutter_"):
-                aliases.add(name[8:].casefold())
-            for alias in aliases:
-                tokens = re.findall(r"[a-z0-9]+", alias)
-                if not tokens:
-                    continue
-                pattern = r"(?<![a-z0-9])" + r"[\s._-]*".join(
-                    re.escape(token) for token in tokens
-                ) + r"(?![a-z0-9])"
-                match = re.search(pattern, query, re.IGNORECASE)
-                if match is None:
-                    continue
-                compact_alias = "".join(tokens)
-                explicitly_quoted = bool(re.search(
-                    rf"[`\"']\s*{pattern}\s*[`\"']",
-                    query,
-                    re.IGNORECASE,
-                ))
-                if compact_alias in _AMBIGUOUS_DEPENDENCY_NAMES and not (
-                    dependency_context or explicitly_quoted
-                ):
-                    continue
-                return name
-        return None
+        """Bind one explicitly quoted, exact current dependency identifier.
+
+        Bare package-name overlap, prefixes and topic cues cannot select a
+        dependency lane. Ambiguous exact selections require the library input.
+        """
+        literals = {match[1] for match in re.finditer(r"[`\"']([^`\"'\n]+)[`\"']", str(question or ""))}
+        matches = {dependency.package_name for dependency in metadata.dependencies
+                   if dependency.package_name in literals}
+        return next(iter(matches)) if len(matches) == 1 else None

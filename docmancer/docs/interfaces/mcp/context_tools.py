@@ -37,14 +37,13 @@ from docmancer.docs.application.model_visible_projection import (
     project_insufficient,
     project_patch_context,
     validate_model_visible_projection,
+    _explicit_delivery_block,
 )
 from docmancer.docs.interfaces.mcp.docs_context_routing import (
     normalize_lookup_queries,
     refresh_projection_estimate as _refresh_projection_estimate,
     tuple_value as _tuple_value,
 )
-from docmancer.docs.domain.mutation_intent import build_mutation_intent
-from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
@@ -294,14 +293,15 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
-    question = _clean_string(args.get("question"))
-    if not question:
+    question = args.get("question") if isinstance(args.get("question"), str) else ""
+    if not question.strip():
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    mutation_intent = build_mutation_intent(question)
-    kind = "patch_context" if is_change_request(question) else "docs_answer"
+    # The public three-tool contract is read-only. Neither prose nor an
+    # unrecognized wire field can supply the SDK's mutation contract.
+    kind = "docs_answer"
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -331,7 +331,6 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         prefetch_auto=False,
         details=False,
         response_style=args.get("response_style"),
-        mutation_intent=mutation_intent,
         lookup_queries=lookup_queries,
     )
     canonical_selection = (
@@ -350,6 +349,20 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    # Check the original operational decision before support/recovery decoration
+    # can overwrite its reason or retain a previously admitted partial quote.
+    blocked_kind = (
+        "docs_context" if raw.get("mode_selected") == "project"
+        and args.get("project_path") and not args.get("library")
+        and not args.get("libraries") else "docs_answer"
+    )
+    blocked = _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=800)
+    if blocked is not None:
+        errors = validate_model_visible_projection(blocked, snapshot={}, max_tokens=800)
+        if errors:
+            return _bad_request("invalid_model_visible_projection", "; ".join(errors))
+        _record_model_visible_bytes(result, raw, blocked)
+        return blocked
     operational_answer_available = bool(raw.get("answer_available", True))
     operational_reason_code = raw.get("reason_code")
     canonical_support = getattr(canonical_selection, "support_decision", None)
@@ -416,10 +429,22 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     canonical_selection=canonical_selection,
                 )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
+            # Retrieval-only partial context is already source/snapshot bound
+            # by the authoritative projector. Recovery must not replace it
+            # with an empty support-failure packet or apply a second crop.
+            retained_read_projection = (
+                deepcopy(projection)
+                if kind == "docs_context" and projection.get("context_available")
+                else None
+            )
+            projection_budget = min(
+                800 if kind == "docs_context" else DOCS_ANSWER_MAX_TOKENS,
+                output_budget,
+            )
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
                 projection.update(_recovery_summary(raw))
-            if projection.get("status") == "insufficient_evidence" and recovery:
+            if projection.get("status") == "insufficient_evidence" and recovery and retained_read_projection is None:
                 support_projection = {
                     key: projection[key]
                     for key in (
@@ -445,9 +470,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
-                    projection, max_tokens=output_budget,
+                    projection, max_tokens=projection_budget,
                 )
-            if projection.get("status") == "insufficient_evidence":
+            if projection.get("status") == "insufficient_evidence" and retained_read_projection is None:
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(
                     projection,
@@ -456,21 +481,20 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
-                    projection, max_tokens=output_budget,
+                    projection, max_tokens=projection_budget,
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
+            if retained_read_projection is not None and projection["estimated_tokens"] > projection_budget:
+                # Optional recovery metadata yields to the projector's bounded
+                # read packet; do not alter its admitted sources or snapshot.
+                projection = retained_read_projection
+                _omit_nullable_reason_code(projection)
+                _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
-                max_tokens=(
-                    output_budget
-                    if projection.get("status") == "insufficient_evidence"
-                    else min(
-                        800 if kind == "docs_context" else DOCS_ANSWER_MAX_TOKENS,
-                        output_budget,
-                    )
-                ),
+                max_tokens=projection_budget,
                 canonical_selection=(None if kind == "docs_context" else canonical_selection),
             )
             if validation_errors:
@@ -500,7 +524,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             project_identity=_clean_string(raw.get("project_identity")),
             module_id=_clean_string(raw.get("module_id")),
             selection_diagnostics=selection_trace,
-            mutation_intent_contract=mutation_intent,
+            mutation_intent_contract=None,
         )
         mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
         coordinated_proof_missing = cross_module_proof_missing(packet)

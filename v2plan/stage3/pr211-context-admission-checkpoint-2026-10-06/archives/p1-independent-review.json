@@ -1,0 +1,130 @@
+{
+  "schema": "p1-independent-review-v1",
+  "date": "2026-10-06",
+  "status": "NEEDS_FIXES",
+  "approved_freeze": false,
+  "owner_approval": false,
+  "blind_holdout": false,
+  "review_scope": "Independent review of visible inputs; all cases computationally, all unique families manually in RU and EN; no product execution",
+  "source_head": "9a7299e273edafe61095397ff10f4d776d8f97f6",
+  "source_sha256": {
+    "P1_CONTRACT_RU.md": "af177d5f9f457f95d3202850fa471a53f1826bba3625544e3f405360b9e9b95f",
+    "p1_contract_corpus.py": "801d911cbf654771e24acac3f54c41d720a393c52a9d1bdcd15a3e00debd380b",
+    "p1_fixture_draft.py": "aedef1f8133830d98ad4fcb2862de57ca48e678158e3ebc869224005c5eaa496",
+    "archives/p1-contract-corpus-review.json": "3ff4eca01edac39e081a1e39bea1a8e9ba351dd954d84f69b0cc3ca345dc3725",
+    "DICTIONARY_EXIT_PLAN_RU.md": "b4264e4221f1077ffc3ecbfb5551954be89fa6f8518bc95f48a0fc2697b70c92",
+    "P1_ACCEPTANCE_DRAFT_RU.md": "28d0d3701f20ef3e975c49d9ed63c7c10b3e5cc5a6794c2fd06319db967ff8f5",
+    "archives/p0-transition-manifest.json": "375cdda976a6e07cea6ae6c95521ee762424c1bc5dd9626a98b37d9ec6a0f91f"
+  },
+  "offline_validation": {
+    "interpreter": "python3",
+    "write_original_archive": false,
+    "exit_code": 0,
+    "initial_python_exit_code": 127,
+    "archive_equals_build": true,
+    "builder_validate_passed": true,
+    "cases_read": 160,
+    "unique_ids": 160,
+    "families": 20,
+    "development": 80,
+    "holdout_candidate": 80,
+    "all_eight_lanes_per_family": true,
+    "exact_nonempty_codepoint_spans": 120,
+    "primary_structurally_eligible": 120,
+    "rejected_primary_sources": 40,
+    "fault_counts": {"module": 8, "generation": 8, "hash": 8, "range": 8, "unsynchronized": 8},
+    "version_decoys_verified": 8,
+    "cross_split_body_hash_overlap": [],
+    "identical_original_caller_lookups": 40,
+    "assertion_records": 159,
+    "structural_fault_outcome_mismatches": []
+  },
+  "validator_mutations_accepted": [
+    "empty-required-witnesses", "wrong-fact-id", "foreign-project-positive",
+    "missing-language-lane", "missing-version-decoy", "missing-budget-requirements"
+  ],
+  "blocking_findings": [
+    {
+      "id": "R1", "families": ["dev-trust"], "cases": 8,
+      "finding": "no-execution-authority witness is only first sentence [0,32), omitting actual negated permission relation in both languages",
+      "fix": "Explicit source-bound annotation of second sentence or complete two-sentence quote; regenerate and re-review hashes"
+    },
+    {
+      "id": "R2",
+      "missing_controls": [
+        "paired consistent product/command/module rename generalization",
+        "foreign-project rejection with owned positive peer",
+        "quantum unrelated question on substantive same-name source",
+        "changed meaning and divergent lookup/original attribution controls",
+        "explicit forbidden own-subject/other-value relations and reordered/reversed peers"
+      ],
+      "fix": "Add frozen eight-lane obligations or exact owner-approved equivalent RU/EN mappings; retain existing tests"
+    },
+    {
+      "id": "R3", "families": ["holdout-budget", "dev-pydantic"],
+      "finding": "Budget distractor bytes, ordering, ranks and call/fan-out binding are unspecified; Pydantic witness is not in pressured mixed-source scenario",
+      "fix": "Freeze hashed workload and serializer/config binding before candidate output; preserve unchanged ceilings and Pydantic quote"
+    },
+    {
+      "id": "R4",
+      "finding": "Builder validator accepts six independently mutated contract defects; substring equality does not validate semantic fact sufficiency",
+      "fix": "Validate lane matrix, per-family obligations, metadata fault expectations, decoy and runner contracts; keep manual semantic review"
+    },
+    {
+      "id": "R5", "families": ["dev-condition"],
+      "finding": "EN only when expiry and RU only after expiry are not strictly the same temporal relation",
+      "fix": "Align exact temporal condition in both sources and pin a before-expiry negative control"
+    }
+  ],
+  "manual_family_review": [
+    {"family": "dev-command", "languages": ["en", "ru"], "result": "Exact command witness valid; real Docs command/trust separation remains dependency"},
+    {"family": "dev-condition", "languages": ["en", "ru"], "result": "Exact spans valid; temporal alignment R5"},
+    {"family": "dev-trust", "languages": ["en", "ru"], "result": "Semantic witness incorrect R1"},
+    {"family": "dev-name-only", "languages": ["en", "ru"], "result": "Valid name-only negative; no quantum substantive-source peer R2"},
+    {"family": "holdout-partial", "languages": ["en", "ru"], "result": "Own two-attempt quote and unresolved location valid; other nine-attempt relation needs explicit prohibition R2"},
+    {"family": "holdout-comparison", "languages": ["en", "ru"], "result": "Both source-bound subject/storage spans valid; reversed-meaning negative absent R2"},
+    {"family": "holdout-wrong-module", "languages": ["en", "ru"], "result": "Actual synthetic module mismatch rejects; not foreign-project control"},
+    {"family": "holdout-stale", "languages": ["en", "ru"], "result": "Actual synthetic g1/g2 mismatch rejects; body version 4.2 is not requested snapshot version proof"},
+    {"family": "dev-pebble", "languages": ["en", "ru"], "result": "Synthetic retention quote valid; does not substitute real Pebble unknown-topic facts"},
+    {"family": "dev-trust-scope", "languages": ["en", "ru"], "result": "Full denial quote valid"},
+    {"family": "dev-trust-network", "languages": ["en", "ru"], "result": "Full denial quote valid"},
+    {"family": "dev-pydantic", "languages": ["en", "ru"], "result": "Literal model_validate quote valid; displacement control missing R3"},
+    {"family": "dev-hostile", "languages": ["en", "ru"], "result": "Allowed command witness excludes following injected instruction; action/network/scope traces needed"},
+    {"family": "dev-offline", "languages": ["en", "ru"], "result": "Local-data quote valid; preindex/fault/network-disable requirements present, actual execution pending"},
+    {"family": "holdout-negation", "languages": ["en", "ru"], "result": "Full negation and before-expiry condition included"},
+    {"family": "holdout-version", "languages": ["en", "ru"], "result": "Version 2.4 command and version 1.9 decoy hashes valid; shared source_id needs composite or distinct identity binding"},
+    {"family": "holdout-budget", "languages": ["en", "ru"], "result": "Short schema witness valid; unpinned distractor workload R3"},
+    {"family": "holdout-hash", "languages": ["en", "ru"], "result": "Real synthetic all-zero metadata hash mismatch, no required witness"},
+    {"family": "holdout-range", "languages": ["en", "ru"], "result": "Real synthetic end=len+1 range fault, no required witness"},
+    {"family": "holdout-unsynced", "languages": ["en", "ru"], "result": "Real synthetic synchronized=false fault, no required witness"}
+  ],
+  "technical_test_proposals": {
+    "TD01_TD02_TD04_TD05": "Narrow explicit typed identity/syntax proposals, no blanket NL exemption; owner pending",
+    "TD03": "No new number tables; existing normalization pending is not P5 completion",
+    "TD06": "Explicit approved scope/source-class contract required before inference removal",
+    "TM01_TM04": "Per-assertion positive/negative replacement proof required; R2/R3 weaknesses must not justify deletion",
+    "TM05": "No fake original coverage or floor lowering; separate metric approval",
+    "TM06": "Independent byte/witness review before sidecar update",
+    "global_false_workaround": "Prohibited; existing typed-proof positives required"
+  },
+  "existing_control_dependencies": [
+    "Real Pebble, Pydantic and three trust controls are not replaced by synthetic names",
+    "Core, full advanced, adversarial, required CI/release and actual red gate resolutions",
+    "Actual P2 index/catalog ownership/version/generation/synchronization and final citation hash/range evidence",
+    "Named optional-stage fault timing and network/model/retry traces for offline/hostile controls",
+    "Owner TD/TM/behavior approvals and resource ceilings before backend choice/download/run",
+    "P0 archival provenance; explicit reconciliation of draft P0-DONE freeze prerequisite with authorized P1 preparation"
+  ],
+  "leakage_review": {
+    "exact_cross_split_source_overlap": false,
+    "family_disjoint": true,
+    "fixtures_visible_to_authors_and_reviewer": true,
+    "blind_independent_generalization_claim_allowed": false,
+    "product_grep_path": "docmancer/",
+    "product_grep_patterns": ["p1_contract_corpus", "p1-contract-corpus-review", "WillowRelay", "MossCore", "validate_slate", "quartz-run"],
+    "product_grep_matches": 0,
+    "limitation": "Narrow textual scan, not full import/prompt/runtime audit; evaluation labels/gold must not reach product"
+  },
+  "reviewer_edits_only": ["P1_INDEPENDENT_REVIEW_RU.md", "archives/p1-independent-review.json"],
+  "next_action": "Author fixes R1-R5, pins new bytes/workload, requests repeat independent review; owner decisions remain separate"
+}

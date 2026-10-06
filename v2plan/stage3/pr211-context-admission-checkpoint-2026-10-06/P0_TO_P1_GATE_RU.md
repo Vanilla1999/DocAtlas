@@ -1,7 +1,10 @@
 # Проверка перехода P0 → P1
 
-2026-10-06. Вердикт: **P0 ACTIVE / P1 entry NOT READY**.
-Пользователь разрешил продолжать по плану; это не разрешение ослабить DONE criteria.
+2026-10-06. Текущий вердикт: **P0 ACTIVE (archival debt) / P1 DONE**.
+Владелец явно утвердил [P1 approval/freeze](P1_APPROVAL_RU.md), включая перенос
+оставшегося archival prerequisite в отдельный долг. P0/release red не стали green.
+Ниже — исторические gate snapshots до parallel closure и owner approval;
+latest classification — P0_PARALLEL_RESULT_RU.md, latest P1 — P1_STATUS_RU.md.
 
 ## Что дополнительно выполнено
 

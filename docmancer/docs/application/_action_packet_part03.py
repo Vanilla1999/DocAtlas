@@ -35,7 +35,7 @@ def build_action_packet(
         HARD_ACTION_PACKET_TOKENS,
         max(MIN_ACTION_PACKET_TOKENS, int(max_tokens or DEFAULT_ACTION_PACKET_TOKENS)),
     )
-    mutation_intent = mutation_intent_contract or build_mutation_intent(question)
+    mutation_intent = mutation_intent_contract or MutationIntentContract("none", "unknown", ())
     required_evidence_paths = tuple(required_evidence_paths)
     required_target_paths = tuple(required_target_paths)
     if mutation_intent_contract is None and required_target_paths:
@@ -100,6 +100,8 @@ def build_action_packet(
         )
         scoped_items.append(item)
     scoped_items = _drop_superseded_fallbacks(scoped_items)
+    # OPEN: legacy patch-plan/proof parsers remain for SDK-supplied request_plan
+    # metadata. Public question text no longer constructs such a contract.
     patch_requirements = (
         build_patch_evidence_requirements(mutation_intent.request_plan)
         if mutation_intent.request_plan is not None else None
@@ -458,12 +460,7 @@ def build_action_packet(
     if packet["missing_evidence"]:
         packet["status"] = "insufficient_evidence"
 
-    if is_change_request(question) and resolved_mutation.operation == "none":
-        packet["status"] = "insufficient_evidence"
-        packet["missing_evidence"].append(
-            "Mutation target readiness is incomplete: patch_surface_not_supported."
-        )
-    elif resolved_mutation.operation != "none" and not mutation_readiness.ready:
+    if resolved_mutation.operation != "none" and not mutation_readiness.ready:
         packet["status"] = "insufficient_evidence"
         for reason in mutation_readiness.missing:
             message = f"Mutation target readiness is incomplete: {reason}."

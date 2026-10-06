@@ -13,8 +13,7 @@ MAX_SUPPORTING_SNIPPET_CHARS = 2400
 MAX_SNIPPETS_PER_SOURCE = 1
 
 _FENCED_CODE_RE = re.compile(r"```([A-Za-z0-9_+.#-]*)\s*\n(.*?)```", re.DOTALL)
-_TERM_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|[A-Za-z0-9][A-Za-z0-9_.:-]*")
-_NOISE_TEXT = ("[¶]", "Copy code", "Copy", "Download", "Open in new tab", "Edit this page", "Other versions and variants")
+_TERM_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.:-]*")
 _FLOATING_VERSION_ALIASES = {"latest", "stable", "main", "master", "beta", "next"}
 _LANGUAGE_ALIASES = {"py": "python", "python3": "python", "sh": "bash", "shell": "bash", "console": "bash", "rs": "rust"}
 
@@ -79,31 +78,8 @@ def validate_response_style(response_style: str | None) -> str:
 
 def infer_snippet_query_intent(question: str) -> SnippetQueryIntent:
     text = question or ""
-    lowered = text.lower()
-    wants_command = bool(re.search(r"\b(command|cli|terminal|curl|shell|bash|run)\b", lowered))
-    wants_config = bool(re.search(r"\b(config|configure|yaml|toml|json|ini|setting)\b", lowered))
-    coding_context = bool(re.search(r"\b(anyhow|with_context|error context|context trait)\b", lowered))
-    wants_code = bool(re.search(r"\b(how do i use|example|snippet|code|api|function|class|decorator|provider|depends|with_context|autodispose|blocprovider|click\.group|command group)\b", lowered)) or coding_context or wants_command or wants_config
-    language_hints = {
-        "python": ("python", "fastapi", "click", "depends"),
-        "dart": ("dart", "flutter", "riverpod", "bloc", "blocprovider", "autodispose"),
-        "rust": ("rust", "anyhow", "with_context", "context trait"),
-        "yaml": ("yaml", "yml"),
-        "toml": ("toml", "cargo.toml"),
-        "json": ("json",),
-        "bash": ("bash", "shell", "cli", "command", "curl"),
-    }
-    expected_languages = [language for language, hints in language_hints.items() if any(hint in lowered for hint in hints)]
     symbols = [_canonical_symbol(term) for term in _TERM_RE.findall(text) if _is_symbol_like(term)]
-    if "click" in lowered and "group" in lowered:
-        symbols.extend(["click.group", "@click.group"])
-    if "fastapi" in lowered and "depends" in lowered:
-        symbols.append("Depends")
-    if "riverpod" in lowered and "autodispose" in lowered:
-        symbols.extend(["autoDispose", "keepAlive", "ref.watch"])
-    if "blocprovider" in lowered:
-        symbols.append("BlocProvider")
-    return SnippetQueryIntent(wants_code, wants_command, wants_config, _dedupe(expected_languages), _dedupe([s for s in symbols if s]))
+    return SnippetQueryIntent(bool(symbols), False, False, [], _dedupe([s for s in symbols if s]))
 
 
 def extract_snippet_candidates(chunk: Any, *, origin_lane: str, question: str) -> list[SnippetCandidate]:
@@ -371,7 +347,7 @@ def _canonical_symbol(term: str) -> str:
 
 
 def _is_symbol_like(term: str) -> bool:
-    return bool(re.search(r"[A-Z_@.]|dispose|provider|depends|context|group|watch|yaml|toml", term))
+    return bool(re.search(r"[_@.]|[a-z][A-Z]", term))
 
 
 def _symbol_score(candidate: SnippetCandidate, intent: SnippetQueryIntent) -> float:
@@ -388,26 +364,7 @@ def _language_score(language: str | None, expected_languages: list[str]) -> floa
 
 
 def _intent_relevance_score(candidate: SnippetCandidate, question: str) -> float:
-    lowered = (question or "").casefold()
-    haystack = " ".join(
-        str(value or "")
-        for value in (candidate.title, candidate.heading_path, candidate.source, candidate.source_url, candidate.code)
-    ).casefold()
-    intents = [
-        ({"module", "modules", "structure", "organized"}, ("module", "modules", "lib/modules", "architecture", "structure")),
-        ({"startup", "init", "bootstrap"}, ("startup", "init", "bootstrap")),
-        ({"test", "testing"}, ("test", "tests", "testing", "pytest")),
-        ({"dependency", "package", "library"}, ("dependency", "dependencies", "package", "library", "pubspec", "requirements")),
-    ]
-    score = 0.0
-    for triggers, boosts in intents:
-        if not any(trigger in lowered for trigger in triggers):
-            continue
-        if any(boost in haystack for boost in boosts):
-            score = max(score, 1.0)
-        elif "architecture" in haystack and triggers & {"module", "modules", "structure", "organized"}:
-            score = max(score, 0.25)
-    return score
+    return 0.0
 
 
 def _source_score(candidate: SnippetCandidate, lane_priority: list[str] | None) -> float:
@@ -494,7 +451,7 @@ def _usability_score(candidate: SnippetCandidate) -> float:
 
 def _is_noisy(candidate: SnippetCandidate) -> bool:
     lowered = candidate.code.strip().lower()
-    if not lowered or lowered in {"copy", "download", "open in new tab"}:
+    if not lowered:
         return True
     if "](" in candidate.code and candidate.code.count("\n") < 3:
         return True
@@ -507,18 +464,20 @@ def _snippet_hash(candidate: SnippetCandidate) -> str:
 
 
 def _infer_language(code: str, metadata: dict[str, Any]) -> str | None:
-    source = " ".join(str(metadata.get(key) or "") for key in ("source", "url", "source_url", "library_id", "canonical_id", "library", "dependency", "ecosystem")).lower()
-    stripped = code.lstrip()
-    if "docs.rs" in source or "rust" in source or re.search(r"\b(fn|let|impl|pub struct|use anyhow|Result<)\b", code):
+    # Source grammar may label presentation, but library names/URLs cannot
+    # infer a requested language or manufacture symbols.
+    if re.search(r"\b(?:fn\s+\w+\s*\(|impl\s+\w+|pub\s+struct\s+\w+)", code):
         return "rust"
-    if "riverpod" in source or "bloc" in source or "flutter" in source or re.search(r"\b(final|Widget|BuildContext|ref\.watch|BlocProvider|FutureProvider)\b", code):
-        return "dart"
-    if "fastapi" in source or "click" in source or re.search(r"(^|\n)\s*(from\s+\w+\s+import|import\s+\w+|def\s+\w+|class\s+\w+|@\w+(?:\.\w+)?\()", code):
+    if re.search(r"(^|\n)\s*(?:from\s+\w+\s+import|def\s+\w+\s*\()", code):
         return "python"
-    if re.search(r"(^|\n)\s*(uv|pytest|python|git|curl|npm|dart|flutter)\s+", code):
-        return "bash"
-    if stripped.startswith(("{", "[")):
-        return "json"
+    if code.lstrip().startswith(("{", "[")):
+        import json
+        try:
+            json.loads(code)
+        except (ValueError, TypeError):
+            pass
+        else:
+            return "json"
     return None
 
 def _normalize_language(value: Any) -> str | None:
@@ -612,9 +571,8 @@ def _exact_version_match(metadata: dict[str, Any]) -> bool | None:
 
 
 def _remove_ui_noise(value: str) -> str:
-    text = value.replace("[¶]", "")
-    text = re.sub(r"(?i)(?:^|\s)(copy code|copy|download|open in new tab|edit this page)(?=\s*$)", "", text)
-    return text
+    # Presentation must not erase source bytes based on an English UI lexicon.
+    return value
 
 
 def _string(value: Any) -> str | None:

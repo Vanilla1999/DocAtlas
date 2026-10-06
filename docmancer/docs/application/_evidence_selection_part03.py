@@ -5,7 +5,6 @@ from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
 from ._evidence_selection_part02 import _authority_conflicts, _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
-from docmancer.docs.domain.project_answer_contract import obligations_can_authorize_docs_answer
 
 
 def _hydrate_cohesive_contract_paragraphs(
@@ -246,8 +245,6 @@ def select_evidence(
     missing.update(f"stable_identity_collision:{value}" for value in identity_collisions)
     if config.result_kind == "docs_answer" and selected and all(item.navigation_only for item in selected):
         missing.add("factual_source_evidence")
-    if config.profile == "project_docs_answer" and not mandatory:
-        missing.add("project_answer_requirement")
     status: Literal["ok", "insufficient_evidence"] = (
         "ok" if selected and not missing and not conflicts else "insufficient_evidence"
     )
@@ -368,36 +365,12 @@ def select_evidence(
     missing.update(mandatory - assigned_requirement_ids)
     if status == "ok" and mandatory - assigned_requirement_ids:
         status = "insufficient_evidence"
-    if config.profile == "project_docs_answer":
-        proof_obligations = tuple(
-            obligation
-            for requirement in requirements
-            if requirement.mandatory
-            if (obligation := requirement.as_proof_obligation()) is not None
-        )
-        explicit_support_contract = any(
-            requirement.mandatory
-            and requirement.public_provenance in {
-                "public_task_contract", "required_evidence_paths",
-            }
-            for requirement in requirements
-        )
-        context_only_retrieval = bool(
-            "fallback:generic_project_terms" in requirements.parse_trace
-            and "unsupported_query:generic_free_form_relation"
-            in requirements.unresolved_parts
-            and not explicit_support_contract
-        )
-        if context_only_retrieval:
-            missing.add("unsupported_answer_authorization:unresolved_query")
-            status = "insufficient_evidence"
-        elif proof_obligations and not obligations_can_authorize_docs_answer(proof_obligations):
-            missing.add("unsupported_answer_authorization:context_only_relation")
-            missing.update(
-                f"context_only:{obligation.relation or obligation.kind}"
-                for obligation in proof_obligations
-            )
-            status = "insufficient_evidence"
+    if config.result_kind == "docs_answer":
+        # Scope, exact literals, hashes and assignments authorize context
+        # selection only. They do not independently establish a full answer,
+        # including the generic/SDK fallback and supplied requirement paths.
+        missing.add("unsupported_answer_authorization:context_only")
+        status = "insufficient_evidence"
     assignment_hash = canonical_hash([asdict(item) for item in assignments])
     selection_hash = canonical_hash({
         "schema_version": SELECTOR_SCHEMA_VERSION,

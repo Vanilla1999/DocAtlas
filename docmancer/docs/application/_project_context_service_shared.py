@@ -12,7 +12,6 @@ from docmancer.docs.application.evidence_selection import (
     select_evidence,
 )
 from docmancer.docs.application.evidence_requirements import build_patch_evidence_requirements
-from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.docs.domain.answer_completeness import (
     derive_project_answer_completeness,
     extract_project_answer_requirements,
@@ -35,6 +34,7 @@ from docmancer.docs.domain.code_graph import build_code_graph_context_items, bui
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.query_terms import documentation_query_terms
 from docmancer.docs.domain.retrieval_routing import (
     fit_stage_items,
     new_routing_record,
@@ -53,32 +53,6 @@ LOW_TRUST_PROJECT_RISK_FLAGS = frozenset({
     "patch_review_artifact",
     "generated_review_output",
 })
-LOW_TRUST_QUERY_TERMS = (
-    "dogfood",
-    "research",
-    "experiment",
-    "benchmark",
-    "baseline",
-    "patch review",
-    "patch-review",
-    "review artifact",
-    "generated review",
-    "eval",
-    "evaluation",
-)
-LOW_SIGNAL_SINGLE_TOKEN_QUERIES = {"test", "tests", "doc", "docs", "readme", "todo", "fixme"}
-PLACEHOLDER_CONTEXT_DOC_RE = re.compile(
-    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b|"
-    r"TODO:\s*Put a short description|const\s+like\s*=\s*['\"]sample['\"]",
-    re.IGNORECASE,
-)
-
-_DEPENDENCY_REFERENCE_CUE_RE = re.compile(
-    r"\b(?:dependency|dependencies|package|packages|library|libraries|sdk|version|"
-    r"pypi|pub\.dev|pub package|npm|crate|gradle|maven)\b",
-    re.IGNORECASE,
-)
-_AMBIGUOUS_DEPENDENCY_NAMES = frozenset({"mcp"})
 
 
 def _dependency_confirmation_blocks_local_answer(
@@ -170,7 +144,7 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
     if project_docs:
         for item in project_docs.results:
             lifecycle_metadata = {"lifecycle_status": item.lifecycle_status or "active"}
-            if not lifecycle_allows(lifecycle_metadata, answer_lifecycle_intent):
+            if item.stale or not lifecycle_allows(lifecycle_metadata, answer_lifecycle_intent):
                 continue
             if _drop_placeholder_context_doc(item):
                 continue
@@ -179,8 +153,13 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
+            source_taxonomy["risk_flags"] = sorted(set(source_taxonomy.get("risk_flags") or ())
+                | set(item.metadata.get("risk_flags") or ())
+                | set(item.metadata.get("project_doc_risk_flags") or ()))
             if item.authority:
                 source_taxonomy["authority"] = item.authority
+            elif item.metadata.get("project_doc_authority") or item.metadata.get("authority"):
+                source_taxonomy["authority"] = item.metadata.get("project_doc_authority") or item.metadata["authority"]
             if _should_skip_low_trust_project_source(question, source_taxonomy):
                 continue
             pack.append({
@@ -351,27 +330,24 @@ def _project_docs_preflight_confirmation_result(*, root: Path, question: str, mo
 
 
 def _drop_placeholder_context_doc(item: ProjectDocsChunk) -> bool:
-    return _looks_like_placeholder_context_doc(getattr(item, "path", None), getattr(item, "content", None))
+    metadata = getattr(item, "metadata", None) or {}
+    return (metadata.get("placeholder") is True
+            or _looks_like_placeholder_context_doc(getattr(item, "path", None), getattr(item, "content", None)))
 
 
 def _looks_like_placeholder_context_doc(path: str | None, content: str | None) -> bool:
-    normalized_path = normalize_doc_path(path)
-    name = normalized_path.rsplit("/", 1)[-1]
-    if not (name.startswith("readme") or name.startswith("architecture") or name in {"license", "copying"}):
-        return False
-    return bool(PLACEHOLDER_CONTEXT_DOC_RE.search((content or "")[:4096]))
+    return not str(content or "").strip()
 
 
 def _should_skip_low_trust_project_source(question: str, source_taxonomy: dict[str, Any]) -> bool:
     risk_flags = set(source_taxonomy.get("risk_flags") or [])
-    if not risk_flags.intersection(LOW_TRUST_PROJECT_RISK_FLAGS):
-        return False
-    return not _question_explicitly_targets_low_trust_artifacts(question)
+    return bool(risk_flags.intersection(LOW_TRUST_PROJECT_RISK_FLAGS)
+                or source_taxonomy.get("authority") in {"artifact", "research", "generated", "stale"})
 
 
 def _question_explicitly_targets_low_trust_artifacts(question: str) -> bool:
-    normalized = (question or "").lower()
-    return any(term in normalized for term in LOW_TRUST_QUERY_TERMS)
+    # Request wording cannot lift catalog/source trust restrictions.
+    return False
 
 
 _GATE_WEIGHT_PATH = 1.0
@@ -388,7 +364,7 @@ def _query_relevance_gate(
     context_pack: list[dict[str, Any]],
     relevance_terms: list[str] | None = None,
 ) -> dict[str, Any]:
-    terms = relevance_terms if relevance_terms is not None else extract_query_relevance_terms(question, intent=intent)
+    terms = relevance_terms if relevance_terms is not None else list(documentation_query_terms(question))
     if not terms:
         return {
             "passed": True,
@@ -526,8 +502,7 @@ def _score_is_strong(score: float | None) -> bool:
 
 
 def _is_low_signal_single_token_query(question: str) -> bool:
-    tokens = re.findall(r"[\wА-Яа-яЁё]+", (question or "").lower())
-    return len(tokens) == 1 and tokens[0] in LOW_SIGNAL_SINGLE_TOKEN_QUERIES
+    return not bool(str(question or "").strip())
 
 
 def _context_has_query_evidence(context_pack: list[dict[str, Any]], terms: list[str] | None) -> bool:
@@ -575,7 +550,7 @@ def _normalize_gate_text(value: Any) -> str:
         value = "\n".join(str(part) for part in parts if part)
     elif isinstance(value, list):
         value = "\n".join(str(part) for part in value if part)
-    text = str(value or "").replace("\\", "/").lower().replace("-", "_")
+    text = str(value or "").replace("\\", "/").lower()
     return re.sub(r"\s+", " ", text)
 
 
@@ -650,16 +625,6 @@ def project_why_selected(item: Any) -> str:
 
 
 def _project_source_kind_reason(path: str) -> str:
-    if path.endswith("readme.md"):
-        return "selected as high-level project overview / usage documentation"
-    if path.endswith("contributing.md"):
-        return "selected as project structure and extension-point documentation"
-    if "architecture" in path:
-        return "selected as internal architecture / pipeline documentation"
-    if "mcp-packs" in path:
-        return "selected as MCP Packs / API action runtime documentation"
-    if is_changelog_path(path):
-        return "selected as release-history evidence"
     return "selected because it matched repo-owned project documentation for the question"
 
 

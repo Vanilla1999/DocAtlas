@@ -4,6 +4,16 @@
 Исследованный SHA: `37bfd0668f819935dd9e027bd9d8bf767fcd185a`.
 Интеграционная ветка: `integration/stage3-v2-identity-pr1`.
 
+**Текущая точка продолжения: [CONTINUE_HERE_RU.md](CONTINUE_HERE_RU.md).**
+Dictionary exit частично реализован в primary: 146 новых tests passed, actual stdio
+MCP smoke PASS; quality gate red, полный milestone NOT DONE. Owner изменил порядок:
+сначала удалить смысловые правила, затем улучшать полноту; replacement не prerequisite.
+Полный журнал: [DICTIONARY_EXIT_EXECUTION_RU.md](DICTIONARY_EXIT_EXECUTION_RU.md).
+P1 frozen approval сохранён; P0 archival debt отдельный. P2 prototype — история.
+
+**Ниже исторический #211 diagnostic checkpoint до смены приоритета и реализации.**
+Его old SHA, «product не изменён» и next steps не описывают текущий local diff.
+
 ## Простыми словами
 
 Система находит документы, но не всегда правильно решает, какие фрагменты полезно
@@ -75,7 +85,7 @@ which allows nine retry attempts.` — проходит внутренний att
 - По последним проверкам CI остаётся красным; разрешения на merge нет. На момент
   этой диагностической паузы документы ещё не были закоммичены и опубликованы.
 
-## С чего продолжить
+## Исторический план продолжения #211 (superseded)
 
 1. Не повторять отвергнутый однострочный veto и не отключать проверки целиком.
 2. Взять подготовленные пары: отсутствие числа / реальное число; inline / heading;

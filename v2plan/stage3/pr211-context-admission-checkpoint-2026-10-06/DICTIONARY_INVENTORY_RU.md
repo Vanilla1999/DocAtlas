@@ -1,5 +1,11 @@
 # Реестр ручных словарей и связанных правил
 
+**Исторический inventory, не текущий implementation ledger.** Уже выполненные
+REMOVE/SPLIT slices и remaining live paths: [CONTINUE_HERE_RU.md](CONTINUE_HERE_RU.md),
+[DICTIONARY_EXIT_EXECUTION_RU.md](DICTIONARY_EXIT_EXECUTION_RU.md).
+Ниже original symbol map/pins/OPEN marks сохранены как audit history; current source
+hashes находятся в `archives/dictionary-exit-current-source-manifest.json`.
+
 Дата: 2026-10-06. Основа: `8d2381d8c9d18498483feaaab918d93dfee47969`.
 Рабочее дерево дополнительно содержит удаление `instruction_trust` block.
 SHA-256 текущего `project_retrieval_intent.py`:

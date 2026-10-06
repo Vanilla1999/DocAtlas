@@ -336,9 +336,6 @@ def _eligible_candidates(
     canonical_policy_required = any(
         item.kind == "canonical_policy" and item.mandatory for item in requirements
     )
-    legal_intent = bool(
-        set(_TOKEN_RE.findall(question.casefold())).intersection(_LEGAL_INTENT_TERMS)
-    )
     query_identifiers = _query_identifier_values(requirements)
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
@@ -369,11 +366,6 @@ def _eligible_candidates(
             reason = "wrong_version"
         elif result_kind == "docs_answer" and candidate.navigation_only:
             reason = "navigation_only"
-        elif (
-            candidate.source_class.casefold() == "legal"
-            and not legal_intent
-        ):
-            reason = "query_intent_mismatch"
         elif _query_identifier_conflict(candidate, query_identifiers):
             reason = "query_identifier_conflict"
         if reason:

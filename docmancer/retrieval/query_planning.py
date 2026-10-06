@@ -23,11 +23,6 @@ QUERY_PLAN_SCHEMA_VERSION = "deterministic-query-plan-v1"
 MAX_EXACT_TERMS = 12
 MAX_CONCEPT_QUERIES = 3
 MAX_DOCUMENT_LOCATOR_CHARS = 240
-_STOPWORDS = frozenset({
-    "a", "an", "and", "are", "be", "can", "do", "does", "for", "how",
-    "i", "in", "is", "it", "of", "on", "or", "the", "this", "to",
-    "what", "when", "where", "which", "with", "you", "your",
-})
 _TERM_PATTERNS = (
     ("quoted", re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]")),
     ("flag", re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}")),
@@ -41,10 +36,6 @@ _DOCUMENT_LOCATOR_RE = re.compile(
     r"[`\"']?((?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.[A-Za-z0-9_-]+)[`\"']?",
     flags=re.IGNORECASE,
 )
-_PATH_ROOTS = frozenset({
-    "app", "bin", "cmd", "config", "docmancer", "docs", "eval", "lib",
-    "packages", "scripts", "src", "test", "tests", "tools", "wiki",
-})
 
 _AUTHORITY_MINIMUMS = {
     "unknown": (
@@ -122,26 +113,15 @@ def extract_document_locator(query: str) -> str | None:
 
 def _looks_like_source_path(value: str) -> bool:
     normalized = value.replace("\\", "/")
-    first = normalized.partition("/")[0]
     leaf = normalized.rsplit("/", 1)[-1]
     return (
         normalized.startswith(("./", "../", "/"))
         or "." in leaf
-        or first.casefold() in _PATH_ROOTS
     )
 
 
 def _concept_queries(query: str, exact_terms: tuple[ExactTerm, ...]) -> tuple[str, ...]:
-    cleaned = query
-    for term in exact_terms:
-        cleaned = cleaned.replace(term.value, " ")
-    tokens = [
-        token.casefold()
-        for token in re.findall(r"[\w+-]+", cleaned, flags=re.UNICODE)
-        if token.casefold() not in _STOPWORDS and len(token) > 1
-    ]
-    normalized = " ".join(tokens)[:320]
-    return (normalized,) if normalized else ()
+    return ()
 
 
 def _requirement_exact_terms(requirements: Any) -> tuple[ExactTerm, ...]:
@@ -303,13 +283,9 @@ def build_query_plan(
     requested_lanes: tuple[str, ...] = ("lexical",),
     requirements: Any | None = None,
 ) -> QueryPlan:
-    requirement_terms = (
-        _requirement_exact_terms(requirements) if requirements is not None else ()
-    )
-    exact_terms = tuple({
-        term.normalized_value: term
-        for term in (*requirement_terms, *extract_exact_terms(query))
-    }.values())[:MAX_EXACT_TERMS]
+    # Requirements can carry inferred expected values; only literal query
+    # syntax supplies exact retrieval constraints. Their hash remains bound.
+    exact_terms = extract_exact_terms(query)
     concepts = _concept_queries(query, exact_terms)[:MAX_CONCEPT_QUERIES]
     filter_spec = _filter_spec(filters)
     executed_filters_hash = canonical_hash(_canonical_filter_value(filters or {}))

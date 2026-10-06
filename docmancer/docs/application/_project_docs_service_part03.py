@@ -175,7 +175,7 @@ class _ProjectDocsServicePart03:
             effective_limit = max(effective_limit, 20)
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
-        documentation_query_plan = documentation_query_plan or build_documentation_query_plan(
+        documentation_query_plan = build_documentation_query_plan(
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
@@ -190,7 +190,7 @@ class _ProjectDocsServicePart03:
         lookup_query_ids = {
             item.text: item.query_id
             for item in documentation_query_plan.queries
-            if item.origin in {"exact_anchor", "exact_path", "host_lookup", "canonical_intent", "concept_alias", "retrieval_hint", "lexical_topic"}
+            if item.origin == "host_lookup"
         }
         lookup_query_ids.update({item.text: item.query_id for item in scheduled_lookups})
         exact_path_query_id = next((
@@ -303,31 +303,17 @@ class _ProjectDocsServicePart03:
                         anchor_lookup,
                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
-        same_atom_canonical_texts = {
-            alias.text
-            for alias in build_project_retrieval_aliases(query)
-            if alias.intent_id == "fail_closed_workflow"
-        }
         supplemental_chunks_by_query = {}
         for supplemental_query in supplemental_queries:
             lookups = [item for item in documentation_query_plan.queries if item.text == supplemental_query]
             public_lookup = requirements is not None and any(item.origin == "host_lookup" for item in lookups)
             # Public lookups need the same pre-qualification candidate window
             # as the original question; projection owns the public budget.
-            preserve_canonical_neighbors = any(
-                item.origin == "canonical_intent"
-                and item.text in same_atom_canonical_texts
-                for item in lookups
-            )
             lane = _run(
                 supplemental_query,
                 query_limit=effective_limit if public_lookup else 4,
-                query_budget=(
-                    budget if public_lookup else
-                    min(budget, max(800, supplemental_budget))
-                    if preserve_canonical_neighbors else supplemental_budget
-                ),
-                query_expand="adjacent" if preserve_canonical_neighbors else "none",
+                query_budget=budget if public_lookup else supplemental_budget,
+                query_expand="none",
                 query_filters=filters,
             )
             if not lookups:
@@ -340,9 +326,6 @@ class _ProjectDocsServicePart03:
                     lane, lookup.query_id, lookup.text, lookup,
                     expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                 )
-                if lookup.origin == "canonical_intent":
-                    lane = _qualify_same_atom_continuations(lane, lookup.query_id)
-                    lane = _merge_same_atom_continuations(lane, lookup.query_id)
             supplemental_chunks_by_query[supplemental_query] = lane
         queries_by_origin: dict[str, list[list[Any]]] = {}
         for item in documentation_query_plan.queries:

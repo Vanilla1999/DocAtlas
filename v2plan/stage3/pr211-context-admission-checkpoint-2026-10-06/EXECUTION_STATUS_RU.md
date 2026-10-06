@@ -1,12 +1,24 @@
 # Выполнение плана #211
 
+**Latest checkpoint: [CONTINUE_HERE_RU.md](CONTINUE_HERE_RU.md).**
+Current HEAD `9a7299e2`, dictionary-exit implementation в незакоммиченном primary
+diff; 146 новых tests passed, real stdio smoke PASS. Quality gate red, full exit
+NOT DONE. [Owner change / journal](DICTIONARY_EXIT_EXECUTION_RU.md).
+Ниже исторический CI/diagnostic отчёт: опубликованные SHA и прежние entry gates
+не являются current local implementation status. P1 уже owner-approved/frozen;
+replacement больше не prerequisite удаления словарей.
+
+## Исторические исследования до dictionary-exit implementation
+
 Дата: 2026-10-06. Опубликованный product head: `8d2381d8`.
 Pebble prefit patch опубликован. Разрешения merge нет.
 Последнее исследование по запросу владельца:
 [удаление retrieval-словаря](RETRIEVAL_DICTIONARY_REVIEW_RU.md).
 Общий план RU/EN и критерии завершения:
 [DICTIONARY_EXIT_PLAN_RU.md](DICTIONARY_EXIT_PLAN_RU.md);
-[реестр D01–D38](DICTIONARY_INVENTORY_RU.md). P0 ACTIVE, P1 PREPARATION, P2–P7 NOT STARTED;
+[реестр D01–D38](DICTIONARY_INVENTORY_RU.md). P0 archival ACTIVE,
+[P1 DONE: owner-approved contract/freeze/resource limits](P1_STATUS_RU.md),
+[P2 ACTIVE: isolated development prototype](P2_STATUS_RU.md), P3–P7 NOT STARTED;
 реализация нового pipeline и test-contract migrations ещё не выполнены.
 Продолжение P0: [caller map и baseline manifest](P0_READ_PATH_AUDIT_RU.md),
 [статус этапов](DICTIONARY_STAGE_STATUS_RU.md).

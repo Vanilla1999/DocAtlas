@@ -8,10 +8,12 @@ import json
 import re
 import zlib
 from copy import deepcopy
+from dataclasses import replace
 from typing import Any, Iterable
 
 from docmancer.docs.application.action_packet import evidence_identity_for_item
 from docmancer.docs.application.context_selection import validate_context_selection_payload
+from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
 from docmancer.docs.application.evidence_selection import (
     AggregateMixedSelectionDecision,
     EvidenceAssignment,
@@ -23,8 +25,10 @@ from docmancer.docs.application.evidence_selection import (
     resolve_assignment_unit,
     select_evidence,
     validate_assignment_binding,
+    build_requirements,
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
+from docmancer.docs.domain.evidence_qualification import evidence_policy_rejection_reason
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.application.insufficient_projection import (
     apply_terminal_insufficient_projection,
@@ -167,6 +171,85 @@ def _unit_materialized_item(
     return item
 
 
+def _request_input_limit_failures(question: str, retrieval: dict[str, Any], decision: Any = None) -> list[str]:
+    """Validate current bounded inputs independently of cached answer decisions."""
+    fresh = build_requirements(
+        question, profile="project_docs_answer",
+        required_evidence_paths=retrieval.get("required_evidence_paths") or (),
+        required_target_paths=retrieval.get("required_target_paths") or (),
+        public_requirements=retrieval.get("public_requirements") or (),
+    )
+    failures = {row.requirement_id for row in fresh if row.requirement_id.startswith("input_limit:")}
+    failures.update(str(value) for value in retrieval.get("missing_requirement_ids") or ()
+                    if str(value).startswith("input_limit:"))
+    selection = decision if decision is not None else retrieval.get("selection_decision")
+    if isinstance(selection, dict):
+        missing = selection.get("missing_requirements") or ()
+    else:
+        missing = getattr(selection, "missing_requirements", ())
+    failures.update(str(value) for value in missing if str(value).startswith("input_limit:"))
+    requirements = retrieval.get("requirements") or ()
+    if isinstance(requirements, dict):
+        requirements = requirements.get("requirements") or ()
+    for row in requirements:
+        identity = row.get("requirement_id", "") if isinstance(row, dict) else getattr(row, "requirement_id", "")
+        if str(identity).startswith("input_limit:"):
+            failures.add(str(identity))
+    return sorted(failures)
+
+
+def _requires_exact_snapshot(retrieval: dict[str, Any], decision: Any = None) -> bool:
+    if retrieval.get("exact_snapshot_required"):
+        return True
+    selection = decision if decision is not None else retrieval.get("selection_decision")
+    selected_requirements = (selection.get("requirements") if isinstance(selection, dict)
+                             else getattr(selection, "requirements", None))
+    for contract in (retrieval.get("requirements"), selected_requirements):
+        rows = contract.get("requirements", ()) if isinstance(contract, dict) else contract or ()
+        for row in rows:
+            kind = row.get("kind") if isinstance(row, dict) else getattr(row, "kind", None)
+            mandatory = row.get("mandatory", True) if isinstance(row, dict) else getattr(row, "mandatory", True)
+            if kind == "exact_snapshot" and mandatory:
+                return True
+    return False
+
+
+def _normalize_projection_requirements(value: Any) -> EvidenceRequirementSet | None:
+    """Hydrate current contracts once; malformed serialization is not no scope."""
+    if value is None:
+        return None
+    if isinstance(value, EvidenceRequirementSet):
+        rows = value.requirements
+        metadata = None
+    elif isinstance(value, dict):
+        if "requirements" not in value:
+            raise ValueError("serialized requirements are missing their rows")
+        rows = value["requirements"]
+        metadata = {key: item for key, item in value.items() if key != "requirements"}
+    else:
+        rows = value
+        metadata = {}
+    if not isinstance(rows, (list, tuple)):
+        raise ValueError("requirements must be a row sequence")
+    normalized = []
+    for row in rows:
+        if isinstance(row, dict):
+            row = EvidenceRequirement(**row)
+        if not isinstance(row, EvidenceRequirement):
+            raise ValueError("invalid evidence requirement row")
+        if any(not isinstance(item, str) or not item.strip() for item in (
+            row.requirement_id, row.kind, row.value, row.public_provenance,
+        )) or not isinstance(row.mandatory, bool):
+            raise ValueError("invalid evidence requirement binding")
+        normalized.append(row)
+    for kind in ("project_identity", "module_id", "exact_version"):
+        if len({row.value for row in normalized if row.kind == kind and row.mandatory}) > 1:
+            raise ValueError("conflicting mandatory request scope")
+    if metadata is None:
+        return replace(value, requirements=tuple(normalized))
+    return EvidenceRequirementSet(requirements=tuple(normalized), **metadata)
+
+
 def project_docs_answer(
     *,
     question: str,
@@ -177,6 +260,16 @@ def project_docs_answer(
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Create one deduplicated source list and an internal immutable snapshot."""
 
+    blocked = _explicit_delivery_block(retrieval, kind="docs_answer", max_tokens=max_tokens)
+    if blocked is not None:
+        return blocked, {}
+    try:
+        current_requirements = _normalize_projection_requirements(retrieval.get("requirements"))
+    except (ValueError, TypeError, AttributeError):
+        return project_insufficient(
+            kind="docs_answer", missing=["Current context requirements are invalid."],
+            recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+        ), {}
     candidates = _docs_candidates(retrieval)
     selection_config = (
         library_docs_selection_config(max_tokens)
@@ -207,9 +300,10 @@ def project_docs_answer(
             )
             payload.update({
                 "operational_status": str(retrieval.get("status") or "unknown"),
-                "context_available": bool(candidates),
+                "context_available": False,
                 "answer_supported": False,
                 "answer_available": False,
+                "edit_ready": False,
                 "support_status": "insufficient_evidence",
                 "reason_code": "canonical_support_decision_missing",
                 "missing_requirement_ids": ["canonical_support_decision"],
@@ -223,63 +317,120 @@ def project_docs_answer(
             _refresh_estimate(payload)
             return payload, {}
     elif decision is None:
-        decision = select_evidence(
-            candidates,
-            question=question,
-            config=selection_config,
-            trust_contract=retrieval.get("trust_contract") or {},
-            exact_version=_requested_exact_version(retrieval),
+        try:
+            decision = select_evidence(
+                candidates,
+                question=question,
+                config=selection_config,
+                trust_contract=retrieval.get("trust_contract") or {},
+                exact_version=_requested_exact_version(retrieval),
+                required_evidence_paths=retrieval.get("required_evidence_paths") or (),
+                required_target_paths=retrieval.get("required_target_paths") or (),
+                public_requirements=retrieval.get("public_requirements") or (),
+                requirements=current_requirements,
+                library_requirement_contract=retrieval.get("library_requirement_contract"),
+                project_identity=retrieval.get("project_identity"),
+                module_id=retrieval.get("module_id"),
+            )
+        except (ValueError, TypeError, AttributeError):
+            return project_insufficient(
+                kind="docs_answer", missing=["Current context scope could not be validated."],
+                recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+            ), {}
+    # Recheck supplied/cached selections under current technical eligibility.
+    # Old support booleans and semantic assignments are never projection authority.
+    if canonical_decision_supplied:
+        fresh_scope = build_requirements(
+            question, profile=selection_config.profile,
             required_evidence_paths=retrieval.get("required_evidence_paths") or (),
             required_target_paths=retrieval.get("required_target_paths") or (),
             public_requirements=retrieval.get("public_requirements") or (),
-            requirements=retrieval.get("requirements"),
-            library_requirement_contract=retrieval.get("library_requirement_contract"),
-            project_identity=retrieval.get("project_identity"),
-            module_id=retrieval.get("module_id"),
+            exact_version=_requested_exact_version(retrieval),
+            project_identity=retrieval.get("project_identity"), module_id=retrieval.get("module_id"),
         )
-    has_canonical_selection = strict_selection_profile or canonical_decision_supplied
+        try:
+            current_rows = tuple(current_requirements) if current_requirements is not None else ()
+            merged: dict[str, EvidenceRequirement] = {}
+            for contract in (current_rows, fresh_scope, decision.requirements):
+                for row in contract:
+                    previous = merged.get(row.requirement_id)
+                    if previous is not None:
+                        if previous != row and (previous.mandatory or row.mandatory):
+                            raise ValueError("conflicting mandatory requirement identity")
+                        continue
+                    merged[row.requirement_id] = row
+            # Multiple mandatory scope bindings cannot be treated as alternatives.
+            # In particular, an old path must not widen the current path allowlist.
+            for kind in ("project_identity", "module_id", "exact_version", "evidence_path"):
+                scopes = [
+                    {row.value for row in contract if row.kind == kind and row.mandatory}
+                    for contract in (current_rows, fresh_scope, decision.requirements)
+                ]
+                nonempty = [scope for scope in scopes if scope]
+                if kind != "evidence_path" and any(len(scope) > 1 for scope in nonempty):
+                    raise ValueError("conflicting mandatory request scope")
+                if nonempty and any(scope != nonempty[0] for scope in nonempty[1:]):
+                    raise ValueError("conflicting mandatory request scope")
+            checked_requirements = replace(decision.requirements, requirements=tuple(merged.values()))
+            decision = select_evidence(
+                [candidate.original for candidate in decision.selected_candidates],
+                question=question, config=selection_config, requirements=checked_requirements,
+                trust_contract=retrieval.get("trust_contract") or {},
+                project_identity=retrieval.get("project_identity"), module_id=retrieval.get("module_id"),
+            )
+        except (ValueError, TypeError, AttributeError):
+            return project_insufficient(
+                kind="docs_answer", missing=["Canonical context scope could not be revalidated."],
+                recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+            ), {}
     if selection_diagnostics is not None:
         selection_diagnostics.update(decision.audit_manifest())
+    technical_failures = _request_input_limit_failures(question, retrieval, decision)
+    # Apply the established question bound even to generic and cached profiles.
+    # Context-only is a weaker answer claim, not permission to bypass limits.
+    if len(question) > 4_000 and "input_limit:question" not in technical_failures:
+        technical_failures.append("input_limit:question")
+    if technical_failures:
+        return project_insufficient(
+            kind="docs_answer", missing=technical_failures,
+            recommended_next_action=None,
+            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+        ), {}
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     omitted = len(decision.omissions)
-    assigned_ids = {
-        assignment.evidence_id for assignment in decision.assignments
-    } if has_canonical_selection else {
-        candidate.stable_id for candidate in decision.selected_candidates
-    }
-    candidates_by_id = {candidate.stable_id: candidate for candidate in decision.selected_candidates}
-    selected_candidates = [
-        candidates_by_id[evidence_id]
-        for evidence_id in decision.support_decision.selected_evidence_ids
-        if evidence_id in candidates_by_id and evidence_id in assigned_ids
-    ] if has_canonical_selection else [
-        candidate for candidate in decision.selected_candidates
-        if candidate.stable_id in assigned_ids
-    ]
-    if len(selected_candidates) > 6:
-        selected_candidates = []
+    selected_candidates = list(decision.selected_candidates)
+    exact_snapshot_required = _requires_exact_snapshot(retrieval, decision)
     for candidate in selected_candidates:
-        candidate_assignments = tuple(
-            assignment for assignment in decision.assignments
-            if assignment.evidence_id == candidate.stable_id
-        )
-        # Mixed selections may contain unit-bound project evidence and
-        # whole-chunk library evidence. A neighboring candidate's unit must
-        # not change this candidate's canonical materialization contract.
-        use_unit_projection = (
-            retrieval.get("selection_profile") == "project_docs_answer"
-            or bool(candidate.project_identity)
-            or any(assignment.unit_id for assignment in candidate_assignments)
-        )
-        item = (
-            _unit_materialized_item(candidate, candidate_assignments)
-            if has_canonical_selection and use_unit_projection
-            else dict(candidate.original)
-        )
-        if item is None:
+        if exact_snapshot_required and candidate.docs_snapshot_exact is not True:
             omitted += 1
             continue
+        if len(sources) >= MAX_DOCS_SOURCES:
+            omitted += 1
+            continue
+        scoped_paths = {row.value.replace("\\", "/").casefold().removeprefix("./")
+                        for row in decision.requirements if row.kind == "evidence_path" and row.mandatory}
+        source_path = candidate.path_or_url.replace("\\", "/").casefold().removeprefix("./")
+        if scoped_paths and not any(source_path == path or source_path.endswith("/" + path) for path in scoped_paths):
+            omitted += 1
+            continue
+        if evidence_policy_rejection_reason(
+            {}, visible_text=candidate.display_text, candidate=candidate.original,
+            expected_project_identity=retrieval.get("project_identity"),
+        ) is not None:
+            omitted += 1
+            continue
+        requested_version = _requested_exact_version(retrieval)
+        if requested_version and candidate.resolved_version != requested_version:
+            omitted += 1
+            continue
+        item = dict(candidate.original)
+        # Render exactly the normalized eligible display, never an unselected
+        # metadata code block or a larger raw-content alias.
+        item.pop("code", None)
+        item.update(snippet=candidate.display_text, display_text=candidate.display_text,
+                    source_url=candidate.path_or_url, heading_path=candidate.section,
+                    version_binding=candidate.version_binding)
         normalized = _docs_source(
             item,
             evidence_id=candidate.stable_id if has_canonical_selection else None,
@@ -291,131 +442,69 @@ def project_docs_answer(
         sources.append(normalized)
         snapshot[evidence_id] = _snapshot_entry(item, normalized)
 
-    canonical_can_override = (
-        has_canonical_selection
-        and decision.support_decision.answer_supported
-        and bool(decision.support_decision.mandatory_requirement_ids)
-        and {
-            assignment.requirement_id for assignment in decision.assignments
-        }.issuperset(decision.support_decision.mandatory_requirement_ids)
-    )
-    retrieval_issues = _docs_retrieval_issues(
-        retrieval,
-        canonical_supported=canonical_can_override,
-    )
-    support = (
-        _docs_support_decision(
-            retrieval=retrieval,
-            decision=decision,
-            context_available=bool(candidates),
-        )
-        if has_canonical_selection
-        else {}
-    )
-    if has_canonical_selection and decision.support_decision.answer_supported:
-        selected_ids = list(decision.support_decision.selected_evidence_ids)
-        visible_ids = [source["evidence_id"] for source in sources]
-        if visible_ids != selected_ids:
-            payload = project_insufficient(
-                kind="docs_answer",
-                missing=["A selected support witness could not be materialized safely."],
-                recommended_next_action=None,
-                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-            )
-            payload.update({
-                "operational_status": str(retrieval.get("status") or "unknown"),
-                "context_available": bool(candidates),
-                "reason_code": "support_witness_not_materialized",
-            })
-            bound_insufficient_projection(
-                payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-            )
-            return payload, snapshot
-        visible_candidates = {candidate.stable_id: candidate for candidate in selected_candidates}
-        requirements_by_id = {
-            requirement.requirement_id: requirement
-            for requirement in decision.requirements
-        }
-        invalid_assignments = [
-            assignment for assignment in decision.assignments
-            if assignment.evidence_id not in visible_candidates
-            or assignment.requirement_id not in requirements_by_id
-            or not validate_assignment_binding(
-                requirements_by_id[assignment.requirement_id],
-                visible_candidates[assignment.evidence_id],
-                assignment,
-            )
-            or (
-                assignment.unit_id is not None
-                and resolve_assignment_unit(
-                    visible_candidates[assignment.evidence_id], assignment,
-                ).text not in next(
-                    source["snippet"] for source in sources
-                    if source["evidence_id"] == assignment.evidence_id
-                )
-            )
-        ]
-        if invalid_assignments:
-            payload = project_insufficient(
-                kind="docs_answer",
-                missing=["A mandatory support assignment could not be materialized safely."],
-                recommended_next_action=None,
-                max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-            )
-            payload["reason_code"] = "support_assignment_not_materialized"
-            return payload, snapshot
-    if decision.status != "ok" or not sources or retrieval_issues:
-        missing = list(decision.missing_requirements)
-        missing.extend(decision.unresolved_conflicts)
-        missing.extend(retrieval_issues)
-        missing.append(str(retrieval.get("message") or "No complete source-backed documentation answer is available."))
-        payload = project_insufficient(
-            kind="docs_answer", missing=missing,
-            recommended_next_action=retrieval.get("next_action"), max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        )
-        payload.update(support)
-        if not payload.get("reason_code") and retrieval.get("reason_code"):
-            payload["reason_code"] = retrieval["reason_code"]
-        bound_insufficient_projection(
-            payload, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        )
-        return payload, snapshot
-
-    answer, answer_evidence_ids, answer_limited = _answer_text(
-        question,
-        retrieval,
-        sources,
-        require_all_sources=has_canonical_selection,
-    )
-    if has_canonical_selection:
-        answer_evidence_ids = list(decision.support_decision.selected_evidence_ids)
-    omitted_counts = {"sources": omitted} if omitted else {}
-    if answer_limited:
-        omitted_counts["answer_details"] = 1
+    # Incompleteness is not a source-safety failure. Confirmation, trust and
+    # technical eligibility still fail closed; answer availability does not.
+    if (retrieval.get("requires_confirmation")
+        or retrieval.get("status") == "confirmation_required" or decision.unresolved_conflicts):
+        sources, snapshot = [], {}
     payload: dict[str, Any] = {
         "status": "ok",
         "kind": "docs_answer",
-        "answer": answer,
-        "answer_evidence_ids": answer_evidence_ids,
+        "retrieval_only": True,
+        "answer_policy": "cite_only",
+        "answer_supported": False, "answer_available": False, "edit_ready": False,
+        "support_status": "insufficient_evidence", "reason_code": "context_only",
+        "context_available": bool(sources),
+        "satisfied_requirement_ids": [], "selected_evidence_ids": [],
+        "mandatory_coverage": 0.0, "evidence_coverage": 0.0,
         "sources": sources,
-        "omitted_counts": omitted_counts,
-        **support,
+        "omitted_counts": {"sources": omitted} if omitted else {},
         "estimated_tokens": 0,
     }
-    if answer_limited:
-        payload["limitations"] = [_ACTIONABLE_LIMITATION]
+    limit = min(DOCS_ANSWER_MAX_TOKENS, max_tokens)
+    while sources and estimate_projection_tokens(payload) > limit:
+        dropped = sources.pop()
+        snapshot.pop(dropped["evidence_id"], None)
+        omitted += 1
+        payload["omitted_counts"] = {"sources": omitted}
+    payload["context_available"] = bool(sources)
+    if not sources:
+        return project_insufficient(
+            kind="docs_answer", missing=["No safe bounded selected context is available."],
+            recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, limit),
+        ), {}
     _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > min(DOCS_ANSWER_MAX_TOKENS, max_tokens):
-        fallback = project_insufficient(
-            kind="docs_answer", missing=["Selected evidence exceeds the answer budget."],
-            recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        )
-        fallback.update(support)
-        bound_insufficient_projection(
-            fallback, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        )
-        return fallback, snapshot
     return payload, snapshot
+
+
+def _explicit_delivery_block(
+    retrieval: dict[str, Any], *, kind: str, max_tokens: int,
+) -> dict[str, Any] | None:
+    """Keep explicit operational/consent vetoes ahead of quote recovery."""
+    delivery = retrieval.get("delivery_decision")
+    delivery = delivery if isinstance(delivery, dict) else {}
+    confirmation = bool(retrieval.get("requires_confirmation")
+                        or retrieval.get("status") == "confirmation_required")
+    if not confirmation and delivery.get("deliverable") is not False:
+        return None
+    reason = str(delivery.get("reason_code") or retrieval.get("reason_code")
+                 or ("confirmation_required" if confirmation else "delivery_blocked"))[:120]
+    payload = project_insufficient(
+        kind=kind, missing=[reason], recommended_next_action=None,
+        max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+    )
+    payload.update(
+        reason_code=reason, context_available=False, answer_supported=False,
+        answer_available=False, edit_ready=False, support_status="insufficient_evidence",
+        requires_confirmation=confirmation,
+        delivery_decision={"deliverable": False, "reason_code": reason},
+    )
+    if retrieval.get("confirmation_reason"):
+        payload["confirmation_reason"] = str(retrieval["confirmation_reason"])[:120]
+    if retrieval.get("status"):
+        payload["operational_status"] = str(retrieval["status"])[:120]
+    bound_insufficient_projection(payload, max_tokens=max_tokens)
+    return payload
 
 
 def _requested_exact_version(retrieval: dict[str, Any]) -> str | None:
@@ -629,6 +718,8 @@ def project_insufficient(
         "missing": messages or [_MINIMAL_MISSING],
         "estimated_tokens": 0,
     }
+    if kind == "docs_answer":
+        payload.update(answer_supported=False, answer_available=False, edit_ready=False)
     if kind == "docs_context":
         from .context_quality import context_quality
         payload["context_quality"] = context_quality(sources=())
@@ -660,6 +751,8 @@ def validate_model_visible_projection(
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
+    if kind == "docs_answer" and status in {"ok", "truncated"} and payload.get("retrieval_only") is not True:
+        errors.append("docs answer projection requires current retrieval-only policy")
     limit = (
         min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens)
         if status == "insufficient_evidence"
@@ -762,7 +855,16 @@ def validate_model_visible_projection(
             if source.get(key) != expected.get(key):
                 errors.append(f"projection source {key} does not match the internal snapshot")
         ids.add(evidence_id)
-    if kind == "docs_answer":
+    if kind == "docs_answer" and payload.get("retrieval_only") is True:
+        if (payload.get("answer_supported") is not False
+            or payload.get("answer_available") is not False or payload.get("edit_ready") is not False
+            or payload.get("answer_policy") != "cite_only"):
+            errors.append("retrieval-only docs quotes must not authorize answers or edits")
+        if (payload.get("answer") or payload.get("answer_evidence_ids")
+            or payload.get("selected_evidence_ids") or payload.get("satisfied_requirement_ids")
+            or payload.get("mandatory_coverage") != 0.0 or payload.get("evidence_coverage") != 0.0):
+            errors.append("retrieval-only docs quotes must not claim proof coverage")
+    elif kind == "docs_answer":
         answer_refs = payload.get("answer_evidence_ids")
         if not isinstance(answer_refs, list) or not answer_refs or any(ref not in ids for ref in answer_refs):
             errors.append("docs_answer claims require valid evidence IDs")

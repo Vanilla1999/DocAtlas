@@ -14,27 +14,6 @@ from docmancer.docs.domain.project_answer_contract import LifecycleIntent
 CoverageKind = Literal["direct", "derived"]
 
 
-_COMPARISON_RELATION_MARKERS = frozenset({"different", "separate"})
-_GENERAL_COMPARISON_RELATION_RE = re.compile(
-    r"(?:"
-    r"\b(?:differs?|differed|differing|whereas)\b|"
-    r"\b(?:different|distinct|separate)\s+from\b|"
-    r"\b(?:are|is|was|were|remain(?:s|ed)?|become(?:s)?|became)\s+"
-    r"(?:different|distinct|separate)\b|"
-    r"\brather\s+than\b|\binstead\s+of\b|\bnot\s+the\s+same\b|"
-    r"\bno\s+distinction\b"
-    r")",
-    re.I,
-)
-_PROOF_INSUFFICIENCY_RELATION_RE = re.compile(
-    r"(?:"
-    r"\b(?:not|never)\b[^.!?\n]{0,40}\b(?:enough|sufficient)\b"
-    r"[^.!?\n]{0,48}\b(?:prove|support|establish|answer|cover)\w*\b|"
-    r"\b(?:does|do|did|is|are|was|were)\s+not\b[^.!?\n]{0,56}"
-    r"\b(?:prove|support|establish|certif|sufficien)\w*\b"
-    r")",
-    re.I,
-)
 
 
 def _clean_relation_line(value: str) -> str:
@@ -126,10 +105,7 @@ def _relation_units(body: str) -> tuple[str, ...]:
 
 
 def _comparison_relation_probe(query_id: str, query_text: str) -> bool:
-    if not query_id.startswith("query-relation-"):
-        return False
-    tokens = tuple(re.findall(r"[A-Za-z]+", query_text.casefold()))
-    return len(tokens) >= 2 and tuple(tokens[-2:]) == ("different", "separate")
+    return False
 
 
 def _relation_term_count(text: str, terms: tuple[str, ...]) -> int:
@@ -173,20 +149,7 @@ def _general_relation_is_locally_bound(
 
 
 def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
-    """Require the visible relation to be local to the requested concepts."""
-    for sentence in re.split(r"[.!?\n]+", text):
-        sentence = sentence.strip()
-        if not sentence:
-            continue
-        for clause in (value.strip() for value in sentence.split(";")):
-            if not clause:
-                continue
-            for match in _PROOF_INSUFFICIENCY_RELATION_RE.finditer(clause):
-                if _proof_relation_is_locally_bound(clause, match, terms):
-                    return True
-            for match in _GENERAL_COMPARISON_RELATION_RE.finditer(clause):
-                if _general_relation_is_locally_bound(clause, match, terms):
-                    return True
+    """Literal matching cannot establish comparison entailment."""
     return False
 
 
@@ -276,6 +239,7 @@ def qualify_evidence(
     candidate: Mapping[str, Any] | None = None,
     expected_project_identity: str | None = None,
     lifecycle_intent: LifecycleIntent = "current",
+    authoritative_query: Mapping[str, Any] | None = None,
 ) -> EvidenceQualification:
     """Qualify one retrieval probe against evidence visible to the model."""
     # Body-bound decisions belong to the current bytes, never the incoming trace.
@@ -293,10 +257,45 @@ def qualify_evidence(
     )
     if policy_reason is not None:
         return _rejected(result, policy_reason)
+    expected_origin = (
+        "original" if query_id == "query-original" else
+        "host_lookup" if re.fullmatch(r"query-lookup-[1-5]", query_id) else None
+    )
+    expected_relation = "direct" if expected_origin == "original" else "host_lookup"
+    if (query_id.startswith("query-need-") or
+        (probe.get("query_origin") in ("original", "host_lookup") and
+         (expected_origin != probe.get("query_origin") or
+          probe.get("relation") != expected_relation))):
+        return _rejected(result, "query_contract_mismatch")
+    if authoritative_query is not None and (
+        authoritative_query.get("query_id") != query_id
+        or authoritative_query.get("origin") != expected_origin
+        or authoritative_query.get("relation") != expected_relation
+        or authoritative_query.get("text") != probe.get("query_text")
+        or authoritative_query.get("public_parent_query_id")
+        or probe.get("query_origin") != expected_origin
+        or probe.get("relation") != expected_relation
+    ):
+        return _rejected(result, "query_contract_mismatch")
+    public_credit = bool(expected_origin and authoritative_query is not None and not probe.get("admission_only"))
+    if not public_credit:
+        # Helper matches can still inform diagnostics/local formatting, but an
+        # anonymous trace cannot stand in for a public request contract.
+        result["admission_only"] = True
+    if (
+        probe.get("query_origin") not in (None, "", "original", "host_lookup")
+        or probe.get("relation") not in (None, "", "direct", "host_lookup")
+        or probe.get("public_parent_query_id")
+        or probe.get("derived_from_query_id")
+        or probe.get("derived_from_query_ids")
+    ):
+        return _rejected(result, "nonliteral_retrieval_lane")
     body = evidence_text if evidence_text is not None else visible_text
     from .query_reference_binding import prepare_reference_probe
     probe, reference_reason = prepare_reference_probe(probe, candidate=candidate, evidence_text=body)
     result = dict(probe)
+    if not public_credit:
+        result["admission_only"] = True
     if reference_reason is not None:
         return _rejected(result, reference_reason)
     lines = body.splitlines()
@@ -346,7 +345,6 @@ def qualify_evidence(
     normalized_headings = "\n".join(heading_lines).casefold()
 
     relation_text = str(probe.get("query_text") or "").casefold()
-    comparison_relation = _comparison_relation_probe(query_id, relation_text)
     if query_id.startswith("query-relation-"):
         negated_state = re.search(
             r"(?<!\w)(?:not|without|never|no)(?!\w)\s+([a-z][a-z0-9_-]{2,})\s*$",
@@ -370,8 +368,8 @@ def qualify_evidence(
         )
         return EvidenceQualification(
             qualified,
-            (query_id,) if qualified else (),
-            _coverage_kind(probe) if qualified else None,
+            (query_id,) if qualified and public_credit else (),
+            _coverage_kind(probe) if qualified and public_credit else None,
             str(result["qualification_reason"]),
             result,
         )
@@ -386,11 +384,6 @@ def qualify_evidence(
                 r"[A-Za-zА-Яа-яЁё0-9_.-]{4,}", str(probe.get("query_text") or ""),
             )
         ))
-    if comparison_relation:
-        terms = tuple(term for term in terms if term not in _COMPARISON_RELATION_MARKERS)
-        relation_units = _relation_units(body)
-        if not any(_visible_comparison_relation(unit, terms) for unit in relation_units):
-            return _rejected(result, "missing_visible_comparison_relation")
     if not terms:
         return _rejected(result, "missing_visible_query_terms")
 
@@ -460,7 +453,7 @@ def qualify_evidence(
     ratio = len(matched) / len(terms)
     required_ratio = (
         1.0 if len(terms) == 1
-        else 0.4 if exact_terms or comparison_relation
+        else 0.4 if exact_terms
         else 0.5
     )
     qualified = bool(matched) and ratio >= required_ratio and not missing_exact
@@ -479,26 +472,13 @@ def qualify_evidence(
         "qualified": qualified,
         "qualification_reason": reason,
     })
-    from .admission_contract import choose_need_admission
-    decision, witness = choose_need_admission(
-        probe, query_id=query_id, text=body,
-        legacy_qualified=qualified, missing_exact=missing_exact,
-    )
-    qualified = decision.admitted
-    # Preserve old reason text on unsupported legacy forms.
-    if decision.route != "legacy_strict":
-        reason = decision.reason
-    if witness.status != "unknown" or probe.get("query_origin") == "retrieval_need":
-        result.update(qualified=qualified, qualification_reason=reason,
-            admission_route=decision.route, matched_need_ids=list(decision.matched_need_ids))
-    if decision.route == "typed_local":
-        result.update(need_local_witness=True,
-            need_witness_spans=[list(span) for span in witness.spans],
-            need_witness_source_key=witness.source_key)
+    # Honest crop-local lexical retrieval attribution only. Do not compile the
+    # question into semantic needs or upgrade a quote to typed answer proof.
+    result["context_only"] = True
     return EvidenceQualification(
         qualified,
-        (query_id,) if qualified else (),
-        _coverage_kind(probe) if qualified else None,
+        (query_id,) if qualified and public_credit else (),
+        _coverage_kind(probe) if qualified and public_credit else None,
         reason,
         result,
     )
@@ -520,23 +500,8 @@ def qualify_visible_trace(
 def derived_parent_trace(
     trace: Mapping[str, Any], *, source_query_id: str, parent_query_id: str,
 ) -> dict[str, Any] | None:
-    """Derive parent coverage only from a qualified audited rewrite."""
-    if (
-        trace.get("qualified") is not True
-        or trace.get("relation") != "audited_rewrite"
-        or not parent_query_id
-        or bool(trace.get("missing_parent_exact_terms"))
-    ):
-        return None
-    result = dict(trace)
-    result.update({
-        "query_id": parent_query_id,
-        "coverage_kind": "derived",
-        "coverage_kinds": ["derived"],
-        "derived_from_query_id": source_query_id,
-        "derived_from_query_ids": [source_query_id],
-    })
-    return result
+    """Independent lookups never confer coverage on another query lane."""
+    return None
 
 
 def _bound_table_context(rows: list[tuple[str, str]], exact_terms: tuple[str, ...]) -> str:

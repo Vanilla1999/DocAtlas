@@ -30,22 +30,7 @@ def _certification_semantic_text(text: str) -> str:
 
 
 def _attribute_aliases(attribute: str | None) -> tuple[str, ...]:
-    normalized = _normal(attribute)
-    aliases = {
-        "python version": ("python version", "requires-python", "python_requires", "python requirement", "python"),
-        "version": ("version", "requires", "runtime"),
-        "timeout": ("timeout", "time-out", "deadline", "request timeout", "timeout_seconds", "timeout_ms", "время ожидания", "тайм-аут"),
-        "status": ("status", "state", "статус", "состояние"),
-        "public tools": ("public tools", "tools", "commands", "methods", "инструменты", "команды"),
-        "scope": ("scope", "scopes", "область", "области"),
-        "marker": ("marker", "markers", "test marker", "test markers", "pytest marker", "pytest markers"),
-        "source": ("source", "sources", "source type", "source types"),
-        "file format": (
-            "file format", "file formats", "document format", "document formats",
-            "local file format", "local file formats",
-        ),
-    }
-    return aliases.get(normalized, (attribute,) if attribute else ())
+    return (attribute,) if attribute else ()
 
 
 def _attribute_present(attribute: str | None, text: str) -> bool:
@@ -53,26 +38,11 @@ def _attribute_present(attribute: str | None, text: str) -> bool:
 
 
 def _inventory_anchor(text: str, item_kind: str | None = None) -> re.Match[str] | None:
-    if not item_kind or item_kind == "public_tool":
-        return _TOOL_INVENTORY_ANCHOR_RE.search(text)
-    forms = controlled_noun_forms(item_kind)
-    if not forms:
+    if not item_kind:
         return None
-    variants = set(forms)
-    singular = forms[-1]
-    if re.fullmatch(r"[a-z][a-z0-9_-]{2,}", singular) and not singular.endswith("s"):
-        variants.add(singular + "s")
-    if singular == "scope":
-        variants.update(("scope", "scopes", "область", "области"))
-    elif singular == "mode":
-        variants.update(("mode", "modes", "режим", "режимы"))
-    elif singular == "option":
-        variants.update(("option", "options", "опция", "опции"))
     pattern = re.compile(
-        r"(?<![A-Za-zА-Яа-яЁё0-9_-])(?:"
-        + "|".join(re.escape(value) for value in sorted(variants, key=lambda value: (-len(value), value)))
-        + r")(?![A-Za-zА-Яа-яЁё0-9_-])",
-        re.I,
+        r"(?<![A-Za-zА-Яа-яЁё0-9_-])" + re.escape(item_kind)
+        + r"(?![A-Za-zА-Яа-яЁё0-9_-])",
     )
     return pattern.search(text)
 
