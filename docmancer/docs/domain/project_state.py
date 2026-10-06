@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from docmancer.docs.domain.source_map import build_project_repo_map
+from docmancer.docs.domain.source_map import collect_project_source_facts
 
 
 PROJECT_DOCS_HANDOFF_MAX_BYTES = 12 * 1024
@@ -262,7 +262,12 @@ def _documentation_gap_evidence(root: Path, query: str | None) -> list[dict[str,
     ]
     source_paths = [
         str(item.get("path"))
-        for item in build_project_repo_map(root, question=query or "architecture", max_files=6, token_budget=800)
+        # Gap inspection may retain unmatched structural context, not invent a
+        # retrieval topic or claim that these paths support the original query.
+        for item in collect_project_source_facts(
+            root, question=query if query is not None else "",
+            max_files=6, token_budget=800, include_unmatched=True,
+        )
         if item.get("path")
     ]
     evidence = []
@@ -322,7 +327,7 @@ def evaluate_documentation_sections(
 
 def create_project_docs_next_action(root: Path, query: str | None = None, *, reason: str | None = None) -> dict[str, Any]:
     get_docs_context_args = {"project_path": str(root)}
-    if query:
+    if query is not None:
         get_docs_context_args["question"] = query
     evidence_to_collect = _documentation_gap_evidence(root, query)
     required_sections = [
@@ -413,6 +418,6 @@ def project_docs_structured_next_action(
             user_message,
         )
     get_context_args = {"project_path": str(root)}
-    if query:
+    if query is not None:
         get_context_args["question"] = query
     return (None, False, None, get_context_args, "Project documentation is indexed and ready.", None)

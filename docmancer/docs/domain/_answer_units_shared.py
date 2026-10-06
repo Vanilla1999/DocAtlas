@@ -49,13 +49,8 @@ _SENTENCE_RE = re.compile(r".+?(?:[.!?](?=\s|$)|$)")
 _PARAGRAPH_SENTENCE_RE = re.compile(r".+?(?:[.!?](?=\s|$)|$)", re.S)
 _IDENTIFIER_RE = re.compile(r"`([^`\n]{2,120})`|\b([A-Za-z_][A-Za-z0-9_.:-]{2,})\b")
 
-# Negative guard only. It is not used to infer a positive relation.
-_NEGATION_RE = re.compile(
-    r"\b(?:does|do|did|is|are|was|were|should|must|can|could|would|will)\s+not\b"
-    r"|\b(?:never|cannot|can't|mustn't|shouldn't)\b"
-    r"|\b(?:не\s+следует|не\s+нужно|нельзя|никогда\s+не)\b",
-    re.I,
-)
+# Negative ABI only: every unknown prose input retains the veto uniformly.
+_NEGATION_RE = re.compile(r"")
 
 # Keep existing exported symbols/imports without keeping NL detectors. In
 # particular admission_local_binding imports _DURATION_RE; it must fail closed

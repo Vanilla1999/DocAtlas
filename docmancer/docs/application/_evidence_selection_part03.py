@@ -227,7 +227,11 @@ def select_evidence(
         ordered = ordered[:config.max_candidates]
     deduped, dedupe_omissions = _deduplicate(ordered, config, requirements)
     omissions.extend(dedupe_omissions)
-    conflicts = _authority_conflicts(deduped)
+    conflict_review_required = bool(_authority_conflicts(deduped))
+    # Unknown agreement is an unresolved requirement, not a proven conflict.
+    # Actual conflicts suppress context in downstream projections; unknown
+    # agreement must retain the quote without becoming an all-pass decision.
+    conflicts: set[str] = set()
     mandatory = {item.requirement_id for item in requirements if item.mandatory}
     selected, missing, selection_omissions = _reserve_and_select(
         deduped,
@@ -235,6 +239,8 @@ def select_evidence(
         config,
         prefer_proof_completeness=compositional_question,
     )
+    if conflict_review_required:
+        missing.add("unresolved_authority_conflict:manual_review")
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
     bounded_materialization_failed = config.result_kind == "docs_answer" and (
@@ -407,7 +413,7 @@ def select_evidence(
         None if status == "ok" else
         unresolved_reason if unresolved_reason else
         "bounded_evidence_not_materializable" if bounded_materialization_failed else
-        "authority_conflict" if conflicts else
+        "manual_review_required" if conflict_review_required else
         "required_evidence_missing" if missing else
         "no_eligible_evidence"
     )

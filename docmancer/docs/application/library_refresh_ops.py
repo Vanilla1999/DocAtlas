@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import nullcontext
+from copy import deepcopy
 
 import json
 import logging
@@ -14,6 +15,7 @@ import time
 
 from docmancer.docs.models import RefreshResult
 from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
+from docmancer.docs.finite_membership import preflight_target_urls, selected_robots, validate_target_collections
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.application.library_index_publication import LibraryIndexPublication
 from docmancer.docs.application.library_ingest_ports import LibraryRefreshPorts
@@ -90,6 +92,7 @@ class LibraryRefreshOps:
         lock_held: bool = False,
     ) -> RefreshResult:
         started = self.ports.monotonic()
+        record = deepcopy(record)
         if not record.docs_url:
             return RefreshResult(
                 library_id=record.library_id,
@@ -120,7 +123,7 @@ class LibraryRefreshOps:
                 targets_completed=1,
             )
 
-        target = self.ports.target_from_record(record)
+        target = deepcopy(self.ports.target_from_record(record))
         source_manifest = target.source_manifest or {}
         discovery = source_manifest.get("discovery")
         unresolved_github_directory = (
@@ -135,16 +138,11 @@ class LibraryRefreshOps:
             and "resolved_commit_sha" not in discovery
         )
         if unresolved_github_directory:
-            target = self.ports.resolve_github_directory_target(target)
-            resolved_urls, target_error = self.ports.target_urls(target)
-            if target_error:
-                raise ValueError(target_error)
-            resolved_spec = self.ports.target_to_spec(target, resolved_urls)
-            record = LibraryRecord(
-                **{
-                    **record.__dict__,
-                    "target_spec": {**(record.target_spec or {}), **resolved_spec},
-                }
+            return RefreshResult(
+                library_id=record.library_id, status="needs_source_manifest",
+                docs_url=record.docs_url, version=record.version,
+                source_type=record.source_type, targets_failed=1,
+                message="resolved_github_manifest_required",
             )
         manifest = (
             normalize_resolved_github_manifest(target.source_manifest)
@@ -177,11 +175,18 @@ class LibraryRefreshOps:
         discovery_diagnostics: list[dict[str, Any]] = []
         fetch_failure: Exception | None = None
         try:
-            urls = self.ports.record_urls(record)
-            direct_text_operations = target.doc_format == "direct-text"
-            seed_urls_for_discovery = [] if direct_text_operations else list(target.seed_urls)
-            if seed_urls_for_discovery and (target.docs_url or target.docs_url_template):
-                urls = urls[:1]
+            validate_target_collections(record.target_spec or {})
+            # Revalidate the explicit target, not a legacy resolved/discovered
+            # URL cache or record_urls' fallback on target validation errors.
+            urls, target_error = self.ports.target_urls(target)
+            if target_error:
+                raise ValueError(target_error)
+            urls = list(preflight_target_urls(
+                urls, max_pages=target.max_pages,
+                allowed_domains=target.allowed_domains, path_prefixes=target.path_prefixes,
+                source_manifest=manifest, cancellation_callback=should_cancel, deadline_at=deadline_at,
+            ))
+            # Resolved roots and seeds are whole-document members, not subtrees.
             per_url_max_pages = target.max_pages if target.doc_format == "dartdoc" else (1 if target.seed_urls and not target.docs_url and not target.docs_url_template else target.max_pages)
             agent = self.ports.agent_gateway.agent_for_config(staging[0]) if staging else self.ports.agent_instance(record)
 
@@ -193,7 +198,10 @@ class LibraryRefreshOps:
                     max_pages=per_url_max_pages,
                     strategy=(None if target.discovery_strategy in {None, "auto"} else target.discovery_strategy),
                     browser=target.browser,
-                    seed_urls=seed_urls_for_discovery if (target.docs_url or target.docs_url_template) else None,
+                    exact_urls=[url],
+                    robots_urls=selected_robots(urls),
+                    doc_format=target.doc_format,
+                    query=target.query,
                     allowed_domains=target.allowed_domains,
                     path_prefixes=target.path_prefixes,
                     metadata=_metadata_for_record(record),

@@ -13,45 +13,26 @@ import hashlib
 import re
 from urllib.parse import unquote, urlparse, urljoin
 
-from w3lib.url import canonicalize_url
-
 # URL path patterns to exclude (compiled for performance).
 _BLOCKLIST_PATTERNS: list[re.Pattern[str]] = [
     re.compile(p)
     for p in [
-        r"/blog(/|$)",
-        r"/changelog(/|$)",
-        r"/release-notes(/|$)",
-        r"/status(/|$)",
-        r"/pricing(/|$)",
         r"/login(/|$)",
         r"/signup(/|$)",
         r"/register(/|$)",
         r"/sign-in(/|$)",
         r"/sign-up(/|$)",
         r"/account(/|$)",
-        r"/settings(/|$)",
-        r"/search(\?|$)",
-        r"[?&]print",
-        r"/_print(/|$)",
-        r"/print\.html",
         r"\.(pdf|zip|tar|gz|png|jpg|jpeg|gif|svg|mp4|mp3|woff|woff2|ttf|eot|ico)$",
     ]
 ]
-
-# Query parameters to strip (tracking/noise).
-_STRIP_PARAMS = {"utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
-                 "ref", "from", "source", "fbclid", "gclid"}
-
 
 def normalize_url(url: str) -> str:
     """Normalize a URL for consistent comparison.
 
     - Lowercases scheme and host
     - Removes fragments
-    - Strips tracking query parameters
-    - Removes trailing slash (except for root path)
-    - Applies w3lib canonicalization
+    - Preserves query parameters, order and trailing slashes as source identity
 
     Args:
         url: The URL to normalize.
@@ -61,51 +42,8 @@ def normalize_url(url: str) -> str:
     """
     # Strip fragment
     url = url.split("#")[0]
-
-    # Use w3lib for RFC-correct canonicalization
-    url = canonicalize_url(url, keep_fragments=False)
-
-    # Strip tracking params
-    parsed = urlparse(url)
-    if parsed.query:
-        params = parsed.query.split("&")
-        filtered = [p for p in params if p.split("=")[0] not in _STRIP_PARAMS]
-        query = "&".join(filtered)
-        url = parsed._replace(query=query).geturl()
-
-    # Remove trailing slash (but keep root "/")
-    if url.endswith("/") and urlparse(url).path != "/":
-        url = url.rstrip("/")
-
-    return url
-
-
-_LOCALE_PREFIXES = {
-    "ar",
-    "bn",
-    "de",
-    "es",
-    "fr",
-    "id",
-    "it",
-    "ja",
-    "ko",
-    "nl",
-    "pl",
-    "pt",
-    "pt-br",
-    "ru",
-    "tr",
-    "uk",
-    "vi",
-    "zh-hans",
-    "zh-hant",
-}
-
-
-def _is_locale_segment(segment: str) -> bool:
-    return segment.lower().replace("_", "-") in _LOCALE_PREFIXES
-
+    from docmancer.docs.finite_membership import exact_url
+    return exact_url(url)
 
 def _starts_with_parts(parts: list[str], prefix: list[str]) -> bool:
     return len(parts) >= len(prefix) and parts[: len(prefix)] == prefix
@@ -183,21 +121,8 @@ def is_docs_url(url: str, base_url: str, locale_skip_counter: list[int] | None =
     if scope_path and url_path != scope_path and not url_path.startswith(scope_path + "/"):
         return False
 
-    # Default web/Docusaurus ingest should not pull translated mirrors when
-    # the seed is the canonical English root. Users can still opt into a
-    # locale by seeding that locale path directly, e.g. /ru/docs.
-    url_parts = [part.lower() for part in parsed.path.split("/") if part]
-    base_parts = [part.lower() for part in base_parsed.path.split("/") if part]
-    base_has_locale = any(_is_locale_segment(part) for part in base_parts)
-    scope_parts = [part.lower() for part in scope_path.split("/") if part]
-    relative_parts = url_parts[len(scope_parts) :] if scope_parts and _starts_with_parts(url_parts, scope_parts) else url_parts
-    if relative_parts and _is_locale_segment(relative_parts[0]) and not base_has_locale:
-        if locale_skip_counter is not None:
-            locale_skip_counter[0] += 1
-        return False
-
     # Must not match blocklist
-    full_url = parsed.path + ("?" + parsed.query if parsed.query else "")
+    full_url = parsed.path
     for pattern in _BLOCKLIST_PATTERNS:
         if pattern.search(full_url):
             return False

@@ -618,7 +618,7 @@ def _add_mandatory_requirement_witnesses(
         ]
         while remaining:
             witness = _requirement_witness(
-                _content_text(evidence), [requirement.value for requirement in remaining]
+                candidate.display_text, [requirement.value for requirement in remaining]
             )
             if not witness or _content_instruction_risk_flags(witness):
                 break
@@ -707,50 +707,12 @@ def _requirement_witness(content: str, values: list[str]) -> str:
 
 
 def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
-    facts: list[tuple[str, str]] = []
-    omitted_critical = 0
-    in_fence = False
-    python_declaration_lines = python_declaration_line_indexes(content)
-    for line_index, raw in enumerate(content.splitlines()):
-        if line_index in python_declaration_lines:
-            continue
-        stripped = raw.strip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            continue
-        if (
-            in_fence
-            or stripped.startswith(">")
-            or stripped.startswith("#")
-            or (stripped.startswith("|") and stripped.count("|") >= 2)
-        ):
-            continue
-        line = stripped.lstrip("-* ").strip().replace("`", "")
-        if not line:
-            continue
-        segments = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", line)
-        for segment in segments:
-            fact = segment.strip()
-            if not fact:
-                continue
-            modality = classify_normative_modality(fact)
-            looks_critical = bool(
-                modality
-                or _validation_command(fact)
-            )
-            if len(fact) > 500:
-                omitted_critical += int(looks_critical)
-                continue
-            if modality == "forbidden":
-                facts.append((modality, fact))
-                continue
-            command = _validation_command(fact)
-            if command:
-                facts.append(("validation", command))
-                continue
-            if modality == "required":
-                facts.append((modality, fact))
-    return facts, omitted_critical
+    """Compatibility adapter: quotes are data, not inferred policy or commands.
+
+    Even exact command grammar supplies no runnable validation intent. Keep
+    bounded quotes through the visible source path instead of fact categories.
+    """
+    return [], 0
 
 
 def _validation_command(value: str) -> str | None:

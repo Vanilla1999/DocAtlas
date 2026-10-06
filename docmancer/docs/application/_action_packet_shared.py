@@ -19,10 +19,6 @@ from docmancer.docs.application.evidence_selection import (
     select_evidence,
 )
 from docmancer.docs.application.evidence_requirements import build_patch_evidence_requirements
-from docmancer.docs.domain.normative_language import (
-    classify_normative_modality,
-    python_declaration_line_indexes,
-)
 from docmancer.docs.domain.mutation_intent import (
     MutationIntentContract,
     build_mutation_intent,
@@ -40,7 +36,7 @@ HARD_ACTION_PACKET_TOKENS = 2_000
 MIN_ACTION_PACKET_TOKENS = 128
 
 _VALIDATION_START_RE = re.compile(
-    r"^(?:run\s+)?(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|"
+    r"^(?:python\s+-m\s+(?:pytest|unittest|compileall)|pytest|"
     r"uv\s+run(?:\s+--offline)?\s+(?:pytest|ruff|mypy|python\s+-m\s+(?:pytest|unittest|compileall))|"
     r"npm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|pnpm\s+(?:test|run\s+[A-Za-z0-9_.:-]+)|"
     r"yarn\s+(?:test|run\s+[A-Za-z0-9_.:-]+|build)|cargo\s+(?:test|check|build)|"
@@ -56,6 +52,8 @@ _SYMBOL_RE = re.compile(
 _CODE_SOURCE_CLASSES = {"repo_map", "source_evidence", "code_graph"}
 _MAX_SOURCE_PATH = 500
 _MAX_SOURCE_SECTION = 300
+# Retained negative-only safety NL debt, not a dictionary-free classifier.
+# No finding is not proof of safe content or permission to execute instructions.
 _DANGEROUS_CONTENT_PATTERNS = (
     (
         "credential_exfiltration_instruction",

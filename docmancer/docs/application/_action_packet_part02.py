@@ -8,8 +8,8 @@ from ._action_packet_part01 import _authority, _blocked_source_keys, _cited_evid
 def _authority_conflicts(
     items: Iterable[dict[str, Any]], trust_contract: dict[str, Any]
 ) -> list[tuple[str, str]]:
-    constraints: dict[str, dict[str, set[tuple[str, str]]]] = {}
     blocked_sources = _blocked_source_keys(trust_contract)
+    unresolved: set[tuple[str, str]] = set()
     for item in items:
         if (
             _authority(item) != "canonical"
@@ -19,30 +19,15 @@ def _authority_conflicts(
             or _item_source_keys(item) & blocked_sources
         ):
             continue
-        identity = _item_identity(item)
-        content = _content_text(item).strip()
-        facts, _ = _extract_facts(content)
-        for fact_type, fact in facts:
-            if fact_type not in {"required", "forbidden"}:
-                continue
-            signature = _constraint_signature(fact)
-            if signature:
-                constraints.setdefault(signature, {}).setdefault(fact_type, set()).add(identity)
-    conflicts: set[tuple[str, str]] = set()
-    for by_type in constraints.values():
-        if by_type.get("required") and by_type.get("forbidden"):
-            conflicts.update(by_type["required"])
-            conflicts.update(by_type["forbidden"])
-    return sorted(conflicts)
+        if _content_text(item).strip() and str(item.get("source_class") or "") not in _CODE_SOURCE_CLASSES:
+            unresolved.add(_item_identity(item))
+    # The compatibility DTO carries unresolved identities, not proven conflict.
+    return sorted(unresolved)
 
 
 def _constraint_signature(value: str) -> str:
-    normalized = re.sub(
-        r"\b(?:must|shall|required|requires?|invariant|do|not|never|forbidden|prohibited|this|is|be)\b",
-        " ",
-        value.lower(),
-    )
-    return " ".join(re.findall(r"[a-z0-9_]+", normalized))
+    """Literal bytes only; never erase negation to invent constraint identity."""
+    return str(value or "")
 
 
 def _may_guide_workflow(item: dict[str, Any]) -> bool:
@@ -130,19 +115,9 @@ def _prune_orphan_sources(
 
 
 def _has_behavioral_contract(packet: dict[str, Any]) -> bool:
-    raw_task = packet.get("task_interpretation")
-    task: dict[str, Any] = raw_task if isinstance(raw_task, dict) else {}
-    rows = [
-        *(task.get("acceptance_conditions") or []),
-        *(packet.get("required_invariants") or []),
-        *(packet.get("forbidden_changes") or []),
-        *(packet.get("implementation_guidance") or []),
-    ]
-    return any(
-        classify_normative_modality(str(row.get("text") or "")) is not None
-        for row in rows
-        if isinstance(row, dict)
-    )
+    # Explicit mutation/task DTOs are preserved elsewhere. Their existence, or
+    # rows of quoted prose, does not requalify a source behavioral proposition.
+    return False
 
 
 def _fit_packet(

@@ -213,14 +213,10 @@ def _best_subject(question: str, subjects: list[str], *, fallback: str) -> str:
 
 
 def _cardinality(question: str) -> int | None:
-    match = re.search(r"\b(?:exactly|ровно)?\s*(\d{1,2})\b", question, re.I)
+    match = re.search(r"(?<!\w)(\d{1,2})(?!\w)", question)
     if match:
         value = int(match.group(1))
         return value if 1 <= value <= 32 else None
-    normalized = _normal(question)
-    for word, value in _NUMBER_WORDS.items():
-        if re.search(rf"(?<!\w){re.escape(word)}(?!\w)", normalized):
-            return value
     return None
 
 

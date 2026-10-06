@@ -57,7 +57,6 @@ from docmancer.docs.domain.evidence_qualification import (
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
-from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
 
 
 def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
@@ -822,13 +821,9 @@ def _expand_selected_snippets(
             )
             if len(snippet) <= len(str(source.get("snippet") or "")):
                 continue
-            # Exact-identifier witnesses need retention even without a normative
-            # keyword. Optional fuzzy alias fragments may still be reselected;
-            # public attribution, component and assignment guards below apply.
-            preserve_span = any(
-                trace.get("qualified") is True and trace.get("exact_terms")
-                for trace in (source.get("retrieval_query_matches") or {}).values()
-            ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"]) or inline_command_literals(source["snippet"])
+            # Preserve the current bound quote uniformly, without interpreting
+            # wording. Requalification, assignment and budget guards still apply.
+            preserve_span = True
             retained_start = raw_snippet.find(source["snippet"])
             if preserve_span and (retained_start < 0
                     or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):

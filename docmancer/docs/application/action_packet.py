@@ -160,44 +160,8 @@ def _promote_trusted_behavioral_witnesses(
     packet: dict[str, Any],
     public_requirements: Iterable[Any],
 ) -> None:
-    """Route trusted project-rule witnesses to invariants after selector fitting."""
-
-    trusted_paths = {
-        str(row.get("source_path") or "").strip().replace("\\", "/").casefold()
-        for row in public_requirements
-        if isinstance(row, Mapping)
-        and str(row.get("kind") or "").casefold() == "source_fact"
-        and str(row.get("proof_role") or "").casefold() == "project_rule"
-    }
-    if not trusted_paths:
-        return
-    trusted_ids = {
-        str(row.get("evidence_id") or "")
-        for row in packet.get("source_of_truth") or []
-        if isinstance(row, Mapping)
-        and str(row.get("path") or "").strip().replace("\\", "/").casefold() in trusted_paths
-        and str(row.get("authority") or "").casefold() == "canonical"
-    }
-    if not trusted_ids:
-        return
-    retained_guidance: list[dict[str, Any]] = []
-    promoted: list[dict[str, Any]] = []
-    for row in packet.get("implementation_guidance") or []:
-        if not isinstance(row, dict):
-            continue
-        evidence_ids = {str(value) for value in row.get("evidence_ids") or []}
-        if evidence_ids & trusted_ids and classify_normative_modality(str(row.get("text") or "")) is not None:
-            promoted.append(row)
-        else:
-            retained_guidance.append(row)
-    if not promoted:
-        return
-    packet["implementation_guidance"] = retained_guidance
-    packet["required_invariants"] = _dedupe_dicts(
-        [*(packet.get("required_invariants") or []), *promoted],
-        ("text",),
-    )
-    _refresh_estimated_tokens(packet)
+    """Compatibility no-op: source identity is not behavioral proof."""
+    return
 
 
 def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:

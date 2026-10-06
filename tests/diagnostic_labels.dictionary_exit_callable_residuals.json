@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_callable_residuals.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_callable_residuals.py": "254a26168e2278859bdf35a9d1b5f14b16cb4b18a15b21acabf0809a72aa15e4"
+  }
+}

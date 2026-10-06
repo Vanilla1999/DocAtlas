@@ -150,7 +150,9 @@ def _deduplicate(
             )
             if distinct_versions:
                 continue
-            if _policy_polarity(candidate.display_text) != _policy_polarity(representative.display_text):
+            # Similarity or a shared parent cannot erase distinct quoted bytes,
+            # including a negation, punctuation or an unrecognized condition.
+            if candidate.display_text != representative.display_text:
                 continue
             has_new_symbols = bool(set(candidate.symbols) - set(representative.symbols))
             if candidate.stable_id == representative.stable_id or (
@@ -228,12 +230,8 @@ def _raw_candidate_binding(item: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _policy_polarity(value: str) -> str:
-    lowered = value.casefold()
-    if re.search(r"\b(?:must\s+not|do\s+not|never|forbidden|prohibited)\b", lowered):
-        return "forbidden"
-    if re.search(r"\b(?:must|required|shall)\b", lowered):
-        return "required"
-    return "neutral"
+    """Compatibility adapter: prose polarity is unknown, not neutral proof."""
+    return "unknown"
 
 
 def _overlap_millis(left: EvidenceCandidate, right: EvidenceCandidate) -> int:
@@ -437,21 +435,13 @@ def _selected_feature_trace(
 
 
 def _authority_conflicts(candidates: Sequence[EvidenceCandidate]) -> set[str]:
-    required: dict[str, set[str]] = {}
-    forbidden: dict[str, set[str]] = {}
-    for candidate in candidates:
-        if candidate.authority != "canonical":
-            continue
-        for line in candidate.display_text.splitlines():
-            normalized = " ".join(re.findall(r"[\w]+", line.casefold()))
-            if "must not" in line.casefold() or "never" in line.casefold() or "forbidden" in line.casefold():
-                key = re.sub(r"\b(?:must|not|never|forbidden|be)\b", " ", normalized)
-                forbidden.setdefault(" ".join(key.split()), set()).add(candidate.stable_id)
-            elif "must" in line.casefold() or "required" in line.casefold():
-                key = re.sub(r"\b(?:must|required|be)\b", " ", normalized)
-                required.setdefault(" ".join(key.split()), set()).add(candidate.stable_id)
-    return {
-        key for key in required.keys() & forbidden.keys() if key
+    """Canonical metadata does not prove agreement of source statements."""
+    quoted_bytes = {
+        candidate.display_text for candidate in candidates
+        if candidate.authority == "canonical" and candidate.display_text
     }
+    # A single literal window needs no cross-statement agreement inference.
+    # Multiple distinct windows cannot be certified compatible from wording.
+    return {"unresolved_authority_conflict:manual_review"} if len(quoted_bytes) > 1 else set()
 
 __all__=['_scope_requirement_value', '_facet_requirement_matches', '_code_group_fragments', '_candidate_code_blocks', '_code_group_requirement_matches', '_legacy_requirement_matches_unit', '_witness_for_requirement', '_with_canonical_policy_requirements', '_deduplicate', '_raw_candidate_binding', '_policy_polarity', '_overlap_millis', '_reserve_and_select', '_selected_feature_trace', '_authority_conflicts']

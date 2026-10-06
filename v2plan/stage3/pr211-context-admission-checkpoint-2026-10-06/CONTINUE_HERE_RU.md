@@ -2,6 +2,26 @@
 
 **Актуальный checkpoint: 2026-10-06. Полное удаление словарей ACTIVE / NOT DONE.**
 
+**Latest completed coordinated pass 2026-10-07:**
+[FINAL_FINITE_CORPUS_PARALLEL_RU.md](FINAL_FINITE_CORPUS_PARALLEL_RU.md) и
+[FINAL_INTEGRATED_EXIT_AUDIT_RU.md](FINAL_INTEGRATED_EXIT_AUDIT_RU.md).
+Remotefinite membership+callers+transport/identity corrections, R1–R10 иlocal
+source-map/project-state cleanup integrated/scopedapproved; boundedpublicationblockerNO.
+Allagentsfinished. Final1970dictionaryPASS/14FAIL,2080combinedPASS/17FAIL,
+oldmixed331PASS/311FAIL,MCPstdioPASS,qualityFAIL,frozen13/13match.
+FullEXITNO: R11/R12 LOCALcatalog/filemembership иnegative-securitypolicy choices
+остаютсяOPEN; remotefinite approval неразрешает localcorpusexpansion/guardremoval.
+Следующийdecision exactpaths in integratedaudit§6; retrievalquality/releasegates
+отдельно. Pendingactive заметки ниже historical. Rawgzip некоммитить/неудалять.
+
+**Active final pass 2026-10-07:**
+[FINAL_FINITE_CORPUS_PARALLEL_RU.md](FINAL_FINITE_CORPUS_PARALLEL_RU.md).
+Owner approved finite explicit URL/file membership без discovery expansion.
+Baseline42c72bd6; corpus/localresidual implementers и read-only full inventory
+запущены в3isolated worktrees. Никакого живого crawl/networkauthorization.
+Исторические «membership decision BLOCKED» ниже теперь superseded только finite
+implementation decision; конкретный membership не выдумывать, fail-closed absentset.
+
 **Latest completed 2026-10-07:**
 [IDENTITY_ADMISSION_PARALLEL_RU.md](IDENTITY_ADMISSION_PARALLEL_RU.md).
 Source identity/preference, core/admission literal cleanup иunknown adapter flags

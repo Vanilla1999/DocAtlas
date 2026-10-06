@@ -42,8 +42,8 @@ def _inventory_facts(
 
 
 def _contract_fact_disclaimer(text: str) -> bool:
-    # A negative guard is not a positive contract witness.
-    return bool(_NEGATION_RE.search(text))
+    # Unknown prose always retains the negative guard, regardless of wording.
+    return True
 
 
 def _contract_fact_relation_valid(text: str) -> bool:
@@ -80,13 +80,8 @@ def _predicate_has_local_value(match: re.Match[str], clause: str) -> bool:
 
 
 def _predicate_is_negated(match: re.Match[str], clause: str) -> bool:
-    """Retain the local negative guard without using it for approval."""
-    prefix = clause[max(0, match.start() - 48):match.start()]
-    return bool(re.search(
-        r"\b(?:not|never|cannot|can't|does\s+not|do\s+not|did\s+not|"
-        r"must\s+not|should\s+not|will\s+not|не|никогда\s+не|нельзя)\s+"
-        r"(?:\w+\s+){0,2}$", prefix, re.I,
-    ))
+    """Negative ABI adapter: unknown predicate cannot grant approval."""
+    return True
 
 
 def _definition_clause(obligation: ProofObligation, text: str) -> str | None:

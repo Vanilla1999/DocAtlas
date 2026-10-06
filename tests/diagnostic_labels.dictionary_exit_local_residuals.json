@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_local_residuals.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_local_residuals.py": "7e6638ecd1837b5aef4258417def41888f0e275681e3c97daf962a8947cd9be2"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_finite_corpus.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_finite_corpus.py": "0df6c1e4df8dfcd39f726adb040dfeaf9a3d504a3d29750bad671c546a30f0cf"
+  }
+}

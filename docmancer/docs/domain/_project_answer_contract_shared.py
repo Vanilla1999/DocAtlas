@@ -43,14 +43,8 @@ _IDENTIFIER_RE = re.compile(
     r"|\b([A-Z][A-Za-z0-9]*(?:[A-Z][A-Za-z0-9]*)+)\b"
 )
 
-# General numeric parsing is retained, not used to synthesize an obligation or
-# expected answer. The historical helper still enforces the cardinality bound.
-_NUMBER_WORDS = {
-    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
-    "seven": 7, "eight": 8, "nine": 9, "ten": 10,
-    "один": 1, "одна": 1, "два": 2, "две": 2, "три": 3, "четыре": 4,
-    "пять": 5, "шесть": 6, "семь": 7, "восемь": 8, "девять": 9, "десять": 10,
-}
+# ABI only; explicit bounded digits are parsed by _cardinality.
+_NUMBER_WORDS = {}
 
 
 __all__ = [name for name in globals() if not name.startswith('__')]

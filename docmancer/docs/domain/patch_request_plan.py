@@ -1,11 +1,10 @@
-"""Bounded, polarity-aware grammar for explicit patch requests."""
+"""Negative prose compatibility and bounded literal patch-target coordinates."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import re
 from typing import Any, Literal
 
-from docmancer.docs.domain.request_intent import find_change_clause
 from docmancer.docs.domain.canonical import canonical_hash
 
 
@@ -18,25 +17,6 @@ PatchOperation = Literal["modify", "create", "delete", "rename", "none"]
 PatchLanguage = Literal["en", "ru"]
 PatchTargetRole = Literal["mutate", "preserve", "destination", "parent"]
 
-_PATCH_PLAN_VERB = re.compile(
-    r"^(?:fix|update|modify|change|patch|implement|refactor|make|create|add|delete|remove|rename|"
-    r"исправ(?:ить|ь)|обнов(?:ить|и)|измен(?:ить|и)|реализова(?:ть|ть)|"
-    r"(?:от)?рефактор(?:ить|и)?|созда(?:ть|й)|добав(?:ить|ь)|удал(?:ить|и)|"
-    r"переименова(?:ть|й))$",
-    re.I,
-)
-_PRESERVE_HEAD = re.compile(
-    r"\b(?:without\s+(?:changing|modifying|editing|touching)|"
-    r"but\s+do\s+not\s+(?:change|modify|edit|touch)|"
-    r"do\s+not\s+(?:change|modify|edit|touch)|"
-    r"без\s+изменения|не\s+(?:изменяй|редактируй|трогай))\b",
-    re.I,
-)
-_ACCEPTANCE_HEAD = re.compile(r"\b(?:so\s+that|чтобы)\b", re.I)
-_BEHAVIOR_TARGET_HEAD = re.compile(r"\s+(?:in|across|в)\s+", re.I)
-_TARGET_BEHAVIOR_HEAD = re.compile(r"\s+for\s+", re.I)
-_RENAME_HEAD = re.compile(r"\s+to\s+", re.I)
-_CREATE_PARENT_HEAD = re.compile(r"\s+in\s+", re.I)
 _PATH_PATTERN = (
     r"(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\."
     r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp|md|mdx|rst|txt|adoc|toml|yaml|yml|json|ini|cfg|xml)"
@@ -49,9 +29,7 @@ _TARGET_RE = re.compile(
     rf"(?P<path>{_PATH_PATTERN})|(?P<qualified>{_QUALIFIED_PATTERN})|"
     rf"(?P<snake>{_SNAKE_PATTERN})|(?P<camel>{_CAMEL_PATTERN})|(?P<quoted>{_QUOTED_PATTERN})"
 )
-_LIST_SEPARATOR_RE = re.compile(
-    r"\s*(?:,\s*(?:(?:and|и)\s+)?|\s+(?:and|и)\s+)\s*", re.I,
-)
+_LIST_SEPARATOR_RE = re.compile(r"\s*,\s*")
 _TRAILING_PUNCTUATION_RE = re.compile(r"[\s.,;:!?]*$")
 
 
@@ -126,14 +104,8 @@ class PatchRequestPlan:
 
 
 def _operation(verb: str) -> PatchOperation:
-    value = verb.casefold()
-    if re.fullmatch(r"create|add|созда(?:ть|й)|добав(?:ить|ь)", value):
-        return "create"
-    if re.fullmatch(r"delete|remove|удал(?:ить|и)", value):
-        return "delete"
-    if re.fullmatch(r"rename|переименова(?:ть|й)", value):
-        return "rename"
-    return "modify"
+    # A verb supplied to the legacy prose helper is not typed mutation input.
+    return "none"
 
 
 def _target_list(
@@ -210,143 +182,8 @@ def build_patch_request_plan(question: str) -> PatchRequestPlan:
     language: PatchLanguage = "ru" if re.search(r"[А-Яа-яЁё]", raw) else "en"
     if len(source) > len(raw):
         return _unsupported(raw, language, "input_limit:question")
-    action = find_change_clause(raw)
-    if action is None or _PATCH_PLAN_VERB.fullmatch(action.verb) is None:
-        return _unsupported(raw, language, "unsupported_patch_surface")
-    operation = _operation(action.verb)
-    root_start = action.start
-    root_end = action.verb_end
-    preserve_match = _PRESERVE_HEAD.search(raw, root_end)
-    main_end = preserve_match.start() if preserve_match else len(raw)
-    acceptance_match = _ACCEPTANCE_HEAD.search(raw, root_end, main_end)
-    target_region_end = acceptance_match.start() if acceptance_match else main_end
-    body_start = root_end
-    while body_start < target_region_end and raw[body_start].isspace():
-        body_start += 1
-    unresolved: list[str] = []
-    consumed: list[tuple[int, int]] = [(root_start, root_end)]
-    behavior: list[PatchClause] = []
-    acceptance: list[PatchClause] = []
-    mutation_targets: tuple[PatchTarget, ...] = ()
-    preserve_targets: tuple[PatchTarget, ...] = ()
-    destination: PatchTarget | None = None
-    parent_context: PatchTarget | None = None
-    surface = f"imperative:{operation}:{language}:clause_aware"
-
-    if operation == "rename":
-        separator = _RENAME_HEAD.search(raw, body_start, target_region_end)
-        if separator is None:
-            unresolved.append("rename_destination_not_requested")
-        else:
-            sources, error = _target_list(raw, start=body_start, end=separator.start(), role="mutate")
-            destinations, destination_error = _target_list(raw, start=separator.end(), end=target_region_end, role="destination")
-            if error:
-                unresolved.append(error)
-            if destination_error:
-                unresolved.append(destination_error)
-            mutation_targets = sources
-            destination = destinations[0] if len(destinations) == 1 else None
-            if len(destinations) != 1:
-                unresolved.append("rename_destination_not_requested")
-            consumed.append((body_start, target_region_end))
-            surface += ":source_to_destination"
-    elif operation == "create":
-        separator = _CREATE_PARENT_HEAD.search(raw, body_start, target_region_end)
-        destination_end = separator.start() if separator else target_region_end
-        destinations, error = _target_list(raw, start=body_start, end=destination_end, role="destination")
-        if error:
-            unresolved.append(error)
-        destination = destinations[0] if len(destinations) == 1 else None
-        if len(destinations) != 1:
-            unresolved.append("create_target_not_requested")
-        if separator is not None:
-            parents, parent_error = _target_list(raw, start=separator.end(), end=target_region_end, role="parent")
-            if parent_error:
-                unresolved.append(parent_error)
-            parent_context = parents[0] if len(parents) == 1 else None
-            if len(parents) != 1:
-                unresolved.append("create_parent_not_requested")
-        else:
-            unresolved.append("create_parent_not_requested")
-        consumed.append((body_start, target_region_end))
-        surface += ":destination"
-    else:
-        target_start = body_start
-        behavior_separator = None
-        for candidate in _BEHAVIOR_TARGET_HEAD.finditer(raw, body_start, target_region_end):
-            parsed, error = _target_list(raw, start=candidate.end(), end=target_region_end, role="mutate")
-            if parsed and error is None:
-                behavior_separator = candidate
-                mutation_targets = parsed
-                target_start = candidate.end()
-        if behavior_separator is not None:
-            behavior.append(_clause("behavior", raw, body_start, behavior_separator.start()))
-            surface += ":behavior_in_targets"
-            if "across" in behavior_separator.group(0).casefold():
-                surface += ":across"
-        else:
-            for_separator = _TARGET_BEHAVIOR_HEAD.search(raw, body_start, target_region_end)
-            if for_separator is not None:
-                parsed, error = _target_list(raw, start=body_start, end=for_separator.start(), role="mutate")
-                if parsed and error is None:
-                    mutation_targets = parsed
-                    behavior.append(_clause("behavior", raw, for_separator.end(), target_region_end))
-                    surface += ":targets_for_behavior"
-            if not mutation_targets:
-                mutation_targets, error = _target_list(raw, start=body_start, end=target_region_end, role="mutate")
-                if error:
-                    unresolved.append(error)
-                surface += ":targets"
-        if mutation_targets:
-            consumed.append((target_start, target_region_end))
-        elif not unresolved:
-            unresolved.append("mutation_target_not_requested")
-
-    if acceptance_match is not None:
-        acceptance_start = acceptance_match.end()
-        if not raw[acceptance_start:main_end].strip(" .;,:"):
-            unresolved.append("acceptance_condition_not_requested")
-        else:
-            acceptance.append(_clause("acceptance", raw, acceptance_start, main_end))
-            consumed.append((acceptance_match.start(), main_end))
-            surface += ":acceptance"
-
-    if preserve_match is not None:
-        preserve_targets, error = _target_list(
-            raw, start=preserve_match.end(), end=len(raw), role="preserve",
-        )
-        if error:
-            unresolved.append(error)
-        if not preserve_targets:
-            unresolved.append("preserve_target_not_resolved")
-        consumed.append((preserve_match.start(), len(raw)))
-        surface += ":preserve"
-
-    mutate_values = {item.value.casefold(): item.value for item in mutation_targets}
-    preserve_values = {item.value.casefold(): item.value for item in preserve_targets}
-    for key in sorted(mutate_values.keys() & preserve_values.keys()):
-        unresolved.append(f"target_polarity_conflict:{mutate_values[key]}")
-
-    if not mutation_targets and operation in {"modify", "delete"} and not any(
-        item.startswith(("mutation_target_not_requested", "input_limit:mutation_targets"))
-        for item in unresolved
-    ):
-        unresolved.append("mutation_target_not_requested")
-
-    return PatchRequestPlan(
-        operation=operation,
-        mutation_targets=mutation_targets,
-        preserve_targets=preserve_targets,
-        destination=destination,
-        parent_context=parent_context,
-        scope_terms=tuple(item.text for item in behavior),
-        behavioral_requirements=tuple(behavior),
-        acceptance_conditions=tuple(acceptance),
-        consumed_spans=tuple(sorted(set(consumed))),
-        unresolved_parts=tuple(dict.fromkeys(unresolved))[:MAX_PATCH_CLAUSES],
-        language=language,
-        surface_id=surface,
-    )
+    # Explicit task contracts are handled by typed consumers, not this parser.
+    return _unsupported(raw, language, "unsupported_patch_surface")
 
 
 __all__ = [

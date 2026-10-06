@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -21,6 +22,7 @@ from docmancer.docs.domain.source_identity import docs_exactness, docs_identity,
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.github_source_manifest import normalize_resolved_github_manifest
+from docmancer.docs.finite_membership import preflight_target_urls, selected_robots, validate_target_collections
 from docmancer.docs.models import DocsChunk, DocsInspectResult, DocsJobStartResult, DocsManifestValidationResult, DocsPruneResult, DocsRemoveResult, DocsResult, DocsSourceResolution, DocsTarget, DocsTargetResult, DocsTargetsPrefetchResult, LibraryInfo, ProjectDocsBootstrapResult, ProjectDocsChunk, ProjectDocsIngestResult, ProjectDocsInspectResult, ProjectDocsResult, ProjectMetadata, ProjectPrefetchResult, RefreshResult
 from docmancer.docs.registry import LibraryRecord
 from docmancer.docs.resolver import canonical_library_id, normalize_library_name, normalize_version
@@ -107,6 +109,7 @@ class DocsPrefetchService:
         continue_on_error: bool = True,
         async_: bool = False,
     ) -> DocsTargetsPrefetchResult | DocsJobStartResult:
+        targets = deepcopy(targets)
         if async_:
             job = self.jobs.create("prefetch_docs_targets")
             self.jobs.update(job.job_id, status="running", message="Started docs prefetch job.")
@@ -160,7 +163,7 @@ class DocsPrefetchService:
         pages_failed_total = 0
         targets_completed = 0
         targets_failed = 0
-        raw_targets = list(targets)
+        raw_targets = deepcopy(list(targets))
         if job_id:
             self.jobs.update(
                 job_id,
@@ -214,9 +217,20 @@ class DocsPrefetchService:
             seen.add(canonical_id)
 
             try:
-                target = self.deps._discover_pub_dartdoc_target(target, warnings, job_id=job_id, canonical_id=canonical_id)
-                target = self.deps._resolve_github_directory_target(target)
+                if isinstance(raw_target, dict):
+                    validate_target_collections(raw_target)
+                if not (target.docs_url or target.docs_url_template or target.seed_urls or target.source_manifest.get("documents")):
+                    raise ValueError("explicit_members_required")
+                if target.source_manifest and "documents" not in target.source_manifest:
+                    raise ValueError("resolved_github_manifest_required")
                 urls, error = self.deps._target_urls(target)
+                if not error:
+                    urls = list(preflight_target_urls(
+                        urls, max_pages=target.max_pages,
+                        allowed_domains=target.allowed_domains, path_prefixes=target.path_prefixes,
+                        source_manifest=(normalize_resolved_github_manifest(target.source_manifest) if target.source_manifest else None),
+                        cancellation_callback=lambda: self._job_cancelled(job_id), deadline_at=deadline_at,
+                    ))
             except Exception as exc:
                 urls, error = [], str(exc)
             if self._job_cancelled(job_id):
@@ -411,6 +425,10 @@ class DocsPrefetchService:
                         add_kwargs: dict[str, Any] = {
                             "max_pages": per_url_max_pages,
                             "browser": target.browser,
+                            "exact_urls": [url],
+                            "allowed_domains": target.allowed_domains,
+                            "path_prefixes": target.path_prefixes,
+                            "robots_urls": selected_robots(urls),
                             "metadata": {
                                 "canonical_source_identity": canonical_source_identity(url),
                                 "library_id": record.library_id,

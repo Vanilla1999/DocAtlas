@@ -59,18 +59,6 @@ DOCS_CONTEXT_SOURCE_FIELDS = frozenset({
 })
 PATCH_SOURCE_FIELDS = frozenset({"evidence_id", "path", "symbol_or_section", "authority",
                                  "instruction_trust", "scope", "version_binding", "content_sha256"})
-_ACTIONABLE_QUESTION_RE = re.compile(
-    r"\b(?:how\s+(?:do|can|should)\s+(?:i|we)\s+(?:configure|set|call|run|use)"
-    r"|(?:configure|set|call|run)\s+(?:up\s+)?(?:the\s+)?"
-    r"|command\s+to\b)",
-    re.IGNORECASE,
-)
-_ACTIONABLE_SNIPPET_RE = re.compile(
-    r"(?:[A-Za-z_][\w.-]*\s*=\s*[^=]|\b[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+\s*\("
-    r"|(?:^|\n)\s*(?:\$\s*)?[\w./-]+\s+--?[\w-]+"
-    r"|```|\b(?:set|configure|export)\s+[A-Za-z_][\w.-]*\s+(?:to\s+)?\S+)",
-    re.IGNORECASE,
-)
 _ACTIONABLE_LIMITATION = (
     "The selected evidence does not provide a concrete configuration key, "
     "value, command, or API call."
@@ -1037,10 +1025,8 @@ def _answer_text(
 
 
 def _needs_actionable_limitation(question: str, answer: str) -> bool:
-    return bool(
-        _ACTIONABLE_QUESTION_RE.search(question)
-        and not _ACTIONABLE_SNIPPET_RE.search(answer)
-    )
+    # Source quotation is not proof of actionability; no prose exemption.
+    return True
 
 
 def _docs_retrieval_issues(

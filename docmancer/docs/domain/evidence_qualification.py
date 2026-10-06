@@ -115,37 +115,15 @@ def _relation_term_count(text: str, terms: tuple[str, ...]) -> int:
 def _proof_relation_is_locally_bound(
     clause: str, match: re.Match[str], terms: tuple[str, ...],
 ) -> bool:
-    """Do not borrow proof subjects from a neighboring comma-delimited clause."""
-    left = max(clause.rfind(",", 0, match.start()), clause.rfind(";", 0, match.start()))
-    right_candidates = [
-        pos for token in (",", ";")
-        if (pos := clause.find(token, match.end())) >= 0
-    ]
-    right = min(right_candidates) if right_candidates else len(clause)
-    local = clause[left + 1:right]
-    return any(_visible_term_present(term, local, exact=False) for term in terms)
+    """Legacy relation binding cannot establish entailment."""
+    return False
 
 
 def _general_relation_is_locally_bound(
     clause: str, match: re.Match[str], terms: tuple[str, ...],
 ) -> bool:
-    marker = match.group(0).casefold()
-    before, after = clause[:match.start()], clause[match.end():]
-    splits_sides = (
-        "whereas" in marker
-        or re.search(r"\bdiffers?\b", marker) is not None
-        or "rather than" in marker
-        or "instead of" in marker
-        or " from" in marker
-        or ("not the same" in marker and re.match(r"\s+as\b", after) is not None)
-    )
-    if splits_sides:
-        return (
-            _relation_term_count(before, terms) >= 1
-            and _relation_term_count(after, terms) >= 1
-        )
-    needed = min(2, len(terms))
-    return bool(needed and _relation_term_count(clause, terms) >= needed)
+    """Legacy comparison wording cannot bind a semantic relation."""
+    return False
 
 
 def _visible_comparison_relation(text: str, terms: tuple[str, ...]) -> bool:
@@ -344,19 +322,8 @@ def qualify_evidence(
     normalized_evidence = "\n".join(substantive_lines).casefold()
     normalized_headings = "\n".join(heading_lines).casefold()
 
-    relation_text = str(probe.get("query_text") or "").casefold()
     if query_id.startswith("query-relation-"):
-        negated_state = re.search(
-            r"(?<!\w)(?:not|without|never|no)(?!\w)\s+([a-z][a-z0-9_-]{2,})\s*$",
-            relation_text, re.I,
-        )
-        if negated_state is not None:
-            state = re.escape(negated_state.group(1))
-            if re.search(
-                rf"(?<!\w)(?:not|without|never|no)(?!\w)(?:\s+\w+){{0,2}}\s+{state}(?!\w)",
-                normalized_evidence, re.I,
-            ) is None:
-                return _rejected(result, "missing_visible_relation_negation")
+        return _rejected(result, "unsupported_relation_qualification")
 
     if str(probe.get("mode") or "") == "exact_path":
         query_text = str(probe.get("query_text") or "").replace("\\", "/").casefold()
@@ -527,20 +494,7 @@ def _coverage_kind(probe: Mapping[str, Any]) -> CoverageKind:
 
 @lru_cache(maxsize=4096)
 def _visible_term_present(term: str, text: str, *, exact: bool) -> bool:
-    suffix = "" if exact else r"(?:s|es|ed|ing)?"
-    if re.search(technical_term_pattern(term, exact=exact), text) is not None:
-        return True
-    if not exact and re.fullmatch(r"[a-z]+", term):
-        # Regular consonant-y inflection is lexical equivalence, not an
-        # identifier alias: retry/retried/retries, identity/identities.
-        stem = re.sub(r"(?:ied|ies|y)$", "", term)
-        if (stem != term and len(stem) >= 3 and stem[-1] not in 'aeiou'
-                and re.search(rf"(?<!\w){re.escape(stem)}(?:y|ied|ies)(?!\w)", text)):
-            return True
-        base = re.sub(r"(?:ing|ed|es|s)$", "", term)
-        if len(base) >= 4:
-            return re.search(rf"(?<!\w){re.escape(base)}{suffix}(?!\w)", text) is not None
-    return False
+    return re.search(technical_term_pattern(term, exact=exact), text) is not None
 
 
 def _rejected(trace: dict[str, Any], reason: str) -> EvidenceQualification:

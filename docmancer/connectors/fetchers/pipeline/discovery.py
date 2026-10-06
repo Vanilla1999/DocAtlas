@@ -94,14 +94,12 @@ def discover_urls(
     seed_urls: list[str] | None = None,
     root_html: str | None = None,
     query: str | None = None,
+    exact_urls: list[str] | None = None,
 ) -> DiscoveryResult:
-    """Run discovery strategies in order and return found URLs.
+    """Return only finite selected whole-document URLs without network discovery.
 
-    Short-circuits on llms-full.txt. Otherwise merges results from
-    llms.txt, sitemap strategies, seed_urls, and nav-crawl.
-
-    When sitemap strategies return fewer than MIN_DOC_PAGES usable URLs,
-    a nav-fallback with higher depth runs automatically.
+    Legacy strategy, platform, robots, HTML and query inputs cannot expand this
+    set. The client is deliberately never called by this operation.
 
     Args:
         base_url: Root URL of the documentation site.
@@ -115,159 +113,16 @@ def discover_urls(
     Returns:
         DiscoveryResult with urls and diagnostics.
     """
-    strategies = [
-        (DiscoveryStrategy.LLMS_FULL_TXT, lambda u, c, p, r, m: _try_llms_full_txt(u, c, p, r)),
-        (DiscoveryStrategy.LLMS_TXT, lambda u, c, p, r, m: _try_llms_txt(u, c, p, r)),
-        (DiscoveryStrategy.ROBOTS_SITEMAP, lambda u, c, p, r, m: _try_robots_sitemap(u, c, r, m)),
-        (DiscoveryStrategy.SITEMAP_XML, _try_sitemap_xml),
-        (DiscoveryStrategy.PLATFORM_SITEMAP, _try_platform_sitemap),
-        (DiscoveryStrategy.NAV_CRAWL, _try_nav_crawl),
-    ]
+    from docmancer.docs.finite_membership import contains, finite_members
 
-    if force_strategy:
-        for strategy_enum, strategy_fn in strategies:
-            if strategy_enum.value != force_strategy:
-                continue
-            try:
-                result = strategy_fn(base_url, client, platform, robots, max_pages) or []
-                return DiscoveryResult(urls=result[:max_pages])
-            except DocsFetchSecurityError:
-                raise
-            except Exception as exc:
-                logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
-                return DiscoveryResult()
-
-    _LOCALE_SKIP_COUNTER[0] = 0
-
-    # A task-specific query benefits from page-level candidates. A monolithic
-    # llms-full response prevents bounded URL ranking and can make a small
-    # question download an entire product manual.
-    llms_full = None if query else _try_llms_full_txt(base_url, client, platform, robots)
-    if llms_full:
-        logger.info("Discovery: %s found %d URL(s)", DiscoveryStrategy.LLMS_FULL_TXT.value, len(llms_full))
-        return DiscoveryResult(urls=llms_full)
-
-    dartdoc, dartdoc_diagnostics = _try_dartdoc_index_with_diagnostics(
-        base_url, client, max_pages, root_html=root_html, query=query,
-    )
-    if dartdoc:
-        logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
-        return DiscoveryResult(
-            urls=dartdoc[:max_pages],
-            diagnostics={
-                "strategies": {"dartdoc-index": len(dartdoc)},
-                "discovery_strategy": "dartdoc-index",
-                "fallback_reason": None,
-                "sitemap_pages": 0,
-                "seed_pages": 0,
-                "fallback_pages": 0,
-                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
-                **dartdoc_diagnostics,
-            },
-        )
-
-    all_results: list[DiscoveredUrl] = []
-    strategy_counts: dict[str, int] = {}
-    nav_crawl_ran = False
-    sitemap_total = 0
-    for strategy_enum, strategy_fn in strategies[1:]:
-        try:
-            results = strategy_fn(base_url, client, platform, robots, max_pages)
-            if results:
-                strategy_counts[strategy_enum.value] = len(results)
-                all_results.extend(results)
-                if strategy_enum in (DiscoveryStrategy.ROBOTS_SITEMAP, DiscoveryStrategy.SITEMAP_XML, DiscoveryStrategy.PLATFORM_SITEMAP):
-                    sitemap_total += len(results)
-                if strategy_enum == DiscoveryStrategy.NAV_CRAWL:
-                    nav_crawl_ran = True
-        except DocsFetchSecurityError:
-            raise
-        except Exception as exc:
-            logger.debug("Discovery strategy %s failed: %s", strategy_enum.value, exc)
-
-    # ---------------------------------------------------------------
-    # Nav-fallback: when sitemap coverage is too low, run a deeper
-    # nav crawl to try to discover more pages (common for ReadTheDocs).
-    # ---------------------------------------------------------------
-    fallback_reason = None
-    fallback_results: list[DiscoveredUrl] = []
-    if all_results and sitemap_total < MIN_DOC_PAGES and not nav_crawl_ran:
-        fallback_results = _try_nav_fallback(base_url, client, platform, robots, max_pages) or []
-        if fallback_results:
-            fallback_reason = "low_sitemap_coverage"
-            strategy_counts[DiscoveryStrategy.NAV_FALLBACK.value] = len(fallback_results)
-            all_results.extend(fallback_results)
-    elif sitemap_total < MIN_DOC_PAGES and nav_crawl_ran:
-        # Nav-crawl ran but sitemap was sparse; this is primarily a
-        # ReadTheDocs docset — log it for diagnostics.
-        fallback_reason = "low_sitemap_coverage_nav_crawl_used"
-
-    # ---------------------------------------------------------------
-    # Seed URLs: merge explicit page URLs as an additional source.
-    # ---------------------------------------------------------------
-    seed_pages = 0
-    if seed_urls:
-        seed_discovered = []
-        for seed in seed_urls:
-            seed_discovered.append(DiscoveredUrl(url=seed, strategy=DiscoveryStrategy.SEED_URLS))
-        if seed_discovered:
-            strategy_counts[DiscoveryStrategy.SEED_URLS.value] = len(seed_discovered)
-            seed_pages = len(seed_discovered)
-            all_results.extend(seed_discovered)
-
-    if all_results:
-        ranked = _dedupe_and_rank(all_results)
-        if query:
-            ranked = _rank_urls_for_query(ranked, query)
-        logger.info("Discovery candidates by strategy: %s", strategy_counts)
-        discovery_strategy = _compute_discovery_strategy_label(
-            strategy_counts, fallback_reason, bool(seed_urls),
-        )
-        return DiscoveryResult(
-            urls=ranked[:max_pages],
-            diagnostics={
-                "strategies": dict(strategy_counts),
-                "discovery_strategy": discovery_strategy,
-                "fallback_reason": fallback_reason,
-                "sitemap_pages": sitemap_total,
-                "seed_pages": seed_pages,
-                "fallback_pages": len(fallback_results),
-                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
-                **dartdoc_diagnostics,
-            },
-        )
-
-    if not dartdoc_diagnostics:
-        dartdoc = _try_dartdoc_index(base_url, client, max_pages)
-    else:
-        dartdoc = None
-    if dartdoc:
-        logger.info("Discovery: dartdoc-index found %d URL(s)", len(dartdoc))
-        return DiscoveryResult(
-            urls=dartdoc[:max_pages],
-            diagnostics={
-                "strategies": {"dartdoc-index": len(dartdoc)},
-                "discovery_strategy": "dartdoc-index",
-                "fallback_reason": None,
-                "sitemap_pages": 0,
-                "seed_pages": 0,
-                "fallback_pages": 0,
-                "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
-            },
-        )
-
-    logger.warning("No discovery strategy found URLs for %s", base_url)
+    members = finite_members(exact_urls if exact_urls is not None else seed_urls, max_pages)
+    if not contains(members, base_url):
+        raise ValueError("finite_member_seed_mismatch")
+    # Platform, forced strategy, query, links and preloaded aggregate bodies do
+    # not authorize source discovery. Protocol helpers below are not dispatched.
     return DiscoveryResult(
-        diagnostics={
-            "strategies": {},
-            "discovery_strategy": "none",
-            "fallback_reason": "no_discovery",
-            "sitemap_pages": 0,
-            "seed_pages": 0,
-            "fallback_pages": 0,
-            "locale_skipped_count": _LOCALE_SKIP_COUNTER[0],
-            **dartdoc_diagnostics,
-        },
+        urls=[DiscoveredUrl(url=member, strategy=DiscoveryStrategy.SEED_URLS) for member in members],
+        diagnostics={"discovery_strategy": "finite-explicit", "selected_pages": len(members)},
     )
 
 

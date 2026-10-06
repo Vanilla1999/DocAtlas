@@ -62,13 +62,6 @@ MAX_CODE_GROUPS = 6
 DOCS_SERIALIZATION_RESERVE_TOKENS = 350
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _TOKEN_RE = re.compile(r"[\w.+:/-]+", re.UNICODE)
-_PATCH_FACT_RE = re.compile(
-    r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
-    r"is\s+reserved\s+for|only\s+(?:after|before|when|if)|is\s+allowed\s+only|"
-    r"pytest|compileall|cargo\s+(?:test|check|build)|npm\s+(?:test|run)|"
-    r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
-    re.IGNORECASE,
-)
 _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "query_exact_term",
     "public_task_contract",
@@ -80,15 +73,6 @@ _ALLOWED_REQUIREMENT_PROVENANCE = frozenset({
     "disclosed_authority_version_conflict",
     "patch_request_plan",
 })
-
-_QUALIFIER_PATTERNS = {
-    "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
-    "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
-    "confirmation_required": re.compile(r"\b(?:confirmation|required approval)\s+(?:is\s+)?required\b", re.I),
-    "negated": re.compile(r"\b(?:not|never|no|cannot|must not)\b", re.I),
-    "conditional": re.compile(r"\b(?:if|when|unless|only after|only before)\b", re.I),
-    "deprecated": re.compile(r"\bdeprecated\b", re.I),
-}
 
 _GOVERNANCE_PROJECT_RULE_RELATIONS = frozenset({
     "governed_scope",

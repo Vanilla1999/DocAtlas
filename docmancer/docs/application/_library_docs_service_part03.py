@@ -452,24 +452,6 @@ class _LibraryDocsApplicationServicePart03:
             profile="library_docs_answer",
             library_requirement_contract=library_requirement_contract,
         )
-        explicit_query_values, has_unqualified_explicit_query_list = (
-            _explicit_library_query_analysis(query)
-        )
-        existing_requirement_values = {
-            requirement.value.casefold() for requirement in requirements
-        }
-        missing_explicit_values = [
-            value for value in explicit_query_values
-            if value.casefold() not in existing_requirement_values
-        ]
-        if missing_explicit_values:
-            requirements = build_requirements(
-                query,
-                public_requirements=missing_explicit_values,
-                exact_version=resolved_version,
-                profile="library_docs_answer",
-                library_requirement_contract=library_requirement_contract,
-            )
         dispatch_result = self.facade.agent_gateway.query_library(
             record,
             query,
@@ -478,12 +460,6 @@ class _LibraryDocsApplicationServicePart03:
             requirements=requirements,
         )
         chunks = getattr(dispatch_result, "chunks", dispatch_result)
-        if has_unqualified_explicit_query_list:
-            chunks = []
-            diagnostic_warnings.append({
-                "code": "unqualified_explicit_query_list",
-                "blocking": True,
-            })
         retrieval_diagnostics = {
             "requested": {
                 "mode": str(
@@ -540,9 +516,7 @@ class _LibraryDocsApplicationServicePart03:
         }
         if not chunks:
             reason_code = (
-                "unqualified_explicit_query_list"
-                if has_unqualified_explicit_query_list
-                else "guard_dropped_all" if dropped > 0
+                "guard_dropped_all" if dropped > 0
                 else "no_library_docs_results"
             )
             reason_diagnostics = {**resolution.diagnostics, "retrieval": retrieval_diagnostics, "reason_code": reason_code, "warnings": diagnostic_warnings}
@@ -562,11 +536,8 @@ class _LibraryDocsApplicationServicePart03:
                 else None
             )
             next_actions = (
-                ["Qualify at least one requested symbol with backticks or a dotted, underscored, or colon-qualified name."]
-                if has_unqualified_explicit_query_list
-                else [inspection_action] if inspection_action
-                else ["Call refresh_library_docs to ingest this library's docs."] if dropped > 0
-                else ["Narrow or rephrase the topic, or inspect_library_docs to verify indexed coverage before refreshing."]
+                [inspection_action] if inspection_action
+                else ["Inspect indexed coverage with inspect_library_docs; preparation requires an explicit lifecycle authorization or returned action."]
             )
             return DocsResult(
                 library_id=info.library_id,

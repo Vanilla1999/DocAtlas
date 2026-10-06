@@ -21,29 +21,11 @@ from docmancer.docs.domain.answer_units import extract_answer_units
 from docmancer.retrieval.contracts import canonical_hash
 
 _HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
-_PATCH_FACT_RE = re.compile(
-    r"\b(?:must|shall|required|requires?|never|cannot|may\s+not|forbidden|prohibited|"
-    r"is\s+reserved\s+for|only\s+(?:after|before|when|if)|is\s+allowed\s+only|"
-    r"pytest|compileall|cargo\s+(?:test|check|build)|npm\s+(?:test|run)|"
-    r"dart\s+(?:test|analyze)|go\s+test|make\s+test)\b",
-    re.IGNORECASE,
-)
-_QUALIFIER_PATTERNS = {
-    "proposed": re.compile(r"\bpropos(?:ed|al)\b", re.I),
-    "not_implemented": re.compile(r"\bnot\s+(?:yet\s+)?implemented\b", re.I),
-    "confirmation_required": re.compile(r"\b(?:confirmation|required approval)\s+(?:is\s+)?required\b", re.I),
-    "negated": re.compile(r"\b(?:not|never|no|cannot|must not)\b", re.I),
-    "conditional": re.compile(r"\b(?:if|when|unless|only after|only before)\b", re.I),
-    "deprecated": re.compile(r"\bdeprecated\b", re.I),
-}
 
 
 def observed_qualifiers(text: str) -> tuple[EvidenceQualifier, ...]:
-    return tuple(sorted(
-        qualifier
-        for qualifier, pattern in _QUALIFIER_PATTERNS.items()
-        if pattern.search(text)
-    ))
+    """No semantic qualifiers are inferred from source wording."""
+    return ()
 
 
 def estimated_tokens(value: str) -> int:
@@ -83,7 +65,7 @@ def normalized_source(value: Any) -> str:
 
 
 def requirement_value_visible(value: str, text: str) -> bool:
-    """Match exact query terms, including a bounded CamelCase→snake_case alias."""
+    """Match literal query terms at identifier boundaries; no derived aliases."""
 
     wanted = str(value or "").strip()
     haystack = str(text or "")
@@ -91,15 +73,7 @@ def requirement_value_visible(value: str, text: str) -> bool:
         return False
     if re.search(rf"(?<![\w]){re.escape(wanted)}(?![\w])", haystack, re.I):
         return True
-    if not (
-        re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", wanted)
-        and any(char.isupper() for char in wanted[1:])
-        and any(char.islower() for char in wanted)
-    ):
-        return False
-    acronym_split = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", wanted)
-    snake_case = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", acronym_split).casefold()
-    return bool(re.search(rf"(?<![\w]){re.escape(snake_case)}(?![\w])", haystack, re.I))
+    return False
 
 
 def source_path(item: Mapping[str, Any]) -> str:
@@ -143,26 +117,9 @@ def symbols(item: Mapping[str, Any]) -> tuple[str, ...]:
 
 
 def projected_text(item: Mapping[str, Any], raw_display_text: str, result_kind: str) -> str:
-    if result_kind == "docs_answer":
-        return raw_display_text
-    snippet = _text(item.get("snippet"))
-    fact_material = str(item.get("content") or raw_display_text)
-    fact_lines = [line.strip() for line in fact_material.splitlines() if _PATCH_FACT_RE.search(line)]
-    identity_terms = list(dict.fromkeys(
-        match.group(0)
-        for line in fact_material.splitlines()
-        for match in re.finditer(
-            r"(?:[A-Za-z0-9_.-]+[\\/])+[A-Za-z0-9_.-]+"
-            r"|\b[A-Za-z][A-Za-z0-9]*_[A-Za-z0-9_]+\b",
-            line,
-        )
-    ))[:32]
-    parts = [
-        part
-        for part in [snippet, *fact_lines, *identity_terms, " ".join(symbols(item)), source_path(item)]
-        if part
-    ]
-    return "\n".join(dict.fromkeys(parts)) or raw_display_text
+    # Only the visible source window participates in assignment and cost.
+    # Hidden content, paths and symbol metadata must not manufacture a quote.
+    return raw_display_text
 
 
 def authority(item: Mapping[str, Any]) -> str:

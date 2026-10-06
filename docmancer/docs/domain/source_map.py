@@ -404,15 +404,8 @@ def _source_evidence_terms(*, question: str, requirements: list[str] | None) -> 
     if requirements is None:
         raw_terms = [*_QUERY_PATH_RE.findall(question), *raw_terms]
     terms = _dedupe_normalized_terms(str(term) for term in raw_terms if str(term or "").strip())
-    # Named declarations are mutation targets, while ordinary words are recall
-    # hints. Search the bounded declaration surface first so generic snippets do
-    # not consume the source-evidence budget before requested symbols.
-    terms.sort(key=lambda value: (
-        0 if re.fullmatch(
-            r"[A-Z][A-Za-z0-9_]*(?:Gate|Service|Repository|Controller|Manager|Policy|Adapter)",
-            value,
-        ) else 1,
-    ))
+    # Preserve literal request order; a naming convention does not establish
+    # a declaration's role or give it priority within the bounded term budget.
     return terms[:16]
 
 

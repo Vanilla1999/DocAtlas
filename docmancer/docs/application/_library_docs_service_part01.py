@@ -68,9 +68,7 @@ class _LibraryDocsApplicationServicePart01:
                     prefetch=self.refresh_ops.prefetch_docs,
                     timeout_seconds=self._library_job_timeout_seconds,
                     executor=lambda: self.job_executor,
-                    prefetch_targets=lambda *args, **kwargs: self.facade.docs_prefetch.prefetch_docs_targets_sync(
-                        *args, **kwargs
-                    ),
+                    prefetch_targets=self._prefetch_explicit_targets,
                 )
             )
         return self._ingest_orchestrator

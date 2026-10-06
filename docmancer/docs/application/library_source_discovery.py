@@ -174,30 +174,26 @@ def _python_candidates(payload: Any, library: str, version: str | None) -> list[
     if not isinstance(info, dict):
         return []
     project_urls = info.get("project_urls") if isinstance(info.get("project_urls"), dict) else {}
-    ranked: list[tuple[int, str, str]] = []
+    ranked: list[tuple[str, str]] = []
     for label, raw_url in project_urls.items():
         if not isinstance(raw_url, str) or not _safe_public_url(raw_url):
             continue
-        normalized_label = str(label).casefold()
-        rank = 0 if any(term in normalized_label for term in ("documentation", "docs", "reference")) else 2
-        if any(term in normalized_label for term in ("homepage", "home")):
-            rank = 1
-        ranked.append((rank, str(label), raw_url))
+        ranked.append((raw_url, str(label)))
     home_page = info.get("home_page")
     if isinstance(home_page, str) and _safe_public_url(home_page):
-        ranked.append((1, "Project homepage", home_page))
+        ranked.append((home_page, "Project homepage"))
     return _dedupe_candidates([
         _candidate(
             url,
             label=label,
-            confidence="high" if rank == 0 else "medium",
+            confidence="medium",
             source="pypi_project_metadata",
             ecosystem="python",
             version=version,
             source_type="web",
             library=library,
         )
-        for rank, label, url in sorted(ranked)
+        for url, label in sorted(ranked)
     ])
 
 

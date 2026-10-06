@@ -1,12 +1,4 @@
-"""Generic web fetcher for any documentation site.
-
-Implements the full ingestion pipeline:
-1. Fetch homepage and detect platform
-2. Run discovery chain to find all doc page URLs
-3. Filter, normalize, and deduplicate URLs
-4. Fetch each page with rate limiting and robots.txt compliance
-5. Extract content with trafilatura + markdownify
-6. Deduplicate content and build Document objects"""
+"""Secure finite whole-document and immutable-file fetcher."""
 
 from __future__ import annotations
 
@@ -22,16 +14,18 @@ class WebFetcher(_WebFetcherPart01, _WebFetcherPart02):
 
     Implements the Fetcher protocol: ``def fetch(self, url: str) -> list[Document]``.
 
-    Uses platform detection to select the best discovery strategy,
-    then fetches and extracts content from discovered pages.
+    Fetches only exact selected whole-document URLs or approved immutable
+    GitHub manifest rows. No platform, sitemap, navigation or llms discovery.
 
     Args:
         timeout: HTTP request timeout in seconds.
         max_pages: Maximum number of pages to fetch.
-        strategy: Force a specific discovery strategy (e.g. "llms-full.txt").
+        strategy: Legacy compatibility input; cannot expand finite selection.
         browser: Enable Playwright browser fallback for JS-heavy sites.
         respect_robots: Whether to respect robots.txt (default True).
         delay: Base delay between requests to same host (seconds).
+        exact_urls: Required finite members; seed_urls is a compatibility input.
+        robots_urls: Explicit protocol-control URLs within transport ceilings.
     """
 
 

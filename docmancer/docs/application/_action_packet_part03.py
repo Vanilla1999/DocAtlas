@@ -236,16 +236,7 @@ def build_action_packet(
     untrusted_validation_omissions = 0
     selected_text_by_evidence_id: dict[str, str] = {}
     for candidate in selection.selected_candidates:
-        behavioral_witnesses = [
-            witness.unit_text
-            for witness in candidate.requirement_witnesses
-            if witness.requirement_id.startswith("behavioral_contract:")
-            and witness.unit_text
-        ]
-        if behavioral_witnesses:
-            selected_text_by_evidence_id[_evidence_id(dict(candidate.original))] = (
-                "\n".join(dict.fromkeys(behavioral_witnesses))
-            )
+        selected_text_by_evidence_id[_evidence_id(dict(candidate.original))] = candidate.display_text
     for item in items:
         evidence_id = _evidence_id(item) if _source_path(item) else None
         if not evidence_id:
@@ -304,7 +295,7 @@ def build_action_packet(
                 {"compile": compile_checks, "tests": test_checks, "semantic": semantic_checks}[bucket].append(cited)
             elif fact_type == "required":
                 required.append(cited)
-        snippet, snippet_omitted = _snippet_text(item.get("snippet"))
+        snippet, snippet_omitted = _snippet_text(selected_text_by_evidence_id.get(evidence_id, ""))
         snippet_omissions += snippet_omitted
         if snippet and _content_instruction_risk_flags(snippet):
             risky_content_omissions += 1
@@ -451,7 +442,7 @@ def build_action_packet(
             {"type": "authority_conflict", "path": path, "symbol_or_section": section}
             for path, section in authority_conflicts
         ]
-        packet["missing_evidence"].append("Conflicting canonical evidence must be resolved before editing.")
+        packet["missing_evidence"].append("Canonical prose agreement is unresolved; manual review is required before editing.")
 
     for issue in retrieval_issue_list[:5]:
         text, _ = _bounded_text(str(issue).strip(), 240)
