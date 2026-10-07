@@ -185,3 +185,16 @@ Delegate seam требует успешного producer case, не только
 B получил steering до fixture migration: нельзя просто emit all expected strings.
 Actual SQLite read-trace test design R признал materially improved, исполнение
 и green full matrix всё ещё pending. Integration HELD.
+
+## Свежая работа — актуальное состояние
+
+См. `FRESH_PLAN_RU.md`: user-approved trusted local storage и auto-install
+заменили прежний production VFS путь. Старые reports выше — chronological
+snapshots, не описание текущих blockers.
+
+Packing series после fresh production-forwarder repair и independent approval
+интегрирована до `28e15d55`. Итоговые 326 focused tests PASS (302 packing matrix
++24 installer); scope/D1/syntax/whitespace/line-budget PASS. Real lexical delivery:
+45 qualified windows / 32 475 source bytes, не >32 KiB. A реализует trusted
+fresh storage lifecycle, C — library lineage и installed acceptance. Live MCP,
+БД и конфигурация не менялись; push/merge/publish не выполнялись.

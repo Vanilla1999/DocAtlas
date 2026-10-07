@@ -85,6 +85,12 @@ production graph / public handler: 45 qualified windows, 32 475 source bytes
 совпадают с docs mode. Fresh independent R review запущен; до verdict весь
 packing series остаётся вне integration branch.
 
+Independent packing R APPROVE integration: 302 matrix + 19 diagnostic/support
+tests PASS; real lexical proof отдельно PASS. Series включена в integration
+`28e15d55` (`6daa0fe2`, `362cfbae`, `eda9db59`, `28e15d55`). Итоговый rerun с
+installer: 326 PASS; scope/syntax/whitespace/D1/line-budget PASS. Это закрывает
+scoped packing findings, но не installed >32 KiB, storage lifecycle или release.
+
 ### C — lineage и installed acceptance
 
 Свежий audit выделил минимальный lineage fix: canonical индекс уже хранит
