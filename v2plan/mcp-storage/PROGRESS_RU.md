@@ -175,3 +175,13 @@ PASS по отчёту B. Full focused matrix НЕ green: 240 PASS / 15 FAIL / 3
 Coordinator разрешил два точных active-fixture paths (см. AUTHORIZATION), без
 ослабления assertions/gates. R проверяет stable production closure commit;
 B обновляет fixtures. Packing integration всё ещё HELD.
+
+R stable-commit audit: ACK closure incomplete. Plain stage-name ACKs могут быть
+собраны одним invocation, пока wrapper возвращает bounded result другого;
+escaped callback не закрывается, entry ACK происходит до completion. R выявил
+это по source, без исполнения counterexample. Требуются completion/result/sink
+binding, finally lifetime invalidation и cross-call/exception/interleaving tests.
+Delegate seam требует успешного producer case, не только dropping negatives.
+B получил steering до fixture migration: нельзя просто emit all expected strings.
+Actual SQLite read-trace test design R признал materially improved, исполнение
+и green full matrix всё ещё pending. Integration HELD.
