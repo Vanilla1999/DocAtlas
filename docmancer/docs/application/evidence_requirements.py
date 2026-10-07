@@ -343,6 +343,10 @@ def build_requirements(
     extraction_provenance: list[tuple[str, str, str]] = []
     for requirement in unique.values():
         key = _semantic_requirement_key(requirement)
+        if not representation_bounded:
+            # Exact patch obligations cannot be interchanged by case-folding,
+            # nor can distinct explicit provenance be erased by deduplication.
+            key = (requirement.kind, requirement.value, *key[2:], requirement.public_provenance)
         canonical = canonical_by_obligation.get(key)
         # Query extractors can discover the same exact obligation through a
         # symbol and a project-answer term. Keep both audit provenance records

@@ -464,3 +464,44 @@ def test_exact_version_does_not_turn_code_or_navigation_into_dependency_proof(so
     assert not selector.validate_assignment_binding(
         relabeled, base.selected_candidates[0], assignment, requirements=(relabeled,),
     )
+
+
+def test_patch_canonical_dedupe_preserves_case_distinct_explicit_literal_facts():
+    facts = ["Cache enabled.", "cache enabled."]
+    items = [row(index, fact) for index, fact in enumerate(facts)]
+    patch = select(items, question="reference", public_requirements=facts)
+    assert patch.status == "ok"
+    assert {requirement.value for requirement in patch.requirements} == set(facts)
+    assert len(patch.requirements) == len(patch.assignments) == len(patch.selected_candidates) == 2
+    assert not selector.validate_evidence_sufficiency(patch, result_kind="patch_context")
+    by_id = {candidate.stable_id: candidate for candidate in patch.selected_candidates}
+    by_requirement = {requirement.requirement_id: requirement for requirement in patch.requirements}
+    for assignment in patch.assignments:
+        candidate = by_id[assignment.evidence_id]
+        requirement = by_requirement[assignment.requirement_id]
+        assert candidate.display_text == requirement.value
+        assert selector.validate_assignment_binding(
+            requirement, candidate, assignment, requirements=patch.requirements,
+        )
+    reversed_patch = select(reversed(items), question="reference", public_requirements=reversed(facts))
+    assert patch.selection_hash == reversed_patch.selection_hash
+    docs = selector.build_requirements("reference", public_requirements=facts)
+    assert len(docs) == 1
+    assert docs[0].value in facts
+
+
+def test_patch_canonical_dedupe_preserves_distinct_explicit_provenance():
+    fact = "Cache enabled."
+    rows = [
+        {"value": fact, "kind": "required_fact", "public_provenance": provenance}
+        for provenance in ("public_task_contract", "patch_request_plan")
+    ]
+    patch = select([row(0, fact)], question="reference", public_requirements=rows)
+    assert patch.status == "ok"
+    assert len(patch.requirements) == len(patch.assignments) == 2
+    assert {requirement.public_provenance for requirement in patch.requirements} == {
+        "public_task_contract", "patch_request_plan",
+    }
+    assert all(requirement.value == fact for requirement in patch.requirements)
+    assert not selector.validate_evidence_sufficiency(patch, result_kind="patch_context")
+    assert len(selector.build_requirements("reference", public_requirements=rows)) == 1
