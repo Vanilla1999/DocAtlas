@@ -241,3 +241,108 @@ def test_policy_audit_checks_v4_read_only_retrieval_metadata(tmp_path):
     event["arguments"]["action_packet_completeness"] = "partial"
     path.write_text(json.dumps([event]), encoding="utf-8")
     assert "required_docatlas_action_packet_invalid" in audit_trajectory("docatlas_tool_required_once", path).violations
+
+
+def test_provider_composer_keeps_old_oversized_patch_and_embedded_constraints(case, tmp_path):
+    from eval.answer_quality_runner import _task42_projection
+    from eval.task_level._github_models_part01 import _bounded_runner_messages
+
+    projection, _, _ = _task42_projection(case)
+    content = "Observed tool output:\n" + json.dumps(projection, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    assert len(content) > 32000
+    protected = {"role": "user", "content": content}
+    history = [protected] + [{"role": "user", "content": "ordinary history " * 500} for _ in range(8)]
+    messages, metrics = _bounded_runner_messages(
+        [{"role": "system", "content": "offline"}], history, [], token_limit=7000,
+    )
+    assert protected in messages
+    assert metrics["protected_patch_data_exceeds_input_budget"] is True
+    assert metrics["input_token_limit"] == 7000
+    assert metrics["clipped_messages"] == []
+    retained = json.loads(next(row["content"] for row in messages if row == protected).split("\n", 1)[1])
+    assert retained == projection
+    for row in retained["sources"]:
+        assert hashlib.sha256(row["text"].encode()).hexdigest() == row["content_sha256"]
+    # A patch embedded alongside explicit instructions protects that entire message.
+    base = {"role": "user", "content": "Explicit target: lib/example.py; do not change policy.\n" + content}
+    composed, _ = _bounded_runner_messages([base], [], [], token_limit=7000)
+    assert composed == [base]
+    from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+    packet = {key: value for key, value in projection.items()
+              if key not in {"kind", "recommended_next_action", "source_search_status"}}
+    refresh_action_packet_estimate(packet)
+    packet_message = {"role": "user", "content": json.dumps(packet)}
+    composed, _ = _bounded_runner_messages([], [packet_message] + history[1:], [], token_limit=7000)
+    assert packet_message in composed
+    docs, docs_metrics = _bounded_runner_messages(
+        [{"role": "system", "content": "offline"}], history[1:], [], token_limit=7000,
+    )
+    assert docs_metrics["estimated_input_tokens"] <= 7000
+    assert docs_metrics["protected_patch_data_exceeds_input_budget"] is False
+
+
+def test_mocked_provider_request_keeps_full_v4_after_history_selection(necessary_evidence, tmp_path, monkeypatch):
+    import docmancer.docs.service as service_module
+    import eval.task_level._github_models_part02 as runner_module
+    from eval.task_level.runners.base import AgentRunRequest
+
+    service = OfflineRetrieval(necessary_evidence)
+    monkeypatch.setattr(service_module, "LibraryDocsService", lambda: service)
+    monkeypatch.setattr(runner_module, "_absolute_deadline_supported", lambda: True)
+    calls = []
+    expected = []
+
+    class MockClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def complete_json(self, **kwargs):
+            messages = deepcopy(kwargs["messages"])
+            calls.append(messages)
+            if len(calls) > 1:
+                packet_message = next(row for row in messages if row["content"].startswith("Observed tool output:\n{"))
+                if not expected:
+                    expected.append(packet_message)
+                assert packet_message == expected[0]
+                packet = json.loads(packet_message["content"].split("\n", 1)[1])
+                assert packet["result"] == "data" and len(packet["sources"]) == 12
+                assert len(packet_message["content"]) > 32000
+                assert packet["edit_ready"] is False
+            action = ({"tool": "get_docs_context", "query": "Inspect protocol implementations"} if len(calls) == 1
+                      else {"tool": "finish", "summary": "offline composer smoke"} if len(calls) == 7
+                      else {"tool": "list_files"})
+            completion = SimpleNamespace(model="offline", request_id="offline", request_ids={},
+                                         raw_usage={"prompt_tokens": 1, "completion_tokens": 1},
+                                         request_payload_sha256="offline", estimated_input_tokens=1)
+            return action, completion
+
+    monkeypatch.setattr(runner_module, "GitHubModelsClient", MockClient)
+    workspace = tmp_path / "workspace"
+    workspace.mkdir()
+    (workspace / "example.py").write_text("value = 1\n", encoding="utf-8")
+    request = AgentRunRequest(
+        task_id="offline", condition_id="docatlas_tool_optional", workspace=workspace,
+        prompt="Inspect protocol implementations", model="offline", timeout_seconds=30, max_turns=7,
+        environment={}, mcp_config_path=None, tool_policy_path=tmp_path / "policy.json",
+        output_dir=tmp_path / "output", allowed_write_paths=("example.py",),
+    )
+    sandbox = SimpleNamespace(verify=lambda: {"status": "verified"})
+    result = runner_module.GitHubModelsRunner("offline-placeholder", sandbox=sandbox).run(request)
+    assert result.status == "completed" and len(calls) == 7
+    assert expected[0] in calls[-1]  # Survives both the old six-message selection and byte slice.
+
+
+def test_delivery_report_uses_v4_result_and_completeness(tmp_path):
+    from eval.task_level.report import write_report
+    from eval.task_level._execution_shared import BOUNDED_DIRECT_EXECUTION_POLICY
+
+    result = {"task_id": "offline", "condition_id": "docatlas_bounded_direct", "repeat": 1,
+              "status": "condition_setup_failed", "metrics": {
+                  "action_packet_result": "data", "action_packet_completeness": "partial",
+              }}
+    text = write_report(tmp_path, {}, [result]).read_text()
+    assert "packet_result | packet_completeness" in text
+    assert "| docatlas_bounded_direct | data | partial |" in text
+    assert "packet_status" not in text
+    assert "UNSUPPORTED: workflow_checks_from_patch_context" in BOUNDED_DIRECT_EXECUTION_POLICY
+    assert "cannot run from v4 patch evidence alone" in BOUNDED_DIRECT_EXECUTION_POLICY
