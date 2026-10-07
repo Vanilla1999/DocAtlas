@@ -578,7 +578,9 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "module_path always implies module scope, all is repository-local without module filters. Never widen scope from question wording. "
         "Cite returned context; lookup coverage does not transfer to the original. Context and flags do not certify an answer, "
         "semantic proof or edit readiness. Mutation requires a separate explicit target and authorization. "
-        "hard_stop=true blocks edits; hard_stop=false is not permission. Preserve freshness, provenance, network consent and budgets."
+        "hard_stop=true blocks edits; hard_stop=false is not permission. Preserve freshness, provenance, network consent and budgets. "
+        "Optional context_format=patch_context selects read-only v4 evidence representation only, never mutation/workflow permission. "
+        "Omitted/null retains docs defaults. Patch representation has no internal compaction cap; retrieval/runtime guards remain unchanged."
     ),
     "prepare_docs": (
         "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "
@@ -697,10 +699,10 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
 }
 
 PUBLIC_ADVERTISED_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
-    "get_docs_context": {
+    "get_docs_context": {"oneOf": [{
         "type": "object", "required": ["status"], "properties": {
             "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
-            "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
+            "kind": {"enum": ["docs_answer", "docs_context"]},
             "estimated_tokens": {"type": "integer"},
             "context_quality": {"type": "object"},
             "read_next": {"type": "array", "maxItems": 1, "items": {"type": "object"}},
@@ -715,7 +717,7 @@ PUBLIC_ADVERTISED_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "missing": {"type": "array", "maxItems": 5, "items": {"type": "string"}},
             "recommended_next_action": {"type": "object"},
         },
-    },
+    }, copy.deepcopy(PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["oneOf"][1])]},
 }
 
 __all__=[n for n in globals() if not n.startswith('__')]

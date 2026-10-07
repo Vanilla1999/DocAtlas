@@ -293,6 +293,7 @@ def test_real_dispatch_and_both_terminal_transports_preserve_over_32000_bytes(ne
     import jsonschema
     import mcp.types as mcp_types
     from docmancer.mcp._docs_server_part01 import call_docs_tool_payload, _mcp_tool_result
+    from docmancer.mcp._docs_server_part01 import current_docs_surface
     from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload
     from docmancer.mcp._docs_server_schema import PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
 
@@ -304,6 +305,10 @@ def test_real_dispatch_and_both_terminal_transports_preserve_over_32000_bytes(ne
     assert len(canonical.encode("utf-8")) > 32000
     assert result["estimated_tokens"] > 2000 and len(result["sources"]) == 12
     jsonschema.validate(result, PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA)
+    tool = next(tool for tool in current_docs_surface(env={}).tools if tool.name == "get_docs_context")
+    jsonschema.validate(result, tool.output_schema)
+    assert "context_format" in tool.input_schema["properties"]
+    assert "context_format=patch_context" in tool.description
     assert compact_mcp_payload(result, max_bytes=1) is result
     structured = _mcp_tool_result(mcp_types, result, text_fallback=False)
     assert structured.structuredContent == result
@@ -355,3 +360,27 @@ def test_explicit_mutation_constraints_and_request_plan_are_lossless(necessary_e
     assert mutation["request_plan"]["mutation_targets"][0]["value"] == target
     assert mutation["request_plan"]["acceptance_conditions"][0]["text"] == acceptance
     assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+
+
+def test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap(necessary_evidence, tmp_path):
+    import jsonschema
+    from docmancer.mcp._docs_server_part01 import call_docs_tool_payload, current_docs_surface
+
+    necessary_evidence["context_pack"] = necessary_evidence["context_pack"][:5]
+    result = call_docs_tool_payload("get_docs_context", {
+        "question": "Inspect protocol implementations", "context_format": "patch_context",
+    }, OfflineRetrieval(necessary_evidence))
+    assert result["result"] == "data" and result["completeness"] == "partial"
+    assert len(result["missing"]) > 5 and "status" not in result
+    tool = next(tool for tool in current_docs_surface(env={}).tools if tool.name == "get_docs_context")
+    jsonschema.validate(result, tool.to_tool_dict()["outputSchema"])
+    forged = {**result, "edit_ready": True}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(forged, tool.output_schema)
+    docs = call_docs_tool_payload("get_docs_context", {
+        "question": "Protocol configuration",
+    }, OfflineRetrieval({"status": "success", "primary_snippet": source(
+        "Protocol configuration: set `protocol_mode = strict`."
+    )}))
+    assert docs["kind"] == "docs_answer" and docs["estimated_tokens"] <= 800
+    jsonschema.validate(docs, tool.output_schema)

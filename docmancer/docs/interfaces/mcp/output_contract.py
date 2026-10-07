@@ -183,8 +183,9 @@ def is_v4_patch_projection(payload: dict[str, Any]) -> bool:
         or payload.get("completeness") not in ("complete", "partial", "unavailable")):
         return False
     from docmancer.docs.application.action_packet import (
-        refresh_action_packet_estimate, validate_action_packet,
+        ACTION_PACKET_OUTPUT_SCHEMA, refresh_action_packet_estimate,
     )
+    from jsonschema import Draft202012Validator, validators
     estimated = deepcopy(payload)
     refresh_action_packet_estimate(estimated)
     if payload.get("estimated_tokens") != estimated["estimated_tokens"]:
@@ -192,7 +193,15 @@ def is_v4_patch_projection(payload: dict[str, Any]) -> bool:
     core = {key: deepcopy(value) for key, value in payload.items()
             if key not in {"kind", "recommended_next_action", "source_search_status"}}
     refresh_action_packet_estimate(core)
-    if validate_action_packet(core):
+    # Do not recreate selector identities from inline text at this terminal
+    # boundary: attribution/proof-role metadata lives in the upstream snapshot.
+    strict_validator = validators.extend(
+        Draft202012Validator,
+        type_checker=Draft202012Validator.TYPE_CHECKER.redefine(
+            "integer", lambda checker, value: type(value) is int,
+        ),
+    )
+    if not strict_validator(ACTION_PACKET_OUTPUT_SCHEMA).is_valid(core):
         return False
     from docmancer.docs.application.model_visible_projection import _patch_recovery_errors
     return not _patch_recovery_errors(payload, core)
