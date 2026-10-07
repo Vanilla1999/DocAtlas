@@ -7,6 +7,10 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "scripts/test-install.sh",  # Reviewed nested-config/JSONC installer checks.
+    "tests/test_nl_dictionary_removal_consumer_contract.py",
+    "tests/test_dictionary_exit_selector_visibility.py",
+    "tests/diagnostic_labels.dictionary_exit_selector_visibility.json",
     "README.md",  # Coordinator: reviewed auto-install command documentation.
     # Coordinator records for the explicitly approved storage continuation.
     "v2plan/mcp-storage/AUTHORIZATION.md",

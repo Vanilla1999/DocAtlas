@@ -373,6 +373,12 @@ only reviewed slices, pushes the exact resulting branch SHA and reports real
 remote results. Unexpected defects stop the bounded slice instead of initiating
 new architecture or unrestricted test migration.
 
+Independent reviews approved installer `04087e91` and active callers `c9493936`.
+Integrated as `8430e1b9` / `59b398d0`. Combined-tree checks: 16 installer checks
+and 106 active caller/Python installer tests PASS; scope/syntax/whitespace/D1 PASS.
+No production runtime changes. Dedicated platform proof implementation is pending;
+no remote result or full required-CI claim yet.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
