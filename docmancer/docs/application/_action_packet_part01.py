@@ -452,8 +452,26 @@ def _dedupe_id(item: dict[str, Any]) -> str:
 
 
 def _evidence_id(item: dict[str, Any]) -> str:
+    from collections.abc import Mapping
+    from .evidence_candidates import _span, display_text, section, source_path, symbols
+    from docmancer.retrieval.contracts import canonical_hash
+
+    metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+    stable_id = str(item.get("stable_chunk_id") or item.get("stable_child_id")
+                    or metadata.get("stable_chunk_id") or item.get("stable_id") or "")
+    if not stable_id and source_path(item) and display_text(item):
+        # Match the selector's deterministic fallback identity exactly.
+        stable_id = "legacy:" + canonical_hash({
+            "path": source_path(item), "section": section(item),
+            "content": hashlib.sha256(display_text(item).encode("utf-8")).hexdigest(),
+            "symbols": sorted(symbols(item)),
+        })[:40]
+    char_start, char_end = _span(item, "char")
     identity = json.dumps(
         {
+            "stable_id": stable_id,
+            "char_start": char_start,
+            "char_end": char_end,
             "path": _source_path(item),
             "source": item.get("source"),
             "url": item.get("url"),

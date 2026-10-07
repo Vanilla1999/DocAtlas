@@ -174,6 +174,8 @@ def validate_action_packet(
         by_stable = {row["stable_id"]: row for row in sources}
         if len(by_stable) != len(sources):
             errors.append("duplicate source stable_id")
+        if len({row["evidence_id"] for row in sources}) != len(sources):
+            errors.append("duplicate source evidence_id")
         for source in sources:
             if source["content_sha256"] != hashlib.sha256(source["text"].encode("utf-8")).hexdigest():
                 errors.append("source content_sha256 mismatch")

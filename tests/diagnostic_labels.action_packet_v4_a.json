@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_action_packet_v4_contract.py": "c312d0c670dbeb3195180cdaa16bf19510891db04aba4e6bf487414a7df14448"
+    "tests/test_action_packet_v4_contract.py": "fcb8f535f429f93a77f4b1cae9872eedb146f5530bc7357c968255b238d0c016"
   }
 }

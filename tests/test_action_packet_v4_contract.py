@@ -407,3 +407,52 @@ def test_non_target_mutation_resolution_attributes_are_evidence_bound(change, tm
     assert any("mutation resolution assertion" in error for error in validate_action_packet(
         packet, evidence_items=evidence, project_path=str(tmp_path), mutation_intent_contract=contract,
     ))
+
+
+@pytest.mark.parametrize("stable_children", [False, True])
+def test_distinct_same_text_windows_have_unique_evidence_ids(stable_children):
+    text = "Cache enabled."
+    first = {**_evidence(text=text), "char_start": 0, "char_end": len(text),
+             "line_start": 1, "line_end": 1}
+    second = {**first, "char_start": 100, "char_end": 100 + len(text)}
+    if stable_children:
+        first.update(stable_chunk_id="first-window-child", parent_logical_id="cache-parent",
+                     display_content_hash=hashlib.sha256(text.encode()).hexdigest())
+        second.update(stable_chunk_id="different-window-child", parent_logical_id="cache-parent",
+                      display_content_hash=hashlib.sha256(text.encode()).hexdigest())
+    else:
+        first["stable_id"] = "first-legacy-window"
+        second["stable_id"] = "second-legacy-window"
+    ids = {evidence_identity_for_item(row)[0] for row in (first, second)}
+    assert len(ids) == 2
+    assert evidence_identity_for_item(first) == evidence_identity_for_item(deepcopy(first))
+    deduplicated = build_action_packet(question="cache", context_pack=[first, deepcopy(first)],
+                                       public_requirements=(text,))
+    assert len(deduplicated["sources"]) == 1
+    assert deduplicated["sources"][0]["evidence_id"] == evidence_identity_for_item(first)[0]
+    for windows in ([first, second], [second, first]):
+        packet = build_action_packet(question="cache", context_pack=windows, public_requirements=(text,))
+        assert len(packet["sources"]) == 2 and packet["completeness"] == "complete"
+        assert {row["evidence_id"] for row in packet["sources"]} == ids
+        assert {row["char_start"] for row in packet["sources"]} == {0, 100}
+        assert validate_action_packet(packet, evidence_items=windows) == []
+        assert validate_action_packet(packet) == []
+
+
+def test_evidence_identity_uses_normalized_legacy_id_and_character_span():
+    first = _evidence()
+    candidate = normalize_candidates([first], result_kind="patch_context")[0][0]
+    explicit = {**first, "stable_id": candidate.stable_id}
+    assert evidence_identity_for_item(first) == evidence_identity_for_item(explicit)
+    shifted = {**first, "char_start": 200, "char_end": 200 + len(first["content"])}
+    assert evidence_identity_for_item(first)[0] != evidence_identity_for_item(shifted)[0]
+
+
+def test_duplicate_evidence_ids_rejected_without_external_evidence():
+    packet, evidence, _ = _canonical_packet()
+    duplicate = {**packet["sources"][0], "stable_id": "another-stable-window",
+                 "char_start": 200, "char_end": 200 + len(evidence[0]["content"])}
+    packet["sources"].append(duplicate)
+    refresh_action_packet_estimate(packet)
+    assert "duplicate source evidence_id" in validate_action_packet(packet)
+    assert "duplicate source evidence_id" in validate_action_packet(packet, evidence_items=evidence)
