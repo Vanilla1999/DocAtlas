@@ -1,12 +1,13 @@
 # ActionPacket v4 — реализация и проверка
 
-Статус: финальная миграция косвенных eval consumers и независимая проверка ещё выполняются. Это не release acceptance.
+Статус: core R1–R8 независимо закрыты; исправление R9 интегрировано и ожидает независимого подтверждения. Это не release acceptance.
 
 ## Контракт и расположение
 
 - Worktree: `/tmp/opencode/action-packet-v4-integration`.
 - Ветка: `implementation/action-packet-v4-integration`.
 - Исходный SHA: `b89fa3cc16534445501bab14e0d63e099e9f61f6`.
+- Интегрированный production/eval snapshot: `0f722677` (последующие commits отчётов не меняют реализацию).
 - Новый результат: `data` с source-bound evidence либо компактный `failure`;
   полнота: `complete`, `partial`, `unavailable`. `edit_ready` всегда `false`.
 - Полезное partial evidence сохраняется вместе с явными requirements,
@@ -84,7 +85,7 @@ PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 DOCATLAS_AUTO_VECTORS=0 \
   tests/test_action_packet_v4_public.py \
   tests/test_action_packet_v4_integrated.py \
   tests/test_action_packet_v4_eval.py \
-  --basetemp=/tmp/opencode/action-packet-v4-final-tests \
+  --basetemp=/tmp/opencode/action-packet-v4-final-r9-tests \
   -o cache_dir=/tmp/opencode/action-packet-v4-final-cache
 
 PYTHONPATH=. PYTHONDONTWRITEBYTECODE=1 \
@@ -95,9 +96,12 @@ python3 v2plan/action-packet-v4/VERIFY_SCOPE.py
 git diff --check b89fa3cc16534445501bab14e0d63e099e9f61f6
 ```
 
-Последний совместный промежуточный run при HEAD `d84ff297`: **184 PASS**, exit 0.
-Examples / ownership / syntax / diff checks: PASS. Финальный run и reviewer closure
-будут зафиксированы после последней интеграции.
+Финальный совместный run production snapshot `0f722677`: **195 PASS**, exit 0.
+Examples / ownership / syntax / diff checks: PASS; все 44 изменённых source/eval
+модуля успешно импортированы; инструкция проверена реальным dispatch тестом.
+Ownership: 61 changed paths, 2566
+unchanged baseline paths; syntax: 51 source/new-test modules. Каждый из
+перечисленных checks завершился exit 0. Независимое закрытие R9 ещё проверяется.
 
 ## Независимый review
 
@@ -105,8 +109,13 @@ Examples / ownership / syntax / diff checks: PASS. Финальный run и rev
   Нашёл R1–R6, несмотря на 106 зелёных новых tests.
 - Координатор отдельно воспроизвёл R7 (casefold потеря requirements) и
   R8 (одинаковый ev ID разных indexed windows); новые regressions сначала FAIL.
-- Исправления владельцев интегрированы; закрытие findings зависит от повторной
-  независимой проверки, а не worker handoffs. Проверка выполняется.
+- [REVIEW_R_CLOSURE.md](REVIEW_R_CLOSURE.md): независимые воспроизведения
+  подтвердили закрытие R1–R8.
+- [REVIEW_R_FINAL.md](REVIEW_R_FINAL.md): provider composer сохраняет полный
+  ~55.9 KB patch message на восьми последующих requests; выявлен Medium R9
+  в активной required-once инструкции. Исправление интегрировано; regression
+  исполняет actual instruction injection и public dispatch, ровно один retrieval,
+  `retrieval_succeeded=True`, `edit_ready=False`. Независимый rereview выполняется.
 
 ## Границы и ограничения
 
@@ -116,7 +125,8 @@ Examples / ownership / syntax / diff checks: PASS. Финальный run и rev
   посторонние `v2plan/artifacts/` не изменяются.
 - Installed wheels/packs/deployed SDK/current-index parity, full-product quality,
   historical evaluation acceptance и release/security certification — UNKNOWN.
-- Изменённые файлы и финальный интегрированный SHA будут добавлены после closure.
+- Реализация находится в отдельном integration worktree; пользовательская
+  ветка остаётся `b89fa3cc`, status — только прежние untracked artifacts.
 
 ## Изменённые source / eval / новые tests
 
@@ -156,6 +166,7 @@ eval/task_level/_github_models_shared.py
 eval/task_level/_isolated_delivery_part02.py
 eval/task_level/_isolated_delivery_shared.py
 eval/task_level/_one_call_agent_loop_core.py
+eval/task_level/conditions.py
 eval/task_level/evaluators/actionability.py
 eval/task_level/evaluators/docatlas_utilization.py
 eval/task_level/evaluators/policy.py
@@ -178,5 +189,5 @@ tests/test_action_packet_v4_selection.py
 
 Новые coordination / verification / review документы находятся только в
 `v2plan/action-packet-v4/`: `CONTRACT.md`, этот отчёт, `REVIEW_R.md`,
-`REVIEW_R_CLOSURE.md`, `VERIFY_EXAMPLES.py`, `VERIFY_SCOPE.py`.
+`REVIEW_R_CLOSURE.md`, `REVIEW_R_FINAL.md`, `VERIFY_EXAMPLES.py`, `VERIFY_SCOPE.py`.
 Точный список всего diff: `git diff --name-only b89fa3cc16534445501bab14e0d63e099e9f61f6`.
