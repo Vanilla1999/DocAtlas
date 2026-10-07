@@ -151,3 +151,18 @@ checks. Portable denial checks remain under ordinary discovery. No CI gate,
 workflow or pytest/conftest configuration changes; unsupported explicit positive
 runs fail closed. Header normalization must record upstream/normalized hashes.
 Production persistence and R1 closure remain unapproved.
+
+## Native research evidence-contract correction
+
+Independent reaudit resolved the reproduced close false-green and header gate,
+but the labeled, non-discovered pytest research module breaks directory inventory.
+Coordinator accepted R's exact-eight-file solution: convert
+`tests/mcp_storage_native_spike_checks.py` to a genuinely standalone finite runner
+and remove only its newly added pytest inventory labels/hash. Preserve all 27
+research scenarios and explicit unsupported-runtime failure. No hidden pytest
+tests without labels, inventory suppression, historical changes or CI gate edits.
+
+Evidence must distinguish 16 normal-gated portable pytest checks from 27
+standalone research checks. Standalone checks are not ordinary CI certification.
+Default directory inventory compatibility and the verifier wording must be fixed
+before independent review/integration. Production persistence remains blocked.

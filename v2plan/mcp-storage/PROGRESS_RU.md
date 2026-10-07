@@ -130,3 +130,25 @@ positive profile reject до compilation. Directory-discovery inventory conflict
 ещё BLOCKED, без обхода gates/CI/conftest. Independent native R повторно
 проверяет исправления и минимальный способ закрыть inventory conflict.
 Ни исходный spike, ни followup пока не интегрированы; R1 остаётся OPEN.
+
+R retention audit: 280 focused tests independently PASS, но integration HELD.
+Два medium findings: generic `**kwargs` facade может silently drop retention
+flag (независимо воспроизведено: 4 sources вместо 32); текущие mocked-store
+tests не доказывают неизменность actual stored-generation/fallback reads.
+B исправляет explicit delegation support и добавляет реальные temporary stored
+generation / nonempty fallback traces, duplicate lookup и unresolved admission
+regressions. Source audit иных acquisition/freshness нарушений не обнаружил;
+validators untouched, но это не closure двух findings или installed acceptance.
+
+Native independent reaudit `a537e18a`: 43 requested-runtime pytest checks PASS
+(16 portable + 27 explicit); portable Python 3.12: 16 PASS; unsupported positive
+setup fails до compile. Real close EIO independently reproduced: теперь error /
+unknown после commit, не false-green. Header diff/provenance PASS. Однако
+directory inventory conflict остаётся blocking; исходные 27 gated positives не
+являются ordinary CI compatibility.
+
+Coordinator принял standalone runner correction: все 27 research scenarios
+сохраняются, скрытый pytest-модуль преобразуется в настоящий finite script,
+удаляются только его новые labels/hash. Portable pytest gates остаются. Future
+evidence: 16 normal-gated checks + 27 standalone checks, не CI certification.
+A реализует correction; native integration всё ещё HELD, R1 OPEN.
