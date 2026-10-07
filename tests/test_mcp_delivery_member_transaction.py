@@ -11,6 +11,7 @@ import pytest
 import yaml
 
 from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.core.member_storage_policy import MemberStoragePolicy
 from docmancer.docs.application.project_docs_member_transaction import (
     MemberDocument, PinnedProject, UnsafeSQLitePathMutation, catalog_entry_hash,
     local_project_identity, member_document,
@@ -22,21 +23,25 @@ from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 
 
 @pytest.fixture
-def local(tmp_path):
+def local(tmp_path, monkeypatch):
     root = tmp_path / "project"
     root.mkdir()
     for path, text in (("README.md", "# Overview\n\nOriginal lexical evidence.\n"),
                        ("other.md", "# Other\n\nUnrelated evidence.\n")):
         (root / path).write_text(text)
-    (root / "docatlas.yaml").write_text("index:\n  db_path: .docatlas/docatlas.db\n")
+    home = tmp_path / "app-home"
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
+    policy = MemberStoragePolicy(home, home / "mcp" / "members.db")
+    (root / "docatlas.yaml").write_text(f"index:\n  db_path: {policy.db_path}\n")
     (root / "docatlas.project-docs.yaml").write_text(yaml.safe_dump({
         "schema_version": 1, "code_files": [], "documents": [
             {"path": path, "role": "overview", "scope": "project", "description": path}
             for path in ("README.md", "other.md")
         ],
     }))
-    store = SQLiteStore(root / ".docatlas" / "docatlas.db")
-    app = ProjectDocsService(SimpleNamespace())
+    policy.initialize()
+    store = SQLiteStore(policy.db_path)
+    app = ProjectDocsService(SimpleNamespace(member_storage_policy=policy))
     return root, store, app
 
 
@@ -149,22 +154,20 @@ def test_public_dispatch_and_no_extraction(local, monkeypatch):
     payload = handle_prefetch_tool("prepare_docs", {
         "action": "sync_project_docs", "project_path": str(root), "mutation": request(local),
     }, SimpleNamespace(project_docs=app))
-    assert payload["status"] == "blocked"
-    assert payload["reason_code"] == "unsafe_sqlite_path_mutation"
-    assert payload["retryable"] is False
-    assert payload["mutation_performed"] is False
+    assert payload["status"] == "success"
     assert list(store.extracted_dir.iterdir()) == []
-    assert state(store) == before
+    assert len(state(store)["sources"]) == len(before["sources"]) + 1
 
 
 def test_direct_ingest_operation(local):
     root, store, app = local
     before = state(store)
-    with pytest.raises(UnsafeSQLitePathMutation):
-        app.ingest_project_docs(str(root), mutation=request(local, operation="ingest_project_docs"))
+    result = app.ingest_project_docs(str(root), mutation=request(local, operation="ingest_project_docs"))
+    assert result.status == "success"
+    committed = state(store)
     with pytest.raises(PermissionError, match="matching operation"):
         app.ingest_project_docs(str(root), mutation=request(local))
-    assert state(store) == before
+    assert state(store) == committed and committed != before
 
 
 def test_current_reader_hash_binding_and_crlf_bytes(local):
@@ -237,7 +240,7 @@ def test_sqlite_writer_contention_is_fail_closed(local):
     before = state(local[1])
     with local[1]._connect() as conn:
         conn.execute("BEGIN IMMEDIATE")
-        with pytest.raises(UnsafeSQLitePathMutation):
+        with pytest.raises(sqlite3.OperationalError, match="locked"):
             sync(local, mutation)
         conn.rollback()
     assert state(local[1]) == before
@@ -297,7 +300,7 @@ def test_source_and_storage_boundaries(local, kind):
                    "vector": "retrieval:\n  default_mode: dense\n",
                    "config_shadow": "index:\n  db_path: /different/user.db\n"}
         (root / "docatlas.yaml").write_text(configs[kind] if kind == "config_shadow" else
-                                            "index:\n  db_path: .docatlas/docatlas.db\n" + configs[kind])
+                                            f"index:\n  db_path: {store.db_path}\n" + configs[kind])
     elif kind == "utf8":
         (root / "README.md").write_bytes(b"\xff")
         mutation["documents"][0]["content_sha256"] = hashlib.sha256(b"\xff").hexdigest()
@@ -365,6 +368,12 @@ def test_storage_links_denied_without_mutation(local, kind):
     if kind == "journal_symlink":
         assert external.read_bytes() == b"untouched"
         Path(str(store.db_path) + "-journal").unlink()
+    if kind == "database_symlink":
+        store.db_path.unlink()
+        external.rename(store.db_path)
+    elif kind == "directory_symlink":
+        store.db_path.parent.unlink()
+        directory.rename(store.db_path.parent)
     assert state(store) == before
 
 
@@ -396,13 +405,13 @@ def test_same_generation_concurrent_writers_cannot_both_commit(local):
         barrier.wait(timeout=5)
         try:
             return sync(local, mutation).status
-        except UnsafeSQLitePathMutation:
+        except (ValueError, sqlite3.OperationalError):
             return "denied"
     with ThreadPoolExecutor(max_workers=2) as pool:
         results = list(pool.map(lambda _: writer(), range(2)))
-    assert results == ["denied", "denied"]
+    assert sorted(results) == ["denied", "success"]
     with local[1]._connect() as conn:
-        assert conn.execute("SELECT count(*) FROM sources").fetchone()[0] == 0
+        assert conn.execute("SELECT count(*) FROM sources").fetchone()[0] == 1
 
 
 @pytest.mark.parametrize("input_path", ["docatlas.project-docs.yaml", "docatlas.yaml", ".gitignore", "README.md"])
@@ -477,19 +486,18 @@ def test_replacement_between_validation_and_read_is_confined(local, kind, monkey
 
 
 @pytest.mark.parametrize("kind", ["directory", "database", "journal", "wal", "shm", "hardlink"])
-@pytest.mark.parametrize("phase", ["before_snapshot", "before_connect", "after_final_recheck"])
+@pytest.mark.parametrize("phase", ["before_generation", "before_connect", "after_final_recheck"])
 def test_storage_swap_cannot_connect_or_write_foreign_files(local, kind, phase, monkeypatch):
     import docmancer.docs.application.project_docs_member_transaction as module
     root, store, _app = local
     mutation = request(local)
     outside = SQLiteStore(root.parent / "outside" / ".docatlas" / "docatlas.db")
     outside_before = outside.db_path.read_bytes()
-    original_connect = sqlite3.connect
-    def memory_only(database, *args, **kwargs):
-        assert database == ":memory:", "pathname SQLite connect attempted"
+    original_connect = MemberStoragePolicy.connect
+    def checked_connect(self):
         if phase == "before_connect":
             replace()
-        return original_connect(database, *args, **kwargs)
+        return original_connect(self)
     did_replace = []
     def replace():
         if did_replace:
@@ -506,18 +514,18 @@ def test_storage_swap_cannot_connect_or_write_foreign_files(local, kind, phase, 
         else:
             suffix = {"journal": "-journal", "wal": "-wal", "shm": "-shm"}[kind]
             Path(str(store.db_path) + suffix).symlink_to(outside.db_path)
-    original_read = module._read_member
-    def read(pinned, relative, limit, **kwargs):
-        if relative == ".docatlas/docatlas.db" and phase == "before_snapshot":
+    original_generation = MemberStoragePolicy.generation
+    def generation(self):
+        if phase == "before_generation":
             replace()
-        return original_read(pinned, relative, limit, **kwargs)
+        return original_generation(self)
     original_upsert = SQLiteStore.upsert_project_members
     def upsert(self, *args, **kwargs):
         if phase == "after_final_recheck":
             replace()
         return original_upsert(self, *args, **kwargs)
-    monkeypatch.setattr(module, "_read_member", read)
-    monkeypatch.setattr(module.sqlite3, "connect", memory_only)
+    monkeypatch.setattr(MemberStoragePolicy, "generation", generation)
+    monkeypatch.setattr(MemberStoragePolicy, "connect", checked_connect)
     monkeypatch.setattr(SQLiteStore, "upsert_project_members", upsert)
     with pytest.raises((PermissionError, OSError)):
         sync(local, mutation)
@@ -555,7 +563,7 @@ def test_remaining_aggregate_allowance_prevents_excess_member_read(local, monkey
     first = (root / "README.md").stat().st_size
     second = (root / "other.md").stat().st_size
     (root / "docatlas.yaml").write_text(
-        "index:\n  db_path: .docatlas/docatlas.db\nproject:\n  max_scanned_bytes: " + str(first + second - 1) + "\n"
+        f"index:\n  db_path: {store.db_path}\nproject:\n  max_scanned_bytes: " + str(first + second - 1) + "\n"
     )
     mutation = request(local, paths=("README.md", "other.md"))
     second_inode = (root / "other.md").stat().st_ino
@@ -606,7 +614,7 @@ def test_unsupported_platform_denied_before_any_io(local, missing, monkeypatch):
     else:
         monkeypatch.setattr(module, "_DESCRIPTOR_READ_SUPPORTED", False)
     monkeypatch.setattr(module.os, "open", lambda *_args, **_kwargs: pytest.fail("filesystem IO"))
-    monkeypatch.setattr(module.sqlite3, "connect", lambda *_args, **_kwargs: pytest.fail("SQLite IO"))
+    monkeypatch.setattr(sqlite3, "connect", lambda *_args, **_kwargs: pytest.fail("SQLite IO"))
     with pytest.raises(PermissionError, match="unsupported_descriptor_read_platform"):
         sync(local, mutation)
 
@@ -616,7 +624,7 @@ def test_storage_entry_denies_before_consuming_documents_or_connecting(local, mo
     def documents():
         pytest.fail("documents consumed before unsafe route rejection")
         yield
-    monkeypatch.setattr(module.sqlite3, "connect", lambda *_args, **_kwargs: pytest.fail("disk connect"))
+    monkeypatch.setattr(sqlite3, "connect", lambda *_args, **_kwargs: pytest.fail("disk connect"))
     with pytest.raises(UnsafeSQLitePathMutation):
         local[1].upsert_project_members(documents(), project_path=str(local[0]), expected_generation_id=None)
 
@@ -709,7 +717,7 @@ def test_root_local_identity_never_reads_git_metadata(local, git_kind, monkeypat
 
 @pytest.mark.parametrize("git_kind", ["none", "repository", "worktree_marker"])
 def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, monkeypatch):
-    """Fixture-author persistence only; the application disk route remains blocked."""
+    """Actual member preparation feeds real lexical retrieval with bound bytes."""
     from docmancer.agent import DocmancerAgent
     from docmancer.core.config import DocmancerConfig
     from docmancer.docs.application.docs_job_service import DocsJobTracker
@@ -740,12 +748,8 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
         subprocess.run(["git", "-C", str(root), "config", "remote.origin.url", "https://invalid.example/fixture.git"], check=True)
     elif git_kind == "worktree_marker":
         (root / ".git").write_text("gitdir: /unselected/external/worktree\n")
-    conn = memory_fixture(local)
-    outcome = memory_upsert(local, conn, paths=("README.md", "protocols.md"))
-    # Explicit fixture setup publishes the committed RAM generation, not a
-    # bypass/test shim in the production mutation entry or retrieval functions.
-    store.db_path.write_bytes(conn.serialize())
-    conn.close()
+    result = sync(local, request(local, paths=("README.md", "protocols.md")))
+    outcome = result.diagnostics["metrics"]
     config = DocmancerConfig()
     config.index.db_path = str(store.db_path)
     config.index.extracted_dir = str(store.extracted_dir)

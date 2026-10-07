@@ -535,7 +535,10 @@ class _ProjectDocsServicePart01:
             if skip_known is not True or with_vectors is not False or _candidate_paths is not None or _coordination_held is not False:
                 raise PermissionError("Member ingestion does not accept legacy mutation flags")
             from .project_docs_member_transaction import execute_member_transaction
-            metadata, outcome = execute_member_transaction(project_path, mutation, operation="ingest_project_docs")
+            metadata, outcome = execute_member_transaction(
+                project_path, mutation, operation="ingest_project_docs",
+                storage_policy=getattr(self.facade, "member_storage_policy", None),
+            )
             return ProjectDocsIngestResult(
                 status="success", project=metadata, candidate_count=outcome["members"],
                 sections_indexed=outcome["sections_indexed"],

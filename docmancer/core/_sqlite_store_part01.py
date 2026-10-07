@@ -18,7 +18,8 @@ class _SQLiteStorePart01:
         return conn
 
     def _ensure_schema(self) -> None:
-        with self._connect() as conn:
+        from contextlib import closing
+        with closing(self._connect()) as conn, conn:
             try:
                 conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS fts5_check USING fts5(value)")
                 conn.execute("DROP TABLE IF EXISTS fts5_check")
@@ -295,15 +296,39 @@ class _SQLiteStorePart01:
 
     def upsert_project_members(
         self, documents: Iterable[Document], *, project_path: str,
-        expected_generation_id: str | None,
+        expected_generation_id: str | None, storage_policy=None,
     ) -> dict[str, Any]:
-        """Reject pathname persistence before connecting, recovery or writes.
-
-        Python's SQLite VFS cannot bind database/sidecar opens to selected FDs.
-        Neither a stat comparison nor a /proc FD pathname closes that gap.
-        """
+        """Publish only to an explicitly selected trusted local MCP store."""
+        from docmancer.core.member_storage_policy import MemberCommitUnknown, MemberStoragePolicy
         from docmancer.docs.application.project_docs_member_transaction import reject_pathname_sqlite_mutation
-        reject_pathname_sqlite_mutation()
+        if not isinstance(storage_policy, MemberStoragePolicy) or self.db_path != storage_policy.db_path:
+            reject_pathname_sqlite_mutation()
+        storage_policy.validate(Path(project_path), str(self.db_path))
+        docs = self._validated_project_members(documents, project_path)
+        conn = storage_policy.connect()
+        commit_started = False
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            outcome = self._apply_project_members(conn, docs, project_path, expected_generation_id)
+            commit_started = True
+            conn.commit()
+        except BaseException as exc:
+            try:
+                conn.rollback()
+            except Exception as rollback_error:
+                raise MemberCommitUnknown("member rollback failed; inspect the trusted store") from rollback_error
+            io_error = isinstance(exc, sqlite3.DatabaseError) and (
+                getattr(exc, "sqlite_errorcode", 0) & 255
+            ) in {sqlite3.SQLITE_IOERR, sqlite3.SQLITE_FULL}
+            if commit_started or io_error:
+                raise MemberCommitUnknown("member commit outcome is unknown; inspect before retrying") from exc
+            raise
+        finally:
+            try:
+                conn.close()
+            except Exception as exc:
+                raise MemberCommitUnknown("member connection close failed; outcome is unknown") from exc
+        return outcome
 
     def _upsert_project_members_in_memory(
         self, snapshot: bytes, documents: Iterable[Document], *,
@@ -317,6 +342,23 @@ class _SQLiteStorePart01:
         """
         if not isinstance(snapshot, bytes) or len(snapshot) > 32 * 1024 * 1024:
             raise PermissionError("member transaction requires bounded in-memory snapshot bytes")
+        docs = self._validated_project_members(documents, project_path)
+        conn = sqlite3.connect(":memory:")
+        conn.row_factory = sqlite3.Row
+        try:
+            conn.execute("PRAGMA temp_store=MEMORY")
+            conn.deserialize(snapshot)
+            conn.execute("BEGIN IMMEDIATE")
+            outcome = self._apply_project_members(conn, docs, project_path, expected_generation_id)
+            conn.commit()
+            return outcome, conn.serialize()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def _validated_project_members(self, documents, project_path):
         docs = [self._current_schema_document(doc) for doc in documents]
         if not docs or len(docs) > 500 or len({doc.source for doc in docs}) != len(docs):
             raise ValueError("member batch requires bounded unique documents")
@@ -338,86 +380,75 @@ class _SQLiteStorePart01:
                 or metadata.get("child_hard_max_tokens") != 512
             ):
                 raise PermissionError("member batch has invalid project ownership")
-        # Own the connection: database_list's empty filename also describes a
-        # temporary disk database and is not proof that a supplied handle is RAM.
-        conn = sqlite3.connect(":memory:")
-        conn.row_factory = sqlite3.Row
-        try:
-            conn.execute("PRAGMA temp_store=MEMORY")
-            conn.deserialize(snapshot)
-            conn.execute("BEGIN IMMEDIATE")
-            active = self._active_generation_id(conn)
-            if active != expected_generation_id:
-                raise ValueError("active generation precondition failed")
+        return docs
+
+    def _apply_project_members(self, conn, docs, project_path, expected_generation_id):
+        # The caller owns the write transaction, including CAS and immutable ownership.
+        active = self._active_generation_id(conn)
+        if active != expected_generation_id:
+            raise ValueError("active generation precondition failed")
+        if active:
+            info = conn.execute("SELECT * FROM index_generations WHERE generation_id = ?", (active,)).fetchone()
+            config = ChunkingConfig()
+            retrieval_hash = canonical_hash({
+                "schema_version": "contextual-retrieval-v1",
+                "chunk_config_hash": config.config_hash,
+                "context_config_hash": ContextConfig().config_hash,
+            })
+            if (info is None or info["config_hash"] != config.config_hash
+                or info["retrieval_config_hash"] != retrieval_hash
+                or info["context_config_hash"] != ContextConfig().config_hash
+                or str(info["vector_backend"] or "")):
+                raise ValueError("member batch requires compatible lexical generation")
+            self._validate_generation(conn, active, config, ContextConfig())
+        elif conn.execute("SELECT 1 FROM sources LIMIT 1").fetchone():
+            raise ValueError("nonempty storage without active generation is unresolved")
+        changed = []
+        new_count = 0
+        for doc in docs:
+            row = conn.execute("SELECT content, metadata_json FROM sources WHERE source = ?", (doc.source,)).fetchone()
+            if row:
+                existing = json.loads(row["metadata_json"])
+                if any(existing.get(key) != (doc.metadata or {}).get(key) for key in (
+                    "project_path", "project_doc_path", "project_docs", "source_class",
+                    "project_identity", "repository_identity",
+                )):
+                    raise PermissionError("existing source belongs to a different owner")
+            else:
+                new_count += 1
+            # A generation must not contain a conflicting immutable owner.
             if active:
-                info = conn.execute("SELECT * FROM index_generations WHERE generation_id = ?", (active,)).fetchone()
-                config = ChunkingConfig()
-                retrieval_hash = canonical_hash({
-                    "schema_version": "contextual-retrieval-v1",
-                    "chunk_config_hash": config.config_hash,
-                    "context_config_hash": ContextConfig().config_hash,
-                })
-                if (info is None or info["config_hash"] != config.config_hash
-                    or info["retrieval_config_hash"] != retrieval_hash
-                    or info["context_config_hash"] != ContextConfig().config_hash
-                    or str(info["vector_backend"] or "")):
-                    raise ValueError("member batch requires compatible lexical generation")
-                self._validate_generation(conn, active, config, ContextConfig())
-            elif conn.execute("SELECT 1 FROM sources LIMIT 1").fetchone():
-                raise ValueError("nonempty storage without active generation is unresolved")
-            changed = []
-            new_count = 0
-            for doc in docs:
-                row = conn.execute("SELECT content, metadata_json FROM sources WHERE source = ?", (doc.source,)).fetchone()
-                if row:
-                    existing = json.loads(row["metadata_json"])
-                    if any(existing.get(key) != (doc.metadata or {}).get(key) for key in (
+                prior = conn.execute("SELECT content, metadata_json FROM generation_sources WHERE generation_id = ? AND source = ?",
+                                      (active, doc.source)).fetchone()
+                if prior:
+                    owner = json.loads(prior["metadata_json"])
+                    if any(owner.get(key) != (doc.metadata or {}).get(key) for key in (
                         "project_path", "project_doc_path", "project_docs", "source_class",
                         "project_identity", "repository_identity",
                     )):
-                        raise PermissionError("existing source belongs to a different owner")
-                else:
-                    new_count += 1
-                # A generation must not contain a conflicting immutable owner.
-                if active:
-                    prior = conn.execute("SELECT content, metadata_json FROM generation_sources WHERE generation_id = ? AND source = ?",
-                                         (active, doc.source)).fetchone()
-                    if prior:
-                        owner = json.loads(prior["metadata_json"])
-                        if any(owner.get(key) != (doc.metadata or {}).get(key) for key in (
-                            "project_path", "project_doc_path", "project_docs", "source_class",
-                            "project_identity", "repository_identity",
-                        )):
-                            raise PermissionError("active source belongs to a different owner")
-                    if (row and prior and row["content"] == doc.content and existing == doc.metadata
-                        and prior["content"] == doc.content and owner == doc.metadata):
-                        continue
-                changed.append(doc)
-            sections = 0
-            replaced_sections = 0
-            for doc in changed:
-                replaced_sections += int(conn.execute("SELECT count(*) FROM sections WHERE source = ?", (doc.source,)).fetchone()[0])
-                sections += self._add_document(conn, doc)
-                # This lane deliberately publishes no filesystem extraction.
-                conn.execute("UPDATE sources SET markdown_path = '', json_path = '' WHERE source = ?", (doc.source,))
-            generation = active
-            if changed:
-                generation = self._build_candidate_generation(conn, changed, recreate=False)
-                self._activate_generation(conn, generation)
-            conn.commit()
-            outcome = {"transaction": "committed", "generation_id": generation,
-                    "members": len(docs), "new_count": new_count,
-                    "changed_count": len(changed) - new_count,
-                    "unchanged_files": len(docs) - len(changed),
-                    "derived_writes": sections, "derived_deletes": replaced_sections,
-                    "sources_deleted": 0,
-                    "sections_indexed": sections}
-            return outcome, conn.serialize()
-        except Exception:
-            conn.rollback()
-            raise
-        finally:
-            conn.close()
+                        raise PermissionError("active source belongs to a different owner")
+                if (row and prior and row["content"] == doc.content and existing == doc.metadata
+                    and prior["content"] == doc.content and owner == doc.metadata):
+                    continue
+            changed.append(doc)
+        sections = 0
+        replaced_sections = 0
+        for doc in changed:
+            replaced_sections += int(conn.execute("SELECT count(*) FROM sections WHERE source = ?", (doc.source,)).fetchone()[0])
+            sections += self._add_document(conn, doc)
+            # This lane deliberately publishes no filesystem extraction.
+            conn.execute("UPDATE sources SET markdown_path = '', json_path = '' WHERE source = ?", (doc.source,))
+        generation = active
+        if changed:
+            generation = self._build_candidate_generation(conn, changed, recreate=False)
+            self._activate_generation(conn, generation)
+        return {"transaction": "committed", "generation_id": generation,
+                "members": len(docs), "new_count": new_count,
+                "changed_count": len(changed) - new_count,
+                "unchanged_files": len(docs) - len(changed),
+                "derived_writes": sections, "derived_deletes": replaced_sections,
+                "sources_deleted": 0,
+                "sections_indexed": sections}
 
     def add_documents(
         self,

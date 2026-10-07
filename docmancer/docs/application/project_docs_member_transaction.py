@@ -8,13 +8,13 @@ import os
 from pathlib import Path
 import re
 import stat
-import sqlite3
 import time
 from typing import Any
 
 from docmancer.core.models import Document
 from docmancer.core.config import DocmancerConfig
 from docmancer.core.sqlite_store import SQLiteStore
+from docmancer.core.member_storage_policy import MemberStoragePolicy
 from docmancer.docs.domain.source_boundary import SourceBoundary, finite_local_path
 from docmancer.docs.models import ProjectMetadata
 from docmancer.docs.project import DOC_FILE_EXTENSIONS
@@ -50,7 +50,7 @@ class MemberTransaction:
             raise PermissionError("Explicit confirmation and matching operation required")
         storage = value["storage_path"]
         if not isinstance(storage, str) or not Path(storage).is_absolute():
-            raise ValueError("storage_path must be an absolute project-local path")
+            raise ValueError("storage_path must be an absolute host-selected path")
         digest = value["catalog_sha256"]
         if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
             raise ValueError("catalog_sha256 must be a lowercase SHA256 digest")
@@ -120,7 +120,7 @@ def member_document(root: Path, member: MemberDocument, entry: Any, data: bytes)
 
 
 class UnsafeSQLitePathMutation(PermissionError):
-    """No stdlib SQLite API binds the database and sidecars to selected FDs."""
+    """No trusted host storage policy was supplied to the member route."""
 
 
 _DESCRIPTOR_READ_SUPPORTED = (
@@ -132,8 +132,7 @@ _DIR_FD_OPEN = os.open
 
 def reject_pathname_sqlite_mutation() -> None:
     raise UnsafeSQLitePathMutation(
-        "unsafe_sqlite_path_mutation: descriptor-bound SQLite database and sidecar "
-        "opens are unavailable in this route; pathname checks do not authorize writes"
+        "unsafe_sqlite_path_mutation: a trusted host-selected member storage policy is required"
     )
 
 
@@ -258,47 +257,30 @@ def _read_member(root: PinnedProject, relative: str, limit: int,
     return root.read(relative, limit, deadline=deadline)
 
 
-def execute_member_transaction(project_path: str, mutation: Any, *, operation: str) -> tuple[ProjectMetadata, dict[str, Any]]:
+def execute_member_transaction(project_path: str, mutation: Any, *, operation: str,
+                               storage_policy: MemberStoragePolicy | None = None) -> tuple[ProjectMetadata, dict[str, Any]]:
     request = MemberTransaction.parse(mutation, operation=operation)
     started = time.monotonic()
     if not isinstance(project_path, str) or not Path(project_path).is_absolute():
         raise ValueError("project_path must be absolute")
     raw_root = Path(project_path)
+    if not isinstance(storage_policy, MemberStoragePolicy):
+        reject_pathname_sqlite_mutation()
+    storage_policy.validate(raw_root, request.storage_path)
     with PinnedProject(raw_root) as pinned:
-        return _execute_pinned(raw_root, pinned, request, started)
+        return _execute_pinned(raw_root, pinned, request, started, storage_policy)
 
 
 def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransaction,
-                    started: float) -> tuple[ProjectMetadata, dict[str, Any]]:
-    storage = root / ".docatlas" / "docatlas.db"
-    if request.storage_path != str(storage):
-        raise PermissionError("storage_path must be project_path/.docatlas/docatlas.db")
+                    started: float, storage_policy: MemberStoragePolicy) -> tuple[ProjectMetadata, dict[str, Any]]:
+    storage = storage_policy.db_path
     catalog_bytes = _read_member(pinned, CATALOG_FILENAME, MAX_CATALOG_BYTES)
     if hashlib.sha256(catalog_bytes).hexdigest() != request.catalog_sha256:
         raise ValueError("catalog hash precondition failed")
-    # Read the initialized DB only through its retained no-follow descriptor.
-    # Reject sidecars: an independent WAL/hot-journal snapshot cannot be safely
-    # reconstructed by this bounded read-only preflight.
-    pinned.bind(".docatlas/docatlas.db")
-    for suffix in ("-journal", "-wal", "-shm"):
-        try:
-            pinned.bind(".docatlas/docatlas.db" + suffix)
-        except FileNotFoundError:
-            continue
-        raise PermissionError("unsupported_sqlite_sidecar_snapshot")
-    snapshot = _read_member(pinned, ".docatlas/docatlas.db", 32 * 1024 * 1024)
-    if not hasattr(sqlite3.Connection, "deserialize"):
-        raise PermissionError("unsupported_sqlite_descriptor_snapshot_platform")
-    memory = sqlite3.connect(":memory:")
-    try:
-        memory.execute("PRAGMA temp_store=MEMORY")
-        memory.deserialize(snapshot)
-        memory.execute("PRAGMA query_only=ON")
-        row = memory.execute("SELECT active_generation_id FROM index_state WHERE singleton=1").fetchone()
-        if row is None or row[0] != request.expected_generation_id:
-            raise ValueError("active generation precondition failed")
-    finally:
-        memory.close()
+    exists = storage_policy.validate(root, request.storage_path)
+    active = storage_policy.generation() if exists else None
+    if active != request.expected_generation_id:
+        raise ValueError("active generation precondition failed")
     raw_catalog = yaml.load(catalog_bytes.decode("utf-8"), Loader=_UniqueKeySafeLoader)
     # This docs-only lane must not inspect code/dependency membership.
     if not isinstance(raw_catalog, dict) or raw_catalog.get("code_files", []) != []:
@@ -322,11 +304,11 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
             _read_member(pinned, "docatlas.yaml", MAX_CATALOG_BYTES).decode("utf-8"),
             Loader=_UniqueKeySafeLoader,
         ) or {}))
-        configured_db = Path(config.index.db_path)
-        if not configured_db.is_absolute():
-            configured_db = root / configured_db
-        if configured_db != storage:
-            raise PermissionError("project config storage is not the explicit local target")
+        # Project settings constrain source reads, never select storage. An
+        # explicit conflicting storage request fails rather than redirecting IO.
+        if "db_path" in config.index.model_fields_set:
+            if config.index.db_path != str(storage):
+                raise PermissionError("project config storage is not the host-selected target")
     if config.index.provider != "sqlite" or str(config.retrieval.default_mode).lower() != "lexical":
         raise PermissionError("member transaction requires lexical project configuration")
     configured = config.project.source_boundary()
@@ -368,8 +350,12 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
     store.db_path = storage
     store.extracted_dir = storage.parent / "extracted"
     pinned.recheck()
+    if not exists:
+        storage_policy.initialize()
+    pinned.recheck()
     outcome = store.upsert_project_members(
         documents, project_path=str(root), expected_generation_id=request.expected_generation_id,
+        storage_policy=storage_policy,
     )
     return ProjectMetadata(project_path=str(root), docs_catalog_present=True,
                            docs_catalog_valid=True), outcome

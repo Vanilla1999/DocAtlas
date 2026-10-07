@@ -333,7 +333,10 @@ class _ProjectDocsServicePart02:
             ):
                 raise PermissionError("Member synchronization does not accept legacy mutation flags")
             from .project_docs_member_transaction import execute_member_transaction
-            metadata, outcome = execute_member_transaction(project_path, mutation, operation="sync_project_docs")
+            metadata, outcome = execute_member_transaction(
+                project_path, mutation, operation="sync_project_docs",
+                storage_policy=getattr(self.facade, "member_storage_policy", None),
+            )
             return ProjectDocsSyncResult(
                 status="success", project=metadata, candidate_count=outcome["members"],
                 current_count=outcome["members"], new_count=outcome["new_count"],

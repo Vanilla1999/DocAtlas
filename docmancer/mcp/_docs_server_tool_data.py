@@ -587,8 +587,9 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "
         "Honor approval; poll job_id with docs_status and retry unchanged only after success. "
         "Project sync accepts only action, project_path and mutation, and requires a separate explicit mutation contract "
-        "binding confirmed lexical member upserts to the existing project_path/.docatlas/docatlas.db SQLite store, "
+        "binding confirmed lexical member upserts to the exact host-selected private SQLite store outside the project, "
         "catalog digest, generation and exact document hashes. Omitted/null mutation grants no write permission. "
+        "Explicit null generation permits initialization of an absent store; unexpected existing databases are refused. "
         "No deletion, vector or artifact writes are authorized by this contract."
     ),
     "docs_status": (
@@ -637,14 +638,14 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
             "mutation": {
                 "type": ["object", "null"],
-                "description": "Explicit confirmed project-local lexical member upsert only; omission/null supplies no mutation permission. Runtime verifies catalog membership, absolute project/store paths, exact existing project_path/.docatlas/docatlas.db storage, hashes and generation. Requires descriptor-relative no-follow filesystem support (currently POSIX); unsupported platforms fail closed. No legacy sync flags.",
+                "description": "Explicit confirmed lexical member upsert to the exact host-selected private app-data store outside the project; omission/null supplies no mutation permission. Explicit expected_generation_id=null also authorizes fresh empty initialization if that exact store is absent; an unexpected existing DB is never adopted. Runtime verifies catalog membership, absolute project/store paths, hashes and generation. Requires descriptor-relative no-follow source reads (currently POSIX); unsupported platforms fail closed. OS/current-UID processes are trusted. No legacy sync flags.",
                 "additionalProperties": False,
                 "required": ["operation", "confirm", "storage_path", "catalog_sha256", "expected_generation_id", "documents"],
                 "properties": {
                     "operation": {"const": "sync_project_docs", "type": "string"},
                     "confirm": {"const": True, "type": "boolean"},
                     "storage_path": {"type": "string", "minLength": 1,
-                                     "description": "Exact absolute existing project_path/.docatlas/docatlas.db path; runtime verifies platform support, absoluteness, locality and initialized storage. Schema does not assume POSIX path syntax."},
+                                      "description": "Exact absolute host-selected private app-data DB outside the project. Default: DOCATLAS_HOME/mcp-members/members.db (DOCATLAS_HOME defaults to ~/.docatlas). Project configuration and caller paths cannot redirect storage. Null expected generation allows creation only when this target is absent."},
                     "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "minLength": 64, "maxLength": 64},
                     "expected_generation_id": {"type": ["string", "null"], "pattern": "^gen-[0-9a-f]{32}$", "minLength": 36, "maxLength": 36},
                     "documents": {

@@ -4,6 +4,50 @@ from __future__ import annotations
 from ._docs_server_shared import *  # noqa: F401,F403
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, is_v4_patch_projection
 
+
+class LocalMemberService:
+    """Cold local MCP boundary: construction never creates a database.
+
+    Only confirmed member preparation can provision storage. Other handlers use
+    the real LibraryDocsService after ownership validation, at this same target.
+    """
+
+    def __init__(self, resolved):
+        import threading
+        from docmancer.core.member_storage_policy import MemberStoragePolicy
+        from docmancer.core.product_identity import docatlas_home
+        from docmancer.docs.application.project_docs_service import ProjectDocsService
+        self.config = resolved.config
+        self.config_source = resolved.source
+        self.config_path = str(resolved.path) if resolved.path else None
+        self.member_storage_policy = MemberStoragePolicy(
+            docatlas_home(), Path(self.config.index.db_path), resolved.path,
+        )
+        self.project_docs = ProjectDocsService(self)
+        self._service = None
+        self._lock = threading.RLock()
+
+    def materialize(self):
+        with self._lock:
+            if not self.member_storage_policy.validate(storage_path=self.config.index.db_path):
+                raise PermissionError("member_store_uninitialized: explicit confirmed preparation required")
+            if self._service is None:
+                self._service = LibraryDocsService(
+                    config=self.config, config_source=self.config_source,
+                    config_path=self.config_path,
+                    library_index_root=self.member_storage_policy.db_path.parent / "docs-indexes",
+                )
+                self._service.member_storage_policy = self.member_storage_policy
+            return self._service
+
+    def __getattr__(self, name):
+        return getattr(self.materialize(), name)
+
+
+def create_local_mcp_service(config_path: str | Path | None = None) -> LocalMemberService:
+    from docmancer.core.config_resolution import resolve_mcp_config
+    return LocalMemberService(resolve_mcp_config(explicit_path=config_path))
+
 def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
     """Build the docs MCP surface from the current environment.
 
@@ -38,6 +82,16 @@ def _service_for_project_path(
     service: LibraryDocsService,
     arguments: dict[str, Any],
 ) -> LibraryDocsService:
+    if isinstance(service, LocalMemberService):
+        project = arguments.get("project_path")
+        service.member_storage_policy.validate(Path(project) if project is not None else None)
+        return service.materialize()
+    if isinstance(service, LibraryDocsService) and getattr(service, "member_storage_policy", None) is not None:
+        project = arguments.get("project_path")
+        service.member_storage_policy.validate(
+            Path(project) if project is not None else None, service.config.index.db_path,
+        )
+        return service
     if arguments.get("action") == "clear_index":
         return service
     if not isinstance(service, LibraryDocsService):
@@ -173,6 +227,8 @@ def call_docs_tool_payload(
 
 
 def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
+    if isinstance(service, LocalMemberService):
+        service = service.materialize() if service.member_storage_policy.validate() else None
     if uri.startswith("docatlas://source/"):
         result = {"status": "source_unavailable", "reason_code": "unknown_or_expired_reference"}
         if service is not None:
@@ -336,13 +392,6 @@ async def _run_async(service: LibraryDocsService) -> None:
 
 
 def serve(config_path: str | Path | None = None) -> None:
-    from docmancer.core.config_resolution import resolve_config
-
-    resolved = resolve_config(explicit_path=config_path)
-    asyncio.run(_run_async(LibraryDocsService(
-        config=resolved.config,
-        config_source=resolved.source,
-        config_path=resolved.path,
-    )))
+    asyncio.run(_run_async(create_local_mcp_service(config_path)))
 
 __all__=['current_docs_surface', 'current_tools', '_exception_reason_code', '_public_handler_arguments', '_service_for_project_path', '_destructive_project_scope_error', 'call_docs_tool_payload', 'read_docs_resource', '_json_text', '_mcp_tool_result', '_run_async', 'serve']
