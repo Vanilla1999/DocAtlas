@@ -40,7 +40,7 @@ clean_env=(
   "TMPDIR=$namespace/tmp" "LANG=C.UTF-8"
   "UV_TOOL_DIR=$namespace/tools" "UV_TOOL_BIN_DIR=$namespace/bin"
   "UV_CACHE_DIR=$namespace/cache" "UV_PYTHON_INSTALL_DIR=$namespace/python"
-  "UV_NO_CONFIG=1" "UV_PYTHON_PREFERENCE=only-managed"
+  "UV_NO_CONFIG=1"
   "UV_PYTHON_DOWNLOADS=automatic"
   "XDG_CONFIG_HOME=$namespace/config" "XDG_DATA_HOME=$namespace/data"
   "XDG_CACHE_HOME=$namespace/cache" "XDG_STATE_HOME=$namespace/state"
