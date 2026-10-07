@@ -190,7 +190,7 @@ def validate_action_packet(
         visible_items = [{"stable_id": row["stable_id"], "path": row["path"],
                           "title": row["symbol_or_section"], "content": row["text"],
                           "authority": row["authority"], "version_binding": row["version_binding"],
-                          **{key: row[key] for key in ("char_start", "char_end", "line_start", "line_end") if key in row}}
+                          **{key: row[key] for key in ("resolved_version", "char_start", "char_end", "line_start", "line_end") if key in row}}
                          for row in sources]
         candidates, _ = normalize_candidates(
             _bound_items(evidence_items, project_path=project_path, module_path=module_path)

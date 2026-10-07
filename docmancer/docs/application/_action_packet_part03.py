@@ -28,6 +28,7 @@ def _candidate_source(candidate):
         "path": candidate.path_or_url, "symbol_or_section": _section(item),
         "authority": candidate.authority, "instruction_trust": "untrusted_data",
         "scope": _source_scope(item), "version_binding": candidate.version_binding,
+        "resolved_version": candidate.resolved_version,
         "text": candidate.display_text,
         "content_sha256": hashlib.sha256(candidate.display_text.encode("utf-8")).hexdigest(),
         **{key: getattr(candidate, key) for key in ("char_start", "char_end", "line_start", "line_end")},

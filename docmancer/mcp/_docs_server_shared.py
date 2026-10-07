@@ -39,9 +39,14 @@ def _handler_for_tool(name: str) -> ToolHandler:
 
 
 def _strip_null_enum_values(value: Any) -> Any:
+    """Strip legacy null enum members only when the declared type excludes null."""
     if isinstance(value, dict):
         cleaned = {key: _strip_null_enum_values(child) for key, child in value.items()}
-        if "enum" in cleaned and isinstance(cleaned["enum"], list):
+        declared_type = cleaned.get("type")
+        nullable = declared_type == "null" or (
+            isinstance(declared_type, list) and "null" in declared_type
+        )
+        if "enum" in cleaned and isinstance(cleaned["enum"], list) and not nullable:
             cleaned["enum"] = [item for item in cleaned["enum"] if item is not None]
         return cleaned
     if isinstance(value, list):

@@ -75,7 +75,7 @@ def _patch_wire_binding_errors(context: dict) -> list[str]:
         {'stable_id': source['stable_id'], 'path': source['path'],
          'title': source['symbol_or_section'], 'content': source['text'],
          'authority': source['authority'], 'version_binding': source['version_binding'],
-         **{key: source[key] for key in ('char_start', 'char_end', 'line_start', 'line_end') if key in source}}
+         **{key: source[key] for key in ('resolved_version', 'char_start', 'char_end', 'line_start', 'line_end') if key in source}}
         for source in sources
     ], result_kind='patch_context')
     by_candidate = {candidate.stable_id: candidate for candidate in visible_candidates}

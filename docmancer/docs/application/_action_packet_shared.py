@@ -91,6 +91,8 @@ _SOURCE_PROPERTIES.update({
     "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
 })
 _SOURCE_REQUIRED = list(_SOURCE_PROPERTIES)
+# Version evidence is portable when available, but old project sources omit it.
+_SOURCE_PROPERTIES["resolved_version"] = {"type": "string", "minLength": 1}
 _SOURCE_PROPERTIES.update({key: {"type": "integer", "minimum": 0}
                            for key in ("char_start", "char_end", "line_start", "line_end")})
 _MUTATION_SCHEMA = _type_schema(MutationIntentContract)
