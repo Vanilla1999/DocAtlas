@@ -183,6 +183,21 @@ nullable enum honoring и отсутствие request-derived version synthesis
 D integrated `7a5b87d3`; combined wire/packing/lifecycle/scope rerun 351 PASS,
 scope/D1/syntax/whitespace PASS. C получил approved dependency handoff; duplicate
 finding по-прежнему требует отдельного closure/review, не закрывается D.
+
+C followup `853d39e8` atop `e5cb1fce`, с approved D dependency, tested HEAD
+`f6c1455f`: по отчёту C 332 tests PASS (193 delivery/wire/v4/installer +139
+trusted lifecycle/member). Три D-related failures resolved. Independent C R
+повторяет duplicate counterexamples и green matrix; integration до verdict held.
+Installed-wheel matrix ещё не запускалась.
+
+Active scope migration `cc1376ff`: один test module, base node hash сохранён,
+155 active PASS по отчёту агента. Все пять isolation assertions сохранены,
+root/foreign positive controls добавлены. Independent review pending. Expanded
+run нашёл 25 untouched obsolete NL/proof failures; full CI green не заявляется.
+
+Coordinator подготовил isolated wheel runtime с existing Python 3.12 deps без
+`.pth` и без `docmancer` из seed: `/tmp/opencode/mcp-integrated-wheel-if9p586h`.
+Пакет ещё не установлен, smoke не запущен; нужен approved integrated C SHA.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
