@@ -126,6 +126,23 @@ def validate_action_packet(
                 errors.append("mutation contract or request-plan hash/content mismatch")
             if mutation_intent_contract is not None and mutation != _mutation_payload(mutation_intent_contract):
                 errors.append("mutation differs from supplied explicit contract")
+            plan = contract.request_plan
+            if plan is not None:
+                if plan.operation != contract.operation and not (
+                    contract.operation == "none" and plan.unresolved_parts
+                ):
+                    errors.append("mutation and request-plan operations are inconsistent")
+                mutate_values = [target.value for target in plan.mutation_targets]
+                requested_values = [target.value for target in contract.requested_targets
+                                    if target.provenance == "user_request"]
+                if mutate_values != requested_values:
+                    errors.append("mutation and request-plan targets are inconsistent")
+                if {value.casefold() for value in mutate_values}.intersection(
+                    target.value.casefold() for target in plan.preserve_targets
+                ):
+                    errors.append("request-plan target polarity is inconsistent")
+                if plan.destination is not None and plan.destination.value != contract.destination:
+                    errors.append("mutation and request-plan destinations are inconsistent")
             for binding in (*contract.resolved_targets, *contract.preserved_targets):
                 bound_sources = [row for row in sources if row["evidence_id"] == binding.evidence_id]
                 if not bound_sources:
@@ -135,6 +152,18 @@ def validate_action_packet(
                         errors.append("mutation target path differs from bound evidence")
                     if binding.requested_value not in {row.value for row in contract.requested_targets} and binding not in contract.preserved_targets:
                         errors.append("mutation binding has no explicit requested target")
+                    requested = next((row for row in contract.requested_targets
+                                      if row.value == binding.requested_value), None)
+                    if requested is not None and requested.kind == "path":
+                        wanted = requested.value.replace("\\", "/").casefold()
+                        actual = binding.path.replace("\\", "/").casefold()
+                        if actual != wanted and not actual.endswith("/" + wanted):
+                            errors.append("mutation requested path does not match its binding")
+                    if binding.symbol is not None and evidence_items is not None:
+                        candidates_for_binding = [by_candidate[row["stable_id"]] for row in bound_sources
+                                                  if row["stable_id"] in by_candidate]
+                        if not any(binding.symbol in row.symbols for row in candidates_for_binding):
+                            errors.append("mutation symbol does not match bound retrieval evidence")
     except (TypeError, ValueError, KeyError, AttributeError) as error:
         errors.append(f"invalid canonical packet: {error}")
     return errors
