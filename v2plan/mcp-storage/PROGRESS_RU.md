@@ -116,3 +116,17 @@ HELD. R отдельно воспроизвёл false-green при реальн�
 обнаружены exact-runtime ordinary-CI conflict и whitespace gate failure upstream
 header. A исправляет outcomes, provenance и explicit research selection; gates
 не отключаются. Hook coverage не объявляется complete OS confinement. R1 OPEN.
+
+B завершил minimal retention commit `74494b47a5249b6b6c62ce2ef5387f0705e25a22`:
+ровно семь allowlisted files, clean worktree, 15 новых tests / 280 focused PASS
+по отчёту B. Fixture retention >64 KiB — не installed >32 KiB acceptance.
+R independently проверяет implementation, acquisition/control/fallback traces,
+qualification и неизменность live validators. Commit пока не интегрирован.
+
+A followup `a537e18a`: по отчёту A real-close errno/outcome исправлен,
+write attempts/results разделены, три header whitespace lines нормализованы
+с provenance hashes. 16 portable и 27 explicit native checks PASS; unsupported
+positive profile reject до compilation. Directory-discovery inventory conflict
+ещё BLOCKED, без обхода gates/CI/conftest. Independent native R повторно
+проверяет исправления и минимальный способ закрыть inventory conflict.
+Ни исходный spike, ни followup пока не интегрированы; R1 остаётся OPEN.
