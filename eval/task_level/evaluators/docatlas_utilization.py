@@ -172,7 +172,7 @@ def _used_sources(sources_path: Path, trajectory_text: str, packet_path: Path) -
         packet = _load_json(packet_path)
         return sorted({
             str(row.get("path") or "")
-            for row in packet.get("source_of_truth", [])
+            for row in packet.get("sources", [])
             if (
                 isinstance(row, dict)
                 and str(row.get("path") or "")

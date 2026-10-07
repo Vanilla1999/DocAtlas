@@ -139,3 +139,105 @@ def test_workflow_evaluation_requirements_fail_closed_without_v4_policy_fields(c
     assert "checks" in result["unsupported_evaluation_requirements"]
     assert "checks" not in projection and projection["edit_ready"] is False
     assert len(result["source_manifest"]) == 12
+    assert result["required_covered"] == 0
+
+
+def test_projection_gate_validates_actual_v4_and_keeps_historical_limits(case, tmp_path):
+    from eval.answer_quality_runner import _task42_projection
+    from eval.answer_quality_gate import evaluate_projection_contract
+
+    projection, snapshot, _ = _task42_projection(case)
+    contract = {
+        "contract_id": "offline-visible-data", "source_ref": "offline:v4",
+        "result_kind": "patch_context", "expected_status": "data", "maximum_visible_tokens": 50000,
+        "required_patch_fields": {"sources": ["validate_protocol_0"]},
+        "required_public_commands": [], "exact_identifiers": [],
+        "acceptable_evidence": case["required_evidence_paths"],
+    }
+    assert evaluate_projection_contract(projection, snapshot, contract)["passed"] is True
+    contract["maximum_visible_tokens"] = 1500
+    result = evaluate_projection_contract(projection, snapshot, contract)
+    assert result["passed"] is False and "projection:token_budget_or_estimate" in result["errors"]
+    assert len(projection["sources"]) == 12
+
+
+def test_actionability_measures_sources_but_never_grants_normative_claims(case, tmp_path):
+    from eval.answer_quality_runner import _task42_projection
+    from eval.task_level.evaluators.actionability import _load_projection, _projection_metrics
+
+    projection, snapshot, _ = _task42_projection(case)
+    path, snapshot_path = tmp_path / "projection.json", tmp_path / "snapshot.json"
+    path.write_text(json.dumps(projection), encoding="utf-8")
+    snapshot_path.write_text(json.dumps(snapshot), encoding="utf-8")
+    loaded, reason = _load_projection(path, snapshot_path)
+    assert loaded is None and "historical_evaluation_projection_token_ceiling_exceeded" in reason
+    metrics = _projection_metrics(projection, [SimpleNamespace(expected_files=[case["candidates"][0]["path"]])])
+    assert metrics["source_coverage"] == 1.0 and metrics["citation_fidelity"] == 1.0
+    assert metrics["requirement_recall"] == metrics["critical_invariant_recall"] == metrics["behavioral_scope_coverage"] == 0
+
+
+def test_delivery_metrics_and_source_manifest_read_v4(case, tmp_path):
+    from eval.answer_quality_runner import _task42_projection
+    from eval.task_level._execution_part01 import action_packet_project_doc_metrics, _persist_delivery_prompt_sources, _bounded_direct_projection_errors
+    from eval.task_level.evaluators.docatlas_utilization import _used_sources
+
+    projection, _, _ = _task42_projection(case)
+    paths = case["required_evidence_paths"]
+    metrics = action_packet_project_doc_metrics(SimpleNamespace(expected_project_docs=paths), projection)
+    assert metrics["action_packet_project_doc_coverage"] == 1.0
+    _persist_delivery_prompt_sources(tmp_path, projection)
+    assert len(json.loads((tmp_path / "delivery_prompt_sources.json").read_text())) == 12
+    packet_path = tmp_path / "packet.json"
+    packet_path.write_text(json.dumps(projection), encoding="utf-8")
+    assert _used_sources(tmp_path / "absent.json", paths[0], packet_path) == [paths[0]]
+    assert "unsupported_evaluation_requirement:workflow_checks_from_patch_context" in _bounded_direct_projection_errors(projection, [])
+
+
+def test_real_provider_tool_dispatch_uses_explicit_read_only_format(necessary_evidence, tmp_path, monkeypatch):
+    import time
+    import docmancer.docs.service as service_module
+    from eval.task_level._github_models_part02 import _execute_agent_tool
+
+    service = OfflineRetrieval(necessary_evidence)
+    monkeypatch.setattr(service_module, "LibraryDocsService", lambda: service)
+    request = SimpleNamespace(workspace=tmp_path, environment={}, condition_id="docatlas_tool_required_once")
+    result = _execute_agent_tool(request, {"tool": "get_docs_context", "query": "Inspect protocol implementations"},
+                                 sandbox=None, deadline=time.monotonic() + 30)
+    packet = json.loads(result)
+    assert packet["kind"] == "patch_context" and packet["result"] == "data"
+    assert packet["edit_ready"] is False and len(packet["sources"]) == 12
+    assert result == json.dumps(packet, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    assert "context_format" not in service.calls[0][1]
+
+
+def test_one_call_loop_cannot_unlock_edit_or_shell_from_patch_data(case, tmp_path):
+    from eval.answer_quality_runner import _task42_projection
+    from eval.task_level._one_call_agent_loop_core import FakeLoopAdapter, OneCallAgentLoop, validate_docatlas_result
+
+    small = {**case, "candidates": case["candidates"][:1], "required_facts": case["required_facts"][:1],
+             "required_evidence_paths": case["required_evidence_paths"][:1]}
+    projection, _, _ = _task42_projection(small)
+    assert validate_docatlas_result(projection) == []
+    adapter = FakeLoopAdapter([
+        {"type": "docatlas", "arguments": {"context_format": "patch_context"}},
+        {"type": "shell", "command": "must-not-execute"},
+    ], docatlas_result=projection)
+    result = OneCallAgentLoop(adapter).run(objective=case["question"])
+    assert result.docatlas_state == "accepted"
+    assert result.reason_code == "retrieval_only_does_not_authorize_edit"
+    assert adapter.action_output_limits == []
+
+
+def test_policy_audit_checks_v4_read_only_retrieval_metadata(tmp_path):
+    from eval.task_level.evaluators.policy import audit_trajectory
+
+    event = {"sequence": 1, "tool_name": "get_docs_context", "arguments": {
+        "context_format": "patch_context", "question_matches_task_objective": True,
+        "retrieval_succeeded": True, "action_packet_result": "data", "action_packet_completeness": "complete",
+    }}
+    path = tmp_path / "trajectory.json"
+    path.write_text(json.dumps([event]), encoding="utf-8")
+    assert audit_trajectory("docatlas_tool_required_once", path).clean is True
+    event["arguments"]["action_packet_completeness"] = "partial"
+    path.write_text(json.dumps([event]), encoding="utf-8")
+    assert "required_docatlas_action_packet_invalid" in audit_trajectory("docatlas_tool_required_once", path).violations

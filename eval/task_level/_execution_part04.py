@@ -6,6 +6,7 @@ from ._execution_shared import *  # noqa: F401,F403
 from ._execution_part01 import _estimate_tokens, _load_optional_json, _optional_int, _persist_delivery_prompt_sources, _task_contract_validation, _write_json_atomic, _write_text_atomic, build_tool_policy, capture_patch, fresh_run_environment, is_infrastructure_failure, run_artifact_integrity, serialize_run_results_jsonl
 from ._execution_part02 import _archive_run_attempt, _load_run_results, _run_condition_setup, evaluate_agent_patch
 from ._execution_part03 import _prepare_shared_task33_evidence, build_bounded_direct_packet, inject_docatlas_context, prepare_docatlas, runner_unavailable_result
+from docmancer.docs.application.action_packet import serialize_action_packet
 
 def execute_pilot(
     tasks: list[TaskSpec],
@@ -120,7 +121,7 @@ def execute_pilot(
                                     "status": "condition_setup_failed", "reason": str(exc),
                                 })
                             else:
-                                if packet.get("status") == "insufficient_evidence":
+                                if packet.get("result") != "data" or packet.get("completeness") != "complete":
                                     setup_failed = True
                                     _write_json_atomic(run_output_dir / "bounded_direct_error.json", {
                                         "status": "condition_setup_failed",
@@ -132,8 +133,8 @@ def execute_pilot(
                                         run_output_dir / "model_visible_patch_context.json"
                                     )
                                     prompt += (
-                                        "\nDocAtlas source-backed Patch Contract (bounded direct):\n"
-                                        + json.dumps(projection, sort_keys=True)
+                                        "\nDocAtlas read-only patch evidence (bounded direct):\n"
+                                        + serialize_action_packet(projection)
                                         + "\n"
                                         + BOUNDED_DIRECT_EXECUTION_POLICY
                                     )
@@ -174,7 +175,7 @@ def execute_pilot(
                                     "status": "condition_setup_failed", "reason": str(exc),
                                 })
                             else:
-                                if handoff["status"] == "insufficient_evidence":
+                                if handoff["result"] != "data" or handoff.get("completeness") != "complete":
                                     setup_failed = True
                                     _write_json_atomic(run_output_dir / "isolated_delivery_error.json", {
                                         "status": "condition_setup_failed",
@@ -191,8 +192,8 @@ def execute_pilot(
                                         })
                                     else:
                                         prompt += (
-                                            "\nDocAtlas source-backed Patch Contract (isolated worker):\n"
-                                            + json.dumps(projection, sort_keys=True)
+                                            "\nDocAtlas read-only patch evidence (isolated worker):\n"
+                                            + serialize_action_packet(projection)
                                             + "\n"
                                         )
                     if CONDITIONS[condition_id].tool_policy.inject_external_context:
@@ -591,9 +592,9 @@ def condition_setup_failed_result(task: TaskSpec, condition_id: str, run_output_
             "delivery_retrieval_calls": _optional_int(host_retrieval.get("retrieval_calls")),
             "raw_doc_context_tokens": _optional_int(host_retrieval.get("raw_retrieval_tokens")),
             "action_packet_tokens": _optional_int(action_packet.get("estimated_tokens")),
-            "action_packet_status": action_packet.get("status"),
-            "action_packet_truncated": action_packet.get("status") == "truncated",
-            "action_packet_insufficient_evidence": action_packet.get("status") == "insufficient_evidence",
+            "action_packet_result": action_packet.get("result"),
+            "action_packet_completeness": action_packet.get("completeness"),
+            "action_packet_insufficient_evidence": action_packet.get("completeness") != "complete",
             "action_packet_fidelity": "validated" if action_packet else "not_available",
             "evidence_fingerprint": delivery.get("evidence_fingerprint") or host_retrieval.get("evidence_fingerprint"),
             "worker_input_tokens": _optional_int(delivery.get("worker_input_tokens")),

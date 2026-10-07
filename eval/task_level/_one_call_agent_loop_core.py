@@ -322,7 +322,11 @@ class OneCallAgentLoop:
                     state.docatlas_state = "failed"
                     terminal_status, terminal_reason = "budget_exhausted", "docatlas_output_limit"
                     break
-                if payload.get("status") == "insufficient_evidence":
+                patch_unavailable = False
+                if payload.get("kind") == "patch_context" and payload.get("result") == "failure":
+                    from docmancer.docs.interfaces.mcp.output_contract import is_v4_patch_projection
+                    patch_unavailable = is_v4_patch_projection(payload)
+                if payload.get("status") == "insufficient_evidence" or patch_unavailable:
                     state.docatlas_state = "insufficient"
                     state.docatlas_result = payload
                     terminal_status, terminal_reason = "incomplete", "insufficient_evidence"
@@ -357,7 +361,7 @@ class OneCallAgentLoop:
                 if state.docatlas_state != "accepted":
                     terminal_status, terminal_reason = "incomplete", "docatlas_not_accepted"
                 elif state.docatlas_result and state.docatlas_result.get("kind") == "patch_context" and state.action_attempts == 0:
-                    terminal_status, terminal_reason = "incomplete", "patch_not_attempted"
+                    terminal_status, terminal_reason = "incomplete", "unsupported_evaluation_requirement:patch_edit_authorization"
                 else:
                     terminal_status, terminal_reason = "success", "completed"
                 break
@@ -383,7 +387,7 @@ class OneCallAgentLoop:
 
             # This coding adapter exposes an unrestricted shell, not a read-only
             # source reader. Retrieval-only acceptance must not unlock it either.
-            if state.docatlas_result and state.docatlas_result.get("kind") == "docs_context":
+            if state.docatlas_result and state.docatlas_result.get("kind") in {"docs_context", "patch_context"}:
                 terminal_status, terminal_reason = "incomplete", "retrieval_only_does_not_authorize_edit"
                 break
 
@@ -592,6 +596,11 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
     """Validate the compact public result before retaining it in model history."""
 
     errors: list[str] = []
+    if payload.get("kind") == "patch_context":
+        from docmancer.docs.interfaces.mcp.output_contract import is_v4_patch_projection
+        if not is_v4_patch_projection(payload):
+            return ["invalid read-only v4 patch representation"]
+        return [] if payload.get("result") == "data" else ["DocAtlas patch evidence is unavailable"]
     status = payload.get("status")
     kind = payload.get("kind")
     if status not in {"ok", "truncated"}:
@@ -675,19 +684,7 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
         if not isinstance(refs, list) or not refs or any(ref not in source_ids for ref in refs):
             errors.append("docs_answer claims require returned evidence IDs")
     else:
-        allowed = {
-            "status", "kind", "schema_version", "objective", "acceptance_conditions",
-            "sources", "targets", "invariants", "forbidden_changes",
-            "implementation_guidance", "checks", "uncertainties", "omitted_counts",
-            "estimated_tokens",
-        }
-        required = {
-            "objective", "sources", "targets", "invariants", "forbidden_changes",
-            "implementation_guidance", "checks", "uncertainties", "omitted_counts",
-        }
-        missing = sorted(required - set(payload))
-        if missing:
-            errors.append("patch_context is missing canonical fields: " + ", ".join(missing))
+        allowed = set()
     unexpected = sorted(set(payload) - allowed)
     if unexpected:
         errors.append("unexpected DocAtlas result fields: " + ", ".join(unexpected))

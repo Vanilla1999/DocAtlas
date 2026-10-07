@@ -253,7 +253,9 @@ class GitHubModelsRunner:
             })
             recent_messages.append({
                 "role": "user",
-                "content": "Observed tool output:\n" + observed_result[:8_000],
+                "content": "Observed tool output:\n" + (
+                    observed_result if tool == "get_docs_context" else observed_result[:8_000]
+                ),
             })
             if terminate_repetition:
                 status, exit_code = "stalled_action_loop", 2
@@ -446,8 +448,7 @@ def _execute_agent_tool(
                     {
                         "question": query,
                         "project_path": str(request.workspace),
-                        "delivery_strategy": "bounded_direct",
-                        "packet_tokens": 2_000,
+                        "context_format": "patch_context",
                         "mode": "project",
                         "response_style": "snippet-first",
                         "prepare_project_docs": False,
@@ -460,7 +461,8 @@ def _execute_agent_tool(
                 )
             if result is None:
                 return "ERROR: bounded documentation retrieval was not handled"
-            return json.dumps(_jsonable(result), ensure_ascii=False, sort_keys=True)
+            return json.dumps(_jsonable(result), ensure_ascii=False, sort_keys=True,
+                              **({"separators": (",", ":")} if result.get("kind") == "patch_context" else {}))
         return "ERROR: unavailable action"
     except (OSError, ValueError, subprocess.SubprocessError) as exc:
         return f"ERROR: {exc.__class__.__name__}: {str(exc)[:1_000]}"

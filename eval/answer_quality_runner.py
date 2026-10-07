@@ -634,7 +634,7 @@ def _evaluate_measured_case(
             key: value for key, value in snapshot.items() if key != "__action_packet__"
         }),
         "required_total": required_total,
-        "required_covered": max(0, required_total - required_missing),
+        "required_covered": 0 if unsupported else max(0, required_total - required_missing),
         "errors": sorted(set(errors)),
         "passed": not errors,
     }

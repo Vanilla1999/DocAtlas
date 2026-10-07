@@ -426,3 +426,25 @@ def test_catalog_scoped_authority_survives_projector_and_mcp(tmp_path, module_pa
     tampered = deepcopy(snapshot)
     tampered["__action_packet__"]["project_path"] = None
     assert validate_model_visible_projection(projection, snapshot=tampered)
+
+
+def test_distinct_indexed_windows_keep_unique_public_ids_and_snapshot_bindings(tmp_path):
+    text = "Delivery evidence retains immutable source identity."
+    first = source(text)
+    second = {**first, "stable_chunk_id": "second-indexed-window", "char_start": 500, "char_end": 500 + len(text)}
+    rows = [first, second]
+    packet = action_packet.build_action_packet(question="Delivery evidence", context_pack=rows, public_requirements=[text])
+    assert packet["result"] == "data" and len(packet["sources"]) == 2
+    ids = {row["evidence_id"] for row in packet["sources"]}
+    assert len(ids) == 2
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=rows)
+    assert set(snapshot) - {"__action_packet__"} == ids
+    for row in projection["sources"]:
+        bound = snapshot[row["evidence_id"]]
+        assert bound["source"]["char_start"] == row["char_start"]
+        assert bound["projected_source"] == row
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    result = handle_context_tool("get_docs_context", {
+        "question": "Delivery evidence", "context_format": "patch_context",
+    }, OfflineRetrieval({"status": "success", "context_pack": rows, "public_requirements": [text]}))
+    assert result["sources"] == projection["sources"] and result["edit_ready"] is False
