@@ -615,13 +615,16 @@ def _compact_insufficient_support(payload: dict[str, Any]) -> dict[str, str] | N
 
 
 def project_patch_context(
-    *, packet: dict[str, Any], evidence_items: Iterable[dict[str, Any]]
+    *, packet: dict[str, Any], evidence_items: Iterable[dict[str, Any]],
+    project_path: str | None = None, module_path: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Preserve the complete admitted v4 windows, without edit authorization."""
     from .action_packet import refresh_action_packet_estimate
 
     evidence_items = tuple(evidence_items)
-    packet_errors = validate_action_packet(packet, evidence_items=evidence_items)
+    packet_errors = validate_action_packet(
+        packet, evidence_items=evidence_items, project_path=project_path, module_path=module_path,
+    )
     if packet_errors:
         failure = {
             "schema_version": 4, "result": "failure", "completeness": "unavailable",
@@ -641,7 +644,10 @@ def project_patch_context(
             evidence_id, _, _ = evidence_identity_for_item(candidate)
             raw_evidence.setdefault(evidence_id, deepcopy(original))
     snapshot: dict[str, dict[str, Any]] = {
-        "__action_packet__": {"packet": deepcopy(packet), "evidence_items": deepcopy(evidence_items)},
+        "__action_packet__": {
+            "packet": deepcopy(packet), "evidence_items": deepcopy(evidence_items),
+            "project_path": project_path, "module_path": module_path,
+        },
     }
     for row in packet.get("sources") or []:
         evidence_id = row["evidence_id"]
@@ -694,7 +700,10 @@ def _validate_patch_projection(
     evidence = canonical.get("evidence_items", ())
     if not isinstance(evidence, (tuple, list)):
         return ["invalid canonical patch evidence"]
-    errors.extend(validate_action_packet(core, evidence_items=evidence))
+    errors.extend(validate_action_packet(
+        core, evidence_items=evidence, project_path=canonical.get("project_path"),
+        module_path=canonical.get("module_path"),
+    ))
     if errors:
         return errors
     if canonical:
@@ -956,7 +965,9 @@ def validate_model_visible_projection(
                 if candidate is None or requirement is None or visible is None:
                     errors.append("model-visible assignment does not resolve to canonical evidence")
                     continue
-                if not validate_assignment_binding(requirement, candidate, assignment):
+                if not validate_assignment_binding(
+                    requirement, candidate, assignment, requirements=decision.requirements,
+                ):
                     errors.append("model-visible assignment failed unit proof revalidation")
                     continue
                 unit = resolve_assignment_unit(candidate, assignment)

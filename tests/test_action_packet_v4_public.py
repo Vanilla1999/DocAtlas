@@ -384,3 +384,45 @@ def test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap(ne
     )}))
     assert docs["kind"] == "docs_answer" and docs["estimated_tokens"] <= 800
     jsonschema.validate(docs, tool.output_schema)
+
+
+@pytest.mark.parametrize("module_path", [None, "docs"])
+def test_catalog_scoped_authority_survives_projector_and_mcp(tmp_path, module_path):
+    text = "Delivery evidence retains immutable source identity."
+    # The catalog's missing local file makes its authority unverified. Rooted
+    # retrieval correctly retains the useful quote as supporting, not canonical.
+    (tmp_path / "docatlas.project-docs.yaml").write_text(json.dumps({
+        "schema_version": 1, "documents": [{
+            "path": "docs/guide.md", "role": "project_architecture", "scope": "project",
+            "description": "Delivery data", "authority": "source_of_truth",
+            "status": "active", "impact": "track",
+        }],
+    }), encoding="utf-8")
+    row = source(text)
+    row.update(path="docs/guide.md", stable_chunk_id="scope-child", parent_logical_id="scope-parent")
+    packet = action_packet.build_action_packet(
+        question="Delivery evidence", context_pack=[row], project_path=str(tmp_path),
+        module_path=module_path, public_requirements=[text],
+    )
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["authority"] == "supporting"
+    assert action_packet.validate_action_packet(
+        packet, evidence_items=[row], project_path=str(tmp_path), module_path=module_path,
+    ) == []
+    assert action_packet.validate_action_packet(packet, evidence_items=[row])
+    projection, snapshot = project_patch_context(
+        packet=packet, evidence_items=[row], project_path=str(tmp_path), module_path=module_path,
+    )
+    assert projection["sources"] == packet["sources"] and projection["result"] == "data"
+    assert snapshot["__action_packet__"]["project_path"] == str(tmp_path)
+    assert snapshot["__action_packet__"]["module_path"] == module_path
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    result = handle_context_tool("get_docs_context", {
+        "question": "Delivery evidence", "context_format": "patch_context",
+        "project_path": str(tmp_path), "module_path": module_path,
+    }, OfflineRetrieval({"status": "success", "context_pack": [row], "public_requirements": [text]}))
+    assert result["result"] == "data" and result["sources"] == packet["sources"]
+    assert result["edit_ready"] is False
+    tampered = deepcopy(snapshot)
+    tampered["__action_packet__"]["project_path"] = None
+    assert validate_model_visible_projection(projection, snapshot=tampered)

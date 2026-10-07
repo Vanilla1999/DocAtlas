@@ -561,6 +561,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         projection, snapshot = project_patch_context(
             packet=packet,
             evidence_items=evidence_items,
+            project_path=_clean_string(args.get("project_path")),
+            module_path=_clean_string(args.get("module_path")),
         )
         if recovery:
             projection["recommended_next_action"] = deepcopy(recovery)
