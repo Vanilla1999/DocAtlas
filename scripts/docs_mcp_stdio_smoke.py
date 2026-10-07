@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 from contextlib import closing
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -66,16 +65,23 @@ def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
 
 
 def validate_patch_payload(answer: dict, *, completeness: str | None = None) -> None:
+    from docmancer.docs.application.action_packet import (
+        estimate_action_packet_tokens, refresh_action_packet_estimate, validate_action_packet,
+    )
+
     assert answer.get("kind") == "patch_context" and answer.get("schema_version") == 4, answer
-    assert answer.get("edit_ready") is False, answer
-    assert answer.get("result") in {"data", "failure"}, answer
+    assert answer.get("estimated_tokens") == estimate_action_packet_tokens(answer), answer
+    # Only the documented projection envelope is removed. Unknown fields remain
+    # visible to the strict validator. Keep returned sources/assignments intact.
+    packet = {key: value for key, value in answer.items()
+              if key not in {"kind", "recommended_next_action", "source_search_status"}}
+    assert packet.get("sources") is answer.get("sources")
+    assert packet.get("assignments") is answer.get("assignments")
+    refresh_action_packet_estimate(packet)
+    errors = validate_action_packet(packet)
+    assert not errors, errors
     if completeness is not None:
         assert answer.get("completeness") == completeness, answer
-    for source in answer.get("sources", []):
-        text = source["text"]
-        assert source["content_sha256"] == hashlib.sha256(text.encode()).hexdigest(), source
-        assert source["char_end"] - source["char_start"] == len(text), source
-        assert source["instruction_trust"] == "untrusted_data", source
 
 
 def _accept_fixture(project: Path) -> None:
@@ -149,7 +155,8 @@ async def smoke(*, read_only: bool = False) -> None:
     assert not imported.is_relative_to(checkout), f"smoke imported checkout instead of installed wheel: {imported}"
     executable = shutil.which("doc-atlas")
     assert executable, "installed doc-atlas console script not found"
-    with tempfile.TemporaryDirectory(prefix="docatlas-release-smoke-") as raw:
+    temporary_parent = "/tmp/opencode" if sys.platform.startswith("linux") and Path("/tmp/opencode").is_dir() else None
+    with tempfile.TemporaryDirectory(prefix="docatlas-release-smoke-", dir=temporary_parent) as raw:
         root = Path(raw)
         env = isolated_environment(root)
         project = root / "project"
