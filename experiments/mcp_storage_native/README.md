@@ -133,13 +133,15 @@ sqlite3ext.h normalized: 6a1a5763c6293fa3599ad4ef851d03057176fae49b7c50deafe193c
 
 SQLite is public domain (https://www.sqlite.org/copyright.html); upstream header
 notices are retained. Our experimental C/Python follow the repository MIT license.
-The amalgamation implementation is not bundled or compiled. Tests verify header
-hashes locally; neither worker nor tests fetch headers.
+The amalgamation implementation is not bundled or compiled. The standalone
+runner and portable tests verify header hashes locally; neither they nor the
+worker fetch headers.
 Transformation: remove exactly one trailing ASCII space immediately before LF
 on `sqlite3ext.h` lines 15, 709, 716. All other bytes, including the license,
 remain unchanged; `sqlite3.h` remains byte-exact. The portable test reconstructs
-the three spaces and verifies the upstream SHA. The worker checks the normalized
-SHA. Diff checks now require no header exceptions.
+the three spaces and verifies the upstream SHA. The standalone runner and portable
+tests check the normalized SHA against constants defined in `worker.py`; the worker
+itself does not perform that hash check. Diff checks require no header exceptions.
 
 ## Reproduce — disposable fixtures only
 
@@ -155,47 +157,71 @@ PYTHONPATH=/tmp/opencode/mcp-storage-a \
 tests/test_mcp_storage_native_spike.py
 ```
 
-Explicit opt-in positive native research, requiring the exact trusted Linux
+Standalone opt-in positive native research, requiring the exact trusted Linux
 profile above (including built-in SQLite compiled with clang-22.1.1):
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 DOCATLAS_OFFLINE=1 \
+/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python \
+tests/mcp_storage_native_spike_checks.py \
+--artifact-dir /tmp/opencode/mcp-storage-native-spike-standalone-reproduce
+```
+
+The **16 portable pytest checks** run normal ancestor conftest/diagnostic gates.
+The **27 standalone research scenarios do not**: the runner has no pytest import,
+fixture/mark machinery or `test_*` functions and is not pytest inventory. Only its
+newly added diagnostic label/hash were removed; no historical labels or gates
+changed. It is not an active product gate being disabled. No standalone result is
+ordinary Python 3.11/3.12/3.13 CI coverage or full-CI-green evidence.
+CI/workflows/conftest/pytest.ini remain unchanged.
+
+The directory-inventory conflict is resolved by the genuinely standalone evidence
+contract, not a gate bypass. The portable inventory helper verifies compatible
+default directory selection. Actual normal directory collection was also checked
+without executing historical suites:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 DOCATLAS_OFFLINE=1 \
 PYTHONPATH=/tmp/opencode/mcp-storage-a \
 /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python \
--m pytest -p no:cacheprovider -q \
---basetemp=/tmp/opencode/mcp-storage-native-spike-positive-reproduce \
-tests/mcp_storage_native_spike_checks.py
+-m pytest -p no:cacheprovider --collect-only -q tests/
 ```
 
-Both exact file selections run normal ancestor conftest/diagnostic gates. The
-positive file deliberately does not match default discovery; this is opt-in
-research, not an active product gate being disabled. Unsupported positive runs
-fail closed with no skips/marks. These positive cases are NOT evidence for the
-ordinary Python 3.11/3.12/3.13 CI matrix. CI/workflows/conftest/pytest.ini unchanged.
+The runner admits runtime/source/compile profile and local header hashes before
+compiler lookup or creating the requested artifact directory. Unsupported runs
+emit an error JSON summary and traceback, exit nonzero, and execute zero scenarios.
+The CLI requires one new canonical absolute disposable directory below
+`/tmp/opencode`; existing directories are never overwritten or removed. The fixed
+registry contains exactly 27 parameter-expanded scenarios, each using its own
+fresh fixture and a resource-cleanup context manager. No selection/filter/skip
+options exist. Run without `-O`; disabled assertions are rejected.
 
-**Directory-collection inventory blocker:** the existing conftest's directory
-selection requires every labeled module below `tests`, including this opt-in
-file, while default discovery omits that filename. Thus directory collection's
-inventory would report this module stale. The portable checks reproduce that
-validator conflict into `directory-gate-observation.json` without collecting
-historical suites. No gate/config/inventory bypass was applied; full CI is NOT
-claimed green. Resolving that conflict needs separate coordinator authorization.
+Limits: 4 SQLite workers per scenario, 30 checkpoint records, 64 KiB pending
+checkpoint output and a 5-second checkpoint deadline, 10-second worker completion
+and 5-second kill waits; independent
+reader/peer subprocesses have 5-second waits, compiler has 30 seconds. Worker
+request/object/descriptor limits remain unchanged. On a failed scenario the runner
+stops, preserves failure traceback/counts, cleans up processes/descriptors and
+exits nonzero. `research-summary.json` and stdout JSON record individual outcomes,
+executed/passed/failed/expected counts, `normal_pytest_gate=false`, and `R1=OPEN`.
 
 C is built with the existing `cc` using
 `-std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -fPIC -shared`.
-Do not select an existing directory as basetemp: pytest owns that disposable path.
-No test skips convert unsupported positive platforms into successful coverage.
+Use fresh directories for reproduction: pytest owns portable `--basetemp`, while
+the standalone runner refuses an existing `--artifact-dir`. No skips convert
+unsupported positive platforms into successful coverage.
 
-Trace artifacts are `<basetemp>/test_*/worker-*.trace` (native JSONL) and
+Standalone trace artifacts are `<artifact-dir>/<number>_<scenario>/worker-*.trace`
+(native JSONL) and
 `worker-*.stdout.jsonl` (startup/CAS/result/close JSONL). Profile artifacts:
-`test_exact_profile_and_header_pr*/profile.json`. Hostile removal observation:
-`test_hostile_hot_journal_remov*/hostile-removal-observation.json`.
+`01_exact_profile_and_header_provenance/profile.json`. Hostile removal observation:
+`25_hostile_hot_journal_removal_exposes_unresolved_crash_obligation/hostile-removal-observation.json`.
 Worker stdout traces startup/CAS/commit/close; C traces hook installation, actual
 locks, write attempts/results, sync results, denials, and raw/SQLite close results.
 Forced exit 86 has no final
 result; it must never be interpreted as a successful or zero-write operation.
 
-The tests demonstrate clean fixture commit/default-reader compatibility,
+The standalone scenarios demonstrate clean fixture commit/default-reader compatibility,
 generation/owner denial, independent default-writer contention, two-worker CAS,
 pre/post-check swaps without redirected foreign-inode writes, hardlink detection,
 sync/close errors, intact hot-journal recovery, and denied unknown/SHM routes.
@@ -205,28 +231,31 @@ post-final-check replacement can leave the committed DB unreachable at its name.
 Those are evidence of unresolved grant semantics, NOT success under the required
 production security contract.
 
-### Close-audit followup validation
+### Standalone evidence-contract followup validation
 
 Measured on the reviewed Python 3.13.12 / SQLite 3.50.4 profile:
 
-* Portable exact-file run: **16 passed**; artifacts
-  `/tmp/opencode/mcp-storage-close-portable-final/` (includes directory-gate
-  observation). Python 3.12 portable run: **16 passed**, with the environment's
-  existing unknown `asyncio_mode` config warning; artifacts
-  `/tmp/opencode/mcp-storage-close-portable-py312/`. Python 3.11 lacks pytest here;
-  no install or 3.11 validation claimed.
-* Explicit positive exact-file run: **27 passed**; final artifacts
-  `/tmp/opencode/mcp-storage-close-positive-final-v2/`. The three
-  `test_actual_close_eio_indepen*` directories contain raw close EIO results and
-  worker error/unknown outcome JSONL. DB final-close case also has commit-returned
-  evidence with zero native denials.
-* Unsupported Python 3.12 explicit positive admission: expected pytest **exit 1**,
-  no shared-object build; output/observation at
-  `/tmp/opencode/mcp-storage-close-unsupported-py312/`. This is negative admission
-  evidence, not a passing positive or matrix-green claim.
-* Normal diagnostic gates for both file selections, repository Python module-size
-  gate, authored Python AST checks, and `git diff --check` pass. Native authored C,
-  worker and both test modules remain below 1000 lines.
+* Normally gated portable exact-file run: **16 passed**; artifacts
+  `/tmp/opencode/mcp-storage-standalone-portable-final-v2/` (includes compatible
+  directory-inventory observation).
+* Standalone research: **27 passed**, not normally gated pytest cases; artifacts
+  `/tmp/opencode/mcp-storage-standalone-positive-final-v2/`. Directories 22–24 contain
+  raw DB/journal/directory close EIO and worker error/unknown outcome JSONL. DB
+  final-close case includes commit-returned evidence with zero native denials.
+  Close-fault, write-result and header provenance assertions are preserved. This
+  run also used Python `-S` (no site-package initialization), demonstrating the
+  standalone runner's lack of pytest/third-party dependency.
+* Unsupported Python 3.12 standalone admission: **exit 1**, zero scenarios, no
+  requested artifact directory or shared-object build; output/observation at
+  `/tmp/opencode/mcp-storage-standalone-unsupported-evidence/`. This is negative
+  admission evidence, not a passing positive or matrix-green claim.
+* Actual normal `tests/ --collect-only`: **exit 0**, **8561 collected**, none
+  executed. Output/observation at
+  `/tmp/opencode/mcp-storage-standalone-directory-collection/`. This validates
+  directory inventory, not historical test results or full CI.
+* Repository Python module-size gate, authored Python AST checks, and
+  `git diff --check` pass. Authored C, worker, portable tests and standalone runner
+  remain below 1000 lines. No install, dependency or gate/config change was made.
 
 R1 remains OPEN; independent re-audit is still required. No production persistence,
 packaging, object-grant semantics, protected recovery namespace, or WAL approval

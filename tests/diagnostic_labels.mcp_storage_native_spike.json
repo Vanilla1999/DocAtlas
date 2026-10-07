@@ -1,12 +1,10 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/test_mcp_storage_native_spike.py": "behavioral",
-    "tests/mcp_storage_native_spike_checks.py": "behavioral"
+    "tests/test_mcp_storage_native_spike.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_mcp_storage_native_spike.py": "e1dd42c67545dc719d0022e998a8bfc6d0917bc6ab84187b1b203aff2c04329b",
-    "tests/mcp_storage_native_spike_checks.py": "0e7716f18a105d524f4811bd1b6861ccf569abacc551d43a04cd1be901914179"
+    "tests/test_mcp_storage_native_spike.py": "c69973bf6bfd64f217d842c49e4bf5cf280a1739212473f1ec1ed88e1aa4b079"
   },
   "node_overrides": {}
 }

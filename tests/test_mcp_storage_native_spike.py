@@ -76,24 +76,34 @@ def test_unsupported_platform_denies_before_extension_or_storage_access(monkeypa
     assert result["commit_outcome"] == "no_member_write_attempt"
 
 
-def test_directory_inventory_conflict_is_reported_not_bypassed(pytestconfig, tmp_path):
-    from tests.diagnostic_labels import validate_diagnostic_inventory
+def test_standalone_research_is_compatible_with_default_directory_inventory(pytestconfig, tmp_path):
+    from tests.diagnostic_labels import load_diagnostic_manifest, validate_diagnostic_inventory
 
     portable = "tests/test_mcp_storage_native_spike.py"
     research = "tests/mcp_storage_native_spike_checks.py"
     patterns = pytestconfig.getini("python_files")
     assert not any(fnmatch.fnmatch(Path(research).name, pattern) for pattern in patterns)
     manifest = json.loads((ROOT / "tests/diagnostic_labels.mcp_storage_native_spike.json").read_text())
+    complete_manifest = load_diagnostic_manifest(ROOT / "tests/diagnostic_labels.json")
+    assert research not in complete_manifest["module_labels"]
+    assert research not in complete_manifest["module_node_hashes"]
+    runner_tree = ast.parse((ROOT / research).read_text())
+    assert not any(isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and
+                   node.name.startswith("test_") for node in ast.walk(runner_tree))
+    assert not any((isinstance(node, ast.Import) and any(alias.name == "pytest" for alias in node.names)) or
+                   (isinstance(node, ast.ImportFrom) and node.module == "pytest")
+                   for node in ast.walk(runner_tree))
     functions = [node.name for node in ast.parse((ROOT / portable).read_text()).body
                  if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")]
     portable_items = [SimpleNamespace(nodeid=portable + "::" + name) for name in functions]
-    # The existing conftest directory branch requires all labeled descendants.
-    # Demonstrate its real validator using this shard, without collecting old
-    # suites, changing config, or omitting the opt-in module's inventory entry.
-    with pytest.raises(pytest.UsageError, match="stale modules") as failure:
-        validate_diagnostic_inventory(portable_items, manifest, set(manifest["module_labels"]))
-    assert research in str(failure.value)
+    # Match conftest's directory-selection complete_modules computation for this
+    # shard. The standalone runner is not pytest inventory; no bypass is needed.
+    complete_modules = {module for module in manifest["module_labels"]
+                        if (ROOT / module).resolve().is_relative_to(ROOT / "tests")}
+    assert complete_modules == {portable}
+    validate_diagnostic_inventory(portable_items, manifest, complete_modules)
     (tmp_path / "directory-gate-observation.json").write_text(json.dumps({
         "python_files": patterns, "research_file_default_discovered": False,
-        "inventory_error": str(failure.value), "ci_green_claim": False,
+        "directory_inventory": "compatible", "runner_is_pytest_inventory": False,
+        "ci_green_claim": False,
     }, indent=2))
