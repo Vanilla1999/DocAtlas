@@ -157,3 +157,26 @@ shards. Approved additional ownership: A/B/C respectively
 new tests; old inventory and conftest remain unchanged. Use the existing
 `/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python` interpreter,
 `PYTHONPATH=.` from each worktree, no installation or network.
+
+### Coordinator dependency amendment 3
+
+C additionally owns `docmancer/docs/interfaces/mcp/output_contract.py` and
+`docmancer/mcp/_docs_server_part01.py`. Terminal dispatch and CallToolResult
+repeat internal `compact_mcp_payload`; its default 32000-byte cap replaces
+patch projections with transport_size_limit. Bypass that arbitrary internal
+representation ceiling for finalized v4 patch projections only; docs/error
+paths remain unchanged. Patch JSON text fallback uses the same compact sorted
+UTF-8 serialization as the estimator. Test necessary unique evidence beyond
+32000 bytes through both terminal structuredContent and fallback text, not
+only handler/projector. Actual external transport capacity remains unknown.
+
+### Coordinator dependency amendment 4
+
+B additionally owns `docmancer/docs/application/evidence_candidates.py`,
+`docmancer/docs/domain/_answer_units_shared.py`,
+`docmancer/docs/domain/_answer_units_part01.py`, and
+`docmancer/docs/domain/_answer_units_part02.py`. Patch normalization must not
+silently clip witness units at 1500 characters / 64 units (nor disguise these
+as run-count limits). Add patch-specific unbounded extraction behavior while
+retaining default docs extraction. Long and late exact explicit witnesses
+must remain coverable; hash/span/identity validation remains mandatory.
