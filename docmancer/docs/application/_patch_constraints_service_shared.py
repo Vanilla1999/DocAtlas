@@ -62,10 +62,6 @@ PATCH_REVIEW_ARTIFACT_NAMES = {
 DOGFOOD_TASK_ARTIFACT_NAMES = {"task.md", "review_notes.md"}
 ASSET_REGISTRY_FILENAMES = {"assets.dart", "asset.dart", "assets.gen.dart", "assets.g.dart"}
 SYMBOL_SOURCE_SUFFIXES = (".py", ".dart", ".ts", ".tsx", ".js", ".jsx", ".go", ".rs", ".kt", ".java", ".md", ".txt")
-ARCHITECTURE_DOC_RE = re.compile(
-    r"(^|/)(architecture\.md|architecture/|adr/|adrs/|contributing\.md|readme[^/]*\.(md|txt)|adr[^/]*\.md)$",
-    re.I,
-)
 TREE_GLYPH_RE = re.compile(r"[│├└┬┴┼─]{2,}|^[│├└┬┴┼─]")
 EXCLUDED_SOURCE_PARTS = {
     "eval",

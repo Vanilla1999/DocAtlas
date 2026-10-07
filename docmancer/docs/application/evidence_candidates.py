@@ -162,14 +162,6 @@ def version_rank(value: str) -> int:
     return 1
 
 
-def risk_flags(item: Mapping[str, Any]) -> tuple[str, ...]:
-    values: list[Any] = []
-    for key in ("instruction_risk_flags", "risk_flags"):
-        value = item.get(key)
-        values.extend(value if isinstance(value, (list, tuple, set)) else [value] if value else [])
-    return tuple(sorted(str(value) for value in values if value))
-
-
 def _span(item: Mapping[str, Any], name: str) -> tuple[int | None, int | None]:
     start, end = item.get(f"{name}_start"), item.get(f"{name}_end")
     packed = item.get(f"{name}_span")
@@ -310,7 +302,7 @@ def normalize_candidates(
             doc_scope=str(item.get("doc_scope") or ""),
             symbols=symbols(item),
             exact_terms=tuple(sorted({str(value) for value in exact_values if str(value).strip()})),
-            instruction_risk_flags=risk_flags(item),
+            instruction_risk_flags=(),
             freshness=str(item.get("freshness") or "current"),
             navigation_only=bool(item.get("navigation_only")) or str(item.get("answer_type") or "") in {"navigation_only", "partial_navigational"},
             answer_units=extract_answer_units(
@@ -327,5 +319,5 @@ __all__ = [
     "authority", "display_text", "docs_answer_candidate_tokens", "estimated_tokens",
     "identity_aliases", "normalize_candidates", "normalized_source", "observed_qualifiers",
     "positive_int", "projected_text", "requirement_value_visible", "resolved_version",
-    "risk_flags", "section", "source_path", "symbols", "version_binding", "version_rank",
+    "section", "source_path", "symbols", "version_binding", "version_rank",
 ]

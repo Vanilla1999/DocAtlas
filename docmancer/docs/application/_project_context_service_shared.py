@@ -153,15 +153,14 @@ def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult 
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"
             source_taxonomy = project_source_taxonomy(item.path, doc_scope=item.doc_scope, module_path=item.module_path)
-            source_taxonomy["risk_flags"] = sorted(set(source_taxonomy.get("risk_flags") or ())
-                | set(item.metadata.get("risk_flags") or ())
-                | set(item.metadata.get("project_doc_risk_flags") or ()))
+            # Literal artifact-path exclusions precede caller attribution labels.
+            # Metadata risk/authority claims must not classify quoted content.
+            if _should_skip_low_trust_project_source(question, source_taxonomy):
+                continue
             if item.authority:
                 source_taxonomy["authority"] = item.authority
             elif item.metadata.get("project_doc_authority") or item.metadata.get("authority"):
                 source_taxonomy["authority"] = item.metadata.get("project_doc_authority") or item.metadata["authority"]
-            if _should_skip_low_trust_project_source(question, source_taxonomy):
-                continue
             pack.append({
                 "stable_chunk_id": item.stable_chunk_id,
                 "parent_logical_id": item.parent_logical_id,

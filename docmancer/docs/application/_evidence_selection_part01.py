@@ -156,9 +156,6 @@ def _candidate_window_valid(candidate: EvidenceCandidate) -> bool:
         and _span(candidate.original, "char") == (candidate.char_start, candidate.char_end)
         and _span(candidate.original, "line") == (candidate.line_start, candidate.line_end)
         and (not supplied or str(supplied).casefold() == digest)
-        and not candidate.instruction_risk_flags
-        and not candidate.original.get("risk_flags")
-        and not candidate.original.get("instruction_risk_flags")
         and not candidate.original.get("stale")
         and candidate.freshness == "current"
         and str(candidate.original.get("freshness") or "current") == candidate.freshness
@@ -447,31 +444,15 @@ def _eligible_candidates(
     result_kind: str,
     question: str,
 ) -> tuple[list[EvidenceCandidate], list[Omission], set[str]]:
-    forbidden = _trust_source_keys(trust_contract, "rejected") | _trust_source_keys(trust_contract, "risky")
     exact_versions = {item.value for item in requirements if item.kind == "exact_version" and item.mandatory}
-    canonical_policy_required = any(
-        item.kind == "canonical_policy" and item.mandatory for item in requirements
-    )
     query_identifiers = _query_identifier_values(requirements)
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
     critical: set[str] = set()
     for candidate in candidates:
         reason: OmissionReason | None = None
-        if set(candidate.identity_aliases) & forbidden:
-            reason = "forbidden_source"
-        elif candidate.freshness.casefold() == "stale":
+        if candidate.freshness.casefold() == "stale":
             reason = "stale"
-            if candidate.authority == "canonical":
-                critical.add("stale_canonical_evidence")
-        elif candidate.instruction_risk_flags:
-            reason = "instruction_risk"
-            if candidate.authority == "canonical":
-                critical.add("risky_canonical_evidence")
-        elif canonical_policy_required and candidate.source_class.casefold() in {
-            "generated", "changelog", "research", "community", "mirror",
-        }:
-            reason = "outside_scope"
         elif project_identity and candidate.project_identity != project_identity:
             reason = "outside_scope"
         elif module_id and candidate.module_id != module_id:
@@ -537,28 +518,6 @@ def _query_identifier_values(
     )
 
 
-def _trust_source_keys(contract: Mapping[str, Any], field: str) -> set[str]:
-    sources = contract.get("sources") if isinstance(contract.get("sources"), Mapping) else {}
-    aliases = [field, f"{field}_sources"]
-    values: list[Any] = []
-    for key in aliases:
-        for raw in (contract.get(key), sources.get(key)):
-            values.extend(raw if isinstance(raw, list) else [raw] if raw else [])
-    return {
-        _normalized_source(
-            value.get("source") or value.get("path") or value.get("url")
-            or value.get("canonical_id") or value.get("library_id") or ""
-            if isinstance(value, Mapping) else value
-        )
-        for value in values
-        if _normalized_source(
-            value.get("source") or value.get("path") or value.get("url")
-            or value.get("canonical_id") or value.get("library_id") or ""
-            if isinstance(value, Mapping) else value
-        )
-    }
-
-
 def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
     metadata = candidate.original.get("metadata")
     metadata = metadata if isinstance(metadata, Mapping) else {}
@@ -592,7 +551,6 @@ def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
 
 def _candidate_preference(candidate: EvidenceCandidate) -> tuple[Any, ...]:
     return (
-        0 if candidate.authority == "canonical" else 1,
         _version_rank(candidate.version_binding),
         0 if candidate.docs_snapshot_exact is True else 1,
         -len(candidate.covered_requirement_ids),
@@ -645,7 +603,6 @@ def _assignment_preference(
         0 if witness is not None else 1,
         -(witness.completeness_score if witness else 0),
         target_identity_rank,
-        0 if candidate.authority == "canonical" else 1,
         _lifecycle_assignment_rank(requirement, candidate),
         _version_rank(candidate.version_binding),
         -candidate.relevance_millis,
@@ -712,7 +669,6 @@ def _repair_mandatory_selection(
             ),)
         return (
             *proof_quality,
-            sum(item.authority != "canonical" for item in rows),
             sum(_version_rank(item.version_binding) for item in rows),
             sum(item.token_estimate for item in rows),
             len(rows),
@@ -747,7 +703,6 @@ def _marginal_utility(candidate: EvidenceCandidate, selected_terms: set[str], ma
     return (
         len(candidate.covered_requirement_ids & mandatory) * 1000
         + len(candidate.covered_requirement_ids) * 180
-        + (220 if candidate.authority == "canonical" else 40)
         + (120 if _version_rank(candidate.version_binding) == 0 else 20)
         + (80 if candidate.docs_snapshot_exact is True else 0)
         + (80 if candidate.projected_text.strip() else 0)
@@ -781,4 +736,4 @@ def _count_reasons(omissions: Sequence[Omission]) -> dict[str, int]:
         counts[omission.reason_code] = counts.get(omission.reason_code, 0) + 1
     return dict(sorted(counts.items()))
 
-__all__=['SelectionDecision', 'resolve_assignment_unit', 'validate_assignment_binding', 'MixedSelectionLane', 'AggregateMixedSelectionDecision', 'aggregate_mixed_selection', 'docs_selection_config', 'library_docs_selection_config', 'project_docs_selection_config', 'patch_selection_config', '_eligible_candidates', '_query_identifier_conflict', '_query_identifier_values', '_trust_source_keys', '_candidate_source_view', '_candidate_preference', '_candidate_requirement_witness', '_lifecycle_assignment_rank', '_assignment_preference', '_selected_identity', '_shingles', '_jaccard_millis', '_repair_mandatory_selection', '_selection_terms', '_marginal_utility', '_redundant_token_ratio_millis', '_count_reasons']
+__all__=['SelectionDecision', 'resolve_assignment_unit', 'validate_assignment_binding', 'MixedSelectionLane', 'AggregateMixedSelectionDecision', 'aggregate_mixed_selection', 'docs_selection_config', 'library_docs_selection_config', 'project_docs_selection_config', 'patch_selection_config', '_eligible_candidates', '_query_identifier_conflict', '_query_identifier_values', '_candidate_source_view', '_candidate_preference', '_candidate_requirement_witness', '_lifecycle_assignment_rank', '_assignment_preference', '_selected_identity', '_shingles', '_jaccard_millis', '_repair_mandatory_selection', '_selection_terms', '_marginal_utility', '_redundant_token_ratio_millis', '_count_reasons']

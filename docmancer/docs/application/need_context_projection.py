@@ -156,18 +156,12 @@ def iter_need_context_variants(
 
 
 def precedence_context_variants(candidates, **kwargs):
-    """Propose precedence context before selection, never award relation proof.
-
-    A visible precedence verb is a request-shape preference only. Source, exact
-    identities and conditions have already been rechecked by the classifier.
-    Topic-only Navigation passages do not receive this preference.
-    """
+    """Use explicit relation/disposition data, never infer precedence from prose."""
     for original, variant, contracts, dispositions in iter_need_context_variants(candidates, **kwargs):
         needs = {row.need_id for row in dispositions}
         wanted = tuple(contract.need.need_id for contract in contracts
                        if contract.need.relation == 'precedence' and contract.need.need_id in needs)
-        if wanted and re.search(r'\b(?:overrides?|takes?\s+precedence|wins?|has\s+priority)\b',
-                                variant['snippet'], re.I):
+        if wanted:
             yield original, variant, wanted
 
 

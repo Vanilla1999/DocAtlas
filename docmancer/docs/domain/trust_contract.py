@@ -36,7 +36,6 @@ def build_project_context_trust_contract(
                 "source_type": source_taxonomy["source_type"],
                 "source_kind": source_taxonomy["source_kind"],
                 "authority": source_taxonomy["authority"],
-                "risk_flags": source_taxonomy["risk_flags"],
                 "path": source.get("path"),
                 "source": source.get("source"),
                 "doc_scope": source.get("doc_scope") or "project",

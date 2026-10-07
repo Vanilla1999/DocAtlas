@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
 
-from ._action_packet_part01 import _add_mandatory_requirement_witnesses, _authority, _blocked_source_keys, _content_instruction_risk_flags, _content_text, _critical_fact_count, _declares_canonical_authority, _dedupe_cited, _editable_target_path, _effective_authority, _ensure_selection_survives_packet, _evidence_id, _explicit_acceptance_conditions, _explicit_symbols, _extract_facts, _has_actionable_items, _instruction_risk_flags, _item_source_keys, _normalized_source_key, _rank_and_dedupe, _refresh_estimated_tokens, _rejected_source_keys, _section, _snippet_text, _source_path, _source_row, _source_scope, _version_binding
+from ._action_packet_part01 import _add_mandatory_requirement_witnesses, _authority, _blocked_source_keys, _content_text, _critical_fact_count, _declares_canonical_authority, _dedupe_cited, _editable_target_path, _effective_authority, _ensure_selection_survives_packet, _evidence_id, _explicit_acceptance_conditions, _explicit_symbols, _extract_facts, _has_actionable_items, _item_source_keys, _normalized_source_key, _rank_and_dedupe, _refresh_estimated_tokens, _rejected_source_keys, _section, _snippet_text, _source_path, _source_row, _source_scope, _version_binding
 from ._action_packet_part02 import _authority_conflicts, _bounded_text, _compact_failure_packet, _dedupe_dicts, _drop_superseded_fallbacks, _ensure_post_fit_status, _fit_packet, _has_behavioral_contract, _may_guide_workflow, _prune_orphan_sources, _remove_one_budget_item, _validation_bucket
 
 def build_action_packet(
@@ -73,7 +73,6 @@ def build_action_packet(
             and _editable_target_path(_source_path(item))
             and len(_source_path(item)) <= _MAX_SOURCE_PATH
             and item.get("freshness") != "stale"
-            and not _instruction_risk_flags(item)
             and not (_item_source_keys(item) & blocked_scope_sources)
     ]
     target_hints = [module_path] if module_path else code_target_hints
@@ -145,13 +144,6 @@ def build_action_packet(
         _critical_fact_count(dict(scoped_by_id[omission.stable_id].original))
         for omission in selection.omissions
         if omission.reason_code == "forbidden_source"
-        and omission.stable_id in scoped_by_id
-        and scoped_by_id[omission.stable_id].authority == "canonical"
-    )
-    selector_risky_critical_facts = sum(
-        _critical_fact_count(dict(scoped_by_id[omission.stable_id].original))
-        for omission in selection.omissions
-        if omission.reason_code == "instruction_risk"
         and omission.stable_id in scoped_by_id
         and scoped_by_id[omission.stable_id].authority == "canonical"
     )
@@ -231,8 +223,6 @@ def build_action_packet(
     guidance: list[dict[str, Any]] = []
     critical_fact_omissions = 0
     snippet_omissions = 0
-    risky_content_omissions = 0
-    risky_critical_omissions = selector_risky_critical_facts
     untrusted_validation_omissions = 0
     selected_text_by_evidence_id: dict[str, str] = {}
     for candidate in selection.selected_candidates:
@@ -248,34 +238,9 @@ def build_action_packet(
             # Code declarations prove target identity. They do not become
             # repository policy merely because the source file is authoritative.
             facts, omitted_facts = [], 0
-        if _instruction_risk_flags(item):
-            risky_content_omissions += len(facts) + (1 if item.get("snippet") else 0)
-            if _declares_canonical_authority(item):
-                risky_critical_omissions += sum(
-                    1 for fact_type, _ in facts if fact_type in {"required", "forbidden", "validation"}
-                ) + omitted_facts
-            continue
-        if _authority(item) == "canonical":
-            for condition in sorted(_explicit_acceptance_conditions(item)):
-                bounded_condition, omitted = _bounded_text(condition, 1_000)
-                if omitted:
-                    critical_fact_omissions += 1
-                    continue
-                if _content_instruction_risk_flags(bounded_condition):
-                    risky_content_omissions += 1
-                    risky_critical_omissions += 1
-                    continue
-                acceptance_conditions.append({
-                    "text": bounded_condition,
-                    "evidence_ids": [evidence_id],
-                })
+        # Retrieved acceptance metadata is document data, not task policy.
         critical_fact_omissions += omitted_facts if _authority(item) == "canonical" else 0
         for fact_type, fact in facts:
-            if _content_instruction_risk_flags(fact):
-                risky_content_omissions += 1
-                if _authority(item) == "canonical":
-                    risky_critical_omissions += 1
-                continue
             cited = {"text": fact, "evidence_ids": [evidence_id]}
             if _authority(item) != "canonical":
                 if fact_type in {"required", "forbidden"}:
@@ -297,9 +262,7 @@ def build_action_packet(
                 required.append(cited)
         snippet, snippet_omitted = _snippet_text(selected_text_by_evidence_id.get(evidence_id, ""))
         snippet_omissions += snippet_omitted
-        if snippet and _content_instruction_risk_flags(snippet):
-            risky_content_omissions += 1
-        elif snippet:
+        if snippet:
             guidance.append({"text": snippet, "evidence_ids": [evidence_id]})
 
     has_source_backed_constraints = bool(acceptance_conditions or required or forbidden)
@@ -413,8 +376,6 @@ def build_action_packet(
         ("rejected_critical_source_facts", rejected_critical_facts),
         ("critical_source_facts", critical_fact_omissions),
         ("implementation_guidance", snippet_omissions),
-        ("risky_document_items", risky_content_omissions),
-        ("risky_critical_source_facts", risky_critical_omissions),
         ("untrusted_validation_commands", untrusted_validation_omissions),
         ("critical_source_facts", selection_budget_critical_facts),
         ("required_invariants", selection_budget_critical_facts),
@@ -428,12 +389,11 @@ def build_action_packet(
         critical_fact_omissions
         or filtered_critical_facts
         or rejected_critical_facts
-        or risky_critical_omissions
         or selection_budget_critical_facts
     ):
         packet["status"] = "insufficient_evidence"
         packet["missing_evidence"].append(
-            "At least one critical canonical fact was filtered, rejected, risky, or too large to include safely."
+            "At least one critical canonical fact was filtered, rejected, or too large to include safely."
         )
 
     if authority_conflicts:

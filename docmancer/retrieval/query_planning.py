@@ -32,9 +32,7 @@ _TERM_PATTERNS = (
     ("path", re.compile(r"(?<![\w/])(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+")),
 )
 _DOCUMENT_LOCATOR_RE = re.compile(
-    r"(?:\b(?:in|from|according\s+to)\s+|(?:в|из|согласно)\s+)"
-    r"[`\"']?((?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.[A-Za-z0-9_-]+)[`\"']?",
-    flags=re.IGNORECASE,
+    r"(?<![\w/])((?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.[A-Za-z0-9_-]+)(?![\w/])",
 )
 
 _AUTHORITY_MINIMUMS = {
@@ -99,7 +97,7 @@ def extract_exact_terms(query: str) -> tuple[ExactTerm, ...]:
 
 
 def extract_document_locator(query: str) -> str | None:
-    """Return one explicit locative source path; comparisons remain unscoped."""
+    """Return a unique literal source path without interpreting surrounding prose."""
     matches = {
         match.group(1).replace("\\", "/").removeprefix("./").rstrip(".,;:!?")
         for match in _DOCUMENT_LOCATOR_RE.finditer(query)

@@ -76,36 +76,12 @@ def _find_patterns_for_plan(project_path: str | None, relevant_files: list[dict[
     return patterns[:8]
 
 
-def _operation_for_question(question: str) -> str:
-    if _mentions_any(question, {"bottom", "sheet", "dialog"}):
-        return "Replace open/close inline toggle with call that opens bottom sheet content."
-    return "Apply the requested change only at the evidence-backed target symbol."
-
-
-def _step_for_question(question: str) -> str:
-    if _mentions_any(question, {"bottom", "sheet", "dialog"}):
-        return "Replace inline menu rendering with bottom sheet opening"
-    return "Apply evidence-backed source change"
-
-
-def _goal_for_question(question: str) -> str:
-    if _mentions_any(question, {"bottom", "sheet", "dialog"}):
-        return "Move menu presentation from inline row to modal bottom sheet while preserving existing actions."
-    return "Make the requested source change using only files and APIs found in this context."
-
-
 def _risks_and_constraints(question: str, missing_symbols: list[dict[str, Any]], existing_apis: list[dict[str, Any]], design_context: dict[str, Any] | None = None) -> list[dict[str, str]]:
     risks = [
         _risk("generated files must not be edited", "high", "code", "Edit only source files listed in relevant_files; keep generated outputs read-only."),
         _risk("unrelated modules should not be touched", "medium", "code", "Limit changes to the minimal_patch_path files unless new evidence is found."),
         _risk("missing APIs must not be invented", "high", "code", "Use existing_apis or framework APIs with fresh source evidence."),
     ]
-    if _mentions_any(question, {"menu", "capability", "bluetooth", "flashlight", "emulator", "needbt", "needflashlight"}):
-        risks.extend([
-            _risk("capability semantics must be preserved", "high", "code", "Keep existing capability branches and actions while changing presentation."),
-            _risk("preserve needFlashLight, needBT, and isEmulator semantics", "high", "code", "Move UI wiring without changing these flag meanings or call sites."),
-            _risk("legacy Bluetooth QR helpers _showRT40QRDialog and _showMS300QRDialog should be removal candidates only when backed by file evidence", "medium", "code", "Delete only after confirming the helper definitions/usages in the listed files."),
-        ])
     if existing_apis:
         risks.append(_risk("dependency APIs must be evidence-backed", "medium", "dependency", "Use only dependency APIs with file and line evidence in existing_apis."))
     if missing_symbols:
@@ -117,17 +93,6 @@ def _risks_and_constraints(question: str, missing_symbols: list[dict[str, Any]],
 
 def _risk(risk: str, severity: str, source: str, mitigation: str) -> dict[str, str]:
     return {"risk": risk, "severity": severity, "source": source, "mitigation": mitigation}
-
-
-def _verification_steps(question: str, relevant_files: list[dict[str, Any]], existing_apis: list[dict[str, Any]]) -> list[dict[str, str]]:
-    steps: list[dict[str, str]] = []
-    if _is_flutter_like(question, relevant_files, existing_apis):
-        steps.append({
-            "type": "command",
-            "value": "flutter analyze",
-            "why": "Static analysis should catch import/type errors after UI refactor.",
-        })
-    return steps
 
 
 def _implementation_warnings(
@@ -159,17 +124,6 @@ def _next_actions(
     if missing_symbols:
         actions.append("Treat missing_symbols as blockers for direct API calls unless a listed nearest_alternative is selected.")
     return actions
-
-
-def _is_flutter_like(question: str, relevant_files: list[dict[str, Any]], existing_apis: list[dict[str, Any]]) -> bool:
-    if _mentions_any(question, {"flutter", "widget", "bottom", "sheet", "menu", "dialog"}):
-        return True
-    return any(str(item.get("file", "")).endswith(".dart") for item in [*relevant_files, *existing_apis])
-
-
-def _mentions_any(text: str, needles: set[str]) -> bool:
-    lowered = text.lower()
-    return any(needle in lowered for needle in needles)
 
 
 def discover_dart_dependency_apis(
@@ -238,8 +192,6 @@ def _ordered_terms(question: str, symbol_queries: list[str]) -> list[str]:
     for raw in [*symbol_queries, *_WORD_RE.findall(question)]:
         if len(raw) < 3:
             continue
-        if raw.lower() in {"plan", "change", "changing", "changes", "with", "and", "the", "for", "from", "into"}:
-            continue
         if "_" not in raw and "." not in raw and not any(char.isupper() for char in raw[1:]):
             continue
         if raw not in terms:
@@ -263,8 +215,6 @@ def _looks_like_symbol(value: str) -> bool:
         return False
     lowered = value.lower()
     if lowered.endswith(('.pen', '.fig')):
-        return False
-    if lowered in {"plan", "use", "using", "change", "changing", "changes", "with", "and", "the", "for", "from", "into", "find", "semantics"}:
         return False
     return "." in value or any(char.isupper() for char in value[1:])
 
@@ -294,7 +244,7 @@ def _nearest_dependency_alternatives(symbol: str, dependency_apis: list[dict[str
                 "file": api.get("file"),
                 "start_line": api.get("start_line"),
                 "end_line": api.get("end_line"),
-                "reason": "Closest resolved dependency API for bottom sheet behavior." if "bottom" in symbol_tokens & api_tokens else "Similar resolved dependency API found.",
+                "reason": "Similar resolved dependency API found.",
             })
         if len(alternatives) >= 3:
             break
@@ -580,4 +530,4 @@ def _dedupe(items: list[str]) -> list[str]:
             result.append(item)
     return result
 
-__all__=['build_implementation_map', '_current_behavior_from_files', '_minimal_patch_path', '_find_patterns_for_plan', '_operation_for_question', '_step_for_question', '_goal_for_question', '_risks_and_constraints', '_risk', '_verification_steps', '_implementation_warnings', '_next_actions', '_is_flutter_like', '_mentions_any', 'discover_dart_dependency_apis', 'discover_rejected_sources', '_dedupe_dependency_apis', 'discover_missing_symbols', '_resolved_dart_package_roots', '_pubspec_lock_packages', '_iter_source_files', '_iter_dependency_source_files', '_ordered_terms', '_probable_symbol_terms', '_looks_like_symbol', '_symbol_found_in_source', '_find_dependency_symbol', '_nearest_dependency_alternatives', '_nearest_symbol_alternatives', '_symbol_tokens', '_term_variants', '_to_snake_case', '_to_pascal_case', '_should_skip_source', '_should_skip_dependency_source', '_has_skipped_part', '_read_text', '_score_source_file', '_symbol_definitions', '_import_export_matches', '_line_contains_class', '_first_line_containing', '_first_line_matching', '_ref_for_line', '_changed_file_candidate', '_merge_duplicate_source_candidates', '_append_unique', '_dedupe']
+__all__=['build_implementation_map', '_current_behavior_from_files', '_minimal_patch_path', '_find_patterns_for_plan', '_risks_and_constraints', '_risk', '_implementation_warnings', '_next_actions', 'discover_dart_dependency_apis', 'discover_rejected_sources', '_dedupe_dependency_apis', 'discover_missing_symbols', '_resolved_dart_package_roots', '_pubspec_lock_packages', '_iter_source_files', '_iter_dependency_source_files', '_ordered_terms', '_probable_symbol_terms', '_looks_like_symbol', '_symbol_found_in_source', '_find_dependency_symbol', '_nearest_dependency_alternatives', '_nearest_symbol_alternatives', '_symbol_tokens', '_term_variants', '_to_snake_case', '_to_pascal_case', '_should_skip_source', '_should_skip_dependency_source', '_has_skipped_part', '_read_text', '_score_source_file', '_symbol_definitions', '_import_export_matches', '_line_contains_class', '_first_line_containing', '_first_line_matching', '_ref_for_line', '_changed_file_candidate', '_merge_duplicate_source_candidates', '_append_unique', '_dedupe']

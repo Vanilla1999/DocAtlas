@@ -241,6 +241,17 @@ PATH="$PWD/.venv/bin:$PATH" PYTHONPATH="$PWD" TMPDIR=/tmp/opencode PYTHONDONTWRI
 Smoke создаёт/коммитит только свои disposable fixture repositories, не primary.
 Self-host report — отдельный unchanged quality gate, сохранять в новый versioned
 artifact и указывать SHA/config/time slice, не перезаписывать старый красный result.
+# Latest: NL dictionary removal bounded source EXIT YES (2026-10-07)
+
+[NL_DICTIONARY_REMOVAL_COMPLETED_RU.md](NL_DICTIONARY_REMOVAL_COMPLETED_RU.md)
+и [closure review](NL_DICTIONARY_REMOVAL_CLOSURE_REVIEW_RU.md).
+Primary PR211 from6e94d6ab, new removal changes integrated/uncommitted, no push.
+45new-onlyPASS; no legacy compatibility suites/95-failure triage. Old tests/gold/floors
+unchanged. Semantic dictionaries/veto/boost branches removed in examined source scope.
+Technical guards retained, unknown authorization deny. D1exact10doc/codeempty.
+Installed parity/quality/release UNKNOWN;128-token minimal packet debt remains.
+No reinstall/network/index mutation. Previous retained-veto statuses below historical.
+
 # Latest: local/security bounded pass completed (2026-10-07)
 
 [LOCAL_SECURITY_COMPLETED_RU.md](LOCAL_SECURITY_COMPLETED_RU.md) и

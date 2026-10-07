@@ -160,8 +160,6 @@ def evidence_policy_rejection_reason(
             return "stale_evidence"
         if str(candidate.get("index_freshness") or "synchronized") != "synchronized":
             return "unsynchronized_index"
-        if candidate.get("risk_flags"):
-            return "unsafe_evidence"
         if not lifecycle_allows(candidate, lifecycle_intent):
             return "lifecycle_not_allowed"
     normalized_visible = visible_text.casefold()

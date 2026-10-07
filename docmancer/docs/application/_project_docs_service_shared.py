@@ -50,10 +50,5 @@ FLUTTER_CHANNEL_DOCS_WARNING = (
     "Flutter project version {version} was detected, but api.flutter.dev provides current stable API docs, "
     "not an exact archived snapshot."
 )
-PLACEHOLDER_PROJECT_DOC_RE = re.compile(
-    r"\b(todo|tbd|placeholder|coming soon|lorem ipsum|under construction|work in progress|wip)\b|"
-    r"TODO:\s*Put a short description|const\s+like\s*=\s*['\"]sample['\"]",
-    re.IGNORECASE,
-)
 
 __all__ = [name for name in globals() if not name.startswith('__')]

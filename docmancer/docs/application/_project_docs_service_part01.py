@@ -252,17 +252,12 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _looks_like_placeholder_project_doc(text: str) -> bool:
-        stripped = text.strip()
-        if not stripped:
-            return True
-        return bool(PLACEHOLDER_PROJECT_DOC_RE.search(stripped))
+        """Only structurally empty content is unavailable; prose is not classified."""
+        return not text.strip()
 
     @classmethod
     def _looks_like_placeholder_search_result(cls, path: str | None, text: str) -> bool:
-        name = Path(str(path or "")).name.lower()
-        if not (name.startswith("readme") or name.startswith("architecture") or name in {"license", "copying"}):
-            return False
-        return cls._looks_like_placeholder_project_doc(text[:4096])
+        return cls._looks_like_placeholder_project_doc(text)
 
     @staticmethod
     def _read_text_prefix(path: Path, *, max_chars: int = 4096) -> str | None:

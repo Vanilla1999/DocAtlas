@@ -44,7 +44,6 @@ def component_witnesses(
         or (expected and identity != expected) or original.get("stale")
         or original.get("freshness", "current") != "current"
         or original.get("index_freshness", "synchronized") != "synchronized"
-        or original.get("risk_flags") or original.get("instruction_risk_flags")
         or not lifecycle_allows(original, source.get("_lifecycle_intent", "current"))
     ):
         return {}

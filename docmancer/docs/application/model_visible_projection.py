@@ -28,7 +28,7 @@ from docmancer.docs.application.evidence_selection import (
     build_requirements,
 )
 from docmancer.docs.domain.answer_units import materialize_answer_units
-from docmancer.docs.domain.evidence_qualification import evidence_policy_rejection_reason
+from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.application.insufficient_projection import (
     apply_terminal_insufficient_projection,
@@ -402,10 +402,17 @@ def project_docs_answer(
         if scoped_paths and not any(source_path == path or source_path.endswith("/" + path) for path in scoped_paths):
             omitted += 1
             continue
-        if evidence_policy_rejection_reason(
-            {}, visible_text=candidate.display_text, candidate=candidate.original,
-            expected_project_identity=retrieval.get("project_identity"),
-        ) is not None:
+        original = candidate.original
+        expected_identity = retrieval.get("project_identity")
+        identity = str(original.get("project_identity") or "").strip()
+        if (
+            ((expected_identity or original.get("source_class") == "project_doc") and not identity)
+            or (expected_identity and identity != expected_identity)
+            or original.get("stale")
+            or str(original.get("freshness") or "current") != "current"
+            or str(original.get("index_freshness") or "synchronized") != "synchronized"
+            or not lifecycle_allows(original, "current")
+        ):
             omitted += 1
             continue
         requested_version = _requested_exact_version(retrieval)

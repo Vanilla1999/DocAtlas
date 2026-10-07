@@ -294,7 +294,6 @@ def _reserve_and_select(
                     if witness.requirement_id in remaining
                 ),)
             return (*key,
-                0 if candidate.authority == "canonical" else 1,
                 _version_rank(candidate.version_binding),
                 0 if candidate.docs_snapshot_exact is True else 1,
                 candidate.token_estimate,
@@ -412,7 +411,6 @@ def _selected_feature_trace(
             "retrieval_relevance": candidate.relevance_millis,
             "exact_term_coverage": len(candidate.covered_requirement_ids),
             "mandatory_requirement_coverage": len(candidate.covered_requirement_ids & mandatory),
-            "authority": 1000 if candidate.authority == "canonical" else 250,
             "version_exactness": 1000 if _version_rank(candidate.version_binding) == 0 else 0,
             "usable_snippet": 1000 if candidate.projected_text.strip() else 0,
             "new_source_fact_terms": len(terms - prior_terms),
@@ -423,7 +421,6 @@ def _selected_feature_trace(
             "token_cost": candidate.token_estimate,
             "expansion_cost": 0,
             "stale_risk": int(candidate.freshness.casefold() == "stale"),
-            "generic_source_penalty": int(candidate.authority != "canonical"),
             "ambiguity_penalty": int(candidate.navigation_only),
         })
         prior_terms.update(terms)
@@ -434,14 +431,4 @@ def _selected_feature_trace(
     return trace
 
 
-def _authority_conflicts(candidates: Sequence[EvidenceCandidate]) -> set[str]:
-    """Canonical metadata does not prove agreement of source statements."""
-    quoted_bytes = {
-        candidate.display_text for candidate in candidates
-        if candidate.authority == "canonical" and candidate.display_text
-    }
-    # A single literal window needs no cross-statement agreement inference.
-    # Multiple distinct windows cannot be certified compatible from wording.
-    return {"unresolved_authority_conflict:manual_review"} if len(quoted_bytes) > 1 else set()
-
-__all__=['_scope_requirement_value', '_facet_requirement_matches', '_code_group_fragments', '_candidate_code_blocks', '_code_group_requirement_matches', '_legacy_requirement_matches_unit', '_witness_for_requirement', '_with_canonical_policy_requirements', '_deduplicate', '_raw_candidate_binding', '_policy_polarity', '_overlap_millis', '_reserve_and_select', '_selected_feature_trace', '_authority_conflicts']
+__all__=['_scope_requirement_value', '_facet_requirement_matches', '_code_group_fragments', '_candidate_code_blocks', '_code_group_requirement_matches', '_legacy_requirement_matches_unit', '_witness_for_requirement', '_with_canonical_policy_requirements', '_deduplicate', '_raw_candidate_binding', '_policy_polarity', '_overlap_millis', '_reserve_and_select', '_selected_feature_trace']

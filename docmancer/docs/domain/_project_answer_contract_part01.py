@@ -53,7 +53,6 @@ def _subject_fields(
 
 def _clean_phrase(value: str) -> str:
     cleaned = _bounded(str(value or "").strip(" ?!.,:`\"'"))
-    cleaned = re.sub(r"^(?:the|a|an)\s+", "", cleaned, flags=re.I)
     return cleaned
 
 

@@ -225,7 +225,7 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, Any]:
-    """Keep selected source risk metadata consistent with snippet metadata."""
+    """Keep selected source version bindings consistent with snippets."""
 
     contract = payload.get("trust_contract")
     if not isinstance(contract, dict):
@@ -244,11 +244,10 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
         if not keys:
             continue
         stricter = {
-            "risk_flags": list(snippet.get("risk_flags") or []),
             "version_binding": snippet.get("version_binding"),
             "exact_version_match": snippet.get("exact_version_match"),
         }
-        if not stricter["risk_flags"] and stricter["version_binding"] is None and stricter["exact_version_match"] is None:
+        if stricter["version_binding"] is None and stricter["exact_version_match"] is None:
             continue
         for key in keys:
             snippet_risks[key] = stricter
@@ -276,9 +275,6 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
             updated_selected.append(source)
             continue
         merged = dict(source)
-        risk_flags = list(dict.fromkeys([*(merged.get("risk_flags") or []), *stricter.get("risk_flags", [])]))
-        if risk_flags:
-            merged["risk_flags"] = risk_flags
         if stricter.get("version_binding"):
             merged["version_binding"] = stricter["version_binding"]
         if stricter.get("exact_version_match") is not None:

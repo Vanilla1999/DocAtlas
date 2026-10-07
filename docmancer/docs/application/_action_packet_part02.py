@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from ._action_packet_shared import *  # noqa: F401,F403
 
-from ._action_packet_part01 import _authority, _blocked_source_keys, _cited_evidence_ids, _content_text, _extract_facts, _has_actionable_items, _instruction_risk_flags, _item_source_keys, _normalized_source_key, _refresh_estimated_tokens, _section, _source_path, _version_exactness_rank, estimate_action_packet_tokens
+from ._action_packet_part01 import _authority, _blocked_source_keys, _cited_evidence_ids, _content_text, _extract_facts, _has_actionable_items, _item_source_keys, _normalized_source_key, _refresh_estimated_tokens, _section, _source_path, _version_exactness_rank, estimate_action_packet_tokens
 
 def _authority_conflicts(
     items: Iterable[dict[str, Any]], trust_contract: dict[str, Any]
@@ -15,7 +15,6 @@ def _authority_conflicts(
             _authority(item) != "canonical"
             or item.get("freshness") == "stale"
             or not _source_path(item)
-            or _instruction_risk_flags(item)
             or _item_source_keys(item) & blocked_sources
         ):
             continue
@@ -73,7 +72,7 @@ def _validation_bucket(fact: str) -> str:
         lowered,
     ):
         return "compile"
-    if re.search(r"\b(ruff|mypy|lint|go\s+vet)\b", lowered):
+    if re.search(r"\b(ruff|mypy|go\s+vet)\b", lowered):
         return "semantic"
     return "tests"
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
-from ._evidence_selection_part02 import _authority_conflicts, _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
+from ._evidence_selection_part02 import _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
 from ._evidence_selection_part01 import _technical_requirement_matches, validate_assignment_binding
 
 
@@ -92,7 +92,6 @@ def select_evidence(
         include_soft_wrapped_prose=v3_answer_units,
     )
     eligibility_contract_hash = canonical_hash({
-        "trust_contract": _canonical_contract_value(trust_contract or {}),
         "project_identity": project_identity,
         "module_id": module_id,
         "result_kind": config.result_kind,
@@ -141,7 +140,6 @@ def select_evidence(
             "doc_scope": item.doc_scope,
             "symbols": list(item.symbols),
             "exact_terms": list(item.exact_terms),
-            "instruction_risk_flags": list(item.instruction_risk_flags),
             "freshness": item.freshness,
             "navigation_only": item.navigation_only,
             "token_estimate": item.token_estimate,
@@ -227,10 +225,6 @@ def select_evidence(
         ordered = ordered[:config.max_candidates]
     deduped, dedupe_omissions = _deduplicate(ordered, config, requirements)
     omissions.extend(dedupe_omissions)
-    conflict_review_required = bool(_authority_conflicts(deduped))
-    # Unknown agreement is an unresolved requirement, not a proven conflict.
-    # Actual conflicts suppress context in downstream projections; unknown
-    # agreement must retain the quote without becoming an all-pass decision.
     conflicts: set[str] = set()
     mandatory = {item.requirement_id for item in requirements if item.mandatory}
     selected, missing, selection_omissions = _reserve_and_select(
@@ -239,8 +233,6 @@ def select_evidence(
         config,
         prefer_proof_completeness=compositional_question,
     )
-    if conflict_review_required:
-        missing.add("unresolved_authority_conflict:manual_review")
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
     bounded_materialization_failed = config.result_kind == "docs_answer" and (
@@ -413,7 +405,6 @@ def select_evidence(
         None if status == "ok" else
         unresolved_reason if unresolved_reason else
         "bounded_evidence_not_materializable" if bounded_materialization_failed else
-        "manual_review_required" if conflict_review_required else
         "required_evidence_missing" if missing else
         "no_eligible_evidence"
     )
@@ -539,9 +530,8 @@ def _with_coverage(
         if matches and requirement.proof_role == "implementation_fact":
             matches = candidate.source_class in {"source_snippet", "test", "project_file"}
         if matches and requirement.proof_role == "project_rule":
-            matches = candidate.authority == "canonical" and candidate.source_class not in {
-                "repo_map", "code_graph", "absent_in_source",
-            }
+            # A quoted literal or caller authority label is not a normative grant.
+            matches = False
         if matches and requirement.proof_role == "dependency_fact":
             matches = candidate.source_class not in {
                 "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
@@ -587,20 +577,4 @@ def _with_coverage(
     )
 
 
-def _canonical_contract_value(value: Any) -> Any:
-    if isinstance(value, Mapping):
-        return {
-            str(key): _canonical_contract_value(item)
-            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
-        }
-    if isinstance(value, (set, frozenset)):
-        return sorted(
-            (_canonical_contract_value(item) for item in value), key=canonical_hash
-        )
-    if isinstance(value, (list, tuple)):
-        return [_canonical_contract_value(item) for item in value]
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
-
-__all__=['select_evidence', 'validate_evidence_sufficiency', '_with_coverage', '_canonical_contract_value']
+__all__=['select_evidence', 'validate_evidence_sufficiency', '_with_coverage']

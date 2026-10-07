@@ -256,9 +256,6 @@ def _score_candidate(candidate: SnippetCandidate, *, question: str, intent: Snip
 def _snippet_payload(candidate: SnippetCandidate, *, max_chars: int) -> dict[str, Any]:
     code, truncated = _truncate_code(candidate.code, max_chars)
     fallback = bool(candidate.metadata.get("fallback")) or (candidate.exact_version_match is False and (candidate.version or "").lower() == "latest")
-    risk_flags = list(candidate.metadata.get("risk_flags") or [])
-    if fallback and "not_exact_version" not in risk_flags:
-        risk_flags.append("not_exact_version")
     return {
         "language": candidate.language,
         "code": code,
@@ -275,21 +272,19 @@ def _snippet_payload(candidate: SnippetCandidate, *, max_chars: int) -> dict[str
         "source_class": candidate.source_class,
         "exact_version_match": candidate.exact_version_match,
         "version_binding": "latest_fallback" if fallback else candidate.metadata.get("docs_exactness") or candidate.metadata.get("version_binding"),
-        "risk_flags": risk_flags,
         "source_provenance": candidate.metadata.get("source_provenance"),
         "repository_authority": candidate.metadata.get("repository_authority"),
-        "instruction_trust": candidate.metadata.get("instruction_trust") or "untrusted_data",
-        "content_boundary": candidate.metadata.get("content_boundary") or {
+        "instruction_trust": "untrusted_data",
+        "content_boundary": {
             "role": "cited_document_data",
             "schema": "docmancer-document-data-v1",
             "executable_policy": False,
         },
         "document_data": {
             "schema": "docmancer-document-data-v1",
-            "instruction_trust": candidate.metadata.get("instruction_trust") or "untrusted_data",
+            "instruction_trust": "untrusted_data",
             "content": code,
         },
-        "instruction_risk_flags": list(candidate.metadata.get("instruction_risk_flags") or []),
         "complete": candidate.complete and not truncated,
         "truncated": truncated or candidate.truncated,
         "block_index": candidate.block_index,

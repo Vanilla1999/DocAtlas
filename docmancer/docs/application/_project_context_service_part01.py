@@ -440,8 +440,6 @@ class _ProjectContextServicePart01:
             and item.get("project_identity") == observed_project_identity
             and item.get("freshness") == "current"
             and item.get("index_freshness") == "synchronized"
-            and not item.get("risk_flags")
-            and not item.get("instruction_risk_flags")
         }
         observed_documents = {}
         for chunk in (project_docs.results if project_docs else ()):
@@ -449,8 +447,7 @@ class _ProjectContextServicePart01:
             if (
                 path not in admissible_paths or not chunk.content_hash
                 or not str(chunk.content_hash).strip() or chunk.stale
-                or chunk.metadata.get("stale") or chunk.metadata.get("risk_flags")
-                or chunk.metadata.get("instruction_risk_flags")
+                or chunk.metadata.get("stale")
                 or chunk.metadata.get("freshness", "current") != "current"
                 or chunk.metadata.get("index_freshness", "synchronized") != "synchronized"
                 or chunk.source_class != "project_file"
@@ -509,8 +506,6 @@ class _ProjectContextServicePart01:
                     or candidate_metadata.get("stale")
                     or candidate_metadata.get("freshness", "current") != "current"
                     or candidate_metadata.get("index_freshness", "synchronized") != "synchronized"
-                    or candidate_metadata.get("risk_flags")
-                    or candidate_metadata.get("instruction_risk_flags")
                     or candidate.stable_identity != stable_id
                     or not isinstance(stable_id, str) or not stable_id.strip()
                     or (path, stable_id) in seen_rescue_ids
@@ -568,8 +563,6 @@ class _ProjectContextServicePart01:
                     question=question, project_docs=replace(project_docs, results=[rescued_chunk]),
                     dependency_docs=None,
                 ), repository_root=root)
-                if any(item.get("instruction_risk_flags") or item.get("risk_flags") for item in candidate_pack):
-                    continue
                 candidate_decision = select_evidence(
                     candidate_pack, question=question,
                     config=project_docs_selection_config(tokens or 4000),

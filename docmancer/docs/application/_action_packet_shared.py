@@ -52,46 +52,6 @@ _SYMBOL_RE = re.compile(
 _CODE_SOURCE_CLASSES = {"repo_map", "source_evidence", "code_graph"}
 _MAX_SOURCE_PATH = 500
 _MAX_SOURCE_SECTION = 300
-# Retained negative-only safety NL debt, not a dictionary-free classifier.
-# No finding is not proof of safe content or permission to execute instructions.
-_DANGEROUS_CONTENT_PATTERNS = (
-    (
-        "credential_exfiltration_instruction",
-        re.compile(
-            r"\b(?:(?:must|should)\s+(?!not\b)|(?:please|need\s+to|required\s+to)\s+)"
-            r"(?:[a-z]+\s+){0,4}(?:upload|send|post|transmit|share|paste|provide)\b"
-            r".{0,120}\b(?:credentials?|tokens?|secrets?|passwords?)\b",
-            re.IGNORECASE,
-        ),
-    ),
-    (
-        "network_tool_instruction",
-        re.compile(r"\b(?:run|execute|invoke)\s+(?:curl|wget|ssh|scp|nc)\b", re.IGNORECASE),
-    ),
-    (
-        "remote_instruction",
-        re.compile(
-            r"\b(?:must|should|please|visit|open|fetch|download|upload)\b.{0,100}https?://",
-            re.IGNORECASE,
-        ),
-    ),
-    (
-        "instruction_override",
-        re.compile(
-            r"\b(?:ignore|disregard|override)\b.{0,80}"
-            r"\b(?:previous|prior|system|developer|agent)\s+(?:instructions?|messages?|rules?)\b",
-            re.IGNORECASE,
-        ),
-    ),
-    (
-        "system_prompt_disclosure",
-        re.compile(
-            r"\b(?:reveal|show|print|expose|disclose)\b.{0,80}"
-            r"\b(?:system|developer)\s+(?:prompt|message|instructions?)\b",
-            re.IGNORECASE,
-        ),
-    ),
-)
 
 
 def _non_empty_string_schema(*, max_length: int | None = None) -> dict[str, Any]:

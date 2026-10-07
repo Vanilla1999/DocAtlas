@@ -328,7 +328,6 @@ def _include_complete_code_fence(
     for fence_start, fence_end, closed in blocks:
         if (
             closed and end <= fence_start and not text[end:fence_start].strip()
-            and re.search(r"\b(?:following|command|example)\b", text[start:end], re.I)
             and fence_end - start <= limit
         ):
             end = fence_end

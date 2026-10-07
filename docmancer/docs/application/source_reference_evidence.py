@@ -47,7 +47,7 @@ class SourceReferenceContext:
                     continue
                 if not path or path.startswith(("/", "\\")) or ".." in path.replace("\\", "/").split("/"):
                     continue
-                if metadata.get("risk_flags") or metadata.get("index_freshness") not in (None, "", "synchronized"):
+                if metadata.get("index_freshness") not in (None, "", "synchronized"):
                     continue
                 source_key = str(row["source"])
                 self.sources[source_key] = CatalogSource(

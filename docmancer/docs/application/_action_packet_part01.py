@@ -241,28 +241,6 @@ def _is_within(path: str, scope: str) -> bool:
         return False
 
 
-def _instruction_risk_flags(item: dict[str, Any]) -> list[str]:
-    values: list[Any] = []
-    for raw in (item.get("instruction_risk_flags"), item.get("risk_flags")):
-        if isinstance(raw, (list, tuple, set)):
-            values.extend(raw)
-        elif raw:
-            values.append(raw)
-    return [
-        str(value)
-        for value in values
-        if value
-    ]
-
-
-def _content_instruction_risk_flags(text: str) -> list[str]:
-    return [
-        reason
-        for reason, pattern in _DANGEROUS_CONTENT_PATTERNS
-        if pattern.search(str(text or ""))
-    ]
-
-
 def _source_scope(item: dict[str, Any]) -> str:
     return str(
         item.get("module_path")
@@ -352,11 +330,7 @@ def _rank_and_dedupe(items: Iterable[dict[str, Any]], trust_contract: dict[str, 
 
 
 def _blocked_source_keys(trust_contract: dict[str, Any]) -> set[str]:
-    return _risky_source_keys(trust_contract) | _rejected_source_keys(trust_contract)
-
-
-def _risky_source_keys(trust_contract: dict[str, Any]) -> set[str]:
-    return _trust_source_keys(trust_contract, "risky")
+    return _rejected_source_keys(trust_contract)
 
 
 def _rejected_source_keys(trust_contract: dict[str, Any]) -> set[str]:
@@ -542,7 +516,7 @@ def _add_mandatory_requirement_witnesses(
     for candidate in selection.selected_candidates:
         evidence = dict(candidate.original)
         evidence_id = _evidence_id(evidence)
-        if evidence_id not in source_ids or _instruction_risk_flags(evidence):
+        if evidence_id not in source_ids:
             continue
         custom_witnesses = [
             witness for witness in candidate.requirement_witnesses
@@ -559,7 +533,7 @@ def _add_mandatory_requirement_witnesses(
         ]
         canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
         for witness in custom_witnesses:
-            if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
+            if not witness.unit_text:
                 continue
             if _normalized_fact_text(witness.unit_text) in _normalized_fact_text(visible_text):
                 continue
@@ -600,7 +574,6 @@ def _add_mandatory_requirement_witnesses(
                 fact
                 for _, fact in _extract_facts(_content_text(evidence))[0]
                 if fact
-                and not _content_instruction_risk_flags(fact)
                 and _normalized_fact_text(fact) not in _normalized_fact_text(visible_text)
             ]
             if missing_facts:
@@ -621,7 +594,7 @@ def _add_mandatory_requirement_witnesses(
             witness = _requirement_witness(
                 candidate.display_text, [requirement.value for requirement in remaining]
             )
-            if not witness or _content_instruction_risk_flags(witness):
+            if not witness:
                 break
             packet["implementation_guidance"].append({
                 "text": witness,
@@ -808,7 +781,7 @@ def _policy_witness_survived(
     safe_facts = {
         fact
         for _, fact in _extract_facts(_content_text(dict(candidate.original)))[0]
-        if fact and not _content_instruction_risk_flags(fact)
+        if fact
     }
     witnessed = [
         _normalized_fact_text(str(row.get("text") or ""))
@@ -839,4 +812,4 @@ def _has_actionable_items(packet: dict[str, Any]) -> bool:
         validation.get("semantic_checks"),
     ))
 
-__all__=['estimate_action_packet_tokens', 'evidence_identity_for_item', '_ensure_selection_survives_packet', '_explicit_acceptance_conditions', '_refresh_estimated_tokens', '_effective_authority', '_declares_canonical_authority', '_critical_fact_count', '_scope_applies', '_absolute_scope', '_same_path', '_is_within', '_instruction_risk_flags', '_content_instruction_risk_flags', '_source_scope', '_version_binding', '_relevance_score', '_version_exactness_rank', '_rank_and_dedupe', '_blocked_source_keys', '_risky_source_keys', '_rejected_source_keys', '_trust_source_keys', '_item_source_keys', '_normalized_source_key', '_authority', '_source_row', '_source_path', '_editable_target_path', '_section', '_dedupe_id', '_evidence_id', '_content_text', '_add_mandatory_requirement_witnesses', '_packet_visible_text', '_requirement_witness', '_extract_facts', '_validation_command', '_explicit_symbols', '_snippet_text', '_dedupe_cited', '_cited_evidence_ids', '_has_actionable_items']
+__all__=['estimate_action_packet_tokens', 'evidence_identity_for_item', '_ensure_selection_survives_packet', '_explicit_acceptance_conditions', '_refresh_estimated_tokens', '_effective_authority', '_declares_canonical_authority', '_critical_fact_count', '_scope_applies', '_absolute_scope', '_same_path', '_is_within', '_source_scope', '_version_binding', '_relevance_score', '_version_exactness_rank', '_rank_and_dedupe', '_blocked_source_keys', '_rejected_source_keys', '_trust_source_keys', '_item_source_keys', '_normalized_source_key', '_authority', '_source_row', '_source_path', '_editable_target_path', '_section', '_dedupe_id', '_evidence_id', '_content_text', '_add_mandatory_requirement_witnesses', '_packet_visible_text', '_requirement_witness', '_extract_facts', '_validation_command', '_explicit_symbols', '_snippet_text', '_dedupe_cited', '_cited_evidence_ids', '_has_actionable_items']

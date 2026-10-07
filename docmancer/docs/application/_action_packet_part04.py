@@ -232,7 +232,7 @@ def validate_action_packet(
         key in omitted_counts for key in (
             "required_invariants", "forbidden_changes", "critical_source_facts",
             "filtered_critical_source_facts", "rejected_critical_source_facts",
-            "risky_critical_source_facts", "task_interpretation.objective_characters",
+            "task_interpretation.objective_characters",
             "mandatory_requirements",
         )
     ) and status != "insufficient_evidence":

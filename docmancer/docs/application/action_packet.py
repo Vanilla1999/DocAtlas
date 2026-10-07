@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import replace
-from pathlib import PurePosixPath
-import re
 from typing import Any, Iterable, Mapping
 
 from ._action_packet_shared import *  # noqa: F401,F403
@@ -17,133 +14,6 @@ from ._action_packet_part03 import build_action_packet as _build_action_packet_i
 from ._action_packet_part04 import *  # noqa: F401,F403
 
 
-_TRUSTED_PROJECT_RULE_AUTHORITIES = frozenset({
-    "canonical", "primary", "project_rule", "source_of_truth",
-})
-_GENERIC_PATH_TOKENS = frozenset({
-    "application", "architecture", "contract", "docs", "flow", "gate", "lib", "module", "modules",
-})
-
-
-def _path_token_sequence(value: str) -> tuple[str, ...]:
-    stem = PurePosixPath(str(value or "").replace("\\", "/")).stem
-    return tuple(
-        token.casefold()
-        for token in re.findall(r"[A-Za-z0-9]+", stem.replace("_", "-").replace("-", " "))
-        if len(token) >= 3 and token.casefold() not in _GENERIC_PATH_TOKENS
-    )
-
-
-def _path_tokens(value: str) -> set[str]:
-    return set(_path_token_sequence(value))
-
-
-def _target_scope(path: str) -> str:
-    stem = PurePosixPath(path.replace("\\", "/")).stem
-    parts = [part for part in re.split(r"[_\-]+", stem) if part]
-    return "".join(part[:1].upper() + part[1:] for part in parts) or stem
-
-
-def _declared_authority_by_path(
-    context_pack: Iterable[Mapping[str, Any]],
-    *,
-    project_path: str | None,
-    target_paths: Iterable[str],
-) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for item in context_pack:
-        if not isinstance(item, Mapping):
-            continue
-        path = str(item.get("path") or item.get("source") or "").strip().replace("\\", "/").casefold()
-        authority = _effective_authority(
-            dict(item), project_path=project_path, target_paths=target_paths,
-        )
-        if path and authority:
-            values[path] = authority
-    return values
-
-
-def _behavioral_source_fact_contracts(
-    *,
-    required_evidence_paths: Iterable[str],
-    required_target_paths: Iterable[str],
-    context_pack: Iterable[Mapping[str, Any]],
-    project_path: str | None = None,
-) -> tuple[dict[str, Any], ...]:
-    """Derive one bounded source-scoped behavior obligation per affected flow.
-
-    Matching is based only on public source/target identities. It never embeds a
-    benchmark answer string. A document path proves identity separately; this
-    extra obligation requires substantive behavioral text from the same source.
-    """
-
-    docs = [
-        str(path).strip().replace("\\", "/")
-        for path in required_evidence_paths
-        if str(path).strip().replace("\\", "/").casefold().startswith("docs/")
-        and PurePosixPath(str(path)).suffix.casefold() in {".md", ".mdx", ".rst", ".adoc"}
-    ]
-    targets = [
-        str(path).strip().replace("\\", "/")
-        for path in required_target_paths
-        if str(path).strip()
-    ]
-    if not docs or not targets:
-        return ()
-    authority_by_path = _declared_authority_by_path(
-        context_pack, project_path=project_path, target_paths=targets,
-    )
-    rows: list[dict[str, Any]] = []
-    scope_counts: dict[str, int] = {}
-    for source_path in docs:
-        source_sequence = _path_token_sequence(source_path)
-        source_terms = set(source_sequence)
-        ranked: list[tuple[tuple[Any, ...], str]] = []
-        for target in targets:
-            target_sequence = _path_token_sequence(target)
-            target_terms = set(target_sequence)
-            overlap = len(source_terms & target_terms)
-            if not overlap:
-                continue
-            # Prefer the target whose leading domain noun matches the source
-            # document before using generic lexical density. This prevents a
-            # broad permission architecture document from stealing the browser
-            # flow scope merely because both target names contain "permission".
-            leading_domain_match = int(bool(
-                source_sequence
-                and target_sequence
-                and source_sequence[0] == target_sequence[0]
-            ))
-            density = int(overlap * 1000 / max(1, len(target_terms)))
-            ranked.append((
-                (-overlap, -leading_domain_match, -density, len(target_terms), target.casefold()),
-                target,
-            ))
-        if not ranked:
-            continue
-        target = min(ranked, key=lambda row: row[0])[1]
-        scope = _target_scope(target)
-        if not scope:
-            continue
-        scope_index = scope_counts.get(scope, 0)
-        scope_counts[scope] = scope_index + 1
-        requirement_id = f"behavioral_contract:{scope}"
-        if scope_index:
-            source_identity = "-".join(_path_token_sequence(source_path)) or str(scope_index + 1)
-            requirement_id += f":{source_identity}"
-        declared = authority_by_path.get(source_path.casefold(), "")
-        rows.append({
-            "kind": "source_fact",
-            "source_path": source_path,
-            "scope": scope,
-            "modality": "required",
-            "requirement_id": requirement_id,
-            "public_provenance": "public_task_contract",
-            "proof_role": "project_rule" if declared in _TRUSTED_PROJECT_RULE_AUTHORITIES else "generic_fact",
-        })
-    return tuple(rows)
-
-
 def _explicit_mutation_contract(
     question: str,
     required_target_paths: Iterable[str],
@@ -156,19 +26,10 @@ def _explicit_mutation_contract(
     return bound
 
 
-def _promote_trusted_behavioral_witnesses(
-    packet: dict[str, Any],
-    public_requirements: Iterable[Any],
-) -> None:
-    """Compatibility no-op: source identity is not behavioral proof."""
-    return
-
-
 def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
-    """Build a packet while preserving the caller's semantic selection budget."""
+    """Build a packet preserving explicit requirements and selection budgets."""
 
     question = str(kwargs.get("question") or (args[0] if args else ""))
-    required_evidence_paths = tuple(kwargs.get("required_evidence_paths") or ())
     required_target_paths = tuple(kwargs.get("required_target_paths") or ())
     behavioral_required = bool(kwargs.get("behavioral_contract_required"))
     raw_context = tuple(
@@ -179,13 +40,6 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
         kwargs["context_pack"] = raw_context
 
     public_requirements = list(kwargs.get("public_requirements") or ())
-    if behavioral_required:
-        public_requirements.extend(_behavioral_source_fact_contracts(
-            required_evidence_paths=required_evidence_paths,
-            required_target_paths=required_target_paths,
-            context_pack=raw_context,
-            project_path=kwargs.get("project_path"),
-        ))
     if public_requirements:
         by_identity: dict[str, Any] = {}
         for row in public_requirements:
@@ -204,10 +58,7 @@ def build_action_packet(*args: Any, **kwargs: Any) -> dict[str, Any]:
             provenance="explicit_task_contract" if behavioral_required else "explicit_required_target",
         )
 
-    packet = _build_action_packet_impl(*args, **kwargs)
-    if packet.get("status") != "insufficient_evidence":
-        _promote_trusted_behavioral_witnesses(packet, public_requirements)
-    return packet
+    return _build_action_packet_impl(*args, **kwargs)
 
 
 __all__=[n for n in globals() if not n.startswith("__")]

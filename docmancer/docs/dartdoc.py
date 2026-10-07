@@ -179,7 +179,6 @@ def rank_dartdoc_seed_urls(urls: list[str], query: str | None, *, limit: int) ->
         re.sub(r"[^a-z0-9]", "", term.casefold())
         for term in re.findall(r"[A-Za-z][A-Za-z0-9_]{3,}", query)
     }
-    terms -= {"what", "when", "where", "which", "with", "should", "using", "implemented"}
 
     def score(url: str) -> tuple[int, int]:
         path = re.sub(r"[^a-z0-9]", "", urlparse(url).path.casefold())
