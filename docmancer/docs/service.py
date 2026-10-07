@@ -23,6 +23,7 @@ from docmancer.docs.application.unified_context_service import UnifiedDocsContex
 from docmancer.docs.patch_plan_context import PatchPlanContextService
 from docmancer.docs.domain.policies import is_stale
 from docmancer.docs.domain.project_path_validation import validate_project_path
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
@@ -319,8 +320,9 @@ class LibraryDocsService:
     def query_project_docs(self, *args: Any, **kwargs: Any):
         return self.project_docs.query_project_docs(*args, **kwargs)
 
+    @_found_window_retention_producer
     def get_project_docs(self, *args: Any, **kwargs: Any):
-        return self.project_docs.get_project_docs(*args, **kwargs)
+        return _invoke_found_window_retention(self.project_docs.get_project_docs, *args, **kwargs)
 
     def _indexed_project_doc_sources(self, *args: Any, **kwargs: Any):
         return self.project_docs._indexed_project_doc_sources(*args, **kwargs)
@@ -343,8 +345,9 @@ class LibraryDocsService:
     def _project_docs_structured_next_action(self, *args: Any, **kwargs: Any):
         return self.project_docs._project_docs_structured_next_action(*args, **kwargs)
 
+    @_found_window_retention_producer
     def get_project_context(self, *args: Any, **kwargs: Any):
-        return self.project_context.get_project_context(*args, **kwargs)
+        return _invoke_found_window_retention(self.project_context.get_project_context, *args, **kwargs)
 
     def get_patch_plan_context(self, *args: Any, **kwargs: Any):
         return self.patch_plan_context.get_patch_plan_context(*args, **kwargs)

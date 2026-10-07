@@ -305,6 +305,10 @@ def _found_window_retention_producer(function):
     @wraps(function)
     def produce(*args, **kwargs):
         token = kwargs.get('_retention_ack')
+        # Ordinary calls and deliberate unacknowledged calls retain their input
+        # contract; only an ACK-bearing retention invocation needs a snapshot.
+        if token is None or kwargs.get('retain_found_windows') is not True:
+            return function(*args, **kwargs)
         binding, sinks = _retention_arguments(signature, args, kwargs)
         if binding[-1] and token is not None:
             if type(token) is not _RetentionCompletion:

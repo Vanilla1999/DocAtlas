@@ -1,4 +1,4 @@
-"""Offline packing tests: prepared candidates, fixture files, no index/provider."""
+"""Offline packing tests, including real SQLite/lexical acquisition; no provider."""
 from copy import deepcopy
 from dataclasses import asdict, replace
 import hashlib
@@ -688,3 +688,221 @@ def test_supported_project_docs_delegate_completes_actual_result_and_sink(pipeli
         'question': 'validate_binding', 'mode': 'project', 'context_format': 'patch_context'}, p.unified)
     assert result['kind'] == 'patch_context' and len(result['sources']) == 32
     assert len(calls) == 1 and len(calls[0][2]) == 32
+
+
+@pytest.mark.parametrize('retention_kwargs', [{}, {'retain_found_windows': False}, {'retain_found_windows': True}],
+                         ids=['omitted', 'false', 'unacknowledged-true'])
+def test_unacknowledged_query_preserves_noncopyable_requirements(pipeline, retention_kwargs):
+    import inspect
+    import threading
+    p = pipeline
+    requirements = SimpleNamespace(lifecycle_intent='active', lock=threading.Lock())
+    received = []
+
+    class Dispatcher:
+        def run(self, query, **kwargs):
+            received.append(kwargs['requirements'])
+            return SimpleNamespace(chunks=deepcopy(p.chunks))
+
+    p.service.facade.agent_gateway.dispatcher_for = lambda *a, **k: Dispatcher()
+    actual = p.service.query_project_docs(str(p.root), 'validate_binding',
+        requirements=requirements, **retention_kwargs)
+    assert len(received) == 2 and all(value is requirements for value in received)
+    received.clear()
+    original = inspect.unwrap(p.service.query_project_docs)
+    expected = original(p.service, str(p.root), 'validate_binding',
+        requirements=requirements, **retention_kwargs)
+    assert len(received) == 2 and all(value is requirements for value in received)
+    assert [row.model_dump() for row in actual] == [row.model_dump() for row in expected]
+    assert len(actual) == (32 if retention_kwargs.get('retain_found_windows') else 4)
+
+
+@pytest.fixture
+def lexical_pipeline(tmp_path, monkeypatch):
+    """Fixture-owned index; production service graph, metadata, and acquisition."""
+    from docmancer.agent import DocmancerAgent
+    from docmancer.core.config import DocmancerConfig
+    from docmancer.core.models import Document
+    from docmancer.docs.application.docs_job_service import DocsJobTracker
+    from docmancer.docs.project import ProjectMetadataReader
+    from docmancer.docs.registry import LibraryRegistry
+    from docmancer.docs.service import LibraryDocsService
+    monkeypatch.setenv('DOCATLAS_HOME', str(tmp_path / 'home'))
+    root = tmp_path / 'project'
+    root.mkdir()
+    originals = {'overview.md': '# Contract architecture\n\nEach contract defines an independent record validator.\n'}
+    (root / 'overview.md').write_text(originals['overview.md'])
+    entries = ['  - path: overview.md\n    role: overview\n'
+               '    description: Contract architecture\n    authority: source_of_truth\n']
+    queries = ('validate_binding', 'validate_session', 'validate_record')
+    for group, query in enumerate(queries):
+        for index in range(15):
+            path = f'contract-{group}-{index}.md'
+            lines = ['```python', f'def {query}(record):']
+            for field in range(6):
+                lines.extend([f'    if record["binding_{group}_{index}_{field}"] != "contract-{group}-{index}-{field}":',
+                              f'        raise ValueError("invalid contract {group}-{index} field {field}")'])
+            content = '\n'.join([*lines, '    return record', '```']) + '\n'
+            originals[path] = content
+            (root / path).write_text(content)
+            entries.append(f'  - path: {path}\n    role: api_contract\n'
+                           '    description: Binding contract\n    authority: source_of_truth\n')
+    (root / 'docatlas.project-docs.yaml').write_text('schema_version: 1\ndocuments:\n' + ''.join(entries))
+    metadata = ProjectMetadataReader().read(root)
+    assert metadata.docs_catalog_valid and len(metadata.docs_candidates) == len(originals)
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / 'index.db')
+    config.index.extracted_dir = str(tmp_path / 'extracted')
+    config.retrieval.default_mode = 'lexical'
+    agent = DocmancerAgent(config=config)
+    identity = ProjectDocsService._repository_identity(root)
+    documents = [Document(source=str(root / member.path), content=originals[member.path], metadata={
+        'project_path': str(root), 'project_identity': identity, 'repository_identity': identity,
+        'source_class': 'project_file', 'project_docs': True, 'doc_scope': 'project',
+        'project_doc_path': member.path, 'project_doc_content_hash': member.content_hash,
+        'project_doc_catalog_entry_hash': member.catalog_entry_hash, 'project_doc_mtime_ns': member.mtime_ns,
+        'project_doc_authority': member.authority, 'authority': member.authority,
+        'project_doc_lifecycle_status': 'active', 'lifecycle_status': 'active',
+        'freshness': 'current', 'index_freshness': 'synchronized',
+    }) for member in metadata.docs_candidates]
+    # Test setup owns these temporary bytes; no application mutation bypass.
+    generation = agent.store.add_documents(documents).generation_id
+    service = LibraryDocsService(config=config, config_source='explicit',
+        registry=LibraryRegistry(config.index.db_path), agent=agent,
+        job_tracker=DocsJobTracker(), library_index_root=tmp_path / 'library-indexes')
+    assert generation == agent.store.active_generation_id()
+    return SimpleNamespace(root=root, service=service, agent=agent, generation=generation,
+                           originals=originals, queries=queries)
+
+
+def test_real_lexical_public_retention_preserves_every_qualified_window(lexical_pipeline, monkeypatch):
+    import json
+    import time
+    from functools import wraps
+    from pathlib import Path
+    import docmancer.docs.application._project_docs_service_part03 as implementation
+    import docmancer.docs.application.project_context_service as context_module
+    from docmancer.retrieval.dispatch import RetrievalDispatcher
+    p = lexical_pipeline
+    acquisitions, candidates, contexts, source_loads = [], [], [], []
+    statements, context_sql, file_reads, ranking_times = [], [], [], []
+    connect = p.agent.store._connect
+    def observe_connect():
+        connection = connect()
+        connection.set_trace_callback(statements.append)
+        return connection
+    monkeypatch.setattr(p.agent.store, '_connect', observe_connect)
+    source_paths = {str(p.root / path) for path in p.originals}
+    open_path = Path.open
+
+    class SourceFile:
+        def __init__(self, path, handle):
+            self.path, self.handle = path, handle
+        def read(self, size=-1):
+            value = self.handle.read(size)
+            file_reads.append((self.path, size, len(value)))
+            return value
+        def __enter__(self):
+            self.handle.__enter__()
+            return self
+        def __exit__(self, *args):
+            return self.handle.__exit__(*args)
+        def __getattr__(self, name):
+            return getattr(self.handle, name)
+
+    def observe_open(path, *args, **kwargs):
+        handle = open_path(path, *args, **kwargs)
+        return SourceFile(str(path), handle) if str(path) in source_paths else handle
+    monkeypatch.setattr(Path, 'open', observe_open)
+    rerank = context_module.rerank_project_doc_chunks
+    def observe_rerank(chunks, **kwargs):
+        started = time.perf_counter()
+        result = rerank(chunks, **kwargs)
+        if kwargs.get('retain_found_windows'):
+            ranking_times.append((len(chunks), time.perf_counter() - started))
+        return result
+    monkeypatch.setattr(context_module, 'rerank_project_doc_chunks', observe_rerank)
+    run = RetrievalDispatcher.run
+
+    @wraps(run)
+    def observe_run(dispatcher, query, **kwargs):
+        result = run(dispatcher, query, **kwargs)
+        assert result.mode_used == 'lexical'
+        acquisitions.append((query, deepcopy(kwargs), [row.model_dump() for row in result.chunks]))
+        return result
+
+    monkeypatch.setattr(RetrievalDispatcher, 'run', observe_run)
+    qualify = implementation._qualify_candidate_lookups
+    def observe_candidates(*args, **kwargs):
+        rows = qualify(*args, **kwargs)
+        candidates.extend(deepcopy(rows))
+        return rows
+    monkeypatch.setattr(implementation, '_qualify_candidate_lookups', observe_candidates)
+    def observe_context(original, receiver, args, kwargs):
+        result = original(receiver, *args, **kwargs)
+        contexts.append(deepcopy(result))
+        # Stop the acquisition trace before the docs/patch output projections;
+        # docs continuation metadata and patch catalog validation differ there.
+        context_sql.append(list(statements))
+        return result
+    wrap_method(p.service.project_context, 'get_project_context', observe_context)
+    from docmancer.docs.application.source_reference_evidence import SourceReferenceContext
+    document = SourceReferenceContext._document
+    def observe_document(context, source):
+        if source not in context.documents:
+            source_loads.append((context.scope.snapshot_id, source))
+        return document(context, source)
+    monkeypatch.setattr(SourceReferenceContext, '_document', observe_document)
+
+    args = {'project_path': str(p.root), 'question': p.queries[0], 'mode': 'project',
+            'lookup_queries': list(p.queries[1:])}
+    docs = handle_context_tool('get_docs_context', args, p.service)
+    assert docs['kind'] == 'docs_context' and docs.get('sources'), docs
+    baseline = (deepcopy(acquisitions), list(source_loads), context_sql[-1], list(file_reads))
+    projection_sql_counts = {'docs': len(statements) - len(context_sql[-1])}
+    assert baseline[2] and baseline[3]
+    bounded = contexts[-1]
+    acquisitions.clear()
+    source_loads.clear()
+    statements.clear()
+    file_reads.clear()
+    candidates.clear()
+    started = time.perf_counter()
+    packet = handle_context_tool('get_docs_context', {**args, 'context_format': 'patch_context'}, p.service)
+    elapsed = time.perf_counter() - started
+    assert packet['kind'] == 'patch_context', packet
+    assert (acquisitions, source_loads) == baseline[:2]
+    assert context_sql[-1] == baseline[2]
+    projection_sql_counts['patch'] = len(statements) - len(context_sql[-1])
+    assert file_reads == baseline[3]
+    retained = contexts[-1]
+    assert retained.project_docs == bounded.project_docs
+    assert retained.selection_decision == bounded.selection_decision
+    assert retained.status == bounded.status
+    assert retained.diagnostics['retrieval_routing'] == bounded.diagnostics['retrieval_routing']
+    qualified = {row.metadata['stable_chunk_id']: row for row in candidates
+        if any(trace.get('qualified') is True for key, trace in row.metadata['retrieval_query_matches'].items()
+               if key == 'query-original' or key.startswith('query-lookup-'))}
+    assert len(qualified) > 32
+    assert len(ranking_times) == 1 and ranking_times[0][0] == len(qualified)
+    assert {row['stable_id'] for row in packet['sources']} == set(qualified)
+    assert len(packet['sources']) == len(qualified) > len(bounded.context_pack)
+    for source in packet['sources']:
+        chunk = qualified[source['stable_id']]
+        evidence = chunk.metadata['_reference_evidence']
+        assert source['text'] == chunk.text
+        assert source['content_sha256'] == hashlib.sha256(chunk.text.encode()).hexdigest()
+        assert [source['char_start'], source['char_end']] == chunk.metadata['char_span']
+        assert [source['line_start'], source['line_end']] == chunk.metadata['line_span']
+        assert p.originals[source['path']][source['char_start']:source['char_end']] == source['text']
+        assert evidence['source']['scope']['snapshot_id'] == p.generation
+    # Switching back must still deliver the same bounded docs projection.
+    assert handle_context_tool('get_docs_context', args, p.service) == docs
+    print(json.dumps({'qualified_windows': len(qualified), 'packet_windows': len(packet['sources']),
+        'packet_source_bytes': sum(len(row['text'].encode()) for row in packet['sources']),
+        'bounded_context_windows': len(bounded.context_pack), 'acquisition_calls': len(baseline[0]),
+        'source_loads': len(baseline[1]), 'context_sql_statements': len(baseline[2]),
+        'projection_sql_statements': projection_sql_counts,
+        'source_file_read_bytes': sum(size for _, _, size in baseline[3]),
+        'retention_rerank_seconds': round(ranking_times[0][1], 6),
+        'patch_elapsed_seconds': round(elapsed, 3)}, sort_keys=True))
