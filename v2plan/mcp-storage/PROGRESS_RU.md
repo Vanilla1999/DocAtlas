@@ -152,3 +152,9 @@ Coordinator принял standalone runner correction: все 27 research scenar
 удаляются только его новые labels/hash. Portable pytest gates остаются. Future
 evidence: 16 normal-gated checks + 27 standalone checks, не CI certification.
 A реализует correction; native integration всё ещё HELD, R1 OPEN.
+
+A correction `709c0626`: по отчёту A 16 normal-gated pytest PASS и 27
+standalone research scenarios PASS, unsupported Python 3.12 fail до compilation.
+Default directory collection: 8 561 collected, none executed; CI/gates не
+менялись. Final independent native R проверяет runner, inventory и сохранение
+assertions. Experimental integration до verdict held; production R1 OPEN.
