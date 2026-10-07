@@ -198,6 +198,171 @@ def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
     assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
+@pytest.fixture
+def lexical_gap_project(tmp_path):
+    """Cold public member preparation, not a selector or projector substitute."""
+    from eval.evidence_quality_v2 import runtime
+
+    project = tmp_path / "project"
+    state = tmp_path / "state"
+    runtime.write_project(project, {"docs/queue.md": (
+        "# Queue buffer configuration\n\n"
+        "`QUEUE_BUFFER` configures the queue buffer. The default is 17 records. "
+        "Changes require restarting the worker.\n"
+    )})
+    try:
+        with runtime.isolated_service(state) as (service, config):
+            assert service._cold._service is None
+            assert not service._cold.member_storage_policy.db_path.exists()
+            inventory = runtime.index_project(service, config, project)
+            assert inventory["indexed_paths"] == ["docs/queue.md"]
+            assert inventory["excluded_or_failed_paths"] == []
+            yield project, service, inventory
+    finally:
+        home = runtime._FIXTURE_HOMES.pop(state.resolve(), None)
+        if home is not None:
+            home.cleanup()
+
+
+def _gap_read_request(project):
+    # No expected answer, lookup schedule, version or proof requirements.
+    return {"question": "Explain queue buffer configuration.",
+            "project_path": str(project), "scope": "all"}
+
+
+def test_lexical_gap_quotes_do_not_require_proposed_repo_write_consent(lexical_gap_project):
+    import hashlib
+    from eval.evidence_quality_v2.observer import observe_call
+
+    project, service, inventory = lexical_gap_project
+    raw_bytes = (project / "docs/queue.md").read_bytes()
+    policy = service._cold.member_storage_policy
+    payload, trace = observe_call(service, _gap_read_request(project))
+    assert len(trace["stages"]["projector_inputs"]) == 1
+    retrieval = trace["stages"]["projector_inputs"][0]
+    assert retrieval["requires_confirmation"] is False
+    assert retrieval["delivery_decision"]["deliverable"] is True
+    gaps = [action for action in retrieval["next_actions"]
+            if action.get("action") == "create_reviewable_project_doc"]
+    assert gaps and all(action["requires_confirmation"] is True for action in gaps)
+    assert all(action["confirmation_reason"] == "repo_write" for action in gaps)
+    assert not (project / "ARCHITECTURE.md").exists()
+    assert payload["context_available"] is True
+    assert payload.get("requires_confirmation", False) is False
+    assert payload["answer_supported"] is False and payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert payload["context_quality"]["status"] == "unverified"
+    assert "unsupported_answer_authorization:context_only" in retrieval["missing_requirement_ids"]
+    assert not retrieval["selection_decision"]["assignments"]
+    assert len(payload["sources"]) == 1
+    source = payload["sources"][0]
+    assert source["path_or_url"] == "docs/queue.md"
+    assert source["snippet"].encode() in raw_bytes
+    bound = trace["snapshot"][source["evidence_id"]]
+    candidate = bound["source"]
+    from docmancer.docs.application.model_visible_projection import _source_digest
+    # Public docs hashes bind the source envelope, not just snippet bytes.
+    assert source["content_sha256"] == _source_digest(candidate)
+    assert candidate["content"].encode() == raw_bytes[candidate["char_start"]:candidate["char_end"]]
+    assert candidate["display_content_hash"] == hashlib.sha256(raw_bytes).hexdigest()
+    assert candidate["generation_id"] == inventory["generation_id"]
+    assert candidate["instruction_trust"] == "untrusted_data"
+    qualification = bound["qualification"]["retrieval_query_matches"]["query-original"]
+    assert qualification["qualified"] is True and qualification["context_only"] is True
+    assert qualification["query_text"] == _gap_read_request(project)["question"]
+    assert candidate["_assigned_requirement_ids"] == []
+    assert source["line_start"] == 1 and source["line_end"] == 3
+    assert validate_model_visible_projection(payload, snapshot=trace["snapshot"], max_tokens=800) == []
+    assert (project / "docs/queue.md").read_bytes() == raw_bytes
+    assert policy.generation() == inventory["generation_id"]
+    from contextlib import closing
+    with closing(policy.connect()) as db:
+        rows = [dict(row) for row in db.execute(
+            "SELECT stable_chunk_id, source_path, display_text, line_start, line_end "
+            "FROM retrieval_children WHERE generation_id = ?", (inventory["generation_id"],),
+        )]
+    assert rows == inventory["rows"]
+
+
+def test_gap_does_not_override_real_read_preflight_consent(lexical_gap_project):
+    from eval.evidence_quality_v2.observer import observe_call
+
+    project, service, _ = lexical_gap_project
+    source = project / "docs/queue.md"
+    source.write_bytes(source.read_bytes() + b"Changed after the confirmed snapshot.\n")
+    payload, trace = observe_call(service, _gap_read_request(project))
+    assert payload["requires_confirmation"] is True
+    assert payload["confirmation_reason"] == "project_docs_preflight"
+    assert payload["context_available"] is False and not payload.get("sources")
+    assert payload["edit_ready"] is False
+    assert trace["stages"]["projector_inputs"] == []
+    assert not (project / "ARCHITECTURE.md").exists()
+
+
+def test_gap_preserves_network_consent_and_does_not_call_fetch(lexical_gap_project, monkeypatch):
+    from docmancer.mcp._docs_server_part01 import call_docs_tool_payload
+
+    project, service, _ = lexical_gap_project
+    def forbidden(*args, **kwargs):
+        pytest.fail("network fetch without a grant")
+    monkeypatch.setattr(service.materialize(), "get_docs", forbidden)
+    result = service.get_project_context(str(project), _gap_read_request(project)["question"],
+        library="unindexed-library", mode="auto", scope="all", allow_network=False)
+    assert result.requires_confirmation is True
+    assert result.confirmation_reason == "network_fetch"
+    assert result.next_action["confirmation_reason"] == "network_fetch"
+    assert not result.delivery_decision.deliverable
+    assert any(action.get("confirmation_reason") == "repo_write" for action in result.next_actions)
+    payload = call_docs_tool_payload("get_docs_context", {
+        **_gap_read_request(project), "library": "unindexed-library",
+    }, service)
+    assert payload["requires_confirmation"] is True
+    assert payload["context_available"] is False and not payload.get("sources")
+    assert payload["edit_ready"] is False
+
+
+def test_gap_quote_cannot_bypass_revoked_source_read_grant(lexical_gap_project, monkeypatch):
+    import json
+    from docmancer.mcp._docs_server_part01 import call_docs_tool_payload
+    from docmancer.mcp.docs_server import read_docs_resource
+
+    project, service, _ = lexical_gap_project
+    payload = call_docs_tool_payload("get_docs_context", _gap_read_request(project), service)
+    source = payload["sources"][0]
+    catalog = project / "docatlas.project-docs.yaml"
+    catalog.write_text(catalog.read_text().replace("source_of_truth", "historical"))
+    def forbidden(*args, **kwargs):
+        pytest.fail("revoked source read reached hydration")
+    monkeypatch.setattr(service.source_reader.gateway, "read_snapshot", forbidden)
+    read = json.loads(read_docs_resource(source["source_uri"], service)["text"])
+    assert read["status"] == "source_unavailable"
+    assert "snippet" not in read
+    assert not (project / "ARCHITECTURE.md").exists()
+
+
+def test_gap_quote_is_not_a_mutation_grant(lexical_gap_project, monkeypatch):
+    from docmancer.mcp._docs_server_part01 import call_docs_tool_payload
+
+    project, service, _ = lexical_gap_project
+    payload = call_docs_tool_payload("get_docs_context", _gap_read_request(project), service)
+    assert payload["sources"] and payload["edit_ready"] is False
+    policy = service._cold.member_storage_policy
+    before = policy.db_path.read_bytes()
+    generation = policy.generation()
+    def forbidden(*args, **kwargs):
+        pytest.fail("mutation producer called without a grant")
+    monkeypatch.setattr(service._cold.project_docs, "sync_project_docs", forbidden)
+    result = call_docs_tool_payload("prepare_docs", {
+        "action": "sync_project_docs", "project_path": str(project),
+    }, service._cold)
+    assert result["error"]["reason_code"] in {"validation_error", "permission_denied"}
+    monkeypatch.setattr(service.materialize(), "_project_sync_project_docs_impl", forbidden, raising=False)
+    with pytest.raises(PermissionError, match="no explicit mutation grant"):
+        service.sync_project_docs(str(project))
+    assert policy.generation() == generation and policy.db_path.read_bytes() == before
+    assert not (project / "ARCHITECTURE.md").exists()
+
+
 def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates():
     from eval.project_context_quality_v2_protocol import evaluate_case, load_cases
     from scripts.run_project_docs_self_host_gate import LiveCase, run

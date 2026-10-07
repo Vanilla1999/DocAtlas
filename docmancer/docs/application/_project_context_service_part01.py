@@ -411,10 +411,18 @@ class _ProjectContextServicePart01:
                 )
         gap_actions = _documentation_gap_actions(next_actions)
         if gap_actions:
-            requires_confirmation = True
-            confirmation_reason = "repo_write"
-            next_action = gap_actions[0]
-            arguments_patch = {"project_path": str(root)}
+            # Creating missing docs is a proposed mutation, not the current
+            # read. Keep its consent on the action; never replace an actual
+            # acquisition/network consent decision with advisory write consent.
+            for action in gap_actions:
+                action["requires_confirmation"] = True
+                action["confirmation_reason"] = "repo_write"
+            if not requires_confirmation:
+                next_action = gap_actions[0]
+                arguments_patch = {"project_path": str(root)}
+                if patch_request:
+                    requires_confirmation = True
+                    confirmation_reason = "repo_write"
         context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=root)
         warnings.extend(warning["code"] for warning in content_trust_warnings)
         if evidence_path:
