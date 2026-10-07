@@ -1,6 +1,6 @@
 # ActionPacket v4 — реализация и проверка
 
-Статус: core R1–R8 независимо закрыты; исправление R9 интегрировано и ожидает независимого подтверждения. Это не release acceptance.
+Статус: реализация и bounded verification завершены. Независимый reviewer закрыл R1–R9; остаточных findings в проверенном срезе нет. Это не release acceptance.
 
 ## Контракт и расположение
 
@@ -99,9 +99,10 @@ git diff --check b89fa3cc16534445501bab14e0d63e099e9f61f6
 Финальный совместный run production snapshot `0f722677`: **195 PASS**, exit 0.
 Examples / ownership / syntax / diff checks: PASS; все 44 изменённых source/eval
 модуля успешно импортированы; инструкция проверена реальным dispatch тестом.
-Ownership: 61 changed paths, 2566
+Ownership до добавления финального closure report: 61 changed paths, 2566
 unchanged baseline paths; syntax: 51 source/new-test modules. Каждый из
-перечисленных checks завершился exit 0. Независимое закрытие R9 ещё проверяется.
+перечисленных checks завершился exit 0. Reviewer независимо повторил все пять
+новых suites: **195 PASS**, exit 0, и examples/scope checks: PASS.
 
 ## Независимый review
 
@@ -115,7 +116,12 @@ unchanged baseline paths; syntax: 51 source/new-test modules. Каждый из
   ~55.9 KB patch message на восьми последующих requests; выявлен Medium R9
   в активной required-once инструкции. Исправление интегрировано; regression
   исполняет actual instruction injection и public dispatch, ровно один retrieval,
-  `retrieval_succeeded=True`, `edit_ready=False`. Независимый rereview выполняется.
+  `retrieval_succeeded=True`, `edit_ready=False`.
+- [REVIEW_R_FINAL_CLOSURE.md](REVIEW_R_FINAL_CLOSURE.md): **R1–R9 CLOSED**,
+  no residual findings в bounded review. Reviewer независимо исполнил actual
+  injection → public dispatch → observer: ровно один retrieval, 12 sources,
+  55910 bytes / 13978 estimated tokens, полный валидный v4 result,
+  `edit_ready=false`. Все остальные conditions/threshold bytes сохранены.
 
 ## Границы и ограничения
 
@@ -125,6 +131,9 @@ unchanged baseline paths; syntax: 51 source/new-test modules. Каждый из
   посторонние `v2plan/artifacts/` не изменяются.
 - Installed wheels/packs/deployed SDK/current-index parity, full-product quality,
   historical evaluation acceptance и release/security certification — UNKNOWN.
+- Локальных implementation/review blockers в проверенном срезе не осталось.
+  Исторические workflow conditions, требующие недоступных в v4 normative grants,
+  остаются явно unsupported/fail-closed, не превращаются в разрешение действия.
 - Реализация находится в отдельном integration worktree; пользовательская
   ветка остаётся `b89fa3cc`, status — только прежние untracked artifacts.
 
@@ -189,5 +198,6 @@ tests/test_action_packet_v4_selection.py
 
 Новые coordination / verification / review документы находятся только в
 `v2plan/action-packet-v4/`: `CONTRACT.md`, этот отчёт, `REVIEW_R.md`,
-`REVIEW_R_CLOSURE.md`, `REVIEW_R_FINAL.md`, `VERIFY_EXAMPLES.py`, `VERIFY_SCOPE.py`.
+`REVIEW_R_CLOSURE.md`, `REVIEW_R_FINAL.md`, `REVIEW_R_FINAL_CLOSURE.md`,
+`VERIFY_EXAMPLES.py`, `VERIFY_SCOPE.py`.
 Точный список всего diff: `git diff --name-only b89fa3cc16534445501bab14e0d63e099e9f61f6`.
