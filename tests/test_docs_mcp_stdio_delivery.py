@@ -1,11 +1,12 @@
 """Delivery validation and isolation; real retrieval runs in installed smoke."""
 import hashlib
 import os
+from types import SimpleNamespace
 
 import pytest
 
 from scripts.docs_mcp_stdio_smoke import (
-    fixture_database_state, initialize_fixture_members, isolated_environment, validate_patch_payload,
+    fixture_database_state, initialize_fixture_members, isolated_environment, payload, text_payload, validate_patch_payload,
 )
 from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
 
@@ -49,6 +50,14 @@ def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
     refresh_action_packet_estimate(value)
     with pytest.raises(AssertionError, match="Additional properties"):
         validate_patch_payload(value)
+    terminal = {"status": "failed", "retryable": False}
+    result = SimpleNamespace(isError=True, structuredContent=terminal, content=[])
+    with pytest.raises(AssertionError):
+        payload(result)
+    assert payload(result, allow_error=True) == terminal
+    result.structuredContent = None
+    result.content = [SimpleNamespace(text='{"status":"failed","retryable":false}')]
+    assert text_payload(result, allow_error=True) == terminal
 
 
 def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(tmp_path):

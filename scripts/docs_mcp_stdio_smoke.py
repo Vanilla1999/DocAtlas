@@ -28,8 +28,8 @@ QUESTION = "Which command starts the Docs MCP server?"
 NEEDLE = "doc-atlas mcp docs-serve"
 
 
-def payload(result: object) -> dict:
-    assert not getattr(result, "isError", False), result
+def payload(result: object, *, allow_error: bool = False) -> dict:
+    assert allow_error or not getattr(result, "isError", False), result
     structured = getattr(result, "structuredContent", None)
     if isinstance(structured, dict):
         return structured
@@ -40,10 +40,10 @@ def payload(result: object) -> dict:
     return value
 
 
-def text_payload(result: object) -> dict:
+def text_payload(result: object, *, allow_error: bool = False) -> dict:
     if getattr(result, "structuredContent", None) is not None:
         raise AssertionError("text-only compatibility response included structuredContent")
-    return payload(result)
+    return payload(result, allow_error=allow_error)
 
 
 def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
@@ -180,15 +180,23 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
     if not rejected.isError:
         assert decode(rejected).get("status") != "success", rejected
     assert fixture_database_state(store.db_path) == committed, "stale grant modified fixture DB"
+    print(f"Installed {'text' if text_only else 'structured'} member lifecycle: " + json.dumps({
+        "missing_grant_rows_unchanged": True, "missing_grant_bytes_unchanged": after_files == before_files,
+        "first": metrics, "repeat": repeated["metrics"], "stale_grant_rows_unchanged": True}, sort_keys=True))
 
     canonical_query = {"question": QUESTION, "project_path": str(project)}
     answer = decode(await session.call_tool("get_docs_context", canonical_query))
-    validate_context_payload(answer, required_fragment=NEEDLE)
-    assert answer["kind"] == "docs_context" and answer["estimated_tokens"] <= 800, answer
-    rendered = json.dumps(answer)
-    assert NEEDLE in rendered
-    assert "README.md" in rendered, answer
-    outcomes = {}
+    try:
+        validate_context_payload(answer, required_fragment=NEEDLE)
+        assert answer["kind"] == "docs_context" and answer["estimated_tokens"] <= 800, answer
+        rendered = json.dumps(answer)
+        assert NEEDLE in rendered
+        assert "README.md" in rendered, answer
+    except AssertionError:
+        blockers.append(f"docs default did not return ready cited fixture evidence: {answer}")
+    outcomes = {"docs_default": {"status": answer.get("status"), "kind": answer.get("kind"),
+        "sources": [{"path": row.get("path_or_url"), "bytes": len(row.get("snippet", "").encode())}
+                    for row in answer.get("sources", [])]}}
     queries = {
         "complete": {**canonical_query, "question": "What command is documented as `doc-atlas mcp docs-serve`?"},
         "partial": {**canonical_query, "question": "What command is documented as `doc-atlas mcp docs-serve` and `AbsentFixtureConstraint`?"},
@@ -196,8 +204,7 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
         "all_scope": {**canonical_query, "scope": "all"},
         "module_mismatch": {**canonical_query, "scope": "module", "module_path": "missing-module"},
         "version_mismatch": {**canonical_query, "version": "99.0.0"},
-        "large": {**canonical_query, "question": "Inspect " + " ".join(f"`validate_protocol_{i}`" for i in range(12)),
-                  "tokens": 20000},
+        "large": {**canonical_query, "question": "Inspect " + " ".join(f"`validate_protocol_{i}`" for i in range(12))},
     }
     for name, query in queries.items():
         response = decode(await session.call_tool("get_docs_context", {**query, "context_format": "patch_context"}))
@@ -208,6 +215,9 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
             assert row["text"] in source_path.read_text(encoding="utf-8"), "returned window differs from actual fixture source"
         outcomes[name] = {"result": response["result"], "completeness": response["completeness"],
                           "source_bytes": sum(len(row["text"].encode()) for row in response.get("sources", [])),
+                          "sources": [{"path": row["path"], "evidence_id": row["evidence_id"],
+                                       "bytes": len(row["text"].encode()), "content_sha256": row["content_sha256"]}
+                                      for row in response.get("sources", [])],
                           "missing": response.get("missing", [])}
         if name in {"complete", "partial"} and (response["result"] != "data" or response["completeness"] != name):
             blockers.append(f"{name} real retrieval returned {outcomes[name]}")
@@ -222,6 +232,7 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
                             f"{(project / 'protocols.md').stat().st_size} bytes")
     print(f"Installed {'text' if text_only else 'structured'} indexed delivery observations: {json.dumps(outcomes, sort_keys=True)}")
     await invalid_manifest_lifecycle(session, project, store.db_path, decode)
+    print(f"Installed {'text' if text_only else 'structured'} invalid-manifest lifecycle: terminal failed / zero pages / no retry PASS")
     assert fixture_database_state(store.db_path) == committed, "read delivery changed member rows"
     blockers.append("positive exact-version and positive module-scope evidence fixture not established; negative bindings checked only")
     return blockers
@@ -291,7 +302,7 @@ async def invalid_manifest_lifecycle(session, project: Path, database: Path, dec
             raise TimeoutError("local invalid manifest fixture did not reach failed state")
         await asyncio.sleep(0.01)
     terminal = decode(await session.call_tool("docs_status", {"action": "job", "job_id": started["job_id"],
-                                                             "project_path": str(project)}))
+                                                             "project_path": str(project)}), allow_error=True)
     assert terminal["status"] == "failed" and terminal["retryable"] is False, terminal
     assert terminal["counts"]["pages"]["total"] == 0, terminal
 
@@ -330,7 +341,10 @@ async def smoke(*, read_only: bool = False) -> None:
                     await session.initialize()
                     await read_only_delivery(session, project, text_only=text_only)
                     if not read_only:
-                        blockers.extend(await indexed_delivery(session, project, text_only=text_only))
+                        try:
+                            blockers.extend(await indexed_delivery(session, project, text_only=text_only))
+                        except Exception as exc:
+                            blockers.append(f"{'text' if text_only else 'structured'} indexed matrix aborted: {type(exc).__name__}: {exc}")
         assert not (root / "user-home" / ".docmancer").exists()
         if blockers:
             raise RuntimeError("BLOCKED full installed delivery matrix: " + "\n".join(blockers))
