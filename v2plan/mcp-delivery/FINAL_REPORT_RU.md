@@ -1,5 +1,10 @@
 # MCP delivery — итог безопасно закрытого этапа
 
+**Historical stage snapshot:** дальнейшее user-approved trusted-local решение,
+реальный положительный lifecycle и installed smoke см.
+`../mcp-storage/FRESH_PLAN_RU.md`. Blocked observations ниже относятся к прежнему
+этапу/профилю; они не заменяются утверждением о native VFS security closure.
+
 Runtime integration SHA: `0d3e5b31` (последний smoke commit C включён).
 **Полная замена MCP и merge/release acceptance не достигнуты.**
 

@@ -205,6 +205,39 @@ Coordinator включил identical large probe в text transport (ранее N
 и сохранил strict nullable scope enum assertion после D. Combined matrix:
 542 PASS; scope/D1/syntax/whitespace/line-budget PASS. Installed smoke следующий
 gate; ни source >32 KiB, ни эти tests не заменяют artifact acceptance.
+
+## Installed artifact — coordinator result
+
+Runtime SHA: `b9f52004`. Wheel `doc_atlas-1.3.2-py3-none-any.whl`, SHA256:
+`091fd9aadfe0a52dea63dabfd395523923eba9522b3baf48115b27ffaed56896`.
+Artifact/runtime directory: `/tmp/opencode/mcp-integrated-wheel-if9p586h`.
+
+Wheel built from integration, installed offline without source checkout / `.pth`
+in an isolated Python 3.12.3 runtime. Existing seed dependencies copied: this is
+not clean-machine auto-install proof. Verified module location is that runtime's
+`site-packages/docmancer`, not editable/source imports. `PYTHONPATH` removed;
+execution outside checkout. Full stdio smoke exit 0.
+
+Structured **and text** observations:
+
+- Real cold confirmed prepare → retrieve, no project-index fixture bootstrap.
+- Process restart/repeat/CAS checks PASS; repeat writes 0, stale null rejected.
+- Omitted/null docs mode, complete/partial evidence and scope/version isolation
+  observed; missing module/version stays unavailable.
+- Large delivery: 50 windows, **39 372 unique UTF-8 source bytes**, complete,
+  in each transport. Wire bytes and duplicate spans not counted as source bytes.
+- Authored library v1/v2 sources deliver exact version-bound evidence. Library
+  indexes are explicitly preloaded after cold project acceptance: this proves
+  library retrieval/lineage, not remote/library preparation lifecycle.
+
+Fresh app storage is private temporary state under the user home, not live
+storage. Same-UID interference protection is outside the approved trusted profile.
+No source/hash/span/authority validator relaxation or provider/index expansion.
+
+Independent artifact R repeat/log review is running. Remaining gates: full active
+CI migration (known untouched NL/proof expectations), clean auto-install and
+platform coverage, then separately authorized push/release/live replacement.
+Package remains 1.3.2: no release version or deployed parity claim.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
