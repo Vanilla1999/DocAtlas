@@ -54,6 +54,7 @@ _VALIDATION_REASON_CODES = {
 _LOCAL_MUTATION_GRANT_DENIALS = frozenset({
     "Project docs ingestion is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, staging or ingestion.",
     "Project docs synchronization is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, deduplication or orphan deletion.",
+    "explicit complete member mutation grant required",
 })
 
 
@@ -100,6 +101,12 @@ def build_mcp_error_payload(
             "transaction. Do not change filesystem permissions, rebuild/prune the index, "
             "or retry this mutation on catalog-selection approval."
         ]
+        if str(exception) == "explicit complete member mutation grant required":
+            hints = [
+                "Local project-document mutation authorization is missing. An explicit complete "
+                "member mutation grant and validated member transaction are required. Do not "
+                "change filesystem permissions or retry this mutation on catalog-selection approval."
+            ]
     bounded_message = _bounded_text(message, MAX_ERROR_MESSAGE_CHARS)
     bounded_reason = _bounded_text(reason_code, 100)
     exception_type = _bounded_text(type(exception).__name__, 200) if exception is not None else None
