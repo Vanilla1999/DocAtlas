@@ -48,15 +48,15 @@ def test_omitted_null_and_prose_never_change_docs_routing():
 
 def mutation():
     return {'operation': 'sync_project_docs', 'confirm': True,
-            'storage_path': '/repo/.docatlas/docs.sqlite', 'catalog_sha256': 'a' * 64,
+            'storage_path': '/repo/.docatlas/docatlas.db', 'catalog_sha256': 'a' * 64,
             'expected_generation_id': None,
-            'documents': [{'path': 'docs/rules.md', 'content_sha256': 'b' * 64, 'catalog_entry_hash': 'c' * 64}]}
+            'documents': [{'path': 'docs/rules.md', 'content_sha256': 'b' * 64, 'catalog_entry_hash': 'sha256:' + 'c' * 64}]}
 
 
 def test_prepare_mutation_schema_is_additive_nullable_and_strict():
     tools = {tool['name']: tool for tool in runtime_public_tool_dicts()}
     schema = tools['prepare_docs']['inputSchema']
-    for value in (None, mutation(), {**mutation(), 'expected_generation_id': 'generation-1'}):
+    for value in (None, mutation(), {**mutation(), 'expected_generation_id': 'gen-' + 'd' * 32}):
         jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
     jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo'}, schema)
     assert 'omission/null supplies no mutation permission' in schema['properties']['mutation']['description']
@@ -66,13 +66,14 @@ def test_prepare_mutation_schema_is_additive_nullable_and_strict():
     for arguments in (
         {'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': unknown_document},
         {'action': 'clear_index', 'scope': 'project-local', 'project_path': '/repo', 'mutation': mutation()},
+        {'action': 'clear_index', 'scope': 'project-local', 'project_path': '/repo', 'mutation': None},
     ):
         with pytest.raises(jsonschema.ValidationError):
             jsonschema.validate(arguments, schema)
 
 
 @pytest.mark.parametrize('field,value', [
-    ('operation', 'delete'), ('confirm', False), ('confirm', 1), ('storage_path', 'docs.sqlite'),
+    ('operation', 'delete'), ('confirm', False), ('confirm', 1), ('storage_path', ''),
     ('catalog_sha256', 'A' * 64), ('documents', []), ('unexpected', True),
 ])
 def test_prepare_mutation_schema_rejects_invalid_or_unknown_contract_fields(field, value):
@@ -89,3 +90,44 @@ def test_prepare_mutation_schema_rejects_nonliteral_member_paths(path):
     value['documents'][0]['path'] = path
     with pytest.raises(jsonschema.ValidationError):
         jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
+
+
+@pytest.mark.parametrize('member_hash', ['c' * 64, 'sha256:' + 'C' * 64, 'sha256:' + 'c' * 63, 'sha256:' + 'c' * 65, 'sha256:' + 'c' * 64 + '\n'])
+def test_prepare_mutation_schema_requires_prefixed_exact_member_hash(member_hash):
+    schema = next(tool['inputSchema'] for tool in runtime_public_tool_dicts() if tool['name'] == 'prepare_docs')
+    value = mutation()
+    value['documents'][0]['catalog_entry_hash'] = member_hash
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
+
+
+@pytest.mark.parametrize('generation', ['', 'generation-1', 'd' * 32, 'gen-' + 'D' * 32, 'gen-' + 'd' * 31, 'gen-' + 'd' * 33, 'gen-' + 'd' * 32 + '\n', False])
+def test_prepare_mutation_schema_requires_null_or_exact_generation_id(generation):
+    schema = next(tool['inputSchema'] for tool in runtime_public_tool_dicts() if tool['name'] == 'prepare_docs')
+    value = {**mutation(), 'expected_generation_id': generation}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
+
+
+@pytest.mark.parametrize('extra', ['unexpected', 'with_vectors', 'changed_paths', 'deleted_paths', 'renamed_paths', 'plan_digest', 'dry_run', 'async', 'confirm', 'library'])
+def test_prepare_sync_schema_rejects_all_extra_top_level_fields(extra):
+    schema = next(tool['inputSchema'] for tool in runtime_public_tool_dicts() if tool['name'] == 'prepare_docs')
+    for value in (None, mutation()):
+        arguments = {'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value, extra: False}
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(arguments, schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', extra: False}, schema)
+
+
+def test_prepare_storage_schema_leaves_platform_and_exact_existing_store_to_runtime():
+    tools = {tool['name']: tool for tool in runtime_public_tool_dicts()}
+    schema = tools['prepare_docs']['inputSchema']
+    value = {**mutation(), 'storage_path': r'C:\repo\.docatlas\docatlas.db'}
+    jsonschema.validate({'action': 'sync_project_docs', 'project_path': r'C:\repo', 'mutation': value}, schema)
+    storage = schema['properties']['mutation']['properties']['storage_path']
+    assert 'pattern' not in storage
+    assert 'exact existing project_path/.docatlas/docatlas.db' in schema['properties']['mutation']['description']
+    assert 'currently POSIX' in schema['properties']['mutation']['description']
+    assert 'unsupported platforms fail closed' in schema['properties']['mutation']['description']
+    assert 'existing project_path/.docatlas/docatlas.db' in tools['prepare_docs']['description']

@@ -586,7 +586,8 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
     "prepare_docs": (
         "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "
         "Honor approval; poll job_id with docs_status and retry unchanged only after success. "
-        "Project sync requires a separate explicit mutation contract binding confirmed lexical member upserts to a project-local SQLite store, "
+        "Project sync accepts only action, project_path and mutation, and requires a separate explicit mutation contract "
+        "binding confirmed lexical member upserts to the existing project_path/.docatlas/docatlas.db SQLite store, "
         "catalog digest, generation and exact document hashes. Omitted/null mutation grants no write permission. "
         "No deletion, vector or artifact writes are authorized by this contract."
     ),
@@ -636,25 +637,26 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
             "mutation": {
                 "type": ["object", "null"],
-                "description": "Explicit confirmed project-local lexical member upsert only; omission/null supplies no mutation permission. Runtime verifies catalog membership, storage locality, hashes and generation.",
+                "description": "Explicit confirmed project-local lexical member upsert only; omission/null supplies no mutation permission. Runtime verifies catalog membership, absolute project/store paths, exact existing project_path/.docatlas/docatlas.db storage, hashes and generation. Requires descriptor-relative no-follow filesystem support (currently POSIX); unsupported platforms fail closed. No legacy sync flags.",
                 "additionalProperties": False,
                 "required": ["operation", "confirm", "storage_path", "catalog_sha256", "expected_generation_id", "documents"],
                 "properties": {
                     "operation": {"const": "sync_project_docs", "type": "string"},
                     "confirm": {"const": True, "type": "boolean"},
-                    "storage_path": {"type": "string", "pattern": "^/", "minLength": 1},
-                    "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-                    "expected_generation_id": {"type": ["string", "null"], "minLength": 1},
+                    "storage_path": {"type": "string", "minLength": 1,
+                                     "description": "Exact absolute existing project_path/.docatlas/docatlas.db path; runtime verifies platform support, absoluteness, locality and initialized storage. Schema does not assume POSIX path syntax."},
+                    "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "minLength": 64, "maxLength": 64},
+                    "expected_generation_id": {"type": ["string", "null"], "pattern": "^gen-[0-9a-f]{32}$", "minLength": 36, "maxLength": 36},
                     "documents": {
-                        "type": "array", "minItems": 1, "uniqueItems": True,
+                        "type": "array", "minItems": 1, "maxItems": 500, "uniqueItems": True,
                         "items": {
                             "type": "object", "additionalProperties": False,
                             "required": ["path", "content_sha256", "catalog_entry_hash"],
                             "properties": {
                                 "path": {"type": "string", "minLength": 1,
                                          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:]).+$"},
-                                "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-                                "catalog_entry_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                                "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$", "minLength": 64, "maxLength": 64},
+                                "catalog_entry_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$", "minLength": 71, "maxLength": 71},
                             },
                         },
                     },
@@ -691,8 +693,15 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "required": ["action"],
         "allOf": [{
             "if": {"properties": {"action": {"const": "sync_project_docs"}}},
-            "then": {"required": ["project_path"],
-                     "properties": {"project_path": {"type": "string", "minLength": 1}}},
+            "then": {
+                "required": ["project_path"],
+                "properties": {
+                    "action": {"const": "sync_project_docs"},
+                    "project_path": {"type": "string", "minLength": 1},
+                    "mutation": {},
+                },
+                "additionalProperties": False,
+            },
             "else": {"not": {"required": ["mutation"]}},
         }, {
             "if": {"properties": {"action": {"const": "clear_index"}}},
