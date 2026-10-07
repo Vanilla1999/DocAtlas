@@ -229,8 +229,17 @@ class _UnifiedDocsContextServicePart01:
                 library_results.append(result)
             lane_details["library"] = [self._to_dict(item) for item in library_results]
 
+        answer_completeness = {}
         if project_result:
+            # Retrieval completeness/typed target readiness is evidence data,
+            # not current host authorization. Do not propagate an upstream
+            # edit grant, even when the SDK caller supplies a mutation DTO.
+            answer_completeness = {
+                **dict(getattr(project_result, "answer_completeness", None) or {}),
+                "edit_ready": False,
+            }
             lane_details["project"] = self._to_dict(project_result)
+            lane_details["project"]["answer_completeness"] = dict(answer_completeness)
             project_items = self._normalize_project_context(project_result)
             if project_auto:
                 mode_selected = self._infer_project_auto_mode(project_result, project_items)
@@ -520,16 +529,13 @@ class _UnifiedDocsContextServicePart01:
             support_decision=support_decision,
             delivery_decision=delivery_decision,
             answer_type=getattr(project_result, "answer_type", None) if project_result else None,
-            answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
+            answer_completeness=answer_completeness,
             disposition=(
                 (getattr(project_result, "answer_completeness", None) or {}).get("disposition")
                 if project_result else None
             ),
-            edit_ready=bool(
-                mutation_intent.operation != "none" and
-                (getattr(project_result, "answer_completeness", None) or {}).get("edit_ready")
-                if project_result else False
-            ),
+            # This context-only SDK surface accepts no authorization input.
+            edit_ready=False,
             source_search_status=str(
                 (getattr(project_result, "answer_completeness", None) or {}).get(
                     "source_search_status", "not_required"

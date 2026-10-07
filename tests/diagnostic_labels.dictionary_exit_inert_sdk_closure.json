@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_inert_sdk_closure.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/test_dictionary_exit_inert_sdk_closure.py::test_static_resource_contract_does_not_advertise_workflow_trust": "schema"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_inert_sdk_closure.py": "7fffb3517f6b10fd3b3a83d84b87c0142e58298a364e8fbc606268872f37a579"
+  }
+}

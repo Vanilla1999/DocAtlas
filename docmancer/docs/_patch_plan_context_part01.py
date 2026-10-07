@@ -2,6 +2,13 @@
 from __future__ import annotations
 
 from ._patch_plan_context_shared import *  # noqa: F401,F403
+import hashlib
+import time
+from docmancer.docs.domain.source_boundary import SourceBoundary, finite_local_path, iter_bounded_source_files
+
+# Do not expose the shared, independently scanning package resolver through
+# this allocated module. Dependency membership has no contract here.
+del resolve_dart_package_roots
 
 def build_implementation_map(
     question: str,
@@ -12,19 +19,23 @@ def build_implementation_map(
     missing_symbols: list[dict[str, Any]],
     design_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    current_behavior = _current_behavior_from_files(relevant_files)
-    minimal_patch_path = _minimal_patch_path(question, project_path, relevant_files, design_context=design_context)
-    risks_and_constraints = _risks_and_constraints(question, missing_symbols, existing_apis, design_context)
-    verification = _verification_steps(question, relevant_files, existing_apis)
-    warnings = _implementation_warnings(project_path, relevant_files, existing_apis, missing_symbols)
-    next_actions = _next_actions(relevant_files, existing_apis, missing_symbols)
+    root = Path(project_path).expanduser().resolve() if project_path else None
+    selected = []
+    if root is not None:
+        for item in relevant_files[:5]:
+            path = item.get("file")
+            if isinstance(path, str):
+                candidate = _changed_file_candidate(root, path)
+                if candidate is not None:
+                    selected.append(candidate)
+    current_behavior = _current_behavior_from_files(selected)
     return {
         "current_behavior": current_behavior,
-        "minimal_patch_path": minimal_patch_path,
-        "risks_and_constraints": risks_and_constraints,
-        "verification": verification,
-        "warnings": warnings,
-        "next_actions": next_actions,
+        "minimal_patch_path": [],
+        "risks_and_constraints": [],
+        "verification": [],
+        "warnings": ["Local behavior/policy unresolved; finite read membership does not authorize edits or prove symbol absence."],
+        "next_actions": [],
     }
 
 
@@ -34,70 +45,34 @@ def _current_behavior_from_files(relevant_files: list[dict[str, Any]]) -> list[d
         refs = item.get("refs") or []
         ref = refs[0] if refs else {}
         behavior.append({
-            "behavior": item.get("why") or "Relevant source file found by exact project evidence.",
+            "behavior": "Selected local source context; behavior remains unresolved.",
             "file": item["file"],
             "start_line": ref.get("start_line"),
             "end_line": ref.get("end_line"),
             "symbol": ref.get("symbol"),
             "evidence": ref.get("locate_by_pattern") or item.get("why") or "locate_by_pattern unavailable; read the listed file.",
-            "confidence": "high" if refs else "medium",
+            "confidence": "unknown",
+            "content_hash": item.get("content_hash"),
         })
     return behavior
 
 
 def _minimal_patch_path(question: str, project_path: str | None, relevant_files: list[dict[str, Any]], *, design_context: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-    if not relevant_files:
-        return []
-    files = [item["file"] for item in relevant_files[:4]]
-    find_patterns = _find_patterns_for_plan(project_path, relevant_files)
-    patch_level_plan = []
-    for item in relevant_files[:3]:
-        symbols = item.get("symbols") or []
-        patch_level_plan.append({
-            "file": item["file"],
-            "target_symbol": symbols[0] if symbols else None,
-            "operation": _operation_for_question(question),
-            "must_preserve": [
-                "existing menu actions",
-                "capability flags",
-                "navigation behavior",
-            ],
-            "proposed_fragment": None,
-            "fragment_status": "omitted_for_safety",
-        })
-    goal = _goal_for_question(question)
-    if design_context:
-        artifact = design_context.get("artifact") or "provided design_context"
-        goal = f"{goal} Apply normalized design artifact {artifact}."
-    return [{
-        "step": _step_for_question(question),
-        "goal": goal,
-        "files": files,
-        "find_patterns": find_patterns,
-        "change_type": "replace" if _mentions_any(question, {"replace", "bottom", "sheet", "dialog"}) else "modify",
-        "patch_level_plan": patch_level_plan,
-    }]
+    # A caller-supplied source list is not a mutation intent/grant contract.
+    return []
 
 
 def _find_patterns_for_plan(project_path: str | None, relevant_files: list[dict[str, Any]]) -> list[str]:
     patterns: list[str] = []
-    for item in relevant_files[:4]:
-        for symbol in item.get("symbols") or []:
-            _append_unique(patterns, symbol)
-        for ref in item.get("refs") or []:
-            pattern = ref.get("locate_by_pattern")
-            if isinstance(pattern, str):
-                _append_unique(patterns, pattern)
     root = Path(project_path).expanduser().resolve() if project_path else None
     if root is not None:
         for item in relevant_files[:4]:
-            path = root / item["file"]
-            text = _read_text(path) if path.exists() else None
-            if text is None:
+            if not isinstance(item.get("file"), str):
                 continue
-            for candidate in ("MenuPageBuilder", "openMenu", "closeMenu", "_showRT40QRDialog", "_showMS300QRDialog"):
-                if candidate in text:
-                    _append_unique(patterns, candidate)
+            candidate = _changed_file_candidate(root, item["file"])
+            if candidate is not None:
+                for ref in candidate["refs"]:
+                    _append_unique(patterns, ref["locate_by_pattern"])
     return patterns[:8]
 
 
@@ -163,9 +138,9 @@ def _implementation_warnings(
 ) -> list[str]:
     warnings: list[str] = []
     if project_path and not relevant_files:
-        warnings.append("No project source files were found for an evidence-backed patch path.")
+        warnings.append("No selected local source context is available; source membership/behavior remains unresolved.")
     if missing_symbols:
-        warnings.append("Some requested symbols were not found; keep status partial and do not invent missing APIs.")
+        warnings.append("Requested symbol absence is not certified; caller hints remain unresolved.")
     if existing_apis and any(item.get("kind") == "dependency" for item in existing_apis):
         warnings.append("Dependency API suggestions are limited to resolved local Dart package source evidence.")
     return warnings
@@ -206,70 +181,12 @@ def discover_dart_dependency_apis(
 ) -> tuple[list[dict[str, Any]], list[str]]:
     if not include_dependency_source:
         return [], []
-    root = Path(project_path).expanduser().resolve() if project_path else None
-    if root is None or not root.exists() or not root.is_dir():
-        return [], []
-
-    symbols = _probable_symbol_terms(question, symbol_queries or [])
-    if not symbols:
-        return [], []
-
-    package_roots, warnings = _resolved_dart_package_roots(root)
-    if not package_roots:
-        if _pubspec_lock_packages(root):
-            warnings.append("Dart package metadata found in pubspec.lock, but no dependency source roots were resolved from .dart_tool/package_config.json.")
-        return [], warnings
-
-    existing: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
-    for package_root in package_roots:
-        for path in _iter_dependency_source_files(package_root):
-            text = _read_text(path)
-            if text is None:
-                continue
-            for symbol in symbols:
-                found = _find_dependency_symbol(symbol, path, text)
-                if found is None:
-                    continue
-                key = (found["symbol"], found["file"])
-                if key in seen:
-                    continue
-                seen.add(key)
-                existing.append(found)
-    existing.sort(key=lambda item: (item["symbol"], item["file"]))
-    return _dedupe_dependency_apis(existing), warnings
+    return [], ["Dependency source membership unresolved; no package metadata or imported source read performed."]
 
 
 def discover_rejected_sources(question: str, *, project_path: str | None, symbol_queries: list[str] | None = None) -> list[dict[str, Any]]:
-    root = Path(project_path).expanduser().resolve() if project_path else None
-    if root is None or not root.exists() or not root.is_dir():
-        return []
-    exact_terms = _ordered_terms(question, symbol_queries or [])
-    generic_terms = {term for term in _WORD_RE.findall(question.lower()) if term in {"camera", "dialog", "bottom", "sheet", "plan"}}
-    if not generic_terms:
-        return []
-    rejected: list[dict[str, Any]] = []
-    for path in root.rglob("*.md"):
-        if not path.is_file() or _has_skipped_part(path, root, _SKIPPED_PATH_PARTS):
-            continue
-        text = _read_text(path)
-        if text is None:
-            continue
-        lowered = text.lower()
-        matched_generic = sorted(term for term in generic_terms if term in lowered)
-        if not matched_generic:
-            continue
-        if any(any(variant.lower() in lowered for variant in _term_variants(term)) for term in exact_terms):
-            continue
-        rejected.append({
-            "file": path.relative_to(root).as_posix(),
-            "reason": "Demoted broad docs/source candidate because it matched generic words but none of the exact patch-planning terms.",
-            "matched_terms": matched_generic[:5],
-            "missing_exact_terms": exact_terms[:8],
-        })
-        if len(rejected) >= 5:
-            break
-    return rejected
+    # No name-family/topic scan or inferred rejection certificate.
+    return []
 
 
 def _dedupe_dependency_apis(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -292,60 +209,28 @@ def discover_missing_symbols(
     searched_dependency: bool = False,
     dependency_apis: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    root = Path(project_path).expanduser().resolve() if project_path else None
-    if root is None or not root.exists() or not root.is_dir():
-        return []
-
-    source_texts: list[str] = []
-    discovered_symbols: set[str] = set()
-    for path in _iter_source_files(root):
-        text = _read_text(path)
-        if text is None:
-            continue
-        source_texts.append(text)
-        discovered_symbols.update(_symbol_definitions(text.splitlines()).keys())
-
-    dependency_symbols = {item["symbol"] for item in dependency_apis or []}
-    missing: list[dict[str, Any]] = []
-    for symbol in _probable_symbol_terms(question, symbol_queries or []):
-        if _symbol_found_in_source(symbol, source_texts) or symbol in dependency_symbols:
-            continue
-        searched_scopes = ["project", "dependency"] if searched_dependency else ["project"]
-        alternatives = _nearest_dependency_alternatives(symbol, dependency_apis or []) or _nearest_symbol_alternatives(symbol, discovered_symbols)
-        missing.append({
-            "symbol": symbol,
-            "searched_scopes": searched_scopes,
-            "result": "not_found",
-            "nearest_alternatives": alternatives,
-            "negative_evidence": "No exact symbol match found in project source.",
-        })
-    return missing
+    # A finite/local no-scan result is unknown, never complete symbol absence.
+    return []
 
 
 def _resolved_dart_package_roots(project_root: Path) -> tuple[list[Path], list[str]]:
-    roots, warnings = resolve_dart_package_roots(project_root)
-    project = project_root.resolve()
-    return list(dict.fromkeys(path for path in roots.values() if path != project)), warnings
+    return [], ["Dependency source membership unresolved; package metadata was not read."]
 
 
 def _pubspec_lock_packages(project_root: Path) -> set[str]:
-    lock_path = project_root / "pubspec.lock"
-    if not lock_path.exists():
-        return set()
-    text = _read_text(lock_path) or ""
-    return {match.group(1) for match in re.finditer(r"^\s{2}([A-Za-z0-9_]+):\s*$", text, re.MULTILINE)}
+    # Compatibility empty result means unresolved, not no dependencies.
+    return set()
 
 
 def _iter_source_files(root: Path) -> Iterator[Path]:
-    for path in root.rglob("*"):
-        if path.is_file() and not _should_skip_source(path, root):
-            yield path
+    root = root.expanduser().resolve()
+    yield from iter_bounded_source_files(root, boundary=SourceBoundary.from_project(root),
+                                        supported_extensions=frozenset(_SOURCE_SUFFIXES))
 
 
 def _iter_dependency_source_files(root: Path) -> Iterator[Path]:
-    for path in root.rglob("*"):
-        if path.is_file() and not _should_skip_dependency_source(path, root):
-            yield path
+    # A package directory is not a finite dependency member declaration.
+    yield from ()
 
 
 def _ordered_terms(question: str, symbol_queries: list[str]) -> list[str]:
@@ -390,31 +275,9 @@ def _symbol_found_in_source(symbol: str, source_texts: list[str]) -> bool:
 
 
 def _find_dependency_symbol(symbol: str, path: Path, text: str) -> dict[str, Any] | None:
-    lines = text.splitlines()
-    if "." in symbol:
-        owner, member = symbol.split(".", 1)
-        owner_line = _first_line_matching(lines, rf"\bclass\s+{re.escape(owner)}\b") or _first_line_containing(lines, owner)
-        member_line = _first_line_matching(lines, rf"\b{re.escape(member)}\s*\(") or _first_line_containing(lines, member)
-        if owner_line is None or member_line is None:
-            return None
-        start_line = max(1, min(owner_line, member_line) - 2)
-        end_line = min(len(lines), max(owner_line, member_line) + 4)
-    else:
-        line_no = _first_line_matching(lines, rf"\b(?:class|mixin|enum|extension|typedef)\s+{re.escape(symbol)}\b") or _first_line_containing(lines, symbol)
-        if line_no is None:
-            return None
-        start_line = max(1, line_no - 2)
-        end_line = min(len(lines), line_no + 4)
-    return {
-        "symbol": symbol,
-        "kind": "dependency",
-        "file": str(path.resolve()),
-        "start_line": start_line,
-        "end_line": end_line,
-        "usage_example_file": None,
-        "usage_example_lines": None,
-        "why_relevant": "Requested bottom sheet API found in resolved Dart package source." if "bottom" in _to_snake_case(symbol) else "Requested API found in resolved Dart package source.",
-    }
+    # Caller text/path is not a finite dependency-source binding. Do not probe
+    # that path or manufacture a source-backed API witness from supplied prose.
+    return None
 
 
 def _nearest_dependency_alternatives(symbol: str, dependency_apis: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -505,10 +368,35 @@ def _has_skipped_part(path: Path, root: Path, skipped_parts: set[str]) -> bool:
     return bool(set(rel.parts) & skipped_parts)
 
 
-def _read_text(path: Path) -> str | None:
+def _read_text(path: Path, *, root: Path | None = None) -> str | None:
+    # A bare filename has no project-bound membership contract. Do not guess
+    # its repository by walking ancestors, reading Git/package metadata, etc.
+    if root is None:
+        return None
+    started = time.monotonic()
+    root = root.expanduser().resolve()
+    boundary = SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files or len(boundary.code_files) > boundary.max_scanned_files:
+        return None
     try:
-        return path.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
+        relative = path.relative_to(root).as_posix()
+    except ValueError:
+        return None
+    if relative not in boundary.code_files:
+        return None
+    selected = finite_local_path(root, relative, boundary=boundary,
+                                 supported_extensions=frozenset(_SOURCE_SUFFIXES))
+    if selected is None or time.monotonic() - started >= boundary.scan_deadline_seconds:
+        return None
+    try:
+        with selected.open("rb") as handle:
+            raw = handle.read(min(boundary.max_file_bytes, boundary.max_scanned_bytes) + 1)
+        if len(raw) > min(boundary.max_file_bytes, boundary.max_scanned_bytes):
+            return None
+        if time.monotonic() - started >= boundary.scan_deadline_seconds:
+            return None
+        return raw.decode("utf-8")
+    except (OSError, UnicodeDecodeError):
         return None
 
 
@@ -633,23 +521,23 @@ def _ref_for_line(lines: list[str], line_no: int, *, symbol: str | None, pattern
 
 
 def _changed_file_candidate(root: Path, changed_file: str) -> dict[str, Any] | None:
-    path = (root / changed_file).resolve()
-    try:
-        rel_path = path.relative_to(root).as_posix()
-    except ValueError:
+    from docmancer.docs.project_docs_catalog import _literal_path
+    if not isinstance(changed_file, str) or not _literal_path(changed_file):
         return None
-    if not path.exists() or not path.is_file() or _should_skip_source(path, root):
-        return None
-    text = _read_text(path)
+    root = root.expanduser().resolve()
+    path = root / changed_file
+    text = _read_text(path, root=root)
     if text is None:
         return None
+    rel_path = path.relative_to(root).as_posix()
     lines = text.splitlines()
     definitions = _symbol_definitions(lines)
     refs = [_ref_for_line(lines, line_no, symbol=symbol, pattern=symbol) for symbol, line_no in list(definitions.items())[:2]]
     return {
         "file": rel_path,
-        "why": "Caller-provided changed file; include as patch-planning evidence even without an exact query-term hit.",
-        "action": "edit",
+        "why": "Explicit selected source read context; behavior and edit authority unresolved.",
+        "action": "read",
+        "content_hash": "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "symbols": list(definitions.keys())[:5],
         "refs": refs,
         "_score": 1_000,

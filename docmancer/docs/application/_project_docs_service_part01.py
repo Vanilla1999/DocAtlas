@@ -276,38 +276,8 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _unsupported_root_doc_files(root: Path, candidate_sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        candidate_paths = {str(item.get("path")) for item in candidate_sources if item.get("path")}
-        risks: list[dict[str, Any]] = []
-        try:
-            children = sorted(root.iterdir(), key=lambda item: item.name.lower())
-        except OSError:
-            return risks
-        for child in children:
-            if not child.is_file():
-                continue
-            try:
-                relative = child.relative_to(root).as_posix()
-            except ValueError:
-                continue
-            if relative in candidate_paths:
-                continue
-            name = child.name.lower()
-            stem = child.stem.lower()
-            doc_like = stem in ROOT_DOC_FILES or stem.startswith("readme") or name in ROOT_DOC_FILES
-            if not doc_like:
-                continue
-            suffix = child.suffix.lower()
-            supported_extensionless = name in {"license", "copying"}
-            if suffix in DOC_FILE_EXTENSIONS or supported_extensionless:
-                continue
-            risks.append({
-                "code": "unsupported_project_doc_candidate",
-                "severity": "major",
-                "path": relative,
-                "message": "A root documentation-looking file was found in a format project-doc ingest will not index automatically.",
-                "recommended_action": "Convert or mirror it as Markdown/text, or confirm indexing only the currently supported docs.",
-            })
-        return risks
+        # Unsupported declarations are catalog validation errors, not root scans.
+        return []
 
     def _project_docs_preflight(
         self,
@@ -328,10 +298,7 @@ class _ProjectDocsServicePart01:
                 continue
             path = Path(candidate_path)
             reason = str(candidate.get("reason") or "")
-            if not (
-                path.name.lower().startswith("readme")
-                or reason in {"architecture", "overview", "project_architecture"}
-            ):
+            if not candidate.get("catalog_entry_hash") or reason not in {"overview", "project_architecture"}:
                 continue
             text = self._read_text_prefix(root / candidate_path)
             if text is not None and self._looks_like_placeholder_project_doc(text):
@@ -419,12 +386,8 @@ class _ProjectDocsServicePart01:
         indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
         missing_candidate_count = len(candidate_paths - indexed_paths)
         has_high_level_overview = self._has_high_level_project_overview(candidate_sources)
-        manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml", "package.json") if (root / name).exists()]
-        lockfiles_found = [
-            name
-            for name in ("pubspec.lock", "Cargo.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock")
-            if (root / name).exists()
-        ]
+        manifests_found: list[str] = []
+        lockfiles_found: list[str] = []
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
         if catalog_invalid:
@@ -604,6 +567,14 @@ class _ProjectDocsServicePart01:
         _candidate_paths: set[str] | None = None,
         _coordination_held: bool = False,
     ) -> ProjectDocsIngestResult:
+        # Catalog membership is selection, not a mutation grant. This API has
+        # no validated member transaction/consent contract. Reject before path
+        # probes, adapters, locks, index/agent/queue access or staging writes.
+        raise PermissionError(
+            "Project docs ingestion is unresolved: this API has no explicit "
+            "mutation grant and validated member transaction; catalog membership "
+            "does not authorize indexing, staging or ingestion."
+        )
         root = validate_project_path(project_path).path
         mutation_config = getattr(self.facade, "config", None)
         mutation_index = getattr(mutation_config, "index", None)

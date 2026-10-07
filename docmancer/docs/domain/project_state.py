@@ -214,7 +214,7 @@ def partition_project_doc_state(
                 "stale": True,
                 "reason": "indexed_source_not_discovered",
                 "meaning": "This source exists in the index, but current project-doc discovery did not select it as a candidate.",
-                "recommended_next_action": "Add or correct its entry in docatlas.project-docs.yaml, or refresh/remove the obsolete indexed source.",
+                "recommended_next_action": "Review literal catalog membership; ask before synchronizing or pruning. Unselected does not mean deleted or obsolete.",
             })
             continue
         stale_reasons: list[str] = []
@@ -243,23 +243,13 @@ def partition_project_doc_state(
 def has_high_level_project_overview(candidates: list[dict[str, Any]]) -> bool:
     for candidate in candidates:
         reason = str(candidate.get("reason") or "")
-        path = Path(str(candidate.get("path") or ""))
-        stem = path.stem.lower()
-        parts = {part.lower() for part in path.parts}
-        if reason in {"root_readme", "architecture", "overview", "project_architecture"}:
-            return True
-        if stem in {"overview", "introduction", "intro", "index", "readme"}:
-            return True
-        if "overview" in parts or "architecture" in parts:
+        if candidate.get("catalog_entry_hash") and reason in {"overview", "project_architecture"}:
             return True
     return False
 
 
 def _documentation_gap_evidence(root: Path, query: str | None) -> list[dict[str, Any]]:
-    manifests = [
-        name for name in ("pyproject.toml", "package.json", "Cargo.toml", "pubspec.yaml")
-        if (root / name).exists()
-    ]
+    manifests: list[str] = []
     source_paths = [
         str(item.get("path"))
         # Gap inspection may retain unmatched structural context, not invent a

@@ -31,13 +31,9 @@ def _constraint_signature(value: str) -> str:
 
 
 def _may_guide_workflow(item: dict[str, Any]) -> bool:
-    return (
-        _authority(item) == "canonical"
-        and item.get("repository_authority") == "explicit_agent_policy"
-        and item.get("instruction_trust") == "scoped_agent_policy"
-        and bool(item.get("scope_verified"))
-        and not _instruction_risk_flags(item)
-    )
+    # This consumer receives retrieved document data, not host authorization.
+    # No source, issuer, scope, consent boolean or empty risk list changes that.
+    return False
 
 
 def _version_candidate_identity(item: dict[str, Any]) -> tuple[str, str, str]:

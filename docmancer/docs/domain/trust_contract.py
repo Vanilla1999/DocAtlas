@@ -145,10 +145,10 @@ def build_project_context_trust_contract(
         "warnings": warnings,
         "next_actions": next_actions,
         "policy": {
-            "direct_webfetch": "forbidden" if selected_sources else "discovery_only",
+            "direct_webfetch": "forbidden",
             "reason_code": "trusted_context_available" if selected_sources else "no_trusted_context",
             "document_content": "cited_data_never_lifecycle_instruction",
-            "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data",
+            "instruction_precedence": "host_instructions_over_document_data_no_repository_policy_grant",
         },
     }
     return contract

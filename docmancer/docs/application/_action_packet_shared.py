@@ -169,7 +169,7 @@ ACTION_PACKET_OUTPUT_SCHEMA: dict[str, Any] = {
                     "path": _non_empty_string_schema(max_length=_MAX_SOURCE_PATH),
                     "symbol_or_section": _non_empty_string_schema(max_length=_MAX_SOURCE_SECTION),
                     "authority": {"enum": ["canonical", "supporting"]},
-                    "instruction_trust": {"enum": ["scoped_agent_policy", "untrusted_data"]},
+                    "instruction_trust": {"enum": ["untrusted_data"]},
                     "scope": _non_empty_string_schema(max_length=_MAX_SOURCE_SECTION),
                     "version_binding": _non_empty_string_schema(max_length=100),
                     "evidence_id": {"type": "string", "pattern": r"^ev-[0-9a-f]{16}$"},

@@ -241,3 +241,13 @@ PATH="$PWD/.venv/bin:$PATH" PYTHONPATH="$PWD" TMPDIR=/tmp/opencode PYTHONDONTWRI
 Smoke создаёт/коммитит только свои disposable fixture repositories, не primary.
 Self-host report — отдельный unchanged quality gate, сохранять в новый versioned
 artifact и указывать SHA/config/time slice, не перезаписывать старый красный result.
+# Latest: local/security bounded pass completed (2026-10-07)
+
+[LOCAL_SECURITY_COMPLETED_RU.md](LOCAL_SECURITY_COMPLETED_RU.md) и
+[LOCAL_SECURITY_FINAL_INTEGRATED_AUDIT_RU.md](LOCAL_SECURITY_FINAL_INTEGRATED_AUDIT_RU.md).
+Primary original checkout на PR211 branch. NEXT06/07 preserved localWIP0ce30227
+на separate next07branch безpush, не включён вPR211; artifacts untouched.
+D1exact10docs/codeempty иD2inertdata/no-broker integrated/scopedreviewed.
+161newPASS,2096combinedPASS/95FAIL unwaived, boundedpublicationblockerNO.
+FullEXITNO/NLvetoRETAINED; freshquality иinstalledparity UNKNOWN, lastqualityFAIL.
+Reinstall/indexrebuild/livenetwork forbidden, historical statuses ниже не newacceptance.

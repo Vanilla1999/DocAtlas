@@ -185,15 +185,18 @@ def ensure_broad_query_sources(selected: list[Any], candidates: list[Any], *,
 def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         limit: int | None = None, broad_max_per_source: int = 2,
         narrow_max_per_source: int = 4, lifecycle_intent_value: str | None = None,
-        context_candidate_ids: frozenset[int] = frozenset()) -> list[Any]:
+        context_candidate_ids: frozenset[int] = frozenset(),
+        finite_member_paths: frozenset[str] | None = None) -> list[Any]:
     lifecycle = lifecycle_intent_value or lifecycle_intent(question)
     scored = []
     for index, chunk in enumerate(chunks):
+        if finite_member_paths is not None and getattr(chunk, "path", None) not in finite_member_paths:
+            continue
         if bool(getattr(chunk, "stale", False)) or not lifecycle_allows({
             "lifecycle_status": getattr(chunk, "lifecycle_status", None) or "active",
         }, lifecycle):
             continue
-        if not source_lane_allowed(getattr(chunk, "path", None), question,
+        if finite_member_paths is None and not source_lane_allowed(getattr(chunk, "path", None), question,
                                    impact_policy=getattr(chunk, "impact_policy", None)):
             continue
         metadata = getattr(chunk, "metadata", None) or {}

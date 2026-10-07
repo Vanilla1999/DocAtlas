@@ -11,7 +11,7 @@ from copy import deepcopy
 from dataclasses import replace
 from typing import Any, Iterable
 
-from docmancer.docs.application.action_packet import evidence_identity_for_item
+from docmancer.docs.application.action_packet import evidence_identity_for_item, validate_action_packet
 from docmancer.docs.application.context_selection import validate_context_selection_payload
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
 from docmancer.docs.application.evidence_selection import (
@@ -612,7 +612,16 @@ def _compact_insufficient_support(payload: dict[str, Any]) -> dict[str, str] | N
 def project_patch_context(
     *, packet: dict[str, Any], evidence_items: Iterable[dict[str, Any]], max_tokens: int = PATCH_CONTEXT_TARGET_TOKENS
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
-    """Flatten a validated ActionPacket without exposing its rich evidence input."""
+    """Flatten context, never interpreting packet readiness as authorization."""
+
+    # SDK callers can invoke this projector directly. Do not rely on the MCP
+    # caller having rejected forged policy/workflow rows first.
+    packet_errors = validate_action_packet(packet)
+    if packet_errors:
+        return project_insufficient(
+            kind="patch_context", missing=["Invalid non-authorizing action packet."],
+            recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
+        ), {}
 
     raw_evidence: dict[str, dict[str, Any]] = {}
     for original in evidence_items:
@@ -644,10 +653,6 @@ def project_patch_context(
         snapshot[evidence_id] = _snapshot_entry(item, projected)
 
     mutation_ready = bool((packet.get("mutation_intent") or {}).get("ready"))
-    mandatory_assignments_survived = not bool(
-        (packet.get("omitted_counts") or {}).get("mandatory_requirements")
-    )
-    packet_valid = packet.get("status") in {"ok", "truncated"}
     payload: dict[str, Any] = {
         "status": packet.get("status"),
         "kind": "patch_context",
@@ -662,7 +667,9 @@ def project_patch_context(
         "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
         "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
         "mutation_ready": mutation_ready,
-        "edit_ready": packet_valid and mutation_ready and mandatory_assignments_survived,
+        # Typed intent readiness describes resolution, not current permission.
+        # This context-only SDK surface has no host authorization input.
+        "edit_ready": False,
         "investigation_allowed": True,
         "source_search_status": "not_required",
         "uncertainties": deepcopy(packet.get("uncertainties") or []),
@@ -706,6 +713,8 @@ def project_insufficient(
         "missing": messages or [_MINIMAL_MISSING],
         "estimated_tokens": 0,
     }
+    if kind == "patch_context":
+        payload["edit_ready"] = False
     if kind == "docs_answer":
         payload.update(answer_supported=False, answer_available=False, edit_ready=False)
     if kind == "docs_context":
@@ -739,6 +748,10 @@ def validate_model_visible_projection(
         errors.append("invalid projection kind")
     if status not in {"ok", "truncated", "insufficient_evidence"}:
         errors.append("invalid projection status")
+    if "edit_ready" in payload and payload.get("edit_ready") is not False:
+        errors.append("context projection must not authorize edits")
+    if kind == "patch_context" and payload.get("edit_ready") is not False:
+        errors.append("patch context must not authorize edits")
     if kind == "docs_answer" and status in {"ok", "truncated"} and payload.get("retrieval_only") is not True:
         errors.append("docs answer projection requires current retrieval-only policy")
     limit = (
@@ -912,13 +925,10 @@ def validate_model_visible_projection(
             errors.append("patch context requires a mutation intent contract")
         elif mutation.get("operation") != "none" and mutation.get("ready") is not True:
             errors.append("successful patch context requires operation-aware target readiness")
-        if payload.get("edit_ready") is not bool(
-            status in {"ok", "truncated"}
-            and payload.get("mutation_ready") is True
-            and not (payload.get("omitted_counts") or {}).get("mandatory_requirements")
-            and payload.get("source_search_status") != "required"
-        ):
-            errors.append("patch context edit readiness is inconsistent with validated support")
+        if any(source.get("instruction_trust") != "untrusted_data" for source in sources):
+            errors.append("patch context sources must remain untrusted document data")
+        if any((payload.get("checks") or {}).get(field) for field in ("compile", "tests", "semantic_checks")):
+            errors.append("patch context cannot promote document data to workflow checks")
         for item in _cited_patch_items(payload):
             refs = item.get("evidence_ids")
             if not isinstance(refs, list) or not refs or any(ref not in ids for ref in refs):

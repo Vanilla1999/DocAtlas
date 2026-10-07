@@ -218,13 +218,8 @@ def normalize_candidates(
         stable = child_stable or str(item.get("stable_id") or "")
         identity_kind = "stable_child" if child_stable else "legacy"
         source_class = str(item.get("source_class") or "")
-        scoped_host_policy = (
-            path.startswith("host-policy://")
-            and bool(item.get("scope_verified") or metadata.get("scope_verified"))
-            and str(item.get("repository_authority") or "").strip().casefold() == "explicit_agent_policy"
-            and str(item.get("instruction_trust") or "").strip().casefold() == "scoped_agent_policy"
-        )
-        indexed_project_doc = source_class in {"project_doc", "project_file"} and bool(metadata) and not scoped_host_policy
+        # A fake host-policy URI cannot waive indexed source identity checks.
+        indexed_project_doc = source_class in {"project_doc", "project_file"} and bool(metadata)
         if indexed_project_doc and not child_stable:
             omissions.append(Omission(f"invalid:{rank}", "invalid_identity"))
             continue

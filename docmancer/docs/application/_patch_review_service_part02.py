@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._patch_review_service_shared import *  # noqa: F401,F403
+from docmancer.docs.local_membership import finite_doc_reference
 
 
 class _PatchReviewServicePart02:
@@ -417,7 +418,7 @@ class _PatchReviewServicePart02:
             priority = min(priority, 15)
         if any(re.search(rf"(?<![\w]){re.escape(token)}(?![\w])", haystack) for token in PatchReviewService._task_symbol_tokens(task_lower)):
             priority = min(priority, 20)
-        if source.startswith("docs/research/docatlas-dogfood"):
+        if source.startswith("docs/research/docatlas-dogfood") and not finite_doc_reference(item):
             priority = max(priority, 80)
         confidence_rank = {"high": 0, "medium": 1, "low": 2}.get(confidence, 3)
         if source and source.lower() in changed:
@@ -429,7 +430,7 @@ class _PatchReviewServicePart02:
         rank = PatchReviewService._summary_constraint_rank(item, changed_files, task)[0]
         source = str(item.get("source") or "")
         confidence = str(item.get("confidence") or "low")
-        if source.startswith("docs/research/docatlas-dogfood") or rank >= 75 or confidence == "low":
+        if (source.startswith("docs/research/docatlas-dogfood") and not finite_doc_reference(item)) or rank >= 75 or confidence == "low":
             return "low"
         if rank <= 25:
             return "actionable"
@@ -483,7 +484,7 @@ class _PatchReviewServicePart02:
             constraint = by_id.get(item.get("constraint_id"), {})
             source = str(constraint.get("source") or "")
             ctype = constraint.get("type")
-            if source.startswith("docs/research/docatlas-dogfood"):
+            if source.startswith("docs/research/docatlas-dogfood") and not finite_doc_reference(constraint):
                 bucket = "Residual dogfood/research memo context"
             elif ctype == "source_of_truth":
                 bucket = "Source-of-truth ownership unknowns"

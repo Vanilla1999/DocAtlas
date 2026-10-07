@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_inert_security.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_inert_security.py": "31069d0f656d8974193c5c2726161210e7ad0a67091e6970cad02a5e231bfe68"
+  }
+}

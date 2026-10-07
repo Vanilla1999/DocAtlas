@@ -145,7 +145,7 @@ def validate_action_packet(
             continue
         if row.get("authority") not in {"canonical", "supporting"}:
             errors.append("invalid source authority")
-        if row.get("instruction_trust") not in {"scoped_agent_policy", "untrusted_data"}:
+        if row.get("instruction_trust") != "untrusted_data":
             errors.append("invalid source instruction_trust")
         evidence_id = str(row.get("evidence_id"))
         if evidence_id in evidence_ids:
@@ -176,19 +176,14 @@ def validate_action_packet(
         for item in _cited_dict_items(value):
             if item.get("provenance") == "user_request":
                 continue
+            errors.append(f"{field} cannot promote document data to policy")
             refs = _string_refs(item)
             if refs and any(source_by_evidence.get(ref, {}).get("authority") != "canonical" for ref in refs):
                 errors.append(f"{field} may cite only canonical evidence")
                 break
     for field in ("compile", "tests", "semantic_checks"):
-        for item in _cited_dict_items(validation.get(field)):
-            refs = _string_refs(item)
-            if any(
-                source_by_evidence.get(ref, {}).get("instruction_trust") != "scoped_agent_policy"
-                for ref in refs
-            ):
-                errors.append(f"validation.{field} may cite only scoped agent policy")
-                break
+        if validation.get(field):
+            errors.append(f"validation.{field} cannot promote document data to workflow checks")
 
     uncertainties = packet.get("uncertainties")
     if not isinstance(uncertainties, list):

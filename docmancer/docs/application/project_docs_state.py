@@ -80,7 +80,7 @@ class ProjectDocsState:
             },
             "indexed_source_not_discovered": {
                 "meaning": "The source exists in the index, but the current discovery pass did not select it as a project-doc candidate. This does not by itself mean the file is deleted or invalid.",
-                "next_action": "Add or correct the file in docatlas.project-docs.yaml, or run sync_project_docs to remove obsolete index entries.",
+                "next_action": "Review literal catalog membership. Ask for a separate synchronization/pruning grant; an unselected source is not proven obsolete.",
             },
             "ignored_generated_or_tooling_doc": {
                 "meaning": "Generated, build, dependency, or tooling docs are not treated as reviewable project-owned docs by default.",

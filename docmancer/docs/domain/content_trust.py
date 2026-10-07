@@ -41,10 +41,12 @@ def annotate_context_pack(
             "origin_lane": item.get("origin_lane"),
         }
         item["version_exactness"] = item.get("docs_exactness") or item.get("version_binding") or "not_applicable"
-        item["repository_authority"] = "explicit_agent_policy" if policy_file else (
+        item["repository_authority"] = "scoped_repository_document" if policy_file else (
             "ordinary_repository_document" if scope == "project" else "not_applicable"
         )
-        item["instruction_trust"] = "scoped_agent_policy" if policy_file else "untrusted_data"
+        # Filename/scope establish attribution, never authenticated instructions.
+        # Overwrite caller-supplied trust even for canonical policy-file quotes.
+        item["instruction_trust"] = "untrusted_data"
         item["content_boundary"] = {
             "role": "cited_document_data",
             "schema": "docmancer-document-data-v1",
@@ -86,10 +88,10 @@ def source_trust_dimensions(
             "owner": "configured_repository" if scope == "project" else "external_source",
         },
         "version_exactness": version_exactness or "not_applicable",
-        "repository_authority": "explicit_agent_policy" if policy_file else (
+        "repository_authority": "scoped_repository_document" if policy_file else (
             "ordinary_repository_document" if scope == "project" else "not_applicable"
         ),
-        "instruction_trust": "scoped_agent_policy" if policy_file else "untrusted_data",
+        "instruction_trust": "untrusted_data",
         "authority_root": str(Path(repository_root).resolve()) if policy_file and repository_root else None,
         "policy_scope": str(policy_scope) if policy_scope is not None else None,
         "scope_verified": bool(policy_file),

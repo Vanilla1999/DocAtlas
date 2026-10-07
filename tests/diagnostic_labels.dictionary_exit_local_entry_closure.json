@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_local_entry_closure.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_local_entry_closure.py": "2a3b1f6921972d5d981bca58c57e60aed1677efb2615369fedb5e585c3c19a53"
+  },
+  "node_overrides": {}
+}

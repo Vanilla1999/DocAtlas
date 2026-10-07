@@ -1,0 +1,224 @@
+{
+  "baseline": "ee156cba4cc6dd4bf51c0e2c8adf44907aac9633",
+  "files": [
+    {
+      "path": "INERT_SDK_CLOSURE_RU.md",
+      "sha256": "27189cd5790cf1ddbae96e5d8de3c1c68d5c9a8deb08e4e8c0a8d1a5703ed157"
+    },
+    {
+      "path": "INERT_SECURITY_IMPLEMENTATION_RU.md",
+      "sha256": "f7d612cce38933797a75eb10981f79d46fbfc380e3b0e7c95c4ba8abc7561803"
+    },
+    {
+      "path": "docatlas.project-docs.yaml",
+      "sha256": "4e51d2baee5be889a9828d5f5527e1f937c59c3ba67cba056e59b4e9cf6a86e1"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part01.py",
+      "sha256": "64b0fa0fc7dc230cb2ed2daa0d7ffbc0abc9b86c7b8c0d1c25e99da59224491a"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part02.py",
+      "sha256": "17f9c73cea4f2372d1c18031e27a027f9f0503731a724c802baf7af2c3cafd3a"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part01.py",
+      "sha256": "3b5bec24145c6702ba5cfb29602fee3ba0dfcae2e19c006b80f35d3d46c1aa97"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part02.py",
+      "sha256": "0d9daf64e205e831b2f87fdb2b9316d0d3723a1a26924a54f376b77f6fbd85b1"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part04.py",
+      "sha256": "56336adb0ac84546d91eea2afea86b9e74f39ded7b0a508f10e3da84ce05c5ac"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_shared.py",
+      "sha256": "399bddb0f1cdbf2e8a0798d2c5ecc7a0f9fa6052326caccb56a15fcbad774eb4"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part01.py",
+      "sha256": "239a75b8a6a26c0c7fb1dff3c28d8e00d7506b511bec151c566944fe403fed03"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part02.py",
+      "sha256": "1c38652b4cf41af635e77ae763dcf4c1c8daf85cdfddbf7edf81f94726bc30df"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_part02.py",
+      "sha256": "3aa217e07f66ff3bf5aee7c4fdc7c720083a6875525006f7f2a94654ea2766d5"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "sha256": "cefa020ca9c80e808ccaef4d8c1e735cae2e24f6aca86338208d3ac842680a81"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part01.py",
+      "sha256": "41e74edd094f7710a1ef468abc07e0819a29d5a5968f6df2c1a68d6f60354037"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part02.py",
+      "sha256": "fd46cfb8f423d5b816be96402744baa15c2d16ecadb81065afeca433bca3740d"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part01.py",
+      "sha256": "fc530be74a058a7edf3f4443a66ddbf59b585fb7f0e64fb51c793c9945b09e0f"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "sha256": "e0cfead485d5745687cdd859a86da6e6695efb9ace3448a2e8cffd03c15e80b0"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection.py",
+      "sha256": "938965ff1e2c03d91ed8eff2a4d9e6f9f5eace5c79ff6e2ed800b1f77d646c0c"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_state.py",
+      "sha256": "a87fa4eeca4c695cedc2942ad5de30890520267209fe0f35e0f45a996916f992"
+    },
+    {
+      "path": "docmancer/docs/dart_package_config.py",
+      "sha256": "3d3afd2212a24edb06248ef5017f6a4c5e72ddbab05b6a9e5a7ac8d95db6ee93"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_part01.py",
+      "sha256": "0c7d08e7c2e319955e5cc692cd04af7a98c5070744db2d59bca556c129b48e40"
+    },
+    {
+      "path": "docmancer/docs/domain/content_trust.py",
+      "sha256": "5c1fd2a8ba81284e6ae42474c8b42c4ae0f3b8941cf76318f3a99548481706aa"
+    },
+    {
+      "path": "docmancer/docs/domain/project_doc_ranking.py",
+      "sha256": "f4c8fdd4c4adef960dffa6bc4ca4a27cb405e63833e0f6913f981ad449a3ecbf"
+    },
+    {
+      "path": "docmancer/docs/domain/project_state.py",
+      "sha256": "26ade5123720fb61ceb8976fc4c19641423a60d6d24ca3c1fb4c9f15a6d77021"
+    },
+    {
+      "path": "docmancer/docs/domain/source_boundary.py",
+      "sha256": "1fcfcc4805bd1538dba9899d78d55cc7c97393432f0e90beff24737d78a8ce61"
+    },
+    {
+      "path": "docmancer/docs/domain/source_map.py",
+      "sha256": "46381d0409ba0c9cc0a77911379241e682fc8b486d0861ba744f79ff4ee15f20"
+    },
+    {
+      "path": "docmancer/docs/domain/trust_contract.py",
+      "sha256": "2f5c37e13c9b817489872b0861f7f5964114cac29b8f5572208c9e47ec63853e"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "sha256": "73572b5daccbdd128fa63916a2600046d597c480451f7fb31f95a66df56fc8ac"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/error_contract.py",
+      "sha256": "b75f6fa53c9309e3f7eddd08c4534a641d07feb6c34d66fd0cb2e61db6c83417"
+    },
+    {
+      "path": "docmancer/docs/local_membership.py",
+      "sha256": "fc990a47230f2f43d93b65f95940177c806b94556f09344712fdf4f1f67753da"
+    },
+    {
+      "path": "docmancer/docs/mcp_footprint.py",
+      "sha256": "c997df98f3088f7adbe3820a6828ab8ad6df00080c685d64f887eb8f7fe1e77c"
+    },
+    {
+      "path": "docmancer/docs/models.py",
+      "sha256": "d622d554a284a3bbf832d523e009dff1fe8bf4d49c13e81299697de3da343fc6"
+    },
+    {
+      "path": "docmancer/docs/project.py",
+      "sha256": "c0f5eb9a3e72342d86f2f824b1e65e65b5aba0cce7c2cbf0fa2974f5db23becf"
+    },
+    {
+      "path": "docmancer/docs/project_docs_catalog.py",
+      "sha256": "25236b585a48d17d8461d49d0cd6a7ecc3a913da494e3aecb35e2bf50ff70637"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_resources.py",
+      "sha256": "a2b0cd0e14bf60ae25e3209fe62dc0f611a44579287ec1e720ef4ff47c2cdeba"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_inert_sdk_closure.json",
+      "sha256": "68d0cee86b17051c7acc089509d31e121e6f266065bbcab788df59f49727019a"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_inert_security.json",
+      "sha256": "38edd3a6980c5845661b129172ab74dd30f93bf176da7aa674a2d9550cd8775b"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_local_callers.json",
+      "sha256": "04cbede0466d5bde766fc1c9ad4b362d8e7370ec8d27c6001dc016bffd207304"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_local_entry_closure.json",
+      "sha256": "f20c90cff957a07d6c78236d6d73f6b696398d2d584288d7863eceefca39d1d4"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_local_membership.json",
+      "sha256": "71deee2933d8ecbecef648feddb4d1bd9a8a7077bf704f85a7bc23d5ec1c87e3"
+    },
+    {
+      "path": "tests/diagnostic_labels.dictionary_exit_local_residuals.json",
+      "sha256": "5aed64227ade3f17398f130be1207dbaa8db8f9ec4b7668ae53b67a4deaf19bc"
+    },
+    {
+      "path": "tests/test_dictionary_exit_inert_sdk_closure.py",
+      "sha256": "f7fc180641a00b31296cb1db4422e37a47b87bb610cc9ae681a69a5b2bc069e3"
+    },
+    {
+      "path": "tests/test_dictionary_exit_inert_security.py",
+      "sha256": "65aa2e149418bc16c3ada3577ff916e1c5d5adf2f36bb4bed182a36d89c1d59c"
+    },
+    {
+      "path": "tests/test_dictionary_exit_local_callers.py",
+      "sha256": "58be45fbe5db468214eb7f4bb620094ab616061542c567eb17bcd4064f1a9f34"
+    },
+    {
+      "path": "tests/test_dictionary_exit_local_entry_closure.py",
+      "sha256": "f971d6db9648e6e24d907d5004e6cbb5846fc3bb6588974b60cd43a8b312d2eb"
+    },
+    {
+      "path": "tests/test_dictionary_exit_local_membership.py",
+      "sha256": "323bb27d4a3574e69beae91c936bbcb1682e56a2f94d55f7abfe425abaec4e43"
+    },
+    {
+      "path": "tests/test_dictionary_exit_local_residuals.py",
+      "sha256": "0c89449089df46a3c0a9b46a361412f641199a94b8120189190d7e58d1b5b831"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/CONTINUE_HERE_RU.md",
+      "sha256": "32160ed00f94e2f6d36a57325f22b3817fface6b7dd7276ae0a9da82a0d60f64"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_ENTRY_CLOSURE_RU.md",
+      "sha256": "8a2019ef1a1d8cc1ed4cce96351186a0a40a2fa8a299ef59a3cbffcfb940cdb0"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_MEMBERSHIP_CALLER_CLOSURE_RU.md",
+      "sha256": "19867cef07c003cbeaac182fb521954ceaae81fa1105479bfc2aa356cec9166b"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_MEMBERSHIP_IMPLEMENTATION_RU.md",
+      "sha256": "5a2e339ae9511a4360bfe227f68ae084429b59579283f158c8102fdb3b8a2051"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_SECURITY_COMPLETED_RU.md",
+      "sha256": "f89adc0828998ed4d55b592a103433fa6ed4d5e791b12c3a8fedfcbbc842bc39"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/LOCAL_SECURITY_FINAL_INTEGRATED_AUDIT_RU.md",
+      "sha256": "f041506e3d09874bd7640a276f20ff695ef3a752bc98c0e43bc117a9a9c39e71"
+    },
+    {
+      "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/archives/local-security-integrated-test-ledger-v1.json",
+      "sha256": "478f300cbb909ea5be4ff13ad021c081cbbce5583c185fe295bb9e5c9e65be93"
+    }
+  ],
+  "bounded_publication_blocker": false,
+  "full_exit": false,
+  "installed_parity": "UNKNOWN"
+}

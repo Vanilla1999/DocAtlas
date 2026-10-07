@@ -429,6 +429,7 @@ class ProjectMetadata:
     warnings: list[str] = field(default_factory=list)
     docs_catalog_present: bool = False
     docs_catalog_valid: bool = True
+    code_files: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

@@ -53,7 +53,7 @@ CONTEXT_TOOL_NAMES = {"get_docs_context"}
 DOCUMENT_CONTENT_POLICY = {
     "role": "cited_untrusted_document_data",
     "actionable": False,
-    "actions_source": "typed_top_level_fields_only",
+    "actions_source": "typed_top_level_advisories_not_authorization",
 }
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
 
@@ -160,7 +160,7 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "answer_available": answer_available,
         "answer_type": answer_type,
         "disposition": payload.get("disposition"),
-        "edit_ready": payload.get("edit_ready"),
+        "edit_ready": False,
         "source_search_status": payload.get("source_search_status"),
         **_agent_instruction(answer_type),
         "mode_selected": payload.get("mode_selected"),
@@ -210,7 +210,7 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "supporting_snippets": payload.get("supporting_snippets") or [],
         "context_pack": payload.get("context_pack") or [],
         "disposition": payload.get("disposition"),
-        "edit_ready": payload.get("edit_ready"),
+        "edit_ready": False,
         "source_search_status": payload.get("source_search_status"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],

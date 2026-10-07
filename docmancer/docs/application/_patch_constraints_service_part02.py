@@ -96,130 +96,24 @@ class _PatchConstraintsServicePart02:
         return constraints
 
     def _dependency_constraints(self, root: Path | None) -> list[PatchConstraint]:
-        if not root:
-            return []
-        constraints: list[PatchConstraint] = []
-        observations = self._dependency_observations(root)
-        ranked = sorted(observations, key=lambda dep: self._dependency_relevance(dep), reverse=True)
-        dependency_intent = self._has_dependency_intent()
-        for dep in ranked[:12]:
-            if not dependency_intent and self._dependency_relevance(dep) <= 1:
-                continue
-            version = dep.resolved_version or (dep.specifier_raw if dep.specifier_kind == "exact" else None)
-            if not version:
-                continue
-            source = self._dependency_source(dep.version_source, dep.ecosystem, root)
-            confidence = "high" if dep.resolved_version and ("lock" in dep.version_source or dep.version_source.endswith("exact")) else "medium"
-            constraints.append(self._constraint(
-                id=f"pinned-dependency-{self._slug(dep.package_name)}",
-                type="dependency_version",
-                instruction=f"Use pinned/locked {dep.package_name} {version}; do not assume APIs from another version or latest-only docs.",
-                source=source,
-                severity="must",
-                confidence=confidence,
-                evidence=f"{dep.package_name} version {version} from {dep.version_source}.",
-                symbols=[dep.package_name, version],
-                files=[source],
-            ))
-        lockfiles = [name for name in sorted(LOCKFILES) if (root / name).exists()]
-        if lockfiles:
-            lockfile = self._most_relevant_lockfile(lockfiles)
-            constraints.append(self._constraint(
-                id="do-not-change-lockfile",
-                type="forbidden_edit",
-                instruction="Do not change lockfiles unless the task explicitly requires dependency updates.",
-                source=lockfile,
-                severity="must",
-                confidence="high",
-                evidence=f"Lockfile `{lockfile}` is present and pins dependency resolution.",
-                files=lockfiles,
-            ))
-        return constraints
+        # Documentation read membership does not authorize manifest/lockfile reads.
+        return []
 
     def _has_dependency_intent(self) -> bool:
         return any(Path(path).name in DEPENDENCY_FILES for path in self._changed_files)
 
     def _dependency_observations(self, root: Path) -> list[DependencyObservation]:
-        observations: list[DependencyObservation] = []
-        try:
-            metadata = self.facade.read_project_metadata(str(root))
-            observations.extend(metadata.dependencies)
-        except Exception:
-            pass
-        observations.extend(self._read_python_dependencies(root))
-        observations.extend(self._read_node_dependencies(root))
-        observations.extend(self._read_go_dependencies(root))
-        return self._dedupe_dependencies(observations)
+        return []
 
     def _read_python_dependencies(self, root: Path) -> list[DependencyObservation]:
-        observations: list[DependencyObservation] = []
-        req = root / "requirements.txt"
-        if req.exists():
-            for raw in req.read_text(encoding="utf-8", errors="replace").splitlines():
-                line = raw.split("#", 1)[0].strip()
-                match = re.match(r"([A-Za-z0-9_.-]+)==([A-Za-z0-9_.!+\-]+)", line)
-                if match:
-                    observations.append(DependencyObservation("python", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="requirements.txt_exact"))
-        pyproject = root / "pyproject.toml"
-        if pyproject.exists():
-            try:
-                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-            except Exception:
-                data = {}
-            deps = data.get("project", {}).get("dependencies", []) if isinstance(data, dict) else []
-            if isinstance(deps, list):
-                for spec in deps:
-                    if isinstance(spec, str):
-                        match = re.match(r"([A-Za-z0-9_.-]+)==([A-Za-z0-9_.!+\-]+)", spec)
-                        if match:
-                            observations.append(DependencyObservation("python", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="pyproject.toml_exact"))
-        return observations
+        # Compatibility entry point: no finite metadata read contract.
+        return []
 
     def _read_node_dependencies(self, root: Path) -> list[DependencyObservation]:
-        observations: list[DependencyObservation] = []
-        lock = root / "package-lock.json"
-        if lock.exists():
-            try:
-                data = json.loads(lock.read_text(encoding="utf-8"))
-            except Exception:
-                data = {}
-            packages = data.get("packages") if isinstance(data, dict) else None
-            if isinstance(packages, dict):
-                for path, entry in packages.items():
-                    if not path.startswith("node_modules/") or not isinstance(entry, dict):
-                        continue
-                    version = entry.get("version")
-                    if isinstance(version, str):
-                        observations.append(DependencyObservation("npm", path.split("node_modules/", 1)[1], resolved_version=version, specifier_kind="exact", specifier_raw=version, version_source="package-lock.json_exact"))
-            deps = data.get("dependencies") if isinstance(data, dict) else None
-            if isinstance(deps, dict):
-                for name, entry in deps.items():
-                    if isinstance(entry, dict) and isinstance(entry.get("version"), str):
-                        observations.append(DependencyObservation("npm", name, resolved_version=entry["version"], specifier_kind="exact", specifier_raw=entry["version"], version_source="package-lock.json_exact"))
-        package = root / "package.json"
-        if package.exists():
-            try:
-                data = json.loads(package.read_text(encoding="utf-8"))
-            except Exception:
-                data = {}
-            for section in ("dependencies", "devDependencies"):
-                deps = data.get(section) if isinstance(data, dict) else None
-                if isinstance(deps, dict):
-                    for name, spec in deps.items():
-                        if isinstance(spec, str) and re.match(r"^\d+(?:\.\d+){0,2}$", spec):
-                            observations.append(DependencyObservation("npm", name, resolved_version=spec, specifier_kind="exact", specifier_raw=spec, version_source="package.json_exact"))
-        return observations
+        return []
 
     def _read_go_dependencies(self, root: Path) -> list[DependencyObservation]:
-        observations: list[DependencyObservation] = []
-        gomod = root / "go.mod"
-        if gomod.exists():
-            text = gomod.read_text(encoding="utf-8", errors="replace")
-            for match in re.finditer(r"^\s*([A-Za-z0-9_./-]+)\s+(v\d+\.\d+\.\d+(?:[-+][A-Za-z0-9_.-]+)?)", text, re.M):
-                if match.group(1) == "module":
-                    continue
-                observations.append(DependencyObservation("go", match.group(1), resolved_version=match.group(2), specifier_kind="exact", specifier_raw=match.group(2), version_source="go.mod_exact"))
-        return observations
+        return []
 
     def _symbol_candidates(self, question: str, root: Path | None, changed_files: list[str]) -> list[dict[str, Any]]:
         if not root or not root.exists():
@@ -307,31 +201,9 @@ class _PatchConstraintsServicePart02:
         return [term] if term else []
 
     def _symbol_source_files(self, root: Path, changed_files: list[str]) -> list[Path]:
-        files: list[Path] = []
-        for changed in changed_files:
-            path = (root / changed).resolve()
-            if path.is_file() and self._under_root(path, root):
-                files.append(path)
-            parent = path.parent if path.suffix else path
-            if parent.exists() and self._under_root(parent, root):
-                files.extend(p for p in parent.glob("**/*") if p.is_file() and p.suffix in SYMBOL_SOURCE_SUFFIXES and p.stat().st_size <= 80_000)
-        for base in (root / "lib", root / "src", root / "app", root / "docs"):
-            if base.exists():
-                files.extend(p for p in base.rglob("*") if p.is_file() and p.suffix in SYMBOL_SOURCE_SUFFIXES and p.stat().st_size <= 80_000)
-        out: list[Path] = []
-        seen: set[Path] = set()
-        for path in files:
-            try:
-                resolved = path.resolve()
-            except OSError:
-                continue
-            if resolved in seen or not self._under_root(resolved, root):
-                continue
-            seen.add(resolved)
-            out.append(resolved)
-            if len(out) >= 300:
-                break
-        return out
+        from docmancer.docs.domain.source_boundary import SourceBoundary, iter_bounded_source_files
+        return list(iter_bounded_source_files(root, boundary=SourceBoundary.from_project(root),
+                                             supported_extensions=frozenset(SYMBOL_SOURCE_SUFFIXES)))
 
     @staticmethod
     def _symbol_code_text(text: str) -> str:
@@ -466,6 +338,13 @@ class _PatchConstraintsServicePart02:
         confidence = kwargs.get("confidence") or "low"
         if confidence == "high" and (not source or not evidence):
             confidence = "medium" if source or evidence else "low"
+        ref_metadata = dict(kwargs.get("source_ref_metadata") or {})
+        root = getattr(self, "_project_root", None)
+        if isinstance(root, Path) and source not in {"question", "changed_files", "inferred"}:
+            from docmancer.docs.local_membership import document_binding
+            binding = document_binding(root, source)
+            if binding:
+                ref_metadata["local_read_binding"] = binding
         return PatchConstraint(
             id=kwargs["id"],
             type=kwargs["type"],
@@ -476,7 +355,7 @@ class _PatchConstraintsServicePart02:
             evidence=evidence or "Inferred from task context; no direct source evidence was available.",
             symbols=list(kwargs.get("symbols") or []),
             files=list(kwargs.get("files") or []),
-            source_refs=self._source_refs(source or "inferred", kind=kwargs.get("source_kind"), line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end"), extra=kwargs.get("source_ref_metadata")),
+            source_refs=self._source_refs(source or "inferred", kind=kwargs.get("source_kind"), line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end"), extra=ref_metadata),
             evidence_snippets=self._evidence_snippets(source or "inferred", evidence, line_start=kwargs.get("line_start"), line_end=kwargs.get("line_end")),
         )
 

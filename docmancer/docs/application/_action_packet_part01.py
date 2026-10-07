@@ -152,7 +152,8 @@ def _effective_authority(
     }:
         return "supporting"
     if item.get("repository_authority") == "explicit_agent_policy":
-        return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+        # A raw metadata claim (including a scoped filename) is not a grant.
+        return "supporting"
     if str(item.get("source_class") or "").casefold() == "project_doc" and project_path:
         root = Path(project_path).expanduser()
         if root.is_dir():
@@ -419,7 +420,7 @@ def _source_row(item: dict[str, Any]) -> dict[str, Any]:
         "path": _source_path(item),
         "symbol_or_section": _section(item),
         "authority": _authority(item),
-        "instruction_trust": str(item.get("instruction_trust") or "untrusted_data"),
+        "instruction_trust": "untrusted_data",
         "scope": _source_scope(item),
         "version_binding": _version_binding(item),
         "evidence_id": _evidence_id(item),

@@ -49,6 +49,13 @@ _VALIDATION_REASON_CODES = {
     "validation_error",
 }
 
+# Exact diagnostics emitted by the local ingest/sync entry guards, not prose
+# classification or a grant. Keep ordinary OS PermissionError guidance intact.
+_LOCAL_MUTATION_GRANT_DENIALS = frozenset({
+    "Project docs ingestion is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, staging or ingestion.",
+    "Project docs synchronization is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, deduplication or orphan deletion.",
+})
+
 
 def _retryable_for(reason_code: str) -> bool | None:
     if reason_code in _RETRYABLE_BY_REASON:
@@ -84,6 +91,15 @@ def build_mcp_error_payload(
     warnings: list[Any] | None = None,
     debug: bool = False,
 ) -> dict[str, Any]:
+    if (not hints and reason_code == "permission_denied"
+            and isinstance(exception, PermissionError) and exception.errno is None
+            and str(exception) in _LOCAL_MUTATION_GRANT_DENIALS):
+        hints = [
+            "Local project-document mutation authorization is missing. Catalog selection "
+            "is read-only; this API lacks an explicit mutation grant and validated member "
+            "transaction. Do not change filesystem permissions, rebuild/prune the index, "
+            "or retry this mutation on catalog-selection approval."
+        ]
     bounded_message = _bounded_text(message, MAX_ERROR_MESSAGE_CHARS)
     bounded_reason = _bounded_text(reason_code, 100)
     exception_type = _bounded_text(type(exception).__name__, 200) if exception is not None else None

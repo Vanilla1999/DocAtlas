@@ -181,6 +181,8 @@ def _select_project_source_facts(
     query_terms = _query_terms(question)
     candidates: list[dict[str, Any]] = []
     boundary = source_boundary or SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files:
+        return []
     def capture():
         for path in _iter_source_files(root, source_boundary=boundary, include_generated=include_generated):
             item = _map_source_file(root, path)
@@ -227,6 +229,10 @@ def build_project_source_evidence(
     root = Path(project_root).expanduser().resolve()
     if max_items <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
         return []
+    boundary = source_boundary or SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files:
+        # No scan is not evidence that a requested symbol is absent.
+        return []
 
     terms = _source_evidence_terms(question=question, requirements=requirements)
     if not terms:
@@ -236,11 +242,14 @@ def build_project_source_evidence(
     matches: list[dict[str, Any]] = []
     match_counts: dict[str, int] = {}
     include_generated_files = include_generated is True
-    for path in _iter_source_files(
+    selected_paths = list(_iter_source_files(
         root,
-        source_boundary=source_boundary,
+        source_boundary=boundary,
         include_generated=include_generated_files,
-    ):
+    ))
+    if not selected_paths:
+        return []
+    for path in selected_paths:
         try:
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:

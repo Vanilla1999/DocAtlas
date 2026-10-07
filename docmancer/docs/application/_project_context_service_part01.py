@@ -74,7 +74,8 @@ class _ProjectContextServicePart01:
         from .need_query_schedule import scheduled_plan, requirement_search_probes
         documentation_query_plan, _ = scheduled_plan(documentation_query_plan,
             supplemental_queries=requirement_search_probes(canonical_requirements))
-        metadata = self.facade.read_project_metadata(str(root))
+        from docmancer.docs.project import ProjectMetadataReader
+        metadata = ProjectMetadataReader().read(root)
         project_docs = None
         if mode in {"auto", "project-only"}:
             candidate_limit = min(20, max(12, (limit or 4) * 3))
@@ -89,6 +90,14 @@ class _ProjectContextServicePart01:
             if evidence_path:
                 project_docs_kwargs["evidence_path"] = evidence_path
             project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
+            if project_docs and project_docs.results:
+                members = {candidate.path: candidate for candidate in metadata.docs_candidates}
+                project_docs = replace(project_docs, results=[
+                    chunk for chunk in project_docs.results
+                    if chunk.path in members and members[chunk.path].content_hash
+                    and chunk.content_hash == members[chunk.path].content_hash
+                    and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash
+                ])
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
@@ -138,6 +147,7 @@ class _ProjectContextServicePart01:
                         broad_max_per_source=4 if evidence_path else 2,
                         lifecycle_intent_value=canonical_requirements.lifecycle_intent,
                         context_candidate_ids=context_candidate_ids,
+                        finite_member_paths=frozenset(members),
                     ),
                 )
                 routing_stage_observed["project_docs"] = list(project_docs.results)

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_local_membership.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_local_membership.py": "b1c0dbf2dbe625af11daae68946ec1adc9bed870e69ccff1869acb8550b74cc5"
+  },
+  "node_overrides": {}
+}

@@ -55,6 +55,14 @@ class _ProjectDocsServicePart02:
         deleted_paths: list[str] | tuple[str, ...] | None,
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None,
     ) -> ProjectDocsSyncResult:
+        # This entry point has no explicit mutation/orphan-deletion grant or
+        # validated member transaction. Catalog selection is only a read grant.
+        # Reject before path probes, index reads, locks, adapters or mutations.
+        raise PermissionError(
+            "Project docs synchronization is unresolved: this API has no explicit "
+            "mutation grant and validated member transaction; catalog membership "
+            "does not authorize indexing, deduplication or orphan deletion."
+        )
         started_at = time.perf_counter()
         for field, value in (
             ("changed_paths", changed_paths),
@@ -318,6 +326,13 @@ class _ProjectDocsServicePart02:
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None = None,
         _coordination_held: bool = False,
     ) -> ProjectDocsSyncResult:
+        # _coordination_held, changed/deleted paths and clean Git state are not
+        # consent. Do not dispatch an adapter or open a DB before a real grant.
+        raise PermissionError(
+            "Project docs synchronization is unresolved: this API has no explicit "
+            "mutation grant and validated member transaction; catalog membership "
+            "does not authorize indexing, deduplication or orphan deletion."
+        )
         root = validate_project_path(project_path).path
         mutation_config = getattr(self.facade, "config", None)
         mutation_index = getattr(mutation_config, "index", None)

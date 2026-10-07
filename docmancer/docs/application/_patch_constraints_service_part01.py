@@ -116,58 +116,18 @@ class _PatchConstraintsServicePart01:
     def _visible_sources(self, root: Path | None) -> list[dict[str, str]]:
         if not root or not root.exists():
             return []
-        candidates: list[Path] = []
-        try:
-            metadata = self.facade.read_project_metadata(str(root))
-            candidates.extend(root / item.path for item in metadata.docs_candidates)
-        except Exception:
-            candidates = []
-        patterns = [
-            "README*",
-            "CONTRIBUTING*",
-            "ARCHITECTURE.md",
-            "docs/architecture.md",
-            "docs/**/*.md",
-            "docs/**/*.txt",
-            "ADR*",
-            "adr/**/*.md",
-            "ADR/**/*.md",
-            ".docatlas/**/*.md",
-            "**/README.md",
-            "**/ARCHITECTURE.md",
-        ]
-        for pattern in patterns:
-            candidates.extend(root.glob(pattern))
+        from docmancer.docs.project import ProjectMetadataReader
+        metadata = ProjectMetadataReader(max_docs_hash_bytes=80_000).read(root)
         out: list[dict[str, str]] = []
-        seen: set[Path] = set()
-        for path in candidates:
+        for candidate in metadata.docs_candidates:
+            path = root / candidate.path
             try:
-                resolved = path.resolve()
-            except OSError:
+                if candidate.size_bytes > 80_000:
+                    continue
+                text = path.read_text(encoding="utf-8", errors="replace")
+            except (OSError, UnicodeError):
                 continue
-            if resolved in seen or not resolved.is_file() or not self._under_root(resolved, root):
-                continue
-            rel = resolved.relative_to(root).as_posix()
-            excluded_reason = self._excluded_source_reason(rel)
-            if excluded_reason:
-                if excluded_reason in {
-                    "patch_review_output",
-                    "dogfood_generated_artifact",
-                    "dogfood_result_memo",
-                    "dogfood_task_artifact",
-                    "eval_result_artifact",
-                    "docatlas_internal_output",
-                }:
-                    self._ignored_generated_artifact_sources.append(rel)
-                    self._excluded_source_reasons.append({"path": rel, "reason": excluded_reason})
-                continue
-            if not (ARCHITECTURE_DOC_RE.search(rel) or "/docs/" in f"/{rel}" or rel.lower().startswith("docs/")):
-                continue
-            if resolved.stat().st_size > 80_000:
-                continue
-            text = resolved.read_text(encoding="utf-8", errors="replace")
-            out.append({"path": rel, "text": text})
-            seen.add(resolved)
+            out.append({"path": candidate.path, "text": text})
         return out
 
     def _code_evidence(self, root: Path | None, question: str, requirements: list[str], changed_files: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -346,10 +306,8 @@ class _PatchConstraintsServicePart01:
         return f"Code graph links `{path}` to task-relevant symbols/imports/references. Inspect this file and its linked local files before inventing a new implementation."
 
     def _example_source_noise(self, path: str) -> bool:
-        normalized = path.replace("\\", "/").lower().strip("/")
-        if not (normalized == "example" or normalized.startswith("example/")):
-            return False
-        return not any(path.replace("\\", "/").startswith("example/") for path in self._changed_files)
+        # Candidate reads have already passed literal membership and boundaries.
+        return False
 
     @staticmethod
     def _under_root(path: Path, root: Path) -> bool:
@@ -361,6 +319,8 @@ class _PatchConstraintsServicePart01:
 
     @staticmethod
     def _excluded_source_reason(rel: str) -> str | None:
+        # Compatibility-only negative guard for unbound direct callers. The
+        # finite _visible_sources lane does not apply this guessed taxonomy.
         normalized = rel.replace("\\", "/")
         parts_list = [part.lower() for part in Path(normalized).parts]
         parts = set(parts_list)
@@ -492,77 +452,11 @@ class _PatchConstraintsServicePart01:
         return any(part in normalized for part in artifact_parts) or any(normalized.endswith(suffix) for suffix in artifact_suffixes)
 
     def _repo_artifact_examples(self, root: Path | None, limit: int = 8) -> list[str]:
-        if not root or not root.exists():
-            return []
-        examples: list[str] = []
-        patterns = (
-            "eval/task_level/results/**/*", ".docatlas/**/*", "**/patch-review/**/*", "**/patch_review/**/*",
-            "**/generated/**", "**/dist/**", "**/coverage/**", "**/*.g.dart", "**/*.freezed.dart", "**/*.pb.go",
-            "**/*.pb.dart", "**/*.generated.*", "**/*_generated.py",
-        )
-        seen: set[str] = set()
-        for pattern in patterns:
-            try:
-                paths = root.glob(pattern)
-            except Exception:
-                continue
-            for path in paths:
-                try:
-                    if not path.is_file():
-                        continue
-                    rel = path.relative_to(root).as_posix()
-                except Exception:
-                    continue
-                if rel in seen:
-                    continue
-                seen.add(rel)
-                examples.append(rel)
-                if len(examples) >= limit:
-                    return examples
-        return examples
+        # Artifact examples are not a grant to enumerate the repository.
+        return []
 
     def _owner_is_repo_grounded(self, owner: str | None) -> bool:
-        if not owner:
-            return False
-        root = getattr(self, "_project_root", None)
-        if not isinstance(root, Path) or not root.exists():
-            return False
-        needle = owner.lower()
-        # Fast path: path/file names.
-        try:
-            for path in root.rglob("*"):
-                if len(path.parts) > 20:
-                    continue
-                try:
-                    rel = path.relative_to(root).as_posix()
-                except Exception:
-                    continue
-                lowered = rel.lower()
-                if self._excluded_source(rel):
-                    continue
-                if needle in lowered:
-                    return True
-        except Exception:
-            pass
-        # Bounded content scan to avoid expensive repo-wide reads.
-        scanned = 0
-        for glob in ("**/*.py", "**/*.dart", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.go", "**/*.rs", "**/*.md"):
-            try:
-                files = root.glob(glob)
-            except Exception:
-                continue
-            for path in files:
-                if scanned >= 250:
-                    return False
-                try:
-                    rel = path.relative_to(root).as_posix()
-                    if self._excluded_source(rel) or path.stat().st_size > 120_000:
-                        continue
-                    scanned += 1
-                    if owner in path.read_text(encoding="utf-8", errors="replace"):
-                        return True
-                except Exception:
-                    continue
+        # Prose owners are unresolved; never run a hidden repository scan.
         return False
 
     def _safe_constraint_profile(self, *, source_path: str, line: str, owner: str | None, candidate: dict[str, str]) -> tuple[str, str, str | None]:

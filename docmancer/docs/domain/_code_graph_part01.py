@@ -86,6 +86,13 @@ def build_project_code_graph(
     root = Path(project_root).expanduser().resolve()
     if max_files <= 0 or token_budget <= 0 or not root.exists() or not root.is_dir():
         return CodeGraph(nodes=[], edges=[], diagnostics={"status": "invalid_root"})
+    from docmancer.docs.domain.source_boundary import SourceBoundary
+    boundary = SourceBoundary.from_project(root)
+    if not boundary.enabled or not boundary.code_files:
+        return CodeGraph(nodes=[], edges=[], diagnostics={
+            "status": "unresolved_membership", "scanned_files": 0,
+            "analysis_complete": False, "graph_scope": "selected_files",
+        })
 
     facts = collect_project_source_facts(
         root,
@@ -384,17 +391,7 @@ def _resolve_dart_import(value: str, *, from_path: str, all_paths: set[str], roo
     if value.startswith("dart:"):
         return _resolution_result(None, metadata, resolver="dart_sdk", reason="dart_sdk_import", external=True, attempted_paths=[], confidence="unresolved")
     if value.startswith("package:"):
-        package, _, package_path = value.removeprefix("package:").partition("/")
-        project_name = _pubspec_name(root)
-        if project_name and package == project_name and package_path:
-            bases = [f"lib/{package_path}"]
-            resolved, attempted, matches = _resolve_candidates(bases, all_paths, _DART_EXTENSIONS)
-            if resolved:
-                return _resolution_result(resolved, metadata, resolver="dart_package_self", reason="pubspec_package_self", external=False, attempted_paths=attempted, confidence="exact")
-            if len(matches) > 1:
-                return _ambiguous_resolution(metadata, resolver="dart_package_self", attempted_paths=attempted, matches=matches)
-            return _resolution_result(None, metadata, resolver="dart_package_self", reason="package_self_path_not_found", external=False, attempted_paths=attempted, confidence="unresolved")
-        return _resolution_result(None, metadata, resolver="dart_external_package", reason="external_dart_package", external=True, attempted_paths=[], confidence="unresolved")
+        return _resolution_result(None, metadata, resolver="dart_package", reason="package_identity_unresolved", external=True, attempted_paths=[], confidence="unresolved")
     return _resolve_common_import(
         value,
         from_path=from_path,
@@ -665,15 +662,8 @@ def _graph_diagnostics(facts: list[dict[str, Any]], nodes: list[CodeGraphNode], 
 
 
 def _pubspec_name(root: Path) -> str | None:
-    path = root / "pubspec.yaml"
-    if not path.exists():
-        return None
-    try:
-        text = path.read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return None
-    match = re.search(r"^\s*name:\s*([A-Za-z0-9_\-]+)\s*$", text, re.MULTILINE)
-    return match.group(1) if match else None
+    # Package identity is unresolved without separately selected metadata.
+    return None
 
 
 def _optional_int(value: Any) -> int | None:
