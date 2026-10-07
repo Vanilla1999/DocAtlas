@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_installed_mcp_bootstrap_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_installed_mcp_bootstrap_contract.py": "6ee7be323a23dfd1b73eb0ee01b7fd83e18b989888e98990fcc0d7fbd1fcdfd7"
+  }
+}
