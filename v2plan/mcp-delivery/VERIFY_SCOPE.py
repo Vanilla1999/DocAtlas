@@ -7,6 +7,8 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    ".github/workflows/mcp-platform-proof.yml",
+    "scripts/docs_mcp_platform_proof.sh",
     "scripts/test-install.sh",  # Reviewed nested-config/JSONC installer checks.
     "tests/test_nl_dictionary_removal_consumer_contract.py",
     "tests/test_dictionary_exit_selector_visibility.py",

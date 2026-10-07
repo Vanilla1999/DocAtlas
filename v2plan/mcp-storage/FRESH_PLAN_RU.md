@@ -379,6 +379,12 @@ and 106 active caller/Python installer tests PASS; scope/syntax/whitespace/D1 PA
 No production runtime changes. Dedicated platform proof implementation is pending;
 no remote result or full required-CI claim yet.
 
+Platform proof `124a60cf` independently APPROVED and integrated as `286d6cfb`:
+Ubuntu, macOS 15 ARM64 and macOS 15 Intel standard runners; fresh managed Python,
+exact wheel/source SHA, actual installer, full smoke, failure artifacts. Existing
+required/publish/Windows gates unchanged. Approved branch push is next; source
+review approval is not platform PASS. Inspect the remote run for exact pushed SHA.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
