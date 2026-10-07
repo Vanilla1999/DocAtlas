@@ -10,6 +10,15 @@ ALLOWED = {
     # Coordinator records for the explicitly approved storage continuation.
     "v2plan/mcp-storage/AUTHORIZATION.md",
     "v2plan/mcp-storage/PROGRESS_RU.md",
+    # Reviewed experimental spike only; no production persistence integration.
+    "experiments/mcp_storage_native/README.md",
+    "experiments/mcp_storage_native/sqlite_fd_vfs.c",
+    "experiments/mcp_storage_native/worker.py",
+    "experiments/mcp_storage_native/include/sqlite3.h",
+    "experiments/mcp_storage_native/include/sqlite3ext.h",
+    "tests/test_mcp_storage_native_spike.py",
+    "tests/mcp_storage_native_spike_checks.py",
+    "tests/diagnostic_labels.mcp_storage_native_spike.json",
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",

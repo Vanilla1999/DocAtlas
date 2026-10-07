@@ -158,3 +158,20 @@ standalone research scenarios PASS, unsupported Python 3.12 fail до compilatio
 Default directory collection: 8 561 collected, none executed; CI/gates не
 менялись. Final independent native R проверяет runner, inventory и сохранение
 assertions. Experimental integration до verdict held; production R1 OPEN.
+
+Final native R APPROVE experimental integration only. A commits интегрированы
+как `b721ebbf`, `44d1f374`, `d08a505e`. После интеграции: 23 focused pytest PASS
+(16 portable + 7 delivery), 27 standalone scenarios PASS; scope/syntax/whitespace,
+D1 и line-budget PASS. Scope allowlist расширен только восемью approved
+experimental paths. Локальная evidence:
+`/tmp/opencode/mcp-storage-integration-native-d08a505e`.
+Это не production persistence, installed artifact acceptance или normal CI
+coverage standalone scenarios. R1 OPEN; WAL denied. Packing B всё ещё ждёт
+closure review, live MCP/БД не менялись.
+
+B followup `cafcfcce6c0913ac83e5b1f493316d1eda0714d3`: call-local delegation
+acknowledgements и реальные stored-generation/fallback tests; closure suite 24
+PASS по отчёту B. Full focused matrix НЕ green: 240 PASS / 15 FAIL / 34 ERROR.
+Coordinator разрешил два точных active-fixture paths (см. AUTHORIZATION), без
+ослабления assertions/gates. R проверяет stable production closure commit;
+B обновляет fixtures. Packing integration всё ещё HELD.

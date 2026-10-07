@@ -166,3 +166,21 @@ Evidence must distinguish 16 normal-gated portable pytest checks from 27
 standalone research checks. Standalone checks are not ordinary CI certification.
 Default directory inventory compatibility and the verifier wording must be fixed
 before independent review/integration. Production persistence remains blocked.
+
+## Active retention fixture migration
+
+B followup `cafcfcce6c0913ac83e5b1f493316d1eda0714d3` reports closure checks
+passing but the full focused matrix is red. Coordinator authorizes exactly two
+additional active test paths under the user's existing active-test migration
+permission:
+
+```text
+tests/test_action_packet_v4_delivery_consumers.py
+tests/test_action_packet_v4_public.py
+```
+
+Update deliberate facade support for the explicit retention contract; preserve
+security assertions, dropping-wrapper failures, docs behavior and source bindings.
+No skip/xfail/gate removal, historical modifications or broader production
+allowlist. Necessary hash-shard changes require identifying exact paths first.
+Independent closure review and a green full focused rerun precede integration.
