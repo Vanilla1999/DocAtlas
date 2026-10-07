@@ -75,8 +75,9 @@ def test_actual_public_facade_is_read_only_even_with_unknown_mutation_fields(tmp
 def test_action_packet_without_contract_never_infers_operation(builder):
     packet = builder(question="Delete src/config.py", context_pack=[],
         required_target_paths=("src/config.py",), required_evidence_paths=("src/config.py",))
-    assert packet["mutation_intent"]["operation"] == "none"
-    assert not packet["mutation_intent"]["ready"]
+    assert "mutation_intent" not in packet
+    assert packet["edit_ready"] is False
+    assert packet["result"] == "failure"
     assert validate_action_packet(packet, evidence_items=[]) == []
 
 
@@ -101,7 +102,8 @@ def test_explicit_sdk_contract_preserves_resolution_and_readiness_gates():
     assert not rejected.resolved_targets and not evaluate_mutation_readiness(rejected).ready
     packet = build_action_packet(question="arbitrary prose", context_pack=[], mutation_intent_contract=contract)
     assert packet["mutation_intent"]["operation"] == "modify"
-    assert not packet["mutation_intent"]["ready"]
+    assert "ready" not in packet["mutation_intent"]
+    assert packet["edit_ready"] is False
 
 
 class PartialFacade:

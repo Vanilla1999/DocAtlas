@@ -1,4 +1,4 @@
-"""Bounded in-memory document-data and packet contracts after NL removal."""
+"""Source-bound in-memory document-data and v4 contracts after NL removal."""
 from copy import deepcopy
 import hashlib
 
@@ -43,9 +43,10 @@ def test_annotation_keeps_prose_and_caller_metadata_inert(tmp_path, flags):
     assert row["content_boundary"]["executable_policy"] is False
     assert not _may_guide_workflow(row)
     packet = build_action_packet(question="reference", context_pack=annotated)
-    assert packet["validation"] == {"compile": [], "tests": [], "semantic_checks": []}
-    assert not packet["required_invariants"] and not packet["forbidden_changes"]
-    assert not packet["mutation_intent"]["ready"]
+    assert not any(key in packet for key in ("validation", "required_invariants",
+        "forbidden_changes", "mutation_intent"))
+    assert packet["edit_ready"] is False
+    assert packet["sources"][0]["text"] == TEXT
     assert item == before
 
 
@@ -56,13 +57,12 @@ def test_actual_packet_preserves_bound_prose_without_workflow_permission(authori
     packet = build_action_packet(question="reference", context_pack=annotated,
         required_evidence_paths=[item["path"]], exact_version="2.0")
     assert validate_action_packet(packet, evidence_items=annotated) == []
-    assert packet["implementation_guidance"][0]["text"] == TEXT
-    assert packet["source_of_truth"][0]["version_binding"] == "2.0"
-    assert packet["source_of_truth"][0]["instruction_trust"] == "untrusted_data"
-    assert packet["task_interpretation"]["acceptance_conditions"] == []
-    assert packet["required_invariants"] == []
-    assert packet["validation"] == {"compile": [], "tests": [], "semantic_checks": []}
-    assert not any("risk" in key for key in packet["omitted_counts"])
+    assert packet["sources"][0]["text"] == TEXT
+    assert packet["sources"][0]["version_binding"] == "2.0"
+    assert packet["sources"][0]["instruction_trust"] == "untrusted_data"
+    assert not any(key in packet for key in ("task_interpretation", "required_invariants",
+        "validation", "omitted_counts"))
+    assert packet["edit_ready"] is False
     candidates, omissions = normalize_candidates(annotated, result_kind="patch_context")
     assert not omissions and candidates[0].display_text == TEXT
     assert candidates[0].original["display_content_hash"] == item["display_content_hash"]
@@ -76,20 +76,20 @@ def test_actual_validators_deny_forged_document_permission(promotion):
     item = bound_quote()
     packet = build_action_packet(question="reference", context_pack=[item],
         required_evidence_paths=[item["path"]])
-    ref = packet["source_of_truth"][0]["evidence_id"]
+    ref = packet["sources"][0]["evidence_id"]
     if promotion == "workflow":
-        packet["validation"]["tests"] = [{"text": "pytest", "evidence_ids": [ref]}]
+        packet["validation"] = {"tests": [{"text": "pytest", "evidence_ids": [ref]}]}
     elif promotion == "policy":
         packet["required_invariants"] = [{"text": TEXT, "evidence_ids": [ref]}]
     else:
-        packet["source_of_truth"][0]["instruction_trust"] = "scoped_agent_policy"
+        packet["sources"][0]["instruction_trust"] = "scoped_agent_policy"
     _refresh_estimated_tokens(packet)
     assert validate_action_packet(packet, evidence_items=[item])
     projection, snapshot = project_patch_context(packet=packet, evidence_items=[item])
     assert projection["edit_ready"] is False and snapshot == {}
     projection["edit_ready"] = True
-    assert "patch context must not authorize edits" in validate_model_visible_projection(
-        projection, snapshot=snapshot, max_tokens=2000)
+    assert any("edit_ready" in error for error in validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=2000))
 
 
 @pytest.mark.parametrize("override", [
@@ -104,11 +104,18 @@ def test_root_escape_stays_unverified_and_packet_budget_stays_bounded(tmp_path):
     trust = source_trust_dimensions(path="../AGENTS.md", scope="project", repository_root=tmp_path)
     assert trust["scope_verified"] is False and trust["policy_scope"] is None
     assert trust["instruction_trust"] == "untrusted_data"
-    packet = build_action_packet(question="reference", context_pack=[bound_quote()], max_tokens=800)
-    assert packet["estimated_tokens"] <= 800
-    assert validate_action_packet(packet, max_tokens=800) == []
+    # The old node name is retained for diagnostic inventory continuity; the
+    # v4 representation has no packet budget. Scope checks remain independent.
+    text = TEXT + "\n" + "Source-bound context with unique identifiers: " + ",".join(
+        f"binding_{i:04d}" for i in range(4000))
+    item = bound_quote(content=text, snippet=text, display_text=text,
+        char_end=len(text), line_end=2,
+        display_content_hash=hashlib.sha256(text.encode()).hexdigest())
+    packet = build_action_packet(question="reference", context_pack=[item])
+    assert packet["estimated_tokens"] > 800
+    assert packet["sources"][0]["text"] == text
+    assert validate_action_packet(packet, evidence_items=[item]) == []
     oversized = deepcopy(packet)
-    oversized["task_interpretation"]["objective"] = "x" * 4000
+    oversized["sources"][0]["text"] += "invented text"
     _refresh_estimated_tokens(oversized)
-    assert "estimated_tokens mismatch or hard limit exceeded" in validate_action_packet(
-        oversized, max_tokens=800)
+    assert validate_action_packet(oversized, evidence_items=[item])

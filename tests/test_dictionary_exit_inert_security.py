@@ -90,45 +90,42 @@ def ready_packet():
 
 def test_actual_sdk_typed_readiness_is_not_edit_permission_and_snapshot_survives():
     source, packet = ready_packet()
-    assert packet["mutation_intent"]["ready"] is True
+    assert packet["mutation_intent"]["operation"] == "modify"
+    assert "ready" not in packet["mutation_intent"]
     assert validate_action_packet(packet, evidence_items=[source]) == []
-    assert packet["status"] == "insufficient_evidence"
-    # Simulate an SDK caller claiming success. This is not selector approval:
-    # even that stronger wire claim must not become current edit permission.
-    packet["status"] = "ok"
-    packet["missing_evidence"] = []
-    _refresh_estimated_tokens(packet)
-    assert validate_action_packet(packet, evidence_items=[source]) == []
+    # Completeness and an explicit SDK operation are not host permission.
+    assert packet["edit_ready"] is False
     before = deepcopy((source, packet))
     projection, snapshot = project_patch_context(packet=packet, evidence_items=[source])
-    assert projection["mutation_ready"] is True
+    assert "mutation_ready" not in projection
     assert projection["edit_ready"] is False
-    assert projection["implementation_guidance"][0]["text"] == source["snippet"]
+    assert projection["sources"][0]["text"] == source["snippet"]
     assert snapshot and projection["sources"][0]["content_sha256"]
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=2000) == []
     forged = deepcopy(projection)
     forged["edit_ready"] = True
-    assert "patch context must not authorize edits" in validate_model_visible_projection(forged, snapshot=snapshot, max_tokens=2000)
+    assert any("edit_ready" in error for error in validate_model_visible_projection(
+        forged, snapshot=snapshot, max_tokens=2000))
     assert (source, packet) == before
 
 
 @pytest.mark.parametrize("promotion", ["trust", "workflow", "policy"])
 def test_sdk_packet_consumer_rejects_forged_promotions(promotion):
     source, packet = ready_packet()
-    ref = packet["source_of_truth"][0]["evidence_id"]
+    ref = packet["sources"][0]["evidence_id"]
     if promotion == "trust":
-        packet["source_of_truth"][0]["instruction_trust"] = "scoped_agent_policy"
+        packet["sources"][0]["instruction_trust"] = "scoped_agent_policy"
     elif promotion == "workflow":
-        packet["validation"]["tests"] = [{"text": "pytest", "evidence_ids": [ref]}]
+        packet["validation"] = {"tests": [{"text": "pytest", "evidence_ids": [ref]}]}
     else:
         packet["required_invariants"] = [{"text": source["content"], "evidence_ids": [ref]}]
     assert validate_action_packet(packet)
     projection, snapshot = project_patch_context(packet=packet, evidence_items=[source])
-    assert projection["status"] == "insufficient_evidence" and projection["edit_ready"] is False
+    assert projection["result"] == "failure" and projection["edit_ready"] is False
     assert snapshot == {}
     projection["edit_ready"] = True
-    assert "patch context must not authorize edits" in validate_model_visible_projection(
-        projection, snapshot=snapshot, max_tokens=2000)
+    assert any("edit_ready" in error for error in validate_model_visible_projection(
+        projection, snapshot=snapshot, max_tokens=2000))
 
 
 def test_hash_span_and_version_checks_do_not_become_policy_exceptions():

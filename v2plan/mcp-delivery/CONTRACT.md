@@ -36,6 +36,8 @@ No nested subagents. One owner per file; extensions require coordinator approval
 - Coordinator: agent parser-loading extraction and agent.py size gate;
   CLI docs-impact early legacy-write denial; portable docs/agent_contract;
   content-trust/residual/CLI active tests; integration and scoped reports.
+  Active dictionary-exit inert-security/public-request and NL-removal packet
+  tests also migrate to v4 while retaining nonauthorization and binding checks.
 - R: independent integrated review, no production edits.
 
 Shared prepare_docs mutation schema belongs only to B. A supplies the DTO and
