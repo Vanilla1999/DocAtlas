@@ -22,6 +22,7 @@ from docmancer.docs.application.action_packet import (
     build_action_packet,
     validate_action_packet,
 )
+from docmancer.docs.interfaces.mcp.output_contract import is_v4_patch_projection
 
 from .conditions import TOOL_REQUIRED_ONCE_INSTRUCTION
 from .isolated_delivery import (

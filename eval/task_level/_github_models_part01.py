@@ -311,8 +311,9 @@ class GitHubModelsIsolatedWorker:
             question=envelope.task_objective,
             context_pack=selected,
             trust_contract=evidence.trust_contract,
-            max_tokens=envelope.token_budget,
             retrieval_issues=evidence.retrieval_issues,
+            required_evidence_paths=envelope.required_evidence_paths,
+            required_target_paths=tuple(path for path in envelope.suspected_modules if Path(path).suffix),
         )
         proof = {
             "schema_version": 1,
@@ -450,7 +451,7 @@ def _trajectory_arguments(
             "server": "docmancer-docs",
             "tool": "get_docs_context",
             "project_path": ".",
-            "delivery_strategy": "bounded_direct",
+            "context_format": "patch_context",
         })
         if request is not None and result is not None:
             arguments.update(
@@ -506,24 +507,18 @@ def _required_once_retrieval_metadata(
             loaded = {}
         if isinstance(loaded, dict):
             payload = loaded
-    delivery_strategy = payload.get("delivery_strategy")
-    packet = payload.get("action_packet")
-    packet_status = packet.get("status") if isinstance(packet, dict) else None
-    packet_errors = (
-        validate_action_packet(packet, max_tokens=2_000)
-        if isinstance(packet, dict)
-        else ["ActionPacket missing"]
-    )
+    packet = payload if payload.get("kind") == "patch_context" else None
+    packet_result = packet.get("result") if isinstance(packet, dict) else None
     succeeded = (
         question_matches
-        and delivery_strategy == "bounded_direct"
-        and packet_status in {"ok", "truncated"}
-        and not packet_errors
+        and isinstance(packet, dict) and is_v4_patch_projection(packet)
+        and packet_result == "data" and packet.get("completeness") == "complete"
     )
     return {
         "question_matches_task_objective": question_matches,
         "retrieval_succeeded": succeeded,
-        "action_packet_status": packet_status,
+        "action_packet_result": packet_result,
+        "action_packet_completeness": packet.get("completeness") if isinstance(packet, dict) else None,
     }
 
 

@@ -243,8 +243,9 @@ class CodexExploratoryWorker:
             question=envelope.task_objective,
             context_pack=selected,
             trust_contract=evidence.trust_contract,
-            max_tokens=envelope.token_budget,
             retrieval_issues=evidence.retrieval_issues,
+            required_evidence_paths=envelope.required_evidence_paths,
+            required_target_paths=tuple(path for path in envelope.suspected_modules if Path(path).suffix),
         )
         input_tokens = _usage_int(usage, "input_tokens")
         output_tokens = _usage_int(usage, "output_tokens")
