@@ -7,6 +7,9 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "eval/agent_developer_v1/installed_mcp_benchmark.py",
+    "tests/test_installed_mcp_bootstrap_contract.py",
+    "tests/diagnostic_labels.installed_mcp_bootstrap_contract.json",
     "tests/test_dictionary_exit_local_entry_closure.py",
     "docmancer/docs/interfaces/mcp/error_contract.py",
     ".github/workflows/ci.yml",  # Explicit Linux/macOS supported-platform matrices only.

@@ -458,6 +458,21 @@ modified. Retrieval/installed fixture bootstrap slices remain under implementati
 questions, gold/scoring and acquisition cannot be changed to manufacture PASS.
 Mass old-ABI/semantic incompatibilities remain open, no full-CI green claim.
 
+Installed fixture repair `f286b71e` independently APPROVED and integrated as
+`cdb15b72`. Independent focused tests 11 PASS, contract self-test 7/7 PASS;
+unchanged scripted installed task 1/1 PASS at threshold 1.0 with one schema repair,
+no infrastructure error/contamination. All 390 installed files/wheel hashes match
+reviewed runtime. Questions, oracle, planner, acquisition and scoring unchanged;
+only explicit fixture bootstrap/private storage/redacted diagnostics repaired.
+Remote outcome for this repair is still pending.
+
+Retrieval fixture repair `b9cde191` awaits independent review. Focused 9 PASS;
+one systemic diagnostic completes 80 cases, 0 operational errors/integrity
+violations but frozen floor remains red (0/48 sufficient). That run predates
+the final dispatcher-binding refinement, so it is not final-commit acceptance;
+reviewer will perform one final unchanged diagnostic. No criteria relaxation or
+merge-readiness claim from infrastructure repair alone.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
