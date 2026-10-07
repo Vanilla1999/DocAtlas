@@ -93,3 +93,26 @@ checks; этот вариант пользователь не выбрал. По
 конкретный проект descriptor capture: конечный список дополнительных операций,
 точный интерфейс и следующий independent review до implementation. B готовит
 план с late revalidation/I/O accounting; atomic multi-file snapshot не обещаем.
+
+B представил concrete capture protocol: pinned root/catalog/member descriptors,
+точный finite namespace-edge set, before/after fences и accounting через число
+объектов/рёбер/retained items. Это увеличивает validation I/O, не устраняет его:
+свежие проверки сохраняются на каждом authority-validation occurrence.
+Изменившийся binding предлагается reject, а не silently adopt; поведение также
+требует review. Production allowlist ещё не одобрен.
+
+R сравнивает этот план с меньшим вариантом: оставить existing validators/fresh
+reads неизменными и отдельно согласовать больше validation catalog/path checks
+для qualified retained windows, без дополнительного acquisition/hydration.
+Ни один вариант дополнительных I/O implementation пока не разрешён.
+
+Пользователь затем разрешил дополнительные existing validation catalog/path
+checks для retained eligible windows. Выбран минимальный packing patch без
+capture/cache: B начал реализацию в точном allowlist. Acquisition/source-content
+I/O и validators/freshness не меняются; validation I/O учитывается отдельно.
+
+A spike `a7a41ac5` воспроизведён independent R: 25 tests PASS, но integration
+HELD. R отдельно воспроизвёл false-green при реальной close syscall error;
+обнаружены exact-runtime ordinary-CI conflict и whitespace gate failure upstream
+header. A исправляет outcomes, provenance и explicit research selection; gates
+не отключаются. Hook coverage не объявляется complete OS confinement. R1 OPEN.

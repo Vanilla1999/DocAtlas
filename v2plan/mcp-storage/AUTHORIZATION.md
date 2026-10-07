@@ -112,3 +112,42 @@ Per-object descriptor binding must not be advertised as an atomic multi-file
 snapshot. The proposal must explicitly account for late pathname revalidation,
 operation counts, platform gates and failure behavior; no unspecified traversal
 allowance, global cache, general capability broker or source-scope expansion.
+
+## Approved minimal retention implementation (supersedes capture plan)
+
+After R reviewed the concrete capture plan, the user approved additional
+invocations of existing catalog validation and trust/path checks for more
+already-acquired eligible windows in explicit patch context. Existing validators,
+freshness/replacement behavior, acquisition budgets/queries/filters, source-content
+reads and corpus boundaries stay unchanged. No capture/cache module or new
+descriptor/provenance interface is authorized for this implementation.
+
+B owns exactly:
+
+```text
+docmancer/docs/interfaces/mcp/context_tools.py
+docmancer/docs/application/_unified_context_service_part01.py
+docmancer/docs/application/_project_context_service_part01.py
+docmancer/docs/application/_project_docs_service_part03.py
+docmancer/docs/domain/project_doc_ranking.py
+tests/test_action_packet_v4_found_window_retention.py
+tests/diagnostic_labels.action_packet_v4_found_window_retention.json
+```
+
+Only post-acquisition packing changes are permitted. Independently qualified,
+eligible windows may be retained; unresolved admission and operational control
+views remain bounded and unchanged. Validation I/O must be measured separately;
+identical validation operation counts/targets are no longer claimed. Review and
+tests precede integration; public >32 KB delivery remains conditional.
+
+## Native spike audit corrections
+
+Independent native audit held experimental integration: real close errors could
+be ignored, exact-runtime tests conflicted with ordinary CI discovery, upstream
+header whitespace failed the gate, and write traces lacked syscall outcomes.
+A may correct these in its experimental allowlist and add exactly
+`tests/mcp_storage_native_spike_checks.py` for explicitly invoked positive research
+checks. Portable denial checks remain under ordinary discovery. No CI gate,
+workflow or pytest/conftest configuration changes; unsupported explicit positive
+runs fail closed. Header normalization must record upstream/normalized hashes.
+Production persistence and R1 closure remain unapproved.
