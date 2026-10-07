@@ -344,6 +344,35 @@ R независимо проверяет итоговые изменения и
 
 ## Условия завершения
 
+### Bounded Linux/macOS finishing pass
+
+User approved Linux/macOS-only product scope and remote macOS verification via
+reviewed branch push. This does not authorize merge, publication, live replacement,
+historical/evaluation execution or disabling existing required checks.
+
+Three finite owners (one implementation and independent review per slice):
+
+- Active callers: `/tmp/opencode/mcp-final-active-callers`; two previously
+  allowlisted active test modules and their own inventory entries. Separate
+  eligible-source positives from explicit-rejection negatives; risk labels alone
+  neither authorize nor veto bound evidence. Runtime remains unchanged.
+- Installer tests: `/tmp/opencode/mcp-final-installer-tests`; only
+  `scripts/test-install.sh`. Correct nested OpenCode assertions and verify JSONC
+  refusal leaves bytes untouched. Stubbed test execution only.
+- Platform proof: `/tmp/opencode/mcp-final-platform-proof`; only new
+  `.github/workflows/mcp-platform-proof.yml` and
+  `scripts/docs_mcp_platform_proof.sh`. Separate branch-triggered Linux/macOS
+  proof, exact wheel/SHA, fresh managed Python and downloaded wheels, no seeded
+  runtime dependencies, no source imports, full installed stdio lifecycle.
+
+Existing CI/publish aggregators remain unchanged; this proof does not certify
+full required CI or remove Windows from existing policies. macOS architecture
+claims require the actual matching runner. Record architecture, wheel hash,
+Python, imports and logs, including failure artifacts. Coordinator integrates
+only reviewed slices, pushes the exact resulting branch SHA and reports real
+remote results. Unexpected defects stop the bounded slice instead of initiating
+new architecture or unrestricted test migration.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
