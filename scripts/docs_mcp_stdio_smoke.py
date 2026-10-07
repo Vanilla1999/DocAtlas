@@ -1,18 +1,24 @@
 #!/usr/bin/env python3
-"""Offline smoke for the installed wheel's primary three-tool Docs MCP."""
+"""Real installed-artifact stdio delivery smoke; no mocked retrieval or providers.
+
+--read-only checks the runnable pre-lifecycle delivery surface. It never claims
+the indexed/large-packet matrix passed. The full smoke requires the explicit
+member lexical lifecycle API and fails closed if that API is unavailable.
+"""
 from __future__ import annotations
 
+import argparse
 import asyncio
 from contextlib import closing
+import hashlib
 import json
 import os
+from pathlib import Path
+import shutil
+import sqlite3
+import subprocess
 import sys
 import tempfile
-import string
-import subprocess
-import sqlite3
-import time
-from pathlib import Path
 
 from docmancer.mcp.agent_config import AgentTarget, register_server
 
@@ -22,256 +28,160 @@ NEEDLE = "doc-atlas mcp docs-serve"
 
 
 def payload(result: object) -> dict:
+    assert not getattr(result, "isError", False), result
     structured = getattr(result, "structuredContent", None)
     if isinstance(structured, dict):
         return structured
     content = getattr(result, "content", [])
-    if not content or not hasattr(content[0], "text"):
-        raise AssertionError(f"missing JSON tool response: {result!r}")
-    return json.loads(content[0].text)
+    assert len(content) == 1 and isinstance(getattr(content[0], "text", None), str), result
+    value = json.loads(content[0].text)
+    assert isinstance(value, dict), value
+    return value
 
 
 def text_payload(result: object) -> dict:
     if getattr(result, "structuredContent", None) is not None:
         raise AssertionError("text-only compatibility response included structuredContent")
-    content = getattr(result, "content", [])
-    if not content or not hasattr(content[0], "text"):
-        raise AssertionError(f"missing JSON text-only tool response: {result!r}")
-    return json.loads(content[0].text)
+    return payload(result)
 
 
 def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
     assert answer.get("status") == "ok", answer
-    kind = answer.get("kind")
-    assert kind in {"docs_answer", "docs_context"}, answer
-    if kind == "docs_answer":
-        assert answer.get("support_status") == "supported", answer
-        assert answer.get("answer_supported") is True, answer
-        assert answer.get("answer_available") is True, answer
-    else:
+    assert answer.get("kind") in {"docs_answer", "docs_context"}, answer
+    if answer["kind"] == "docs_context":
         assert answer.get("support_status") == "retrieval_only", answer
         assert answer.get("context_status") == "ready", answer
         assert answer.get("answer_supported") is False, answer
         assert answer.get("answer_available") is False, answer
-    rendered = json.dumps(answer, sort_keys=True)
-    assert required_fragment in rendered, answer
-    sources = answer.get("sources") or []
-    assert sources, answer
-    for source in sources:
-        digest = str(source.get("content_sha256") or "")
-        assert source.get("path_or_url"), source
-        assert source.get("snippet"), source
-        assert len(digest) == 64 and all(char in string.hexdigits.lower()[:16] for char in digest), source
+    else:
+        assert answer.get("support_status") == "supported", answer
+        assert answer.get("answer_supported") is True, answer
+        assert answer.get("answer_available") is True, answer
+    assert required_fragment in json.dumps(answer), answer
+    assert answer.get("sources"), answer
+    for source in answer["sources"]:
+        assert source.get("path_or_url") and source.get("snippet"), source
+        digest = source.get("content_sha256", "")
+        assert len(digest) == 64 and all(c in "0123456789abcdef" for c in digest), source
+
+
+def validate_patch_payload(answer: dict, *, completeness: str | None = None) -> None:
+    assert answer.get("kind") == "patch_context" and answer.get("schema_version") == 4, answer
+    assert answer.get("edit_ready") is False, answer
+    assert answer.get("result") in {"data", "failure"}, answer
+    if completeness is not None:
+        assert answer.get("completeness") == completeness, answer
+    for source in answer.get("sources", []):
+        text = source["text"]
+        assert source["content_sha256"] == hashlib.sha256(text.encode()).hexdigest(), source
+        assert source["char_end"] - source["char_start"] == len(text), source
+        assert source["instruction_trust"] == "untrusted_data", source
 
 
 def _accept_fixture(project: Path) -> None:
-    """Commit only the temporary public fixture, never the caller's repository."""
-    for args in (
-        ("init", "-q"),
-        ("config", "core.autocrlf", "false"),
-        ("config", "user.email", "fixture@example.test"),
-        ("config", "user.name", "Docs MCP smoke fixture"),
-        ("add", "."),
-        ("commit", "-qm", "accepted fixture documentation"),
-    ):
-        subprocess.run(["git", "-C", str(project), *args], check=True, timeout=15)
+    for args in (("init", "-q"), ("config", "core.autocrlf", "false"),
+                 ("config", "user.email", "fixture@example.test"),
+                 ("config", "user.name", "Docs MCP smoke fixture"),
+                 ("add", "."), ("commit", "-qm", "accepted fixture documentation")):
+        subprocess.run(["git", "-C", str(project), *args], stdin=subprocess.DEVNULL,
+                       check=True, timeout=15)
 
 
 def _read_fixture_job_state(database: Path, job_id: str) -> tuple[str] | None:
-    """Read one state and release its handle before temporary-fixture cleanup."""
     with closing(sqlite3.connect(database.as_uri() + "?mode=ro", uri=True, timeout=1)) as db:
         return db.execute("SELECT status FROM docs_jobs WHERE job_id = ?", (job_id,)).fetchone()
 
 
-async def lifecycle_smoke(session: object, root: Path) -> None:
-    """Scripted lifecycle checks on the same real installed MCP connection.
-
-    Status/preparation calls here are explicit fixture lifecycle requests, not
-    speculative model actions. No live model, network fetch or new polling
-    policy is involved. A locally invalid manifest fails before source fetching.
-    """
-    project = root / "lifecycle-project"
-    project.mkdir()
-    (project / "README.md").write_text(
-        f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n",
-        encoding="utf-8", newline="\n",
-    )
-    _accept_fixture(project)
-    original = {"question": QUESTION, "project_path": str(project)}
-    initial = payload(await session.call_tool("get_docs_context", original))
-    assert not initial.get("answer_supported"), initial
-    status_args = {"action": "project", "project_path": str(project), "details": True}
-    inspected = payload(await session.call_tool("docs_status", status_args))["project"]
-    assert inspected["source_summary"]["indexed"] == 0, inspected
-    action = inspected["next_action"]
-    assert action.get("tool") == "prepare_docs" and action.get("requires_confirmation") is False, inspected
-    guarded = action["arguments_patch"]
-    assert guarded["action"] == "sync_project_docs" and guarded["plan_digest"], guarded
-
-    # A legitimate precondition race must fail closed before changing the index.
-    (project / "unreviewed.txt").write_text("unreviewed fixture change\n", encoding="utf-8", newline="\n")
-    rejected = payload(await session.call_tool("prepare_docs", guarded))
-    assert rejected["status"] == "precondition_failed", rejected
-    assert rejected["requires_confirmation"] is True, rejected
-    dirty = payload(await session.call_tool("docs_status", status_args))["project"]
-    assert dirty["requires_confirmation"] is True, dirty
-    assert dirty["source_summary"]["indexed"] == 0, dirty
-    # No unguarded prepare follows a confirmation-required response.
-    _accept_fixture(project)  # fixture author explicitly accepts the new snapshot
-    accepted = payload(await session.call_tool("docs_status", status_args))["project"]
-    next_action = accepted["next_action"]
-    assert next_action["requires_confirmation"] is False, next_action
-    synced = payload(await session.call_tool("prepare_docs", next_action["arguments_patch"]))
-    assert synced["status"] == "success", synced
-    answer = payload(await session.call_tool("get_docs_context", original))
-    validate_context_payload(answer, required_fragment=NEEDLE)
-    # Exactly the original question is retried once; sufficient evidence stops
-    # this task. No extra discovery/status call is made for this ready context.
-
-    # Explicit, local-only invalid-manifest request exercises a real async job.
-    manifest = root / "invalid.docs.yaml"
-    manifest.write_text("schema_version: 1\ntargets: not-a-list\n", encoding="utf-8")
-    started = payload(await session.call_tool("prepare_docs", {
-        "action": "prefetch_docs_manifest", "manifest_path": str(manifest),
-        "project_path": str(project),
-    }))
-    assert started["job_id"] and started["status"] == "running", started
-    # Infrastructure readiness barrier, not extra host/MCP polling or a new
-    # agent policy. Read only status in this fixture's own database so scheduler
-    # timing cannot turn the terminal-state check into a flaky sleep-based test.
-    database = Path(inspected["diagnostics"]["active_index"]["db_path"]).resolve()
-    assert database.is_relative_to(root.resolve()), "fixture database escaped isolation"
-    deadline = time.monotonic() + 10
-    readiness_reads = 0
-    while True:
-        state = _read_fixture_job_state(database, started["job_id"])
-        readiness_reads += 1
-        if state and state[0] == "failed":
-            break
-        if time.monotonic() >= deadline:
-            raise TimeoutError("local invalid-manifest fixture did not reach terminal state")
-        await asyncio.sleep(0.01)
-    print(f"Lifecycle fixture readiness: {readiness_reads} read-only storage checks; "
-          "one MCP job-status call follows (not a model or latency measurement)")
-    terminal = payload(await session.call_tool("docs_status", {
-        "action": "job", "job_id": started["job_id"],
-    }))
-    assert terminal["status"] == "failed" and terminal["retryable"] is False, terminal
-    assert terminal["counts"]["pages"]["total"] == 0, terminal
-    # Terminal failure stops: no retry, cancellation or further polling.
-    print("Installed lifecycle smoke: clean guard / confirmation / unchanged retry / "
-          "ready stop / async status / terminal stop PASS (scripted, no live model)")
+def isolated_environment(root: Path) -> dict[str, str]:
+    # Do not inherit caller config, credentials, Python overlays or provider flags.
+    env = {key: os.environ[key] for key in ("PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP")
+           if key in os.environ}
+    for key, relative in {"HOME": "user-home", "USERPROFILE": "user-home",
+                          "XDG_CONFIG_HOME": "config", "XDG_DATA_HOME": "data",
+                          "XDG_CACHE_HOME": "cache", "DOCATLAS_HOME": "docatlas-home"}.items():
+        path = root / relative
+        path.mkdir(exist_ok=True)
+        env[key] = str(path)
+    env.update({"PYTHONNOUSERSITE": "1", "DOCATLAS_AUTO_VECTORS": "0",
+                "DOCATLAS_REGISTRY_API_URL": "http://127.0.0.1:1", "NO_PROXY": "*"})
+    return env
 
 
-async def smoke() -> None:
-    # The parsers below are provider-free release contracts. Import the MCP
-    # client only when the installed-artifact smoke is actually executed.
+async def read_only_delivery(session, project: Path, *, text_only: bool) -> None:
+    decode = text_payload if text_only else payload
+    names = {tool.name for tool in (await session.list_tools()).tools}
+    assert names == TOOLS, names
+    canonical_query = {"question": QUESTION, "project_path": str(project)}
+    assert set(canonical_query) == {"question", "project_path"}
+    result = await session.call_tool("get_docs_context", canonical_query)
+    if not text_only:
+        assert isinstance(result.structuredContent, dict), result
+    docs = decode(result)
+    assert docs.get("kind") != "patch_context", docs
+    assert not docs.get("edit_ready") and not docs.get("answer_supported"), docs
+    patch = decode(await session.call_tool("get_docs_context", {
+        **canonical_query, "context_format": "patch_context"}))
+    validate_patch_payload(patch)
+    assert patch.get("result") == "failure" and not patch.get("sources"), patch
+    for extra in ({"mutation_intent": {"operation": "delete", "confirm": True}},
+                  {"edit_ready": True}, {"allow_network": True, "consent": True}):
+        rejected = await session.call_tool("get_docs_context", {**canonical_query, **extra})
+        if not rejected.isError:
+            response = decode(rejected)
+            assert response.get("status") in {"error", "failed"}, response
+    assert (project / "README.md").read_text().endswith(f"`{NEEDLE}`.\n")
+
+
+async def indexed_delivery(session, project: Path, *, text_only: bool) -> None:
+    # A's member lifecycle recipe must supply an explicit validated mutation.
+    # Never fall back to status.next_action, clean Git state or unguarded sync.
+    raise RuntimeError("BLOCKED: explicit member lexical lifecycle recipe is not yet integrated; "
+                       "indexed partial/complete/>32KB and positive scope/version smoke NOT RUN")
+
+
+async def smoke(*, read_only: bool = False) -> None:
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
+    import docmancer
 
+    checkout = Path(__file__).resolve().parents[1]
+    imported = Path(docmancer.__file__).resolve()
+    assert not imported.is_relative_to(checkout), f"smoke imported checkout instead of installed wheel: {imported}"
+    executable = shutil.which("doc-atlas")
+    assert executable, "installed doc-atlas console script not found"
     with tempfile.TemporaryDirectory(prefix="docatlas-release-smoke-") as raw:
         root = Path(raw)
+        env = isolated_environment(root)
         project = root / "project"
         project.mkdir()
         (project / "README.md").write_text(
-            f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n"
-        )
-        user_home = root / "user-home"
-        user_home.mkdir()
-        docatlas_home = root / "docatlas-home"
-        docatlas_home.mkdir()
-        env = {
-            **os.environ,
-            "HOME": str(user_home),
-            "USERPROFILE": str(user_home),
-            "DOCATLAS_HOME": str(docatlas_home),
-            "NO_PROXY": "*",
-        }
-        params = StdioServerParameters(command="doc-atlas", args=["mcp", "docs-serve"], env=env, cwd=str(root))
-        async with stdio_client(params) as streams:
-            async with ClientSession(*streams) as session:
-                await session.initialize()
-                names = {tool.name for tool in (await session.list_tools()).tools}
-                assert names == TOOLS, f"unexpected public Docs tools: {sorted(names)}"
-                canonical_query = {
-                    "question": QUESTION,
-                    "project_path": str(project),
-                }
-                assert set(canonical_query) == {"question", "project_path"}
-                await session.call_tool("get_docs_context", canonical_query)
-                sync = payload(await session.call_tool("prepare_docs", {
-                    "action": "sync_project_docs", "project_path": str(project), "with_vectors": False,
-                }))
-                assert sync.get("status") not in {"error", "failed"}, sync
-                answer = payload(await session.call_tool("get_docs_context", canonical_query))
-                if NEEDLE not in json.dumps(answer, sort_keys=True):
-                    exact = payload(await session.call_tool("get_docs_context", {
-                        **canonical_query, "lookup_queries": [NEEDLE],
-                    }))
-                    raise AssertionError({
-                        "diagnostic": "installed_docs_context_missing_after_sync",
-                        "sync": sync,
-                        "canonical": answer,
-                        "exact_lookup": exact,
-                    })
-                validate_context_payload(answer, required_fragment=NEEDLE)
-                rendered = json.dumps(answer, sort_keys=True)
-                assert "README.md" in rendered, answer
-                assert NEEDLE in rendered, answer
-                from docmancer.docs.interfaces.grounded_mcp_session import GroundedMCPSession
-                grounded = await GroundedMCPSession.start(session, arguments=canonical_query,
-                    requested_facts={'command': 'How do I start the server?',
-                                     'details': 'What additional operational details are documented?'})
-                source = next(s for s in grounded.context['sources'] if NEEDLE in s['snippet'])
-                grounded.support('command', evidence_id=source['evidence_id'], quote=NEEDLE)
-                if source.get('source_uri'):
-                    await grounded.read(source['source_uri'], missing_fact_id='details')
-                handoff = grounded.finish()
-                assert handoff['status'] == 'partial' and handoff['known'][0]['quote'] == NEEDLE
-                assert handoff['answer_supported'] is False
-                sources = answer.get("sources") or answer.get("selected_sources") or answer.get("context_pack") or []
-                assert any(
-                    source.get("path_or_url") == "README.md" or source.get("path") == "README.md"
-                    for source in sources
-                ), answer
-                await lifecycle_smoke(session, root)
-        config_path = user_home / "opencode.json"
+            f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n",
+            encoding="utf-8")
+        _accept_fixture(project)
+        config_path = root / "user-home" / "opencode.json"
         register_server(AgentTarget("opencode", config_path, "json_opencode_mcp"))
-        registrations = json.loads(config_path.read_text())["mcp"]
-        assert "docmancer" not in registrations, registrations
+        registrations = json.loads(config_path.read_text())["mcp"]["servers"]
+        assert set(registrations) == {"docatlas"}, registrations
         entry = registrations["docatlas"]
-        assert entry["environment"]["DOCATLAS_MCP_TEXT_FALLBACK"] == "1", entry
-        command = entry["command"]
-        opencode_params = StdioServerParameters(
-            command=command[0],
-            args=command[1:],
-            env={**env, **entry["environment"]},
-            cwd=str(root),
-        )
-        async with stdio_client(opencode_params) as streams:
-            async with ClientSession(*streams) as session:
-                await session.initialize()
-                # OpenCode currently requires text fallback, but uses the same
-                # canonical tool arguments and payload.
-                canonical_query = {
-                    "question": QUESTION,
-                    "project_path": str(project),
-                }
-                grounded_text = await GroundedMCPSession.start(session,
-                    arguments=canonical_query, structured_supported=False,
-                    requested_facts={'command': 'How do I start the server?'})
-                text_answer = grounded_text.context
-                rendered = json.dumps(text_answer, sort_keys=True)
-                assert "README.md" in rendered, text_answer
-                assert NEEDLE in rendered, text_answer
-                text_source = next(s for s in text_answer['sources'] if NEEDLE in s['snippet'])
-                grounded_text.support('command', evidence_id=text_source['evidence_id'], quote=NEEDLE)
-                assert grounded_text.finish()['status'] == 'host_assessed_complete'
-        assert not (user_home / ".docmancer").exists(), (
-            "installed release smoke wrote implicit foreign ~/.docmancer state"
-        )
-    print("Docs MCP installed-artifact stdio smoke: PASS")
+        assert "enabled" not in entry and not entry.get("disabled"), entry
+        for text_only in (False, True):
+            params = StdioServerParameters(command=executable, args=entry["command"][1:],
+                env={**env, **(entry["environment"] if text_only else {})}, cwd=str(root))
+            async with stdio_client(params) as streams:
+                async with ClientSession(*streams) as session:
+                    await session.initialize()
+                    await read_only_delivery(session, project, text_only=text_only)
+                    if not read_only:
+                        await indexed_delivery(session, project, text_only=text_only)
+        assert not (root / "user-home" / ".docmancer").exists()
+    if read_only:
+        print("Installed read-only stdio delivery: PASS (structured/text, empty patch, unauthorized fields). "
+              "Indexed lifecycle/partial/complete/>32KB/scope/version NOT RUN.")
+    else:
+        print("Docs MCP installed-artifact stdio smoke: PASS")
 
 
 if __name__ == "__main__":
-    asyncio.run(smoke())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--read-only", action="store_true")
+    asyncio.run(smoke(read_only=parser.parse_args().read_only))

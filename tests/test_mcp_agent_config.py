@@ -181,10 +181,9 @@ def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
     agent_config.register_server(opencode)
     agent_config.register_server(vscode)
 
-    assert json.loads(opencode.config_path.read_text())["mcp"]["docatlas"] == {
+    assert json.loads(opencode.config_path.read_text())["mcp"]["servers"]["docatlas"] == {
         "type": "local",
         "command": ["doc-atlas", "mcp", "docs-serve"],
-        "enabled": True,
         "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
     }
     assert json.loads(vscode.config_path.read_text())["servers"]["docatlas"] == {
@@ -194,7 +193,7 @@ def test_register_writes_opencode_and_vscode_project_entries(tmp_path):
     }
 
 
-def test_register_reenables_disabled_opencode_entry(tmp_path):
+def test_register_preserves_disabled_opencode_entry(tmp_path):
     cfg = tmp_path / "opencode.json"
     cfg.write_text(json.dumps({
         "mcp": {
@@ -211,8 +210,9 @@ def test_register_reenables_disabled_opencode_entry(tmp_path):
 
     assert changed is True
     payload = json.loads(cfg.read_text())["mcp"]
-    assert payload["docmancer"]["enabled"] is False
-    assert payload["docatlas"]["enabled"] is True
+    assert "docmancer" not in payload
+    assert set(payload["servers"]) == {"docmancer"}
+    assert payload["servers"]["docmancer"]["disabled"] is True
 
 
 def test_register_migrates_opencode_environment_without_clobbering_user_settings(tmp_path):
@@ -237,11 +237,13 @@ def test_register_migrates_opencode_environment_without_clobbering_user_settings
 
     assert changed is True
     payload = json.loads(cfg.read_text())["mcp"]
-    assert payload["docmancer"]["timeout"] == 30
-    entry = payload["docatlas"]
-    assert entry["enabled"] is True
+    assert "docmancer" not in payload
+    entry = payload["servers"]["docmancer"]
+    assert entry["timeout"] == 30
+    assert entry["disabled"] is True
     assert entry["environment"] == {
         "DOCATLAS_MCP_TEXT_FALLBACK": "1",
+        "DOCATLAS_TASK_LEVEL_ALLOW_NETWORK": "1",
     }
     assert agent_config.register_server(target)[0] is False
 
