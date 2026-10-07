@@ -100,6 +100,7 @@ A: `docmancer/docs/application/action_packet.py`,
 `tests/test_action_packet_v4_contract.py`.
 
 B: `docmancer/docs/application/evidence_models.py`,
+`docmancer/docs/application/evidence_requirements.py`,
 `docmancer/docs/application/evidence_selection.py`,
 `docmancer/docs/application/_evidence_selection_shared.py`,
 `docmancer/docs/application/_evidence_selection_part01.py`,
@@ -132,3 +133,27 @@ Workers commit only allowlisted changes and report base/worktree/branch,
 commit, files, contract coverage, commands/exit/results, dependency requests,
 limitations/blockers. R independently reviews integrated diff and reproduces
 key tests; R edits no production code.
+
+### Coordinator dependency amendment 1
+
+B additionally owns `evidence_requirements.py`: its explicit path/public
+requirement bounds currently slice at 12 and insert an input_limit reason.
+For patch selection preserve the entire explicit contract (a deliberate
+patch-only flag on build_requirements is permitted, default docs behavior
+unchanged). B communicates the exact parameter to A. Do not enlarge the
+retrieval universe or remove docs input guards. A must avoid the lossy
+with_explicit_path_targets helper for bare required_target_paths; preserve
+these through selector obligations instead. Supplied MutationIntentContract
+constructor rejecting domain guards remain unchanged; no serializer slicing.
+
+### Coordinator dependency amendment 2
+
+Normal test infrastructure requires new hash-bound diagnostic extension
+shards. Approved additional ownership: A/B/C respectively
+`tests/diagnostic_labels.action_packet_v4_a.json`,
+`tests/diagnostic_labels.action_packet_v4_b.json`,
+`tests/diagnostic_labels.action_packet_v4_c.json`. Coordinator owns
+`tests/diagnostic_labels.action_packet_v4_integrated.json`. Shards label only
+new tests; old inventory and conftest remain unchanged. Use the existing
+`/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python` interpreter,
+`PYTHONPATH=.` from each worktree, no installation or network.
