@@ -314,6 +314,12 @@ deselected / 8 685 total, inventory gates PASS; none executed. Log:
 Read-only CI source audit separates protected mixed historical/evaluation nodes
 before any broader execution; excludes must be justified by protected scope,
 not failures. A full core run is not authorized by collection success alone.
+
+Independent R APPROVE `5f282a57` unit migration: focused 25 PASS / approved wider
+156 PASS. Integrated as `2083c4c1`; main rerun across migrated unit/scope/v4/wire /
+delivery/trusted-lifecycle modules: 239 PASS. Scope/D1/syntax/whitespace/line-budget
+PASS. Other legacy modules still fail in a different selection; no full-CI claim.
+This batch does not change runtime `b9f52004` or previously verified wheel code.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 

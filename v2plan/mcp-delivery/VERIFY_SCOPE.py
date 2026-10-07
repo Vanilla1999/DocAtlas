@@ -47,6 +47,11 @@ ALLOWED = {
     # Independently reviewed library lineage preservation / duplicate rejection.
     "docmancer/docs/application/_library_docs_service_part03.py",
     "docmancer/docs/application/_unified_context_service_part02.py",
+    # Reviewed finite active NL/proof expectation migration; runtime unchanged.
+    "tests/docs/test_query_planning_scope_regressions.py",
+    "tests/diagnostic_labels.query_planning.json",
+    "tests/docs/test_quantified_attribute_scope_isolation.py",
+    "tests/diagnostic_labels.quantified_attribute_scope_isolation.json",
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",
