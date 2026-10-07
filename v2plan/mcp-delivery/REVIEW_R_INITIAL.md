@@ -35,3 +35,19 @@ read capabilities passed their reviewed checks, but do not close R6–R9.
 No new finding in the reviewed coding instructions, projection split, CLI
 early-denial/helper extraction or coordinator active assertion migrations.
 Those coordinator conclusions were static-only, not full release certification.
+
+## Verified closures on `9863c29b`
+
+- R4 CLOSED narrowly: R independently passed all eight Python/shell ×
+  enabled/disabled nested-`servers` registration regressions, including repeat
+  registration. Name and disabled state survive without duplication.
+- The additional request-triggered project-facade initialization defect is
+  CLOSED narrowly by `1e9056d3`: three dispatch tests plus adversarial invalid
+  grant and non-sync routing probes passed. Default configured service startup
+  still initializes independently; this is not a write-free startup claim.
+- Two targeted release-smoke behavioral checks passed. No historical
+  self-host/GOLD tests were modified or executed.
+
+R reported 13 focused nodes plus independent rerun probes. R1/R2/R3/R5 and
+R6–R9 are not closed by this review. Full installed/release acceptance remains
+unestablished.
