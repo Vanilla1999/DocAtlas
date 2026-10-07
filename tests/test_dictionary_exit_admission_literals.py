@@ -209,7 +209,9 @@ def test_application_adapter_really_calls_default_hook_but_unknown_is_consumer_d
     trace = {"qualified": True, "qualification_reason": "legacy"}
     result = consumer.apply_retrieval_need_witness(query, trace, "RelayClient timeout is 7 seconds.")
     assert len(calls) == 1
-    assert result == trace  # Record the non-owned unknown-veto debt, not approval proof.
+    assert result["qualified"] is False
+    assert result["qualification_reason"] == "missing_need_local_witness"
+    assert trace == {"qualified": True, "qualification_reason": "legacy"}
     assert "need_local_witness" not in result
 
 

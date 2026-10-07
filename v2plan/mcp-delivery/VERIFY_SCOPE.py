@@ -50,6 +50,8 @@ ALLOWED = {
     "tests/test_cli.py",
     "tests/test_release_gate.py",
     "tests/test_dictionary_exit_inert_security.py",
+    "tests/test_dictionary_exit_admission_literals.py",
+    "tests/test_dictionary_exit_inert_sdk_closure.py",
     "tests/test_dictionary_exit_public_request.py",
     "tests/test_nl_dictionary_removal_packet_contract.py",
     "tests/diagnostic_labels.json",

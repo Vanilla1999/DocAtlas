@@ -126,7 +126,7 @@ def test_independent_structural_code_assignment_is_preserved_not_blanket_rejecte
     row["char_end"] = row["char_start"] + len(row["content"])
     requirement = EvidenceRequirement("code", "code_group", '["marble()"]')
     selection = select_evidence([row], question="MarbleValve",
-        requirements=EvidenceRequirementSet((requirement,)), config=patch_selection_config(2000))
+        requirements=EvidenceRequirementSet((requirement,)), config=patch_selection_config())
     assert selection.support_decision.answer_supported
     assert validate_assignment_binding(requirement, selection.selected_candidates[0], selection.assignments[0])
     facade.project = replace(facade.project, context_pack=[row], answer_available=True,
