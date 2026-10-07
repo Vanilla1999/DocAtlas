@@ -4,7 +4,9 @@ import os
 
 import pytest
 
-from scripts.docs_mcp_stdio_smoke import isolated_environment, validate_patch_payload
+from scripts.docs_mcp_stdio_smoke import (
+    fixture_database_state, initialize_fixture_members, isolated_environment, validate_patch_payload,
+)
 from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
 
 
@@ -47,3 +49,22 @@ def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
     refresh_action_packet_estimate(value)
     with pytest.raises(AssertionError, match="Additional properties"):
         validate_patch_payload(value)
+
+
+def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(tmp_path):
+    from docmancer.docs.application.project_docs_member_transaction import MemberTransaction
+
+    project = tmp_path / "fixture"
+    project.mkdir()
+    (project / "README.md").write_text("# Fixture\n\nDocumentation evidence.\n")
+    store, mutation = initialize_fixture_members(project)
+    parsed = MemberTransaction.parse(mutation, operation="sync_project_docs")
+    assert parsed.storage_path == str(project / ".docatlas" / "docatlas.db")
+    assert parsed.expected_generation_id is None
+    assert {document.path for document in parsed.documents} == {"README.md", "protocols.md"}
+    assert all(document.catalog_entry_hash.startswith("sha256:") for document in parsed.documents)
+    assert (project / "protocols.md").stat().st_size > 32768
+    for document in parsed.documents:
+        assert document.content_sha256 == hashlib.sha256((project / document.path).read_bytes()).hexdigest()
+    state = fixture_database_state(store.db_path)
+    assert all(not rows for rows in state.values())
