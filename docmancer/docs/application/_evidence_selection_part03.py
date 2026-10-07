@@ -5,7 +5,7 @@ from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
 from ._evidence_selection_part02 import _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
-from ._evidence_selection_part01 import _technical_requirement_matches, validate_assignment_binding
+from ._evidence_selection_part01 import _proof_role_admitted, _technical_requirement_matches, validate_assignment_binding
 
 
 def _hydrate_cohesive_contract_paragraphs(
@@ -485,7 +485,7 @@ def validate_evidence_sufficiency(
         if candidate is None or requirement is None:
             errors.append("evidence assignment does not resolve to canonical inputs")
             continue
-        if not validate_assignment_binding(requirement, candidate, assignment):
+        if not validate_assignment_binding(requirement, candidate, assignment, requirements=requirements):
             errors.append("evidence assignment visible content or scope binding is invalid")
     if decision.status == "ok" and (decision.missing_requirements or decision.unresolved_conflicts):
         errors.append("successful selection cannot contain unresolved requirements or conflicts")
@@ -529,7 +529,6 @@ def _with_coverage(
     preserve_window: bool = False,
 ) -> EvidenceCandidate:
     # Content requirements always need a literal visible unit, in every profile.
-    source = _normalized_source(candidate.path_or_url)
     covered: set[str] = set()
     witnesses: list[RequirementWitness] = []
     for requirement in requirements:
@@ -539,22 +538,8 @@ def _with_coverage(
         else:
             witness = _witness_for_requirement(requirement, candidate)
             matches = witness is not None
-        if matches and requirement.proof_role == "document_statement":
-            scoped_paths = {
-                _normalized_source(item.value)
-                for item in requirements
-                if item.kind == "evidence_path"
-            }
-            matches = bool(scoped_paths) and source in scoped_paths
-        if matches and requirement.proof_role == "implementation_fact":
-            matches = candidate.source_class in {"source_snippet", "test", "project_file"}
-        if matches and requirement.proof_role == "project_rule":
-            # A quoted literal or caller authority label is not a normative grant.
-            matches = False
-        if matches and requirement.proof_role == "dependency_fact":
-            matches = candidate.source_class not in {
-                "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
-            } and _version_rank(candidate.version_binding) == 0
+        if matches:
+            matches = _proof_role_admitted(requirement, candidate, requirements)
         if requirement.qualifiers:
             matches = False
         if matches:

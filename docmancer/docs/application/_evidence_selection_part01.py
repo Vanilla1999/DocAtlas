@@ -73,6 +73,8 @@ def validate_assignment_binding(
     requirement: EvidenceRequirement,
     candidate: EvidenceCandidate,
     assignment: EvidenceAssignment,
+    *,
+    requirements: Sequence[EvidenceRequirement] = (),
 ) -> bool:
     from ._evidence_selection_part02 import _legacy_requirement_matches_unit
 
@@ -84,6 +86,7 @@ def validate_assignment_binding(
         or requirement.qualifiers
         or not _candidate_window_valid(candidate)
         or not _candidate_lifecycle_valid(requirement, candidate)
+        or not _proof_role_admitted(requirement, candidate, requirements)
     ):
         return False
     unit = resolve_assignment_unit(candidate, assignment)
@@ -183,6 +186,28 @@ def _candidate_lifecycle_valid(requirement: EvidenceRequirement, candidate: Evid
     return requirement.lifecycle_intent == "either" or (
         current if requirement.lifecycle_intent == "current" else historical
     )
+
+
+def _proof_role_admitted(
+    requirement: EvidenceRequirement,
+    candidate: EvidenceCandidate,
+    requirements: Sequence[EvidenceRequirement],
+) -> bool:
+    """Shared canonical role admission; a role label is never a proof grant."""
+    if requirement.proof_role == "project_rule":
+        return False
+    if requirement.proof_role == "implementation_fact":
+        return candidate.source_class in {"source_snippet", "test", "project_file"}
+    if requirement.proof_role == "dependency_fact":
+        return candidate.source_class not in {
+            "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
+        } and _version_rank(candidate.version_binding) == 0
+    if requirement.proof_role == "document_statement":
+        scoped_paths = {
+            _normalized_source(item.value) for item in requirements if item.kind == "evidence_path"
+        }
+        return bool(scoped_paths) and _normalized_source(candidate.path_or_url) in scoped_paths
+    return True
 
 
 def _unit_matches_display(candidate: EvidenceCandidate, unit: AnswerUnit) -> bool:
@@ -465,9 +490,12 @@ def _eligible_candidates(
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
     critical: set[str] = set()
+    blocked_sources = _rejected_patch_source_keys(trust_contract) if result_kind == "patch_context" else set()
     for candidate in candidates:
         reason: OmissionReason | None = None
-        if candidate.freshness.casefold() == "stale":
+        if blocked_sources.intersection(candidate.identity_aliases):
+            reason = "forbidden_source"
+        elif candidate.freshness.casefold() == "stale":
             reason = "stale"
         elif project_identity and candidate.project_identity != project_identity:
             reason = "outside_scope"
@@ -486,6 +514,31 @@ def _eligible_candidates(
         else:
             eligible.append(candidate)
     return eligible, omissions, critical
+
+
+def _rejected_patch_source_keys(trust_contract: Mapping[str, Any]) -> set[str]:
+    """Match explicit source identities only, independently of legacy rendering."""
+    sources = trust_contract.get("sources")
+    rejected = sources.get("rejected") if isinstance(sources, Mapping) else None
+    rows = [rejected] if isinstance(rejected, (str, Mapping)) else rejected if isinstance(rejected, (list, tuple)) else ()
+    keys: set[str] = set()
+    for row in rows:
+        if isinstance(row, str):
+            values = [row]
+        elif isinstance(row, Mapping):
+            values = [row.get(name) for name in (
+                "source_identity", "source", "path", "url", "source_url", "canonical_id", "library_id", "library",
+            )]
+            aliases = row.get("identity_aliases")
+            values.extend(aliases if isinstance(aliases, (list, tuple)) else [aliases])
+        else:
+            continue
+        for value in values:
+            if isinstance(value, Mapping):
+                value = _source_path(value)
+            if isinstance(value, str) and (key := _normalized_source(value)):
+                keys.add(key)
+    return keys
 
 
 def _query_identifier_conflict(

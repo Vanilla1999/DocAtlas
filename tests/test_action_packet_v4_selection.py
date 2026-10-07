@@ -377,3 +377,90 @@ def test_patch_supplied_character_span_must_match_whole_display_window(delta):
     docs, omissions = selector.normalize_candidates([item], result_kind="docs_answer")
     assert len(docs) == 1
     assert not omissions
+
+
+@pytest.mark.parametrize("rejected", [
+    " SRC\\CONFIG_0.PY/ ", ["src/config_0.py"], {"path": "src/config_0.py"},
+    [{"source": {"path": "src/config_0.py"}}], {"source_identity": "origin://contract"},
+    {"canonical_id": "library-contract"}, {"library_id": "library-contract"},
+    {"library": "library-contract"}, {"url": "https://docs.example/contract"},
+    {"source_url": "https://docs.example/contract"},
+    {"identity_aliases": ["library-contract"]},
+])
+def test_explicit_rejected_patch_sources_cannot_supply_complete_evidence(rejected):
+    item = row(0, source_identity="origin://contract", canonical_id="library-contract",
+               url="https://docs.example/contract")
+    requirement = EvidenceRequirement("fact", "required_fact", item["display_text"])
+    canonical = EvidenceRequirementSet((requirement,))
+    trust = {"sources": {"rejected": rejected}}
+    decision = select([item], requirements=canonical, trust_contract=trust)
+    assert not decision.selected_candidates
+    assert not decision.assignments
+    assert decision.status == "insufficient_evidence"
+    assert "fact" in decision.missing_requirements
+    assert {omission.reason_code for omission in decision.omissions} == {"forbidden_source"}
+    admitted = select([item], requirements=canonical, trust_contract={"sources": {"rejected": "other.py"}})
+    assert admitted.status == "ok"
+    docs = selector.select_evidence(
+        [item], question="", config=selector.docs_selection_config(800), requirements=canonical,
+        trust_contract=trust,
+    )
+    assert len(docs.selected_candidates) == len(docs.assignments) == 1
+
+
+@pytest.mark.parametrize("role", ["project_rule", "implementation_fact", "dependency_fact", "document_statement"])
+def test_binding_rejects_roles_that_canonical_selection_does_not_admit(role):
+    item = row(0, source_class="project_doc")
+    requirement = EvidenceRequirement("fact", "required_fact", item["display_text"])
+    base = select([item], requirements=EvidenceRequirementSet((requirement,)))
+    candidate = base.selected_candidates[0]
+    relabeled = replace(requirement, proof_role=role)
+    assignment = replace(base.assignments[0], proof_role=role)
+    canonical = EvidenceRequirementSet((relabeled,))
+    assert not selector.validate_assignment_binding(relabeled, candidate, assignment, requirements=canonical)
+    assert not selector.validate_assignment_binding(relabeled, candidate, assignment)
+    denied = select([item], requirements=canonical)
+    assert "fact" in denied.missing_requirements
+    assert not denied.assignments
+
+
+@pytest.mark.parametrize("role,attributes,scoped", [
+    ("implementation_fact", {"source_class": "source_snippet"}, False),
+    ("implementation_fact", {"source_class": "test"}, False),
+    ("implementation_fact", {"source_class": "project_file"}, False),
+    ("dependency_fact", {"source_class": "library_doc", "version_binding": "exact"}, False),
+    ("document_statement", {"source_class": "project_doc"}, True),
+])
+def test_legitimate_role_scoped_bindings_use_same_admission_as_selector(role, attributes, scoped):
+    item = row(0, **attributes)
+    requirement = EvidenceRequirement("fact", "required_fact", item["display_text"], proof_role=role)
+    canonical = EvidenceRequirementSet((requirement,) + (
+        (EvidenceRequirement("scope", "evidence_path", item["path"]),) if scoped else ()
+    ))
+    patch = select([item], requirements=canonical)
+    assert patch.status == "ok"
+    assert not selector.validate_evidence_sufficiency(patch, result_kind="patch_context")
+    candidate = patch.selected_candidates[0]
+    assignment = next(row for row in patch.assignments if row.requirement_id == "fact")
+    assert selector.validate_assignment_binding(requirement, candidate, assignment, requirements=canonical)
+    assert selector.validate_assignment_binding(requirement, candidate, assignment) is not scoped
+    if scoped:
+        other = EvidenceRequirementSet((requirement, EvidenceRequirement("scope", "evidence_path", "other.py")))
+        assert not selector.validate_assignment_binding(requirement, candidate, assignment, requirements=other)
+    docs = selector.select_evidence(
+        [item], question="", config=selector.docs_selection_config(800), requirements=canonical,
+    )
+    assert len(docs.assignments) == len(canonical)
+    assert not selector.validate_evidence_sufficiency(docs, result_kind="docs_answer")
+
+
+@pytest.mark.parametrize("source_class", ["repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test"])
+def test_exact_version_does_not_turn_code_or_navigation_into_dependency_proof(source_class):
+    item = row(0, source_class=source_class, version_binding="exact")
+    requirement = EvidenceRequirement("fact", "required_fact", item["display_text"])
+    base = select([item], requirements=EvidenceRequirementSet((requirement,)))
+    relabeled = replace(requirement, proof_role="dependency_fact")
+    assignment = replace(base.assignments[0], proof_role="dependency_fact")
+    assert not selector.validate_assignment_binding(
+        relabeled, base.selected_candidates[0], assignment, requirements=(relabeled,),
+    )
