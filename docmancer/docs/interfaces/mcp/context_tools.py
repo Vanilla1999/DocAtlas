@@ -11,7 +11,6 @@ import json
 import math
 from typing import Any
 from ._context_recovery_actions import (
-    _patch_navigation_hints,
     _replace_network_retries_with_prepare_actions,
 )
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
@@ -23,19 +22,18 @@ from docmancer.docs.interfaces.mcp.recovery_projection import (
     _bound_recoverable_insufficient_projection,
     _recovery_summary,
     bind_module_recovery_selector,
-    cross_module_proof_missing,
     is_operational_recovery_action,
 )
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-    PATCH_CONTEXT_HARD_TOKENS,
     SUPPORT_ENVELOPE_KEYS,
     bound_insufficient_projection,
     canonical_projection_bytes,
     project_docs_answer,
     project_insufficient,
     project_patch_context,
+    patch_search_targets,
     validate_model_visible_projection,
     _explicit_delivery_block,
 )
@@ -289,15 +287,18 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
+    context_format = args.get("context_format")
+    if context_format is not None and context_format != "patch_context":
+        return _bad_request("invalid_context_format", "context_format must be patch_context or null")
     question = args.get("question") if isinstance(args.get("question"), str) else ""
     if not question.strip():
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    # The public three-tool contract is read-only. Neither prose nor an
-    # unrecognized wire field can supply the SDK's mutation contract.
-    kind = "docs_answer"
+    # Explicit presentation choice is read-only; it is not a mutation contract
+    # and is never forwarded as permission or inferred from request prose.
+    kind = "patch_context" if context_format == "patch_context" else "docs_answer"
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
@@ -348,11 +349,15 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     # Check the original operational decision before support/recovery decoration
     # can overwrite its reason or retain a previously admitted partial quote.
     blocked_kind = (
+        "patch_context" if kind == "patch_context" else
         "docs_context" if raw.get("mode_selected") == "project"
         and args.get("project_path") and not args.get("library")
         and not args.get("libraries") else "docs_answer"
     )
-    blocked = _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=800)
+    blocked = (
+        None if blocked_kind == "patch_context" else
+        _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=800)
+    )
     if blocked is not None:
         errors = validate_model_visible_projection(blocked, snapshot={}, max_tokens=800)
         if errors:
@@ -499,14 +504,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             _observe_same_call_diagnostics(service, raw, projection, selection_trace)
             return projection
 
-        packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
         selection_trace = {}
         retrieval_issues = bounded_patch_retrieval_issues(raw)
+        delivery = raw.get("delivery_decision") or {}
+        delivery_blocked = bool(
+            raw.get("hard_stop") or raw.get("requires_confirmation")
+            or raw.get("status") == "confirmation_required"
+            or (isinstance(delivery, dict) and delivery.get("deliverable") is False)
+        )
+        if delivery_blocked:
+            retrieval_issues = sorted(set((*retrieval_issues, "delivery_blocked")))
+        evidence_items = [] if delivery_blocked else raw.get("context_pack") or []
         packet = build_action_packet(
             question=question,
-            context_pack=raw.get("context_pack") or [],
+            context_pack=evidence_items,
             trust_contract=raw.get("trust_contract") or {},
-            max_tokens=packet_budget,
             project_path=_clean_string(args.get("project_path")),
             module_path=_clean_string(args.get("module_path")),
             retrieval_issues=retrieval_issues,
@@ -522,130 +534,42 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             selection_diagnostics=selection_trace,
             mutation_intent_contract=None,
         )
-        mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
-        coordinated_proof_missing = cross_module_proof_missing(packet)
-        if source_search_allowed and (mutation.get("ready") is not True or coordinated_proof_missing):
-            requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
-            resolved_values = {
-                str(item.get("requested_value") or "").casefold()
-                for item in mutation.get("resolved_targets") or []
-                if isinstance(item, dict) and item.get("exists") is True
-            }
-            for item in raw.get("context_pack") or []:
-                if not isinstance(item, dict) or str(item.get("source_class") or "").casefold() not in {
-                    "code_graph", "repo_map", "project_file", "source_evidence", "test_evidence",
-                }:
-                    continue
-                path = str(item.get("path") or item.get("source_path") or "").replace("\\", "/").casefold()
-                if path:
-                    resolved_values.add(path)
-                metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
-                for source in (item, metadata):
-                    for key in ("symbols", "matched_symbols", "symbol_names"):
-                        resolved_values.update(
-                            str(value.get("name") if isinstance(value, dict) else value).casefold()
-                            for value in source.get(key) or []
-                        )
-            prioritized = sorted(
-                (item for item in requested if isinstance(item, dict)),
-                key=lambda item: str(item.get("value") or "").casefold() in resolved_values,
-            )[:8]
-            navigation_paths, navigation_symbols = _patch_navigation_hints(packet, raw)
-            query_terms = [
-                str(item.get("value") or "")[:160]
-                for item in prioritized
-                if isinstance(item, dict) and str(item.get("value") or "").strip()
-            ]
-            # Project documentation can constrain an edit, but it cannot clear
-            # the code-search obligation until the requested mutation target is
-            # locally resolved.
-            recovery_reason = (
-                "Find canonical normative proof for the coordinated cross-module invariant before editing."
-                if coordinated_proof_missing
-                else "Resolve the requested mutation target before editing."
-            )
-            if "retrieval_stage_budget_exceeded" in (raw.get("warnings") or []):
-                recovery_reason += " The relevant retrieval stage exceeded its budget."
+        targets = patch_search_targets(packet)
+        recovery = None
+        if source_search_allowed and targets and packet.get("completeness") != "complete":
             recovery = {
                 "tool": "code_search",
                 "type": "search_local_source",
                 "handled_by": "coding_agent",
-                "reason": recovery_reason,
-                "query_terms": query_terms or [question[:160]],
-                "suggested_doc_paths": [
-                    str(item.get("value") or "")[:300]
-                    for item in prioritized
-                    if isinstance(item, dict) and item.get("kind") == "path"
-                ] or navigation_paths,
-                "suggested_symbols": [
-                    str(item.get("value") or "")[:160]
-                    for item in prioritized
-                    if isinstance(item, dict) and item.get("kind") == "symbol"
-                ] or navigation_symbols,
+                "query_terms": [row["value"] for row in targets],
+                "suggested_doc_paths": [row["value"] for row in targets if row["kind"] == "path"],
+                "suggested_symbols": [row["value"] for row in targets if row["kind"] == "symbol"],
                 "requires_confirmation": False,
                 "repeat_docs_context": False,
                 "auto_execute": False,
             }
+            recovery = {key: value for key, value in recovery.items() if value != []}
         raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
         validation_errors = validate_action_packet(
             packet,
-            evidence_items=raw.get("context_pack") or [],
-            max_tokens=packet_budget,
+            evidence_items=evidence_items,
             project_path=_clean_string(args.get("project_path")),
             module_path=_clean_string(args.get("module_path")),
         )
-        if packet.get("estimated_tokens", packet_budget + 1) > packet_budget:
-            validation_errors.append("requested packet token budget exceeded")
         if validation_errors:
             return _bad_request("invalid_action_packet", "; ".join(validation_errors))
         projection, snapshot = project_patch_context(
             packet=packet,
-            evidence_items=raw.get("context_pack") or [],
-            max_tokens=output_budget,
+            evidence_items=evidence_items,
         )
-        if (
-            isinstance(recovery, dict)
-            and recovery.get("type") == "search_local_source"
-            and projection.get("status") in {"ok", "truncated"}
-        ):
+        if recovery:
+            projection["recommended_next_action"] = deepcopy(recovery)
             projection["source_search_status"] = "required"
-            projection["edit_ready"] = False
-        if projection.get("status") == "insufficient_evidence" and recovery:
-            projection = project_insufficient(
-                kind="patch_context",
-                missing=projection.get("missing") or [],
-                recommended_next_action=recovery,
-                max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
-            )
-            projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=False,
-            )
-        # Recovery/source-search metadata is appended after projection.  Bound
-        # the *final* object unconditionally so no post-format mutation can
-        # reintroduce an oversized insufficient response.
-        if projection.get("status") == "insufficient_evidence":
-            projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=False,
-            )
-            _bound_recoverable_insufficient_projection(
-                projection, max_tokens=output_budget,
-            )
-        _omit_nullable_reason_code(projection)
-        _refresh_projection_estimate(projection)
+        from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+        refresh_action_packet_estimate(projection)
         projection_errors = validate_model_visible_projection(
             projection,
             snapshot=snapshot,
-            max_tokens=(
-                    output_budget
-                if projection.get("status") == "insufficient_evidence"
-                else min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
-            ),
         )
         if projection_errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
@@ -867,18 +791,17 @@ def bounded_patch_retrieval_issues(payload: dict[str, Any]) -> list[str]:
     issues: list[str] = []
     status = str(payload.get("status") or "").strip().lower()
     if status and status not in {"success"}:
-        issues.append(f"Documentation retrieval is incomplete (status={status}).")
+        issues.append(f"retrieval_status:{status}")
     if payload.get("requires_confirmation"):
-        issues.append("Documentation retrieval requires explicit user confirmation before editing.")
+        issues.append("confirmation_required")
     lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
     accepted = {"not_requested", "success"}
     failed = sorted(
         str(name) for name, lane in lanes.items()
         if isinstance(lane, dict) and str(lane.get("status") or "") not in accepted
     )
-    if failed:
-        issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
-    return issues
+    issues.extend(f"retrieval_lane:{name}" for name in failed)
+    return sorted(set(issues))
 
 
 def _record_model_visible_bytes(result: Any, raw: dict[str, Any], projection: dict[str, Any]) -> None:

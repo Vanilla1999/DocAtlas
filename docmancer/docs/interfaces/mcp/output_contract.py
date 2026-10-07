@@ -169,6 +169,35 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
     }
 
 
+def is_v4_patch_projection(payload: dict[str, Any]) -> bool:
+    """Recognize a validated v4 projection, not a transport-cap escape flag.
+
+    Binding validation belongs to the upstream projector and its snapshot.
+    This boundary rechecks the packet schema and final serialization estimate.
+    """
+    if (payload.get("kind") != "patch_context"
+        or type(payload.get("schema_version")) is not int
+        or payload.get("schema_version") != 4
+        or payload.get("edit_ready") is not False
+        or payload.get("result") not in ("data", "failure")
+        or payload.get("completeness") not in ("complete", "partial", "unavailable")):
+        return False
+    from docmancer.docs.application.action_packet import (
+        refresh_action_packet_estimate, validate_action_packet,
+    )
+    estimated = deepcopy(payload)
+    refresh_action_packet_estimate(estimated)
+    if payload.get("estimated_tokens") != estimated["estimated_tokens"]:
+        return False
+    core = {key: deepcopy(value) for key, value in payload.items()
+            if key not in {"kind", "recommended_next_action", "source_search_status"}}
+    refresh_action_packet_estimate(core)
+    if validate_action_packet(core):
+        return False
+    from docmancer.docs.application.model_visible_projection import _patch_recovery_errors
+    return not _patch_recovery_errors(payload, core)
+
+
 def compact_mcp_payload(
     payload: dict[str, Any],
     *,
@@ -178,6 +207,10 @@ def compact_mcp_payload(
     page_size: int | None = None,
     include_sections: list[str] | None = None,
 ) -> dict[str, Any]:
+    # This is an internal representation limit, not a negotiated external
+    # transport capacity. V4 patch evidence is deliberately indivisible.
+    if is_v4_patch_projection(payload):
+        return payload
     if json_bytes(payload) <= max_bytes:
         return payload
 

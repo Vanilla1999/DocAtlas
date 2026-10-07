@@ -46,8 +46,6 @@ from docmancer.docs.application.model_visible_projection_helpers import (
 
 DOCS_ANSWER_MAX_TOKENS = 800
 DOCS_CONTEXT_MAX_TOKENS = PROJECT_CONTEXT_BUDGET.max_tokens
-PATCH_CONTEXT_TARGET_TOKENS = 1_500
-PATCH_CONTEXT_HARD_TOKENS = 2_000
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
 MAX_DOCS_SOURCES = PROJECT_CONTEXT_BUDGET.max_sources
 DOCS_SOURCE_FIELDS = frozenset({"evidence_id", "path_or_url", "section", "snippet",
@@ -617,18 +615,21 @@ def _compact_insufficient_support(payload: dict[str, Any]) -> dict[str, str] | N
 
 
 def project_patch_context(
-    *, packet: dict[str, Any], evidence_items: Iterable[dict[str, Any]], max_tokens: int = PATCH_CONTEXT_TARGET_TOKENS
+    *, packet: dict[str, Any], evidence_items: Iterable[dict[str, Any]]
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
-    """Flatten context, never interpreting packet readiness as authorization."""
+    """Preserve the complete admitted v4 windows, without edit authorization."""
+    from .action_packet import refresh_action_packet_estimate
 
-    # SDK callers can invoke this projector directly. Do not rely on the MCP
-    # caller having rejected forged policy/workflow rows first.
-    packet_errors = validate_action_packet(packet)
+    evidence_items = tuple(evidence_items)
+    packet_errors = validate_action_packet(packet, evidence_items=evidence_items)
     if packet_errors:
-        return project_insufficient(
-            kind="patch_context", missing=["Invalid non-authorizing action packet."],
-            recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), {}
+        failure = {
+            "schema_version": 4, "result": "failure", "completeness": "unavailable",
+            "edit_ready": False, "kind": "patch_context",
+            "missing": ["invalid_action_packet"], "estimated_tokens": 1,
+        }
+        refresh_action_packet_estimate(failure)
+        return failure, {}
 
     raw_evidence: dict[str, dict[str, Any]] = {}
     for original in evidence_items:
@@ -639,75 +640,118 @@ def project_patch_context(
             candidate["_packet_authority"] = authority
             evidence_id, _, _ = evidence_identity_for_item(candidate)
             raw_evidence.setdefault(evidence_id, deepcopy(original))
-    if packet.get("status") == "insufficient_evidence":
-        return project_insufficient(
-            kind="patch_context",
-            missing=list(packet.get("missing_evidence") or ["Required patch evidence is unavailable."]),
-            recommended_next_action=None,
-            max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), {}
-
-    snapshot: dict[str, dict[str, Any]] = {}
-    sources: list[dict[str, Any]] = []
-    for row in packet.get("source_of_truth") or []:
-        evidence_id = str(row.get("evidence_id") or "")
-        item = raw_evidence.get(evidence_id)
-        if not item:
-            continue
-        digest = _source_digest(item)
-        projected = {**deepcopy(row), "content_sha256": digest}
-        sources.append(projected)
-        snapshot[evidence_id] = _snapshot_entry(item, projected)
-
-    mutation_ready = bool((packet.get("mutation_intent") or {}).get("ready"))
-    payload: dict[str, Any] = {
-        "status": packet.get("status"),
-        "kind": "patch_context",
-        "schema_version": packet.get("schema_version"),
-        "objective": deepcopy((packet.get("task_interpretation") or {}).get("objective")),
-        "acceptance_conditions": deepcopy((packet.get("task_interpretation") or {}).get("acceptance_conditions") or []),
-        "sources": sources,
-        "targets": deepcopy(packet.get("target_surface") or {"likely_files": [], "symbols": []}),
-        "invariants": deepcopy(packet.get("required_invariants") or []),
-        "forbidden_changes": deepcopy(packet.get("forbidden_changes") or []),
-        "implementation_guidance": deepcopy(packet.get("implementation_guidance") or []),
-        "checks": deepcopy(packet.get("validation") or {"compile": [], "tests": [], "semantic_checks": []}),
-        "mutation_intent": deepcopy(packet.get("mutation_intent") or {}),
-        "mutation_ready": mutation_ready,
-        # Typed intent readiness describes resolution, not current permission.
-        # This context-only SDK surface has no host authorization input.
-        "edit_ready": False,
-        "investigation_allowed": True,
-        "source_search_status": "not_required",
-        "uncertainties": deepcopy(packet.get("uncertainties") or []),
-        "omitted_counts": deepcopy(packet.get("omitted_counts") or {}),
-        "estimated_tokens": 0,
+    snapshot: dict[str, dict[str, Any]] = {
+        "__action_packet__": {"packet": deepcopy(packet), "evidence_items": deepcopy(evidence_items)},
     }
-    _refresh_estimate(payload)
-    limit = min(PATCH_CONTEXT_HARD_TOKENS, max(256, int(max_tokens)))
-    estimated_tokens = estimate_projection_tokens(payload)
-    for optional_key in ("objective", "uncertainties", "omitted_counts"):
-        if estimated_tokens <= limit:
-            break
-        if optional_key not in payload:
-            continue
-        if optional_key == "uncertainties" and payload.get(optional_key):
-            continue
-        payload.pop(optional_key, None)
-        payload["status"] = "truncated"
-        _refresh_estimate(payload)
-        estimated_tokens = estimate_projection_tokens(payload)
-    if estimated_tokens > limit:
-        return project_insufficient(
-            kind="patch_context",
-            missing=[
-                "The validated patch context, including selected evidence guidance, "
-                "cannot be preserved within the model-visible budget "
-                f"({estimated_tokens} > {limit})."
-            ],
-            recommended_next_action=None, max_tokens=INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-        ), snapshot
+    for row in packet.get("sources") or []:
+        evidence_id = row["evidence_id"]
+        snapshot[evidence_id] = _snapshot_entry(raw_evidence[evidence_id], deepcopy(row))
+    payload = deepcopy(packet)
+    payload["kind"] = "patch_context"
+    refresh_action_packet_estimate(payload)
     return payload, snapshot
+
+
+def patch_search_targets(packet: dict[str, Any]) -> list[dict[str, str]]:
+    """Return only explicitly supplied targets, without representation limits."""
+    mutation = packet.get("mutation_intent") or {}
+    targets = [
+        {"kind": row["kind"], "value": row["value"]}
+        for row in mutation.get("requested_targets") or []
+        if isinstance(row, dict) and row.get("kind") in {"path", "symbol"}
+        and isinstance(row.get("value"), str) and row["value"]
+    ]
+    requirements = packet.get("requirements") or []
+    if isinstance(requirements, dict):
+        requirements = requirements.get("requirements") or []
+    targets.extend(
+        {"kind": "path", "value": row["value"]}
+        for row in requirements
+        if isinstance(row, dict) and row.get("kind") == "target_path"
+        and isinstance(row.get("value"), str) and row["value"]
+    )
+    return [dict(kind=kind, value=value) for kind, value in dict.fromkeys(
+        (row["kind"], row["value"]) for row in targets
+    )]
+
+
+def _validate_patch_projection(
+    payload: dict[str, Any], *, snapshot: dict[str, dict[str, Any]],
+) -> list[str]:
+    from .action_packet import refresh_action_packet_estimate, serialize_action_packet
+
+    metadata = {"kind", "recommended_next_action", "source_search_status"}
+    core = {key: deepcopy(value) for key, value in payload.items() if key not in metadata}
+    estimated = deepcopy(payload)
+    refresh_action_packet_estimate(estimated)
+    errors = []
+    if payload.get("estimated_tokens") != estimated["estimated_tokens"]:
+        errors.append("projection estimate mismatch")
+    refresh_action_packet_estimate(core)
+    canonical = snapshot.get("__action_packet__") or {}
+    if not isinstance(canonical, dict):
+        return ["invalid canonical patch snapshot"]
+    evidence = canonical.get("evidence_items", ())
+    if not isinstance(evidence, (tuple, list)):
+        return ["invalid canonical patch evidence"]
+    errors.extend(validate_action_packet(core, evidence_items=evidence))
+    if errors:
+        return errors
+    if canonical:
+        if (not isinstance(canonical.get("packet"), dict)
+            or serialize_action_packet(core) != serialize_action_packet(canonical["packet"])):
+            errors.append("patch packet does not match the internal snapshot")
+    elif core.get("sources") or core.get("requirements") or core.get("mutation_intent"):
+        errors.append("patch contract is missing its canonical snapshot")
+    ids = set()
+    for source in core.get("sources") or []:
+        if not isinstance(source, dict):
+            continue
+        identity = source.get("evidence_id")
+        if not isinstance(identity, str):
+            continue
+        ids.add(identity)
+        bound = snapshot.get(identity) or {}
+        if not isinstance(bound, dict):
+            errors.append("invalid patch source snapshot")
+            continue
+        if source != bound.get("projected_source"):
+            errors.append("patch source does not match the internal snapshot")
+        if bound.get("source") not in evidence:
+            errors.append("patch snapshot source does not match admitted evidence")
+    if set(snapshot) - {"__action_packet__"} != ids:
+        errors.append("patch snapshot evidence identities do not match visible sources")
+    errors.extend(_patch_recovery_errors(payload, core))
+    return errors
+
+
+def _patch_recovery_errors(payload: dict[str, Any], core: dict[str, Any]) -> list[str]:
+    errors = []
+    action = payload.get("recommended_next_action")
+    search_status = payload.get("source_search_status")
+    if ("recommended_next_action" in payload and action is None
+        or "source_search_status" in payload and search_status is None):
+        errors.append("empty patch recovery metadata must be omitted")
+    if action is not None:
+        targets = patch_search_targets(core)
+        expected = {
+            "tool": "code_search", "type": "search_local_source",
+            "handled_by": "coding_agent", "auto_execute": False,
+            "requires_confirmation": False, "repeat_docs_context": False,
+            "query_terms": [row["value"] for row in targets],
+            "suggested_doc_paths": [row["value"] for row in targets if row["kind"] == "path"],
+            "suggested_symbols": [row["value"] for row in targets if row["kind"] == "symbol"],
+        }
+        expected = {key: value for key, value in expected.items() if value != []}
+        if (not targets or not isinstance(action, dict) or action != expected
+            or search_status != "required"
+            or any(action.get(key) is not False for key in (
+                "auto_execute", "requires_confirmation", "repeat_docs_context",
+            ))):
+            errors.append("invalid non-authorizing patch recovery metadata")
+    elif search_status is not None:
+        errors.append("patch source search status requires explicit recovery metadata")
+    return errors
 
 
 def project_insufficient(
@@ -741,12 +785,16 @@ def project_insufficient(
 
 
 def validate_model_visible_projection(
-    payload: Any, *, snapshot: dict[str, dict[str, Any]], max_tokens: int,
+    payload: Any, *, snapshot: dict[str, dict[str, Any]], max_tokens: int | None = None,
     canonical_selection: SelectionDecision | AggregateMixedSelectionDecision | None = None,
 ) -> list[str]:
     errors: list[str] = []
     if not isinstance(payload, dict):
         return ["model-visible projection must be an object"]
+    if payload.get("kind") == "patch_context":
+        return _validate_patch_projection(payload, snapshot=snapshot)
+    if max_tokens is None:
+        return ["docs projections require a token budget"]
     forbidden = sorted(_find_forbidden_keys(payload))
     if forbidden:
         errors.append("forbidden model-visible keys: " + ", ".join(forbidden))

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from ._docs_server_shared import *  # noqa: F401,F403
-from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload
+from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, is_v4_patch_projection
 
 def current_docs_surface(env: Mapping[str, str] | None = None) -> DocsMcpSurface:
     """Build the docs MCP surface from the current environment.
@@ -246,7 +246,13 @@ def _json_text(
     *,
     text_fallback: bool = False,
 ) -> list[Any]:
-    text = json.dumps(payload, ensure_ascii=False) if text_fallback else BOUNDED_STRUCTURED_CONTENT_MARKER
+    if text_fallback:
+        text = (
+            json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+            if is_v4_patch_projection(payload) else json.dumps(payload, ensure_ascii=False)
+        )
+    else:
+        text = BOUNDED_STRUCTURED_CONTENT_MARKER
     return [mcp_types.TextContent(type="text", text=text)]
 
 

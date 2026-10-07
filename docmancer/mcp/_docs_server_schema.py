@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Callable, Mapping, cast
 
 import jsonschema
+from docmancer.docs.application.action_packet import ACTION_PACKET_OUTPUT_SCHEMA
 
 from docmancer.core.storage_topology import StorageTopologyResolver
 from docmancer.docs.domain.project_path_validation import validate_project_path
@@ -87,12 +88,12 @@ DOCS_TARGET_INPUT_SCHEMA: dict[str, Any] = {
 }
 
 
-PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
+_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "required": ["status"],
     "properties": {
         "status": {"enum": ["ok", "truncated", "insufficient_evidence", "failed"]},
-        "kind": {"enum": ["docs_answer", "docs_context", "patch_context"]},
+        "kind": {"enum": ["docs_answer", "docs_context"]},
         "estimated_tokens": {"type": "integer"},
         "context_quality": {
             "type": "object",
@@ -154,6 +155,33 @@ PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "missing": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
         "recommended_next_action": {"type": "object"},
     },
+}
+
+_PATCH_CONTEXT_OUTPUT_SCHEMA = copy.deepcopy(ACTION_PACKET_OUTPUT_SCHEMA)
+_PATCH_CONTEXT_OUTPUT_SCHEMA["properties"].update({
+    "kind": {"const": "patch_context"},
+    "source_search_status": {"const": "required"},
+    "recommended_next_action": {
+        "type": "object",
+        "required": ["tool", "type", "handled_by", "auto_execute", "requires_confirmation",
+                     "repeat_docs_context", "query_terms"],
+        "properties": {
+            "tool": {"const": "code_search"},
+            "type": {"const": "search_local_source"},
+            "handled_by": {"const": "coding_agent"},
+            "auto_execute": {"const": False},
+            "requires_confirmation": {"const": False},
+            "repeat_docs_context": {"const": False},
+            **{key: {"type": "array", "minItems": 1,
+                     "items": {"type": "string", "minLength": 1}}
+               for key in ("query_terms", "suggested_doc_paths", "suggested_symbols")},
+        },
+        "additionalProperties": False,
+    },
+})
+_PATCH_CONTEXT_OUTPUT_SCHEMA["required"].append("kind")
+PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
+    "oneOf": [_DOCS_CONTEXT_OUTPUT_SCHEMA, _PATCH_CONTEXT_OUTPUT_SCHEMA],
 }
 
 __all__=[n for n in globals() if not n.startswith('__')]

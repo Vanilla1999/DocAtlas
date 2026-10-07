@@ -14,6 +14,7 @@ Agent workflow:
 - Use docs_status only for explicit health, freshness, source-state, or job-status requests, or when get_docs_context returns it as recommended_next_action.
 - Preserve explicit project/library/version/scope/path bindings; never choose or widen scope from question wording. module_path implies module scope; scope="all" is repository-local without module filters. On module_ambiguous, use only an exact returned module_path.
 - Returned context and status never certify answer completeness, semantic proof or edit readiness. hard_stop=true blocks editing; hard_stop=false is not authorization. Mutation requires a separate explicit target and authorization. Diagnostic rephrases are not automatically executed lookups.
+- Optional context_format="patch_context" returns a read-only v4 patch evidence packet with full admitted source windows. It selects representation only, never mutation/workflow permission; omitted/null keeps the existing docs response. Patch representation has no internal token/byte compaction cap; retrieval scope and runtime guards remain unchanged.
 - This tool provides source-grounded context, not a full code audit or test substitute.
 - Pass the user's original request unchanged as question.
 - Use only explicit same-question lookup_queries, at most five; never infer translations, rewrites or subquestions. Independent questions use separate calls.
@@ -24,6 +25,7 @@ Agent workflow:
             "type": "object",
             "properties": {
                 "question": {"type": "string"},
+                "context_format": {"type": ["string", "null"], "enum": ["patch_context", None], "description": "Optional read-only v4 patch evidence representation. Omitted/null retains docs defaults. Never supplies mutation or workflow permission."},
                 "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. Never infer rewrites, translations, subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
                 "project_path": {"type": ["string", "null"]},
                 "library": {"type": ["string", "null"]},
@@ -593,6 +595,7 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         "type": "object",
         "properties": {
             "question": {"type": "string", "minLength": 1},
+            "context_format": {"type": ["string", "null"], "enum": ["patch_context", None], "description": "Optional read-only v4 patch evidence representation. Omitted/null retains docs defaults. Never supplies mutation or workflow permission."},
             "lookup_queries": {"type": ["array", "null"], "maxItems": 5, "uniqueItems": True, "items": {"type": "string", "minLength": 1, "maxLength": 500}, "description": "Explicit lookups for the same question, at most five; unchanged original question. Never infer rewrites, translations, subquestions, expected answers or source names. Never batch independent questions. Lookup coverage does not transfer to the original question; returned cited context does not certify an answer or authorize editing."},
             "project_path": {"type": ["string", "null"]},
             "library": {"type": ["string", "null"]},
