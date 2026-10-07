@@ -35,6 +35,7 @@ SOURCE_FILES = {
         "_execution_part01", "_execution_part02", "_execution_part04",
         "_one_call_agent_loop_core", "_github_models_part02", "task33_pilot",
         "evaluators/actionability", "evaluators/docatlas_utilization", "evaluators/policy",
+        "report", "_execution_shared",
     )},
 }
 NEW_TESTS = {

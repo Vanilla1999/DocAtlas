@@ -278,3 +278,14 @@ C additionally owns the ten reported indirect active consumers:
 `eval/task_level/evaluators/policy.py`, and `eval/task_level/task33_pilot.py`.
 No changes to frozen historical threshold values/tests/gold or evaluator runs.
 New smoke coverage stays in the already owned NEW eval suite/shard.
+
+### Coordinator dependency amendment 11 — final active delivery consumers
+
+C additionally owns `eval/task_level/report.py` and
+`eval/task_level/_execution_shared.py`; `_github_models_part01.py` is already
+owned. Finalized v4 evidence must survive evaluator/provider message composing
+and history selection without internal string clipping or dropping necessary
+packet messages. This is verified offline, not through provider calls.
+Historical workflow rules remain explicitly unsupported/fail-closed and their
+threshold values unchanged. Status reporting reads v4 result/completeness.
+Actual external model capacity and historical actor acceptance stay UNKNOWN.
