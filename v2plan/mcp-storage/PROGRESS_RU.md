@@ -53,3 +53,23 @@ Library lineage остаётся отдельным нерешённым сре�
 План — новая пустая БД без migration/alias. Пока ничего не удалено: точный
 target path ещё не определён. Это не снимает безопасное initialization/write
 требование и не разрешает broad storage deletion или live MCP replacement.
+
+## Конкретный review packing R
+
+R проверил исходники на `ffc11a6a` (без исполнения). Post-acquisition retention
+допустим для независимо квалифицированных eligible windows, не всех acquired
+rows. `SourceReferenceContext.prepare()` выполняется до merge caps; блок
+service part03:687–785 не читает source content напрямую с filesystem.
+
+Настоящий no-extra-I/O blocker: action packet authority validation читает
+project catalog для каждого canonical item; build/validation повторяют путь.
+Path resolution также требует отдельного учёта. Простой bypass packing caps
+не может заявлять неизменный I/O. B проектирует request-local root/catalog-bound
+provenance snapshot/cache; точный интерфейс и дополнительные файлы требуют
+review до реализации. Global cache, metadata-issued authority, пропуск проверок
+или downgrade authority не допускаются.
+
+Unresolved admission остаётся bounded и неизменным. Acquisition calls,
+fallback triggers и operational control view сохраняются. Telemetry validators
+остаются bounded diagnostic, не completeness certificate. >32 KB по-прежнему
+условны: unchanged acquisition должен реально вернуть достаточные окна.
