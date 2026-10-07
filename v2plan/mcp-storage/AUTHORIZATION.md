@@ -184,3 +184,17 @@ security assertions, dropping-wrapper failures, docs behavior and source binding
 No skip/xfail/gate removal, historical modifications or broader production
 allowlist. Necessary hash-shard changes require identifying exact paths first.
 Independent closure review and a green full focused rerun precede integration.
+
+## Fresh review: explicit local-storage and installation decision
+
+The user selected automatic installation and explicitly approved a local MCP
+profile with ordinary SQLite in server-owned data storage outside the project,
+trusting the OS and same-UID processes. Malicious same-UID interference is outside
+this approved profile. This supersedes the earlier prohibition on adopting a
+trusted-storage assumption; it does not claim the experimental VFS solved R1.
+Source/grant/scope/hash/span validation and authorized source-read limits remain.
+
+Exact new implementation worktrees, ownership, initialization boundaries and
+acceptance are recorded in `FRESH_PLAN_RU.md`. Existing indexes, installation and
+configuration remain untouched. Automatic install is a delivery design choice,
+not authorization for live replacement. No production native VFS is planned.

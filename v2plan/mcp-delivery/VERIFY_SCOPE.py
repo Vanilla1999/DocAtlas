@@ -10,6 +10,7 @@ ALLOWED = {
     # Coordinator records for the explicitly approved storage continuation.
     "v2plan/mcp-storage/AUTHORIZATION.md",
     "v2plan/mcp-storage/PROGRESS_RU.md",
+    "v2plan/mcp-storage/FRESH_PLAN_RU.md",
     # Reviewed experimental spike only; no production persistence integration.
     "experiments/mcp_storage_native/README.md",
     "experiments/mcp_storage_native/sqlite_fd_vfs.c",
