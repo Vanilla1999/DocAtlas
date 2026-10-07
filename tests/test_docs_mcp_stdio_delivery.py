@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import pytest
 
 from scripts.docs_mcp_stdio_smoke import (
+    bootstrap_library_fixture, bootstrap_ready_fixture, evidence_sizes,
     fixture_database_state, initialize_fixture_members, isolated_environment, payload, text_payload,
     validate_blocked_preparation, validate_patch_payload,
 )
@@ -83,3 +84,54 @@ def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(t
         assert document.content_sha256 == hashlib.sha256((project / document.path).read_bytes()).hexdigest()
     state = fixture_database_state(store.db_path)
     assert all(not rows for rows in state.values())
+
+
+def test_ready_fixture_bootstrap_uses_real_store_and_local_catalog_binding(tmp_path):
+    project = tmp_path / "ready"
+    project.mkdir()
+    (project / "README.md").write_text("# Docs\n\nStart with `doc-atlas mcp docs-serve`.\n")
+    store, _mutation = initialize_fixture_members(project)
+    bootstrap = bootstrap_ready_fixture(project)
+    assert bootstrap["generation_id"].startswith("gen-")
+    assert set(bootstrap["files"]) == {"README.md", "protocols.md", "packages/alpha/README.md", "packages/beta/README.md"}
+    assert bootstrap["files"]["packages/alpha/README.md"]["scope"] == "module"
+    with store._connect() as conn:
+        assert store._active_generation_id(conn) == bootstrap["generation_id"]
+        assert conn.execute("SELECT count(*) FROM generation_sources WHERE generation_id=?",
+                            (bootstrap["generation_id"],)).fetchone()[0] == 4
+        assert conn.execute("SELECT count(*) FROM retrieval_children_fts WHERE retrieval_children_fts MATCH 'alpha'").fetchone()[0] > 0
+
+
+def test_evidence_byte_measurement_unions_overlapping_unicode_source_spans(tmp_path):
+    raw = "αβγδε source"
+    (tmp_path / "source.md").write_text(raw, encoding="utf-8")
+    rows = [{"path": "source.md", "text": raw[start:end], "char_start": start, "char_end": end,
+             "content_sha256": hashlib.sha256(raw[start:end].encode()).hexdigest(), "evidence_id": str(index)}
+            for index, (start, end) in enumerate(((0, 4), (2, 7)))]
+    report = evidence_sizes({"sources": rows}, tmp_path)
+    assert report["source_text_utf8_bytes"] == sum(len(row["text"].encode()) for row in rows)
+    assert report["unique_nonoverlap_utf8_bytes"] == len(raw[:7].encode())
+    assert report["unique_nonoverlap_utf8_bytes"] < report["source_text_utf8_bytes"]
+    docs = evidence_sizes({"sources": [{"path_or_url": "source.md", "snippet": raw[:4]}]}, tmp_path)
+    assert docs["unique_nonoverlap_utf8_bytes"] == len(raw[:4].encode())
+    rows[0]["text"] = "forged"
+    with pytest.raises(AssertionError):
+        evidence_sizes({"sources": rows}, tmp_path)
+
+
+def test_library_fixture_versions_have_real_local_provenance_and_distinct_bytes(tmp_path):
+    from pathlib import Path
+    from urllib.parse import urlparse
+    from urllib.request import url2pathname
+
+    project = tmp_path / "project"
+    project.mkdir()
+    libraries = bootstrap_library_fixture(project, tmp_path / "owned-home" / "docs-indexes")
+    assert set(libraries) == {"1.0.0", "2.0.0"}
+    assert libraries["1.0.0"]["content_sha256"] != libraries["2.0.0"]["content_sha256"]
+    for version, fixture in libraries.items():
+        source = Path(url2pathname(urlparse(fixture["source"]).path))
+        assert source.is_relative_to(project) and source.is_file()
+        assert version in source.read_text()
+        assert hashlib.sha256(source.read_bytes()).hexdigest() == fixture["content_sha256"]
+        assert fixture["generation_id"].startswith("gen-")

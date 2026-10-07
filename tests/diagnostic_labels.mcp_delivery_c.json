@@ -5,7 +5,7 @@
     "tests/test_opencode_v2_installer.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_docs_mcp_stdio_delivery.py": "32bfb501281664d535ca2e489fde5763e2ced11d3c7ec745fa5669b9741a2b79",
+    "tests/test_docs_mcp_stdio_delivery.py": "f9016467cbeb4dde685a5a3a3cccbc8285cb443ce881d5f3a54c115c06a699af",
     "tests/test_opencode_v2_installer.py": "6621ee94c7e2293f4d59a011da76074f8949d06046bb766ab5a215a14a4a4423"
   },
   "node_overrides": {}
