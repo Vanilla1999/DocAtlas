@@ -1,6 +1,8 @@
 """Lossless rendering of the canonical admitted selector decision."""
 from __future__ import annotations
 
+from dataclasses import replace
+
 from ._action_packet_shared import *  # noqa: F401,F403
 from ._action_packet_part01 import (
     _effective_authority, _evidence_id, _section, _source_path, _source_scope,
@@ -39,6 +41,31 @@ def _mutation_payload(contract):
     return _compact_value({**payload, "contract_hash": contract.contract_hash})
 
 
+def _explicit_mutation_paths(contract):
+    return tuple(target.value for target in contract.requested_targets
+                 if target.kind == "path" and contract.operation in {"modify", "delete", "rename"}
+                 and target.value != contract.destination)
+
+
+def _mutation_requirements(contract, *, target_paths=()):
+    paths = tuple(dict.fromkeys((*target_paths, *_explicit_mutation_paths(contract))))
+    scoped = build_requirements("", required_target_paths=paths,
+                                profile="generic", representation_bounded=False)
+    symbolic = build_requirements(
+        "", public_requirements=tuple({"kind": "target_declaration", "value": target.value,
+                                       "proof_role": "target_identity"}
+                                      for target in contract.requested_targets
+                                      if target.kind == "symbol" and contract.operation in {"modify", "delete", "rename"}
+                                      and target.value != contract.destination),
+        profile="generic", representation_bounded=False,
+    )
+    rows = [*scoped.requirements, *(replace(row, requirement_id="mutation_target:" + row.requirement_id)
+                                  for row in symbolic)]
+    if contract.request_plan is not None:
+        rows.extend(build_patch_evidence_requirements(contract.request_plan))
+    return EvidenceRequirementSet(tuple(rows))
+
+
 def build_action_packet(
     *, question: str, context_pack: Iterable[dict[str, Any]],
     trust_contract: dict[str, Any] | None = None,
@@ -63,11 +90,7 @@ def build_action_packet(
                  if candidate.stable_id not in invalid_spans]
     required_target_paths = tuple(required_target_paths)
     if mutation_intent_contract is not None:
-        required_target_paths = tuple(dict.fromkeys((*required_target_paths, *(
-            target.value for target in mutation_intent_contract.requested_targets
-            if target.kind == "path" and mutation_intent_contract.operation in {"modify", "delete", "rename"}
-            and target.value != mutation_intent_contract.destination
-        ))))
+        required_target_paths = tuple(dict.fromkeys((*required_target_paths, *_explicit_mutation_paths(mutation_intent_contract))))
     explicit = build_requirements(
         question, required_evidence_paths=tuple(required_evidence_paths),
         required_target_paths=required_target_paths, public_requirements=tuple(public_requirements),
@@ -75,8 +98,8 @@ def build_action_packet(
         profile="generic", representation_bounded=False,
     )
     requirements = explicit
-    if mutation_intent_contract is not None and mutation_intent_contract.request_plan is not None:
-        planned = build_patch_evidence_requirements(mutation_intent_contract.request_plan)
+    if mutation_intent_contract is not None:
+        planned = _mutation_requirements(mutation_intent_contract, target_paths=required_target_paths)
         requirements = EvidenceRequirementSet((*explicit.requirements, *planned.requirements))
     selection = select_evidence(
         items, question=question, config=patch_selection_config(),
