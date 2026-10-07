@@ -73,3 +73,23 @@ Unresolved admission остаётся bounded и неизменным. Acquisiti
 fallback triggers и operational control view сохраняются. Telemetry validators
 остаются bounded diagnostic, не completeness certificate. >32 KB по-прежнему
 условны: unchanged acquisition должен реально вернуть достаточные окна.
+
+## Request-local provenance: ещё не implementation approval
+
+B предложил immutable observations, созданные существующими trusted readers,
+с request-local owner; consumers пересчитывают проверки по observations, а не
+доверяют cached «validation passed». Wire/metadata/global cache не дают authority.
+
+Однако текущий catalog reader не обеспечивает coherent root/catalog object
+binding. Capture без дополнительных операций пока не доказан. Кроме того,
+same-request snapshot semantics не должны молча заменить требование current
+filesystem state. R проверяет минимальный producer substitution и совместимость
+с действующим контрактом. Ни expanded allowlist, ни изменение актуальности,
+ни дополнительные reads пока не одобрены; packing/cache код не реализован.
+
+R interface review: zero-extra-capture-I/O object binding невозможен с текущими
+producer observations. Observation-only cache меняет late pathname freshness
+checks; этот вариант пользователь не выбрал. Пользователь разрешил только
+конкретный проект descriptor capture: конечный список дополнительных операций,
+точный интерфейс и следующий independent review до implementation. B готовит
+план с late revalidation/I/O accounting; atomic multi-file snapshot не обещаем.

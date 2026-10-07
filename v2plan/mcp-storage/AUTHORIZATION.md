@@ -98,3 +98,17 @@ authorize broad storage-directory deletion. Live MCP/config replacement remains
 separately gated. Fresh-database initialization needs a reviewed safe route;
 discarding legacy data does not solve pathname/sidecar races or permit unsafe
 persistence fallback.
+
+## Descriptor-capture design decision
+
+R found that existing readers provide sequential observations, not coherent
+object bindings. Reusing those observations instead of later pathname checks
+changes freshness semantics. The user selected **capture design**, not that
+observation-only alternative: propose an exact interface and finite additional
+descriptor-operation list, then obtain independent review before implementation.
+
+No additional I/O implementation or freshness weakening is authorized yet.
+Per-object descriptor binding must not be advertised as an atomic multi-file
+snapshot. The proposal must explicitly account for late pathname revalidation,
+operation counts, platform gates and failure behavior; no unspecified traversal
+allowance, global cache, general capability broker or source-scope expansion.
