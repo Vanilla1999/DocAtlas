@@ -180,6 +180,9 @@ Runtime prose classification, historical artifacts и gates не меняютс�
 Independent D R APPROVE integration: 316 PASS / 1 obsolete workflow wording
 failure, уже исправленный на main. Strict optional string `resolved_version`,
 nullable enum honoring и отсутствие request-derived version synthesis проверены.
+D integrated `7a5b87d3`; combined wire/packing/lifecycle/scope rerun 351 PASS,
+scope/D1/syntax/whitespace PASS. C получил approved dependency handoff; duplicate
+finding по-прежнему требует отдельного closure/review, не закрывается D.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
