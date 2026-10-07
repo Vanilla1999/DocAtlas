@@ -52,7 +52,8 @@ def test_advertised_scope_explains_all_without_adding_a_default():
     assert "Never widen scope from question wording" in tool["description"]
     assert "Preserve explicit project/library/version/scope/path" in tool["description"]
     assert "default" not in scope
-    assert scope["enum"] == ["project", "module", "all"]
+    assert scope["type"] == ["string", "null"]
+    assert scope["enum"] == ["project", "module", "all", None]
 
 
 @pytest.mark.parametrize("template", ["skill.md", "claude_code_skill.md", "claude_desktop_skill.md",

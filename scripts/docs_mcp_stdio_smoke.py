@@ -831,7 +831,7 @@ async def smoke(*, read_only: bool = False) -> None:
                             await session.initialize()
                             await repeat_preparation(session, project, database, *prepared, text_only=text_only)
                             blockers.extend(await prepared_delivery_matrix(session, project, database, libraries,
-                                            text_only=text_only, include_large=not text_only))
+                                             text_only=text_only, include_large=True))
                 except Exception as exc:
                     blockers.append(f"{'text' if text_only else 'structured'} restarted matrix failed: {type(exc).__name__}: {exc}")
         assert not (root / "user-home" / ".docmancer").exists()

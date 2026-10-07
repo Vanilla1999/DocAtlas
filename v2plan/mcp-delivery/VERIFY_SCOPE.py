@@ -36,6 +36,7 @@ ALLOWED = {
     "tests/test_mcp_trusted_storage_lifecycle.py",
     "tests/diagnostic_labels.mcp_trusted_storage_lifecycle.json",
     "tests/docs/test_host_scope_planning_contract.py",  # Active wording migration.
+    "tests/docs/test_host_scope_contract.py",  # Reviewed explicit-preparation fixtures.
     # Independently reviewed actual-version wire preservation / nullable schema.
     "docmancer/docs/application/_action_packet_shared.py",
     "docmancer/docs/application/_action_packet_part03.py",
@@ -43,6 +44,9 @@ ALLOWED = {
     "docmancer/mcp/_docs_server_shared.py",
     "tests/test_action_packet_v4_wire_version.py",
     "tests/diagnostic_labels.action_packet_v4_wire_version.json",
+    # Independently reviewed library lineage preservation / duplicate rejection.
+    "docmancer/docs/application/_library_docs_service_part03.py",
+    "docmancer/docs/application/_unified_context_service_part02.py",
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",

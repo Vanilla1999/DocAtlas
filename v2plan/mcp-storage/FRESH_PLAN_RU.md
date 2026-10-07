@@ -198,6 +198,13 @@ run нашёл 25 untouched obsolete NL/proof failures; full CI green не за�
 Coordinator подготовил isolated wheel runtime с existing Python 3.12 deps без
 `.pth` и без `docmancer` из seed: `/tmp/opencode/mcp-integrated-wheel-if9p586h`.
 Пакет ещё не установлен, smoke не запущен; нужен approved integrated C SHA.
+
+C independently APPROVED и интегрирован как `4f047c0b` / `98c1544e`;
+active scope migration independently APPROVED и включена как `3636ebd9`.
+Coordinator включил identical large probe в text transport (ранее NOT RUN)
+и сохранил strict nullable scope enum assertion после D. Combined matrix:
+542 PASS; scope/D1/syntax/whitespace/line-budget PASS. Installed smoke следующий
+gate; ни source >32 KiB, ни эти tests не заменяют artifact acceptance.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
