@@ -246,3 +246,35 @@ roles fail closed without scope, never grant by missing data. Add new regression
 tests to existing NEW suites and preserve historical tests. R re-reviews all
 integrated corrections plus the pending eval migration; worker claims alone
 do not close findings.
+
+### Coordinator additional reproduction R7
+
+Patch requirement dedupe used value.casefold(), erasing one of explicit
+required_fact values `Cache enabled.` / `cache enabled.` while claiming
+complete. These distinct literal obligations are not interchangeable.
+B owns patch-only lossless literal/provenance dedupe correction; coordinator
+adds a cross-layer regression. Default docs policy stays unchanged. R must
+independently verify this closure along with its six original findings.
+
+### Coordinator additional reproduction R8
+
+Distinct indexed windows with the same path/text/line coordinates but
+different stable IDs and character offsets shared the legacy ev identity.
+Both windows were admitted, but the ev-keyed public snapshot overwrote one.
+A owns binding ev identity to normalized stable identity and exact character
+window, and strict duplicate ev-ID rejection; no legacy ABI guarantee. C
+consumes the same exported identity helper, never drops distinct windows or
+loosens snapshot checks. Coordinator adds a public projection regression.
+
+### Coordinator dependency amendment 10 — indirect eval source ownership
+
+C additionally owns the ten reported indirect active consumers:
+`eval/answer_quality_gate.py`, `eval/task_level/_execution_part01.py`,
+`eval/task_level/_execution_part02.py`, `eval/task_level/_execution_part04.py`,
+`eval/task_level/_one_call_agent_loop_core.py`,
+`eval/task_level/_github_models_part02.py`,
+`eval/task_level/evaluators/actionability.py`,
+`eval/task_level/evaluators/docatlas_utilization.py`,
+`eval/task_level/evaluators/policy.py`, and `eval/task_level/task33_pilot.py`.
+No changes to frozen historical threshold values/tests/gold or evaluator runs.
+New smoke coverage stays in the already owned NEW eval suite/shard.

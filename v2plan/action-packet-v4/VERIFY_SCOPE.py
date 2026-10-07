@@ -27,10 +27,14 @@ SOURCE_FILES = {
     "docmancer/mcp/_docs_server_tool_data.py",
     "eval/evidence_selection_quality.py",
     "eval/answer_quality_runner.py",
+    "eval/answer_quality_gate.py",
     *{f"eval/task_level/{part}.py" for part in (
         "_github_models_shared", "_github_models_part01", "task33_validation",
         "task33_codex_exploratory", "runners/codex", "_execution_part03",
         "_isolated_delivery_shared", "_isolated_delivery_part02",
+        "_execution_part01", "_execution_part02", "_execution_part04",
+        "_one_call_agent_loop_core", "_github_models_part02", "task33_pilot",
+        "evaluators/actionability", "evaluators/docatlas_utilization", "evaluators/policy",
     )},
 }
 NEW_TESTS = {

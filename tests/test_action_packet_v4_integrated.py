@@ -103,3 +103,33 @@ def test_removed_budget_arguments_are_not_silently_ignored():
         validate_action_packet(packet, max_tokens=2000)
     with pytest.raises(TypeError):
         project_patch_context(packet=packet, evidence_items=[], max_tokens=2000)
+
+
+def test_distinct_explicit_literal_requirements_are_not_casefolded_away():
+    texts = ["Cache enabled.", "cache enabled."]
+    evidence = [_window(index, text) for index, text in enumerate(texts)]
+    packet = build_action_packet(
+        question="reference", context_pack=evidence, public_requirements=texts,
+    )
+    assert {row["value"] for row in packet["requirements"]} == set(texts)
+    assert packet["completeness"] == "complete"
+    assert len(packet["assignments"]) == len(texts)
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+
+
+def test_distinct_indexed_character_windows_have_unambiguous_snapshot_ids():
+    text = "Cache enabled."
+    first = _window(0, text)
+    second = {
+        **first, "stable_chunk_id": "different-window-child",
+        "char_start": 100, "char_end": 100 + len(text),
+    }
+    evidence = [first, second]
+    packet = build_action_packet(
+        question="reference", context_pack=evidence, public_requirements=[text],
+    )
+    assert len(packet["sources"]) == 2
+    assert len({row["evidence_id"] for row in packet["sources"]}) == 2
+    projected, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    assert projected["sources"] == packet["sources"]
+    assert validate_model_visible_projection(projected, snapshot=snapshot) == []
