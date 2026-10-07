@@ -209,7 +209,7 @@ def _update_opencode_config(config: dict[str, Any]) -> bool:
     desired = _desired_server_entry("json_opencode_mcp")
     owned = [(mapping, name, entry) for mapping in (mcp, servers)
              for name, entry in mapping.items()
-             if name != "servers" and _has_same_command(entry, desired)]
+             if not (mapping is mcp and name == "servers") and _has_same_command(entry, desired)]
     if len(owned) > 1:
         raise ValueError("Ambiguous DocAtlas MCP registrations; refusing to overwrite them")
     for mapping in (mcp, servers):

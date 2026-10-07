@@ -87,3 +87,25 @@ def test_python_jsonc_refuses_without_writes(tmp_path):
     with pytest.raises(ValueError, match="not valid JSON"):
         register_server(AgentTarget("opencode", path, "json_opencode_mcp"))
     assert path.read_text() == '// keep\n{}'
+
+
+@pytest.mark.parametrize("writer", [shell_writer, "python"])
+@pytest.mark.parametrize("state", [{"disabled": True}, {"disabled": False}, {"enabled": False}, {"enabled": True}])
+def test_owned_nested_server_named_servers_preserves_identity_and_state(tmp_path, writer, state):
+    path = tmp_path / "opencode.json"
+    entry = {"type": "local", "command": COMMAND, **state}
+    path.write_text(json.dumps({"mcp": {"servers": {"servers": entry}}}))
+    if writer == "python":
+        register_server(AgentTarget("opencode", path, "json_opencode_mcp"))
+    else:
+        assert shell_writer(path).returncode == 0
+    servers = json.loads(path.read_text())["mcp"]["servers"]
+    assert set(servers) == {"servers"}
+    assert "enabled" not in servers["servers"]
+    assert servers["servers"]["disabled"] is state.get("disabled", not state.get("enabled", True))
+    original = path.read_bytes()
+    if writer == "python":
+        assert register_server(AgentTarget("opencode", path, "json_opencode_mcp"))[0] is False
+    else:
+        assert shell_writer(path).returncode == 0
+    assert path.read_bytes() == original

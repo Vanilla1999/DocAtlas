@@ -294,7 +294,7 @@ desired = {
     "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
 }
 owned = [(mapping, key, value) for mapping in (mcp, servers)
-         for key, value in mapping.items() if key != "servers"
+         for key, value in mapping.items() if not (mapping is mcp and key == "servers")
          and isinstance(value, dict) and value.get("command") == desired["command"]]
 if len(owned) > 1:
     print("ambiguous DocAtlas registrations; refusing to overwrite", file=sys.stderr)

@@ -142,6 +142,7 @@ async def read_only_delivery(session, project: Path, *, text_only: bool) -> None
 
 async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[str]:
     decode = text_payload if text_only else payload
+    blockers = []
     store, mutation = initialize_fixture_members(project)
     before = fixture_database_state(store.db_path)
     before_files = fixture_database_fingerprint(store.db_path)
@@ -151,15 +152,19 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
         denied = decode(rejected)
         assert denied.get("status") != "success", denied
     assert fixture_database_state(store.db_path) == before, "missing grant modified fixture DB"
-    assert fixture_database_fingerprint(store.db_path) == before_files, "missing grant changed database bytes"
+    after_files = fixture_database_fingerprint(store.db_path)
+    if after_files != before_files:
+        blockers.append(f"missing-grant rejection changed database bytes: before={before_files}, after={after_files}")
 
     first = await session.call_tool("prepare_docs", {
         "action": "sync_project_docs", "project_path": str(project), "mutation": mutation})
     if first.isError:
-        raise RuntimeError(f"BLOCKED: public MCP rejected explicit member grant: {first.content}")
+        blockers.append(f"public MCP rejected explicit member grant: {first.content}; indexed evidence bytes NOT OBSERVED")
+        return blockers
     synced = decode(first)
     if synced.get("status") != "success":
-        raise RuntimeError(f"BLOCKED: explicit member grant unavailable on public MCP: {synced}")
+        blockers.append(f"explicit member grant unavailable on public MCP: {synced}; indexed evidence bytes NOT OBSERVED")
+        return blockers
     metrics = synced["metrics"]
     assert metrics["transaction"] == "committed" and metrics["generation_id"].startswith("gen-"), synced
     assert metrics["derived_writes"] > 0, synced
@@ -194,7 +199,6 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
         "large": {**canonical_query, "question": "Inspect " + " ".join(f"`validate_protocol_{i}`" for i in range(12)),
                   "tokens": 20000},
     }
-    blockers = []
     for name, query in queries.items():
         response = decode(await session.call_tool("get_docs_context", {**query, "context_format": "patch_context"}))
         validate_patch_payload(response)
