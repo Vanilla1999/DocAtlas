@@ -12,13 +12,10 @@ def test_public_agent_contract_exposes_bounded_scope_planning():
     scope = workflow["scope_planning"]
 
     assert scope["explicit_scope_is_authoritative"] is True
-    assert scope["repo_level_policy_scope"] == "project"
-    assert scope["known_module_scope"] == "module"
-    assert scope["cross_module_scope"] == "all"
     assert scope["module_path_implies_scope"] == "module"
     assert scope["all_requires_no_module_filter"] is True
-    assert scope["mixed_module_and_project_prefer_two_calls"] is True
     assert scope["never_widen_project_to_all"] is True
+    assert scope["all_is_repository_local"] is True
 
 
 def test_public_tool_and_agent_template_explain_scope_without_hidden_widening():
@@ -26,9 +23,10 @@ def test_public_tool_and_agent_template_explain_scope_without_hidden_widening():
     description = tools["get_docs_context"]["description"]
     schema_scope = tools["get_docs_context"]["inputSchema"]["properties"]["scope"]
 
-    assert 'scope="project"' in description
-    assert 'scope="module"' in description
-    assert 'scope="all"' in description
+    assert "module_path always implies module scope" in description
+    assert "all is repository-local without module filters" in description
+    assert "Never widen scope from question wording" in description
+    assert set(schema_scope["enum"]) - {None} == {"project", "module", "all"}
     assert "repo-level docs only" in schema_scope["description"]
     assert "repo-level plus modules" in schema_scope["description"]
 

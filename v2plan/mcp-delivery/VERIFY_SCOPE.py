@@ -35,6 +35,7 @@ ALLOWED = {
     "docmancer/core/config_resolution.py",
     "tests/test_mcp_trusted_storage_lifecycle.py",
     "tests/diagnostic_labels.mcp_trusted_storage_lifecycle.json",
+    "tests/docs/test_host_scope_planning_contract.py",  # Active wording migration.
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",

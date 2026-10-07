@@ -153,6 +153,14 @@ Resolved version переносится только из existing producer bind
 Missing/contradictory bindings остаются unresolved/rejected; validators не
 ослабляются. Nullable schema honoring не разрешает null в не-nullable fields.
 C/D имеют непересекающиеся owners; integration после independent review.
+
+D `e6d462ed` готов, independent review pending. Coordinator мигрировал ровно
+`tests/docs/test_host_scope_planning_contract.py` с superseded prose-routing
+policy keys на explicit scope/no-widening contract; вместе с workflow schema
+42 tests PASS. Дополнительно выполненный active `test_host_scope_contract.py`
+имеет 13 existing migration failures: obsolete onboarding guidance и legacy
+ingest без mutation grant/catalog. Это отдельный active-CI backlog; assertions
+не отключены, runtime implicit-ingest/prose policies ради зелёного не возвращаем.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
