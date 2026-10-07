@@ -36,9 +36,9 @@ def examples():
     text = "Delivery records preserve their immutable evidence identity."
     item = window(0, text)
     large_texts = [
-        f"Component {i} uses the dedicated delivery partition partition-{i}; "
-        f"its immutable audit identity is component-{i}-delivery. "
-        f"Acknowledgement sequence {i + 1} records the independent delivery state."
+        f"Component {i} uses the dedicated delivery partition partition-{i} "
+        f"with immutable audit identity component-{i}-delivery and acknowledgement "
+        f"sequence {i + 1} for its independent delivery state."
         for i in range(18)
     ]
     return [
@@ -64,7 +64,7 @@ def measure():
                 assert question == "reference"
                 assert kwargs["allow_network"] is False
                 return {
-                    "status": "ok", "context_pack": deepcopy(evidence),
+                    "status": "success", "context_pack": deepcopy(evidence),
                     "public_requirements": requirements,
                 }
 
@@ -98,6 +98,9 @@ def measure():
         })
     assert rows[-1]["estimated_tokens"] > 2000
     assert rows[-1]["retained_sources"] == 18
+    assert [row["completeness"] for row in rows] == [
+        "unavailable", "partial", "complete", "complete",
+    ]
     print(json.dumps(rows, ensure_ascii=False, indent=2))
 
 

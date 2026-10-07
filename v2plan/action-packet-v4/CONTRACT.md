@@ -194,3 +194,29 @@ C additionally owns `docmancer/mcp/_docs_server_tool_data.py` and
 schemas. Output uses a discriminated v4 patch alternative, not legacy status
 scaffold. Tests activate the actual dispatch with the explicit input, including
 operational failures and final terminal structuredContent/text fallback.
+
+### Coordinator dependency amendment 6 — patch coordinate fidelity
+
+B inspects/fixes patch-only assignment end lines: a multi-line witness/hash
+must not advertise start-only line coverage. Patch supplied character-window
+length must equal the admitted display window length. Preserve docs-specific
+coordinate behavior and parent authenticity caveats; no permission inferred.
+
+### Coordinator dependency amendment 7 — user-approved eval migration
+
+User explicitly approved surgical active eval-code migration and NEW offline
+smoke tests. Historical tests/gold/thresholds/reports remain unchanged and
+historical evaluations are not run; their acceptance remains UNKNOWN.
+C additionally owns `eval/evidence_selection_quality.py`,
+`eval/answer_quality_runner.py`, `eval/task_level/_github_models_shared.py`,
+`eval/task_level/_github_models_part01.py`,
+`eval/task_level/task33_validation.py`,
+`eval/task_level/task33_codex_exploratory.py`,
+`eval/task_level/runners/codex.py`, `eval/task_level/_execution_part03.py`,
+`eval/task_level/_isolated_delivery_shared.py`,
+`eval/task_level/_isolated_delivery_part02.py`, plus new
+`tests/test_action_packet_v4_eval.py` and
+`tests/diagnostic_labels.action_packet_v4_eval.json`. Migrate producer API
+calls and v3 field reads, not old score expectations. Evaluation-only frozen
+budget assertions are not runtime caps and must not re-enter v4 producers.
+Unsupported historical normative/workflow requirements stay fail-closed.

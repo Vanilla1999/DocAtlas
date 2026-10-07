@@ -25,15 +25,22 @@ SOURCE_FILES = {
     "docmancer/mcp/_docs_server_part01.py",
     "docmancer/mcp/_docs_server_schema.py",
     "docmancer/mcp/_docs_server_tool_data.py",
+    "eval/evidence_selection_quality.py",
+    "eval/answer_quality_runner.py",
+    *{f"eval/task_level/{part}.py" for part in (
+        "_github_models_shared", "_github_models_part01", "task33_validation",
+        "task33_codex_exploratory", "runners/codex", "_execution_part03",
+        "_isolated_delivery_shared", "_isolated_delivery_part02",
+    )},
 }
 NEW_TESTS = {
     f"tests/test_action_packet_v4_{owner}.py" for owner in (
-        "contract", "selection", "public", "integrated",
+        "contract", "selection", "public", "integrated", "eval",
     )
 }
 NEW_SHARDS = {
     f"tests/diagnostic_labels.action_packet_v4_{owner}.json" for owner in (
-        "a", "b", "c", "integrated",
+        "a", "b", "c", "integrated", "eval",
     )
 }
 
