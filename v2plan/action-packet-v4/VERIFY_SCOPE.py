@@ -23,6 +23,8 @@ SOURCE_FILES = {
     "docmancer/docs/interfaces/mcp/context_tools.py",
     "docmancer/docs/interfaces/mcp/output_contract.py",
     "docmancer/mcp/_docs_server_part01.py",
+    "docmancer/mcp/_docs_server_schema.py",
+    "docmancer/mcp/_docs_server_tool_data.py",
 }
 NEW_TESTS = {
     f"tests/test_action_packet_v4_{owner}.py" for owner in (

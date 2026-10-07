@@ -180,3 +180,17 @@ silently clip witness units at 1500 characters / 64 units (nor disguise these
 as run-count limits). Add patch-specific unbounded extraction behavior while
 retaining default docs extraction. Long and late exact explicit witnesses
 must remain coverable; hash/span/identity validation remains mandatory.
+
+### Coordinator dependency amendment 5 — user-approved ingress
+
+Inspection showed public patch_context was unreachable: handler initialized
+kind to docs_answer and never switched to patch. User explicitly approved an
+optional `get_docs_context(context_format="patch_context")`; absent parameter
+keeps existing docs routing. It selects only non-authorizing presentation,
+never mutation permission, retrieval widening, or inferred operation.
+Unsupported supplied values must reject rather than silently default.
+C additionally owns `docmancer/mcp/_docs_server_tool_data.py` and
+`docmancer/mcp/_docs_server_schema.py` for actual public input and output
+schemas. Output uses a discriminated v4 patch alternative, not legacy status
+scaffold. Tests activate the actual dispatch with the explicit input, including
+operational failures and final terminal structuredContent/text fallback.
