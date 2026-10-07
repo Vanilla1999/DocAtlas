@@ -220,3 +220,28 @@ def test_duplicate_requirements_assignments_and_sources_rejected():
         changed[key].append(deepcopy(changed[key][0]))
         refresh_action_packet_estimate(changed)
         assert validate_action_packet(changed, evidence_items=evidence)
+
+
+@pytest.mark.parametrize("late_witness", [False, True])
+def test_builder_unbounded_witnesses_remain_valid(late_witness, tmp_path):
+    if late_witness:
+        fact = "final_epoch = enabled"
+        text = "\n".join([*(f"epoch_{index:03d} = state_{index:03d}" for index in range(90)), fact])
+    else:
+        entries = ",".join(
+            f'{{"route":"/settings/{index}","handler":"apply_{index}","revision":{index + 1}}}'
+            for index in range(90)
+        )
+        fact = text = f"const settings_contract = '[{entries}]';"
+        assert len(fact) > 1500
+    evidence = [_evidence(text=text)]
+    packet = build_action_packet(question="settings epoch", context_pack=evidence,
+                                 public_requirements=(fact,), project_path=str(tmp_path))
+    assert packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text
+    assignment = packet["assignments"][0]
+    assert assignment["unit_content_hash"] == hashlib.sha256(fact.encode()).hexdigest()
+    assert assignment["char_start"] == 100 + text.index(fact)
+    assert assignment["char_end"] == 100 + len(text)
+    assert validate_action_packet(packet, evidence_items=evidence, project_path=str(tmp_path)) == []
+    assert validate_action_packet(packet) == []
