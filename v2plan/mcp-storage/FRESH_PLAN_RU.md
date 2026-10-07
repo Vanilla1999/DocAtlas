@@ -473,6 +473,21 @@ the final dispatcher-binding refinement, so it is not final-commit acceptance;
 reviewer will perform one final unchanged diagnostic. No criteria relaxation or
 merge-readiness claim from infrastructure repair alone.
 
+Retrieval infra independently APPROVED and integrated as `723ddda5`: focused
+9 PASS. Final unchanged 80-case diagnostic exit 1, 0/48 sufficient, no operational
+or reported integrity errors. Frozen floors 28/48 and 18/48 unchanged and failed.
+Actual acquisition: all 80 retrieved candidates, 804 candidate occurrences,
+402 retained spans validated against project/path/source lines, 32 cases with an
+originally queried qualified span. All 14 manifest docs matched grants/hashes.
+Within primary 48 cases evaluator recognized complete witnesses in 42 indexed /
+38 retrieved cases, but all public payloads contained no sources and stopped
+before projector with `requires_confirmation=True`, reason `repo_write`.
+Not every lost witness is a semantic incompatibility; one finite read-only source
+audit is tracing whether docs-gap mutation consent incorrectly vetoes independently
+admissible read-only quotes. No bypass, gold injection, criteria rewrite or source
+binding fabrication authorized by this observation. Final evidence:
+`/tmp/opencode/review-b9cde-systemic-final-20261007-report.json` and `.log`.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;

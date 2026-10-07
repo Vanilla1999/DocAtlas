@@ -7,6 +7,9 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "eval/evidence_quality_v2/runtime.py",
+    "tests/test_evidence_quality_v2_fixture_runtime.py",
+    "tests/diagnostic_labels.evidence_quality_v2_fixture_runtime.json",
     "eval/agent_developer_v1/installed_mcp_benchmark.py",
     "tests/test_installed_mcp_bootstrap_contract.py",
     "tests/diagnostic_labels.installed_mcp_bootstrap_contract.json",
