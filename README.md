@@ -75,7 +75,7 @@ Install `uv`, the `doc-atlas` CLI, and register the docs MCP server into your ag
 curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh
 ```
 
-The installer sets up `uv` (if missing), runs `uv tool install --upgrade doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and finishes with a version/health check. It is idempotent, so re-running it is safe.
+The installer sets up `uv` (if missing), runs `uv tool install --upgrade --managed-python --python 3.13 --no-build doc-atlas`, then lets you pick which agent(s) to register the DocAtlas docs MCP server (`doc-atlas mcp docs-serve`) into — **Claude Code**, **OpenCode**, and/or **Codex** — and prints the installed version. Managed Python is downloaded when needed; a separate SQLite installation or compiler is not required. Set `DOCATLAS_INSTALL_PYTHON` to `3.11`, `3.12`, or `3.13` to choose another supported Python branch. If a compatible wheel is unavailable, installation fails instead of building from source. `uv` can reuse previously cached built wheels; `--no-build` is not an artifact-origin guarantee.
 
 > It installs the latest published PyPI package, not unreleased code from `main`. Check `doc-atlas --version` before relying on a workflow newly documented on `main`; use a deliberately checked-out source installation for development changes that have not been released.
 

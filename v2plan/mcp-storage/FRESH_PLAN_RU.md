@@ -78,10 +78,35 @@ Bypass ACK/signature/deepcopy в обычном режиме; два насто�
 Проверка реального service graph и actual lexical retrieval на временной БД,
 плюс прежние security/qualification/acquisition-trace tests.
 
+B repair завершён: `a2df42fded4d555ac3b70185b91a2064a1f7ae91`.
+По отчёту B 302 full focused tests PASS. Real temporary SQLite / lexical /
+production graph / public handler: 45 qualified windows, 32 475 source bytes
+(не >32 KiB). IDs/text/hashes/spans fidelity и acquisition/source-read traces
+совпадают с docs mode. Fresh independent R review запущен; до verdict весь
+packing series остаётся вне integration branch.
+
 ### C — lineage и installed acceptance
 
-Свежий read-only audit выделяет точный минимальный lineage fix и достижимость
->32 KiB при прежнем acquisition. Implementation allowlist ещё не выдан.
+Свежий audit выделил минимальный lineage fix: canonical индекс уже хранит
+original text/hash/IDs/spans/generation; presentation cleaning теряет их.
+C implementation approved в `/tmp/opencode/mcp-fresh-delivery`, base `f8be0e7c`:
+
+```text
+docmancer/docs/application/_library_docs_service_part03.py
+docmancer/docs/application/_unified_context_service_part02.py
+scripts/docs_mcp_stdio_smoke.py
+tests/test_docs_mcp_stdio_delivery.py
+tests/diagnostic_labels.mcp_delivery_c.json
+```
+
+Carrier transport не даёт permissions; missing/conflicting/transformed lineage
+reject, hashes/spans не выдумываются и не наследуются cleaned snippets.
+Original source text остаётся bound к existing canonical producer fields.
+Installer node hash в shared shard сохраняется. Exact version ожидается как
+`version_binding="exact_snapshot"` плюс numeric resolved-version binding.
+>32 KiB — один natural multi-document fixture attempt под прежним acquisition,
+с отдельным учётом acquired/qualified/returned unique spans. Нет padding,
+acquisition expansion или засчитывания wire bytes как source bytes.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
@@ -96,6 +121,10 @@ managed Python (default 3.13, overrides 3.11/3.12/3.13) и `--no-build`:
 agent-config tests PASS; это stubbed installer проверка, не clean network install.
 Шард C далее передаётся C: installer hash нужно сохранить, изменяя только
 delivery module inventory для его новых тестов.
+Independent installer R одобрил scoped change: 46 tests PASS, uv 0.9.25 syntax
+подтверждён. `--no-build` допускает reuse cached built wheels; не authentication
+origin guarantee. Clean install / universal platform wheels ещё не доказаны.
+Coordinator также владеет ровно installer paragraph в `README.md` для docs drift.
 R независимо проверяет итоговые изменения и реальные acceptance paths.
 Без nested agents и пересекающихся владельцев файлов. Общий runtime release
 проверяется на одном integration SHA; broad native/capture redesign остановлен.

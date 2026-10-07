@@ -7,6 +7,7 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "README.md",  # Coordinator: reviewed auto-install command documentation.
     # Coordinator records for the explicitly approved storage continuation.
     "v2plan/mcp-storage/AUTHORIZATION.md",
     "v2plan/mcp-storage/PROGRESS_RU.md",
