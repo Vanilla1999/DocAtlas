@@ -4,6 +4,50 @@ from __future__ import annotations
 from ._library_docs_service_shared import *  # noqa: F401,F403
 
 
+def _indexed_library_source(source: str, text: str, metadata: dict) -> dict | None:
+    """Copy consistent indexed coordinates, never create a provenance grant.
+
+    The caller owns source admission. A digest verifies these child bytes only;
+    the stored source hash/generation are attribution, not proof of a new read.
+    """
+    if not isinstance(source, str) or not source or not isinstance(text, str) or not text:
+        return None
+    if metadata.get("source_excerpt"):
+        return None
+    keys = ("stable_chunk_id", "parent_logical_id", "source_identity",
+            "source_content_hash", "generation_id", "library_id")
+    if any(not isinstance(metadata.get(key), str) or not metadata[key].strip() for key in keys):
+        return None
+    digest = metadata.get("content_hash")
+    if (not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None
+            or re.fullmatch(r"[0-9a-f]{64}", metadata["source_content_hash"]) is None
+            or hashlib.sha256(text.encode("utf-8")).hexdigest() != digest):
+        return None
+    spans = {}
+    for name in ("char_span", "byte_span", "line_span"):
+        span = metadata.get(name)
+        if (not isinstance(span, (list, tuple)) or len(span) != 2
+                or any(type(value) is not int for value in span)
+                or span[0] < (1 if name == "line_span" else 0) or span[1] < span[0]):
+            return None
+        spans[name] = list(span)
+    if (spans["char_span"][1] - spans["char_span"][0] != len(text)
+            or spans["byte_span"][1] - spans["byte_span"][0] != len(text.encode("utf-8"))
+            or spans["byte_span"][0] < spans["char_span"][0]
+            or spans["line_span"][1] - spans["line_span"][0] + 1 != len(text.splitlines())):
+        return None
+    version = metadata.get("resolved_version")
+    exact = metadata.get("docs_snapshot_exact")
+    # Promoted SQLite metadata uses the exact integers 0/1. Never interpret
+    # arbitrary truthy values as an exact-snapshot claim.
+    if (not isinstance(version, str)
+            or exact is not None and (type(exact) not in (bool, int) or exact not in (0, 1))):
+        return None
+    return {**{key: metadata[key] for key in keys}, **spans,
+            "source": source, "display_text": text, "display_content_hash": digest,
+            "resolved_version": version, "docs_snapshot_exact": None if exact is None else bool(exact)}
+
+
 class _LibraryDocsApplicationServicePart03:
     def get_docs(
         self,
@@ -567,6 +611,19 @@ class _LibraryDocsApplicationServicePart03:
                 diagnostics=reason_diagnostics,
                 next_actions=next_actions,
             )
+        # Capture only already-guarded indexed children, before presentation
+        # cleaning. Incoming reserved metadata is never a producer witness.
+        originals = {}
+        for chunk in chunks:
+            chunk.metadata = {key: value for key, value in (chunk.metadata or {}).items()
+                              if key != "_indexed_source"}
+            stable = chunk.metadata.get("stable_chunk_id")
+            key = (chunk.source, stable if isinstance(stable, str) else None)
+            witness = _indexed_library_source(chunk.source, chunk.text, chunk.metadata)
+            if key in originals and originals[key] != witness:
+                originals[key] = None  # Ambiguous identities cannot be rehabilitated.
+            elif key not in originals:
+                originals[key] = witness
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
         chunks, excerpt_diagnostics = _bounded_library_evidence_chunks(
             chunks,
@@ -731,6 +788,15 @@ class _LibraryDocsApplicationServicePart03:
             support_decision=support_decision,
             requirements=requirements,
         )
+        # Attach after selection/witness queries so carrying lineage cannot
+        # change acquisition. Excerpts have a different identity and no carrier.
+        for chunk in result_chunks:
+            witness = originals.get((chunk.source, chunk.metadata.get("stable_chunk_id")))
+            chunk.metadata.pop("_indexed_source", None)
+            if (witness is not None and not chunk.metadata.get("source_excerpt")
+                    and chunk.content == _clean_library_section(witness["display_text"])
+                    and _indexed_library_source(chunk.source, witness["display_text"], chunk.metadata) == witness):
+                chunk.metadata["_indexed_source"] = witness
         return DocsResult(
             library_id=info.library_id,
             library=latest.library,

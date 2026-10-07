@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from ._unified_context_service_shared import *  # noqa: F401,F403
+from ._library_docs_service_part03 import _indexed_library_source
+from ._library_docs_service_shared import _clean_library_section
 
 
 class _UnifiedDocsContextServicePart02:
@@ -319,9 +321,25 @@ class _UnifiedDocsContextServicePart02:
     def _library_context_pack(self, result: DocsResult) -> list[dict[str, Any]]:
         items = []
         result_chunks = result.results or []
-        for index, chunk in enumerate(result_chunks):
-            token_estimate = max(1, len(chunk.content or "") // 4)
+        for chunk in result_chunks:
             chunk_metadata = chunk.metadata or {}
+            witness = chunk_metadata.get("_indexed_source")
+            # This carrier is ordinary data, not authority. Recheck its binding
+            # to this actual child, source, version and unchanged stored fields.
+            if not isinstance(witness, dict):
+                continue
+            display = witness.get("display_text")
+            if (not isinstance(display, str)
+                    or _indexed_library_source(chunk.source, display, chunk_metadata) != witness
+                    or chunk.content != _clean_library_section(display)
+                    or witness["library_id"] != result.library_id
+                    or (witness["resolved_version"] or "latest") != (result.resolved_version or result.version or "latest")
+                    or (chunk_metadata.get("version") and chunk_metadata["version"] != (result.resolved_version or result.version))
+                    or (result.docs_snapshot_exact is not None and type(result.docs_snapshot_exact) is not bool)
+                    or witness["docs_snapshot_exact"] != result.docs_snapshot_exact
+                    or (chunk.url is not None and chunk.url != chunk.source)):
+                continue
+            token_estimate = max(1, (len(display.encode("utf-8")) + 3) // 4)
             item = {
                 "doc_scope": "library",
                 "origin_lane": "library",
@@ -330,6 +348,11 @@ class _UnifiedDocsContextServicePart02:
                 "url": chunk.url,
                 "title": chunk.title,
                 "content": chunk.content,
+                **{key: witness[key] for key in ("display_text", "display_content_hash",
+                    "stable_chunk_id", "parent_logical_id", "source_identity",
+                    "source_content_hash", "generation_id", "resolved_version", "docs_snapshot_exact")},
+                **{f"{kind}_{edge}": witness[f"{kind}_span"][index]
+                   for kind in ("char", "byte", "line") for index, edge in enumerate(("start", "end"))},
                 "canonical_id": result.library_id,
                 "library_id": result.library_id,
                 "library": result.library,
@@ -343,12 +366,6 @@ class _UnifiedDocsContextServicePart02:
                 "token_estimate": token_estimate,
                 "section": {"title": chunk.title, "freshness": "stale" if result.stale_before_refresh else "current"},
             }
-            if (
-                "stable_chunk_id" not in item
-                and len(result.selected_evidence_ids) == len(result_chunks)
-                and index < len(result.selected_evidence_ids)
-            ):
-                item["stable_chunk_id"] = result.selected_evidence_ids[index]
             snippet = context_pack_snippet(chunk)
             if snippet:
                 item["snippet"] = snippet
