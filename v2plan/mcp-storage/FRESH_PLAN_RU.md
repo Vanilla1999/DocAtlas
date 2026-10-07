@@ -385,6 +385,37 @@ exact wheel/source SHA, actual installer, full smoke, failure artifacts. Existin
 required/publish/Windows gates unchanged. Approved branch push is next; source
 review approval is not platform PASS. Inspect the remote run for exact pushed SHA.
 
+### Actual remote Linux/macOS result
+
+First run `37657719513` on `0f02c4bb` failed before installer: redundant
+`UV_PYTHON_PREFERENCE=only-managed` conflicted with `--managed-python`. Wheels
+built and fresh Python downloads succeeded; no MCP/platform failure inferred.
+One-line harness correction `1e9ce4a9` removes only redundant env preference;
+managed-only flags and interpreter provenance assertions remain intact.
+
+Run https://github.com/Vanilla1999/DocAtlas/actions/runs/37658168235 succeeded on
+exact SHA `1e9ce4a9725cbd9860b2c8b3f6ee364e3ac726d3`. Downloaded artifacts verified:
+
+- Ubuntu: actual x86_64, proof exit 0.
+- macOS 15: actual arm64, proof exit 0.
+- macOS 15 Intel: actual x86_64, proof exit 0.
+
+Each installed fresh managed Python and downloaded runtime dependencies through
+the actual no-build installer, outside-checkout installed imports verified. Full
+cold project prepare/retrieve/restart/CAS and both stdio transports PASS. Large
+delivery in each transport/platform: 39 372 unique UTF-8 source bytes. Preloaded
+library v1/v2 retrieval complete; not remote/library preparation acceptance.
+All three independently built wheels have identical SHA256:
+`091fd9aadfe0a52dea63dabfd395523923eba9522b3baf48115b27ffaed56896`.
+Local artifact copy: `/tmp/opencode/mcp-platform-proof-37658168235-artifacts`.
+
+Linux x86_64 / macOS arm64 + Intel installed-platform acceptance is now verified
+for this SHA/artifact. Host uv remains CI infrastructure; uv bootstrap on a
+machine without uv is not established by this proof. Full required CI remains
+separate/unconfirmed: existing historical/Windows gates unchanged. No PR creation,
+merge, tagging, publication or live replacement occurred. Do not rerun matrix
+for documentation-only evidence recording.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
