@@ -61,6 +61,15 @@ Generation CAS и member ownership в одной SQLite transaction. Retrieval/r
 Существующие source FD/budget/hash checks сохраняются. Initial journal route —
 rollback; никаких claims о защите от same-UID или hostile journal destruction.
 
+A completed `0ee73213`, independent storage R review pending. Default target:
+`$DOCATLAS_HOME/mcp-members/members.db`. Existing confirmed mutation with explicit
+null generation provisions only an absent target after source validation. A
+reports 168 focused PASS and actual source-stdio cold prepare/retrieve/restart in
+both transports; not installed-wheel acceptance. One workflow schema test still
+expects the superseded project-local target; coordinator will migrate that test
+after review. Private app-home namespace required; group-writable `/tmp/opencode`
+is not an accepted storage root. No live DB/config/install change.
+
 ### B — минимальный packing repair
 
 Worktree `/tmp/opencode/mcp-fresh-packing`, base `b8547099`.
