@@ -293,6 +293,108 @@ class _SQLiteStorePart01:
                 """
             )
 
+    def upsert_project_members(
+        self, documents: Iterable[Document], *, project_path: str,
+        expected_generation_id: str | None,
+    ) -> dict[str, Any]:
+        """SQLite-only member batch: no extraction, deletion or implicit migration.
+
+        Callers must validate the explicit consent, local storage and finite source
+        snapshot before entering. Generation/ownership checks run under the same
+        SQLite write transaction as publication, not under an advisory lock alone.
+        """
+        docs = [self._current_schema_document(doc) for doc in documents]
+        if not docs or len(docs) > 500 or len({doc.source for doc in docs}) != len(docs):
+            raise ValueError("member batch requires bounded unique documents")
+        for doc in docs:
+            metadata = doc.metadata or {}
+            relative = metadata.get("project_doc_path")
+            from docmancer.docs.project_docs_catalog import _literal_path
+            if (
+                not isinstance(relative, str) or not _literal_path(relative)
+                or doc.source != str(Path(project_path) / relative)
+                or metadata.get("project_path") != project_path
+                or metadata.get("project_docs") is not True
+                or metadata.get("source_class") != "project_file"
+                or metadata.get("project_doc_content_hash") != "sha256:" + hashlib.sha256(doc.content.encode("utf-8")).hexdigest()
+                or metadata.get("child_target_tokens") != 160
+                or metadata.get("child_hard_max_tokens") != 512
+            ):
+                raise PermissionError("member batch has invalid project ownership")
+        conn = sqlite3.connect(f"{self.db_path.absolute().as_uri()}?mode=rw", uri=True, timeout=0)
+        conn.row_factory = sqlite3.Row
+        try:
+            conn.execute("BEGIN IMMEDIATE")
+            active = self._active_generation_id(conn)
+            if active != expected_generation_id:
+                raise ValueError("active generation precondition failed")
+            if active:
+                info = conn.execute("SELECT * FROM index_generations WHERE generation_id = ?", (active,)).fetchone()
+                config = ChunkingConfig()
+                retrieval_hash = canonical_hash({
+                    "schema_version": "contextual-retrieval-v1",
+                    "chunk_config_hash": config.config_hash,
+                    "context_config_hash": ContextConfig().config_hash,
+                })
+                if (info is None or info["config_hash"] != config.config_hash
+                    or info["retrieval_config_hash"] != retrieval_hash
+                    or info["context_config_hash"] != ContextConfig().config_hash
+                    or str(info["vector_backend"] or "")):
+                    raise ValueError("member batch requires compatible lexical generation")
+                self._validate_generation(conn, active, config, ContextConfig())
+            elif conn.execute("SELECT 1 FROM sources LIMIT 1").fetchone():
+                raise ValueError("nonempty storage without active generation is unresolved")
+            changed = []
+            new_count = 0
+            for doc in docs:
+                row = conn.execute("SELECT content, metadata_json FROM sources WHERE source = ?", (doc.source,)).fetchone()
+                if row:
+                    existing = json.loads(row["metadata_json"])
+                    if any(existing.get(key) != (doc.metadata or {}).get(key) for key in (
+                        "project_path", "project_doc_path", "project_docs", "source_class",
+                    )):
+                        raise PermissionError("existing source belongs to a different owner")
+                else:
+                    new_count += 1
+                # A generation must not contain a conflicting immutable owner.
+                if active:
+                    prior = conn.execute("SELECT content, metadata_json FROM generation_sources WHERE generation_id = ? AND source = ?",
+                                         (active, doc.source)).fetchone()
+                    if prior:
+                        owner = json.loads(prior["metadata_json"])
+                        if any(owner.get(key) != (doc.metadata or {}).get(key) for key in (
+                            "project_path", "project_doc_path", "project_docs", "source_class",
+                        )):
+                            raise PermissionError("active source belongs to a different owner")
+                    if (row and prior and row["content"] == doc.content and existing == doc.metadata
+                        and prior["content"] == doc.content and owner == doc.metadata):
+                        continue
+                changed.append(doc)
+            sections = 0
+            replaced_sections = 0
+            for doc in changed:
+                replaced_sections += int(conn.execute("SELECT count(*) FROM sections WHERE source = ?", (doc.source,)).fetchone()[0])
+                sections += self._add_document(conn, doc)
+                # This lane deliberately publishes no filesystem extraction.
+                conn.execute("UPDATE sources SET markdown_path = '', json_path = '' WHERE source = ?", (doc.source,))
+            generation = active
+            if changed:
+                generation = self._build_candidate_generation(conn, changed, recreate=False)
+                self._activate_generation(conn, generation)
+            conn.commit()
+            return {"transaction": "committed", "generation_id": generation,
+                    "members": len(docs), "new_count": new_count,
+                    "changed_count": len(changed) - new_count,
+                    "unchanged_files": len(docs) - len(changed),
+                    "derived_writes": sections, "derived_deletes": replaced_sections,
+                    "sources_deleted": 0,
+                    "sections_indexed": sections}
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
     def add_documents(
         self,
         documents: Iterable[Document],

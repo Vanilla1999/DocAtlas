@@ -561,7 +561,19 @@ class _ProjectDocsServicePart01:
         with_vectors: bool = False,
         _candidate_paths: set[str] | None = None,
         _coordination_held: bool = False,
+        mutation: Any = None,
     ) -> ProjectDocsIngestResult:
+        if mutation is not None:
+            if skip_known is not True or with_vectors is not False or _candidate_paths is not None or _coordination_held is not False:
+                raise PermissionError("Member ingestion does not accept legacy mutation flags")
+            from .project_docs_member_transaction import execute_member_transaction
+            metadata, outcome = execute_member_transaction(project_path, mutation, operation="ingest_project_docs")
+            return ProjectDocsIngestResult(
+                status="success", project=metadata, candidate_count=outcome["members"],
+                sections_indexed=outcome["sections_indexed"],
+                vector_sync={"status": "not_requested", **outcome},
+                message="Explicit member-only lexical transaction committed; no extraction published.",
+            )
         # Catalog membership is selection, not a mutation grant. This API has
         # no validated member transaction/consent contract. Reject before path
         # probes, adapters, locks, index/agent/queue access or staging writes.

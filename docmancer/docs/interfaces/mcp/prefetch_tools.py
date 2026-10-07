@@ -27,6 +27,7 @@ _PREPARE_ACTION_FIELDS = {
     "sync_project_docs": {
         "action", "project_path", "with_vectors", "changed_paths", "deleted_paths", "renamed_paths",
         "plan_digest",
+        "mutation",
     },
     "prefetch_project_dependency_docs": {"action", "project_path", "include_flutter", "include_dart", "include_rust", "include_go", "include_packages", "force_refresh", "continue_on_error", "async"},
     "prefetch_library_docs": {"action", "library", "ecosystem", "version", "source_type", "docs_url", "docs_url_template", "force_refresh", "continue_on_error", "async", "question"},
@@ -215,6 +216,14 @@ def validate_prepare_docs_arguments(args: dict[str, Any]) -> dict[str, Any] | No
     if action == "clear_index" and args.get("scope") != "project-local":
         return _prepare_validation_error(action, "only scope='project-local' is supported in this release")
     if action == "sync_project_docs":
+        if "mutation" in args:
+            if set(args) != {"action", "project_path", "mutation"}:
+                return _prepare_validation_error(action, "member mutation accepts only action, project_path and mutation")
+            from docmancer.docs.application.project_docs_member_transaction import MemberTransaction
+            try:
+                MemberTransaction.parse(args["mutation"], operation=action)
+            except (ValueError, PermissionError) as exc:
+                return _prepare_validation_error(action, str(exc))
         plan_digest = args.get("plan_digest")
         if plan_digest is not None and (
             not isinstance(plan_digest, str)
@@ -426,7 +435,11 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             target = _bounded_inspection_target(args["target"])
             payload = asdict(service.inspect_docs_target(target, max_pages=int(args.get("max_pages") or 3)))
         elif action == "sync_project_docs":
-            if args.get("plan_digest"):
+            if "mutation" in args:
+                payload = _compact_project_sync(project_docs_app.sync_project_docs(
+                    args["project_path"], mutation=args["mutation"],
+                ))
+            elif args.get("plan_digest"):
                 git_state = git_worktree_state(args["project_path"])
                 inspection = project_docs_app.inspect_project_docs(args["project_path"])
                 preflight = (inspection.diagnostics or {}).get("preflight") or {}

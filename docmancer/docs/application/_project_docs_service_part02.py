@@ -325,7 +325,23 @@ class _ProjectDocsServicePart02:
         deleted_paths: list[str] | tuple[str, ...] | None = None,
         renamed_paths: list[dict[str, str]] | tuple[dict[str, str], ...] | None = None,
         _coordination_held: bool = False,
+        mutation: Any = None,
     ) -> ProjectDocsSyncResult:
+        if mutation is not None:
+            if with_vectors is not False or _coordination_held is not False or any(
+                value is not None for value in (changed_paths, deleted_paths, renamed_paths)
+            ):
+                raise PermissionError("Member synchronization does not accept legacy mutation flags")
+            from .project_docs_member_transaction import execute_member_transaction
+            metadata, outcome = execute_member_transaction(project_path, mutation, operation="sync_project_docs")
+            return ProjectDocsSyncResult(
+                status="success", project=metadata, candidate_count=outcome["members"],
+                current_count=outcome["members"], new_count=outcome["new_count"],
+                changed_count=outcome["changed_count"], sections_indexed=outcome["sections_indexed"],
+                diagnostics={"mode": "member_upsert", "metrics": outcome,
+                             "vector_sync": {"status": "not_requested"}},
+                message="Explicit member-only lexical transaction committed; unrelated sources preserved.",
+            )
         # _coordination_held, changed/deleted paths and clean Git state are not
         # consent. Do not dispatch an adapter or open a DB before a real grant.
         raise PermissionError(
