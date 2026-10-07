@@ -238,6 +238,26 @@ Independent artifact R repeat/log review is running. Remaining gates: full activ
 CI migration (known untouched NL/proof expectations), clean auto-install and
 platform coverage, then separately authorized push/release/live replacement.
 Package remains 1.3.2: no release version or deployed parity claim.
+
+## Independent installed approval
+
+R APPROVE scoped installed acceptance: independent full smoke exit 0,
+Python 3.12.3, no source `PYTHONPATH`, outside checkout. Both transports cold
+project lifecycle/restart/CAS/scope/version/default-null/partial-complete PASS;
+large each 39 372 unique bytes / 50 windows / complete. All 390 wheel Python
+modules match runtime `b9f52004` and installed files; D1/module/diff gates PASS.
+Wheel SHA256 unchanged. Evidence:
+
+```text
+/tmp/opencode/mcp-integrated-wheel-if9p586h/independent-installed-smoke.log
+/tmp/opencode/mcp-integrated-wheel-if9p586h/independent-installed-evidence.json
+```
+
+Functional project lifecycle/delivery is accepted for this profile/artifact.
+Seeded dependencies are not clean auto-install proof; preloaded library retrieval
+is not remote/library preparation acceptance. Full active CI and Windows/macOS
+coverage remain unproved; 25 reported obsolete NL/proof failures pending explicit
+active-test migration. Release/deployed parity remains unclaimed.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
