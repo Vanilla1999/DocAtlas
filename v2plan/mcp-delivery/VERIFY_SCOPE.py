@@ -30,6 +30,11 @@ ALLOWED = {
     "tests/test_action_packet_v4_found_window_retention.py",
     "tests/diagnostic_labels.action_packet_v4_found_window_retention.json",
     "tests/test_action_packet_v4_public.py",
+    # Reviewed trusted-local storage profile and cold initialization lifecycle.
+    "docmancer/core/member_storage_policy.py",
+    "docmancer/core/config_resolution.py",
+    "tests/test_mcp_trusted_storage_lifecycle.py",
+    "tests/diagnostic_labels.mcp_trusted_storage_lifecycle.json",
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",

@@ -127,7 +127,10 @@ def test_prepare_storage_schema_leaves_platform_and_exact_existing_store_to_runt
     jsonschema.validate({'action': 'sync_project_docs', 'project_path': r'C:\repo', 'mutation': value}, schema)
     storage = schema['properties']['mutation']['properties']['storage_path']
     assert 'pattern' not in storage
-    assert 'exact existing project_path/.docatlas/docatlas.db' in schema['properties']['mutation']['description']
+    assert 'exact host-selected private app-data store outside the project' in schema['properties']['mutation']['description']
+    assert 'Explicit expected_generation_id=null' in schema['properties']['mutation']['description']
+    assert 'unexpected existing DB is never adopted' in schema['properties']['mutation']['description']
     assert 'currently POSIX' in schema['properties']['mutation']['description']
     assert 'unsupported platforms fail closed' in schema['properties']['mutation']['description']
-    assert 'existing project_path/.docatlas/docatlas.db' in tools['prepare_docs']['description']
+    assert 'exact host-selected private SQLite store outside the project' in tools['prepare_docs']['description']
+    assert 'Project configuration and caller paths cannot redirect storage' in storage['description']

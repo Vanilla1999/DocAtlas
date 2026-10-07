@@ -25,6 +25,13 @@ from docmancer.mcp._docs_server_part01 import call_docs_tool_payload, create_loc
 
 @pytest.fixture
 def cold(tmp_path, monkeypatch):
+    # Source-runtime subprocesses must use this checkout after the fixture changes
+    # cwd, not another editable install in the interpreter environment. Installed
+    # wheel acceptance deliberately runs separately without this source path.
+    source_root = str(Path(__file__).resolve().parents[1])
+    inherited_pythonpath = os.environ.get("PYTHONPATH")
+    monkeypatch.setenv("PYTHONPATH", source_root + (
+        os.pathsep + inherited_pythonpath if inherited_pythonpath else ""))
     home = tmp_path / "app-home"
     monkeypatch.setenv("DOCATLAS_HOME", str(home))
     monkeypatch.delenv("DOCATLAS_INDEX_DB_PATH", raising=False)

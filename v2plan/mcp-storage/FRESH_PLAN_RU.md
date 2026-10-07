@@ -70,6 +70,13 @@ expects the superseded project-local target; coordinator will migrate that test
 after review. Private app-home namespace required; group-writable `/tmp/opencode`
 is not an accepted storage root. No live DB/config/install change.
 
+Independent storage R APPROVE integration (trusted-local profile): 168 + 7
+focused checks PASS. Storage включён как `1c505516`. Coordinator обновил один
+устаревший schema-description test и source-runtime fixture `PYTHONPATH`, чтобы
+дочерние процессы после chdir не импортировали другой editable checkout.
+Combined source storage/packing/installer rerun: 478 PASS. Source fixture path
+не применяется к installed-wheel acceptance; это разные evidence lanes.
+
 ### B — минимальный packing repair
 
 Worktree `/tmp/opencode/mcp-fresh-packing`, base `b8547099`.
@@ -122,6 +129,30 @@ Installer node hash в shared shard сохраняется. Exact version ожи
 >32 KiB — один natural multi-document fixture attempt под прежним acquisition,
 с отдельным учётом acquired/qualified/returned unique spans. Нет padding,
 acquisition expansion или засчитывания wire bytes как source bytes.
+
+C source-level real public-route fixture: 39 372 unique UTF-8 bytes, 50 windows,
+complete, unchanged acquisition; не installed lifecycle acceptance. C green
+commit held на двух обнаруженных wire contracts: numeric `resolved_version`
+теряется в packet reconstruction; nullable context format удаляется sanitizer.
+Delivery 34 PASS / 3 FAIL, v4 regression 114 PASS, installer 24 PASS по отчёту C.
+
+Отдельный D contract repair worktree `/tmp/opencode/mcp-wire-contract-repair`,
+base `1c505516`, exact allowlist:
+
+```text
+docmancer/docs/application/_action_packet_shared.py
+docmancer/docs/application/_action_packet_part03.py
+docmancer/docs/application/_action_packet_part04.py
+docmancer/docs/interfaces/host_context.py
+docmancer/mcp/_docs_server_shared.py
+tests/test_action_packet_v4_wire_version.py
+tests/diagnostic_labels.action_packet_v4_wire_version.json
+```
+
+Resolved version переносится только из existing producer binding, не request.
+Missing/contradictory bindings остаются unresolved/rejected; validators не
+ослабляются. Nullable schema honoring не разрешает null в не-nullable fields.
+C/D имеют непересекающиеся owners; integration после independent review.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
