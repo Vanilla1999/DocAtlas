@@ -6,7 +6,7 @@ import json
 import jsonschema
 import pytest
 
-from docmancer.docs.interfaces.mcp.prefetch_tools import _bounded_targets
+from docmancer.docs.interfaces.mcp.prefetch_tools import _bounded_targets, _compact_project_sync
 from docmancer.docs.models import DocsJobCancelResult, DocsJobStartResult, DocsTargetInspectionResult
 from docmancer.mcp.docs_server import (
     DocsMcpSurface,
@@ -134,8 +134,11 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
     def walk(value):
         if isinstance(value, dict):
             enum = value.get("enum")
-            if enum is not None:
-                assert None not in enum
+            if enum is not None and None in enum:
+                declared_type = value.get("type")
+                assert declared_type == "null" or (
+                    isinstance(declared_type, list) and "null" in declared_type
+                ), "null enum values require an explicitly nullable type"
             for child in value.values():
                 walk(child)
         elif isinstance(value, list):
@@ -144,6 +147,35 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
 
     for tool in TOOLS:
         walk(tool["inputSchema"])
+
+    with pytest.raises(AssertionError, match="explicitly nullable type"):
+        walk({"type": "string", "enum": ["patch_context", None]})
+
+    class Service:
+        calls = []
+
+        def get_docs_context(self, question, **kwargs):
+            self.calls.append((question, kwargs))
+            return {"status": "success", "context_pack": []}
+
+    service = Service()
+    schema = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")["inputSchema"]
+    omitted = {"question": "Patch code before editing"}
+    nullable = {**omitted, "context_format": None}
+    jsonschema.validate(nullable, schema)
+    default = call_docs_tool_payload("get_docs_context", omitted, service)
+    explicit_null = call_docs_tool_payload("get_docs_context", nullable, service)
+    assert explicit_null == default
+    assert default["kind"] == "docs_answer"
+    assert len(service.calls) == 2
+    assert all("retain_found_windows" not in kwargs for _, kwargs in service.calls)
+    for invalid in (
+        {**omitted, "context_format": "docs_answer"},
+        {**nullable, "unexpected": True},
+    ):
+        rejected = call_docs_tool_payload("get_docs_context", invalid, service)
+        assert rejected["error"]["reason_code"] == "validation_error"
+    assert len(service.calls) == 2
 
 
 def test_mcp_hides_low_level_target_prefetch_from_public_surface():
@@ -502,25 +534,19 @@ def test_prepare_docs_rejects_invalid_types_before_service_call():
 def test_prepare_docs_compacts_large_project_sync_inventory():
     from docmancer.docs.models import ProjectDocsSyncResult, ProjectMetadata
 
-    class Service:
-        def sync_project_docs(self, project_path, **_kwargs):
-            return ProjectDocsSyncResult(
-                status="success",
-                project=ProjectMetadata(project_path=project_path),
-                indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
-                current_count=500,
-                diagnostics={"vector_sync": {
-                    "status": "success", "requested": True, "verified": 500,
-                    "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
-                    "retrieval_mode": "dense",
-                }},
-            )
-
-    result = call_docs_tool_payload(
-        "prepare_docs",
-        {"action": "sync_project_docs", "project_path": "/repo"},
-        Service(),
+    inventory = ProjectDocsSyncResult(
+        status="success",
+        project=ProjectMetadata(project_path="/repo"),
+        indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
+        current_count=500,
+        diagnostics={"vector_sync": {
+            "status": "success", "requested": True, "verified": 500,
+            "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
+            "retrieval_mode": "dense",
+        }},
     )
+
+    result = _compact_project_sync(inventory)
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32_000
     assert result["summary"]["current_count"] == 500
@@ -530,6 +556,26 @@ def test_prepare_docs_compacts_large_project_sync_inventory():
         "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
         "retrieval_mode": "dense",
     }
+
+
+def test_prepare_docs_rejects_project_sync_without_member_grant():
+    class Service:
+        called = False
+
+        def sync_project_docs(self, *_args, **_kwargs):
+            self.called = True
+            raise AssertionError("authorization should have stopped this call")
+
+    service = Service()
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "sync_project_docs", "project_path": "/repo"},
+        service,
+    )
+
+    assert result["error"]["reason_code"] == "permission_denied"
+    assert service.called is False
+    assert "summary" not in result
 
 
 def test_prepare_docs_rejects_malformed_incremental_sync_paths():

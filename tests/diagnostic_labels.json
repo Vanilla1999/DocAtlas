@@ -295,7 +295,7 @@
     "tests/docs/test_library_job_executor.py": "86b231e4f34972cd7f17d151e2044acdc4ed71cce3bbd340b1888a10b604d77d",
     "tests/docs/test_library_source_discovery.py": "2e3616be1ce2af7a27398fbc4dec25ff4273da4b8ca3af8ba8982c69f61e4def",
     "tests/docs/test_mcp_boundary.py": "e214a62ff3de893b7a4df64d45d76fb0684e7c915e208b12609ae82bb4623a7b",
-    "tests/docs/test_mcp_docs_tools_registration.py": "cfb6f0abeab69db3674322a356c24c37c85590c1955d932860d920772fc70ac1",
+    "tests/docs/test_mcp_docs_tools_registration.py": "126c1abf598b97742534288958ef58a76bcaf0371968fcd4c017e97dd730f4e6",
     "tests/docs/test_mcp_error_contract.py": "effe49e85ff89cb268b103f9df9a695b78bc555c9217e2aa3c89c48446ecdeee",
     "tests/docs/test_mcp_output_contract.py": "cd092f43adf56a4aa1418bdbbf23d6b13ac724d532e75df9cd952206014fea64",
     "tests/docs/test_mcp_token_footprint.py": "34b40986931303bc312678f8e64bb6b3f31129baa6b402508b5181f7e4518833",
