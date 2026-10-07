@@ -35,7 +35,10 @@ class _ProjectContextServicePart01:
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
         retain_found_windows: bool = False,
+        _retention_ack: Any = None,
     ) -> ProjectContextResult:
+        if retain_found_windows and _retention_ack is not None:
+            _retention_ack("project_context")
         response_style = validate_response_style(response_style)
         # This is a read boundary. Only a caller-supplied contract can request
         # mutation guidance; unknown prose never constructs mutation authority.
@@ -92,7 +95,10 @@ class _ProjectContextServicePart01:
             if evidence_path:
                 project_docs_kwargs["evidence_path"] = evidence_path
             if retain_found_windows:
-                project_docs_kwargs.update(retain_found_windows=True, _retained_results=retained_results)
+                project_docs_kwargs.update(retain_found_windows=True, _retained_results=retained_results,
+                                           _retention_ack=_retention_ack)
+                if _retention_ack is not None:
+                    _retention_ack("requires:project_docs")
             project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
             if project_docs and project_docs.results:
                 members = {candidate.path: candidate for candidate in metadata.docs_candidates}

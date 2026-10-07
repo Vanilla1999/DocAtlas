@@ -151,6 +151,7 @@ class _ProjectDocsServicePart03:
         internal_diagnostics: dict[str, Any] | None = None,
         retain_found_windows: bool = False,
         _control_chunks: list[Any] | None = None,
+        _retention_ack: Any = None,
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
@@ -427,6 +428,8 @@ class _ProjectDocsServicePart03:
                 **(preferred.metadata or {}), "retrieval_query_matches": merged,
                 "retrieval_query_ids": tuple(key for key, trace in merged.items() if trace.get("qualified") is True),
             }})
+        if _retention_ack is not None:
+            _retention_ack("query_project_docs")
         return list(retained.values())
 
     def get_project_docs(
@@ -446,8 +449,11 @@ class _ProjectDocsServicePart03:
         documentation_query_plan: DocumentationQueryPlan | None = None,
         retain_found_windows: bool = False,
         _retained_results: list[Any] | None = None,
+        _retention_ack: Any = None,
     ) -> ProjectDocsResult:
         root = validate_project_path(project_path).path
+        if retain_found_windows and _retention_ack is not None:
+            _retention_ack("project_docs")
         if hasattr(self.facade, "_project_get_project_docs_impl"):
             kwargs = {
                 "tokens": tokens, "limit": limit, "expand": expand, "module": module,
@@ -462,7 +468,9 @@ class _ProjectDocsServicePart03:
             if evidence_path:
                 kwargs["evidence_path"] = evidence_path
             if retain_found_windows:
-                kwargs.update(retain_found_windows=True, _retained_results=_retained_results)
+                kwargs.update(retain_found_windows=True, _retained_results=_retained_results, _retention_ack=_retention_ack)
+                if _retention_ack is not None:
+                    _retention_ack("requires:project_docs_delegate")
             return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
@@ -666,8 +674,10 @@ class _ProjectDocsServicePart03:
 
         internal_retrieval_diagnostics: dict[str, Any] = {}
         control_chunks: list[Any] = []
-        retention_kwargs = ({"retain_found_windows": True, "_control_chunks": control_chunks}
+        retention_kwargs = ({"retain_found_windows": True, "_control_chunks": control_chunks, "_retention_ack": _retention_ack}
                             if retain_found_windows else {})
+        if retain_found_windows and _retention_ack is not None:
+            _retention_ack("requires:query_project_docs")
         chunks = self.query_project_docs(
             str(root), query, tokens=tokens, limit=limit, expand=expand,
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,

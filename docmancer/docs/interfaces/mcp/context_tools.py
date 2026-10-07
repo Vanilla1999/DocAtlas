@@ -305,6 +305,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return _handle_maintenance_context(args, maintenance, service)
     app = getattr(service, "unified_context", service)
     retention_kwargs = {}
+    retention_stages: set[str] = set()
     if kind == "patch_context":
         parameters = inspect.signature(app.get_docs_context).parameters
         if "retain_found_windows" not in parameters and not any(
@@ -312,6 +313,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         ):
             return _bad_request("unsupported_found_window_retention", "The context facade does not support explicit patch retention")
         retention_kwargs["retain_found_windows"] = True
+        retention_kwargs["_retention_ack"] = retention_stages.add
     result = app.get_docs_context(
         question,
         project_path=args.get("project_path"),
@@ -340,6 +342,12 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         lookup_queries=lookup_queries,
         **retention_kwargs,
     )
+    if kind == "patch_context":
+        # A call-local acknowledgement is behavior, not permission or result metadata.
+        required_stages = {"unified", *(stage.removeprefix("requires:") for stage in retention_stages
+                                      if stage.startswith("requires:"))}
+        if not required_stages.issubset(retention_stages):
+            return _bad_request("unsupported_found_window_retention", "Context delegation did not acknowledge explicit patch retention")
     canonical_selection = (
         result.get("selection_decision")
         if isinstance(result, dict)

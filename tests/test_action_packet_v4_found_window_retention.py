@@ -83,13 +83,16 @@ def pipeline(tmp_path, monkeypatch):
         return SimpleNamespace(reason_code='project_docs_ready', recommended_next_actions=[])
     facade.get_project_docs = service.get_project_docs
     facade.inspect_project_docs = inspect
+    from docmancer.docs.project import ProjectMetadataReader
+    metadata_reader = ProjectMetadataReader.read
     monkeypatch.setattr('docmancer.docs.project.ProjectMetadataReader.read', lambda *a, **k: deepcopy(metadata))
     context = ProjectContextService(facade)
     facade.get_project_context = context.get_project_context
     facade.read_project_metadata = lambda *a: deepcopy(metadata)
     unified = UnifiedDocsContextService(facade)
     return SimpleNamespace(root=root, chunks=chunks, service=service, context=context,
-        unified=unified, acquisitions=acquisitions, controls=controls)
+        unified=unified, acquisitions=acquisitions, controls=controls, agent=agent,
+        metadata_reader=metadata_reader)
 
 
 def test_final_merge_retains_qualified_windows_without_changing_acquisition(pipeline):
@@ -318,3 +321,233 @@ def test_unsupported_project_facade_never_retries_bounded(pipeline):
         p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only',
             retain_found_windows=True)
     assert calls == []
+
+
+def test_generic_kwargs_is_not_retention_support(pipeline):
+    p = pipeline
+    class DroppingFacade:
+        def get_docs_context(self, question, **kwargs):
+            kwargs.pop('retain_found_windows')
+            kwargs.pop('_retention_ack')
+            return p.unified.get_docs_context(question, **kwargs)
+    packet = handle_context_tool('get_docs_context', {'project_path': str(p.root),
+        'question': 'validate_binding', 'mode': 'project', 'context_format': 'patch_context'}, DroppingFacade())
+    assert packet['error']['reason_code'] == 'unsupported_found_window_retention'
+
+
+@pytest.mark.parametrize('layer', ['get_project_context', 'get_project_docs', 'query_project_docs', 'project_docs_delegate'])
+def test_nested_dropping_delegation_rejects_before_delivery(pipeline, layer):
+    p = pipeline
+    if layer == 'project_docs_delegate':
+        bounded = p.service.get_project_docs(str(p.root), 'validate_binding')
+        p.service.facade._project_get_project_docs_impl = lambda *args, **kwargs: bounded
+    else:
+        owner = p.unified.service if layer == 'get_project_context' else p.context.facade if layer == 'get_project_docs' else p.service
+        original = getattr(owner, layer)
+        def dropping(*args, **kwargs):
+            kwargs.pop('retain_found_windows', None)
+            return original(*args, **kwargs)
+        setattr(owner, layer, dropping)
+    packet = handle_context_tool('get_docs_context', {'project_path': str(p.root),
+        'question': 'validate_binding', 'mode': 'project', 'context_format': 'patch_context'}, p.unified)
+    assert packet['error']['reason_code'] == 'unsupported_found_window_retention'
+
+
+@pytest.fixture
+def stored_generation(pipeline, monkeypatch):
+    """Real disposable SQLite generation; only candidate acquisition is stubbed."""
+    from docmancer.core.models import Document
+    from docmancer.core.sqlite_store import SQLiteStore
+    from docmancer.docs.application.source_reference_evidence import SourceReferenceContext
+    from docmancer.docs.project import ProjectMetadataReader
+    p = pipeline
+    source = str(p.root / 'rules.md')
+    content = (p.root / 'rules.md').read_text()
+    # Unlike the packing-only fixture, use live production metadata/hash reads.
+    monkeypatch.setattr(ProjectMetadataReader, 'read', p.metadata_reader)
+    read_metadata = lambda root: ProjectMetadataReader().read(root)
+    monkeypatch.setattr(p.service, 'read_project_metadata', read_metadata)
+    p.unified.service.read_project_metadata = read_metadata
+    project_metadata = read_metadata(p.root)
+    assert len(project_metadata.docs_candidates) == 1
+    metadata = {key: value for key, value in p.chunks[0].metadata.items()
+                if key not in {'stable_chunk_id', 'parent_logical_id', 'char_span', 'line_span',
+                               'display_content_hash', 'token_estimate'}}
+    metadata['project_doc_catalog_entry_hash'] = project_metadata.docs_candidates[0].catalog_entry_hash
+    identity = ProjectDocsService._repository_identity(p.root)
+    metadata['project_identity'] = identity
+    monkeypatch.setattr(p.service, '_repository_identity', lambda root: identity)
+    store = SQLiteStore(p.root / 'fixture-index.db', extracted_dir=p.root / 'fixture-extracted')
+    indexed = store.add_documents([Document(source=source, content=content, metadata=metadata)])
+    generation = indexed.generation_id
+    assert generation == store.active_generation_id()
+    with store._connect() as conn:
+        ids = [row[0] for row in conn.execute(
+            'SELECT hydration_id FROM retrieval_children WHERE generation_id=? ORDER BY chunk_index', (generation,))]
+    assert ids
+    p.chunks[:] = store.fetch_sections_by_id(ids, budget=1_000_000)
+    p.agent.store = store
+    statements, content_reads, loads, fallback_rows, file_reads, fallbacks = [], [], [], [], [], []
+    from pathlib import Path
+    path_open = Path.open
+    class SourceFile:
+        def __init__(self, handle):
+            self.handle = handle
+        def read(self, size=-1):
+            value = self.handle.read(size)
+            file_reads.append((source, size, len(value)))
+            return value
+        def __enter__(self):
+            self.handle.__enter__()
+            return self
+        def __exit__(self, *args):
+            return self.handle.__exit__(*args)
+        def __getattr__(self, name):
+            return getattr(self.handle, name)
+    def open_path(path, *args, **kwargs):
+        handle = path_open(path, *args, **kwargs)
+        return SourceFile(handle) if str(path) == source else handle
+    monkeypatch.setattr(Path, 'open', open_path)
+    connect = store._connect
+
+    class Cursor:
+        def __init__(self, cursor, sql, params):
+            self.cursor, self.sql, self.params = cursor, sql, params
+        def fetchone(self):
+            row = self.cursor.fetchone()
+            if row is not None and self.sql.startswith('SELECT content FROM generation_sources'):
+                content_reads.append((tuple(self.params), len(row['content'].encode())))
+            return row
+        def __iter__(self):
+            return iter(self.cursor)
+        def __getattr__(self, name):
+            return getattr(self.cursor, name)
+
+    class Connection:
+        def __init__(self):
+            self.connection = connect()
+        def execute(self, sql, params=()):
+            normalized = ' '.join(sql.split())
+            statements.append((normalized, tuple(params)))
+            return Cursor(self.connection.execute(sql, params), normalized, params)
+        def __enter__(self):
+            self.connection.__enter__()
+            return self
+        def __exit__(self, *args):
+            try:
+                return self.connection.__exit__(*args)
+            finally:
+                self.connection.close()
+
+    monkeypatch.setattr(store, '_connect', Connection)
+    document = SourceReferenceContext._document
+    def load(context, source):
+        if source not in context.documents:
+            loads.append((context.scope.snapshot_id, source))
+        return document(context, source)
+    monkeypatch.setattr(SourceReferenceContext, '_document', load)
+    sections = store.list_sections_for_source
+    def list_sections(*args, **kwargs):
+        rows = sections(*args, **kwargs)
+        fallback_rows.append(len(rows))
+        return rows
+    monkeypatch.setattr(store, 'list_sections_for_source', list_sections)
+    import docmancer.docs.application._project_docs_service_part03 as implementation
+    exact = implementation._exact_document_index_chunks
+    def exact_fallback(*args, **kwargs):
+        rows = exact(*args, **kwargs)
+        fallbacks.append(tuple(row.metadata['stable_chunk_id'] for row in rows))
+        return rows
+    monkeypatch.setattr(implementation, '_exact_document_index_chunks', exact_fallback)
+    return SimpleNamespace(p=p, store=store, generation=generation, source=source,
+        statements=statements, content_reads=content_reads, loads=loads, fallback_rows=fallback_rows,
+        file_reads=file_reads, fallbacks=fallbacks)
+
+
+def test_real_generation_preparation_and_nonempty_fallback_traces_match(stored_generation):
+    f, p = stored_generation, stored_generation.p
+    bounded_sink = []
+    bounded = p.service.get_project_docs(str(p.root), 'validate_binding', evidence_path='rules.md',
+        lookup_queries=('validate_binding record',))
+    assert bounded.results
+    assert f.fallback_rows and all(f.fallback_rows)
+    assert len(f.fallbacks) == 1 and f.fallbacks[0]
+    baseline = (deepcopy(f.statements), list(f.content_reads), list(f.loads),
+                deepcopy(p.acquisitions), list(f.fallback_rows), list(f.file_reads), list(f.fallbacks))
+    f.statements.clear()
+    f.content_reads.clear()
+    f.loads.clear()
+    p.acquisitions.clear()
+    f.fallback_rows.clear()
+    f.file_reads.clear()
+    f.fallbacks.clear()
+    retained = p.service.get_project_docs(str(p.root), 'validate_binding', evidence_path='rules.md',
+        lookup_queries=('validate_binding record',), retain_found_windows=True, _retained_results=bounded_sink)
+    assert retained == bounded
+    assert (f.statements, f.content_reads, f.loads, p.acquisitions, f.fallback_rows, f.file_reads, f.fallbacks) == baseline
+    assert len(f.loads) == len(f.content_reads) == 2
+    assert f.content_reads and all(params == (f.generation, f.source) for params, _ in f.content_reads)
+    assert all(size == (p.root / 'rules.md').stat().st_size for _, size in f.content_reads)
+    assert f.file_reads and {path for path, _, _ in f.file_reads} == {f.source}
+    assert sum(size for _, _, size in f.file_reads) == (p.root / 'rules.md').stat().st_size
+    assert bounded_sink
+    for chunk in bounded_sink:
+        evidence = chunk.metadata['_reference_evidence']
+        assert chunk.metadata['generation_id'] == f.generation
+        assert evidence['source']['scope']['snapshot_id'] == f.generation
+        assert evidence['source']['scope']['project_id'] == p.service._repository_identity(p.root)
+        assert evidence['text'] == chunk.content
+        assert evidence['raw_document'][chunk.char_start:chunk.char_end] == chunk.content
+
+
+def test_real_generation_duplicate_lookup_bindings_survive(stored_generation):
+    f, p = stored_generation, stored_generation.p
+    control = []
+    rows = p.service.query_project_docs(str(p.root), 'validate_binding',
+        lookup_queries=('validate_binding record',), retain_found_windows=True, _control_chunks=control)
+    assert len({(row.source, row.chunk_index) for row in rows}) == len(rows)
+    independent = [row for row in rows if row.metadata['retrieval_query_matches']['query-original']['qualified']]
+    assert independent
+    for row in independent:
+        matches = row.metadata['retrieval_query_matches']
+        assert any(key.startswith('query-lookup-') and trace['qualified'] for key, trace in matches.items())
+        assert set(row.metadata['retrieval_query_ids']) == {key for key, trace in matches.items() if trace['qualified']}
+        assert row.metadata['_reference_evidence']['source']['scope']['snapshot_id'] == f.generation
+
+
+def test_real_generation_context_retention_preserves_control_and_read_traces(stored_generation):
+    f, p = stored_generation, stored_generation.p
+    bounded = p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only')
+    baseline = (deepcopy(f.statements), list(f.content_reads), list(f.loads),
+                deepcopy(p.acquisitions), list(f.file_reads), list(p.controls))
+    f.statements.clear()
+    f.content_reads.clear()
+    f.loads.clear()
+    p.acquisitions.clear()
+    f.file_reads.clear()
+    p.controls.clear()
+    retained = p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only',
+        retain_found_windows=True)
+    assert (f.statements, f.content_reads, f.loads, p.acquisitions, f.file_reads, p.controls) == baseline
+    assert retained.selection_decision == bounded.selection_decision
+    assert retained.project_docs == bounded.project_docs
+    assert retained.diagnostics['retrieval_routing'] == bounded.diagnostics['retrieval_routing']
+    assert len(retained.context_pack) > len(bounded.context_pack)
+    assert all(row['_reference_evidence']['source']['scope']['snapshot_id'] == f.generation
+               for row in retained.context_pack)
+
+
+def test_real_generation_unresolved_admission_is_not_uncapped(stored_generation):
+    p = stored_generation.p
+    control = []
+    rows = p.service.query_project_docs(str(p.root), 'unmatched_identifier',
+        retain_found_windows=True, _control_chunks=control)
+    assert [row.model_dump() for row in rows] == [row.model_dump() for row in control]
+    assert all(not trace['qualified'] for row in rows
+               for trace in row.metadata['retrieval_query_matches'].values())
+    results = []
+    p.service.get_project_docs(str(p.root), 'unmatched_identifier',
+        retain_found_windows=True, _retained_results=results)
+    ranked = rerank_project_doc_chunks(results, question='unmatched_identifier',
+        intent=SimpleNamespace(broad=True), finite_member_paths=frozenset({'rules.md'}), retain_found_windows=True)
+    assert ranked == []
