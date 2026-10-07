@@ -161,6 +161,25 @@ policy keys на explicit scope/no-widening contract; вместе с workflow s
 имеет 13 existing migration failures: obsolete onboarding guidance и legacy
 ingest без mutation grant/catalog. Это отдельный active-CI backlog; assertions
 не отключены, runtime implicit-ingest/prose policies ради зелёного не возвращаем.
+
+Independent C R REQUEST CHANGES на `e5cb1fce`: повторные `(source, stable_chunk_id)`
+admitted на producer/consumer уровнях, включая identical duplicates и conflicting
+parents с matching carriers. Counterexamples independently reproduced на real
+SQLite fixtures; C получил finite fix: reject все rows repeated identity до
+admission, не выбирать произвольного winner. Остальные lineage/smoke boundaries
+по source audit корректны; R не воспроизвёл весь C matrix из-за доступных deps,
+не заявил closure D/installed acceptance. C integration HELD до duplicate fix.
+
+Bounded active-scope migration: `/tmp/opencode/mcp-active-scope-tests`, base
+`33390ee5`, только `tests/docs/test_host_scope_contract.py` и его active shard
+`tests/diagnostic_labels.scope_span.json` при необходимости. 13 failures
+мигрируются на explicit catalog/grant/prepare в isolated app-home, не SQL
+bootstrap/implicit ingestion. Все scope/foreign isolation assertions сохраняются.
+Runtime prose classification, historical artifacts и gates не меняются.
+
+Independent D R APPROVE integration: 316 PASS / 1 obsolete workflow wording
+failure, уже исправленный на main. Strict optional string `resolved_version`,
+nullable enum honoring и отсутствие request-derived version synthesis проверены.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
