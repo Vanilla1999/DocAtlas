@@ -143,6 +143,22 @@ def _deduplicate(
     for candidate in candidates:
         duplicate: tuple[OmissionReason, EvidenceCandidate] | None = None
         for representative in selected:
+            if config.result_kind == "patch_context":
+                # Ranking/cost are not evidence semantics. Everything else,
+                # including stable identity, attribution, spans and coverage,
+                # must be interchangeable before one row can be discarded.
+                def semantic_row(row: EvidenceCandidate) -> EvidenceCandidate:
+                    return replace(
+                        row, retrieval_rank=0, component_ranks=(), relevance_millis=0,
+                        token_estimate=0, fit_token_estimate=0, reported_token_estimate=None,
+                    )
+                if (
+                    semantic_row(candidate) == semantic_row(representative)
+                    and _candidate_source_view(candidate) == _candidate_source_view(representative)
+                ):
+                    duplicate = "exact_duplicate", representative
+                    break
+                continue
             distinct_versions = bool(
                 candidate.resolved_version
                 and representative.resolved_version
@@ -251,6 +267,27 @@ def _reserve_and_select(
     *,
     prefer_proof_completeness: bool = False,
 ) -> tuple[list[EvidenceCandidate], set[str], list[Omission]]:
+    if config.result_kind == "patch_context":
+        # Preserve every distinct admitted row. Relevance still orders evidence,
+        # but cost, shared coverage and source counts cannot erase witnesses.
+        selected_terms: set[str] = set()
+        selected: list[EvidenceCandidate] = []
+        pool = list(candidates)
+        omissions: list[Omission] = []
+        while pool:
+            best = min(pool, key=lambda candidate: (
+                -len(candidate.covered_requirement_ids & mandatory),
+                -_marginal_utility(candidate, selected_terms, mandatory),
+                *_candidate_preference(candidate, length_dependent=False),
+            ))
+            pool.remove(best)
+            if not best.covered_requirement_ids and _marginal_utility(best, selected_terms, set()) <= 0:
+                omissions.append(Omission(best.stable_id, "zero_marginal_utility"))
+                continue
+            selected.append(best)
+            selected_terms.update(_selection_terms([best]))
+        covered = set().union(*(item.covered_requirement_ids for item in selected)) if selected else set()
+        return selected, mandatory - covered, omissions
     fit_reserve = (
         DOCS_SERIALIZATION_RESERVE_TOKENS
         if config.result_kind == "docs_answer"

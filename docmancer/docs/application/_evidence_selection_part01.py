@@ -425,12 +425,12 @@ def project_docs_selection_config(max_tokens: int) -> SelectionConfig:
     return replace(docs_selection_config(max_tokens), profile="project_docs_answer")
 
 
-def patch_selection_config(max_tokens: int) -> SelectionConfig:
-    hard = min(2000, max(256, int(max_tokens)))
+def patch_selection_config() -> SelectionConfig:
     return SelectionConfig(
-        result_kind="patch_context", target_tokens=min(1200, hard), hard_tokens=hard,
-        max_sources=12, max_items_per_source=3, wrapper_reserve_tokens=min(300, hard // 3),
-        marginal_utility_threshold=160,
+        result_kind="patch_context", target_tokens=None, hard_tokens=None,
+        max_candidates=None, max_sources=None, max_items_per_source=None,
+        max_documents=None, max_spans=None, wrapper_reserve_tokens=None,
+        marginal_utility_threshold=None,
     )
 
 
@@ -549,12 +549,12 @@ def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
     return view
 
 
-def _candidate_preference(candidate: EvidenceCandidate) -> tuple[Any, ...]:
+def _candidate_preference(candidate: EvidenceCandidate, *, length_dependent: bool = True) -> tuple[Any, ...]:
     return (
         _version_rank(candidate.version_binding),
         0 if candidate.docs_snapshot_exact is True else 1,
         -len(candidate.covered_requirement_ids),
-        candidate.token_estimate,
+        *((candidate.token_estimate,) if length_dependent else ()),
         -candidate.relevance_millis,
         candidate.retrieval_rank,
         candidate.stable_id,
@@ -590,6 +590,8 @@ def _assignment_preference(
     requirement: EvidenceRequirement,
     candidate: EvidenceCandidate,
     witness: RequirementWitness | None,
+    *,
+    length_dependent: bool = True,
 ) -> tuple[Any, ...]:
     target_identity_rank = 0
     if requirement.proof_role == "target_identity":
@@ -606,7 +608,7 @@ def _assignment_preference(
         _lifecycle_assignment_rank(requirement, candidate),
         _version_rank(candidate.version_binding),
         -candidate.relevance_millis,
-        len(witness.unit_text) if witness else candidate.token_estimate * 4,
+        *((len(witness.unit_text) if witness else candidate.token_estimate * 4,) if length_dependent else ()),
         candidate.retrieval_rank,
         candidate.stable_id,
     )

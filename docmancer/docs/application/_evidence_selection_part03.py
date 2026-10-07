@@ -59,6 +59,7 @@ def select_evidence(
             project_identity=project_identity,
             module_id=module_id,
             profile=config.profile,
+            representation_bounded=config.result_kind != "patch_context",
         )
     )
     canonical_project_identity = _scope_requirement_value(requirements, "project_identity")
@@ -107,6 +108,16 @@ def select_evidence(
             candidate.symbols,
             candidate.exact_terms,
         )
+        if config.result_kind == "patch_context":
+            binding += (
+                candidate.evidence_id, candidate.hydration_id, candidate.identity_aliases,
+                candidate.path_or_url, candidate.section, candidate.authority,
+                candidate.source_class, candidate.version_binding, candidate.resolved_version,
+                candidate.docs_snapshot_exact, candidate.project_identity, candidate.module_id,
+                candidate.doc_scope, candidate.char_start, candidate.char_end,
+                candidate.line_start, candidate.line_end, candidate.freshness,
+                canonical_hash(_candidate_source_view(candidate)),
+            )
         previous = identity_bindings.setdefault(candidate.stable_id, binding)
         if previous != binding:
             identity_collisions.add(candidate.stable_id)
@@ -191,6 +202,7 @@ def select_evidence(
                 config.profile == "project_docs_answer"
                 and not any(item.proof_role == "document_statement" for item in requirements)
             ),
+            preserve_window=config.result_kind == "patch_context",
         )
         for candidate in eligible
     ]
@@ -216,10 +228,10 @@ def select_evidence(
                 -len(candidate.covered_requirement_ids & mandatory_ids),
                 -sum(witness.completeness_score for witness in mandatory_witnesses),
             )
-        return (*base, *_candidate_preference(candidate))
+        return (*base, *_candidate_preference(candidate, length_dependent=config.result_kind != "patch_context"))
 
     ordered = sorted(covered, key=ordering_key)
-    if len(ordered) > config.max_candidates:
+    if config.max_candidates is not None and len(ordered) > config.max_candidates:
         for candidate in ordered[config.max_candidates:]:
             omissions.append(Omission(candidate.stable_id, "candidate_cap"))
         ordered = ordered[:config.max_candidates]
@@ -249,7 +261,7 @@ def select_evidence(
     )
     selected = sorted(selected, key=lambda item: (
         0 if item.covered_requirement_ids & mandatory else 1,
-        *_candidate_preference(item),
+        *_candidate_preference(item, length_dependent=config.result_kind != "patch_context"),
     ))
     selected_tokens = sum(item.token_estimate for item in selected)
     selected_fit_tokens = sum(item.fit_token_estimate for item in selected)
@@ -263,11 +275,11 @@ def select_evidence(
         "max_spans": config.max_spans,
         "selected_tokens": selected_tokens,
         "wrapper_reserve_tokens": config.wrapper_reserve_tokens,
-        "projected_total_tokens": selected_tokens + config.wrapper_reserve_tokens,
+        "projected_total_tokens": selected_tokens + (config.wrapper_reserve_tokens or 0),
         "serialized_projected_tokens": (
             selected_fit_tokens + DOCS_SERIALIZATION_RESERVE_TOKENS
             if config.result_kind == "docs_answer"
-            else selected_tokens + config.wrapper_reserve_tokens
+            else selected_tokens
         ),
         "hard_tokens": config.hard_tokens,
         "mandatory_requirements": len(mandatory),
@@ -315,7 +327,9 @@ def select_evidence(
             matching.append((candidate, witness))
         if not matching:
             continue
-        matching.sort(key=lambda pair: _assignment_preference(requirement, pair[0], pair[1]))
+        matching.sort(key=lambda pair: _assignment_preference(
+            requirement, pair[0], pair[1], length_dependent=config.result_kind != "patch_context",
+        ))
         candidate, witness = matching[0]
         if witness is not None:
             if witness.unit_char_start is None or witness.unit_char_end is None:
@@ -476,7 +490,8 @@ def validate_evidence_sufficiency(
         errors.append("selected stable IDs must be unique")
     if len({(item.stable_id, item.content_sha256) for item in decision.selected_candidates}) != len(decision.selected_candidates):
         errors.append("selected stable identity bindings must be unique")
-    if decision.metrics.get("projected_total_tokens", 0) > decision.metrics.get("hard_tokens", 0):
+    hard_tokens = decision.metrics.get("hard_tokens")
+    if hard_tokens is not None and decision.metrics.get("projected_total_tokens", 0) > hard_tokens:
         errors.append("selected whole-item bundle exceeds the hard token budget")
     if result_kind == "docs_answer" and decision.status == "ok" and all(
         item.navigation_only for item in decision.selected_candidates
@@ -508,6 +523,7 @@ def _with_coverage(
     requirements: Sequence[EvidenceRequirement],
     *,
     factual_only: bool,
+    preserve_window: bool = False,
 ) -> EvidenceCandidate:
     # Content requirements always need a literal visible unit, in every profile.
     source = _normalized_source(candidate.path_or_url)
@@ -556,10 +572,10 @@ def _with_coverage(
         for unit in candidate.answer_units
         if unit.unit_id == witness.unit_id
     )
-    material = materialize_answer_units(candidate.display_text, witness_units)
+    material = "" if preserve_window else materialize_answer_units(candidate.display_text, witness_units)
     fit_tokens = candidate.fit_token_estimate
     visible_tokens = candidate.token_estimate
-    if material:
+    if material and not preserve_window:
         visible_tokens = _estimated_tokens(material)
         fit_tokens = _docs_answer_candidate_tokens(
             stable_id=candidate.stable_id,

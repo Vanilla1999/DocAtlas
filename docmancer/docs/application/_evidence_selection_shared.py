@@ -133,6 +133,8 @@ def _source_fact_requirements(
 def build_requirements(*args: Any, **kwargs: Any) -> EvidenceRequirementSet:
     """Bind typed governance and source-scoped obligations to selector policy."""
 
+    if kwargs.get("representation_bounded") is False:
+        kwargs["public_requirements"] = tuple(kwargs.get("public_requirements") or ())
     requirements = _build_requirements_impl(*args, **kwargs)
     source_facts = _source_fact_requirements(kwargs.get("public_requirements") or ())
     rebound = tuple(

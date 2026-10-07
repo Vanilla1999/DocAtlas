@@ -45,20 +45,20 @@ _EVIDENCE_QUALIFIERS = frozenset({
 @dataclass(frozen=True, slots=True)
 class SelectionConfig:
     result_kind: Literal["docs_answer", "patch_context"]
-    target_tokens: int
-    hard_tokens: int
+    target_tokens: int | None
+    hard_tokens: int | None
     profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic"
     schema_version: str = SELECTOR_SCHEMA_VERSION
-    max_candidates: int = MAX_SELECTOR_CANDIDATES
-    max_sources: int = 3
-    max_items_per_source: int = 2
-    max_documents: int = MAX_VISIBLE_DOCUMENTS
-    max_spans: int = MAX_VISIBLE_SPANS
+    max_candidates: int | None = MAX_SELECTOR_CANDIDATES
+    max_sources: int | None = 3
+    max_items_per_source: int | None = 2
+    max_documents: int | None = MAX_VISIBLE_DOCUMENTS
+    max_spans: int | None = MAX_VISIBLE_SPANS
     near_duplicate_threshold: int = 850
     overlap_threshold: int = 800
-    marginal_utility_threshold: int = 80
+    marginal_utility_threshold: int | None = 80
     shingle_size: int = 5
-    wrapper_reserve_tokens: int = 120
+    wrapper_reserve_tokens: int | None = 120
     cache_enabled: bool = False
 
     def __post_init__(self) -> None:
@@ -66,13 +66,23 @@ class SelectionConfig:
             raise ValueError("unsupported evidence result kind")
         if self.profile not in {"generic", "library_docs_answer", "project_document_answer", "project_docs_answer"}:
             raise ValueError("unsupported evidence selection profile")
-        if not 1 <= self.target_tokens <= self.hard_tokens:
+        limits = (
+            self.target_tokens, self.hard_tokens, self.max_candidates,
+            self.max_sources, self.max_items_per_source, self.max_documents,
+            self.max_spans, self.wrapper_reserve_tokens, self.marginal_utility_threshold,
+        )
+        if self.result_kind == "patch_context":
+            if any(value is not None for value in limits):
+                raise ValueError("patch selection representation limits must be None")
+        elif any(value is None for value in limits):
+            raise ValueError("docs selection requires bounded limits")
+        elif not 1 <= self.target_tokens <= self.hard_tokens:
             raise ValueError("selector token budgets are invalid")
-        if not 1 <= self.max_candidates <= MAX_SELECTOR_CANDIDATES:
+        if self.max_candidates is not None and not 1 <= self.max_candidates <= MAX_SELECTOR_CANDIDATES:
             raise ValueError("selector candidate limit is invalid")
-        if self.max_sources < 1 or self.max_items_per_source < 1:
+        if self.max_sources is not None and (self.max_sources < 1 or self.max_items_per_source < 1):
             raise ValueError("selector source limits are invalid")
-        if self.max_documents < 1 or self.max_spans < 1:
+        if self.max_documents is not None and (self.max_documents < 1 or self.max_spans < 1):
             raise ValueError("selector document/span limits are invalid")
         if not 0 <= self.near_duplicate_threshold <= 1000:
             raise ValueError("near duplicate threshold is invalid")

@@ -189,6 +189,7 @@ def build_requirements(
     module_id: str | None = None,
     profile: Literal["generic", "library_docs_answer", "project_document_answer", "project_docs_answer"] = "generic",
     library_requirement_contract: Mapping[str, Iterable[str]] | None = None,
+    representation_bounded: bool = True,
 ) -> EvidenceRequirementSet:
     # Materialize caller-provided iterables once.  Several stages inspect the
     # same public evidence contract (construction, safety gating and hashing);
@@ -230,7 +231,7 @@ def build_requirements(
         and token.casefold() not in existing_exact_values
         and token.casefold().replace("\\", "/") not in evidence_path_aliases
     }, key=str.casefold)
-    if len(identifier_values) > MAX_REQUIREMENT_IDENTIFIERS:
+    if representation_bounded and len(identifier_values) > MAX_REQUIREMENT_IDENTIFIERS:
         input_limits.add("identifiers")
         identifier_values = identifier_values[:MAX_REQUIREMENT_IDENTIFIERS]
     for index, value in enumerate(identifier_values):
@@ -250,7 +251,7 @@ def build_requirements(
             {str(path).strip() for path in paths if str(path).strip()},
             key=lambda value: (_normalized_source(value), value),
         )
-        if len(normalized_paths) > MAX_REQUIREMENT_PATHS:
+        if representation_bounded and len(normalized_paths) > MAX_REQUIREMENT_PATHS:
             input_limits.add("paths")
             normalized_paths = normalized_paths[:MAX_REQUIREMENT_PATHS]
         for index, value in enumerate(normalized_paths):
@@ -280,7 +281,7 @@ def build_requirements(
                 public_provenance="selector_scope_requirement",
             ))
     sorted_public_requirements = sorted(public_requirements, key=canonical_hash)
-    if len(sorted_public_requirements) > MAX_PUBLIC_REQUIREMENTS:
+    if representation_bounded and len(sorted_public_requirements) > MAX_PUBLIC_REQUIREMENTS:
         input_limits.add("public_requirements")
         sorted_public_requirements = sorted_public_requirements[:MAX_PUBLIC_REQUIREMENTS]
     for index, raw in enumerate(sorted_public_requirements):
