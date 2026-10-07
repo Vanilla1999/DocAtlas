@@ -355,6 +355,9 @@ def select_evidence(
             absolute_line = candidate.line_start
             projected_hash = hashlib.sha256(candidate.projected_text.encode("utf-8")).hexdigest()
             qualifier_text = candidate.projected_text
+        absolute_line_end = absolute_line
+        if config.result_kind == "patch_context" and absolute_line is not None:
+            absolute_line_end += qualifier_text.count("\n")
         assignment_rows.append(EvidenceAssignment(
             requirement_id=requirement.requirement_id,
             evidence_id=candidate.stable_id,
@@ -362,7 +365,7 @@ def select_evidence(
             char_start=absolute_start,
             char_end=absolute_end,
             line_start=absolute_line,
-            line_end=absolute_line,
+            line_end=absolute_line_end,
             projected_content_hash=projected_hash,
             proof_role=requirement.proof_role,
             qualifiers=requirement.qualifiers or _observed_qualifiers(qualifier_text),

@@ -94,7 +94,11 @@ def validate_assignment_binding(
             and assignment.char_start == candidate.char_start
             and assignment.char_end == candidate.char_end
             and assignment.line_start == candidate.line_start
-            and assignment.line_end == candidate.line_start
+            and assignment.line_end == (
+                candidate.line_start + candidate.display_text.count("\n")
+                if not candidate.answer_units_representation_bounded and candidate.line_start is not None
+                else candidate.line_start
+            )
             and assignment.projected_content_hash == hashlib.sha256(candidate.projected_text.encode("utf-8")).hexdigest()
             and all(value is None for value in (
                 assignment.unit_kind, assignment.unit_char_start,
@@ -114,7 +118,10 @@ def validate_assignment_binding(
         or assignment.projected_content_hash != unit.content_sha256
         or assignment.char_start != absolute_start
         or assignment.char_end != absolute_end
-        or assignment.line_start != line or assignment.line_end != line
+        or assignment.line_start != line
+        or assignment.line_end != (
+            line + unit.text.count("\n") if not candidate.answer_units_representation_bounded else line
+        )
     ):
         return False
     obligation = requirement.as_proof_obligation()
@@ -155,6 +162,11 @@ def _candidate_window_valid(candidate: EvidenceCandidate) -> bool:
         and resolved_version(candidate.original) == candidate.resolved_version
         and (candidate.original.get("docs_snapshot_exact") if isinstance(candidate.original.get("docs_snapshot_exact"), bool) else None) == candidate.docs_snapshot_exact
         and _span(candidate.original, "char") == (candidate.char_start, candidate.char_end)
+        and (
+            candidate.answer_units_representation_bounded
+            or candidate.char_start is None
+            or candidate.char_end - candidate.char_start == len(candidate.display_text)
+        )
         and _span(candidate.original, "line") == (candidate.line_start, candidate.line_end)
         and (not supplied or str(supplied).casefold() == digest)
         and not candidate.original.get("stale")

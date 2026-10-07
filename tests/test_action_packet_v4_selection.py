@@ -2,6 +2,7 @@
 from dataclasses import asdict, replace
 import hashlib
 import inspect
+import json
 from pathlib import Path
 
 import pytest
@@ -121,7 +122,7 @@ def test_shared_parent_identical_bytes_and_overlapping_windows_are_not_duplicate
     {"path": "other.py"}, {"title": "other section"},
     {"doc_scope": "other scope"}, {"module_id": "other module"},
     {"version_binding": "exact", "resolved_version": "2"},
-    {"authority": "canonical"}, {"char_start": 200, "char_end": 226},
+    {"authority": "canonical"}, {"char_start": 200, "char_end": 228},
 ])
 def test_same_stable_id_with_noninterchangeable_attribution_fails_closed(change):
     first = row(0)
@@ -333,3 +334,46 @@ def test_patch_group_width_and_soft_wrapped_sentence_counts_have_no_representati
     docs = extract_answer_units(paragraphs, include_soft_wrapped_prose=True)
     assert sum(unit.kind == "paragraph_sentence" for unit in units) == 22
     assert sum(unit.kind == "paragraph_sentence" for unit in docs) == 16
+
+
+@pytest.mark.parametrize("kind", ["required_fact", "code_group"])
+def test_patch_multiline_assignment_lines_bind_full_witness_and_window(kind):
+    block = "```config\nroute_alpha: dispatch_alpha\nroute_beta: dispatch_beta\n```"
+    text = "Deployment routes.\n" + block + "\nEnd of routes."
+    value = block if kind == "required_fact" else json.dumps(["route_alpha", "route_beta"])
+    requirements = EvidenceRequirementSet((
+        EvidenceRequirement("routes", kind, value),
+        EvidenceRequirement("source", "evidence_path", "src/config_0.py"),
+    ))
+    decision = select([row(0, text)], requirements=requirements)
+    assert decision.status == "ok"
+    assignments = {assignment.requirement_id: assignment for assignment in decision.assignments}
+    assert (assignments["routes"].line_start, assignments["routes"].line_end) == (4, 7)
+    assert (assignments["source"].line_start, assignments["source"].line_end) == (3, 8)
+    candidate = decision.selected_candidates[0]
+    assert assignments["routes"].unit_content_hash == hashlib.sha256(block.encode()).hexdigest()
+    for requirement in requirements:
+        assignment = assignments[requirement.requirement_id]
+        assert selector.validate_assignment_binding(requirement, candidate, assignment)
+        assert not selector.validate_assignment_binding(
+            requirement, candidate, replace(assignment, line_end=assignment.line_start),
+        )
+    assert not selector.validate_evidence_sufficiency(decision, result_kind="patch_context")
+    docs = selector.select_evidence(
+        [row(0, text)], question="", config=selector.docs_selection_config(800), requirements=requirements,
+    )
+    assert len(docs.assignments) == 2
+    assert all(assignment.line_end == assignment.line_start for assignment in docs.assignments)
+    assert not selector.validate_evidence_sufficiency(docs, result_kind="docs_answer")
+
+
+@pytest.mark.parametrize("delta", [-1, 1])
+def test_patch_supplied_character_span_must_match_whole_display_window(delta):
+    item = row(0)
+    item["char_end"] += delta
+    decision = select([item])
+    assert not decision.selected_candidates
+    assert {omission.reason_code for omission in decision.omissions} == {"invalid_identity"}
+    docs, omissions = selector.normalize_candidates([item], result_kind="docs_answer")
+    assert len(docs) == 1
+    assert not omissions

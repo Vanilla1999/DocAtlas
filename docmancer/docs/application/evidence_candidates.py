@@ -229,6 +229,7 @@ def normalize_candidates(
             or (_span_was_supplied(item, "line") and (line_start is None or line_end is None))
             or (char_start is None) != (char_end is None)
             or (char_start is not None and (char_start < 0 or char_end <= char_start))
+            or (result_kind == "patch_context" and char_start is not None and char_end - char_start != len(display))
             or (line_start is None) != (line_end is None)
             or (line_start is not None and (line_start < 0 or line_end < line_start))
         )
