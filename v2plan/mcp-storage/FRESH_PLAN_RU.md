@@ -258,6 +258,48 @@ Seeded dependencies are not clean auto-install proof; preloaded library retrieva
 is not remote/library preparation acceptance. Full active CI and Windows/macOS
 coverage remain unproved; 25 reported obsolete NL/proof failures pending explicit
 active-test migration. Release/deployed parity remains unclaimed.
+
+## Real installer check (separate evidence lane)
+
+Coordinator started actual installer in isolated fresh tool/bin/config/home dirs:
+`/tmp/opencode/mcp-auto-install-5eo4yg8f`, registration `none`, exact built wheel,
+no dependency copying, managed Python selected, new source builds disabled.
+Offline attempt exited 1: required `fastembed==0.8.0` missing from cache; no
+fallback/registration occurred. Network attempt exited 0: 83 declared package
+dependencies resolved/installed, no copying from the seed and no new source build.
+Existing managed Python/uv are reused: neither attempt proves clean-machine uv /
+Python bootstrap, and no existing live MCP/tool directories are replaced.
+
+First post-install import probe executed from checkout and resolved source: it
+is explicitly invalid as installed-import proof. Corrected isolated probe and
+full smoke run outside checkout, no `PYTHONPATH`, import from fresh tool env
+`site-packages/docmancer`; full smoke exit 0 with downloaded dependencies.
+Both transports large 39 372 unique bytes, library v1/v2 complete. Evidence:
+
+```text
+/tmp/opencode/mcp-auto-install-5eo4yg8f/installer-network.log
+/tmp/opencode/mcp-auto-install-5eo4yg8f/fresh-dependency-smoke.log
+/tmp/opencode/mcp-auto-install-5eo4yg8f/fresh-dependency-evidence.json
+```
+
+## Remaining active NL/proof unit batch
+
+Approved implementation in `/tmp/opencode/mcp-active-nl-contract-tests`, base
+`6e18862b`, exactly:
+
+```text
+tests/docs/test_query_planning_scope_regressions.py
+tests/diagnostic_labels.query_planning.json
+tests/docs/test_quantified_attribute_scope_isolation.py
+tests/diagnostic_labels.quantified_attribute_scope_isolation.json
+```
+
+25 existing failures reproduced on updated main, all in offline core CI; bounded
+batch only, not full-CI inventory. Tests migrate to explicit finite requirements,
+immutable question/conditions and exact source hash/span witnesses. Positive and
+negative controls preserved; no semantic-entailment certification, runtime NL
+classifier/weights, permission from completeness or historical changes. Query
+shard's other three modules remain untouched. Independent review before integration.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
