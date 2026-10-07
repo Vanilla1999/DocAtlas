@@ -194,7 +194,8 @@ def test_library_adapter_uses_child_identity_not_selected_id_position(library_se
     assert all(row["stable_chunk_id"] != "unrelated-selection-id" for row in rows)
 
 
-@pytest.mark.parametrize("attack", ["missing_parent", "wrong_hash", "wrong_span", "ambiguous", "wrong_version", "wrong_root"])
+@pytest.mark.parametrize("attack", ["missing_parent", "wrong_hash", "wrong_span", "ambiguous", "duplicate",
+                                   "duplicate_parent", "wrong_version", "wrong_root"])
 def test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guards(library_service, monkeypatch, attack):
     service, project, _fixtures = library_service
     original = service.agent_gateway.query_library
@@ -209,9 +210,12 @@ def test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guard
             chunk.metadata["content_hash"] = "f" * 64
         elif attack == "wrong_span":
             chunk.metadata["char_span"][1] += 7
-        elif attack == "ambiguous":
+        elif attack in {"ambiguous", "duplicate", "duplicate_parent"}:
             altered = chunk.model_copy(deep=True)
-            altered.text += " conflicting bytes"
+            if attack == "ambiguous":
+                altered.text += " conflicting bytes"
+            elif attack == "duplicate_parent":
+                altered.metadata["parent_logical_id"] += "-conflicting"
             result.chunks.append(altered)
         elif attack == "wrong_version":
             chunk.metadata["version"] = "2.0.0"
@@ -226,6 +230,25 @@ def test_real_library_producer_rejects_corrupt_lineage_and_existing_source_guard
     assert service.unified_context._library_context_pack(result) == []
     if attack in {"wrong_version", "wrong_root"}:
         assert result.results == []
+
+
+@pytest.mark.parametrize("duplicate", ["identical", "conflicting_parent", "invalid_parent"])
+def test_library_consumer_rejects_all_repeated_child_identities(library_service, duplicate):
+    service, _project, _fixtures = library_service
+    result = _library_result(service)
+    assert len(result.results) == 1
+    assert len(service.unified_context._library_context_pack(result)) == 1
+    competing = deepcopy(result.results[0])
+    if duplicate == "conflicting_parent":
+        competing.metadata["parent_logical_id"] += "-conflicting"
+        competing.metadata["_indexed_source"]["parent_logical_id"] = competing.metadata["parent_logical_id"]
+        # Each row passes its own consistency check. Only the cross-row
+        # repeated identity makes the pair inadmissible.
+        assert len(service.unified_context._library_context_pack(replace(result, results=[competing]))) == 1
+    elif duplicate == "invalid_parent":
+        competing.metadata.pop("parent_logical_id")
+    for chunks in ([result.results[0], competing], [competing, result.results[0]]):
+        assert service.unified_context._library_context_pack(replace(result, results=chunks)) == []
 
 
 @pytest.mark.parametrize("derived", [False, True])

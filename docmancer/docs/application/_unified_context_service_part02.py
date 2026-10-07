@@ -321,8 +321,21 @@ class _UnifiedDocsContextServicePart02:
     def _library_context_pack(self, result: DocsResult) -> list[dict[str, Any]]:
         items = []
         result_chunks = result.results or []
+        identity_counts = {}
         for chunk in result_chunks:
-            chunk_metadata = chunk.metadata or {}
+            metadata = chunk.metadata if isinstance(chunk.metadata, dict) else {}
+            stable = metadata.get("stable_chunk_id")
+            if isinstance(chunk.source, str) and isinstance(stable, str):
+                key = (chunk.source, stable)
+                identity_counts[key] = identity_counts.get(key, 0) + 1
+        for chunk in result_chunks:
+            chunk_metadata = chunk.metadata if isinstance(chunk.metadata, dict) else {}
+            stable = chunk_metadata.get("stable_chunk_id")
+            # Count before validating any carrier: an invalid competing row
+            # cannot rehabilitate the first occurrence of a repeated identity.
+            if (not isinstance(chunk.source, str) or not isinstance(stable, str)
+                    or identity_counts[(chunk.source, stable)] != 1):
+                continue
             witness = chunk_metadata.get("_indexed_source")
             # This carrier is ordinary data, not authority. Recheck its binding
             # to this actual child, source, version and unchanged stored fields.

@@ -620,9 +620,10 @@ class _LibraryDocsApplicationServicePart03:
             stable = chunk.metadata.get("stable_chunk_id")
             key = (chunk.source, stable if isinstance(stable, str) else None)
             witness = _indexed_library_source(chunk.source, chunk.text, chunk.metadata)
-            if key in originals and originals[key] != witness:
-                originals[key] = None  # Ambiguous identities cannot be rehabilitated.
-            elif key not in originals:
+            if key in originals:
+                # Even identical repeats are ambiguous; no occurrence wins.
+                originals[key] = None
+            else:
                 originals[key] = witness
         chunks, quality_diagnostics = _postprocess_library_chunks(chunks, query)
         chunks, excerpt_diagnostics = _bounded_library_evidence_chunks(
