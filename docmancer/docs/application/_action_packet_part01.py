@@ -7,7 +7,7 @@ from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 def estimate_action_packet_tokens(value: Any) -> int:
     """Estimate tokens deterministically as ceil(serialized UTF-8 bytes / 4)."""
 
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    encoded = serialize_action_packet(value).encode("utf-8")
     return max(1, math.ceil(len(encoded) / 4))
 
 
