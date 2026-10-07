@@ -7,6 +7,9 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    # Coordinator records for the explicitly approved storage continuation.
+    "v2plan/mcp-storage/AUTHORIZATION.md",
+    "v2plan/mcp-storage/PROGRESS_RU.md",
     "docmancer/docs/application/_project_docs_service_part01.py",
     "docmancer/docs/application/_project_docs_service_part02.py",
     "docmancer/docs/application/project_docs_member_transaction.py",

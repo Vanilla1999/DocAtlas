@@ -1,0 +1,56 @@
+# Storage continuation: approved boundaries
+
+Common base: `cb29039e901824cbd4a9dc9b6cf427a0016fe19b`.
+Prior safe-closed delivery report: `v2plan/mcp-delivery/FINAL_REPORT_RU.md`.
+
+The user approved a separate storage/VFS design and implementation phase with
+expanded ownership, isolated fixtures, no new dependencies, no live reinstall,
+and no user-index mutation. Existing mutation denial stays in place until a
+safe positive route has passed adversarial checks and independent review.
+
+The user did **not** approve identity migration or a compatibility break; they
+asked why migration is needed. The root-local identity change is ours. First
+investigate compatibility without migration, aliasing, weakened scope filters,
+unconstrained Git reads or index rebuilds. Do not treat that question as consent.
+
+## Read-only design assignments
+
+- A `/tmp/opencode/mcp-storage-a`: descriptor-bound SQLite main/sidecar storage,
+  SQL atomicity, concurrency, crashes, platform support, minimal packaging.
+- B `/tmp/opencode/mcp-storage-b`: preserve legitimate old index access without
+  unapproved migration or inferred authorization; producer/consumer bindings.
+- C `/tmp/opencode/mcp-storage-c`: real installed ready-index retrieval matrix,
+  necessary >32 KB evidence feasibility under unchanged runtime guards; no
+  mocked retrieval or fake padding. Fixture bootstrap is not preparation proof.
+- R: independent review of concrete design before production implementation,
+  then independent verification of the integrated result.
+
+Each implementation needs a reviewed interface and exact non-overlapping file
+allowlist. No nested agents. No edits to prior worktrees, historical gold,
+thresholds, reports/evaluation suites, D1 catalog or other user work.
+D1 remains exactly 10 documents, `code_files=()`; no corpus/scan expansion.
+
+Merge, release publication, version selection, current installation/config/index
+changes remain separately gated. Current stage does not imply release acceptance.
+
+## Subsequent packing approval
+
+The user approved reviewing token packing/admission for explicit
+`context_format="patch_context"` on already found windows. This does not permit
+expanding corpus, scan, candidate acquisition, source scope, network authority,
+or I/O safety limits. Omitted/null docs mode remains separate and unchanged.
+Source/hash/span bindings and partial evidence must survive. A naturally
+reachable >32 KB result remains a test obligation, not permission to pad fixtures
+or enlarge acquisition. Implementation requires the reviewed exact allowlist.
+
+## Diagnostic implementation and pending native review
+
+C's three-file ready-index diagnostic was approved and integrated as `f4db3e95`
+(original `b81e942a`). It is fixture bootstrap evidence, not preparation proof.
+Both transports delivered project/module evidence; library lineage and >32 KB
+admission remain blocked. Full smoke and ready-index diagnostic both exit 1.
+
+Neither the snapshot backend nor native persistence implementation is approved.
+The native proposal is under independent R review; object-bound versus strict
+external-alias semantics and crash recovery under hostile sidecar removal remain
+unresolved. Existing unsafe persistence denial must not be removed on this basis.
