@@ -6,11 +6,18 @@ verbatim evidence and controls I/O; it never certifies the generated answer.
 from __future__ import annotations
 
 from copy import deepcopy
+import inspect
 import json
 from pathlib import PurePosixPath
 
 from .host_context import SourceReadController, extract_tool_payload, validate_patch_context_payload
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
+
+RECOVERY_BINDING_KEYS = (
+    'project_path', 'library', 'libraries', 'ecosystem', 'version', 'source_type',
+    'docs_url', 'module', 'module_path', 'scope', 'mode', 'allow_latest_fallback',
+    'project_identity', 'module_id',
+)
 
 
 class GroundedMCPSession:
@@ -27,7 +34,7 @@ class GroundedMCPSession:
     def __init__(self, client, arguments, context, requested_facts):
         if any(context.get(flag) is True for flag in ('answer_supported', 'answer_available', 'edit_ready')):
             raise ValueError('grounded project sessions require retrieval-only evidence')
-        self.arguments = deepcopy(arguments)
+        self._arguments = deepcopy(arguments)
         self._context = deepcopy(context)
         self._client = client
         self._patch = context.get('kind') == 'patch_context'
@@ -44,6 +51,11 @@ class GroundedMCPSession:
         self._recovery_context = None
         self._recovery_attempts = 0
         self._stopped_reason = None
+
+    @property
+    def arguments(self) -> dict:
+        """Immutable request bindings; callers cannot widen recovery scope."""
+        return deepcopy(self._arguments)
 
     @property
     def context(self) -> dict:
@@ -97,13 +109,15 @@ class GroundedMCPSession:
             self._stopped_reason = result.get('reason_code')
         return result
 
-    async def recover(self, search_local_source) -> dict:
+    async def recover(self, search_local_source, *, verify_bindings=None) -> dict:
         """Execute one advertised read-only search through a host-owned adapter.
 
         The adapter must enforce local source permissions. No arbitrary command,
         preparation, editing or network action is delegated by this session.
         Recovery shares the two-action I/O ceiling with source reads. Docs
         recovery retains its bounded representation; v4 evidence does not.
+        V4 additionally needs a host-owned verifier for bindings not provable
+        from the wire (including project origin). Payload echoes are not proof.
         """
         action = self._context.get('recommended_next_action') or {}
         if (self._context.get('hard_stop') or self._recovery_attempts
@@ -121,9 +135,23 @@ class GroundedMCPSession:
             return self._stop('invalid_recovery_terms')
         self._recovery_attempts += 1
         try:
-            result = await search_local_source(project_path=self.arguments['project_path'],
-                                               query_terms=tuple(terms))
+            bindings = {key: deepcopy(self._arguments[key]) for key in RECOVERY_BINDING_KEYS
+                        if key in self._arguments}
+            result = deepcopy(await search_local_source(**deepcopy(bindings), query_terms=tuple(terms)))
             if self._patch:
+                if isinstance(result, dict):
+                    validate_patch_context_payload(result)
+                    if result.get('result') == 'data':
+                        mismatch = self._recovery_binding_mismatch(result, bindings)
+                        if mismatch:
+                            return self._stop(mismatch)
+                        if not callable(verify_bindings):
+                            return self._stop('unverified_recovery_request_bindings')
+                        verified = verify_bindings(bindings=deepcopy(bindings), context=deepcopy(result))
+                        if inspect.isawaitable(verified):
+                            verified = await verified
+                        if verified is not True:
+                            return self._stop('unverified_recovery_request_bindings')
                 return self._retain_patch_recovery(result)
             if not isinstance(result, dict) or docs_context_budget_tokens(result) > 600:
                 return self._stop('invalid_or_oversized_recovery')
@@ -145,6 +173,33 @@ class GroundedMCPSession:
             return {'status': 'context_added', 'sources': accepted}
         except Exception:
             return self._stop('read_only_recovery_failed')
+
+    @staticmethod
+    def _recovery_binding_mismatch(result, bindings) -> str | None:
+        """Visible contradictions deny even if a host verifier says otherwise."""
+        for key, requirement_kind in (
+            ('project_identity', 'project_identity'), ('module_id', 'module_id'), ('version', 'exact_version'),
+        ):
+            expected = bindings.get(key)
+            if expected is not None and any(
+                row['kind'] == requirement_kind and row['value'] != expected for row in result.get('requirements', [])
+            ):
+                return 'recovery_' + key + '_binding_mismatch'
+        for source in result['sources']:
+            version = bindings.get('version')
+            if version is not None and source['version_binding'] != version:
+                return 'recovery_version_binding_mismatch_or_unverified'
+            module_path = bindings.get('module_path')
+            if module_path is not None and source['scope'] != module_path:
+                return 'recovery_module_binding_mismatch_or_unverified'
+            scope = bindings.get('scope')
+            if scope == 'project' and source['scope'] != 'project':
+                return 'recovery_project_scope_mismatch_or_unverified'
+            if scope in {'all', 'module'} and source['scope'] == 'unscoped':
+                return 'unverified_recovery_scope'
+            if scope == 'module' and module_path is None and source['scope'] in {'project', 'module'}:
+                return 'unverified_recovery_module_binding'
+        return None
 
     def _retain_patch_recovery(self, result) -> dict:
         """Accept a host-bound native v4 result, never a lossy snippet adapter."""

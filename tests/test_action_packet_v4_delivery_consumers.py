@@ -121,7 +121,7 @@ def test_v4_paths_do_not_create_read_capabilities_and_failed_read_keeps_evidence
     asyncio.run(run())
 
 
-@pytest.mark.parametrize('mutation', ['text', 'hash', 'span', 'trust', 'unknown', 'estimate', 'recovery', 'unit_hash', 'unit_id', 'assignment_span'])
+@pytest.mark.parametrize('mutation', ['text', 'hash', 'span', 'trust', 'unknown', 'estimate', 'recovery', 'unit_hash', 'unit_id', 'assignment_span', 'unit_kind_rehash'])
 def test_wire_validation_rejects_tampering_without_original_snapshot(patch, mutation):
     broken = deepcopy(patch)
     source = broken['sources'][0]
@@ -141,6 +141,13 @@ def test_wire_validation_rejects_tampering_without_original_snapshot(patch, muta
         assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
         key = {'unit_hash': 'unit_content_hash', 'unit_id': 'unit_id', 'assignment_span': 'char_end'}[mutation]
         assignment[key] = assignment[key] + 1 if key == 'char_end' else '0' * 64
+    elif mutation == 'unit_kind_rehash':
+        assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
+        source = next(row for row in broken['sources'] if row['stable_id'] == assignment['evidence_id'])
+        start, end = assignment['unit_char_start'], assignment['unit_char_end']
+        witness = source['text'][start:end]
+        assignment['unit_kind'] = 'invented_kind'
+        assignment['unit_id'] = 'unit-' + hashlib.sha256(f'invented_kind\0{start}\0{end}\0{witness}'.encode()).hexdigest()[:20]
     else:
         broken['estimated_tokens'] += 1
     if mutation != 'estimate':
@@ -221,7 +228,10 @@ def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explici
         async def search(**kwargs):
             calls.append(kwargs)
             return recovery
-        added = await session.recover(search)
+        def verify(*, bindings, context):
+            # Host-owned fixture provenance, separate from returned data labels.
+            return bindings == {'project_path': '/repo'} and context == recovery
+        added = await session.recover(search, verify_bindings=verify)
         assert added['status'] == 'context_added' and added['sources'] == recovery['sources']
         assert session.recovery_context == recovery
         assert len(session.evidence) == 24
@@ -232,6 +242,249 @@ def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explici
         assert session.recovery_context == recovery
         assert session.finish()['status'] == 'partial' and not session.finish()['answer_supported']
         assert (await session.recover(search))['status'] == 'stopped' and len(calls) == 1
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('structured', [[], ['packet'], 'packet', 1, False])
+def test_malformed_nonnull_structured_channel_never_falls_back(patch, structured):
+    with pytest.raises(EvidenceDeliveryError, match='malformed_structured'):
+        extract_tool_payload({'structuredContent': structured,
+                              'content': [{'type': 'text', 'text': json.dumps(patch)}]})
+
+
+@pytest.mark.parametrize('structured', [True, False])
+def test_error_tool_result_never_delivers_evidence(patch, structured):
+    result = {'isError': True, 'content': [{'type': 'text', 'text': json.dumps(patch)}]}
+    if structured:
+        result['structuredContent'] = patch
+    with pytest.raises(EvidenceDeliveryError, match='error_tool_result'):
+        extract_tool_payload(result)
+
+
+def test_structured_delivery_rejects_conflicting_and_multiple_evidence_channels(patch):
+    other = deepcopy(patch)
+    other['sources'][0]['text'] += 'different packet'
+    bare_packet = deepcopy(patch)
+    bare_packet.pop('kind')
+    for alternate in (other, bare_packet, {'status': 'ok', 'kind': 'docs_context', 'sources': []}):
+        with pytest.raises(EvidenceDeliveryError, match='conflicting'):
+            extract_tool_payload({'structuredContent': patch,
+                                  'content': [{'type': 'text', 'text': json.dumps(alternate)}]})
+    text = {'type': 'text', 'text': json.dumps(patch)}
+    with pytest.raises(EvidenceDeliveryError, match='ambiguous'):
+        extract_tool_payload({'structuredContent': patch, 'content': [text, text]})
+
+
+def test_identical_dual_delivery_allows_only_canonical_equality_and_ignores_prose(patch):
+    assert extract_tool_payload({'structuredContent': patch,
+        'content': [{'type': 'text', 'text': 'Structured DocAtlas result attached in structuredContent.'}]}) == patch
+    assert extract_tool_payload({'structuredContent': patch,
+        'content': [{'type': 'text', 'text': json.dumps(patch, sort_keys=True)}]}) == patch
+    alternate = deepcopy(patch)
+    alternate['estimated_tokens'] = float(alternate['estimated_tokens'])
+    with pytest.raises(EvidenceDeliveryError, match='conflicting'):
+        extract_tool_payload({'structuredContent': patch,
+            'content': [{'type': 'text', 'text': json.dumps(alternate)}]})
+
+
+def test_visible_requirement_value_must_match_canonical_witness_not_only_hash(patch):
+    from docmancer.docs.application.action_packet import validate_action_packet
+    original_core = deepcopy(patch)
+    original_core.pop('kind')
+    refresh_action_packet_estimate(original_core)
+    assert validate_action_packet(original_core, evidence_items=retrieval()['context_pack'], project_path='/repo') == []
+    broken = deepcopy(patch)
+    requirement = next(row for row in broken['requirements'] if row['kind'] == 'code_group')
+    requirement['value'] = json.dumps(['definitely_absent_review_symbol'])
+    refresh_action_packet_estimate(broken)
+    broken_core = deepcopy(broken)
+    broken_core.pop('kind')
+    refresh_action_packet_estimate(broken_core)
+    assert 'assignment witness binding is invalid' in validate_action_packet(
+        broken_core, evidence_items=retrieval()['context_pack'], project_path='/repo')
+    with pytest.raises(EvidenceDeliveryError, match='canonical visible witness binding'):
+        validate_patch_context_payload(broken)
+
+
+@pytest.mark.parametrize('change', ['source_line_end', 'source_line_start', 'assignment_line_end', 'assignment_char_end'])
+def test_source_newline_endpoints_and_assignment_containment_fail_closed(patch, change):
+    broken = deepcopy(patch)
+    if change.startswith('source'):
+        broken['sources'][0][change.removeprefix('source_')] += 100
+    else:
+        assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
+        assignment[change.removeprefix('assignment_')] += 100_000
+    refresh_action_packet_estimate(broken)
+    with pytest.raises(EvidenceDeliveryError):
+        validate_patch_context_payload(broken)
+
+
+def test_newline_endpoint_convention_handles_trailing_newline_and_unknown_absolute_position():
+    from docmancer.docs.application.action_packet import build_action_packet
+    from docmancer.docs.application.model_visible_projection import project_patch_context
+    for positioned in (True, False):
+        row = retrieval()['context_pack'][0]
+        text = row['content'] + '\n'
+        row.update(content=text, display_text=text, char_end=len(text),
+                   display_content_hash=hashlib.sha256(text.encode()).hexdigest())
+        if positioned:
+            row.update(line_start=17, line_end=17 + text.count('\n'))
+        else:
+            row.pop('line_start')
+            row.pop('line_end')
+        packet = build_action_packet(question='Read contract setting', context_pack=[row])
+        context, _ = project_patch_context(packet=packet, evidence_items=[row])
+        validate_patch_context_payload(context)
+        assert context['sources'][0]['text'].endswith('\n')
+
+
+@pytest.mark.parametrize('kind', ['version', 'module', 'project_scope', 'unknown_version', 'project_identity'])
+def test_recovery_rejects_visible_binding_contradictions_and_preserves_partial(patch, kind):
+    async def run():
+        initial_raw = retrieval()
+        initial_raw['required_target_paths'] = ['src/missing.py']
+        recovery_raw = retrieval(12)
+        class Service:
+            def __init__(self, raw):
+                self.raw = raw
+            def get_docs_context(self, *args, **kwargs):
+                return deepcopy(self.raw)
+        request = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
+        initial = call_docs_tool_payload('get_docs_context', request, Service(initial_raw))
+        recovery = call_docs_tool_payload('get_docs_context', request, Service(recovery_raw))
+        if kind in {'version', 'unknown_version'}:
+            request['version'] = '4.0'
+            for source in recovery['sources']:
+                source['version_binding'] = '99.0' if kind == 'version' else 'exact_version'
+        elif kind == 'module':
+            request.update(module_path='packages/orders', scope='module')
+            for source in recovery['sources']:
+                source['scope'] = 'packages/other'
+        elif kind == 'project_identity':
+            request['project_identity'] = 'offline'
+            for requirement in recovery['requirements']:
+                if requirement['kind'] == 'project_identity':
+                    requirement['value'] = 'different-project'
+        else:
+            request['scope'] = 'project'
+            for source in recovery['sources']:
+                source['scope'] = 'packages/other'
+        refresh_action_packet_estimate(recovery)
+        validate_patch_context_payload(recovery)
+        session = await GroundedMCPSession.start(OfflineClient(initial), arguments=request,
+            requested_facts={'known': 'Known binding', 'missing': 'Missing binding'})
+        source = initial['sources'][0]
+        session.support('known', evidence_id=source['evidence_id'], quote=source['text'].splitlines()[1])
+        calls, verifications = [], []
+        async def search(**kwargs):
+            calls.append(kwargs)
+            return recovery
+        def verify(**kwargs):
+            verifications.append(kwargs)
+            return True  # Even a permissive host callback cannot override contradictions.
+        denied = await session.recover(search, verify_bindings=verify)
+        assert denied['status'] == 'stopped'
+        assert 'binding' in denied['reason_code'] or 'scope' in denied['reason_code']
+        assert not verifications
+        assert calls[0]['project_path'] == '/repo'
+        for key in ('version', 'module_path', 'scope', 'project_identity'):
+            if key in request:
+                assert calls[0][key] == request[key]
+        assert session.finish()['status'] == 'partial'
+        assert list(session.evidence.values()) == initial['sources'] and session.recovery_context is None
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize('verification', [None, False, 1])
+def test_unverifiable_recovery_origin_never_becomes_matching_evidence(verification):
+    async def run():
+        initial_raw = retrieval()
+        initial_raw['required_target_paths'] = ['src/missing.py']
+        class Service:
+            def __init__(self, raw):
+                self.raw = raw
+            def get_docs_context(self, *args, **kwargs):
+                return deepcopy(self.raw)
+        request = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
+        initial = call_docs_tool_payload('get_docs_context', request, Service(initial_raw))
+        recovery = call_docs_tool_payload('get_docs_context', request, Service(retrieval(12)))
+        session = await GroundedMCPSession.start(OfflineClient(initial), arguments=request,
+            requested_facts={'known': 'Known binding', 'missing': 'Missing binding'})
+        source = initial['sources'][0]
+        session.support('known', evidence_id=source['evidence_id'], quote=source['text'].splitlines()[1])
+        async def search(**kwargs):
+            return recovery
+        verifier = None if verification is None else lambda **kwargs: verification
+        denied = await session.recover(search, verify_bindings=verifier)
+        assert denied['reason_code'] == 'unverified_recovery_request_bindings'
+        assert session.finish()['status'] == 'partial'
+        assert list(session.evidence.values()) == initial['sources']
+    asyncio.run(run())
+
+
+def test_recovery_forwards_all_explicit_bindings_but_never_permission_flags(patch):
+    async def run():
+        initial_raw = retrieval()
+        initial_raw['required_target_paths'] = ['src/missing.py']
+        class Service:
+            def get_docs_context(self, *args, **kwargs):
+                return deepcopy(initial_raw)
+        basic = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
+        context = call_docs_tool_payload('get_docs_context', basic, Service())
+        bindings = {'project_path': '/repo', 'library': 'sample', 'libraries': ['sample', 'second'],
+            'ecosystem': 'python', 'version': '4.0', 'source_type': 'api', 'docs_url': 'https://example.invalid/docs',
+            'module': 'orders', 'module_path': 'packages/orders', 'scope': 'module', 'mode': 'mixed',
+            'allow_latest_fallback': False, 'project_identity': 'offline', 'module_id': 'orders-id'}
+        request = {**basic, **bindings, 'allow_network': True, 'force_refresh': True, 'prepare_project_docs': True}
+        session = await GroundedMCPSession.start(OfflineClient(context), arguments=request,
+            requested_facts={'missing': 'Missing binding'})
+        detached = session.arguments
+        detached['scope'] = 'all'
+        detached['libraries'].append('inferred')
+        calls = []
+        async def search(**kwargs):
+            calls.append(kwargs)
+            return patch
+        denied = await session.recover(search)
+        assert denied['status'] == 'stopped'
+        assert calls == [{**bindings, 'query_terms': tuple(context['recommended_next_action']['query_terms'])}]
+        assert session.arguments == request and not session.recovery_context
+    asyncio.run(run())
+
+
+def test_async_host_binding_verifier_cannot_mutate_retained_response_or_request():
+    async def run():
+        initial_raw = retrieval()
+        initial_raw['required_target_paths'] = ['src/missing.py']
+        class Service:
+            def __init__(self, raw):
+                self.raw = raw
+            def get_docs_context(self, *args, **kwargs):
+                return deepcopy(self.raw)
+        basic = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
+        initial = call_docs_tool_payload('get_docs_context', basic, Service(initial_raw))
+        recovery = call_docs_tool_payload('get_docs_context', basic, Service(retrieval(12)))
+        expected_recovery = deepcopy(recovery)
+        request = {**basic, 'version': '4.0', 'scope': 'project', 'libraries': ['sample']}
+        session = await GroundedMCPSession.start(OfflineClient(initial), arguments=request,
+            requested_facts={'missing': 'Missing binding'})
+        async def search(**kwargs):
+            assert kwargs['version'] == '4.0' and kwargs['scope'] == 'project'
+            kwargs['libraries'].append('altered-by-search')
+            return recovery
+        async def verify(*, bindings, context):
+            # The offline host fixture independently owns /repo provenance.
+            assert bindings == {'project_path': '/repo', 'version': '4.0', 'scope': 'project', 'libraries': ['sample']}
+            assert context == expected_recovery
+            bindings['scope'] = 'all'
+            context['sources'][0]['text'] = 'tampered'
+            recovery['sources'][0]['version_binding'] = '99.0'
+            refresh_action_packet_estimate(recovery)
+            return True
+        assert (await session.recover(search, verify_bindings=verify))['status'] == 'context_added'
+        assert session.arguments == request
+        assert session.recovery_context == expected_recovery
+        assert len(session.evidence) == 24
     asyncio.run(run())
 
 

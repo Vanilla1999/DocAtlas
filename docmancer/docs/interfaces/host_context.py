@@ -19,6 +19,7 @@ from docmancer.docs.application.action_packet import (
 from docmancer.docs.application._action_packet_part04 import _StrictValidator, _restore_dto
 from docmancer.docs.application._action_packet_shared import _compact_value
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceAssignment
+from docmancer.docs.application.evidence_selection import normalize_candidates, validate_assignment_binding
 from docmancer.mcp._docs_server_schema import _PATCH_CONTEXT_OUTPUT_SCHEMA
 
 
@@ -61,12 +62,23 @@ def _patch_wire_binding_errors(context: dict) -> list[str]:
                 errors.append('invalid source span')
         if source.get('char_start') is not None and source['char_end'] - source['char_start'] != len(source['text']):
             errors.append('source character span mismatch')
+        if source.get('line_start') is not None and source['line_end'] != source['line_start'] + source['text'].count('\n'):
+            errors.append('source newline-window endpoint mismatch')
     requirements = context.get('requirements', [])
     if requirements != [_compact_value(_restore_dto(EvidenceRequirement, row)) for row in requirements]:
         errors.append('requirements differ from canonical DTO serialization')
     by_requirement = {row['requirement_id']: row for row in requirements}
     if len(by_requirement) != len(requirements):
         errors.append('duplicate requirement identity')
+    canonical_requirements = tuple(_restore_dto(EvidenceRequirement, row) for row in requirements)
+    visible_candidates, _ = normalize_candidates([
+        {'stable_id': source['stable_id'], 'path': source['path'],
+         'title': source['symbol_or_section'], 'content': source['text'],
+         'authority': source['authority'], 'version_binding': source['version_binding'],
+         **{key: source[key] for key in ('char_start', 'char_end', 'line_start', 'line_end') if key in source}}
+        for source in sources
+    ], result_kind='patch_context')
+    by_candidate = {candidate.stable_id: candidate for candidate in visible_candidates}
     assignments = context.get('assignments', [])
     if assignments != [_compact_value(_restore_dto(EvidenceAssignment, row)) for row in assignments]:
         errors.append('assignments differ from canonical DTO serialization')
@@ -79,6 +91,18 @@ def _patch_wire_binding_errors(context: dict) -> list[str]:
         if source is None or requirement is None:
             errors.append('unbound assignment identity')
             continue
+        # These unit-less bindings depend on metadata absent from the wire.
+        # Preserve them as unverified claims, never manufacture candidate fields.
+        hidden_binding = assignment.get('unit_id') is None and requirement['kind'] in {
+            'project_identity', 'module_id', 'exact_version', 'exact_snapshot',
+        }
+        if not hidden_binding:
+            candidate = by_candidate.get(assignment['evidence_id'])
+            if candidate is None or not validate_assignment_binding(
+                _restore_dto(EvidenceRequirement, requirement), candidate,
+                _restore_dto(EvidenceAssignment, assignment), requirements=canonical_requirements,
+            ):
+                errors.append('assignment canonical visible witness binding is invalid')
         if (assignment['path'] != source['path']
                 or assignment['proof_role'] != requirement.get('proof_role', 'generic_fact')
                 or assignment.get('qualifiers', []) != requirement.get('qualifiers', [])):
@@ -113,6 +137,12 @@ def _patch_wire_binding_errors(context: dict) -> list[str]:
                     ('char_start', char_start), ('char_end', char_end),
                     ('line_start', line_start), ('line_end', line_end)))):
             errors.append('assignment visible witness binding mismatch')
+        for prefix in ('char', 'line'):
+            source_start, source_end = source.get(prefix + '_start'), source.get(prefix + '_end')
+            start, end = assignment.get(prefix + '_start'), assignment.get(prefix + '_end')
+            if source_start is not None and (start is None or end is None
+                    or not source_start <= start <= end <= source_end):
+                errors.append('assignment escapes source window')
     if context['completeness'] == 'complete':
         mandatory = {row['requirement_id'] for row in requirements if row.get('mandatory', True)}
         if mandatory - set(assigned) or not any(row.get('unit_id') for row in assignments):
@@ -131,15 +161,17 @@ def _patch_wire_binding_errors(context: dict) -> list[str]:
 
 
 def extract_tool_payload(result: Any, *, structured_supported: bool = True) -> dict:
-    """Consume the evidence once, or diagnose an unsupported delivery channel."""
+    """Consume one non-error packet; structured/text dual delivery must agree."""
     value = result.model_dump() if hasattr(result, 'model_dump') else result
     if not isinstance(value, dict):
         raise EvidenceDeliveryError('invalid_tool_result')
+    if value.get('isError') is True:
+        raise EvidenceDeliveryError('error_tool_result')
+    if 'isError' in value and type(value['isError']) is not bool:
+        raise EvidenceDeliveryError('invalid_tool_error_flag')
     structured = value.get('structuredContent')
-    if isinstance(structured, dict):
-        if not structured_supported:
-            raise EvidenceDeliveryError('structured_evidence_unsupported: configure DOCATLAS_MCP_TEXT_FALLBACK=1')
-        return deepcopy(structured)
+    if structured is not None and not isinstance(structured, dict):
+        raise EvidenceDeliveryError('malformed_structured_evidence')
     candidates = []
     for block in value.get('content') or ():
         if not isinstance(block, dict) or block.get('type') != 'text':
@@ -148,10 +180,23 @@ def extract_tool_payload(result: Any, *, structured_supported: bool = True) -> d
             payload = json.loads(block.get('text', ''))
         except (ValueError, TypeError):
             continue
-        if isinstance(payload, dict) and ('status' in payload or payload.get('kind') == 'patch_context'):
+        if isinstance(payload, dict) and any(key in payload for key in ('status', 'kind', 'result', 'schema_version')):
             candidates.append(payload)
     if len(candidates) != 1:
-        raise EvidenceDeliveryError('missing_or_ambiguous_evidence_channel')
+        if candidates or structured is None:
+            raise EvidenceDeliveryError('missing_or_ambiguous_evidence_channel')
+    if structured is not None:
+        if not structured_supported:
+            raise EvidenceDeliveryError('structured_evidence_unsupported: configure DOCATLAS_MCP_TEXT_FALLBACK=1')
+        if candidates:
+            from docmancer.docs.application.action_packet import serialize_action_packet
+            try:
+                identical = serialize_action_packet(structured) == serialize_action_packet(candidates[0])
+            except (ValueError, TypeError) as exc:
+                raise EvidenceDeliveryError('invalid_evidence_channel') from exc
+            if not identical:
+                raise EvidenceDeliveryError('conflicting_evidence_channels')
+        return deepcopy(structured)
     return candidates[0]
 
 
