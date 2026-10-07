@@ -8,6 +8,7 @@ from docmancer.docs.application.recovery import projection_recovery_action
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
+import inspect
 import math
 from typing import Any
 from ._context_recovery_actions import (
@@ -303,6 +304,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
     app = getattr(service, "unified_context", service)
+    retention_kwargs = {}
+    if kind == "patch_context":
+        parameters = inspect.signature(app.get_docs_context).parameters
+        if "retain_found_windows" not in parameters and not any(
+            value.kind == inspect.Parameter.VAR_KEYWORD for value in parameters.values()
+        ):
+            return _bad_request("unsupported_found_window_retention", "The context facade does not support explicit patch retention")
+        retention_kwargs["retain_found_windows"] = True
     result = app.get_docs_context(
         question,
         project_path=args.get("project_path"),
@@ -329,6 +338,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         details=False,
         response_style=args.get("response_style"),
         lookup_queries=lookup_queries,
+        **retention_kwargs,
     )
     canonical_selection = (
         result.get("selection_decision")

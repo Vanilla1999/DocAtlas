@@ -149,6 +149,8 @@ class _ProjectDocsServicePart03:
         lookup_queries: tuple[str, ...] = (),
         documentation_query_plan: DocumentationQueryPlan | None = None,
         internal_diagnostics: dict[str, Any] | None = None,
+        retain_found_windows: bool = False,
+        _control_chunks: list[Any] | None = None,
     ):
         root = validate_project_path(project_path).path
         answer_lifecycle_intent = str(
@@ -400,7 +402,32 @@ class _ProjectDocsServicePart03:
             selected.append(chunk)
             seen.add(key)
             token_total += chunk_tokens
-        return selected
+        if _control_chunks is not None:
+            _control_chunks.extend(selected)
+        if not retain_found_windows:
+            return selected
+        # Acquisition and the bounded operational view above are unchanged.
+        # Only independently qualified, already-prepared candidates bypass packing.
+        retained = {(chunk.source, chunk.chunk_index): chunk for chunk in selected}
+        for chunk in candidates:
+            matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
+            if not any(trace.get("qualified") is True for key, trace in matches.items()
+                       if isinstance(trace, dict) and (key == "query-original" or key.startswith("query-lookup-"))):
+                continue
+            if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):
+                continue
+            key = (chunk.source, chunk.chunk_index)
+            existing = retained.get(key)
+            if existing is None:
+                retained[key] = chunk
+                continue
+            merged = merge_query_matches((existing.metadata or {}).get("retrieval_query_matches"), matches)
+            preferred = chunk if chunk.score > existing.score else existing
+            retained[key] = preferred.model_copy(update={"metadata": {
+                **(preferred.metadata or {}), "retrieval_query_matches": merged,
+                "retrieval_query_ids": tuple(key for key, trace in merged.items() if trace.get("qualified") is True),
+            }})
+        return list(retained.values())
 
     def get_project_docs(
         self,
@@ -417,6 +444,8 @@ class _ProjectDocsServicePart03:
         requirements: Any | None = None,
         lookup_queries: tuple[str, ...] = (),
         documentation_query_plan: DocumentationQueryPlan | None = None,
+        retain_found_windows: bool = False,
+        _retained_results: list[Any] | None = None,
     ) -> ProjectDocsResult:
         root = validate_project_path(project_path).path
         if hasattr(self.facade, "_project_get_project_docs_impl"):
@@ -432,6 +461,8 @@ class _ProjectDocsServicePart03:
                 kwargs["documentation_query_plan"] = documentation_query_plan
             if evidence_path:
                 kwargs["evidence_path"] = evidence_path
+            if retain_found_windows:
+                kwargs.update(retain_found_windows=True, _retained_results=_retained_results)
             return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
@@ -634,6 +665,9 @@ class _ProjectDocsServicePart03:
             )
 
         internal_retrieval_diagnostics: dict[str, Any] = {}
+        control_chunks: list[Any] = []
+        retention_kwargs = ({"retain_found_windows": True, "_control_chunks": control_chunks}
+                            if retain_found_windows else {})
         chunks = self.query_project_docs(
             str(root), query, tokens=tokens, limit=limit, expand=expand,
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
@@ -641,7 +675,11 @@ class _ProjectDocsServicePart03:
             lookup_queries=lookup_queries,
             documentation_query_plan=documentation_query_plan,
             internal_diagnostics=internal_retrieval_diagnostics,
+            **retention_kwargs,
         )
+        found_chunks = chunks
+        if retain_found_windows:
+            chunks = control_chunks
         current_by_source = {str(item.get("source")): item for item in indexed_sources if item.get("source")}
         current_by_exact_path = {str(item["path"]): item for item in indexed_sources if item.get("path")}
         path_groups: dict[str, list[Any]] = {}
@@ -684,6 +722,10 @@ class _ProjectDocsServicePart03:
                 )
             chunks = [*exact_chunks, *chunks]
             exact_document_fallback_used = bool(exact_chunks)
+        control_keys = {(chunk.source, chunk.chunk_index) for chunk in chunks}
+        if retain_found_windows:
+            chunks = [*chunks, *(chunk for chunk in found_chunks
+                                if (chunk.source, chunk.chunk_index) not in control_keys)]
         safe_chunks = []
         dropped_placeholder_chunks = 0
         answer_lifecycle_intent = str(
@@ -706,7 +748,8 @@ class _ProjectDocsServicePart03:
                 continue
             canonical_path = str(current_source.get("path") or chunk_path or "")
             if self._looks_like_placeholder_search_result(canonical_path, chunk.text):
-                dropped_placeholder_chunks += 1
+                if (chunk.source, chunk.chunk_index) in control_keys:
+                    dropped_placeholder_chunks += 1
                 continue
             # Retrieval/index internals may normalize path case. Once the chunk
             # is rebound to the exact current catalog entry, restore that
@@ -722,6 +765,9 @@ class _ProjectDocsServicePart03:
             }
             safe_chunks.append(chunk.model_copy(update={"metadata": canonical_metadata}))
         chunks = safe_chunks
+        all_safe_chunks = chunks
+        if retain_found_windows:
+            chunks = [chunk for chunk in chunks if (chunk.source, chunk.chunk_index) in control_keys]
         seen_sources: set[str] = set()
         result_indexed_sources = []
         for chunk in chunks:
@@ -784,8 +830,23 @@ class _ProjectDocsServicePart03:
                 impact_policy=(chunk.metadata or {}).get("project_doc_impact_policy"),
                 project_identity=(chunk.metadata or {}).get("project_identity"),
             )
-            for chunk in chunks
+            for chunk in (all_safe_chunks if retain_found_windows else chunks)
         ]
+        if retain_found_windows:
+            if _retained_results is not None:
+                found_by_key = {(chunk.source, chunk.chunk_index): chunk for chunk in found_chunks}
+                for result, chunk in zip(results, all_safe_chunks, strict=True):
+                    found = found_by_key.get((chunk.source, chunk.chunk_index))
+                    matches = merge_query_matches(
+                        result.metadata.get("retrieval_query_matches"),
+                        (found.metadata or {}).get("retrieval_query_matches") if found is not None else None,
+                    )
+                    _retained_results.append(replace(result, metadata={
+                        **result.metadata, "retrieval_query_matches": matches,
+                        "retrieval_query_ids": tuple(key for key, trace in matches.items() if trace.get("qualified") is True),
+                    }))
+            results = [result for result, chunk in zip(results, all_safe_chunks, strict=True)
+                       if (chunk.source, chunk.chunk_index) in control_keys]
         next_actions: list[dict[str, Any]] = []
         next_action: dict[str, Any] = {}
         requires_confirmation = False

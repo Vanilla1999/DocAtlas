@@ -186,7 +186,8 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         limit: int | None = None, broad_max_per_source: int = 2,
         narrow_max_per_source: int = 4, lifecycle_intent_value: str | None = None,
         context_candidate_ids: frozenset[int] = frozenset(),
-        finite_member_paths: frozenset[str] | None = None) -> list[Any]:
+        finite_member_paths: frozenset[str] | None = None,
+        retain_found_windows: bool = False) -> list[Any]:
     lifecycle = lifecycle_intent_value or lifecycle_intent(question)
     scored = []
     for index, chunk in enumerate(chunks):
@@ -209,6 +210,8 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
             continue
         public = {key for key in qualified if key == "query-original"
                   or key.startswith("query-lookup-")}
+        if retain_found_windows and not public:
+            continue
         scored.append((chunk_base_score(chunk, index), index, chunk, public))
     scored.sort(key=lambda row: (-row[0], row[1]))
     selected = []
@@ -222,13 +225,13 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         score, index, chunk, public = scored.pop(next_index)
         key = _source_key(chunk, index)
         relaxed = counts.get(key, 0) >= max_per_source
-        if relaxed and not public - covered:
+        if relaxed and not public - covered and not retain_found_windows:
             continue
         selected.append(attach_project_ranking_metadata(chunk, base_score=score,
             final_score=score, original_rank=index, selected_rank=len(selected) + 1,
             question=question, intent=intent, selected_by="ranking", diversity_relaxed=relaxed))
         covered.update(public)
         counts[key] = counts.get(key, 0) + 1
-        if limit and len(selected) >= limit:
+        if limit and len(selected) >= limit and not retain_found_windows:
             break
     return selected

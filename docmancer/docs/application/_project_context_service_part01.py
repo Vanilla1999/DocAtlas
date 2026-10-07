@@ -34,6 +34,7 @@ class _ProjectContextServicePart01:
         allow_network: bool = False,
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
+        retain_found_windows: bool = False,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
         # This is a read boundary. Only a caller-supplied contract can request
@@ -77,6 +78,7 @@ class _ProjectContextServicePart01:
         from docmancer.docs.project import ProjectMetadataReader
         metadata = ProjectMetadataReader().read(root)
         project_docs = None
+        retained_results: list[Any] = []
         if mode in {"auto", "project-only"}:
             candidate_limit = min(20, max(12, (limit or 4) * 3))
             project_docs_kwargs = {
@@ -89,6 +91,8 @@ class _ProjectContextServicePart01:
                 project_docs_kwargs["lookup_queries"] = lookup_queries
             if evidence_path:
                 project_docs_kwargs["evidence_path"] = evidence_path
+            if retain_found_windows:
+                project_docs_kwargs.update(retain_found_windows=True, _retained_results=retained_results)
             project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
             if project_docs and project_docs.results:
                 members = {candidate.path: candidate for candidate in metadata.docs_candidates}
@@ -98,6 +102,12 @@ class _ProjectContextServicePart01:
                     and chunk.content_hash == members[chunk.path].content_hash
                     and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash
                 ])
+            if retain_found_windows:
+                members = {candidate.path: candidate for candidate in metadata.docs_candidates}
+                retained_results = [chunk for chunk in retained_results
+                    if chunk.path in members and members[chunk.path].content_hash
+                    and chunk.content_hash == members[chunk.path].content_hash
+                    and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash]
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
@@ -833,6 +843,36 @@ class _ProjectContextServicePart01:
             deliverable=bool(answer_available or read_context_eligible),
             reason_code=None if answer_available or read_context_eligible else str(reason or "operational_delivery_blocked"),
         )
+        # All acquisition, fallback, routing and answer decisions above use the
+        # unchanged bounded control view. Patch representation is a separate lane.
+        if retain_found_windows and project_docs is not None:
+            retained_results = rerank_project_doc_chunks(
+                retained_results, question=question, intent=intent,
+                lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                finite_member_paths=frozenset(members), retain_found_windows=True,
+            )
+            if evidence_path:
+                retained_results = [chunk for chunk in retained_results
+                                    if normalize_doc_path(chunk.path) == normalize_doc_path(evidence_path)]
+            retained_docs = replace(project_docs, results=retained_results)
+            retained_pack, retained_warnings = annotate_context_pack(
+                project_context_pack(question=question, project_docs=retained_docs, dependency_docs=None),
+                repository_root=root,
+            )
+            def window_key(item):
+                return (item.get("path"), item.get("stable_chunk_id"), item.get("char_start"), item.get("char_end"))
+            seen_windows = {window_key(item) for item in context_pack}
+            context_pack = [*context_pack, *(item for item in retained_pack
+                if window_key(item) not in seen_windows)]
+            warnings.extend(warning["code"] for warning in retained_warnings)
+            trust_contract = build_project_context_trust_contract(
+                project_docs=retained_docs, dependency_docs=dependency_docs,
+                requested_library=selected_dependency, mode=mode, context_pack=context_pack,
+            )
+            if retained_pack and not project_docs_blocked and not requires_confirmation \
+                    and not dependency_confirmation_blocks_answer and status != "stale" \
+                    and project_docs.status in {"success", "partial_success", "no_results"}:
+                delivery_decision = DeliveryDecision(deliverable=True, reason_code=None)
         return ProjectContextResult(
             project_path=str(root),
             question=question,
