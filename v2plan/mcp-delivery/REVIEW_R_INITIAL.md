@@ -51,3 +51,30 @@ Those coordinator conclusions were static-only, not full release certification.
 R reported 13 focused nodes plus independent rerun probes. R1/R2/R3/R5 and
 R6–R9 are not closed by this review. Full installed/release acceptance remains
 unestablished.
+
+## Final independent re-review at `5772d372`
+
+157 focused tests passed, plus two reruns with independent attack probes.
+
+- R1: security containment verified, positive persistence OPEN. Valid public
+  grant yields nonretryable `blocked` / `unsafe_sqlite_path_mutation`, no disk
+  SQLite connection, no mutation; fixture database bytes unchanged.
+- R2 CLOSED: FD-pinned input hardlinks/replacement detection.
+- R3 CLOSED: selected-document remaining allowance and pre-read deadline checks;
+  not a whole-operation deadline certification.
+- R4 remains CLOSED narrowly for nested-`servers` duplicate prevention.
+- R5 CLOSED: unsupported descriptor-platform denial before I/O; not Windows support.
+- R6 CLOSED: conflicting/malformed/error/duplicate channel attacks reject;
+  identical canonical dual delivery explicitly supported.
+- R7 CLOSED: reported forged visible witness binding rejects using canonical checks.
+- R8 CLOSED: reported newline endpoint and assignment containment attacks reject;
+  absolute source positions are not authenticated here.
+- R9 CLOSED: explicit immutable bindings forwarded, contradictions rejected before
+  verifier, missing/non-true verification unresolved; provenance verifier remains
+  host-owned.
+
+Compatibility decision OPEN: root-local identity excludes legacy Git-identity
+rows with no migration/alias/rebuild; index parity is not certified. Installed
+reporting must reflect the final blocked write lane, not earlier positive fixture
+commits. No historical evaluations, providers, user-index updates or full release
+certification were performed by R.

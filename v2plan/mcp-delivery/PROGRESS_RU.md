@@ -3,6 +3,10 @@
 База PR #211: `2d060bf0`. Интеграционный runtime snapshot: `5de649fa`.
 Это промежуточный отчёт, **не merge/release acceptance**.
 
+**SUPERSEDED:** финальное safe-closed состояние и installed результаты см.
+`FINAL_REPORT_RU.md`. Pre-hardening положительные записи ниже не являются
+acceptance финального runtime: в нём preparation намеренно заблокирован.
+
 ## Что реализовано
 
 - Coding workflow явно использует v4; omitted/null сохраняет docs mode.
