@@ -7,6 +7,8 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    ".github/workflows/ci.yml",  # Explicit Linux/macOS supported-platform matrices only.
+    ".github/workflows/p1-stack-exact-validation.yml",
     ".github/workflows/mcp-platform-proof.yml",
     "scripts/docs_mcp_platform_proof.sh",
     "scripts/test-install.sh",  # Reviewed nested-config/JSONC installer checks.

@@ -416,6 +416,25 @@ separate/unconfirmed: existing historical/Windows gates unchanged. No PR creatio
 merge, tagging, publication or live replacement occurred. Do not rerun matrix
 for documentation-only evidence recording.
 
+### Merge finishing checks
+
+Required platform scope `547e1b74` independently APPROVED and integrated as
+`bdc32d0b`: ci/platform and p1-stack/platform require Ubuntu, macOS ARM64 + Intel;
+all existing steps, aggregators, protected jobs and criteria preserved.
+Registration test-only repair `e83d83f9` independently APPROVED and integrated as
+`9c7b2e8e`: five complete product modules independently 92 PASS. Nullable schema
+and omitted/null docs dispatch, bounded compaction and denied ungranted mutation
+remain explicit. Runtime unchanged.
+
+Fetched main/merge-base `d2ed5c4c`; source merge-tree against finishing baseline
+`6a27e0d3` clean, no conflicts. Main-relative boundary is 605 files/117 commits
+including inherited earlier stages; not a small delivery-only PR. NEXT07 WIP
+`0ce30227` belongs to a separate branch, not main or integration ancestry; it is
+neither removed nor merged here. PR211 remains old `2d060bf0` until separately
+authorized fast-forward of its existing head. Updating it triggers protected
+historical/evaluation checks; permission still pending. No full required-CI or
+merge-readiness claim and no automatic merge.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
