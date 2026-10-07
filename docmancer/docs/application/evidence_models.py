@@ -346,6 +346,7 @@ class EvidenceCandidate:
     freshness: str
     navigation_only: bool
     answer_units: tuple[AnswerUnit, ...] = ()
+    answer_units_representation_bounded: bool = True
     requirement_witnesses: tuple["RequirementWitness", ...] = ()
     covered_requirement_ids: frozenset[str] = frozenset()
     original: Mapping[str, Any] = field(default_factory=dict, compare=False, repr=False)

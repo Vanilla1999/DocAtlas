@@ -124,6 +124,7 @@ def validate_assignment_binding(
         obligation,
         unit,
         source=_candidate_source_view(candidate),
+        representation_bounded=candidate.answer_units_representation_bounded,
     ).valid
 
 
@@ -142,7 +143,7 @@ def _candidate_window_valid(candidate: EvidenceCandidate) -> bool:
     )
     return (
         digest == candidate.content_sha256
-        and len(candidate.answer_units) <= MAX_ANSWER_UNITS
+        and (not candidate.answer_units_representation_bounded or len(candidate.answer_units) <= MAX_ANSWER_UNITS)
         and _display_text(candidate.original) == candidate.display_text
         and source_path(candidate.original) == candidate.path_or_url
         and authority(candidate.original) == candidate.authority
@@ -181,7 +182,10 @@ def _unit_matches_display(candidate: EvidenceCandidate, unit: AnswerUnit) -> boo
     return any(
         (fresh.unit_id, fresh.kind, fresh.text, fresh.char_start, fresh.char_end, fresh.content_sha256)
         == (unit.unit_id, unit.kind, unit.text, unit.char_start, unit.char_end, unit.content_sha256)
-        for fresh in extract_answer_units(candidate.display_text, include_soft_wrapped_prose=True)
+        for fresh in extract_answer_units(
+            candidate.display_text, include_soft_wrapped_prose=True,
+            representation_bounded=candidate.answer_units_representation_bounded,
+        )
     )
 
 

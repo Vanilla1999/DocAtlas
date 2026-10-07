@@ -8,6 +8,7 @@ import pytest
 
 from docmancer.docs.application import evidence_selection as selector
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
+from docmancer.docs.domain.answer_units import extract_answer_units
 
 
 def row(index, text=None, **overrides):
@@ -229,3 +230,106 @@ def test_docs_profiles_keep_original_representation_policy(factory, profile):
     assert len(decision.selected_candidates) <= 6
     assert decision.metrics["projected_total_tokens"] <= 800
     assert not selector.validate_evidence_sufficiency(decision, result_kind="docs_answer")
+
+
+def test_long_exact_required_fact_has_lossless_hash_bound_witness():
+    routes = ",".join(
+        f'{{"route":"/contract/{index}","handler":"dispatch_{index}","timeout":{index + 1}}}'
+        for index in range(90)
+    )
+    fact = f"const route_contract = '[{routes}]';"
+    assert len(fact) > 1500
+    requirement = EvidenceRequirement("route-contract", "required_fact", fact)
+    decision = select([row(0, fact)], requirements=EvidenceRequirementSet((requirement,)))
+    assert decision.status == "ok"
+    candidate = decision.selected_candidates[0]
+    assignment = decision.assignments[0]
+    unit = selector.resolve_assignment_unit(candidate, assignment)
+    assert unit.text == fact
+    assert unit.char_end - unit.char_start == len(fact)
+    assert unit.content_sha256 == assignment.unit_content_hash == hashlib.sha256(fact.encode()).hexdigest()
+    assert assignment.char_start == 100
+    assert assignment.char_end == 100 + len(fact)
+    assert not selector.validate_evidence_sufficiency(decision, result_kind="patch_context")
+    docs = extract_answer_units(fact)
+    assert docs == extract_answer_units(fact, representation_bounded=True)
+    assert len(docs) == 1 and len(docs[0].text) == 1500
+    assert docs[0].text == fact[:1500]
+    assert docs[0].char_end == 1500
+    assert not selector.validate_assignment_binding(
+        requirement, candidate, replace(assignment, unit_content_hash="0" * 64),
+    )
+    assert not selector.validate_assignment_binding(
+        requirement, candidate, replace(assignment, unit_char_end=assignment.unit_char_end - 1),
+    )
+    forged = replace(unit, unit_id="unit-forged")
+    assert not selector.validate_assignment_binding(
+        requirement, replace(candidate, answer_units=(forged,)), replace(assignment, unit_id=forged.unit_id),
+    )
+    with pytest.raises(ValueError, match="hash mismatch"):
+        replace(unit, content_sha256="0" * 64)
+
+
+@pytest.mark.parametrize("typed", [False, True])
+def test_late_literal_after_sixty_four_units_is_assigned(typed):
+    declarations = [f"config_{index:03d} = value_{index:03d}" for index in range(90)]
+    fact = "late_config = enabled"
+    text = "\n".join([*declarations, fact])
+    requirement = (
+        EvidenceRequirement(
+            "late-literal", "proof_obligation", "late_config", obligation_kind="exact_fact",
+            subject="late_config", subject_kind="config_key", value_kind="text", expected_value="enabled",
+        ) if typed else EvidenceRequirement("late-literal", "required_fact", fact)
+    )
+    decision = select([row(0, text)], requirements=EvidenceRequirementSet((requirement,)))
+    assert decision.status == "ok"
+    candidate = decision.selected_candidates[0]
+    assert len(candidate.answer_units) > 64
+    assert candidate.answer_units_representation_bounded is False
+    assignment = decision.assignments[0]
+    unit = selector.resolve_assignment_unit(candidate, assignment)
+    assert unit.text == fact
+    assert assignment.char_start == 100 + text.index(fact)
+    assert assignment.char_end == 100 + len(text)
+    assert assignment.line_start == assignment.line_end == 93
+    assert not selector.validate_evidence_sufficiency(decision, result_kind="patch_context")
+    docs_candidates, _ = selector.normalize_candidates([row(0, text)], result_kind="docs_answer")
+    docs = docs_candidates[0]
+    assert docs.answer_units_representation_bounded is True
+    assert len(docs.answer_units) == 64
+    assert all(unit.text != fact for unit in docs.answer_units)
+    assert docs.answer_units == extract_answer_units(
+        text, source_fields={"path_or_url": docs.path_or_url, "section": docs.section},
+    )
+
+
+@pytest.mark.parametrize("soft_wrapped", [False, True])
+def test_late_bullet_group_is_not_lost_to_run_representation_gates(soft_wrapped):
+    runs = [f"- route_{index:03d}: dispatch_{index:03d}\n- retry_{index:03d}: {index + 1}" for index in range(14)]
+    text = "\n".join(f"{run}\nseparator_{index:03d} = boundary" for index, run in enumerate(runs))
+    units = extract_answer_units(
+        text, include_soft_wrapped_prose=soft_wrapped, representation_bounded=False,
+    )
+    assert any(unit.kind == "unit_group" and unit.text == runs[-1] for unit in units)
+    docs = extract_answer_units(text, include_soft_wrapped_prose=soft_wrapped)
+    assert not any(unit.kind == "unit_group" and unit.text == runs[-1] for unit in docs)
+    assert len(docs) <= 64
+    requirement = EvidenceRequirement("late-route-and-retry", "required_fact", runs[-1])
+    decision = select([row(0, text)], requirements=EvidenceRequirementSet((requirement,)))
+    assert decision.status == "ok"
+    assert not selector.validate_evidence_sufficiency(decision, result_kind="patch_context")
+
+
+def test_patch_group_width_and_soft_wrapped_sentence_counts_have_no_representation_caps():
+    bullets = "\n".join(f"- endpoint_{index:03d}: handler_{index:03d}" for index in range(9))
+    units = extract_answer_units(bullets, include_soft_wrapped_prose=True, representation_bounded=False)
+    assert any(unit.kind == "unit_group" and unit.text == bullets for unit in units)
+    docs = extract_answer_units(bullets, include_soft_wrapped_prose=True)
+    assert not any(unit.kind == "unit_group" and unit.text == bullets for unit in docs)
+    paragraphs = "\n\n".join(
+        f"Component {index} provides request\nvalidation for route {index}." for index in range(22)
+    )
+    units = extract_answer_units(paragraphs, include_soft_wrapped_prose=True, representation_bounded=False)
+    docs = extract_answer_units(paragraphs, include_soft_wrapped_prose=True)
+    assert sum(unit.kind == "paragraph_sentence" for unit in units) == 22
+    assert sum(unit.kind == "paragraph_sentence" for unit in docs) == 16

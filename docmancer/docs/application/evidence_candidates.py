@@ -309,7 +309,9 @@ def normalize_candidates(
                 display,
                 source_fields={"path_or_url": path, "section": heading},
                 include_soft_wrapped_prose=include_soft_wrapped_prose,
+                representation_bounded=result_kind != "patch_context",
             ),
+            answer_units_representation_bounded=result_kind != "patch_context",
             original=item,
         ))
     return candidates, omissions

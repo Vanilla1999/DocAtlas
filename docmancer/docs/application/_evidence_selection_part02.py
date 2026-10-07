@@ -84,6 +84,7 @@ def _witness_for_requirement(
             obligation,
             tuple(unit for unit in candidate.answer_units if _unit_matches_display(candidate, unit)),
             source=_candidate_source_view(candidate),
+            representation_bounded=candidate.answer_units_representation_bounded,
         )
         if matched is None:
             return None

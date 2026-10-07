@@ -7,8 +7,8 @@ def _normal(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "").casefold().replace("ё", "е").replace("_", " ")).strip()
 
 
-def _bounded_text(text: str) -> str:
-    return text.strip()[:MAX_ANSWER_UNIT_CHARS]
+def _bounded_text(text: str, *, representation_bounded: bool = True) -> str:
+    return text.strip()[:MAX_ANSWER_UNIT_CHARS] if representation_bounded else text.strip()
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,8 +33,6 @@ class AnswerUnit:
             or self.char_start < 0 or self.char_end <= self.char_start
         ):
             raise ValueError("invalid answer unit offsets")
-        if len(self.text) > MAX_ANSWER_UNIT_CHARS:
-            raise ValueError("answer unit exceeds bound")
         expected = hashlib.sha256(self.text.encode("utf-8")).hexdigest()
         if expected != self.content_sha256:
             raise ValueError("answer unit hash mismatch")
@@ -124,10 +122,13 @@ class LocalProof:
     reason: str = ""
 
 
-def _make_unit(kind: str, raw: str, start: int, end: int, *, proposition: bool) -> AnswerUnit | None:
+def _make_unit(
+    kind: str, raw: str, start: int, end: int, *, proposition: bool,
+    representation_bounded: bool = True,
+) -> AnswerUnit | None:
     left_trim = len(raw) - len(raw.lstrip())
     right_trim = len(raw) - len(raw.rstrip())
-    text = _bounded_text(raw)
+    text = _bounded_text(raw, representation_bounded=representation_bounded)
     if not text:
         return None
     start += left_trim
@@ -143,8 +144,10 @@ def _make_unit(kind: str, raw: str, start: int, end: int, *, proposition: bool) 
     )
 
 
-def _make_source_field_unit(name: str, value: Any) -> AnswerUnit | None:
-    text = _bounded_text(str(value or ""))
+def _make_source_field_unit(
+    name: str, value: Any, *, representation_bounded: bool = True,
+) -> AnswerUnit | None:
+    text = _bounded_text(str(value or ""), representation_bounded=representation_bounded)
     if not text:
         return None
     identity = hashlib.sha256(f"source_field\0{name}\0{text}".encode("utf-8")).hexdigest()
@@ -165,6 +168,7 @@ def extract_answer_units(
     *,
     source_fields: Mapping[str, Any] | None = None,
     include_soft_wrapped_prose: bool = False,
+    representation_bounded: bool = True,
 ) -> tuple[AnswerUnit, ...]:
     """Extract deterministic bounded context, not certified propositions.
 
@@ -177,6 +181,7 @@ def extract_answer_units(
     if not source.strip():
         return ()
     units: list[AnswerUnit] = []
+    key_value_re = _KEY_VALUE_RE if representation_bounded else _UNBOUNDED_KEY_VALUE_RE
     lines = list(re.finditer(r".*(?:\n|$)", source))
     heading_positions: list[tuple[int, int, str]] = []
     in_fence = False
@@ -184,7 +189,10 @@ def extract_answer_units(
     fence_lines: list[tuple[int, int, str]] = []
 
     def add(kind: str, raw: str, start: int, end: int) -> None:
-        unit = _make_unit(kind, raw, start, end, proposition=False)
+        unit = _make_unit(
+            kind, raw, start, end, proposition=False,
+            representation_bounded=representation_bounded,
+        )
         if unit is not None:
             units.append(unit)
 
@@ -205,11 +213,11 @@ def extract_answer_units(
                 fence_lines = []
             else:
                 for code_start, code_end, code_line in fence_lines:
-                    if _CODE_DECL_RE.match(code_line) or _KEY_VALUE_RE.match(code_line):
+                    if _CODE_DECL_RE.match(code_line) or key_value_re.match(code_line):
                         add("code_declaration", code_line, code_start, code_end)
                 if fence_lines and not any(_CODE_DECL_RE.match(value[2]) for value in fence_lines):
                     raw_block = source[fence_start:line_match.end()]
-                    if len(raw_block.strip()) <= MAX_ANSWER_UNIT_CHARS:
+                    if not representation_bounded or len(raw_block.strip()) <= MAX_ANSWER_UNIT_CHARS:
                         # Preserve source-relative offsets.  Passing a stripped
                         # block with the untrimmed start used to shorten the
                         # span and could make a selected code-block witness
@@ -248,7 +256,7 @@ def extract_answer_units(
         if "|" in line and not _TABLE_SEPARATOR_RE.match(line) and len([part for part in line.split("|") if part.strip()]) >= 2:
             add("table_row", line, start, end)
             continue
-        if _KEY_VALUE_RE.match(line):
+        if key_value_re.match(line):
             add("key_value", line, start, end)
             continue
         if _CODE_DECL_RE.match(line):
@@ -270,13 +278,13 @@ def extract_answer_units(
 
         def flush_paragraph() -> None:
             nonlocal paragraph_lines, paragraph_sentence_count
-            if not paragraph_lines or paragraph_sentence_count >= 16:
+            if not paragraph_lines or (representation_bounded and paragraph_sentence_count >= 16):
                 paragraph_lines = []
                 return
             paragraph_start = paragraph_lines[0][0]
             paragraph_end = paragraph_lines[-1][1]
             paragraph = source[paragraph_start:paragraph_end]
-            if "\n" not in paragraph or len(paragraph) > MAX_ANSWER_UNIT_CHARS:
+            if "\n" not in paragraph or (representation_bounded and len(paragraph) > MAX_ANSWER_UNIT_CHARS):
                 paragraph_lines = []
                 return
             for sentence in _PARAGRAPH_SENTENCE_RE.finditer(paragraph):
@@ -291,7 +299,7 @@ def extract_answer_units(
                     sentence_start, sentence_start + len(stripped),
                 )
                 paragraph_sentence_count += 1
-                if paragraph_sentence_count >= 16:
+                if representation_bounded and paragraph_sentence_count >= 16:
                     break
             paragraph_lines = []
 
@@ -312,7 +320,7 @@ def extract_answer_units(
                 or _BULLET_RE.match(line)
                 or _TABLE_SEPARATOR_RE.match(line)
                 or ("|" in line and len([part for part in line.split("|") if part.strip()]) >= 2)
-                or _KEY_VALUE_RE.match(line)
+                or key_value_re.match(line)
                 or _CODE_DECL_RE.match(line)
             )
             if structural:
@@ -341,7 +349,7 @@ def extract_answer_units(
         body_text = source[heading_end:block_end].strip()
         if not body_text or candidate.strip() == heading_text:
             continue
-        if len(candidate) <= MAX_ANSWER_UNIT_CHARS:
+        if not representation_bounded or len(candidate) <= MAX_ANSWER_UNIT_CHARS:
             add("heading_context", candidate, heading_start, block_end)
 
     positional = sorted(
@@ -359,10 +367,10 @@ def extract_answer_units(
         previous = current[-1]
         gap = source[previous.char_end:unit.char_start]
         if (
-            len(current) < 6
+            (not representation_bounded or len(current) < 6)
             and not gap.strip()
             and (unit.kind == "bullet") == (previous.kind == "bullet")
-            and unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS
+            and (not representation_bounded or unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS)
         ):
             current.append(unit)
         else:
@@ -374,8 +382,10 @@ def extract_answer_units(
 
     if include_soft_wrapped_prose:
         group_count = 0
-        for run in runs[:12]:
-            max_width = min(6, len(run))
+        for run in runs[:12] if representation_bounded else runs:
+            if not representation_bounded and not all(unit.kind == "bullet" for unit in run):
+                continue
+            max_width = min(6, len(run)) if representation_bounded else len(run)
             for width in range(2, max_width + 1):
                 for offset in range(0, len(run) - width + 1):
                     window = run[offset:offset + width]
@@ -388,14 +398,14 @@ def extract_answer_units(
                     if bullet_count == len(window):
                         add("unit_group", material, start, end)
                         group_count += 1
-                        if group_count >= 24:
+                        if representation_bounded and group_count >= 24:
                             break
-                if group_count >= 24:
+                if representation_bounded and group_count >= 24:
                     break
-            if group_count >= 24:
+            if representation_bounded and group_count >= 24:
                 break
     else:
-        for run in runs[:12]:
+        for run in runs[:12] if representation_bounded else runs:
             start = run[0].char_start
             end = run[-1].char_end
             if start is None or end is None:
@@ -406,7 +416,9 @@ def extract_answer_units(
                 add("unit_group", material, start, end)
 
     for field_name, value in sorted((source_fields or {}).items()):
-        unit = _make_source_field_unit(str(field_name), value)
+        unit = _make_source_field_unit(
+            str(field_name), value, representation_bounded=representation_bounded,
+        )
         if unit is not None:
             units.append(unit)
 
@@ -418,7 +430,7 @@ def extract_answer_units(
         item.char_end if item.char_end is not None else 10**9,
         item.kind, item.source_field or "", item.unit_id,
     ))
-    return tuple(ordered[:MAX_ANSWER_UNITS])
+    return tuple(ordered[:MAX_ANSWER_UNITS] if representation_bounded else ordered)
 
 
 def _obligation_technical_term(obligation: ProofObligation) -> TechnicalTerm | None:

@@ -37,6 +37,9 @@ _TABLE_SEPARATOR_RE = re.compile(r"^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*:?-{3,}:?\s*\
 _KEY_VALUE_RE = re.compile(
     r"^\s*(?:[-*+]\s+)?[`\"']?([A-Za-zА-Яа-яЁё_][\w .:/-]{0,80})[`\"']?\s*[:=]\s*(\S.{0,1000})$"
 )
+_UNBOUNDED_KEY_VALUE_RE = re.compile(
+    r"^\s*(?:[-*+]\s+)?[`\"']?([A-Za-zА-Яа-яЁё_][\w .:/-]*)[`\"']?\s*[:=]\s*(\S.*)$"
+)
 _CODE_DECL_RE = re.compile(
     r"^\s*(?:class|def|async\s+def|function|interface|enum|type|const|let|var|final|"
     r"public|private|protected|static|fun|data\s+class|struct|trait|impl|fn|package|module|"

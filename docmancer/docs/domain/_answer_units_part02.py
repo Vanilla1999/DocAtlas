@@ -139,6 +139,7 @@ def _unit_identity_valid(unit: AnswerUnit, source: Mapping[str, Any]) -> bool:
 
 def _explicit_literal_value_proof(
     obligation: ProofObligation, unit: AnswerUnit,
+    *, representation_bounded: bool = True,
 ) -> LocalProof | None:
     """Certify only exact single-line typed key/value equality, never NL meaning."""
     if (
@@ -154,11 +155,12 @@ def _explicit_literal_value_proof(
         or unit.source_field is not None
         or unit.kind not in {"key_value", "code_declaration"}
         or "\n" in unit.text or "\r" in unit.text
-        or len(unit.text) >= MAX_ANSWER_UNIT_CHARS
+        or (representation_bounded and len(unit.text) >= MAX_ANSWER_UNIT_CHARS)
         or not _unit_identity_valid(unit, {})
     ):
         return None
-    declaration = _KEY_VALUE_RE.fullmatch(unit.text)
+    key_value_re = _KEY_VALUE_RE if representation_bounded else _UNBOUNDED_KEY_VALUE_RE
+    declaration = key_value_re.fullmatch(unit.text)
     if declaration is None:
         return None
     key, value = declaration.groups()
@@ -177,6 +179,7 @@ def local_proof_for_obligation(
     unit: AnswerUnit,
     *,
     source: Mapping[str, Any] | None = None,
+    representation_bounded: bool = True,
 ) -> LocalProof:
     """Preserve lifecycle boundaries; a supplied proposition grants no authority."""
     source = source or {}
@@ -187,7 +190,9 @@ def local_proof_for_obligation(
         return LocalProof(False, reason="historical_source_for_current_obligation")
     if obligation.lifecycle_intent == "historical" and lifecycle in {"", "active", "current"}:
         return LocalProof(False, reason="current_source_for_historical_obligation")
-    literal_proof = _explicit_literal_value_proof(obligation, unit)
+    literal_proof = _explicit_literal_value_proof(
+        obligation, unit, representation_bounded=representation_bounded,
+    )
     if literal_proof is not None:
         if not _unit_identity_valid(unit, source):
             return LocalProof(False, reason="literal_source_span_mismatch")
@@ -204,13 +209,16 @@ def best_local_proof(
     units: Iterable[AnswerUnit],
     *,
     source: Mapping[str, Any] | None = None,
+    representation_bounded: bool = True,
 ) -> tuple[AnswerUnit, LocalProof] | None:
     matches: list[tuple[AnswerUnit, LocalProof]] = []
     for index, unit in enumerate(units):
-        if index >= MAX_ANSWER_UNITS:
+        if representation_bounded and index >= MAX_ANSWER_UNITS:
             # An overflowing supplied packet is unresolved, not partially approved.
             return None
-        proof = local_proof_for_obligation(obligation, unit, source=source)
+        proof = local_proof_for_obligation(
+            obligation, unit, source=source, representation_bounded=representation_bounded,
+        )
         if proof.valid:
             matches.append((unit, proof))
     if not matches:
