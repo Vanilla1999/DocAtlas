@@ -83,3 +83,18 @@ guarantees, protected-namespace assumptions, or any threat-model weakening.
 Persistence remains blocked; packaging and production integration need later
 review and approval. B's found-window retention proposal is independently under
 R review and has no implementation allowlist yet.
+
+## Subsequent legacy-data decision
+
+The user explicitly stated that the old database is unused and disposable, and
+authorized clearing it if needed. Legacy-row preservation and identity migration
+are no longer requirements. Prefer a fresh empty database rather than designing
+compatibility aliases/migration. This supersedes the earlier unresolved legacy
+compatibility decision, not the source/ownership/security contract.
+
+No database has been cleared. Before any destructive operation, identify the
+exact database and related files; this statement does not identify a pathname or
+authorize broad storage-directory deletion. Live MCP/config replacement remains
+separately gated. Fresh-database initialization needs a reviewed safe route;
+discarding legacy data does not solve pathname/sidecar races or permit unsafe
+persistence fallback.

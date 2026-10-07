@@ -47,3 +47,9 @@ B закончил read-only inventory packing: финальные merge/ranking
 от acquisition stops, которые могут запускать дополнительные reads. Контракт
 проходит review R, включая риск дополнительных current-source rebinding reads.
 Library lineage остаётся отдельным нерешённым срезом.
+
+Пользователь уточнил: старая БД не нужна, никто ей не пользуется; её можно
+очистить. Сохранение legacy rows и identity migration больше не нужны.
+План — новая пустая БД без migration/alias. Пока ничего не удалено: точный
+target path ещё не определён. Это не снимает безопасное initialization/write
+требование и не разрешает broad storage deletion или live MCP replacement.
