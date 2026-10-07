@@ -8,7 +8,7 @@ from docmancer.docs.application.recovery import projection_recovery_action
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
-import inspect
+from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 import math
 from typing import Any
 from ._context_recovery_actions import (
@@ -305,49 +305,38 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         return _handle_maintenance_context(args, maintenance, service)
     app = getattr(service, "unified_context", service)
     retention_kwargs = {}
-    retention_stages: set[str] = set()
     if kind == "patch_context":
-        parameters = inspect.signature(app.get_docs_context).parameters
-        if "retain_found_windows" not in parameters and not any(
-            value.kind == inspect.Parameter.VAR_KEYWORD for value in parameters.values()
-        ):
-            return _bad_request("unsupported_found_window_retention", "The context facade does not support explicit patch retention")
         retention_kwargs["retain_found_windows"] = True
-        retention_kwargs["_retention_ack"] = retention_stages.add
-    result = app.get_docs_context(
-        question,
-        project_path=args.get("project_path"),
-        library=args.get("library"),
-        libraries=args.get("libraries"),
-        ecosystem=args.get("ecosystem"),
-        version=args.get("version"),
-        source_type=args.get("source_type"),
-        docs_url=args.get("docs_url"),
-        module=args.get("module"),
-        module_path=args.get("module_path"),
-        scope=args.get("scope"),
-        mode=args.get("mode"),
-        tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
-        limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
-        expand=args.get("expand"),
-        allow_latest_fallback=args.get("allow_latest_fallback"),
-        # The public three-tool surface is retrieval-only; this handler never
-        # starts bootstrap or network work.
-        prepare_project_docs=False,
-        allow_network=False,
-        force_refresh=False,
-        prefetch_auto=False,
-        details=False,
-        response_style=args.get("response_style"),
-        lookup_queries=lookup_queries,
-        **retention_kwargs,
-    )
-    if kind == "patch_context":
-        # A call-local acknowledgement is behavior, not permission or result metadata.
-        required_stages = {"unified", *(stage.removeprefix("requires:") for stage in retention_stages
-                                      if stage.startswith("requires:"))}
-        if not required_stages.issubset(retention_stages):
-            return _bad_request("unsupported_found_window_retention", "Context delegation did not acknowledge explicit patch retention")
+    try:
+        result = _invoke_found_window_retention(app.get_docs_context,
+            question,
+            project_path=args.get("project_path"),
+            library=args.get("library"),
+            libraries=args.get("libraries"),
+            ecosystem=args.get("ecosystem"),
+            version=args.get("version"),
+            source_type=args.get("source_type"),
+            docs_url=args.get("docs_url"),
+            module=args.get("module"),
+            module_path=args.get("module_path"),
+            scope=args.get("scope"),
+            mode=args.get("mode"),
+            tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
+            limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
+            expand=args.get("expand"),
+            allow_latest_fallback=args.get("allow_latest_fallback"),
+            # This read-only handler never starts bootstrap or network work.
+            prepare_project_docs=False,
+            allow_network=False,
+            force_refresh=False,
+            prefetch_auto=False,
+            details=False,
+            response_style=args.get("response_style"),
+            lookup_queries=lookup_queries,
+            **retention_kwargs,
+        )
+    except _UnsupportedFoundWindowRetention as exc:
+        return _bad_request("unsupported_found_window_retention", str(exc))
     canonical_selection = (
         result.get("selection_decision")
         if isinstance(result, dict)

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._unified_context_service_shared import *  # noqa: F401,F403
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 
 
 _MODULE_RECOVERY_REASON_CODES = frozenset({
@@ -55,6 +56,7 @@ class _UnifiedDocsContextServicePart01:
     def __init__(self, service: Any):
         self.service = service
 
+    @_found_window_retention_producer
     def get_docs_context(
         self,
         question: str,
@@ -85,8 +87,6 @@ class _UnifiedDocsContextServicePart01:
         retain_found_windows: bool = False,
         _retention_ack: Any = None,
     ) -> UnifiedDocsContextResult:
-        if retain_found_windows and _retention_ack is not None:
-            _retention_ack("unified")
         response_style = validate_response_style(response_style)
         mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
         mode_requested = (mode or "auto").lower()
@@ -176,9 +176,7 @@ class _UnifiedDocsContextServicePart01:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            if retain_found_windows and _retention_ack is not None:
-                _retention_ack("requires:project_context")
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -194,17 +192,13 @@ class _UnifiedDocsContextServicePart01:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            if retain_found_windows and _retention_ack is not None:
-                _retention_ack("requires:project_context")
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
         elif mode_selected == "mixed":
             # Explicit libraries are handled by the version-bound library lane
             # below. Do not also auto-route the project lane into dependency
             # preparation: that can block an already cached exact snapshot.
             project_mode = "project-only" if libs else "auto"
-            if retain_found_windows and _retention_ack is not None:
-                _retention_ack("requires:project_context")
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode=project_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode=project_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:

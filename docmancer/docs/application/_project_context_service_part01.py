@@ -8,12 +8,14 @@ from docmancer.docs.application.evidence_selection import requirement_probe_quer
 from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
 from docmancer.docs.application.project_docs_service import ProjectDocsService
 from docmancer.docs.domain.source_map import ProjectSourceFacts
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 
 
 class _ProjectContextServicePart01:
     def __init__(self, facade: Any):
         self.facade = facade
 
+    @_found_window_retention_producer
     def get_project_context(
         self,
         project_path: str,
@@ -37,8 +39,6 @@ class _ProjectContextServicePart01:
         retain_found_windows: bool = False,
         _retention_ack: Any = None,
     ) -> ProjectContextResult:
-        if retain_found_windows and _retention_ack is not None:
-            _retention_ack("project_context")
         response_style = validate_response_style(response_style)
         # This is a read boundary. Only a caller-supplied contract can request
         # mutation guidance; unknown prose never constructs mutation authority.
@@ -97,9 +97,7 @@ class _ProjectContextServicePart01:
             if retain_found_windows:
                 project_docs_kwargs.update(retain_found_windows=True, _retained_results=retained_results,
                                            _retention_ack=_retention_ack)
-                if _retention_ack is not None:
-                    _retention_ack("requires:project_docs")
-            project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
+            project_docs = _invoke_found_window_retention(self.facade.get_project_docs, str(root), question, **project_docs_kwargs)
             if project_docs and project_docs.results:
                 members = {candidate.path: candidate for candidate in metadata.docs_candidates}
                 project_docs = replace(project_docs, results=[

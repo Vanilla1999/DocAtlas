@@ -16,7 +16,9 @@ from docmancer.docs.domain.evidence_qualification import (
     derived_parent_trace,
     qualify_evidence,
 )
-from docmancer.docs.domain.project_doc_ranking import condition_lead_priority
+from docmancer.docs.domain.project_doc_ranking import (
+    condition_lead_priority, _found_window_retention_producer, _invoke_found_window_retention,
+)
 from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 from docmancer.docs.application.retrieval_need_support import apply_retrieval_need_witness
 from docmancer.docs.domain.query_terms import (
@@ -133,6 +135,7 @@ def _qualify_candidate_lookups(
         result.append(chunk)
     return result
 class _ProjectDocsServicePart03:
+    @_found_window_retention_producer
     def query_project_docs(
         self,
         project_path: str,
@@ -428,10 +431,9 @@ class _ProjectDocsServicePart03:
                 **(preferred.metadata or {}), "retrieval_query_matches": merged,
                 "retrieval_query_ids": tuple(key for key, trace in merged.items() if trace.get("qualified") is True),
             }})
-        if _retention_ack is not None:
-            _retention_ack("query_project_docs")
         return list(retained.values())
 
+    @_found_window_retention_producer
     def get_project_docs(
         self,
         project_path: str,
@@ -452,8 +454,6 @@ class _ProjectDocsServicePart03:
         _retention_ack: Any = None,
     ) -> ProjectDocsResult:
         root = validate_project_path(project_path).path
-        if retain_found_windows and _retention_ack is not None:
-            _retention_ack("project_docs")
         if hasattr(self.facade, "_project_get_project_docs_impl"):
             kwargs = {
                 "tokens": tokens, "limit": limit, "expand": expand, "module": module,
@@ -469,9 +469,7 @@ class _ProjectDocsServicePart03:
                 kwargs["evidence_path"] = evidence_path
             if retain_found_windows:
                 kwargs.update(retain_found_windows=True, _retained_results=_retained_results, _retention_ack=_retention_ack)
-                if _retention_ack is not None:
-                    _retention_ack("requires:project_docs_delegate")
-            return self.facade._project_get_project_docs_impl(str(root), query, **kwargs)
+            return _invoke_found_window_retention(self.facade._project_get_project_docs_impl, str(root), query, **kwargs)
         if scope and scope not in {"project", "module", "all"}:
             raise ValueError("scope must be one of: project, module, all")
         metadata = self.read_project_metadata(str(root))
@@ -676,9 +674,7 @@ class _ProjectDocsServicePart03:
         control_chunks: list[Any] = []
         retention_kwargs = ({"retain_found_windows": True, "_control_chunks": control_chunks, "_retention_ack": _retention_ack}
                             if retain_found_windows else {})
-        if retain_found_windows and _retention_ack is not None:
-            _retention_ack("requires:query_project_docs")
-        chunks = self.query_project_docs(
+        chunks = _invoke_found_window_retention(self.query_project_docs,
             str(root), query, tokens=tokens, limit=limit, expand=expand,
             scope=query_scope, module_path=resolved_module_path, evidence_path=evidence_path,
             requirements=requirements,

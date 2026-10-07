@@ -235,3 +235,110 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         if limit and len(selected) >= limit and not retain_found_windows:
             break
     return selected
+class _UnsupportedFoundWindowRetention(ValueError):
+    """A synchronous retention invocation did not complete its behavior contract."""
+
+
+def _retention_arguments(signature, args, kwargs):
+    from copy import deepcopy
+    bound = signature.bind(*args, **kwargs)
+    bound.apply_defaults()
+    values = dict(bound.arguments)
+    values.update(values.get('kwargs', {}))
+    positional = values.get('args', ())
+    root = values.get('project_path', values.get('root', positional[0] if len(positional) > 1 else None))
+    question = values.get('question', values.get('query', positional[-1] if positional else None))
+    excluded = {'self', 'args', 'kwargs', 'project_path', 'root', 'question', 'query',
+                'lookup_queries', 'retain_found_windows', '_retention_ack', '_retained_results', '_control_chunks'}
+    inputs = deepcopy({key: value for key, value in values.items() if key not in excluded})
+    binding = (str(root) if root is not None else None, question,
+               tuple(values.get('lookup_queries', ())), inputs, values.get('retain_found_windows') is True)
+    sinks = tuple(values.get(key) for key in ('_retained_results', '_control_chunks'))
+    return binding, sinks
+
+
+class _RetentionCompletion:
+    """Private call-local behavior check; not permissions or evidence provenance.
+
+    Ordinary wrappers cannot complete another receiver's invocation or substitute
+    a different result/sink. Arbitrary Python access to internals is not a security
+    boundary. No token or completion data is accepted from returned wire metadata.
+    """
+    def __init__(self, producer, receiver, binding, sinks):
+        self.producer, self.receiver, self.binding, self.sinks = producer, receiver, binding, sinks
+        self.active, self.completed = True, False
+        self.result = self.snapshot = self.sink_snapshots = None
+
+    def check(self, producer, receiver, binding, sinks):
+        if not self.active or self.completed:
+            raise _UnsupportedFoundWindowRetention('closed or already completed retention invocation')
+        if producer is not self.producer or receiver is not self.receiver or binding != self.binding or not binding[-1]:
+            raise _UnsupportedFoundWindowRetention('completion belongs to a different retention invocation')
+        if any(left is not right for left, right in zip(sinks, self.sinks, strict=True)):
+            raise _UnsupportedFoundWindowRetention('retention output sink was substituted')
+
+    def complete(self, result, producer, receiver, binding, sinks):
+        from copy import deepcopy
+        self.check(producer, receiver, binding, sinks)
+        self.result, self.snapshot = result, deepcopy(result)
+        self.sink_snapshots = deepcopy(sinks)
+        self.completed = True
+
+    def validate(self, result):
+        if not self.active or not self.completed or result is not self.result or result != self.snapshot:
+            raise _UnsupportedFoundWindowRetention('returned result did not complete this retention invocation')
+        if self.sinks != self.sink_snapshots:
+            raise _UnsupportedFoundWindowRetention('completed retention output sink was changed')
+
+    def close(self):
+        self.active = False
+        self.producer = self.receiver = self.result = self.snapshot = self.sink_snapshots = None
+        self.binding = ()
+        self.sinks = ()
+
+
+def _found_window_retention_producer(function):
+    """Complete only the actual invocation's result, after normal return."""
+    from functools import wraps
+    import inspect
+    signature = inspect.signature(function)
+    @wraps(function)
+    def produce(*args, **kwargs):
+        token = kwargs.get('_retention_ack')
+        binding, sinks = _retention_arguments(signature, args, kwargs)
+        if binding[-1] and token is not None:
+            if type(token) is not _RetentionCompletion:
+                raise _UnsupportedFoundWindowRetention('invalid retention completion token')
+            receiver = args[0] if 'self' in signature.parameters else None
+            token.check(function, receiver, binding, sinks)
+        result = function(*args, **kwargs)
+        if binding[-1] and token is not None:
+            token.complete(result, function, receiver, binding, sinks)
+        return result
+    return produce
+
+
+def _invoke_found_window_retention(function, *args, **kwargs):
+    """Each delegation owns a fresh token, closed on success and exceptions."""
+    import inspect
+    if kwargs.get('retain_found_windows') is not True:
+        return function(*args, **kwargs)
+    parent = kwargs.get('_retention_ack')
+    if parent is not None and (type(parent) is not _RetentionCompletion or not parent.active or parent.completed):
+        raise _UnsupportedFoundWindowRetention('closed or invalid parent retention completion')
+    token = None
+    try:
+        kwargs = {**kwargs, '_retention_ack': None}
+        try:
+            binding, sinks = _retention_arguments(inspect.signature(function), args, kwargs)
+        except (TypeError, ValueError) as exc:
+            raise _UnsupportedFoundWindowRetention('facade lacks the explicit completion interface') from exc
+        token = _RetentionCompletion(inspect.unwrap(getattr(function, '__func__', function)),
+                                     getattr(function, '__self__', None), binding, sinks)
+        kwargs['_retention_ack'] = token
+        result = function(*args, **kwargs)
+        token.validate(result)
+        return result
+    finally:
+        if token is not None:
+            token.close()

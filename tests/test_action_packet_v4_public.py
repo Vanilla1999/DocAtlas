@@ -14,6 +14,7 @@ from docmancer.docs.application.model_visible_projection import (
     validate_model_visible_projection,
 )
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer
 
 
 class OfflineRetrieval:
@@ -21,9 +22,18 @@ class OfflineRetrieval:
         self.result = result
         self.calls = []
 
-    def get_docs_context(self, question, **kwargs):
+    @_found_window_retention_producer
+    def get_docs_context(self, question, *, retain_found_windows=False, _retention_ack=None, **kwargs):
+        # This fixture supplies complete prepared windows, with no acquisition or
+        # packing delegation. Acknowledge its deliberate retention behavior only.
+        if retain_found_windows:
+            kwargs['retain_found_windows'] = True
         self.calls.append((question, kwargs))
-        return deepcopy(self.result)
+        result = deepcopy(self.result)
+        if retain_found_windows:
+            assert result == self.result
+            assert _retention_ack is not None
+        return result
 
 
 def source(text, index=0):
@@ -117,6 +127,7 @@ def test_real_mcp_preserves_unique_necessary_data_over_2000(necessary_evidence, 
     assert service.calls[0][1]["allow_network"] is False
     assert service.calls[0][1]["prepare_project_docs"] is False
     assert "context_format" not in service.calls[0][1]
+    assert service.calls[0][1]['retain_found_windows'] is True
     expected = deepcopy(result)
     refresh(expected)
     assert result == expected

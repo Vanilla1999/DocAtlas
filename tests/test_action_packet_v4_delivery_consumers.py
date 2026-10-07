@@ -7,6 +7,7 @@ import json
 import pytest
 
 from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer
 from docmancer.docs.interfaces.grounded_mcp_session import GroundedMCPSession
 from docmancer.docs.interfaces.host_context import (
     EvidenceDeliveryError, SourceReadController, extract_tool_payload,
@@ -58,14 +59,24 @@ def retrieval(start=0):
             'required_evidence_paths': [row['path'] for row in rows], 'project_identity': 'offline'}
 
 
+def prepared_fixture_context(raw, *, retain_found_windows=False, _retention_ack=None):
+    """Deliver all prepared fixture windows; no acquisition/delegation or packing."""
+    result = deepcopy(raw)
+    if retain_found_windows:
+        assert result == raw  # Keep text, hashes, spans and explicit obligations.
+        assert _retention_ack is not None
+    return result
+
+
 @pytest.fixture
 def patch():
     raw = retrieval()
     class Service:
-        def get_docs_context(self, question, **kwargs):
+        @_found_window_retention_producer
+        def get_docs_context(self, question, *, retain_found_windows=False, _retention_ack=None, **kwargs):
             assert kwargs['allow_network'] is False
             assert kwargs['prepare_project_docs'] is False
-            return deepcopy(raw)
+            return prepared_fixture_context(raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
     result = call_docs_tool_payload('get_docs_context', {
         'question': 'Inspect the contract implementations', 'project_path': '/repo',
         'context_format': 'patch_context',
@@ -214,8 +225,9 @@ def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explici
         class Service:
             def __init__(self, raw):
                 self.raw = raw
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(self.raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(self.raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         arguments = {'question': 'Inspect contract implementations', 'project_path': '/repo', 'context_format': 'patch_context'}
         initial = call_docs_tool_payload('get_docs_context', arguments, Service(raw))
         assert initial['result'] == 'data' and initial['completeness'] == 'partial'
@@ -347,8 +359,9 @@ def test_recovery_rejects_visible_binding_contradictions_and_preserves_partial(p
         class Service:
             def __init__(self, raw):
                 self.raw = raw
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(self.raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(self.raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         request = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         initial = call_docs_tool_payload('get_docs_context', request, Service(initial_raw))
         recovery = call_docs_tool_payload('get_docs_context', request, Service(recovery_raw))
@@ -403,8 +416,9 @@ def test_unverifiable_recovery_origin_never_becomes_matching_evidence(verificati
         class Service:
             def __init__(self, raw):
                 self.raw = raw
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(self.raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(self.raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         request = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         initial = call_docs_tool_payload('get_docs_context', request, Service(initial_raw))
         recovery = call_docs_tool_payload('get_docs_context', request, Service(retrieval(12)))
@@ -427,8 +441,9 @@ def test_recovery_forwards_all_explicit_bindings_but_never_permission_flags(patc
         initial_raw = retrieval()
         initial_raw['required_target_paths'] = ['src/missing.py']
         class Service:
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(initial_raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(initial_raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         basic = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         context = call_docs_tool_payload('get_docs_context', basic, Service())
         bindings = {'project_path': '/repo', 'library': 'sample', 'libraries': ['sample', 'second'],
@@ -459,8 +474,9 @@ def test_async_host_binding_verifier_cannot_mutate_retained_response_or_request(
         class Service:
             def __init__(self, raw):
                 self.raw = raw
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(self.raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(self.raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         basic = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         initial = call_docs_tool_payload('get_docs_context', basic, Service(initial_raw))
         recovery = call_docs_tool_payload('get_docs_context', basic, Service(retrieval(12)))
@@ -493,8 +509,9 @@ def test_patch_failed_recovery_preserves_original_partial_and_never_accepts_unbo
         raw = retrieval()
         raw['required_target_paths'] = ['src/missing.py']
         class Service:
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         arguments = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         context = call_docs_tool_payload('get_docs_context', arguments, Service())
         session = await GroundedMCPSession.start(OfflineClient(context), arguments=arguments,
@@ -515,8 +532,9 @@ def test_valid_patch_recovery_failure_retains_machine_constraints():
         raw = retrieval()
         raw['required_target_paths'] = ['src/missing.py']
         class Service:
-            def get_docs_context(self, *args, **kwargs):
-                return deepcopy(raw)
+            @_found_window_retention_producer
+            def get_docs_context(self, *args, retain_found_windows=False, _retention_ack=None, **kwargs):
+                return prepared_fixture_context(raw, retain_found_windows=retain_found_windows, _retention_ack=_retention_ack)
         arguments = {'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'}
         context = call_docs_tool_payload('get_docs_context', arguments, Service())
         session = await GroundedMCPSession.start(OfflineClient(context), arguments=arguments,
