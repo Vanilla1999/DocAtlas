@@ -21,6 +21,7 @@ static sqlite3_vfs vfs;
 static int dbfd=-1, journalfd=-1, dirfd=-1, lock_level=0;
 static int known[128], kinds[128], sync_count=0, bound=0;
 static int denied_count=0;
+static int close_error_count=0, last_close_errno=0, close_call_count=0, close_fault_used=0;
 static const char *main_name="/spike/main";
 static const char *journal_name="/spike/main-journal";
 
@@ -33,10 +34,32 @@ static int kind(int fd){
   for(int i=0;i<128;i++) if(known[i]==fd+1) return kinds[i];
   return 0;
 }
+/* Fault primitive returns EIO without recording status or poisoning context.
+ * Model Linux's released-FD error case; the observer must latch actual results.
+ * Never retry close() after an error.
+ */
+static int close_syscall(int fd,int k){
+  const char *fault=getenv("SPIKE_CLOSE_EIO_KIND");
+  if(!close_fault_used && fault && atoi(fault)==k){
+    close_fault_used=1;
+    int rc=close(fd);
+    if(rc!=0) return rc;
+    errno=EIO; return -1;
+  }
+  return close(fd);
+}
+static int observed_close(int fd,int k){
+  int rc=close_syscall(fd,k), saved=rc<0?errno:0;
+  close_call_count++;
+  if(rc<0){ close_error_count++; last_close_errno=saved; }
+  fprintf(stderr,"{\"event\":\"close_syscall_result\",\"fd\":%d,\"kind\":%d,\"call\":%d,\"result\":%d,\"errno\":%d,\"lock\":%d}\n",
+    fd,k,close_call_count,rc,saved,lock_level);
+  fflush(stderr); errno=saved; return rc;
+}
 static int remember(int fd, int k){
   if(fd<0) return fd;
   for(int i=0;i<128;i++) if(!known[i]){ known[i]=fd+1; kinds[i]=k; return fd; }
-  close(fd); return deny("descriptor_budget_denied");
+  observed_close(fd,k); return deny("descriptor_budget_denied");
 }
 static int selected(const char *name){
   if(!name) return -1;
@@ -47,6 +70,7 @@ static int selected(const char *name){
 static int writable(int fd){
   struct stat st;
   if(denied_count) return deny("poisoned_context_write_denied");
+  if(close_error_count) return deny("close_failure_write_denied");
   if(kind(fd)!=1 && kind(fd)!=2) return deny("unknown_write_fd_denied");
   if(lock_level!=SQLITE_LOCK_EXCLUSIVE) return deny("write_without_exclusive_denied");
   /* A detector, NOT an atomic no-external-alias guarantee. */
@@ -63,10 +87,11 @@ static int h_open(const char *name,int flags,int mode){
   return remember(fcntl(fd,F_DUPFD_CLOEXEC,3),fd==dbfd?1:2);
 }
 static int h_close(int fd){
-  if(!kind(fd)) return deny("unknown_close_denied");
+  int k=kind(fd);
+  if(!k) return deny("unknown_close_denied");
   trace("unix_close",fd);
   for(int i=0;i<128;i++) if(known[i]==fd+1){ known[i]=0; kinds[i]=0; }
-  return close(fd);
+  return observed_close(fd,k);
 }
 static int h_access(const char *name,int mode){
   (void)mode; trace("unix_access",0);
@@ -108,22 +133,31 @@ static ssize_t h_pread(int fd,void *p,size_t n,off_t off){
   if(!kind(fd)) return deny("unknown_pread_denied"); return pread(fd,p,n,off);
 }
 static void before_write(int fd){
-  trace(kind(fd)==1?"db_write":"journal_write",(int)fd);
+  trace(kind(fd)==1?"db_write_attempt":"journal_write_attempt",(int)fd);
   if(kind(fd)==1 && getenv("SPIKE_PAUSE_DB_WRITE")){
     unsetenv("SPIKE_PAUSE_DB_WRITE");
     puts("{\"checkpoint\":\"native_before_db_write\"}"); fflush(stdout);
     char line[32]; if(!fgets(line,sizeof(line),stdin) || strcmp(line,"continue\n")) _exit(87);
   }
 }
+static void write_result(int fd,size_t n,ssize_t rc,int saved,int performed){
+  fprintf(stderr,"{\"event\":\"write_syscall_result\",\"fd\":%d,\"kind\":%d,\"requested_bytes\":%zu,\"result_bytes\":%lld,\"errno\":%d,\"syscall_performed\":%s,\"lock\":%d}\n",
+    fd,kind(fd),n,(long long)rc,saved,performed?"true":"false",lock_level);
+  fflush(stderr); errno=saved;
+}
 static ssize_t h_write(int fd,const void *p,size_t n){
-  before_write(fd); if(writable(fd)) return -1;
-  ssize_t rc=write(fd,p,n);
+  before_write(fd);
+  int performed=writable(fd)==0;
+  ssize_t rc=performed?write(fd,p,n):-1; int saved=rc<0?errno:0;
+  write_result(fd,n,rc,saved,performed);
   if(kind(fd)==1 && getenv("SPIKE_CRASH_DB_WRITE")) _exit(86);
   return rc;
 }
 static ssize_t h_pwrite(int fd,const void *p,size_t n,off_t off){
-  before_write(fd); if(writable(fd)) return -1;
-  ssize_t rc=pwrite(fd,p,n,off);
+  before_write(fd);
+  int performed=writable(fd)==0;
+  ssize_t rc=performed?pwrite(fd,p,n,off):-1; int saved=rc<0?errno:0;
+  write_result(fd,n,rc,saved,performed);
   if(kind(fd)==1 && getenv("SPIKE_CRASH_DB_WRITE")) _exit(86);
   return rc;
 }
@@ -159,9 +193,7 @@ typedef struct { sqlite3_file base; sqlite3_file *inner; int type; } SpFile;
 #define INNER(f) (((SpFile*)(f))->inner)
 static int io_close(sqlite3_file *f){
   trace("vfs_close",0); int rc=INNER(f)->pMethods->xClose(INNER(f)); sqlite3_free(INNER(f));
-  if(((SpFile*)f)->type==SQLITE_OPEN_MAIN_DB && getenv("SPIKE_FAIL_CLOSE")){
-    deny("injected_close_failure"); return SQLITE_IOERR_CLOSE;
-  }
+  trace("vfs_close_result",rc);
   return rc;
 }
 static int io_read(sqlite3_file *f,void *p,int n,sqlite3_int64 off){ return INNER(f)->pMethods->xRead(INNER(f),p,n,off); }
@@ -257,6 +289,12 @@ static void profile(sqlite3_context *ctx,int argc,sqlite3_value **argv){
 static void status(sqlite3_context *ctx,int argc,sqlite3_value **argv){
   (void)argc;(void)argv; sqlite3_result_int(ctx,denied_count);
 }
+static void close_status(sqlite3_context *ctx,int argc,sqlite3_value **argv){
+  (void)argc;(void)argv; sqlite3_result_int(ctx,close_error_count);
+}
+static void close_errno(sqlite3_context *ctx,int argc,sqlite3_value **argv){
+  (void)argc;(void)argv; sqlite3_result_int(ctx,last_close_errno);
+}
 static void probes(sqlite3_context *ctx,int argc,sqlite3_value **argv){
   (void)argc;(void)argv; int out=0; void volatile *mapping=NULL;
   h_open("/proc/self/fd/1",O_WRONLY,0);
@@ -317,6 +355,8 @@ int sqlite3_extension_init(sqlite3 *db,char **error,const sqlite3_api_routines *
   (void)error; SQLITE_EXTENSION_INIT2(api); unix_vfs=sqlite3_vfs_find("unix");
   int rc=sqlite3_create_function(db,"spike_profile",0,SQLITE_UTF8,NULL,profile,NULL,NULL);
   if(rc==SQLITE_OK) rc=sqlite3_create_function(db,"spike_status",0,SQLITE_UTF8,NULL,status,NULL,NULL);
+  if(rc==SQLITE_OK) rc=sqlite3_create_function(db,"spike_close_errors",0,SQLITE_UTF8,NULL,close_status,NULL,NULL);
+  if(rc==SQLITE_OK) rc=sqlite3_create_function(db,"spike_close_errno",0,SQLITE_UTF8,NULL,close_errno,NULL,NULL);
   if(rc==SQLITE_OK) rc=sqlite3_create_function(db,"spike_probes",0,SQLITE_UTF8,NULL,probes,NULL,NULL);
   if(rc==SQLITE_OK) rc=sqlite3_create_function(db,"spike_bind",3,SQLITE_UTF8,NULL,bind_fds,NULL,NULL);
   /* VFS and syscall callbacks remain registered until this worker exits. */

@@ -37,8 +37,20 @@ This exercises a small fixture schema, **not** production member SQL/retrieval.
 An initial experiment exposed ignored fchmod errors and a denied journal delete
 on close in DELETE mode. No unsafe unlink was implemented. PERSIST avoids that
 normal close route, and native denials poison later writes and invalidate even
-an apparently successful close. Close failure after commit is reported as an
-unknown outcome, not zero mutation.
+an apparently successful close. R's independent audit of `a7a41ac5` found that
+actual close EIO was still false-green: SQLite's `robust_close()` discards the
+return code, and the old test directly poisoned status in the fault itself.
+The followup instead independently latches every observed close syscall failure
+and errno. The EIO fault primitive closes the FD then returns -1/EIO without
+touching denial/latch state; the observer must catch it. DB, journal and directory
+close cases are exercised. No close retries occur. A final DB close failure after
+commit invalidates success even with **zero native denials**; outcome is unknown,
+not zero mutation. Close outcomes and SQLite xClose outcomes are traced separately.
+
+Write events are explicitly `db_write_attempt` / `journal_write_attempt`.
+Each is followed by `write_syscall_result` with requested/result bytes, errno and
+whether the syscall ran, including denied attempts. These results indicate kernel
+acceptance, NOT storage durability. `io_evidence` no longer claims physical writes.
 
 ## Measured runtime, not an optional-API assumption
 
@@ -56,7 +68,8 @@ Actual `unix.xNextSystemCall()` profile:
 open,close,access,getcwd,stat,fstat,ftruncate,fcntl,read,pread,write,pwrite,fchmod,unlink,openDirectory,mkdir,rmdir,fchown,geteuid,mmap,munmap,mremap,getpagesize,readlink,lstat
 ```
 
-All 25 available hooks are replaced and individually traced. Absent hooks in
+All 25 available hooks are replaced and individually traced **on this trusted
+profile only; hook coverage is not confinement**. Absent hooks in
 the source table: `pread64`, `pwrite64`, `fallocate`, `ioctl`. Unknown hooks reject
 binding. The complete measured `PRAGMA compile_options` is pinned in `worker.py`
 and emitted into profile artifacts; a different profile rejects target access.
@@ -88,6 +101,7 @@ pragma.c   6c152895b2e85b9fa855891b199df8d57184ae6772c5eb682c0b0cd32d455b74
 | `unixSync` / `openDirectory` | Duplicated inherited directory FD; base Unix sync methods retained. |
 | direct fsync/fdatasync in `full_fsync` | Not in xSetSystemCall table. They receive the selected file or directory FD; xSync entry/result is traced. Injected faults are at xSync, NOT actual kernel/hardware fsync faults. |
 | fcntl locking / Unix inode registry / close deferral | Original POSIX protocol on retained-inode duplicates, with command/type/byte-range traces. Worker has no inherited SQLite connection. Extra retained FDs close only after its target connection exits. |
+| `robust_close` / raw close | Actual syscall return/errno latched independently; default VFS may report OK despite raw close EIO. No retries or false-success inference from xClose. |
 | pread/read/fstat, pwrite/write/ftruncate | Registered FDs only. Writes require successful exclusive lock; link-count detector is explicitly non-atomic. |
 | permission/ownership adjustment | Deny and poison context, including adjustments SQLite might otherwise ignore. |
 | mmap/munmap/mremap, xShmMap/Lock/Unmap | Deny; unexpected xShmBarrier terminates worker. Database xFetch is not supplied. |
@@ -107,37 +121,67 @@ proof of absence of every direct OS call has been obtained.
 
 ## Header provenance and license
 
-Headers are byte-for-byte from the official, reviewed 3.50.4 amalgamation:
+Headers originate from the official, reviewed 3.50.4 amalgamation:
 https://www.sqlite.org/2025/sqlite-amalgamation-3500400.zip
 
 ```text
 archive SHA256: 1d3049dd0f830a025a53105fc79fd2ab9431aea99e137809d064d8ee8356b032
 sqlite3.h:     abd1514e0351f79393d1be882830afdb40a8099e8257f311f0bfdf8486f11bea
-sqlite3ext.h:  9a91de0d5e5ccc04ec59041275c67972d6f8894f7543a10033e387b69987beb5
+sqlite3ext.h upstream:   9a91de0d5e5ccc04ec59041275c67972d6f8894f7543a10033e387b69987beb5
+sqlite3ext.h normalized: 6a1a5763c6293fa3599ad4ef851d03057176fae49b7c50deafe193cf438c7d61
 ```
 
 SQLite is public domain (https://www.sqlite.org/copyright.html); upstream header
 notices are retained. Our experimental C/Python follow the repository MIT license.
 The amalgamation implementation is not bundled or compiled. Tests verify header
 hashes locally; neither worker nor tests fetch headers.
-`git diff --check` reports three upstream trailing-space lines in `sqlite3ext.h`
-(15, 709, 716). They are intentionally retained to preserve byte-exact provenance;
-the authored spike/test files have no diff-check warnings.
+Transformation: remove exactly one trailing ASCII space immediately before LF
+on `sqlite3ext.h` lines 15, 709, 716. All other bytes, including the license,
+remain unchanged; `sqlite3.h` remains byte-exact. The portable test reconstructs
+the three spaces and verifies the upstream SHA. The worker checks the normalized
+SHA. Diff checks now require no header exceptions.
 
 ## Reproduce — disposable fixtures only
 
-From `/tmp/opencode/mcp-storage-a`:
+From `/tmp/opencode/mcp-storage-a`, portable default-discovered checks (no native
+build/load, compiler or SQLite-profile requirement):
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 DOCATLAS_OFFLINE=1 \
 PYTHONPATH=/tmp/opencode/mcp-storage-a \
 /home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python \
 -m pytest -p no:cacheprovider -q \
---basetemp=/tmp/opencode/mcp-storage-native-spike-reproduce \
+--basetemp=/tmp/opencode/mcp-storage-native-spike-portable-reproduce \
 tests/test_mcp_storage_native_spike.py
 ```
 
-The normal conftest/diagnostic gates run. C is built with the existing `cc` using
+Explicit opt-in positive native research, requiring the exact trusted Linux
+profile above (including built-in SQLite compiled with clang-22.1.1):
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 DOCATLAS_OFFLINE=1 \
+PYTHONPATH=/tmp/opencode/mcp-storage-a \
+/home/viadmin/StudioProjects/hermes/docmancer/.venv/bin/python \
+-m pytest -p no:cacheprovider -q \
+--basetemp=/tmp/opencode/mcp-storage-native-spike-positive-reproduce \
+tests/mcp_storage_native_spike_checks.py
+```
+
+Both exact file selections run normal ancestor conftest/diagnostic gates. The
+positive file deliberately does not match default discovery; this is opt-in
+research, not an active product gate being disabled. Unsupported positive runs
+fail closed with no skips/marks. These positive cases are NOT evidence for the
+ordinary Python 3.11/3.12/3.13 CI matrix. CI/workflows/conftest/pytest.ini unchanged.
+
+**Directory-collection inventory blocker:** the existing conftest's directory
+selection requires every labeled module below `tests`, including this opt-in
+file, while default discovery omits that filename. Thus directory collection's
+inventory would report this module stale. The portable checks reproduce that
+validator conflict into `directory-gate-observation.json` without collecting
+historical suites. No gate/config/inventory bypass was applied; full CI is NOT
+claimed green. Resolving that conflict needs separate coordinator authorization.
+
+C is built with the existing `cc` using
 `-std=c11 -Wall -Wextra -Werror -Wno-misleading-indentation -fPIC -shared`.
 Do not select an existing directory as basetemp: pytest owns that disposable path.
 No test skips convert unsupported positive platforms into successful coverage.
@@ -147,7 +191,8 @@ Trace artifacts are `<basetemp>/test_*/worker-*.trace` (native JSONL) and
 `test_exact_profile_and_header_pr*/profile.json`. Hostile removal observation:
 `test_hostile_hot_journal_remov*/hostile-removal-observation.json`.
 Worker stdout traces startup/CAS/commit/close; C traces hook installation, actual
-locks, data writes, sync results, denials, and close. Forced exit 86 has no final
+locks, write attempts/results, sync results, denials, and raw/SQLite close results.
+Forced exit 86 has no final
 result; it must never be interpreted as a successful or zero-write operation.
 
 The tests demonstrate clean fixture commit/default-reader compatibility,
@@ -159,6 +204,33 @@ retained-directory operation committing outside the current pathname, and a
 post-final-check replacement can leave the committed DB unreachable at its name.
 Those are evidence of unresolved grant semantics, NOT success under the required
 production security contract.
+
+### Close-audit followup validation
+
+Measured on the reviewed Python 3.13.12 / SQLite 3.50.4 profile:
+
+* Portable exact-file run: **16 passed**; artifacts
+  `/tmp/opencode/mcp-storage-close-portable-final/` (includes directory-gate
+  observation). Python 3.12 portable run: **16 passed**, with the environment's
+  existing unknown `asyncio_mode` config warning; artifacts
+  `/tmp/opencode/mcp-storage-close-portable-py312/`. Python 3.11 lacks pytest here;
+  no install or 3.11 validation claimed.
+* Explicit positive exact-file run: **27 passed**; final artifacts
+  `/tmp/opencode/mcp-storage-close-positive-final-v2/`. The three
+  `test_actual_close_eio_indepen*` directories contain raw close EIO results and
+  worker error/unknown outcome JSONL. DB final-close case also has commit-returned
+  evidence with zero native denials.
+* Unsupported Python 3.12 explicit positive admission: expected pytest **exit 1**,
+  no shared-object build; output/observation at
+  `/tmp/opencode/mcp-storage-close-unsupported-py312/`. This is negative admission
+  evidence, not a passing positive or matrix-green claim.
+* Normal diagnostic gates for both file selections, repository Python module-size
+  gate, authored Python AST checks, and `git diff --check` pass. Native authored C,
+  worker and both test modules remain below 1000 lines.
+
+R1 remains OPEN; independent re-audit is still required. No production persistence,
+packaging, object-grant semantics, protected recovery namespace, or WAL approval
+is implied by these experimental checks.
 
 ## Unresolved obligations — no threat-model weakening
 
@@ -182,8 +254,9 @@ production security contract.
    have not been proved. No header conversion or automatic upgrade is performed.
 7. **Durability:** ordinary intact-journal process-crash recovery is exercised;
    power-loss, real fsync failures, filesystem/hardware guarantees, and every
-   error cleanup branch remain unproved. Physical recovery writes are reported
-   separately from member attempts. Unknown commits remain unknown.
+    error cleanup branch remain unproved. Recovery write attempts and syscall
+    results are reported separately from member attempts; syscall success is not
+    proof of physical durability. Unknown commits remain unknown.
 8. **Same-UID direct rewriting:** descriptor binding does not protect inode contents
    from a malicious writer with equivalent credentials. No advisory-lock defense
    or filesystem permission assumption is substituted for hostile-race protection.

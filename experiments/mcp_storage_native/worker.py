@@ -14,7 +14,7 @@ import time
 MAX_REQUEST = 8192
 HEADER_HASHES = {
     "sqlite3.h": "abd1514e0351f79393d1be882830afdb40a8099e8257f311f0bfdf8486f11bea",
-    "sqlite3ext.h": "9a91de0d5e5ccc04ec59041275c67972d6f8894f7543a10033e387b69987beb5",
+    "sqlite3ext.h": "6a1a5763c6293fa3599ad4ef851d03057176fae49b7c50deafe193cf438c7d61",
 }
 # Filled from the measured built-in VFS; no generic optional-hook assumption.
 EXPECTED_PROFILE = (
@@ -33,6 +33,33 @@ MAX_DEFAULT_PAGE_SIZE=8192 MAX_EXPR_DEPTH=1000 MAX_FUNCTION_ARG=1000 MAX_LENGTH=
 MAX_LIKE_PATTERN_LENGTH=50000 MAX_MMAP_SIZE=0x7fff0000 MAX_PAGE_COUNT=0xfffffffe MAX_PAGE_SIZE=65536
 MAX_SQL_LENGTH=1000000000 MAX_TRIGGER_DEPTH=1000 MAX_VARIABLE_NUMBER=32766 MAX_VDBE_OP=250000000
 MAX_WORKER_THREADS=8 MUTEX_PTHREADS SYSTEM_MALLOC TEMP_STORE=1 THREADSAFE=1""".split()
+EXPECTED_SOURCE_ID = "2025-07-30 19:33:53 4d8adfb30e03f9cf27f800a2c1ba3c48fb4ca1b08b0f5ed59a4d5ecbf45e20a3"
+
+
+def validate_profile(profile, identity, options):
+    """Pure admission check; never infer support from an optional API alone."""
+    if profile != EXPECTED_PROFILE:
+        raise PermissionError("unsupported exact Unix syscall profile")
+    if options != EXPECTED_COMPILE_OPTIONS:
+        raise PermissionError("unsupported exact SQLite compile profile")
+    if identity != ("3.50.4", EXPECTED_SOURCE_ID):
+        raise PermissionError("unsupported SQLite source identity")
+
+
+def validate_request(raw):
+    if len(raw) > MAX_REQUEST:
+        raise ValueError("fixture request too large")
+    request = json.loads(raw)
+    if not isinstance(request, dict) or set(request) - {
+        "operation", "expected_generation", "new_generation", "content", "pause",
+    } or request.get("operation") not in {"profile", "upsert", "recover", "probe_denials"}:
+        raise ValueError("invalid finite fixture request")
+    if request["operation"] != "profile":
+        if any(type(request.get(key)) is not str for key in ("expected_generation", "new_generation", "content")):
+            raise ValueError("explicit fixture generation and member bytes required")
+        if request.get("pause") not in {None, "bound", "locked", "before_commit"}:
+            raise ValueError("unknown fixture checkpoint")
+    return request
 
 
 def emit(value):
@@ -80,12 +107,7 @@ def run(args, request):
               "compile_options": options})
         if request["operation"] == "profile":
             return {"status": "profile", "profile": profile}
-        if profile != EXPECTED_PROFILE:
-            raise PermissionError("unsupported exact Unix syscall profile")
-        if options != EXPECTED_COMPILE_OPTIONS:
-            raise PermissionError("unsupported exact SQLite compile profile")
-        if identity[1] != "2025-07-30 19:33:53 4d8adfb30e03f9cf27f800a2c1ba3c48fb4ca1b08b0f5ed59a4d5ecbf45e20a3":
-            raise PermissionError("unsupported SQLite source identity")
+        validate_profile(profile, identity, options)
         for fd in (args.database_fd, args.journal_fd, args.directory_fd):
             os.fstat(fd)
         if not stat.S_ISDIR(os.fstat(args.directory_fd).st_mode):
@@ -115,11 +137,12 @@ def run(args, request):
         if owner is not None and owner[0] != "fixture-owner":
             raise PermissionError("member ownership conflict")
         emit({"phase": "cas_passed", "generation": generation})
-        if loader.execute("SELECT spike_status()").fetchone()[0]:
-            raise PermissionError("native operation denied before member writes")
+        if loader.execute("SELECT spike_status(), spike_close_errors()").fetchone() != (0, 0):
+            raise PermissionError("native denial or close failure before member writes")
         if request["operation"] == "recover":
             conn.rollback()
-            outcome.update(status="recovered", generation=generation, physical_writes="see_trace")
+            outcome.update(status="recovered", generation=generation,
+                           io_evidence="attempts_and_syscall_results_not_durability")
             return outcome
         attempts = True
         conn.execute("INSERT INTO members(path,owner,content) VALUES('README.md','fixture-owner',?) "
@@ -130,7 +153,7 @@ def run(args, request):
         committed = True
         emit({"phase": "commit_returned"})
         outcome.update(status="experimental_commit", generation=request["new_generation"],
-                       production_ready=False, physical_writes="see_trace")
+                       production_ready=False, io_evidence="attempts_and_syscall_results_not_durability")
         return outcome
     except Exception as exc:
         rollback = "not_needed"
@@ -142,7 +165,7 @@ def run(args, request):
                 rollback = type(failure).__name__ + ": " + str(failure)
         outcome.update(status="error", error=str(exc), rollback=rollback,
                        commit_outcome="unknown" if attempts or committed else "no_member_write_attempt",
-                       physical_writes="see_trace", profile=profile)
+                       io_evidence="attempts_and_syscall_results_not_durability", profile=profile)
         return outcome
     finally:
         if conn is not None:
@@ -155,6 +178,12 @@ def run(args, request):
         if bound_status := (loader.execute("SELECT spike_status()").fetchone()[0] if profile else 0):
             outcome.update(status="error", native_denials=bound_status,
                            commit_outcome="unknown" if attempts or committed else "no_member_write_attempt")
+        if profile:
+            errors, error_number = loader.execute("SELECT spike_close_errors(), spike_close_errno()").fetchone()
+            if errors:
+                outcome.update(status="error", error="native close syscall failed",
+                               close_errors=errors, close_errno=error_number,
+                               native_denials=bound_status, commit_outcome="unknown")
         loader.close()
         emit({"elapsed_seconds": round(time.monotonic() - started, 4)})
 
@@ -167,18 +196,7 @@ def main():
     parser.add_argument("--directory-fd", type=int, default=-1)
     args = parser.parse_args()
     raw = sys.stdin.readline(MAX_REQUEST + 1)
-    if len(raw) > MAX_REQUEST:
-        raise ValueError("fixture request too large")
-    request = json.loads(raw)
-    if not isinstance(request, dict) or set(request) - {
-        "operation", "expected_generation", "new_generation", "content", "pause",
-    } or request.get("operation") not in {"profile", "upsert", "recover", "probe_denials"}:
-        raise ValueError("invalid finite fixture request")
-    if request["operation"] != "profile":
-        if any(type(request.get(key)) is not str for key in ("expected_generation", "new_generation", "content")):
-            raise ValueError("explicit fixture generation and member bytes required")
-        if request.get("pause") not in {None, "bound", "locked", "before_commit"}:
-            raise ValueError("unknown fixture checkpoint")
+    request = validate_request(raw)
     emit({"result": run(args, request)})
 
 
