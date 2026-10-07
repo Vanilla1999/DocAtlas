@@ -47,11 +47,15 @@ def test_normalization_and_selector_preserve_bound_quotes_without_label_veto(quo
     assert (candidate.parent_logical_id, candidate.char_start, candidate.line_start,
             candidate.resolved_version) == ("parent", 10, 2, "2.0")
     requirement = EvidenceRequirement("code", "code_group", '["marble()"]')
-    contract = {"sources": {"risky": [{"path": "AGENTS.md"}], "rejected": [{"path": "AGENTS.md"}]}}
-    decision = select_evidence([row], question="marble()", config=patch_selection_config(2000),
+    contract = {"sources": {"risky": [{"path": "AGENTS.md"}]}}
+    decision = select_evidence([row], question="marble()", config=patch_selection_config(),
         requirements=EvidenceRequirementSet((requirement,)), trust_contract=contract)
     assert decision.support_decision.answer_supported
     assert decision.selected_candidates[0].display_text == row["content"]
+    assert decision.selected_candidates[0].content_sha256 == row["display_content_hash"]
+    assert (decision.selected_candidates[0].char_start, decision.selected_candidates[0].char_end,
+            decision.selected_candidates[0].line_start, decision.selected_candidates[0].line_end) == (
+                row["char_start"], row["char_end"], row["line_start"], row["line_end"])
     assert validate_assignment_binding(requirement, decision.selected_candidates[0], decision.assignments[0])
     public, snapshot = project_docs_answer(question="marble()", retrieval={
         "context_pack": [row], "requirements": decision.requirements,
@@ -60,14 +64,25 @@ def test_normalization_and_selector_preserve_bound_quotes_without_label_veto(quo
     assert not public["edit_ready"] and snapshot
     plain = {key: value for key, value in row.items() if key not in {
         "instruction_risk_flags", "risk_flags", "instruction_trust", "authority"}}
-    unlabelled = select_evidence([plain], question="marble()", config=patch_selection_config(2000),
+    unlabelled = select_evidence([plain], question="marble()", config=patch_selection_config(),
         requirements=EvidenceRequirementSet((requirement,)))
     assert decision.assignments == unlabelled.assignments
     other = dict(row, stable_chunk_id="aaa", parent_logical_id="other-parent",
         path="CLAUDE.md", authority="supporting")
-    competing = select_evidence([row, other], question="marble()", config=patch_selection_config(2000),
+    competing = select_evidence([row, other], question="marble()", config=patch_selection_config(),
         requirements=EvidenceRequirementSet((requirement,)), trust_contract=contract)
     assert competing.assignments[0].evidence_id == "aaa"
+    rejected_contract = {"sources": {**contract["sources"], "rejected": [{"path": "AGENTS.md"}]}}
+    rejected = select_evidence([row], question="marble()", config=patch_selection_config(),
+        requirements=EvidenceRequirementSet((requirement,)), trust_contract=rejected_contract)
+    assert rejected.status == "insufficient_evidence" and not rejected.support_decision.answer_supported
+    assert not rejected.selected_candidates and not rejected.assignments
+    assert any(omission.reason_code == "forbidden_source" for omission in rejected.omissions)
+    allowed_other = select_evidence([row, other], question="marble()", config=patch_selection_config(),
+        requirements=EvidenceRequirementSet((requirement,)), trust_contract=rejected_contract)
+    assert allowed_other.support_decision.answer_supported
+    assert [candidate.path_or_url for candidate in allowed_other.selected_candidates] == ["CLAUDE.md"]
+    assert validate_assignment_binding(requirement, allowed_other.selected_candidates[0], allowed_other.assignments[0])
 
 
 @pytest.mark.parametrize("invalid", [
@@ -98,7 +113,7 @@ def test_actual_sdk_and_public_projection_do_not_grant_workflow(tmp_path):
     assert raw.answer_completeness["edit_ready"] is False
     assert raw.context_pack[0]["instruction_trust"] == "untrusted_data"
     requirement = EvidenceRequirement("code", "code_group", '["marble()"]')
-    selection = select_evidence([row], question="marble()", config=patch_selection_config(2000),
+    selection = select_evidence([row], question="marble()", config=patch_selection_config(),
         requirements=EvidenceRequirementSet((requirement,)))
     public, snapshot = project_docs_answer(question="marble()", retrieval={
         "context_pack": raw.context_pack, "requirements": selection.requirements,

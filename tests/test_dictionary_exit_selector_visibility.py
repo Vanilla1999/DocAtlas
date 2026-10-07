@@ -28,7 +28,7 @@ def row(text="Unrelated policy must remain.", **changes):
 def select(raw, requirements=(CODE,), docs=False):
     return select_evidence(
         [raw], question="inspect", requirements=EvidenceRequirementSet(requirements),
-        config=docs_selection_config(800) if docs else patch_selection_config(2000),
+        config=docs_selection_config(800) if docs else patch_selection_config(),
     )
 
 
@@ -133,7 +133,7 @@ def test_assignment_mutations_fail_strict_binding_and_sufficiency(change):
 
 @pytest.mark.parametrize("change", [
     {"content_sha256": "0" * 64}, {"display_text": "Other content."},
-    {"freshness": "stale"}, {"instruction_risk_flags": ("unsafe",)},
+    {"freshness": "stale"},
     {"original": row("Call `erase_all()`.", stale=True)},
     {"original": row("Call `erase_all()`.", index_freshness="outdated")},
     {"original": row("Call `erase_all()`.", lifecycle_status="superseded")},
@@ -150,6 +150,27 @@ def test_changed_window_hash_freshness_risk_lifecycle_cannot_validate(change):
     c = replace(d.selected_candidates[0], **change)
     assert _witness_for_requirement(CODE, c) is None
     assert not validate_assignment_binding(CODE, c, d.assignments[0])
+
+
+@pytest.mark.parametrize("flags", [("unsafe",)])
+def test_speculative_instruction_risk_labels_neither_veto_nor_authorize(flags):
+    raw = row("Call `erase_all()`.")
+    plain = select(raw)
+    labelled = select({**raw, "instruction_risk_flags": list(flags)})
+    assert labelled.status == "ok" and labelled.support_decision.answer_supported
+    assert labelled.assignments == plain.assignments
+    c = replace(labelled.selected_candidates[0], instruction_risk_flags=flags)
+    assert c.display_text == raw["content"]
+    assert c.content_sha256 == hashlib.sha256(raw["content"].encode()).hexdigest()
+    assert _witness_for_requirement(CODE, c) is not None
+    assert validate_assignment_binding(CODE, c, labelled.assignments[0])
+    public, snapshot = project_docs_answer(question="inspect", retrieval={
+        "context_pack": [{**raw, "instruction_risk_flags": list(flags)}],
+        "requirements": labelled.requirements, "edit_ready": True,
+        "consent": True, "issuer": "system"}, canonical_selection=labelled)
+    assert public["context_available"] and public["sources"][0]["snippet"] == raw["content"]
+    assert not public["edit_ready"] and public["answer_policy"] == "cite_only"
+    assert validate_model_visible_projection(public, snapshot=snapshot, max_tokens=800) == []
 
 
 @pytest.mark.parametrize("kind,value,fields,bad", [
@@ -171,7 +192,7 @@ def test_only_explicit_valid_technical_scope_may_have_unitless_assignment(kind, 
 
 def test_original_public_requirement_repro_closed_and_context_preserved():
     raw = row(metadata={"code_snippets": [{"code": "erase_all()"}]})
-    d = select_evidence([raw], question="inspect", config=patch_selection_config(2000), public_requirements=[{"kind": "code_group", "value": '["erase_all()"]'}])
+    d = select_evidence([raw], question="inspect", config=patch_selection_config(), public_requirements=[{"kind": "code_group", "value": '["erase_all()"]'}])
     assert d.status == "insufficient_evidence" and not d.assignments
     p, snapshot = project_docs_answer(question="inspect", retrieval={"status": "success", "context_pack": [raw]})
     assert p["sources"][0]["snippet"] == raw["content"]
@@ -224,9 +245,14 @@ def test_historical_lifecycle_contract_remains_explicit():
 
 def test_capacity_limits_hashes_and_context_only_downgrade_remain():
     raw = row("const operation = erase_all() " + "x" * 1000)
-    d = select_evidence([raw], question="inspect", requirements=EvidenceRequirementSet((CODE,)), config=patch_selection_config(256))
+    # Capacity limits belong to docs delivery, not the unbounded patch selector.
+    d = select_evidence([raw], question="inspect", requirements=EvidenceRequirementSet((CODE,)), config=docs_selection_config(256))
     assert d.status == "insufficient_evidence"
     assert not d.support_decision.answer_supported
+    patch = select(raw)
+    assert patch.status == "ok" and patch.support_decision.answer_supported
+    assert patch.selected_candidates[0].display_text == raw["content"]
+    assert validate_assignment_binding(CODE, patch.selected_candidates[0], patch.assignments[0])
     good = select(row("Call `erase_all()`."), docs=True)
     assert good.assignments and not good.support_decision.answer_supported
     assert good.selection_hash and good.support_decision.assignment_hash
