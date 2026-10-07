@@ -289,3 +289,14 @@ packet messages. This is verified offline, not through provider calls.
 Historical workflow rules remain explicitly unsupported/fail-closed and their
 threshold values unchanged. Status reporting reads v4 result/completeness.
 Actual external model capacity and historical actor acceptance stay UNKNOWN.
+
+### Coordinator dependency amendment 12 — final reviewer R9
+
+R's final review found stale active required-once instructions advertising
+removed `delivery_strategy`, rejected by real MCP dispatch before retrieval.
+C additionally owns `eval/task_level/conditions.py` for the narrow instruction
+migration to user-approved `context_format="patch_context"`. Historical
+condition/threshold values remain unchanged. A NEW offline regression sends
+the actual advertised arguments through public dispatch and required-once
+metadata parsing; no compatibility adapter or unknown-argument ignoring.
+Final completion requires independent R9 closure.

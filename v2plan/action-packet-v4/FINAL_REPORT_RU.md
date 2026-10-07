@@ -117,3 +117,66 @@ Examples / ownership / syntax / diff checks: PASS. Финальный run и rev
 - Installed wheels/packs/deployed SDK/current-index parity, full-product quality,
   historical evaluation acceptance и release/security certification — UNKNOWN.
 - Изменённые файлы и финальный интегрированный SHA будут добавлены после closure.
+
+## Изменённые source / eval / новые tests
+
+```text
+docmancer/docs/application/_action_packet_part01.py
+docmancer/docs/application/_action_packet_part03.py
+docmancer/docs/application/_action_packet_part04.py
+docmancer/docs/application/_action_packet_shared.py
+docmancer/docs/application/_evidence_selection_part01.py
+docmancer/docs/application/_evidence_selection_part02.py
+docmancer/docs/application/_evidence_selection_part03.py
+docmancer/docs/application/_evidence_selection_shared.py
+docmancer/docs/application/action_packet.py
+docmancer/docs/application/evidence_candidates.py
+docmancer/docs/application/evidence_models.py
+docmancer/docs/application/evidence_requirements.py
+docmancer/docs/application/model_visible_projection.py
+docmancer/docs/domain/_answer_units_part01.py
+docmancer/docs/domain/_answer_units_part02.py
+docmancer/docs/domain/_answer_units_shared.py
+docmancer/docs/interfaces/mcp/context_tools.py
+docmancer/docs/interfaces/mcp/output_contract.py
+docmancer/mcp/_docs_server_part01.py
+docmancer/mcp/_docs_server_schema.py
+docmancer/mcp/_docs_server_tool_data.py
+eval/answer_quality_gate.py
+eval/answer_quality_runner.py
+eval/evidence_selection_quality.py
+eval/task_level/_execution_part01.py
+eval/task_level/_execution_part02.py
+eval/task_level/_execution_part03.py
+eval/task_level/_execution_part04.py
+eval/task_level/_execution_shared.py
+eval/task_level/_github_models_part01.py
+eval/task_level/_github_models_part02.py
+eval/task_level/_github_models_shared.py
+eval/task_level/_isolated_delivery_part02.py
+eval/task_level/_isolated_delivery_shared.py
+eval/task_level/_one_call_agent_loop_core.py
+eval/task_level/evaluators/actionability.py
+eval/task_level/evaluators/docatlas_utilization.py
+eval/task_level/evaluators/policy.py
+eval/task_level/report.py
+eval/task_level/runners/codex.py
+eval/task_level/task33_codex_exploratory.py
+eval/task_level/task33_pilot.py
+eval/task_level/task33_validation.py
+tests/diagnostic_labels.action_packet_v4_a.json
+tests/diagnostic_labels.action_packet_v4_b.json
+tests/diagnostic_labels.action_packet_v4_c.json
+tests/diagnostic_labels.action_packet_v4_eval.json
+tests/diagnostic_labels.action_packet_v4_integrated.json
+tests/test_action_packet_v4_contract.py
+tests/test_action_packet_v4_eval.py
+tests/test_action_packet_v4_integrated.py
+tests/test_action_packet_v4_public.py
+tests/test_action_packet_v4_selection.py
+```
+
+Новые coordination / verification / review документы находятся только в
+`v2plan/action-packet-v4/`: `CONTRACT.md`, этот отчёт, `REVIEW_R.md`,
+`REVIEW_R_CLOSURE.md`, `VERIFY_EXAMPLES.py`, `VERIFY_SCOPE.py`.
+Точный список всего diff: `git diff --name-only b89fa3cc16534445501bab14e0d63e099e9f61f6`.
