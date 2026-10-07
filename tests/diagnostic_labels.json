@@ -439,7 +439,7 @@
     "tests/test_library_retrieval_quality_baseline.py": "49a66ee06a7362221103135815fe043089f33b79a970e635b58dfec3548ae9f4",
     "tests/test_live_benchmark_isolation.py": "de6578bb0fba57ee0d82fc2bf11a9dd463dffa82a19bf202a88dc14776411b25",
     "tests/test_live_benchmark_unified_dependency.py": "12a058ddf6cb0493c5b478938d1a638cf51222433b881dc6e04861591fa11334",
-    "tests/test_mcp_agent_config.py": "5a4d63a2e553ce243308e9067995d2a0a2d5a016c99ecc9225a6e6b8400bdb97",
+    "tests/test_mcp_agent_config.py": "39b332c189db85424bed296b7c9b7e0e75793783a0c9b53771fe3a311e12a6b4",
     "tests/test_mcp_cli.py": "7cedf751074ccf0e8667ba7e62115c65278da2c59b78fa732833250ce9d7cfc2",
     "tests/test_mcp_code_context_tool.py": "cfca565637d43e590570647dbf3c9946b6330ef02ea5bb5be8d52ec201ed93c5",
     "tests/test_mcp_credentials.py": "95791cbd12bb39e3dab7ae4165537c94e6cbb1c1ebe37a47170895fae1ea3521",
