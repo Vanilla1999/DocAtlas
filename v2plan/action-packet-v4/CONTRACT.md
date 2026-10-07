@@ -220,3 +220,29 @@ C additionally owns `eval/evidence_selection_quality.py`,
 calls and v3 field reads, not old score expectations. Evaluation-only frozen
 budget assertions are not runtime caps and must not re-enter v4 producers.
 Unsupported historical normative/workflow requirements stay fail-closed.
+
+### Coordinator dependency amendment 8 — rooted projection binding
+
+Coordinator reproduced a valid catalog-bound packet being discarded by
+projector re-validation without the builder's project_path/module_path.
+`project_patch_context` additionally accepts these optional scope inputs;
+MCP passes the same explicit scope throughout. Internal snapshots retain the
+revalidation scope, and model-visible validation reuses it. Do not resolve the
+mismatch by disabling source attribution checks or treating authority as
+permission. C owns the narrow fix and new regression within existing files.
+
+### Coordinator dependency amendment 9 — independent review closure
+
+R's immutable initial report records six findings at 04b35923. B owns R1
+(restore explicit rejected-source admission guard) and R3 (binding validation
+must enforce the selector's proof-role admission). A owns R4 (stable-identity
+collision rejection), R5 (all explicit mutation resolution binding kinds
+require actual canonical local evidence) and R6 (retained plan/explicit mutation
+requirements cannot disappear from completeness checks). C owns rooted R2.
+`validate_assignment_binding` gains optional keyword `requirements=()`;
+A passes canonical requirements, B canonical validation passes its whole set,
+C's existing docs-assignment check passes decision.requirements. Contextual
+roles fail closed without scope, never grant by missing data. Add new regression
+tests to existing NEW suites and preserve historical tests. R re-reviews all
+integrated corrections plus the pending eval migration; worker claims alone
+do not close findings.
