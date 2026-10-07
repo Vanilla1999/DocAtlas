@@ -237,7 +237,7 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert workflow["prepare_docs"]["speculative"] is False
     assert workflow["docs_status"]["discovery"] is False
     lookup = workflow["free_form_lookup"]
-    assert lookup["one_concept_per_lookup"] is True
+    assert lookup["lookup_queries_must_refine_same_question"] is True
     assert lookup["maximum_lookup_queries"] == 5
     assert lookup["answer_only_from_returned_sources"] is True
     assert lookup["partial_coverage_is_not_completeness"] is True
@@ -246,9 +246,8 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert recovery["after_prepare"] == "retry_original_get_docs_context_unchanged"
     assert recovery["rephrase_retry_limit"] == 1
     assert recovery["rephrase_auto_execute"] is False
-    assert recovery["investigation_allowed_when_hard_stop_false"] is True
-    assert recovery["source_search_after_rephrase_exhausted"] is True
-    assert recovery["documentation_claim_requires_support"] is True
+    assert recovery["hard_stop_false_authorizes_edit"] is False
+    assert recovery["documentation_claim_requires_cited_context"] is True
     assert recovery["stop_before_edit_when"] == "hard_stop"
 
     canonical_raw = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
@@ -615,25 +614,27 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     context_tool = tools["get_docs_context"]
     assert "Source-grounded documentation tool" in context_tool["description"]
     assert 'module_path always implies module scope' in context_tool["description"]
-    assert 'make two bounded calls (module then project)' in context_tool["description"]
-    assert 'scope=all without module filters' in context_tool["description"]
+    assert 'Never widen scope from question wording' in context_tool["description"]
+    assert 'all is repository-local without module filters' in context_tool["description"]
     context_properties = context_tool["inputSchema"]["properties"]
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
     )
     assert set(context_properties) == {
         "question", "lookup_queries", "project_path", "library", "version",
-        "module_path", "scope",
+        "module_path", "scope", "context_format",
     }
     assert "always implies module scope" in context_properties["module_path"]["description"]
     assert "repo-level docs only" in context_properties["scope"]["description"]
     assert "original request unchanged" in context_tool["description"]
-    assert "never authorize an answer or edit" in context_tool["description"]
-    output_properties = context_tool["outputSchema"]["properties"]
+    assert "Context and flags do not certify an answer" in context_tool["description"]
+    assert "Mutation requires a separate explicit target and authorization" in context_tool["description"]
+    assert "explicitly pass context_format=patch_context" in context_tool["description"]
+    output_properties = context_tool["outputSchema"]["oneOf"][0]["properties"]
     assert output_properties["module_candidates"]["maxItems"] == 8
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]
     assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
-    assert "explicitly asks" in tools["docs_status"]["description"]
+    assert "explicit health, freshness, indexing, or job-progress request" in tools["docs_status"]["description"]
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
         "project",
@@ -744,7 +745,7 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert '"schema_version": "trust-contract-1.2"' in schema["text"]
     assert '"selected"' in schema["text"]
     assert selection is not None
-    assert "Natural documentation" in selection["text"]
+    assert "One unchanged original documentation question" in selection["text"]
     assert "get_docs_context" in selection["text"]
     assert "prepare_docs" in selection["text"]
     assert "docs_status" in selection["text"]

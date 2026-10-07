@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import hashlib
 import json
 import re
 import zlib
@@ -42,6 +41,11 @@ from docmancer.docs.application.model_visible_projection_helpers import (
     canonical_projection_bytes,
     estimate_projection_tokens,
     docs_context_budget_tokens,
+)
+from ._model_visible_patch_projection import _validate_patch_projection, _patch_recovery_errors
+from ._model_visible_docs_support import (
+    _docs_candidates, _docs_source, _source_digest, _snapshot_entry,
+    _answer_text, _needs_actionable_limitation,
 )
 
 DOCS_ANSWER_MAX_TOKENS = 800
@@ -681,88 +685,6 @@ def patch_search_targets(packet: dict[str, Any]) -> list[dict[str, str]]:
     )]
 
 
-def _validate_patch_projection(
-    payload: dict[str, Any], *, snapshot: dict[str, dict[str, Any]],
-) -> list[str]:
-    from .action_packet import refresh_action_packet_estimate, serialize_action_packet
-
-    metadata = {"kind", "recommended_next_action", "source_search_status"}
-    core = {key: deepcopy(value) for key, value in payload.items() if key not in metadata}
-    estimated = deepcopy(payload)
-    refresh_action_packet_estimate(estimated)
-    errors = []
-    if payload.get("estimated_tokens") != estimated["estimated_tokens"]:
-        errors.append("projection estimate mismatch")
-    refresh_action_packet_estimate(core)
-    canonical = snapshot.get("__action_packet__") or {}
-    if not isinstance(canonical, dict):
-        return ["invalid canonical patch snapshot"]
-    evidence = canonical.get("evidence_items", ())
-    if not isinstance(evidence, (tuple, list)):
-        return ["invalid canonical patch evidence"]
-    errors.extend(validate_action_packet(
-        core, evidence_items=evidence, project_path=canonical.get("project_path"),
-        module_path=canonical.get("module_path"),
-    ))
-    if errors:
-        return errors
-    if canonical:
-        if (not isinstance(canonical.get("packet"), dict)
-            or serialize_action_packet(core) != serialize_action_packet(canonical["packet"])):
-            errors.append("patch packet does not match the internal snapshot")
-    elif core.get("sources") or core.get("requirements") or core.get("mutation_intent"):
-        errors.append("patch contract is missing its canonical snapshot")
-    ids = set()
-    for source in core.get("sources") or []:
-        if not isinstance(source, dict):
-            continue
-        identity = source.get("evidence_id")
-        if not isinstance(identity, str):
-            continue
-        ids.add(identity)
-        bound = snapshot.get(identity) or {}
-        if not isinstance(bound, dict):
-            errors.append("invalid patch source snapshot")
-            continue
-        if source != bound.get("projected_source"):
-            errors.append("patch source does not match the internal snapshot")
-        if bound.get("source") not in evidence:
-            errors.append("patch snapshot source does not match admitted evidence")
-    if set(snapshot) - {"__action_packet__"} != ids:
-        errors.append("patch snapshot evidence identities do not match visible sources")
-    errors.extend(_patch_recovery_errors(payload, core))
-    return errors
-
-
-def _patch_recovery_errors(payload: dict[str, Any], core: dict[str, Any]) -> list[str]:
-    errors = []
-    action = payload.get("recommended_next_action")
-    search_status = payload.get("source_search_status")
-    if ("recommended_next_action" in payload and action is None
-        or "source_search_status" in payload and search_status is None):
-        errors.append("empty patch recovery metadata must be omitted")
-    if action is not None:
-        targets = patch_search_targets(core)
-        expected = {
-            "tool": "code_search", "type": "search_local_source",
-            "handled_by": "coding_agent", "auto_execute": False,
-            "requires_confirmation": False, "repeat_docs_context": False,
-            "query_terms": [row["value"] for row in targets],
-            "suggested_doc_paths": [row["value"] for row in targets if row["kind"] == "path"],
-            "suggested_symbols": [row["value"] for row in targets if row["kind"] == "symbol"],
-        }
-        expected = {key: value for key, value in expected.items() if value != []}
-        if (not targets or not isinstance(action, dict) or action != expected
-            or search_status != "required"
-            or any(action.get(key) is not False for key in (
-                "auto_execute", "requires_confirmation", "repeat_docs_context",
-            ))):
-            errors.append("invalid non-authorizing patch recovery metadata")
-    elif search_status is not None:
-        errors.append("patch source search status requires explicit recovery metadata")
-    return errors
-
-
 def project_insufficient(
     *, kind: str, missing: Iterable[str], recommended_next_action: Any, max_tokens: int = INSUFFICIENT_EVIDENCE_MAX_TOKENS
 ) -> dict[str, Any]:
@@ -1001,108 +923,6 @@ def validate_model_visible_projection(
                 errors.append("factual patch item has missing or unknown evidence_ids")
                 break
     return errors
-
-
-def _docs_candidates(retrieval: dict[str, Any]) -> list[dict[str, Any]]:
-    values = [retrieval.get("primary_snippet"), *(retrieval.get("primary_snippets") or []), *(retrieval.get("supporting_snippets") or []), *(retrieval.get("context_pack") or [])]
-    return [dict(item) for item in values if isinstance(item, dict)]
-
-
-def _docs_source(
-    item: dict[str, Any], *, evidence_id: str | None = None,
-    display_snippet: str | None = None,
-) -> dict[str, Any] | None:
-    path = str(item.get("source_url") or item.get("url") or item.get("path") or item.get("source") or "").strip()
-    section = str(item.get("heading_path") or item.get("title") or "document").strip()
-    snippet = display_snippet if display_snippet is not None else (
-        item.get("code") or item.get("snippet") or item.get("content")
-        or item.get("display_text")
-    )
-    if isinstance(snippet, dict):
-        snippet = snippet.get("code") or snippet.get("text") or snippet.get("content")
-    snippet = str(snippet or "").strip()
-    version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
-    if (
-        not path or not snippet or len(path) > 500 or len(section) > 300
-        or len(snippet) > 3_000 or len(version) > 100
-    ):
-        return None
-    digest = _source_digest(item)
-    identity = canonical_projection_bytes({"path": path, "section": section, "sha256": digest})
-    return {
-        "evidence_id": evidence_id or "ev-" + hashlib.sha256(identity).hexdigest()[:16],
-        "path_or_url": path,
-        "section": section,
-        "snippet": snippet,
-        "version_binding": version,
-        "content_sha256": digest,
-    }
-
-
-def _source_digest(item: dict[str, Any]) -> str:
-    material = {
-        "path": item.get("path") or item.get("source") or item.get("url") or item.get("source_url"),
-        "section": item.get("heading_path") or item.get("title"),
-        "content": item.get("content") or item.get("display_text"),
-        "snippet": item.get("snippet") or item.get("code"),
-        "version": item.get("version_binding") or item.get("version") or item.get("requested_version"),
-    }
-    return hashlib.sha256(canonical_projection_bytes(material)).hexdigest()
-
-
-def _snapshot_entry(
-    original: dict[str, Any], projected: dict[str, Any]
-) -> dict[str, Any]:
-    """Bind both raw source content and the exact model-visible source row."""
-
-    canonical = dict(projected)
-    # Keep the flat fields for the frozen Task 43 evaluator. New validation is
-    # deliberately bound to projected_source so deleting or injecting a field
-    # cannot exploit the evaluator's backwards-compatible snapshot shape.
-    return {
-        "source": deepcopy(original),
-        "projected_source": canonical,
-        **canonical,
-    }
-
-
-def _answer_text(
-    question: str,
-    retrieval: dict[str, Any],
-    sources: list[dict[str, Any]],
-    *,
-    require_all_sources: bool = False,
-) -> tuple[str, list[str], bool]:
-    """Return only text that is directly present in one or more projected sources."""
-
-    explicit = retrieval.get("answer")
-    if isinstance(explicit, str) and explicit.strip():
-        normalized = " ".join(explicit.split()).casefold()
-        refs = [
-            str(source["evidence_id"])
-            for source in sources
-            if normalized and normalized in " ".join(str(source.get("snippet") or "").split()).casefold()
-        ]
-        required_refs = [str(source["evidence_id"]) for source in sources]
-        if refs and (not require_all_sources or refs == required_refs):
-            answer = explicit.strip()
-            limited = _needs_actionable_limitation(question, answer)
-            return answer, refs, limited
-    if require_all_sources:
-        snippets = [str(source["snippet"]).strip() for source in sources]
-        answer = "\n\n".join(dict.fromkeys(snippet for snippet in snippets if snippet))
-        refs = [str(source["evidence_id"]) for source in sources]
-        limited = _needs_actionable_limitation(question, answer)
-        return answer, refs, limited
-    primary = sources[0]
-    answer = str(primary["snippet"])
-    limited = _needs_actionable_limitation(question, answer)
-    return answer, [str(primary["evidence_id"])], limited
-
-
-def _needs_actionable_limitation(question: str, answer: str) -> bool:
-    # Source quotation is not proof of actionability; no prose exemption.
-    return True
 
 
 def _docs_retrieval_issues(

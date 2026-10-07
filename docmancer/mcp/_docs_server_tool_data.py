@@ -579,12 +579,16 @@ PUBLIC_ADVERTISED_DESCRIPTIONS: dict[str, str] = {
         "Cite returned context; lookup coverage does not transfer to the original. Context and flags do not certify an answer, "
         "semantic proof or edit readiness. Mutation requires a separate explicit target and authorization. "
         "hard_stop=true blocks edits; hard_stop=false is not permission. Preserve freshness, provenance, network consent and budgets. "
+        "For coding and patch tasks explicitly pass context_format=patch_context before the first edit. "
         "Optional context_format=patch_context selects read-only v4 evidence representation only, never mutation/workflow permission. "
         "Omitted/null retains docs defaults. Patch representation has no internal compaction cap; retrieval/runtime guards remain unchanged."
     ),
     "prepare_docs": (
         "Call only from get_docs_context recommended_next_action or an explicit sync, refresh, index, or prefetch request. "
-        "Honor approval; poll job_id with docs_status and retry unchanged only after success."
+        "Honor approval; poll job_id with docs_status and retry unchanged only after success. "
+        "Project sync requires a separate explicit mutation contract binding confirmed lexical member upserts to a project-local SQLite store, "
+        "catalog digest, generation and exact document hashes. Omitted/null mutation grants no write permission. "
+        "No deletion, vector or artifact writes are authorized by this contract."
     ),
     "docs_status": (
         "Read-only status, not discovery. Use only for an explicit health, freshness, indexing, or job-progress request, "
@@ -630,6 +634,32 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             },
             "project_path": {"type": ["string", "null"]},
             "scope": {"type": ["string", "null"], "enum": ["project-local", None]},
+            "mutation": {
+                "type": ["object", "null"],
+                "description": "Explicit confirmed project-local lexical member upsert only; omission/null supplies no mutation permission. Runtime verifies catalog membership, storage locality, hashes and generation.",
+                "additionalProperties": False,
+                "required": ["operation", "confirm", "storage_path", "catalog_sha256", "expected_generation_id", "documents"],
+                "properties": {
+                    "operation": {"const": "sync_project_docs", "type": "string"},
+                    "confirm": {"const": True, "type": "boolean"},
+                    "storage_path": {"type": "string", "pattern": "^/", "minLength": 1},
+                    "catalog_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                    "expected_generation_id": {"type": ["string", "null"], "minLength": 1},
+                    "documents": {
+                        "type": "array", "minItems": 1, "uniqueItems": True,
+                        "items": {
+                            "type": "object", "additionalProperties": False,
+                            "required": ["path", "content_sha256", "catalog_entry_hash"],
+                            "properties": {
+                                "path": {"type": "string", "minLength": 1,
+                                         "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:]).+$"},
+                                "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                                "catalog_entry_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                            },
+                        },
+                    },
+                },
+            },
             "confirm": {
                 "type": ["boolean", "null"],
                 "description": "Second-call apply flag for action='clear_index' only; omit for every other action.",
@@ -660,6 +690,11 @@ PUBLIC_ADVERTISED_INPUT_SCHEMAS: dict[str, dict[str, Any]] = {
         },
         "required": ["action"],
         "allOf": [{
+            "if": {"properties": {"action": {"const": "sync_project_docs"}}},
+            "then": {"required": ["project_path"],
+                     "properties": {"project_path": {"type": "string", "minLength": 1}}},
+            "else": {"not": {"required": ["mutation"]}},
+        }, {
             "if": {"properties": {"action": {"const": "clear_index"}}},
             "then": {
                 "required": ["scope", "project_path"],

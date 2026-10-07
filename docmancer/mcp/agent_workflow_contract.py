@@ -32,6 +32,10 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "before_first_edit": True,
         "max_calls_before_first_edit": 1,
         "call_limit_scope": "per_concrete_question_and_evidence_scope",
+        "coding_context_format": "patch_context",
+        "documentation_context_format": None,
+        "context_format_inferred_from_prose": False,
+        "patch_evidence_representation_cap": None,
     },
     "prepare_docs": {
         "tool": "prepare_docs",
@@ -95,10 +99,20 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
     {
         "id": "repository-first-call",
         "tool": "get_docs_context",
-        "condition": "normal documentation/coding question",
+        "condition": "normal documentation question (omitted format retains docs mode)",
         "arguments": {
             "question": "How is authentication configured?",
             "project_path": "/repo",
+        },
+    },
+    {
+        "id": "coding-first-call",
+        "tool": "get_docs_context",
+        "condition": "coding or patch task before first edit; representation is not authorization",
+        "arguments": {
+            "question": "Which documented constraints apply to changing authentication?",
+            "project_path": "/repo",
+            "context_format": "patch_context",
         },
     },
     {

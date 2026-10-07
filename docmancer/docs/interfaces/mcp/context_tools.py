@@ -786,8 +786,8 @@ def bounded_patch_retrieval_issues(payload: dict[str, Any]) -> list[str]:
     """Return operational retrieval failures relevant to an ActionPacket.
 
     Docs-answer availability and semantic completeness belong to the answer
-    projection. Patch contexts independently prove requirements, authority, and
-    mutation readiness while building the ActionPacket.
+    projection. Patch contexts retain admitted evidence and explicit constraints
+    independently of docs-answer compaction; they never grant mutation permission.
     """
 
     issues: list[str] = []
