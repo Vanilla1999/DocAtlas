@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+from docmancer._agent_parser_loading import _import_class
 import json
 import logging
 import os
@@ -42,12 +42,6 @@ SOURCE_DERIVED_METADATA_KEYS = {
     "lang",
     "format",
 }
-
-
-def _import_class(dotted_path: str) -> type:
-    module_path, class_name = dotted_path.rsplit(":", 1)
-    module = importlib.import_module(module_path)
-    return getattr(module, class_name)
 
 
 class DocmancerAgent:

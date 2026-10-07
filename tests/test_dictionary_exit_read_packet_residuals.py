@@ -7,11 +7,9 @@ import re
 import pytest
 
 from docmancer.docs.application import _docs_context_projection_core as projection
-from docmancer.docs.application.action_packet import (
-    _promote_trusted_behavioral_witnesses, build_action_packet,
-)
+from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application._action_packet_part01 import (
-    _critical_fact_count, _extract_facts, _validation_command,
+    _critical_fact_count, _extract_facts,
 )
 from docmancer.docs.application._action_packet_part02 import (
     _constraint_signature, _has_behavioral_contract,
@@ -20,7 +18,7 @@ from docmancer.docs.application.evidence_candidates import (
     normalize_candidates, observed_qualifiers, projected_text, requirement_value_visible,
 )
 from docmancer.docs.application.evidence_selection import (
-    SelectionConfig, docs_selection_config, select_evidence,
+    docs_selection_config, patch_selection_config, select_evidence,
 )
 from docmancer.docs.application._evidence_selection_part02 import _deduplicate
 from docmancer.docs.application.model_visible_projection import (
@@ -59,34 +57,48 @@ def test_prose_is_unknown_with_zero_fact_credit_in_actual_packet(text):
     assert observed_qualifiers(text) == ()
     assert _extract_facts(text) == ([], 0)
     assert _critical_fact_count(item) == 0
-    packet = build_action_packet(question="RelayClient", context_pack=[item], max_tokens=1500)
-    assert packet["required_invariants"] == packet["forbidden_changes"] == []
-    assert packet["validation"] == {"compile": [], "tests": [], "semantic_checks": []}
+    packet = build_action_packet(question="RelayClient", context_pack=[item],
+        behavioral_contract_required=True)
+    assert packet["schema_version"] == 4
+    assert packet["sources"][0]["text"] == text
+    assert packet["sources"][0]["instruction_trust"] == "untrusted_data"
+    assert not any(key in packet for key in
+        ("required_invariants", "forbidden_changes", "validation"))
     assert not _has_behavioral_contract(packet)
-    assert packet["status"] == "insufficient_evidence"
+    assert packet["completeness"] == "partial"
+    assert "behavioral_contract_required" in packet["missing"]
+    assert packet["edit_ready"] is False
+    assert validate_action_packet(packet) == []
     assert item == before
 
 
 def test_canonical_source_metadata_cannot_promote_quote_or_establish_agreement():
-    packet = {
-        "source_of_truth": [{"evidence_id": "e", "path": "RULES.md", "authority": "canonical"}],
-        "implementation_guidance": [{"text": "RelayClient must retry.", "evidence_ids": ["e"]}],
-        "required_invariants": [],
-    }
-    before = deepcopy(packet)
-    _promote_trusted_behavioral_witnesses(packet, [{
-        "kind": "source_fact", "proof_role": "project_rule", "source_path": "RULES.md",
-    }])
-    assert packet == before
+    item = row("RelayClient must retry.", kind="source_fact", proof_role="project_rule")
+    before = deepcopy(item)
+    packet = build_action_packet(question="RelayClient", context_pack=[item],
+        behavioral_contract_required=True)
+    assert item == before
+    assert packet["edit_ready"] is False
+    assert "behavioral_contract_required" in packet["missing"]
+    assert not any(assignment["proof_role"] in {"project_rule", "document_statement"}
+        for assignment in packet.get("assignments", []))
+    assert validate_action_packet(packet) == []
     selection = select_evidence([row("RelayClient must retry."),
         row("RelayClient must not retry.", "quote-2")], question="RelayClient",
         config=docs_selection_config(1000))
     assert selection.selected_candidates
     assert selection.status == "insufficient_evidence"
-    assert "unresolved_authority_conflict:manual_review" in selection.missing_requirements
-    assert selection.support_decision.reason_code == "manual_review_required"
+    assert "unsupported_answer_authorization:context_only" in selection.missing_requirements
+    patch_selection = select_evidence([row("RelayClient must retry."),
+        row("RelayClient must not retry.", "quote-2")], question="RelayClient",
+        config=patch_selection_config())
+    assert {candidate.display_text for candidate in patch_selection.selected_candidates} == {
+        "RelayClient must retry.", "RelayClient must not retry.",
+    }
+    # No semantic contradiction detector is reconstructed from prose.
+    assert not selection.support_decision.answer_supported
     assert not any(omission.reason_code in {"exact_duplicate", "overlap_duplicate", "near_duplicate"}
-        for omission in selection.omissions)
+        for omission in patch_selection.omissions)
     assert not selection.support_decision.answer_supported
     assert _constraint_signature("RelayClient must retry") != _constraint_signature("RelayClient must not retry")
 
@@ -95,7 +107,7 @@ def test_canonical_source_metadata_cannot_promote_quote_or_establish_agreement()
     "RelayClient must not retry.", "RelayClient must retry!", "RelayClient MUST retry.",
 ])
 def test_byte_distinct_quotes_do_not_deduplicate_even_shared_id_hash_and_span(other):
-    config = SelectionConfig("patch_context", 1500, 2000, near_duplicate_threshold=0)
+    config = replace(patch_selection_config(), near_duplicate_threshold=0)
     candidates, _ = normalize_candidates([
         row("RelayClient must retry.", char_start=0, char_end=23),
         row(other, "quote-2", char_start=0, char_end=len(other)),
@@ -117,11 +129,12 @@ def test_patch_selector_does_not_manufacture_quote_from_hidden_content_or_metada
     candidates, _ = normalize_candidates([item], result_kind="patch_context")
     assert candidates[0].projected_text == "neutral"
     selection = select_evidence([item], question="RelayClient",
-        config=SelectionConfig("patch_context", 1500, 2000))
+        config=patch_selection_config())
     assert not any("RelayClient" in candidate.projected_text for candidate in selection.selected_candidates)
     assert not selection.support_decision.answer_supported
-    packet = build_action_packet(question="RelayClient", context_pack=[item], max_tokens=1500)
-    assert all("RelayClient must" not in value["text"] for value in packet["implementation_guidance"])
+    packet = build_action_packet(question="RelayClient", context_pack=[item])
+    assert all("RelayClient must" not in value["text"] for value in packet.get("sources", []))
+    assert packet["edit_ready"] is False
     assert item == before
 
 
@@ -152,10 +165,16 @@ def test_technical_boundaries_python_grammar_and_command_safety_are_preserved():
     assert not re.search(technical_term_pattern("Client.send"), "Client.send.more")
     assert not re.search(technical_term_pattern("retry", exact=False), "retried")
     assert python_declaration_line_indexes("class Client:\n    pass") == frozenset({0, 1})
-    assert _validation_command("pytest -q") == "pytest -q"
-    assert _validation_command("cargo test") == "cargo test"
-    for command in ("run pytest", "pytest; rm file", "pytest | tee out", "pytest $(pwd)"):
-        assert _validation_command(command) is None
+    # The public v4 lane retains command-shaped quotes as data. Neither safe
+    # syntax nor shell metacharacters create executable validation instructions.
+    for command in ("pytest -q", "cargo test", "run pytest", "pytest; rm file",
+            "pytest | tee out", "pytest $(pwd)"):
+        packet = build_action_packet(question="command", context_pack=[row(command)])
+        assert packet["sources"][0]["text"] == command
+        assert packet["sources"][0]["instruction_trust"] == "untrusted_data"
+        assert "validation" not in packet
+        assert packet["edit_ready"] is False
+        assert validate_action_packet(packet) == []
 
 
 @pytest.mark.parametrize("body", ["RelayClient is enabled.", "RelayClient is not enabled."])

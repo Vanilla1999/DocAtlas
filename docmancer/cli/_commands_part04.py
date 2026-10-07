@@ -54,6 +54,13 @@ def docs_impact_cmd(
         raise click.UsageError("Pass --base to read git diff paths, or at least one --changed-file.")
     if sync_saved_docs and not base:
         raise click.UsageError("--sync-saved-docs requires --base/--head so accepted rename and deletion status is exact.")
+    if sync_saved_docs:
+        # A committed diff is evidence, not the explicit member transaction
+        # grant. Deny this legacy write flag before constructing services/DBs.
+        raise PermissionError(
+            "--sync-saved-docs has no explicit member mutation grant; "
+            "use the authorized prepare_docs member transaction instead."
+        )
     try:
         effective_config_path = _effective_config(config_path)
         config = _load_config(effective_config_path)
