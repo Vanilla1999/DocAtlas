@@ -77,11 +77,18 @@ fi
 # C. doc-atlas
 # ---------------------------------------------------------------------------
 info "Installing doc-atlas..."
+INSTALL_PYTHON="${DOCATLAS_INSTALL_PYTHON:-3.13}"
+case "$INSTALL_PYTHON" in
+  3.11|3.12|3.13) : ;;
+  *) die "Unsupported DOCATLAS_INSTALL_PYTHON '$INSTALL_PYTHON'; choose 3.11, 3.12 or 3.13." ;;
+esac
 INSTALL_SOURCE="${DOCATLAS_INSTALL_SOURCE:-doc-atlas}"
 if [ -n "${DOCATLAS_INSTALL_VERSION:-}" ] && [ "$INSTALL_SOURCE" = "doc-atlas" ]; then
   INSTALL_SOURCE="doc-atlas==${DOCATLAS_INSTALL_VERSION}"
 fi
-uv tool install --upgrade "$INSTALL_SOURCE"
+# Managed Python is downloaded as needed. Refuse source builds rather than
+# requiring a compiler or falling back to an unreviewed system interpreter.
+uv tool install --upgrade --managed-python --python "$INSTALL_PYTHON" --no-build "$INSTALL_SOURCE"
 ensure_path
 
 if [ -n "${DOCATLAS_EXPECT_VERSION:-${DOCATLAS_INSTALL_VERSION:-}}" ]; then

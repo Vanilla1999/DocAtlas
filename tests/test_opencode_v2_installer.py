@@ -48,6 +48,58 @@ def test_unique_owned_name_and_state_preserved(tmp_path, writer, legacy):
     assert path.read_bytes() == original
 
 
+def run_stubbed_installer(tmp_path, **overrides):
+    """Execute the installer with fake tools; no downloads or live registration."""
+    tools = tmp_path / "bin"
+    tools.mkdir()
+    log = tmp_path / "uv-args"
+    (tools / "uv").write_text(
+        '#!/bin/sh\nif [ "$1" = "--version" ]; then echo "uv fixture"; exit 0; fi\n'
+        'printf "%s\\n" "$@" > "$UV_ARGS_LOG"\nexit "${UV_STUB_EXIT:-0}"\n'
+    )
+    (tools / "doc-atlas").write_text('#!/bin/sh\necho "doc-atlas fixture"\n')
+    (tools / "curl").write_text('#!/bin/sh\nexit 99\n')
+    for tool in tools.iterdir():
+        tool.chmod(0o755)
+    env = {key: value for key, value in os.environ.items()
+           if not key.startswith("DOCATLAS_")}
+    env.update(HOME=str(tmp_path), PATH=f"{tools}:/usr/bin:/bin", UV_ARGS_LOG=str(log))
+    env.update(overrides)
+    script = Path(__file__).resolve().parents[1] / "scripts/install.sh"
+    result = subprocess.run(["/bin/sh", str(script), "none"], env=env,
+                            text=True, capture_output=True, timeout=15)
+    return result, log
+
+
+@pytest.mark.parametrize("runtime", [None, "3.11", "3.12", "3.13"])
+def test_installer_uses_managed_supported_python_and_wheels(tmp_path, runtime):
+    overrides = {"DOCATLAS_INSTALL_SOURCE": "/fixture/doc_atlas.whl"}
+    if runtime is not None:
+        overrides["DOCATLAS_INSTALL_PYTHON"] = runtime
+    result, log = run_stubbed_installer(tmp_path, **overrides)
+    assert result.returncode == 0, result.stderr
+    assert log.read_text().splitlines() == [
+        "tool", "install", "--upgrade", "--managed-python", "--python",
+        runtime or "3.13", "--no-build", "/fixture/doc_atlas.whl",
+    ]
+    assert not (tmp_path / ".config").exists()
+
+
+def test_installer_rejects_unsupported_python_before_tool_install(tmp_path):
+    result, log = run_stubbed_installer(tmp_path, DOCATLAS_INSTALL_PYTHON="3.14")
+    assert result.returncode != 0
+    assert "Unsupported DOCATLAS_INSTALL_PYTHON" in result.stderr
+    assert not log.exists()
+
+
+def test_installer_does_not_fallback_after_wheel_install_failure(tmp_path):
+    result, log = run_stubbed_installer(tmp_path, UV_STUB_EXIT="8")
+    assert result.returncode == 8
+    assert "--no-build" in log.read_text().splitlines()
+    assert "DocAtlas is ready" not in result.stdout
+    assert not (tmp_path / ".config").exists()
+
+
 @pytest.mark.parametrize("writer", [shell_writer, "python"])
 @pytest.mark.parametrize("entries", [
     {"docatlas": {"command": ["foreign"]}},

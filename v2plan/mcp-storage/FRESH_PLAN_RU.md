@@ -88,6 +88,14 @@ fresh initialization → prepare → retrieve → restart, а не fixture boots
 ### Coordinator / R
 
 Coordinator фиксирует interfaces/ownership и интегрирует проверенные commits.
+Coordinator installer paths: `scripts/install.sh`,
+`tests/test_opencode_v2_installer.py`, installer module hash в
+`tests/diagnostic_labels.mcp_delivery_c.json`. Installer теперь запрашивает uv
+managed Python (default 3.13, overrides 3.11/3.12/3.13) и `--no-build`:
+при отсутствии wheel fail, без compiler/source fallback. 46 focused installer /
+agent-config tests PASS; это stubbed installer проверка, не clean network install.
+Шард C далее передаётся C: installer hash нужно сохранить, изменяя только
+delivery module inventory для его новых тестов.
 R независимо проверяет итоговые изменения и реальные acceptance paths.
 Без nested agents и пересекающихся владельцев файлов. Общий runtime release
 проверяется на одном integration SHA; broad native/capture redesign остановлен.
