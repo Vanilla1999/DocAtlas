@@ -6,7 +6,8 @@ from types import SimpleNamespace
 import pytest
 
 from scripts.docs_mcp_stdio_smoke import (
-    fixture_database_state, initialize_fixture_members, isolated_environment, payload, text_payload, validate_patch_payload,
+    fixture_database_state, initialize_fixture_members, isolated_environment, payload, text_payload,
+    validate_blocked_preparation, validate_patch_payload,
 )
 from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
 
@@ -58,6 +59,11 @@ def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
     result.structuredContent = None
     result.content = [SimpleNamespace(text='{"status":"failed","retryable":false}')]
     assert text_payload(result, allow_error=True) == terminal
+    blocked = {"status": "blocked", "reason_code": "unsafe_sqlite_path_mutation",
+               "retryable": False, "mutation_performed": False}
+    validate_blocked_preparation(blocked)
+    with pytest.raises(AssertionError):
+        validate_blocked_preparation({**blocked, "mutation_performed": True})
 
 
 def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(tmp_path):

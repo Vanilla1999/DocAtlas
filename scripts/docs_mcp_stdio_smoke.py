@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Real installed-artifact stdio delivery smoke; no mocked retrieval or providers.
 
---read-only checks the runnable pre-lifecycle delivery surface. It never claims
-the indexed/large-packet matrix passed. The full smoke requires the explicit
-member lexical lifecycle API and fails closed if that API is unavailable.
+--read-only checks the runnable unindexed delivery surface. It never claims
+the indexed/large-packet matrix passed. Full smoke verifies the current blocked
+preparation boundary and exits nonzero until separately approved safe storage
+work makes positive indexed delivery available.
 """
 from __future__ import annotations
 
@@ -131,6 +132,15 @@ async def read_only_delivery(session, project: Path, *, text_only: bool) -> None
         **canonical_query, "context_format": "patch_context"}))
     validate_patch_payload(patch)
     assert patch.get("result") == "failure" and not patch.get("sources"), patch
+    negative_bindings = {}
+    for name, extra in (("module_mismatch", {"scope": "module", "module_path": "missing-module"}),
+                        ("version_mismatch", {"version": "99.0.0"})):
+        response = decode(await session.call_tool("get_docs_context", {
+            **canonical_query, **extra, "context_format": "patch_context"}))
+        validate_patch_payload(response, completeness="unavailable")
+        assert response["result"] == "failure" and not response.get("sources"), response
+        negative_bindings[name] = {"result": response["result"], "completeness": response["completeness"],
+                                   "sources": [], "source_bytes": 0}
     for extra in ({"mutation_intent": {"operation": "delete", "confirm": True}},
                   {"edit_ready": True}, {"allow_network": True, "consent": True}):
         rejected = await session.call_tool("get_docs_context", {**canonical_query, **extra})
@@ -138,6 +148,13 @@ async def read_only_delivery(session, project: Path, *, text_only: bool) -> None
             response = decode(rejected)
             assert response.get("status") in {"error", "failed"}, response
     assert (project / "README.md").read_text().endswith(f"`{NEEDLE}`.\n")
+    print(f"Installed {'text' if text_only else 'structured'} unindexed read-only observations: " + json.dumps({
+        "docs_default": {"status": docs.get("status"), "kind": docs.get("kind"),
+                         "sources": docs.get("sources", []),
+                         "source_bytes": sum(len(row.get("snippet", "").encode()) for row in docs.get("sources", []))},
+        "empty_patch": {"result": patch["result"], "completeness": patch["completeness"],
+                        "sources": [], "source_bytes": 0},
+        "negative_bindings": negative_bindings, "unauthorized_fields": "rejected; target unchanged"}, sort_keys=True))
 
 
 async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[str]:
@@ -158,84 +175,25 @@ async def indexed_delivery(session, project: Path, *, text_only: bool) -> list[s
 
     first = await session.call_tool("prepare_docs", {
         "action": "sync_project_docs", "project_path": str(project), "mutation": mutation})
-    if first.isError:
-        blockers.append(f"public MCP rejected explicit member grant: {first.content}; indexed evidence bytes NOT OBSERVED")
-        return blockers
-    synced = decode(first)
-    if synced.get("status") != "success":
-        blockers.append(f"explicit member grant unavailable on public MCP: {synced}; indexed evidence bytes NOT OBSERVED")
-        return blockers
-    metrics = synced["metrics"]
-    assert metrics["transaction"] == "committed" and metrics["generation_id"].startswith("gen-"), synced
-    assert metrics["derived_writes"] > 0, synced
-    committed = fixture_database_state(store.db_path)
-    mutation["expected_generation_id"] = metrics["generation_id"]
-    repeated = decode(await session.call_tool("prepare_docs", {
-        "action": "sync_project_docs", "project_path": str(project), "mutation": mutation}))
-    assert repeated["status"] == "success" and repeated["metrics"]["derived_writes"] == 0, repeated
-    assert fixture_database_state(store.db_path) == committed, "unchanged member repeat wrote DB rows"
-    forged = {**mutation, "catalog_sha256": "0" * 64}
-    rejected = await session.call_tool("prepare_docs", {
-        "action": "sync_project_docs", "project_path": str(project), "mutation": forged})
-    if not rejected.isError:
-        assert decode(rejected).get("status") != "success", rejected
-    assert fixture_database_state(store.db_path) == committed, "stale grant modified fixture DB"
-    print(f"Installed {'text' if text_only else 'structured'} member lifecycle: " + json.dumps({
-        "missing_grant_rows_unchanged": True, "missing_grant_bytes_unchanged": after_files == before_files,
-        "first": metrics, "repeat": repeated["metrics"], "stale_grant_rows_unchanged": True}, sort_keys=True))
-
-    canonical_query = {"question": QUESTION, "project_path": str(project)}
-    answer = decode(await session.call_tool("get_docs_context", canonical_query))
-    try:
-        validate_context_payload(answer, required_fragment=NEEDLE)
-        assert answer["kind"] == "docs_context" and answer["estimated_tokens"] <= 800, answer
-        rendered = json.dumps(answer)
-        assert NEEDLE in rendered
-        assert "README.md" in rendered, answer
-    except AssertionError:
-        blockers.append(f"docs default did not return ready cited fixture evidence: {answer}")
-    outcomes = {"docs_default": {"status": answer.get("status"), "kind": answer.get("kind"),
-        "sources": [{"path": row.get("path_or_url"), "bytes": len(row.get("snippet", "").encode())}
-                    for row in answer.get("sources", [])]}}
-    queries = {
-        "complete": {**canonical_query, "question": "What command is documented as `doc-atlas mcp docs-serve`?"},
-        "partial": {**canonical_query, "question": "What command is documented as `doc-atlas mcp docs-serve` and `AbsentFixtureConstraint`?"},
-        "project_scope": {**canonical_query, "scope": "project"},
-        "all_scope": {**canonical_query, "scope": "all"},
-        "module_mismatch": {**canonical_query, "scope": "module", "module_path": "missing-module"},
-        "version_mismatch": {**canonical_query, "version": "99.0.0"},
-        "large": {**canonical_query, "question": "Inspect " + " ".join(f"`validate_protocol_{i}`" for i in range(12))},
-    }
-    for name, query in queries.items():
-        response = decode(await session.call_tool("get_docs_context", {**query, "context_format": "patch_context"}))
-        validate_patch_payload(response)
-        for row in response.get("sources", []):
-            source_path = (project / row["path"]).resolve()
-            assert source_path.is_relative_to(project) and source_path.is_file(), row
-            assert row["text"] in source_path.read_text(encoding="utf-8"), "returned window differs from actual fixture source"
-        outcomes[name] = {"result": response["result"], "completeness": response["completeness"],
-                          "source_bytes": sum(len(row["text"].encode()) for row in response.get("sources", [])),
-                          "sources": [{"path": row["path"], "evidence_id": row["evidence_id"],
-                                       "bytes": len(row["text"].encode()), "content_sha256": row["content_sha256"]}
-                                      for row in response.get("sources", [])],
-                          "missing": response.get("missing", [])}
-        if name in {"complete", "partial"} and (response["result"] != "data" or response["completeness"] != name):
-            blockers.append(f"{name} real retrieval returned {outcomes[name]}")
-        if name in {"project_scope", "all_scope"}:
-            assert all(row["path"] in {"README.md", "protocols.md"} for row in response.get("sources", [])), response
-            if response["result"] != "data":
-                blockers.append(f"positive {name} returned {outcomes[name]}")
-        if name in {"module_mismatch", "version_mismatch"}:
-            assert response["completeness"] != "complete", response
-        if name == "large" and outcomes[name]["source_bytes"] <= 32768:
-            blockers.append(f">32KB necessary evidence not delivered: {outcomes[name]}; fixture protocols.md="
-                            f"{(project / 'protocols.md').stat().st_size} bytes")
-    print(f"Installed {'text' if text_only else 'structured'} indexed delivery observations: {json.dumps(outcomes, sort_keys=True)}")
-    await invalid_manifest_lifecycle(session, project, store.db_path, decode)
-    print(f"Installed {'text' if text_only else 'structured'} invalid-manifest lifecycle: terminal failed / zero pages / no retry PASS")
-    assert fixture_database_state(store.db_path) == committed, "read delivery changed member rows"
-    blockers.append("positive exact-version and positive module-scope evidence fixture not established; negative bindings checked only")
+    blocked = decode(first, allow_error=True)
+    validate_blocked_preparation(blocked)
+    assert fixture_database_state(store.db_path) == before, "blocked preparation modified fixture member rows"
+    assert fixture_database_fingerprint(store.db_path) == before_files, "blocked preparation changed fixture database bytes"
+    mode = "text" if text_only else "structured"
+    print(f"Installed {mode} preparation boundary: " + json.dumps({
+        "response": blocked, "database_bytes_unchanged": True, "member_rows_unchanged": True,
+        "fixture_initialization": "explicit outside-MCP empty SQLite fixture only",
+        "ready_index_bootstrap": "NOT RUN", "sources": [], "source_bytes": 0,
+        "positive_matrix": "NOT RUN: docs ready / partial / complete / >32KB / positive scope/version / generation repeat"}, sort_keys=True))
+    blockers.append(f"{mode}: unsafe_sqlite_path_mutation; mutation_performed=false; retryable=false. "
+                    "Positive indexed delivery, including >32KB, remains blocked. Descriptor-bound/native VFS storage work requires separate user approval; no retries or bypass.")
     return blockers
+
+
+def validate_blocked_preparation(response: dict) -> None:
+    assert response.get("status") == "blocked", response
+    assert response.get("reason_code") == "unsafe_sqlite_path_mutation", response
+    assert response.get("retryable") is False and response.get("mutation_performed") is False, response
 
 
 def initialize_fixture_members(project: Path):
