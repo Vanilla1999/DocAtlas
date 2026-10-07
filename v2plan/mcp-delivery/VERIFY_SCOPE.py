@@ -7,6 +7,8 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "tests/test_dictionary_exit_local_entry_closure.py",
+    "docmancer/docs/interfaces/mcp/error_contract.py",
     ".github/workflows/ci.yml",  # Explicit Linux/macOS supported-platform matrices only.
     ".github/workflows/p1-stack-exact-validation.yml",
     ".github/workflows/mcp-platform-proof.yml",

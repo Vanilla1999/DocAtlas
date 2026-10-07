@@ -435,6 +435,29 @@ authorized fast-forward of its existing head. Updating it triggers protected
 historical/evaluation checks; permission still pending. No full required-CI or
 merge-readiness claim and no automatic merge.
 
+### Authorized unchanged PR CI diagnostic
+
+User subsequently authorized updating PR211 and unchanged offline historical /
+evaluation execution; external provider calls, live user indexes, publication and
+merge remain excluded. Pre-push source audit confirmed automatic self-host
+`--live` is provider-free temporary-fixture retrieval, not external inference.
+Both remote heads fast-forwarded normally to `b6b13072`; PR211 CI ran on that SHA.
+
+Main CI `37662139596`: installer, static/docs contracts and all three supported
+platform smoke jobs PASS. Core 3.11/3.12/3.13, advanced, installed benchmark and
+retrieval FAILED; required-ci red. Core diagnostic was incomplete: 3 237 PASS,
+1 958 FAIL, 82 ERROR before reporting aborted; 2 787 selected nodes unfinished.
+These are not all classified as legacy. Advanced reports 129 FAIL / 493 PASS.
+
+Independent review approved core reporting/member-grant guidance fix `36f9f0a5`,
+integrated as `8a806445`: 36 focused PASS, intentional assertion failure exits 1
+normally with all filesystem guards restored, no pytest INTERNALERROR. Original
+guards/assertions preserved; exact missing-grant denial correctly classified as
+authorization, never grants permission. No thresholds or historical artifacts
+modified. Retrieval/installed fixture bootstrap slices remain under implementation;
+questions, gold/scoring and acquisition cannot be changed to manufacture PASS.
+Mass old-ABI/semantic incompatibilities remain open, no full-CI green claim.
+
 - Реальный fresh lifecycle и scope/version/partial evidence проходят validators.
 - Library lineage сохраняется от producer; hashes/spans не синтезируются ради PASS.
 - >32 KiB считаются только по уникальным source bytes в одном реальном ответе;
