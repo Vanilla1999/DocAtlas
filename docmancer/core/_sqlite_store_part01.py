@@ -297,12 +297,26 @@ class _SQLiteStorePart01:
         self, documents: Iterable[Document], *, project_path: str,
         expected_generation_id: str | None,
     ) -> dict[str, Any]:
-        """SQLite-only member batch: no extraction, deletion or implicit migration.
+        """Reject pathname persistence before connecting, recovery or writes.
+
+        Python's SQLite VFS cannot bind database/sidecar opens to selected FDs.
+        Neither a stat comparison nor a /proc FD pathname closes that gap.
+        """
+        from docmancer.docs.application.project_docs_member_transaction import reject_pathname_sqlite_mutation
+        reject_pathname_sqlite_mutation()
+
+    def _upsert_project_members_in_memory(
+        self, snapshot: bytes, documents: Iterable[Document], *,
+        project_path: str, expected_generation_id: str | None,
+    ) -> tuple[dict[str, Any], bytes]:
+        """In-memory transaction mechanics, not a disk persistence grant.
 
         Callers must validate the explicit consent, local storage and finite source
         snapshot before entering. Generation/ownership checks run under the same
         SQLite write transaction as publication, not under an advisory lock alone.
         """
+        if not isinstance(snapshot, bytes) or len(snapshot) > 32 * 1024 * 1024:
+            raise PermissionError("member transaction requires bounded in-memory snapshot bytes")
         docs = [self._current_schema_document(doc) for doc in documents]
         if not docs or len(docs) > 500 or len({doc.source for doc in docs}) != len(docs):
             raise ValueError("member batch requires bounded unique documents")
@@ -310,20 +324,27 @@ class _SQLiteStorePart01:
             metadata = doc.metadata or {}
             relative = metadata.get("project_doc_path")
             from docmancer.docs.project_docs_catalog import _literal_path
+            from docmancer.docs.application.project_docs_member_transaction import local_project_identity
             if (
                 not isinstance(relative, str) or not _literal_path(relative)
                 or doc.source != str(Path(project_path) / relative)
                 or metadata.get("project_path") != project_path
                 or metadata.get("project_docs") is not True
                 or metadata.get("source_class") != "project_file"
+                or metadata.get("project_identity") != local_project_identity(Path(project_path))
+                or metadata.get("repository_identity") != metadata.get("project_identity")
                 or metadata.get("project_doc_content_hash") != "sha256:" + hashlib.sha256(doc.content.encode("utf-8")).hexdigest()
                 or metadata.get("child_target_tokens") != 160
                 or metadata.get("child_hard_max_tokens") != 512
             ):
                 raise PermissionError("member batch has invalid project ownership")
-        conn = sqlite3.connect(f"{self.db_path.absolute().as_uri()}?mode=rw", uri=True, timeout=0)
+        # Own the connection: database_list's empty filename also describes a
+        # temporary disk database and is not proof that a supplied handle is RAM.
+        conn = sqlite3.connect(":memory:")
         conn.row_factory = sqlite3.Row
         try:
+            conn.execute("PRAGMA temp_store=MEMORY")
+            conn.deserialize(snapshot)
             conn.execute("BEGIN IMMEDIATE")
             active = self._active_generation_id(conn)
             if active != expected_generation_id:
@@ -352,6 +373,7 @@ class _SQLiteStorePart01:
                     existing = json.loads(row["metadata_json"])
                     if any(existing.get(key) != (doc.metadata or {}).get(key) for key in (
                         "project_path", "project_doc_path", "project_docs", "source_class",
+                        "project_identity", "repository_identity",
                     )):
                         raise PermissionError("existing source belongs to a different owner")
                 else:
@@ -364,6 +386,7 @@ class _SQLiteStorePart01:
                         owner = json.loads(prior["metadata_json"])
                         if any(owner.get(key) != (doc.metadata or {}).get(key) for key in (
                             "project_path", "project_doc_path", "project_docs", "source_class",
+                            "project_identity", "repository_identity",
                         )):
                             raise PermissionError("active source belongs to a different owner")
                     if (row and prior and row["content"] == doc.content and existing == doc.metadata
@@ -382,13 +405,14 @@ class _SQLiteStorePart01:
                 generation = self._build_candidate_generation(conn, changed, recreate=False)
                 self._activate_generation(conn, generation)
             conn.commit()
-            return {"transaction": "committed", "generation_id": generation,
+            outcome = {"transaction": "committed", "generation_id": generation,
                     "members": len(docs), "new_count": new_count,
                     "changed_count": len(changed) - new_count,
                     "unchanged_files": len(docs) - len(changed),
                     "derived_writes": sections, "derived_deletes": replaced_sections,
                     "sources_deleted": 0,
                     "sections_indexed": sections}
+            return outcome, conn.serialize()
         except Exception:
             conn.rollback()
             raise

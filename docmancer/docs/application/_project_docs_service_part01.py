@@ -33,46 +33,14 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _repository_identity(root: Path) -> str:
-        """Return a clone-stable identity when Git metadata is available.
+        """Root-local retrieval isolation; never inspect Git or worktree markers.
 
-        Unversioned directories have no portable identity by definition.  Keep
-        them isolated in a deterministic local namespace instead of allowing
-        equal relative paths from unrelated projects to collide in one index.
+        Identity is attribution, not a grant. Legacy Git identities are not
+        aliased or migrated by this reader. The mutation lane separately binds
+        the explicit initialized storage target to this same absolute root.
         """
-        git_entry = root / ".git"
-        config_path = git_entry / "config"
-        if git_entry.is_file():
-            try:
-                marker = git_entry.read_text(encoding="utf-8").strip()
-            except OSError:
-                marker = ""
-            if marker.lower().startswith("gitdir:"):
-                git_dir = Path(marker.split(":", 1)[1].strip())
-                if not git_dir.is_absolute():
-                    git_dir = (root / git_dir).resolve()
-                config_path = git_dir / "config"
-
-        parser = configparser.RawConfigParser()
-        try:
-            if config_path.is_file():
-                parser.read(config_path, encoding="utf-8")
-        except (OSError, configparser.Error):
-            parser = configparser.RawConfigParser()
-        remote_sections = sorted(
-            section for section in parser.sections()
-            if section.startswith('remote "') and section.endswith('"')
-        )
-        preferred = 'remote "origin"'
-        if preferred in remote_sections:
-            remote_sections.remove(preferred)
-            remote_sections.insert(0, preferred)
-        for section in remote_sections:
-            remote = parser.get(section, "url", fallback="").strip().rstrip("/")
-            if remote:
-                return f"git:{ProjectDocsService._canonical_git_remote(remote)}"
-
-        local_digest = hashlib.sha256(str(root).encode("utf-8")).hexdigest()
-        return f"local:{local_digest}"
+        from .project_docs_member_transaction import local_project_identity
+        return local_project_identity(root)
 
     def __init__(self, facade: Any):
         self.facade = facade

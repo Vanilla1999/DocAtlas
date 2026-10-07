@@ -436,9 +436,17 @@ def handle_prefetch_tool(name: str, args: dict[str, Any], service: LibraryDocsSe
             payload = asdict(service.inspect_docs_target(target, max_pages=int(args.get("max_pages") or 3)))
         elif action == "sync_project_docs":
             if "mutation" in args:
-                payload = _compact_project_sync(project_docs_app.sync_project_docs(
-                    args["project_path"], mutation=args["mutation"],
-                ))
+                from docmancer.docs.application.project_docs_member_transaction import UnsafeSQLitePathMutation
+                try:
+                    payload = _compact_project_sync(project_docs_app.sync_project_docs(
+                        args["project_path"], mutation=args["mutation"],
+                    ))
+                except UnsafeSQLitePathMutation:
+                    payload = {
+                        "status": "blocked", "reason_code": "unsafe_sqlite_path_mutation",
+                        "retryable": False, "mutation_performed": False,
+                        "message": "Pathname SQLite persistence is unsupported: descriptor-bound database and sidecar opens are required. Do not retry, rebuild or change filesystem permissions to bypass this boundary.",
+                    }
             elif args.get("plan_digest"):
                 git_state = git_worktree_state(args["project_path"])
                 inspection = project_docs_app.inspect_project_docs(args["project_path"])
