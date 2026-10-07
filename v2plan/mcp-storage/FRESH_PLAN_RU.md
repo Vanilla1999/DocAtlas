@@ -300,6 +300,20 @@ immutable question/conditions and exact source hash/span witnesses. Positive and
 negative controls preserved; no semantic-entailment certification, runtime NL
 classifier/weights, permission from completeness or historical changes. Query
 shard's other three modules remain untouched. Independent review before integration.
+
+Batch implemented as `5f282a57`: four files only, no runtime/helper changes.
+Baseline 25 FAIL → 25 PASS; wider approved active batch 156 PASS по отчёту агента.
+All original scenarios retained as explicit mandatory requirements with positive
+command/inventory/path/number witnesses and negative stale/foreign/forged-span /
+changed-rehashed-text controls. Independent semantic assertion review pending;
+not full CI or semantic-entailment certification.
+
+Coordinator default offline-core COLLECT-ONLY: exit 0, 8 063 selected / 622
+deselected / 8 685 total, inventory gates PASS; none executed. Log:
+`/tmp/opencode/mcp-integrated-wheel-if9p586h/active-core-collection.log`.
+Read-only CI source audit separates protected mixed historical/evaluation nodes
+before any broader execution; excludes must be justified by protected scope,
+not failures. A full core run is not authorized by collection success alone.
 Финальное доказательство — установленный wheel, настоящие stdio structured/text,
 fresh initialization → prepare → retrieve → restart, а не fixture bootstrap.
 
