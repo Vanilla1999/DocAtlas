@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_mcp_storage_native_spike.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_mcp_storage_native_spike.py": "1e21f6c3e9d595778d0e7faea8d1e2dd3bfcc9c75bb94bb306cbc98500983e02"
+  },
+  "node_overrides": {}
+}
