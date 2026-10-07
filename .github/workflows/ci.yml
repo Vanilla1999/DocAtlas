@@ -159,7 +159,12 @@ jobs:
           python -m pytest -q tests/docs/test_mcp_docs_tools_registration.py tests/test_cli.py tests/test_support_surface_policy.py
 
       - name: Verify installed Docs MCP over stdio
-        run: python scripts/docs_mcp_stdio_smoke.py
+        shell: bash
+        run: |
+          python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/docs-mcp-wheel" .
+          python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/docs-mcp-wheel/*.whl
+          cd "$RUNNER_TEMP"
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
   test:
     runs-on: ubuntu-latest

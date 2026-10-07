@@ -61,7 +61,13 @@ jobs:
       - run: |
           python -m compileall -q docmancer eval scripts
           doc-atlas --version
-          python scripts/docs_mcp_stdio_smoke.py
+      - name: Verify real installed-wheel Docs MCP
+        shell: bash
+        run: |
+          python -m pip wheel --no-deps --wheel-dir "$RUNNER_TEMP/docs-mcp-wheel" .
+          python -m pip install --force-reinstall --no-deps "$RUNNER_TEMP"/docs-mcp-wheel/*.whl
+          cd "$RUNNER_TEMP"
+          python "$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
 
   advanced:
     name: p1-stack-advanced-security
