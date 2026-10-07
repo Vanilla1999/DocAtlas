@@ -54,3 +54,32 @@ Neither the snapshot backend nor native persistence implementation is approved.
 The native proposal is under independent R review; object-bound versus strict
 external-alias semantics and crash recovery under hostile sidecar removal remain
 unresolved. Existing unsafe persistence denial must not be removed on this basis.
+
+## Explicitly approved isolated research spike
+
+After R's concept review, the user selected the research spike. Coordinator
+assigned A only these experimental paths, on disposable fixtures:
+
+```text
+experiments/mcp_storage_native/sqlite_fd_vfs.c
+experiments/mcp_storage_native/worker.py
+experiments/mcp_storage_native/README.md
+experiments/mcp_storage_native/include/sqlite3.h
+experiments/mcp_storage_native/include/sqlite3ext.h
+tests/test_mcp_storage_native_spike.py
+tests/diagnostic_labels.mcp_storage_native_spike.json
+```
+
+No production dispatch/store/agent/config/build/package integration is permitted
+by this allowlist. Existing compiler use and temporary experimental artifacts
+are allowed; no new dependency, runtime downloads, install or current-index use.
+Header provenance and licensing must be recorded. Coverage, locking, recovery,
+error and crash behavior must be reported with actual supported SQLite profiles.
+Unknown operations deny; no unsafe fallback. Unsupported or uncertain outcomes
+must not be mislabeled as no mutation.
+
+This does not approve object-bound authorization in place of strict alias
+guarantees, protected-namespace assumptions, or any threat-model weakening.
+Persistence remains blocked; packaging and production integration need later
+review and approval. B's found-window retention proposal is independently under
+R review and has no implementation allowlist yet.

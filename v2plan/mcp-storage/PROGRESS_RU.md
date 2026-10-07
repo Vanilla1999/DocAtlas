@@ -35,3 +35,15 @@ Snapshot backend не принят: он меняет storage product и име�
 restart/CAS obligations. Native extension/VFS — пока предложение под review R,
 не разрешение ослабить alias, crash или ownership guarantees. Новые зависимости,
 live replacement, index migration/rebuild, publish и merge не выполнялись.
+
+R concept review: native путь правдоподобен, но `xSetSystemCall` — optional
+testing API, не доказанная полная confinement boundary. Пользователь разрешил
+изолированный research spike; A получил только experimental C/worker/headers
+и новые tests. Production integration не разрешена. Strict hardlink semantics,
+crash recovery после hostile journal removal и direct same-UID modification
+этим разрешением не ослаблены.
+
+B закончил read-only inventory packing: финальные merge/ranking caps отделены
+от acquisition stops, которые могут запускать дополнительные reads. Контракт
+проходит review R, включая риск дополнительных current-source rebinding reads.
+Library lineage остаётся отдельным нерешённым срезом.
