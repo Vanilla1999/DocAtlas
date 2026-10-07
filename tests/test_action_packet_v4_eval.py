@@ -346,3 +346,48 @@ def test_delivery_report_uses_v4_result_and_completeness(tmp_path):
     assert "packet_status" not in text
     assert "UNSUPPORTED: workflow_checks_from_patch_context" in BOUNDED_DIRECT_EXECUTION_POLICY
     assert "cannot run from v4 patch evidence alone" in BOUNDED_DIRECT_EXECUTION_POLICY
+
+
+def test_required_once_injected_arguments_reach_current_public_dispatch(necessary_evidence, tmp_path):
+    import ast
+    import re
+    import jsonschema
+    from docmancer.mcp._docs_server_part01 import call_docs_tool_payload, current_docs_surface
+    from eval.task_level import _execution_part04
+    from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
+    from eval.task_level.runners.codex import _required_once_retrieval_metadata
+
+    # Execute only the actual active injection statement, not a historical pilot run.
+    tree = ast.parse(Path(_execution_part04.__file__).read_text(encoding="utf-8"))
+    injections = [node for node in ast.walk(tree) if isinstance(node, ast.If)
+                  and isinstance(node.test, ast.Attribute)
+                  and node.test.attr == "require_docatlas_call_before_edit"]
+    assert len(injections) == 1
+    question = "Inspect protocol implementations"
+    namespace = {"prompt": question, "condition_id": "docatlas_tool_required_once",
+                 "CONDITIONS": CONDITIONS, "TOOL_REQUIRED_ONCE_INSTRUCTION": TOOL_REQUIRED_ONCE_INSTRUCTION}
+    exec(compile(ast.Module(body=injections, type_ignores=[]), "<offline-prompt-injection>", "exec"), namespace)
+    prompt = namespace["prompt"]
+    assert prompt.startswith(question + "\n")
+    assert "`get_docs_context` exactly once" in prompt
+    arguments = {key: json.loads(value) for key, value in re.findall(r'^- (\w+)=("[^"\n]*")$', prompt, re.MULTILINE)}
+    assert arguments["question"] == "<original task objective>"
+    arguments["question"] = question
+    assert arguments["project_path"] == "."
+
+    surface = current_docs_surface(env={})
+    tool = next(tool for tool in surface.tools if tool.name == "get_docs_context")
+    service = OfflineRetrieval(necessary_evidence)
+    result = call_docs_tool_payload("get_docs_context", arguments, service, surface=surface)
+    assert len(service.calls) == 1
+    jsonschema.validate(arguments, tool.input_schema)
+    jsonschema.validate(result, tool.output_schema)
+    assert result["kind"] == "patch_context" and result["result"] == "data"
+    assert result["completeness"] == "complete" and result["edit_ready"] is False
+    assert len(result["sources"]) == 12
+    metadata = _required_once_retrieval_metadata(
+        {"arguments": arguments, "result": {"structuredContent": result}}, task_objective=question,
+    )
+    assert metadata["question_matches_task_objective"] is True
+    assert metadata["context_format"] == "patch_context"
+    assert metadata["retrieval_succeeded"] is True
