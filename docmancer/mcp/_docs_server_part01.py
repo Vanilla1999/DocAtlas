@@ -139,7 +139,11 @@ def call_docs_tool_payload(
         )
     handler_args = _public_handler_arguments(name, args)
     try:
-        active_service = _service_for_project_path(service, handler_args)
+        # The explicit member executor validates its own project/storage/hash
+        # bindings before opening the existing store. Constructing a project
+        # facade here would initialize registries/jobs before that validation.
+        member_sync = name == "prepare_docs" and handler_args.get("action") == "sync_project_docs"
+        active_service = service if member_sync else _service_for_project_path(service, handler_args)
         payload = handler(name, handler_args, active_service)
     except Exception as exc:
         reason_code = _exception_reason_code(exc)

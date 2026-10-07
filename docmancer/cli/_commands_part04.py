@@ -28,7 +28,7 @@ from ._commands_part01 import _create_agent_or_raise_lock_error, _effective_conf
     "--sync-saved-docs",
     is_flag=True,
     default=False,
-    help="Incrementally index accepted doc changes from the exact --base/--head Git diff; never writes repository files.",
+    help="Unsupported legacy write flag: an exact Git diff is not a mutation grant. Use prepare_docs with an explicit confirmed member transaction.",
 )
 @click.option("--config", "config_path", default=None, help="Path to docatlas.yaml.")
 def docs_impact_cmd(
