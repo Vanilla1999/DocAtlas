@@ -11,6 +11,10 @@ hostile filesystem or Windows reproduction executed by R.
 | R3 | Medium | Aggregate byte/deadline checks happen after excess document read | A | OPEN |
 | R4 | Medium | Owned server named `servers` inside V2 mapping is skipped, permitting duplicate registration | C | OPEN |
 | R5 | Medium | POSIX descriptor primitives lack deliberate unsupported-platform guard on Windows | A | OPEN |
+| R6 | Medium | Host accepts error-marked/malformed/conflicting structured and text evidence channels | B | OPEN |
+| R7 | Medium | Host permits forged visible requirement-to-witness syntactic binding | B | OPEN |
+| R8 | Medium | Host source line endpoints need not match retained text and are copied into citations | B | OPEN |
+| R9 | Medium | Native recovery drops explicit scope/module/version bindings and admits contradictory versions | B | OPEN |
 
 SQLite generation comparison, source ownership and rollback use one
 `BEGIN IMMEDIATE` transaction; R found no independent SQL atomicity defect.
@@ -21,3 +25,13 @@ expected generation. These limits must remain visible in acceptance reporting.
 
 No full installed/deployed/release certification was issued. Final closure
 requires fixes, targeted tests and independent re-review on the integrated SHA.
+
+## Native consumer followup
+
+R independently ran 39 focused tests plus one targeted recovery case with normal
+conftest, and directly reproduced R6–R9 with adversarial probes. No production
+edits or historical suite runs. Native retention/copies and absence of invented
+read capabilities passed their reviewed checks, but do not close R6–R9.
+No new finding in the reviewed coding instructions, projection split, CLI
+early-denial/helper extraction or coordinator active assertion migrations.
+Those coordinator conclusions were static-only, not full release certification.

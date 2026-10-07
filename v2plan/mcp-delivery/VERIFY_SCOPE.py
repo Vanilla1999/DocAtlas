@@ -48,6 +48,7 @@ ALLOWED = {
     "tests/docs/test_content_trust.py",
     "tests/test_dictionary_exit_read_packet_residuals.py",
     "tests/test_cli.py",
+    "tests/test_release_gate.py",
     "tests/test_dictionary_exit_inert_security.py",
     "tests/test_dictionary_exit_public_request.py",
     "tests/test_nl_dictionary_removal_packet_contract.py",

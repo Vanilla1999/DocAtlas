@@ -38,6 +38,9 @@ No nested subagents. One owner per file; extensions require coordinator approval
   content-trust/residual/CLI active tests; integration and scoped reports.
   Active dictionary-exit inert-security/public-request and NL-removal packet
   tests also migrate to v4 while retaining nonauthorization and binding checks.
+  Coordinator also owns pre-dispatch member-sync constructor isolation and
+  two active release-smoke layout assertions; historical self-host/gold-coupled
+  release cases remain unchanged and are not run.
 - R: independent integrated review, no production edits.
 
 Shared prepare_docs mutation schema belongs only to B. A supplies the DTO and

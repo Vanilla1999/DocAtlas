@@ -414,22 +414,28 @@ def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
 
 
 def test_stdio_smoke_requires_cited_content() -> None:
-    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
-    assert "assert NEEDLE in rendered" in text
-    assert 'assert set(canonical_query) == {"question", "project_path"}' in text
-    canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
-    assert "output_mode" not in canonical_block
-    assert "compatibility_query" not in text
-    assert "validate_context_payload(answer, required_fragment=NEEDLE)" in text
+    from scripts.docs_mcp_stdio_smoke import NEEDLE, validate_context_payload
+
+    payload = {"status": "ok", "kind": "docs_context", "support_status": "retrieval_only",
+        "context_status": "ready", "answer_supported": False, "answer_available": False,
+        "sources": [{"path_or_url": "README.md", "snippet": NEEDLE,
+            "content_sha256": "a" * 64}]}
+    validate_context_payload(payload, required_fragment=NEEDLE)
+    for source in ({"path_or_url": "README.md", "snippet": "unrelated", "content_sha256": "a" * 64},
+                   {"path_or_url": "README.md", "snippet": NEEDLE, "content_sha256": "forged"},
+                   {"snippet": NEEDLE, "content_sha256": "a" * 64}):
+        with pytest.raises(AssertionError):
+            validate_context_payload({**payload, "sources": [source]}, required_fragment=NEEDLE)
 
 
-def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
-    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
-    assert '"HOME": str(user_home)' in text
-    assert '"USERPROFILE": str(user_home)' in text
-    assert '"DOCATLAS_HOME": str(docatlas_home)' in text
-    assert 'env.pop("DOCATLAS_HOME", None)' not in text
-    assert 'not (user_home / ".docmancer").exists()' in text
+def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes(tmp_path) -> None:
+    from scripts.docs_mcp_stdio_smoke import isolated_environment
+
+    environment = isolated_environment(tmp_path)
+    assert environment["HOME"] == environment["USERPROFILE"] == str(tmp_path / "user-home")
+    assert environment["DOCATLAS_HOME"] == str(tmp_path / "docatlas-home")
+    assert not (Path(environment["HOME"]) / ".docmancer").exists()
+    assert "PYTHONPATH" not in environment
 
 
 @pytest.mark.parametrize("self_host_check,args", [
