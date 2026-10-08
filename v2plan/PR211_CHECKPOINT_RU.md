@@ -1,80 +1,113 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Последний полный прогон: 40032f7; два следующих fixture slices reviewed
+## Последний полный прогон: 3be9c34; следующий пакет test/guidance successors
 
 Обновление: 2026-10-08. Последний полностью выполненный main CI:
-[37822521243](https://github.com/Vanilla1999/DocAtlas/actions/runs/37822521243),
-HEAD `40032f7be3c6d0822e8c25a2e2c53acf9a46aeea`, merge checkout
-`5736ec7b2ba2dcd55892b6085aff6107bae15e4f`, одинаковый tree
-`701ba7a4e529e0b197c6d28d4ec9ce7ac7dbdfb4`.
+[37824782946](https://github.com/Vanilla1999/DocAtlas/actions/runs/37824782946),
+HEAD `3be9c34afa49dcf4278d2910ec29ed37c305225c`, merge checkout
+`fc1b4cf20e3e561a03230adcd67dd920e8464bdc`, одинаковый tree
+`b27a3a70a6e3796e5e76a59395330843c7784656`.
 
-- Core Python 3.11/3.12/3.13: на каждой **8507 = 6450 PASS / 1986 FAIL /
-  61 ERROR / 10 SKIP**. Roster и outcomes совпали; против f0ed956 ровно
-  **35 FAIL→PASS**, без новых/удалённых nodes, PASS regressions и иных state changes.
-  Закрыты registration companion и все 34 generated-consent cases.
-- Advanced: **622 = 524 PASS / 98 FAIL**, без изменений относительно f0.
-  Новые CI conditions выполнили все девять независимых downstream steps;
-  все девять FAIL. Adversarial mutation правильно SKIPPED после красного
-  полного adversarial baseline. Required CI **FAILURE**.
+- Core Python 3.11/3.12/3.13: на каждой **8507 = 6456 PASS / 1980 FAIL /
+  61 ERROR / 10 SKIP**. Все concrete IDs и outcomes совпали. Против 40032f7
+  ровно **6 FAIL→PASS** — шесть indexed MCP fixtures; новых/удалённых nodes,
+  PASS regressions и иных state changes нет. Предыдущие 35 исправлений также
+  сохраняются. Исторический focused 791/801 не заменяет эту полную матрицу.
+- Advanced: **622 = 524 PASS / 98 FAIL**, все states прежние. Все девять
+  независимых downstream steps выполнены и FAIL; adversarial mutation правильно
+  SKIPPED после красного полного baseline. Required CI **FAILURE**.
 - Docs contract, static, installer и installed MCP harness PASS. Все три main
   platform suites дали **77/77 PASS**, затем реальный SDK stdio PASS.
   Все три P1 stack platform SDK также PASS. Release build, wheels 3.11/3.12/3.13,
   sdist/installer и required-release PASS; release не публиковался.
-- Actual SDK: 15 invocations, 30 structured/text prepared lanes; source bindings
-  совпадают с f0, case outcomes/metrics — с f0/df9. Large delivery: 39372 unique UTF-8 bytes,
-  50 sources; partial: 94 bytes, один source и прежний missing marker.
-  Claude Code, Codex и OpenCode application sessions по-прежнему NOT RUN.
+- Actual SDK: 19 logs, 15 invocations, 30 structured/text prepared lanes и
+  420 case observations. Все matrix outcomes, metrics и normalized source
+  bindings совпадают с 40032f7. Large delivery: **39372 unique UTF-8 bytes,
+  50 sources**; partial: **94 bytes**, один source и прежний missing marker.
+  Это реальный MCP SDK transport и installed package evidence. Claude Code,
+  Codex и OpenCode application sessions по-прежнему **NOT RUN**.
+- Все 17 workflows завершились: **8 SUCCESS / 8 FAILURE / 1 SKIPPED**.
+  P1 stack overall FAIL при зелёных installed SDK lanes. Green release validation
+  не означает green main CI или разрешение выпуска.
 
 Catalog **6918 bytes**, output schema **860 bytes**. Владелец снял фиксированные
 catalog ceilings 6144/10240; продолжаются минимизация и измерение без нового
 magic number. Output schema <1000 и остальные guards/gates не отменены.
 [Актуальные решения](CURRENT_WAVE_DECISIONS_RU.md).
 
-Подготовлен отдельный reviewed slice шести indexed MCP fixture cases:
-[author review](PR211_INDEXED_MCP_FIXTURE_REVIEW_RU.md),
-[independent review](PR211_INDEXED_MCP_FIXTURE_INDEPENDENT_REVIEW_RU.md).
-Он заменяет implicit indexing настоящим confirmed hash-bound member transaction,
-сохраняет все content/fidelity/authority assertions и существующий <=800 criterion.
-Runtime этого следующего slice пока NOT RUN; PASS версии 40032f7 не наследуется.
-Agent gate preparation также прошла [author review](PR211_AGENT_GATE_FIXTURE_REVIEW_RU.md)
-и [independent review](PR211_AGENT_GATE_FIXTURE_INDEPENDENT_REVIEW_RU.md).
-Три связанных callers используют current cold preparation в пределах context
-lifetime; provider/planner/scoring и evaluator tails сохранены. Missing catalogs
-не генерируются автоматически и остаются явным FAIL. Runtime нового Agent slice
-пока NOT RUN. После публикации совместного snapshot нужен полный CI с
-concrete-node сравнением.
+## Следующий пакет на публикацию и общий CI
 
-## Подтверждённые оставшиеся причины
+Подготовлены отдельные reviewed slices для **25 известных baseline failures**:
 
-| Gate | Первая фактическая граница на 40032f7 |
+| Slice | Смысл изменения | Прежние FAIL nodes |
+|---|---|---:|
+| Recovery diagnostics | Display cap 220 заменён точным сохранением длинного исходного вопроса; parser prohibition прежний | 3 |
+| Unified MCP surface | Nullable scope с schema negatives; fidelity/no-authority guidance; реальные library examples без mode | 3 |
+| Model-visible projection | Отменённый display cap и удаление missing IDs заменены full-DTO fidelity; validator/authority/confirmation/hard-stop guards сохранены | 4 |
+| Source continuation | Настоящий confirmed member transaction для прежнего finite docs/jobs.md fixture; весь public read/tamper/change tail прежний | 1 |
+| Installed bootstrap | Canonical/root guidance сокращён 267→249 managed words при сохранении правил; installer threshold не повышен | 8 |
+| Installed lookup meaning | Две полные эквивалентные clauses сохраняют запрет переноса coverage на original question | 6 |
+
+Все base IDs/параметры и diagnostic inventories сохранены. Новые negative controls
+добавлены внутри существующих cases. Production retrieval, corpora, gold, thresholds
+и workflow configuration не меняются. Из product files меняются только canonical
+agent guidance и синхронный root SKILL tail. Ранние варианты compaction получили
+CHANGES REQUIRED из-за literal-clause/root parity regressions; они исправлены до
+публикации. Финальные review reports связаны с точными source hashes.
+
+Runtime этого следующего пакета **NOT RUN** на момент записи checkpoint. Ни один
+из 25 исправленных tests не объявляется PASS до CI следующего опубликованного SHA.
+Source continuation может открыть следующую границу после исправления setup;
+сравнение обязано учитывать и такой FAIL→FAIL с новой причиной.
+
+## Подтверждённые оставшиеся причины на 3be9c34
+
+| Gate | Первая фактическая граница |
 |---|---|
 | Recovery | Ожидаемый parsing origin против actual retrieval_miss; до fixture setup |
 | Recovery mutation | Красный полный recovery baseline; mutants не запускались |
 | Hermetic project context | 1/16 PASS, 15 FAIL по frozen query-plan/intent contract; retrieval не выполнялся |
 | Legacy и V2 self-host | Legacy sync без explicit mutation; отдельный project-config/host-storage conflict также требует решения |
 | Question surface | 0/100 по frozen semantic expectations |
-| Agent V1 и adversarial | Legacy fixture sync без explicit mutation; adversarial cases ещё не достигнуты |
+| Agent V1 и adversarial | Setup теперь дошёл до ValueError: fixture requires a nonempty finite docs-only catalog; missing catalogs не создавались; собственные adversarial cases не достигнуты |
 | Critical mutation | Baseline 28 cases: 19 PASS / 9 FAIL по normative modality; mutants не запускались |
-| Retrieval evidence | Неизменённый полный model-visible DTO превысил 800-token criterion |
+| Retrieval evidence | **1451** tokens maximum full DTO при frozen criterion **800**; превышают **24/48** within_budget cases |
+
+1451 — счётчик pinned offline `docatlas-offline:o200k_base`, не фактически
+измеренная стоимость в приложениях Claude Code/Codex/OpenCode и не история
+повторных запросов. Catalog policy не снимает этот отдельный frozen gate.
+
+Triage core выделяет 89 mutation-grant failures, 61 setup error, 30 stale ABI
+failures и 19 remote explicit-member failures. Это формы ошибок, не обещание
+механических fixes: lifecycle groups включают auto-prune/vector semantics,
+а ABI tests также требуют старых caps и inferred authority. У десяти admission
+invariant ERROR пустой captured projection; их последующие query-need/typed_local
+expectations также конфликтуют с текущим literal qualifier. Подстановка lookup
+или ручных proof flags не является сохранением этих guard tests.
 
 Это не разрешение заменить ожидания фактическими значениями, снизить thresholds,
-переписать frozen gold или исправлять deferred retrieval. В группе 51 legacy
-lifecycle failures есть проверки auto-prune/vector semantics; всю группу
-нельзя механически превращать в member-upsert tests. Исторический полный CI
-от начального 21fe472d не выполнялся, поэтому весь остаток не называется
-«pre-existing» относительно исходной точки.
+переписать frozen gold или исправлять deferred retrieval. Исходный HEAD 21fe472d
+имеет существующий красный [CI 37796983129](https://github.com/Vanilla1999/DocAtlas/actions/runs/37796983129).
+Точное per-node сопоставление с ним не выполнено: JUnit artifacts отсутствуют,
+а connector отклонил original core log из-за предела response body 8 MiB.
+По одному job status нельзя назвать весь остаток pre-existing относительно 21fe.
+Прежняя фраза «полный CI на 21fe не выполнялся» исправлена этим уточнением.
 
-Полное f0 evidence и baseline roster сохранены в
-[PR211_CONTINUATION_ACCEPTANCE.json](PR211_CONTINUATION_ACCEPTANCE.json),
-[PR211_CONTINUATION_OUTCOMES.json.gz](PR211_CONTINUATION_OUTCOMES.json.gz) и
-[русском отчёте](PR211_CONTINUATION_ACCEPTANCE_RU.md).
-Отдельный [core delta 40032f7](PR211_FOLLOWUP_CORE_ACCEPTANCE.json) фиксирует
-точные 35 переходов, hashes и matrix provenance без повторного огромного roster.
+## Evidence
+
+- [Полный compact acceptance 3be9c34](PR211_RUNTIME_FOLLOWUP_ACCEPTANCE.json):
+  workflows/jobs, advanced/downstream, retrieval metrics, реальные SDK origins и
+  30 ссылок на одну одинаковую нормализованную 14-case delivery matrix.
+- [Core delta 3be9c34](PR211_RUNTIME_FOLLOWUP_CORE_ACCEPTANCE.json): точные шесть
+  transitions, hashes и три JUnit matrices; roster восстанавливается из f0 +400 delta.
+- [Core delta 40032f7](PR211_FOLLOWUP_CORE_ACCEPTANCE.json): прежние 35 transitions.
+- Полный f0 baseline: [manifest](PR211_CONTINUATION_ACCEPTANCE.json),
+  [roster](PR211_CONTINUATION_OUTCOMES.json.gz), [отчёт](PR211_CONTINUATION_ACCEPTANCE_RU.md).
 
 **PR НЕ ГОТОВ к merge:** required CI и семантические gates красные, actual client
 acceptance не выполнен. Обычный push разрешён; merge, release и force-push — нет.
-Deferred retrieval остаётся без изменений. Следующий CI должен определить
-результаты нового fixture slice, а не скрыть оставшиеся conflicts.
+Deferred retrieval остаётся без изменений. После публикации нужен один совместный
+CI нового HEAD с полным concrete-node сравнением; PASS snapshots не наследуется.
 
 ## Историческое состояние перед f0ed956
 
