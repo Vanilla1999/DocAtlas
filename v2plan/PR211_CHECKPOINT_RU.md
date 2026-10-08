@@ -1,6 +1,116 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Последний полный прогон: 0358365; четыре contract-fixture migrations
+## Последний полный прогон: 04ff1dd; четыре migrations подтверждены
+
+Обновление: 2026-10-08. Полный [CI 37833279436](https://github.com/Vanilla1999/DocAtlas/actions/runs/37833279436)
+завершён на HEAD `04ff1dda57efb5236d7b3577d4e2736b2820df5b`, merge checkout
+`1d750c0f2926ccad325f4ecb1440c623022110ec`, tree
+`745fc099952eacbbe1fb5fb462e02ff0b0d0eaac`.
+
+- Python 3.11/3.12/3.13: **8507 = 6484 PASS / 1952 FAIL / 61 ERROR / 10 SKIP**.
+  Roster и outcomes одинаковы. Против 0358365 ровно **4 FAIL→PASS**: provenance,
+  identity collision, policy text fidelity и exact Dartdoc. Новых/удалённых nodes,
+  PASS regressions и неожиданных transitions нет.
+- Из 2013 сохранивших FAIL/ERROR nodes у 47 диагностических fixture errors вместо
+  IndexError теперь содержательный AssertionError; у остальных 1966 первая
+  причина прежняя. Эти 47 errors **не исправлены**.
+- Все 47 cases на каждой Python показывают `insufficient_evidence / docs_context /
+  required_evidence_missing`, `error=None`, `source_count=0`. Видны stage counts:
+  retrieved_candidates=1, query_window=1, rankings=0, qualified_fragments=0;
+  projector stage пуст. Дополнительные flags и missing requirement IDs сокращены
+  pytest и остаются неизвестны. Source ordering подтверждает typed block до
+  projector, но не доказывает конкретную скрытую причину admission. Обход этого
+  block или изменение исходных вопросов ради запуска guard tail не выполнялись.
+- Advanced: **622 = 524 PASS / 98 FAIL**, полный roster/states прежние. Все девять
+  независимых downstream steps выполнены и FAIL с прежними первыми причинами;
+  зависимый adversarial mutation SKIP после красного baseline. Critical baseline
+  **19/28 PASS**, mutants не стартовали.
+- Все **6 platform SDK jobs PASS**. Main package/CLI: **77/77 PASS** на Ubuntu,
+  macOS ARM и Intel. Проверены 19 actual logs, 15 SDK invocations, 30 structured/text
+  lanes и 420 observations; source bindings, default/advanced cold guards,
+  large/partial delivery и restart/CAS совпадают с 0358365.
+- Installed scripted harness **1/1 PASS**. Release build, три wheels,
+  sdist/installer и required-release **PASS**. Actual Claude Code/Codex/OpenCode
+  application sessions **NOT RUN**; CLI stubs и SDK их не заменяют.
+- Все 17 workflows завершились: **8 SUCCESS / 8 FAILURE / 1 SKIPPED**.
+  required-ci **113507696834 FAILURE**, P1 aggregate **113507192604 FAILURE**.
+
+Catalog source не менялся: прежнее измерение **6918 bytes**, docs output schema
+**860 bytes**. Фиксированные catalog ceilings сняты владельцем; продолжается
+обоснованная минимизация без нового magic number. Output schema <1000 и отдельный
+frozen retrieval criterion 800 остаются. Retrieval max **1451 pinned offline BPE
+ tokens**, **24/48** within-budget cases выше 800; все 80 BPE values прежние,
+80/80 canonical UTF-8 byte measurements сверены. Это не стоимость app sessions.
+
+[Полный acceptance 04ff1dd](PR211_04FF_ACCEPTANCE.json) содержит завершённые
+workflows/jobs, advanced/downstream/retrieval и installed SDK matrix.
+[Core delta](PR211_04FF_CORE_ACCEPTANCE.json) содержит четыре точных transitions,
+три JUnit artifact bindings и диагностические/source-order evidence.
+Исторические reports ниже сохраняются; PASS не переносится на следующие commits.
+
+**PR пока НЕ ГОТОВ к merge:** полный core/advanced и required gates красные,
+actual app-client acceptance отсутствует. Следующие возможные fixture setup
+migrations рассматриваются отдельно по текущему контракту. Deferred retrieval,
+gold, thresholds и guards не меняются; ordinary push разрешён, merge/release/
+force-push не выполнялись.
+
+## Подготовленный следующий пакет: member/read и mtime
+
+Следующие source changes имеют independent review, но runtime **NOT RUN** на
+момент записи. Предыдущие6484 PASS и actual SDK outcomes относятся только к04ff.
+
+- Шесть существующих module/foreign/stale-read fixtures используют настоящий
+  explicit member transaction. Два прежних catalogs сохранены буквально;
+  четыре README fixtures получили единственное supporting/overview membership.
+  Foreign upsert использует captured CAS того же store; owned и foreign rows
+  сохраняются вместе. Перед stale negatives есть реальное непустое чтение
+  исходного вопроса. [Author review](PR211_MEMBER_READ_FIXTURE_REVIEW_RU.md),
+  [independent review](PR211_MEMBER_READ_FIXTURE_INDEPENDENT_REVIEW_RU.md).
+- Production member transaction сохраняет mtime из уже checked descriptor.
+  Это устраняет отсутствующий timestamp/ложный metadata drift, сохраняя
+  hash-first stale contract. Два прежних tests проверяют exact mtime, отсутствие
+  drift до touch и неизменность source/generation rows после чтения. Первая
+  последующая **явная** sync старой metadata либо после mtime-only touch может
+  создать generation; read-path repair не добавлен. [Author review](PR211_MEMBER_MTIME_REVIEW_RU.md),
+  [independent review](PR211_MEMBER_MTIME_INDEPENDENT_REVIEW_RU.md).
+- Дополнительный review поймал обязательную description в двух новых catalogs;
+  она исправлена до publication. Старое одобрение отозвано, corrected bytes и
+  объединённые три functions в test_docs_service.py перепроверены.
+  [Integration review](PR211_MEMBER_INTEGRATION_REVIEW_RU.md).
+
+Восемь targets фактически FAIL на baseline04ff, пять modules содержат108 cases
+(32 PASS/76 FAIL) и97 base names. Collection/decorators/параметры не меняются.
+Отдельно проверяются ранее зелёные109 member/descriptor tests,30 trusted-storage
+и2 fixture hash/CAS controls. Production metadata change не даёт оснований
+переносить прежний zero-write SDK repeat PASS на новый SHA.
+
+Self-host setup подготовлен отдельным slice: полная копия всех tracked regular
+files сохраняет физические unselected distractors; membership берётся только из
+неизменённого literal catalog. В copied config меняется только index.db_path на
+изолированный host store. Настоящий cold public read должен подтвердить отсутствие
+storage/grant; затем требуется explicit confirmed preparation с полными original
+content/catalog/entry hashes и CAS None. Ошибочный cold ответ останавливает run
+до подготовки и вопросов. Исходные questions, lookup_queries, scopes, positive/
+negative loops и scoring/floors сохранены. Actual checkout/import origins, все
+копируемые bytes и generation записываются в additive artifact provenance.
+[Author review](PR211_SELF_HOST_FIXTURE_REVIEW_RU.md) и
+[independent review](PR211_SELF_HOST_FIXTURE_INDEPENDENT_REVIEW_RU.md) фиксируют
+точный scope; шесть новых fixture safety tests дополняют прежний roster.
+Runtime нового setup **NOT RUN** на момент записи; Git witness копии — not_git,
+это не проверка original storage config, Git auto-sync или actual app client.
+
+Отдельный [critical gate contract proposal](PR211_CRITICAL_CONTRACT_PROPOSAL_RU.md)
+подтверждает две причины: девять ожиданий required/forbidden относятся к retired
+prose classifier, а mutation anchor отсутствует в текущем source. Предложены
+проверки сохранности исходного текста/отрицаний/границ и отсутствия authority,
+сохраняющие все 26 fixtures и Python grammar controls. Это **предложение для
+согласования frozen criteria**, tests/gate/gold не изменены и mutants не запущены.
+
+Deferred retrieval, frozen gold/thresholds и client requirements сохраняются.
+После обычного push проверять actual GitHub CI нового HEAD; исторические
+acceptance documents не являются динамическим status CI.
+
+## Исторический полный прогон: 0358365; четыре contract-fixture migrations
 
 Обновление: 2026-10-08. Полный [CI 37830452263](https://github.com/Vanilla1999/DocAtlas/actions/runs/37830452263)
 завершён на HEAD `03583656617336a746e9192249467017d6131f29`, merge checkout
