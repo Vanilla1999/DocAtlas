@@ -44,10 +44,7 @@ from ._model_visible_docs_support import (
 )
 
 DOCS_ANSWER_MAX_TOKENS = 800
-# Transitional aliases: only coordinator-owned core imports remain.
-DOCS_CONTEXT_MAX_TOKENS = 800
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
-MAX_DOCS_SOURCES = 3
 DOCS_SOURCE_FIELDS = frozenset({"evidence_id", "path_or_url", "section", "snippet",
                                 "version_binding", "content_sha256"})
 DOCS_CONTEXT_SOURCE_FIELDS = frozenset({

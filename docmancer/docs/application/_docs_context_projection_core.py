@@ -30,9 +30,6 @@ from docmancer.docs.application.context_selection import (
     visible_assignments,
 )
 from docmancer.docs.application.model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS,
-    INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-    MAX_DOCS_SOURCES,
     _docs_source,
     _refresh_estimate,
     _snapshot_entry,
@@ -65,7 +62,7 @@ def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
 
 
 def project_docs_context(
-    *, retrieval: dict[str, Any], max_tokens: int = DOCS_CONTEXT_MAX_TOKENS,
+    *, retrieval: dict[str, Any], max_tokens: int | None = None,
     selection_diagnostics: dict[str, Any] | None = None,
     _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
@@ -96,7 +93,7 @@ def project_docs_context(
         payload = project_insufficient(
             kind="docs_context", missing=technical_failures,
             recommended_next_action=None,
-            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+            max_tokens=max_tokens,
         )
         payload["reason_code"] = "request_input_limit_exceeded"
         _refresh_estimate(payload)
@@ -680,7 +677,7 @@ def project_docs_context(
             kind="docs_context",
             missing=["No safe, current, project-scoped documentation context was retrieved."],
             recommended_next_action=None,
-            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+            max_tokens=max_tokens,
         )
         projection.update({
             "answer_supported": False,
