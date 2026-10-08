@@ -1,5 +1,7 @@
 """Live read tails retain literal context and explicit technical boundaries."""
 import builtins
+import json
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -8,6 +10,13 @@ from docmancer.docs.application import context_candidate_ranking as ranking
 from docmancer.docs.application import recovery
 from docmancer.docs.domain import need_composition, source_map
 from docmancer.docs.domain.source_boundary import SourceBoundary
+
+
+def _declare_code_files(root, *paths):
+    (root / "docatlas.project-docs.yaml").write_text(
+        json.dumps({"schema_version": 1, "documents": [], "code_files": list(paths)}),
+        encoding="utf-8",
+    )
 
 
 @pytest.mark.parametrize('question', [
@@ -157,6 +166,7 @@ def test_source_map_omits_semantic_status_summary_but_keeps_structural_facts(tmp
         'import os\nclass Client:\n    def send(self):\n        return "готово"\n'
         'state = "active"\n# pending done failed unknown\n', encoding='utf-8',
     )
+    _declare_code_files(tmp_path, 'client.py')
     (fact,) = source_map.collect_project_source_facts(tmp_path, include_unmatched=True)
     assert fact['language'] == 'python' and fact['imports'] == ['os']
     assert [(symbol['name'], symbol['line_start']) for symbol in fact['symbols']] == [
@@ -181,6 +191,7 @@ def test_explicit_generated_opt_in_preserves_source_boundary_and_scan_limits(tmp
     boundary = SourceBoundary(
         source_roots=('src',), exclude_paths=('src/blocked.g.dart',),
         max_file_bytes=100, max_scanned_files=10, max_scanned_bytes=1000,
+        code_files=('src/allowed.g.dart',),
     )
     facts = source_map.collect_project_source_facts(
         tmp_path, question='Alpha', include_generated=True, source_boundary=boundary,
@@ -192,10 +203,25 @@ def test_explicit_generated_opt_in_preserves_source_boundary_and_scan_limits(tmp
     ) == []
     assert source_map.collect_project_source_facts(tmp_path, max_files=0) == []
     assert source_map.collect_project_source_facts(tmp_path, token_budget=0) == []
+    for denied in ('src/blocked.g.dart', 'src/large.g.dart', 'outside/escape.py', 'src/link.py'):
+        assert source_map.collect_project_source_facts(
+            tmp_path, question='Alpha', include_generated=True,
+            source_boundary=replace(boundary, code_files=('src/allowed.g.dart', denied)),
+        ) == []
+    assert source_map.collect_project_source_facts(
+        tmp_path, include_unmatched=True, include_generated=True,
+        source_boundary=replace(boundary, enabled=False),
+    ) == []
+    for budget in ({'max_files': 0}, {'token_budget': 0}):
+        assert source_map.collect_project_source_facts(
+            tmp_path, include_unmatched=True, include_generated=True,
+            source_boundary=boundary, **budget,
+        ) == []
 
 
 def test_source_snippet_scrubbing_and_bounded_output_survive(tmp_path):
     (tmp_path / 'settings.py').write_text('password = "private-value"\nAlpha = 1\n')
+    _declare_code_files(tmp_path, 'settings.py')
     (evidence,) = source_map.build_project_source_evidence(
         tmp_path, requirements=['password'], max_items=1,
     )
