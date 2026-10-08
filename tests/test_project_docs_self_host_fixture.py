@@ -219,8 +219,16 @@ def test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project(tmp
         from scripts.run_project_docs_self_host_gate import _call_with_snapshot
         payload, snapshot = _call_with_snapshot({
             'question': 'What does `MirrorNeedle` require?', 'project_path': str(fixture.root), 'scope': 'all',
+            'lookup_queries': ['`MirrorNeedle` explicit preparation'],
         }, fixture.service)
-        assert payload['status'] == 'ok' and payload['kind'] == 'docs_context'
+        diagnostic = json.dumps({'payload': payload, 'snapshot_keys': sorted(snapshot)},
+                                ensure_ascii=False, sort_keys=True)
+        assert payload['status'] == 'ok' and payload['kind'] == 'docs_context', diagnostic
+        assert payload['context_available'] is True and snapshot, diagnostic
+        assert payload['answer_available'] is False and payload['support_status'] == 'retrieval_only', diagnostic
+        assert 'query-lookup-1' in payload['covered_query_ids'], diagnostic
+        assert 'query-original' not in payload['covered_query_ids'], diagnostic
+        assert 'query-original' in payload['missing_query_ids'], diagnostic
         assert payload['answer_supported'] is False and payload['edit_ready'] is False
         sources = [row for row in payload['sources'] if row['path_or_url'] == 'docs/rules.md']
         assert sources and sources[0]['snippet'] in RULES.decode()
