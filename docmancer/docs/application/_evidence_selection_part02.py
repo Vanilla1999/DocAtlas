@@ -294,7 +294,7 @@ def _reserve_and_select(
         if config.result_kind == "docs_answer"
         else config.wrapper_reserve_tokens
     )
-    available = max(1, config.hard_tokens - fit_reserve)
+    available = max(1, config.hard_tokens - (fit_reserve or 0)) if config.hard_tokens is not None else None
     selected: list[EvidenceCandidate] = []
     remaining = set(mandatory)
     pool = list(candidates)
@@ -308,7 +308,7 @@ def _reserve_and_select(
         and config.profile == "generic"
         and config.result_kind == "docs_answer"
         and len(pool) == 1
-        and pool[0].fit_token_estimate <= available
+        and (available is None or pool[0].fit_token_estimate <= available)
     ):
         return [pool[0]], set(), []
     while remaining:
@@ -355,7 +355,7 @@ def _reserve_and_select(
     remaining = mandatory - covered_after_repair
     selected_ids = {item.stable_id for item in selected}
     pool = [item for item in candidates if item.stable_id not in selected_ids]
-    if sum(item.fit_token_estimate for item in selected) > available:
+    if available is not None and sum(item.fit_token_estimate for item in selected) > available:
         remaining.add("mandatory_evidence_does_not_fit")
         for candidate in candidates:
             omissions.append(Omission(candidate.stable_id, "budget"))
@@ -389,9 +389,9 @@ def _reserve_and_select(
                 continue
             source_key = _normalized_source(candidate.source_identity)
             is_mandatory = bool(candidate.covered_requirement_ids & mandatory)
-            if not is_mandatory and source_key not in selected_sources and len(selected_sources) >= config.max_sources:
+            if not is_mandatory and config.max_sources is not None and source_key not in selected_sources and len(selected_sources) >= config.max_sources:
                 continue
-            if not is_mandatory and source_counts.get(source_key, 0) >= config.max_items_per_source:
+            if not is_mandatory and config.max_items_per_source is not None and source_counts.get(source_key, 0) >= config.max_items_per_source:
                 continue
             utility = _marginal_utility(candidate, selected_terms, set())
             ratio = int(utility * 100 / max(1, candidate.token_estimate))
@@ -406,7 +406,7 @@ def _reserve_and_select(
         if utility_ratio < config.marginal_utility_threshold:
             omissions.append(Omission(best.stable_id, "zero_marginal_utility"))
             continue
-        if spent + best.fit_token_estimate > available:
+        if available is not None and spent + best.fit_token_estimate > available:
             omissions.append(Omission(best.stable_id, "budget"))
             continue
         selected.append(best)
@@ -414,7 +414,7 @@ def _reserve_and_select(
         selected_sources.add(source_key)
         source_counts[source_key] = source_counts.get(source_key, 0) + 1
         selected_terms = _selection_terms(selected)
-        if spent >= min(available, config.target_tokens - config.wrapper_reserve_tokens):
+        if available is not None and config.target_tokens is not None and spent >= min(available, config.target_tokens - (config.wrapper_reserve_tokens or 0)):
             break
     selected_ids = {item.stable_id for item in selected}
     omitted_ids = {item.stable_id for item in omissions}
@@ -424,8 +424,8 @@ def _reserve_and_select(
         source_key = _normalized_source(candidate.source_identity)
         reason: OmissionReason = (
             "source_cap"
-            if source_counts.get(source_key, 0) >= config.max_items_per_source
-            or (source_key not in selected_sources and len(selected_sources) >= config.max_sources)
+            if (config.max_items_per_source is not None and source_counts.get(source_key, 0) >= config.max_items_per_source)
+            or (config.max_sources is not None and source_key not in selected_sources and len(selected_sources) >= config.max_sources)
             else "dominated"
         )
         omissions.append(Omission(candidate.stable_id, reason))

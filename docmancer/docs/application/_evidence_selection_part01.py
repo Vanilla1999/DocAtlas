@@ -377,24 +377,12 @@ def aggregate_mixed_selection(
     })
     selected_documents = {_normalized_source(item.source_identity) for item in candidates}
     selected_tokens = sum(item.token_estimate for item in candidates)
-    bounded_materialization_failed = (
-        len(selected_documents) > MAX_VISIBLE_DOCUMENTS
-        or len(candidates) > MAX_VISIBLE_SPANS
-        or selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS > MAX_MIXED_VISIBLE_TOKENS
-    )
-    if bounded_materialization_failed:
-        missing_ids = tuple(sorted({*missing_ids, "bounded_evidence_not_materializable"}))
-        missing.append("bounded_evidence_not_materializable")
-    supported = (
-        not bounded_materialization_failed
-        and all(lane.decision.support_decision.answer_supported for lane in lanes)
-    )
+    supported = all(lane.decision.support_decision.answer_supported for lane in lanes)
     base = {
         "answer_supported": supported,
         "support_status": "supported" if supported else "insufficient_evidence",
         "reason_code": (
             None if supported else
-            "bounded_evidence_not_materializable" if bounded_materialization_failed else
             "mixed_support_incomplete"
         ),
         "missing_requirement_ids": missing_ids,
@@ -430,9 +418,9 @@ def aggregate_mixed_selection(
             "selected_spans": len(candidates),
             "selected_tokens": selected_tokens,
             "projected_total_tokens": selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS,
-            "max_documents": MAX_VISIBLE_DOCUMENTS,
-            "max_spans": MAX_VISIBLE_SPANS,
-            "hard_tokens": MAX_MIXED_VISIBLE_TOKENS,
+            "max_documents": None,
+            "max_spans": None,
+            "hard_tokens": None,
         },
         selector_config_hash=support.selector_config_hash,
         eligibility_contract_hash=support.eligibility_contract_hash,
@@ -448,12 +436,8 @@ def aggregate_mixed_selection(
 
 
 def docs_selection_config(max_tokens: int) -> SelectionConfig:
-    hard = min(800, max(256, int(max_tokens)))
     return SelectionConfig(
-        result_kind="docs_answer", target_tokens=min(650, hard), hard_tokens=hard,
-        max_sources=3, max_items_per_source=2,
-        max_documents=MAX_VISIBLE_DOCUMENTS, max_spans=MAX_VISIBLE_SPANS,
-        wrapper_reserve_tokens=120,
+        result_kind="docs_answer", target_tokens=None, hard_tokens=None,
         marginal_utility_threshold=100,
     )
 

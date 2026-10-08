@@ -248,7 +248,8 @@ def select_evidence(
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
     bounded_materialization_failed = config.result_kind == "docs_answer" and (
-        len(selected) > config.max_spans or len(selected_documents) > config.max_documents
+        (config.max_spans is not None and len(selected) > config.max_spans)
+        or (config.max_documents is not None and len(selected_documents) > config.max_documents)
     )
     if bounded_materialization_failed:
         missing.add("bounded_evidence_not_materializable")

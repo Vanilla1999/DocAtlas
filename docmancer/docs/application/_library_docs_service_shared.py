@@ -182,80 +182,13 @@ def _bounded_library_evidence_chunks(
     requirements: Any,
     max_tokens: int,
 ) -> tuple[list[Any], dict[str, Any]]:
-    config = library_docs_selection_config(max_tokens)
-    available_tokens = max(1, config.hard_tokens - config.wrapper_reserve_tokens)
-    available_bytes = available_tokens * 4
-    bounded = []
-    derived = 0
-    rejected = 0
-    mandatory = [
-        requirement
-        for requirement in requirements
-        if requirement.mandatory and requirement.kind != "exact_version"
-    ]
-    for chunk in chunks:
-        if len(chunk.text.encode("utf-8")) <= available_bytes:
-            bounded.append(chunk)
-            continue
-        ranked = []
-        for section in _rst_symbol_sections(chunk.text):
-            haystack = "\n".join([section["text"], *section["symbols"]])
-            covered = {
-                requirement.requirement_id
-                for requirement in mandatory
-                if requirement_value_visible(requirement.value, haystack)
-            }
-            if covered:
-                ranked.append((section, covered))
-        selected = []
-        remaining = {requirement.requirement_id for requirement in mandatory}
-        spent = 0
-        while remaining:
-            options = [
-                (section, covered)
-                for section, covered in ranked
-                if section not in selected and covered & remaining
-            ]
-            if not options:
-                break
-            section, covered = min(options, key=lambda item: (
-                -len(item[1] & remaining),
-                len(item[0]["text"].encode("utf-8")),
-                item[0]["start"],
-            ))
-            section_bytes = len(section["text"].encode("utf-8"))
-            if spent + section_bytes > available_bytes:
-                break
-            selected.append(section)
-            spent += section_bytes
-            remaining -= covered
-        if remaining:
-            rejected += 1
-            continue
-        selected.sort(key=lambda section: section["start"])
-        excerpt = "\n\n".join(section["text"] for section in selected)
-        metadata = dict(chunk.metadata or {})
-        parent_id = str(
-            metadata.get("stable_chunk_id")
-            or metadata.get("section_id")
-            or metadata.get("chunk_id")
-            or chunk.source
-        )
-        digest = hashlib.sha256(excerpt.encode("utf-8")).hexdigest()
-        metadata.update({
-            "stable_chunk_id": f"{parent_id}:excerpt:{digest[:16]}",
-            "parent_logical_id": parent_id,
-            "symbols": sorted({symbol for section in selected for symbol in section["symbols"]}),
-            "source_excerpt": True,
-            "source_excerpt_sha256": digest,
-        })
-        bounded.append(_copy_chunk(chunk, text=excerpt, metadata=metadata))
-        derived += 1
-    return bounded, {
+    # These windows have already passed acquisition/source guards. Presentation
+    # size cannot derive a new identity, excerpt them, or discard their lineage.
+    return list(chunks), {
         "bounded_evidence": {
-            "available_tokens": available_tokens,
-            "derived_excerpts": derived,
-            "rejected_oversized_sources": rejected,
+            "available_tokens": None,
+            "derived_excerpts": 0,
+            "rejected_oversized_sources": 0,
         }
     }
 
@@ -282,8 +215,6 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         )
 
     selected = []
-    source_counts: dict[str, int] = {}
-    dropped_for_diversity = 0
     while candidates:
         scored = []
         for candidate in candidates:
@@ -293,12 +224,6 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         _mmr_score, _relevance, _negative_index, best = max(scored, key=lambda item: item[:3])
         candidates.remove(best)
         chunk = best["chunk"]
-        source = chunk.source or ""
-        count = source_counts.get(source, 0)
-        if count >= MAX_CHUNKS_PER_SOURCE:
-            dropped_for_diversity += 1
-            continue
-        source_counts[source] = count + 1
         selected.append(chunk)
 
     top_relevance = max((candidate["relevance"] for candidate in candidates), default=None)
@@ -308,8 +233,8 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         "code_snippets": snippet_count,
         "top_relevance": top_relevance,
         "mmr_lambda": MMR_LAMBDA,
-        "max_chunks_per_source": MAX_CHUNKS_PER_SOURCE,
-        "chunks_dropped_for_diversity": dropped_for_diversity,
+        "max_chunks_per_source": None,
+        "chunks_dropped_for_diversity": 0,
         "unique_sources@5": len({chunk.source for chunk in selected[:5]}),
     }
 
