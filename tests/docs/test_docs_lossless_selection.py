@@ -16,7 +16,7 @@ from docmancer.docs.application._library_docs_service_shared import (
 )
 from docmancer.docs.application._library_docs_service_part03 import _indexed_library_source
 from docmancer.docs.application.library_docs_service import LibraryDocsApplicationService
-from docmancer.docs.application._unified_context_service_part02 import _UnifiedContextServicePart02
+from docmancer.docs.application._unified_context_service_part02 import _UnifiedDocsContextServicePart02
 from docmancer.docs.domain.policies import is_stale
 from docmancer.docs.registry import LibraryRecord
 
@@ -346,7 +346,7 @@ def _public_library_run(tmp_path, windows, complete):
     start = monotonic()
     result = service.get_docs("fixture-library", topic="Delivery contract deployment_region", version="1", ecosystem="fixture", source_type="web")
     trace["elapsed_seconds"] = monotonic() - start
-    adapted = _UnifiedContextServicePart02._library_context_pack(None, result)
+    adapted = _UnifiedDocsContextServicePart02._library_context_pack(None, result)
     return result, adapted, trace
 
 
@@ -405,7 +405,7 @@ def test_public_library_carrier_negatives_have_bound_positive(tmp_path, attack):
     if attack == "reserved_carrier_source":
         target = next(row for row in result.results if row.metadata["stable_chunk_id"] == "target")
         target.metadata["_indexed_source"]["source"] = _LIBRARY_ROOT + "/forged"
-        denied = _UnifiedContextServicePart02._library_context_pack(None, result)
+        denied = _UnifiedDocsContextServicePart02._library_context_pack(None, result)
     else:
         invalid = deepcopy(original)
         if attack == "digest":
