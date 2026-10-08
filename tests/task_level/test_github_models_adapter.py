@@ -5,6 +5,7 @@ import json
 import shlex
 import subprocess
 import time
+from copy import deepcopy
 from pathlib import Path
 from typing import cast
 
@@ -13,7 +14,12 @@ import pytest
 from docmancer.docs.application.action_packet import (
     build_action_packet,
     estimate_action_packet_tokens,
+    refresh_action_packet_estimate,
     validate_action_packet,
+)
+from docmancer.docs.application.model_visible_projection import (
+    project_patch_context,
+    validate_model_visible_projection,
 )
 from eval.task_level.github_models import (
     OPENAI_API_PROVIDER,
@@ -406,28 +412,54 @@ def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_pac
         output_dir=tmp_path / "output",
         task_objective="Fix the permission gate.",
     )
-    valid_packet = build_action_packet(
+    source_text = "The permission gate must preserve whole facts."
+    evidence = [{
+        "doc_scope": "project",
+        "source_class": "project_doc",
+        "path": "AGENTS.md",
+        "heading_path": "Architecture",
+        "authority": "canonical",
+        "content": source_text,
+        "char_start": 0,
+        "char_end": len(source_text),
+        "line_start": 1,
+        "line_end": 1,
+    }]
+    packet = build_action_packet(
         question="Fix the permission gate.",
-        context_pack=[{
-            "doc_scope": "project",
-            "source_class": "project_doc",
-            "path": "AGENTS.md",
-            "heading_path": "Architecture",
-            "authority": "canonical",
-            "content": "The permission gate must preserve whole facts.",
-        }],
-        max_tokens=2_000,
+        context_pack=evidence,
     )
-    valid_result = json.dumps({
-        "delivery_strategy": "bounded_direct",
-        "action_packet": valid_packet,
-    })
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    assert projection["result"] == "data" and projection["completeness"] == "complete"
+    assert projection["sources"] == packet["sources"] and len(projection["sources"]) == 1
+    source = projection["sources"][0]
+    assert source["path"] == "AGENTS.md" and source["text"] == source_text
+    assert source["content_sha256"] == hashlib.sha256(source_text.encode()).hexdigest()
+    assert (source["char_start"], source["char_end"], source["line_start"], source["line_end"]) == (0, len(source_text), 1, 1)
+    assert source["instruction_trust"] == "untrusted_data" and projection["edit_ready"] is False
+    valid_result = json.dumps(projection)
+    action = {"tool": "get_docs_context", "query": request.task_objective}
+    positive = _required_once_retrieval_metadata(request, action, valid_result)
+    assert positive["question_matches_task_objective"] is True
+    assert positive["retrieval_succeeded"] is True
+    assert positive["action_packet_result"] == "data"
+    assert positive["action_packet_completeness"] == "complete"
 
     assert _required_once_retrieval_metadata(
         request,
         {"tool": "get_docs_context", "query": "Different objective"},
         valid_result,
     )["retrieval_succeeded"] is False
+    # A legacy envelope is not a successful flat v4 representation.
+    assert _required_once_retrieval_metadata(request, action, json.dumps({
+        "delivery_strategy": "bounded_direct", "action_packet": packet,
+    }))["retrieval_succeeded"] is False
+    forged = deepcopy(projection)
+    forged["edit_ready"] = True
+    refresh_action_packet_estimate(forged)
+    assert _required_once_retrieval_metadata(request, action, json.dumps(forged))["retrieval_succeeded"] is False
     assert _required_once_retrieval_metadata(
         request,
         {"tool": "get_docs_context", "query": "Fix the permission gate."},

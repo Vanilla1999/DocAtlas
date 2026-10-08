@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
-from docmancer.docs.application.action_packet import build_action_packet
+from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 from eval.task_level.execution import (
     _assert_task33_run_preconditions,
     _run_evaluation_command,
@@ -195,22 +197,58 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
             "provider_usage_verified": False,
         },
     )
-    output = IsolatedWorkerOutput(
-        packet=build_action_packet(
-            question=_envelope().task_objective,
-            context_pack=_snapshot().evidence_items,
-            trust_contract=_snapshot().trust_contract,
-            max_tokens=_envelope().token_budget,
-        ),
-        usage=usage,
-        wall_time_seconds=0.5,
-    )
+    envelope = _envelope()
+
+    def worker_output(evidence):
+        packet = build_action_packet(
+            question=envelope.task_objective,
+            context_pack=evidence.evidence_items,
+            trust_contract=evidence.trust_contract,
+            required_evidence_paths=envelope.required_evidence_paths,
+            required_target_paths=envelope.suspected_modules,
+        )
+        assert validate_action_packet(packet, evidence_items=evidence.evidence_items) == []
+        assert packet["result"] == "data" and packet["edit_ready"] is False
+        return IsolatedWorkerOutput(packet=packet, usage=usage, wall_time_seconds=0.5)
+
+    evidence = _snapshot()
+    output = worker_output(evidence)
     monkeypatch.setattr(CodexExploratoryWorker, "run", lambda *args, **kwargs: output)
+    with pytest.raises(IsolatedDeliveryError, match="action_packet_missing_required_target_modules"):
+        deliver_with_exploratory_worker(
+            worker=CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path),
+            envelope=envelope,
+            evidence=evidence,
+            output_dir=tmp_path / "missing-target",
+            timeout_seconds=30,
+        )
+    assert not (tmp_path / "missing-target" / "action_packet.json").exists()
+
+    # An explicit host-selected code window supplies the target identity; the
+    # documentation's mention of this filename does not establish that identity.
+    target = envelope.suspected_modules[0]
+    target_path = tmp_path / target
+    target_path.parent.mkdir(parents=True)
+    target_path.write_text("class PermissionService {}\n", encoding="utf-8")
+    target_text = target_path.read_text(encoding="utf-8")
+    target_evidence = {
+        "path": target,
+        "source_class": "project_file",
+        "authority": "supporting",
+        "content": target_text,
+        "matched": True,
+        "char_start": 0,
+        "char_end": len(target_text),
+        "line_start": 1,
+        "line_end": 1,
+    }
+    evidence = replace(evidence, evidence_items=(*evidence.evidence_items, target_evidence))
+    output = worker_output(evidence)
 
     result = deliver_with_exploratory_worker(
         worker=CodexExploratoryWorker(model="gpt-test", temp_root=tmp_path),
-        envelope=_envelope(),
-        evidence=_snapshot(),
+        envelope=envelope,
+        evidence=evidence,
         output_dir=tmp_path / "exploratory",
         timeout_seconds=30,
     )
@@ -218,7 +256,28 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
     metrics = json.loads(
         (tmp_path / "exploratory" / "isolated_delivery_metrics.json").read_text()
     )
-    assert result["status"] == metrics["status"]
+    assert result["result"] == metrics["result"] == "data"
+    assert result["completeness"] == metrics["completeness"] == "complete"
+    assert result["packet"]["estimated_tokens"] <= envelope.token_budget
+    assert result["packet"]["edit_ready"] is False
+    projection = result["projection"]
+    projection_snapshot = json.loads(
+        (tmp_path / "exploratory" / "model_visible_evidence_snapshot.json").read_text()
+    )
+    assert validate_model_visible_projection(projection, snapshot=projection_snapshot) == []
+    assert projection["sources"] == result["packet"]["sources"]
+    assert projection["edit_ready"] is False
+    expected = {item["path"]: item["content"] for item in evidence.evidence_items}
+    assert len(projection["sources"]) == len(expected) == 2
+    for source in projection["sources"]:
+        assert source["text"] == expected[source["path"]]
+        assert source["content_sha256"] == hashlib.sha256(source["text"].encode()).hexdigest()
+        assert source["instruction_trust"] == "untrusted_data"
+    selected_target = next(source for source in projection["sources"] if source["path"] == target)
+    assert (selected_target["char_start"], selected_target["char_end"], selected_target["line_start"], selected_target["line_end"]) == (0, len(target_text), 1, 1)
+    assert any(row["path"] == target and row["proof_role"] == "target_identity" for row in projection["assignments"])
+    assert metrics["evidence_fingerprint"] == evidence.fingerprint
+    assert metrics["attempts"] == metrics["retrieval_calls"] == 1
     assert metrics["evidence_tier"] == "exploratory"
     assert metrics["causal_claim_allowed"] is False
     assert metrics["server_request_id_verified"] is False
