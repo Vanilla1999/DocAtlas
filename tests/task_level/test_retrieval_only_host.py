@@ -5,6 +5,7 @@ import pytest
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
 from docmancer.docs.application.model_visible_projection import _refresh_estimate
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from eval.task_level.one_call_agent_loop import FakeLoopAdapter, LoopCapabilities, OneCallAgentLoop, validate_docatlas_result
 from docmancer.docs.interfaces.host_context import (
     EvidenceDeliveryError, SourceReadController, extract_tool_payload,
@@ -13,7 +14,8 @@ from docmancer.docs.interfaces.host_context import (
 
 @pytest.fixture
 def context():
-    payload, _ = project_docs_context(retrieval={
+    query = "job status terminal"
+    payload, snapshot = project_docs_context(retrieval={
         "context_pack": [{
             "source_class": "project_doc", "path": "docs/jobs.md",
             "heading_path": "Polling", "content": "Poll the job until its status is terminal.",
@@ -22,16 +24,21 @@ def context():
             "freshness": "current", "index_freshness": "synchronized", "risk_flags": [],
             "retrieval_query_ids": ["query-original"],
             "retrieval_query_matches": {"query-original": {
-                "qualified": True, "mode": "and", "query_text": "job polling",
+                "qualified": True, "mode": "and", "query_text": query,
             }},
         }],
-        "documentation_query_plan": {
-            "query_ids": ["query-original"], "required_query_ids": [],
-            "queries": [{"query_id": "query-original", "text": "job polling",
-                         "origin": "original", "coverage_required": False}],
-        },
+        "documentation_query_plan": build_documentation_query_plan(query).as_payload(),
     })
     assert payload["kind"] == "docs_context"
+    assert payload["context_available"] is True
+    assert payload["sources"]
+    assert payload["answer_policy"] == "cite_only"
+    assert all(payload[key] is False for key in ("answer_supported", "answer_available", "edit_ready"))
+    for source in payload["sources"]:
+        entry = snapshot[source["evidence_id"]]
+        assert entry["projected_source"] == source
+        assert entry["source"]["retrieval_query_matches"]["query-original"]["qualified"] is True
+    assert not validate_docatlas_result(payload)
     return payload
 
 
