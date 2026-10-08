@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_core34fc_static_guidance_no_access.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_core34fc_static_guidance_no_access.py": "3c61a67c6a8eec4f59b1fc9f8a964e91883b9b78dc30044710c44dbe71f656a0"
+  }
+}

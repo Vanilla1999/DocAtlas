@@ -227,9 +227,9 @@ def call_docs_tool_payload(
 
 
 def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
-    if isinstance(service, LocalMemberService):
-        service = service.materialize() if service.member_storage_policy.validate() else None
     if uri.startswith("docatlas://source/"):
+        if isinstance(service, LocalMemberService):
+            service = service.materialize() if service.member_storage_policy.validate() else None
         result = {"status": "source_unavailable", "reason_code": "unknown_or_expired_reference"}
         if service is not None:
             with service._project_service_cache_lock:
