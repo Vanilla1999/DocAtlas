@@ -46,7 +46,8 @@ def test_all_distinct_required_acquired_documents_survive_candidate_and_span_cap
     )
     assert decision.metrics["eligible_count"] == len(items)
     assert {candidate.stable_id for candidate in decision.selected_candidates} == {item["stable_chunk_id"] for item in items}
-    assert not decision.missing_requirements
+    assert decision.missing_requirements == ("unsupported_answer_authorization:context_only",)
+    assert decision.status == "insufficient_evidence"
     assert len(decision.assignments) == len(items)
     for candidate in decision.selected_candidates:
         assignment = next(row for row in decision.assignments if row.evidence_id == candidate.evidence_id)
