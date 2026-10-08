@@ -1,5 +1,6 @@
 """Delivery validation and isolation; real retrieval runs in installed smoke."""
 import hashlib
+import json
 import os
 from copy import deepcopy
 from dataclasses import replace
@@ -13,7 +14,7 @@ from scripts.docs_mcp_stdio_smoke import (
     fixture_database_state, initialize_fixture_members, isolated_environment, payload, text_payload,
     natural_protocol_documents, LARGE_PHASES, trace_project_delivery,
     cold_fixture_members, indexed_delivery, repeat_preparation, read_only_delivery,
-    validate_blocked_preparation, validate_patch_payload,
+    advertised_context_tool, validate_blocked_preparation, validate_input_rejection, validate_patch_payload,
 )
 from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
 from docmancer.mcp.docs_server import current_docs_surface
@@ -322,16 +323,20 @@ def test_patch_validator_preserves_large_utf8_evidence_and_checks_hash():
 
 
 def test_fixture_environment_does_not_inherit_configuration_or_credentials(tmp_path, monkeypatch):
-    for key in ("PYTHONPATH", "OPENCODE_CONFIG", "OPENAI_API_KEY", "DOCATLAS_CONFIG"):
+    inherited = ("PYTHONPATH", "OPENCODE_CONFIG", "OPENAI_API_KEY", "DOCATLAS_CONFIG",
+                 "DOCATLAS_MCP_ADVANCED_TOOLS", "DOCATLAS_MCP_ADMIN_TOOLS", "DOCATLAS_MCP_TEXT_FALLBACK")
+    for key in inherited:
         monkeypatch.setenv(key, "foreign")
     env = isolated_environment(tmp_path)
-    assert all(key not in env for key in ("PYTHONPATH", "OPENCODE_CONFIG", "OPENAI_API_KEY", "DOCATLAS_CONFIG"))
+    assert all(key not in env for key in inherited)
     assert env["DOCATLAS_HOME"] == str(tmp_path / "docatlas-home")
     assert env["HOME"] == env["USERPROFILE"]
     assert os.environ["OPENAI_API_KEY"] == "foreign"
 
 
 def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
+    import jsonschema
+
     value = {"schema_version": 4, "kind": "patch_context", "result": "failure",
              "completeness": "unavailable", "edit_ready": False,
              "missing": ["no_evidence"], "estimated_tokens": 1}
@@ -354,6 +359,45 @@ def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
     validate_blocked_preparation(blocked)
     with pytest.raises(AssertionError):
         validate_blocked_preparation({**blocked, "mutation_performed": True})
+
+    schema = current_docs_surface({}).tools[0].input_schema
+    with pytest.raises(jsonschema.ValidationError) as error:
+        jsonschema.validate({"question": "Literal question", "context_format": None}, schema)
+    assert error.value.validator == "additionalProperties"
+    message = error.value.message
+    typed = {"status": "failed", "error": {"reason_code": "validation_error",
+             "where": {"phase": "validation", "tool": "get_docs_context"}}}
+    for text_only in (False, True):
+        sdk_error = SimpleNamespace(isError=True, structuredContent=None,
+                                   content=[SimpleNamespace(text=f"Input validation error: {message}")])
+        assert validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)[
+            "wire_form"] == "mcp_input_validation_text"
+        with pytest.raises(json.JSONDecodeError):
+            payload(sdk_error, allow_error=True)  # The general success/error decoder stays strict JSON.
+        application_error = SimpleNamespace(
+            isError=True, structuredContent=None if text_only else typed,
+            content=[SimpleNamespace(text=json.dumps(typed))],
+        )
+        assert validate_input_rejection(application_error, expected_message=message, text_only=text_only)[
+            "wire_form"] == "application_validation_error"
+        for bad in (
+            {**typed, "error": {**typed["error"], "reason_code": "permission_denied"}},
+            {**typed, "error": {**typed["error"], "where": {"phase": "execution", "tool": "get_docs_context"}}},
+            {**typed, "sources": [{"snippet": "should not be delivered"}]},
+            {**typed, "edit_ready": True},
+        ):
+            application_error.structuredContent = None if text_only else bad
+            application_error.content = [SimpleNamespace(text=json.dumps(bad))]
+            with pytest.raises(AssertionError):
+                validate_input_rejection(application_error, expected_message=message, text_only=text_only)
+        sdk_error.isError = False
+        with pytest.raises(AssertionError):
+            validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)
+        sdk_error.isError = True
+        for text in ("permission denied", "Input validation error: unrelated schema failure", "not JSON"):
+            sdk_error.content = [SimpleNamespace(text=text)]
+            with pytest.raises((AssertionError, json.JSONDecodeError)):
+                validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)
 
 
 def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(tmp_path):
@@ -378,6 +422,7 @@ def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(t
 @pytest.mark.parametrize("text_only", [False, True])
 def test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio(tmp_path, text_only):
     import asyncio
+    import docmancer
     import sys
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
@@ -389,13 +434,24 @@ def test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio(tmp_p
     env = isolated_environment(tmp_path)
     # Source test only. Installed smoke forbids PYTHONPATH and verifies imports.
     env["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
+    assert Path(docmancer.__file__).resolve().is_relative_to(Path(env["PYTHONPATH"]))
+    env["DOCATLAS_MCP_ADVANCED_TOOLS"] = "0"
+    env["DOCATLAS_MCP_ADMIN_TOOLS"] = "0"
     if text_only:
         env["DOCATLAS_MCP_TEXT_FALLBACK"] = "1"
     database = Path(env["DOCATLAS_HOME"]) / "mcp-members" / "members.db"
     params = StdioServerParameters(command=sys.executable,
                                   args=["-m", "docmancer.cli", "mcp", "docs-serve"], env=env, cwd=str(tmp_path))
+    advanced_params = StdioServerParameters(command=sys.executable,
+        args=["-m", "docmancer.cli", "mcp", "docs-serve"],
+        env={**env, "DOCATLAS_MCP_ADVANCED_TOOLS": "1"}, cwd=str(tmp_path))
 
     async def run():
+        async with stdio_client(advanced_params) as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                await read_only_delivery(session, project, text_only=text_only, advanced=True)
+        assert not database.parent.exists()
         async with stdio_client(params) as streams:
             async with ClientSession(*streams) as session:
                 await session.initialize()
@@ -411,6 +467,20 @@ def test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio(tmp_p
             async with ClientSession(*streams) as session:
                 await session.initialize()
                 await repeat_preparation(session, project, database, *prepared, text_only=text_only)
+        async with stdio_client(advanced_params) as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                await advertised_context_tool(session, advanced=True, text_only=text_only)
+                decode = text_payload if text_only else payload
+                answer = decode(await session.call_tool("get_docs_context", {
+                    "question": "What is `doc-atlas mcp docs-serve`?", "project_path": str(project),
+                    "context_format": "patch_context",
+                }))
+                validate_patch_payload(answer)
+                assert answer["result"] == "data" and answer["sources"], answer
+                assert "doc-atlas mcp docs-serve" in "".join(row["text"] for row in answer["sources"])
+                assert evidence_sizes(answer, project)["unique_nonoverlap_utf8_bytes"] > 0
+        assert fixture_database_state(database) == state
         assert not (project / ".docatlas" / "docatlas.db").exists()
 
     asyncio.run(run())

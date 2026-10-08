@@ -191,7 +191,16 @@ jobs:
         run: python -m pip install -e ".[dev]"
 
       - name: Run offline core tests
-        run: pytest tests/ -m "not advanced and not live and not live_network" -v
+        run: pytest tests/ -m "not advanced and not live and not live_network" -v --junitxml="$RUNNER_TEMP/core-tests-${{ matrix.python-version }}.xml"
+
+      - name: Upload offline core test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pytest-core-${{ matrix.python-version }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/core-tests-${{ matrix.python-version }}.xml
+          if-no-files-found: warn
+          retention-days: 14
 
   advanced-contract:
     runs-on: ubuntu-latest
@@ -212,7 +221,7 @@ jobs:
         run: python -m pip install -e ".[dev]"
 
       - name: Run offline advanced contract and shared-security tests
-        run: pytest tests/ -m advanced -v
+        run: pytest tests/ -m advanced -v --junitxml="$RUNNER_TEMP/advanced-contract.xml"
 
       - name: Run recoverable documentation failure gate
         run: python scripts/run_recovery_contract_gate.py
@@ -266,6 +275,15 @@ jobs:
           path: |
             ${{ runner.temp }}/docmancer-mutation-*
             ${{ runner.temp }}/docatlas-agent-v2-mutant-*
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload offline advanced test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pytest-advanced-3.12-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/advanced-contract.xml
           if-no-files-found: warn
           retention-days: 14
 

@@ -5,6 +5,8 @@ Full smoke prepares a cold host-selected member store through confirmed MCP,
 then retrieves and repeats preparation after restart. Local library fixtures
 are preloaded separately after cold preparation and never count as lifecycle
 acceptance. --read-only checks cold rejection without provisioning storage.
+Default and explicitly enabled advanced surfaces use separate server sessions;
+the patch matrix is exercised only after advanced inventory/schema verification.
 """
 from __future__ import annotations
 
@@ -28,6 +30,10 @@ from urllib.request import url2pathname
 from docmancer.mcp.agent_config import AgentTarget, register_server
 
 TOOLS = {"get_docs_context", "prepare_docs", "docs_status"}
+ADVANCED_TOOLS = TOOLS | {
+    "inspect_project_docs", "docs_job", "get_code_context", "get_patch_plan_context",
+    "get_patch_constraints", "validate_patch_against_constraints",
+}
 QUESTION = "Which command starts the Docs MCP server?"
 NEEDLE = "doc-atlas mcp docs-serve"
 LARGE_PHASES = ("LeaseAcquire", "LeaseRenew", "CheckpointCommit", "LeaseRelease", "CrashRecover")
@@ -227,6 +233,76 @@ def text_payload(result: object, *, allow_error: bool = False) -> dict:
     return payload(result, allow_error=allow_error)
 
 
+def validate_input_rejection(result: object, *, expected_message: str, text_only: bool) -> dict:
+    """Recognize only schema rejection, never reinterpret arbitrary tool errors."""
+    assert getattr(result, "isError", None) is True, result
+    content = getattr(result, "content", [])
+    # The MCP SDK can reject input before the application callback, returning
+    # protocol error text even when normal tool results use structuredContent.
+    # Match the exact advertised-schema error; do not weaken payload()'s JSON ABI.
+    if (getattr(result, "structuredContent", None) is None and len(content) == 1
+            and getattr(content[0], "text", None) == f"Input validation error: {expected_message}"):
+        wire_form = "mcp_input_validation_text"
+    else:
+        decode = text_payload if text_only else payload
+        response = decode(result, allow_error=True)
+        assert response.get("status") == "failed", response
+        assert response["error"]["reason_code"] == "validation_error", response
+        assert response["error"]["where"]["phase"] == "validation", response
+        assert response["error"]["where"]["tool"] == "get_docs_context", response
+        assert not response.get("sources") and not response.get("edit_ready"), response
+        assert not response.get("answer_supported") and not response.get("answer_available"), response
+        wire_form = "application_validation_error"
+    return {"status": "rejected", "reason": "validation_error", "phase": "validation",
+            "wire_form": wire_form, "sources": [], "source_bytes": 0}
+
+
+async def advertised_context_tool(session, *, advanced: bool, text_only: bool):
+    tools = (await session.list_tools()).tools
+    names = {tool.name for tool in tools}
+    expected = ADVANCED_TOOLS if advanced else TOOLS
+    assert names == expected and len(tools) == len(expected), names
+    spec = next(tool for tool in tools if tool.name == "get_docs_context")
+    assert spec.inputSchema["additionalProperties"] is False, spec
+    if advanced:
+        field = spec.inputSchema["properties"]["context_format"]
+        assert field["type"] == ["string", "null"] and field["enum"] == ["patch_context", None], field
+    else:
+        assert "context_format" not in spec.inputSchema["properties"], spec
+    if text_only:
+        assert all(getattr(tool, "outputSchema", None) is None for tool in tools), tools
+    else:
+        output = spec.outputSchema
+        if advanced:
+            assert len(output["oneOf"]) == 2, output
+            assert output["oneOf"][1]["properties"]["kind"] == {"const": "patch_context"}, output
+            output = output["oneOf"][0]
+        assert output["properties"]["kind"]["enum"] == ["docs_answer", "docs_context"], output
+        assert "oneOf" not in output, output
+    return spec
+
+
+async def rejected_context_arguments(session, spec, arguments: dict, *, text_only: bool) -> dict:
+    import jsonschema
+
+    try:
+        jsonschema.validate(arguments, spec.inputSchema)
+    except jsonschema.ValidationError as exc:
+        assert exc.validator == "additionalProperties", exc
+        expected_message = exc.message
+    else:
+        raise AssertionError("negative fixture is accepted by the advertised input schema")
+    rejected = await session.call_tool("get_docs_context", arguments)
+    return validate_input_rejection(rejected, expected_message=expected_message, text_only=text_only)
+
+
+async def rejected_default_formats(session, spec, arguments: dict, *, text_only: bool) -> dict:
+    return {name: await rejected_context_arguments(
+        session, spec, {**arguments, "context_format": value}, text_only=text_only,
+    ) for name, value in (("null", None), ("patch_context", "patch_context"),
+                         ("docs_answer", "docs_answer"), ("unknown", "unknown"))}
+
+
 def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
     assert answer.get("status") == "ok", answer
     assert answer.get("kind") in {"docs_answer", "docs_context"}, answer
@@ -296,10 +372,9 @@ def isolated_environment(root: Path) -> dict[str, str]:
     return env
 
 
-async def read_only_delivery(session, project: Path, *, text_only: bool) -> None:
+async def read_only_delivery(session, project: Path, *, text_only: bool, advanced: bool = False) -> None:
     decode = text_payload if text_only else payload
-    names = {tool.name for tool in (await session.list_tools()).tools}
-    assert names == TOOLS, names
+    spec = await advertised_context_tool(session, advanced=advanced, text_only=text_only)
     canonical_query = {"question": QUESTION, "project_path": str(project)}
     assert set(canonical_query) == {"question", "project_path"}
     result = await session.call_tool("get_docs_context", canonical_query)
@@ -310,36 +385,45 @@ async def read_only_delivery(session, project: Path, *, text_only: bool) -> None
     assert not docs.get("edit_ready") and not docs.get("answer_supported"), docs
     assert docs.get("status") == "failed" and not docs.get("sources"), docs
     assert docs["error"]["reason_code"] == "permission_denied", docs
-    patch = decode(await session.call_tool("get_docs_context", {
-        **canonical_query, "context_format": "patch_context"}), allow_error=True)
-    assert patch.get("status") == "failed" and not patch.get("sources"), patch
-    assert patch["error"]["reason_code"] == "permission_denied", patch
+    format_rejections = {}
+    if advanced:
+        null = decode(await session.call_tool("get_docs_context", {
+            **canonical_query, "context_format": None}), allow_error=True)
+        assert null.get("status") == "failed" and not null.get("sources"), null
+        assert null["error"]["reason_code"] == "permission_denied", null
+        patch = decode(await session.call_tool("get_docs_context", {
+            **canonical_query, "context_format": "patch_context"}), allow_error=True)
+        assert patch.get("status") == "failed" and not patch.get("sources"), patch
+        assert patch["error"]["reason_code"] == "permission_denied", patch
+        cold_patch = {"status": patch["status"], "reason": patch["error"]["reason_code"],
+                      "sources": [], "source_bytes": 0}
+    else:
+        format_rejections = await rejected_default_formats(session, spec, canonical_query, text_only=text_only)
+        cold_patch = format_rejections["patch_context"]
     negative_bindings = {}
     for name, extra in (("module_mismatch", {"scope": "module", "module_path": "missing-module"}),
                         ("version_mismatch", {"version": "99.0.0"})):
         response = decode(await session.call_tool("get_docs_context", {
-            **canonical_query, **extra, "context_format": "patch_context"}), allow_error=True)
+            **canonical_query, **extra, **({"context_format": "patch_context"} if advanced else {})}), allow_error=True)
         assert response.get("status") == "failed" and not response.get("sources"), response
         negative_bindings[name] = {"status": response["status"],
                                    "sources": [], "source_bytes": 0}
     for extra in ({"mutation_intent": {"operation": "delete", "confirm": True}},
                   {"edit_ready": True}, {"allow_network": True, "consent": True}):
-        rejected = await session.call_tool("get_docs_context", {**canonical_query, **extra})
-        if not rejected.isError:
-            response = decode(rejected)
-            assert response.get("status") in {"error", "failed"}, response
+        await rejected_context_arguments(session, spec, {**canonical_query, **extra}, text_only=text_only)
     assert (project / "README.md").read_text().endswith(f"`{NEEDLE}`.\n")
     print(f"Installed {'text' if text_only else 'structured'} unindexed read-only observations: " + json.dumps({
+        "surface_mode": "advanced" if advanced else "default",
         "docs_default": {"status": docs.get("status"), "kind": docs.get("kind"),
                          "sources": docs.get("sources", []),
                          "source_bytes": sum(len(row.get("snippet", "").encode()) for row in docs.get("sources", []))},
-        "cold_patch": {"status": patch["status"], "reason": patch["error"]["reason_code"],
-                        "sources": [], "source_bytes": 0},
+        "cold_patch": cold_patch, "default_format_rejections": format_rejections,
         "negative_bindings": negative_bindings, "unauthorized_fields": "rejected; target unchanged"}, sort_keys=True))
 
 
 async def indexed_delivery(session, project: Path, database: Path, *, text_only: bool) -> tuple[dict, str]:
     decode = text_payload if text_only else payload
+    await advertised_context_tool(session, advanced=False, text_only=text_only)
     mutation = cold_fixture_members(project, database)
     assert not database.exists() and not database.parent.exists()
     rejected = await session.call_tool("prepare_docs", {
@@ -364,6 +448,7 @@ async def indexed_delivery(session, project: Path, database: Path, *, text_only:
 
 async def repeat_preparation(session, project: Path, database: Path, mutation: dict, generation: str, *, text_only: bool):
     decode = text_payload if text_only else payload
+    spec = await advertised_context_tool(session, advanced=False, text_only=text_only)
     before = fixture_database_state(database)
     request = {"action": "sync_project_docs", "project_path": str(project),
                "mutation": {**mutation, "expected_generation_id": generation}}
@@ -374,9 +459,13 @@ async def repeat_preparation(session, project: Path, database: Path, mutation: d
     assert stale.get("status") != "success", stale
     answer = decode(await session.call_tool("get_docs_context", {"question": QUESTION, "project_path": str(project)}))
     validate_context_payload(answer, required_fragment=NEEDLE)
+    rejections = await rejected_default_formats(session, spec, {"question": QUESTION, "project_path": str(project)},
+                                               text_only=text_only)
     assert fixture_database_state(database) == before
     print("Restart/repeat/CAS: " + json.dumps({"transport": "text" if text_only else "structured",
+          "surface_mode": "default", "default_format_rejections": rejections,
           "generation_id": generation, "derived_writes": 0, "stale_null_rejected": True,
+          **evidence_sizes(answer, project),
           "source_generation_rows_unchanged": True}, sort_keys=True))
 
 
@@ -565,8 +654,9 @@ def trace_project_delivery(service, arguments: dict, project: Path) -> dict:
     from unittest.mock import patch
     from docmancer.retrieval.dispatch import RetrievalDispatcher
     from docmancer.docs.application import _project_docs_service_part03 as project_service
-    from docmancer.mcp.docs_server import call_docs_tool_payload
+    from docmancer.mcp.docs_server import call_docs_tool_payload, current_docs_surface
 
+    assert arguments.get("context_format") == "patch_context", "source trace requires an explicit patch request"
     acquired, qualified, routes = [], [], []
     dispatch = RetrievalDispatcher.run
     qualify = project_service._qualify_candidate_lookups
@@ -600,7 +690,8 @@ def trace_project_delivery(service, arguments: dict, project: Path) -> dict:
 
     with patch.object(RetrievalDispatcher, "run", observe_dispatch), patch.object(
             project_service, "_qualify_candidate_lookups", observe_qualification):
-        response = call_docs_tool_payload("get_docs_context", arguments, service)
+        response = call_docs_tool_payload("get_docs_context", arguments, service,
+                                         surface=current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"}))
     validate_patch_payload(response)
     return {"measurement": "real in-process public route; NOT installed stdio or lifecycle acceptance",
             "routes": routes, "acquired": evidence_sizes({"sources": acquired}, project),
@@ -658,6 +749,7 @@ def bootstrap_library_fixture(project: Path, index_root: Path, *, database: Path
 async def prepared_delivery_matrix(session, project: Path, database: Path, libraries: dict, *, text_only: bool,
                                    include_large: bool = True) -> list[str]:
     decode = text_payload if text_only else payload
+    await advertised_context_tool(session, advanced=True, text_only=text_only)
     library_before = {version: fixture_database_state(Path(row["database"])) for version, row in libraries.items()}
     before = fixture_database_state(database)
     before_bytes = fixture_database_fingerprint(database)
@@ -741,6 +833,7 @@ async def prepared_delivery_matrix(session, project: Path, database: Path, libra
     assert after == before, "public fixture reads changed indexed evidence generation/member state"
     assert {version: fixture_database_state(Path(row["database"])) for version, row in libraries.items()} == library_before, "library public reads changed evidence generation"
     print(f"Installed {'text' if text_only else 'structured'} PREPARED DELIVERY: " + json.dumps({
+        "surface_mode": "advanced",
         "project_preparation": "confirmed cold MCP sync; no fixture database bootstrap",
         "library_preload": "authored local library indexes/registry only; NOT lifecycle acceptance",
         "local_library_provenance": libraries, "matrix": outcomes, "source_generation_rows_unchanged": True,
@@ -808,19 +901,26 @@ async def smoke(*, read_only: bool = False) -> None:
             (project / "README.md").write_text(
                 f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{NEEDLE}`.\n", encoding="utf-8")
             _accept_fixture(project)
+            server_env = {**mode_env, **(entry["environment"] if text_only else {}),
+                          "DOCATLAS_MCP_ADMIN_TOOLS": "0", "DOCATLAS_MCP_ADVANCED_TOOLS": "0"}
             params = StdioServerParameters(command=executable, args=entry["command"][1:],
-                env={**mode_env, **(entry["environment"] if text_only else {})}, cwd=str(mode_root))
+                env=server_env, cwd=str(mode_root))
+            advanced_params = StdioServerParameters(command=executable, args=entry["command"][1:],
+                env={**server_env, "DOCATLAS_MCP_ADVANCED_TOOLS": "1"}, cwd=str(mode_root))
             prepared = None
-            async with stdio_client(params) as streams:
-                async with ClientSession(*streams) as session:
-                    await session.initialize()
-                    await read_only_delivery(session, project, text_only=text_only)
-                    assert not database.parent.exists(), "read-only request provisioned member storage"
-                    if not read_only:
-                        try:
-                            prepared = await indexed_delivery(session, project, database, text_only=text_only)
-                        except Exception as exc:
-                            blockers.append(f"{'text' if text_only else 'structured'} cold preparation failed: {type(exc).__name__}: {exc}")
+            # Exercise advanced cold rejection first, then the unchanged default
+            # cold preparation path. Neither cold session may provision storage.
+            for advanced, parameters in ((True, advanced_params), (False, params)):
+                async with stdio_client(parameters) as streams:
+                    async with ClientSession(*streams) as session:
+                        await session.initialize()
+                        await read_only_delivery(session, project, text_only=text_only, advanced=advanced)
+                        assert not database.parent.exists(), "read-only request provisioned member storage"
+                        if not read_only and not advanced:
+                            try:
+                                prepared = await indexed_delivery(session, project, database, text_only=text_only)
+                            except Exception as exc:
+                                blockers.append(f"{'text' if text_only else 'structured'} cold preparation failed: {type(exc).__name__}: {exc}")
             if prepared is not None:
                 try:
                     # Cold prepare/retrieve has already succeeded. Preload only
@@ -830,6 +930,9 @@ async def smoke(*, read_only: bool = False) -> None:
                         async with ClientSession(*streams) as session:
                             await session.initialize()
                             await repeat_preparation(session, project, database, *prepared, text_only=text_only)
+                    async with stdio_client(advanced_params) as streams:
+                        async with ClientSession(*streams) as session:
+                            await session.initialize()
                             blockers.extend(await prepared_delivery_matrix(session, project, database, libraries,
                                              text_only=text_only, include_large=True))
                 except Exception as exc:
@@ -838,7 +941,8 @@ async def smoke(*, read_only: bool = False) -> None:
         if blockers:
             raise RuntimeError("BLOCKED full installed delivery matrix: " + "\n".join(blockers))
     if read_only:
-        print("Installed read-only stdio delivery: PASS (structured/text, cold rejection, unauthorized fields). "
+        print("Installed read-only stdio delivery: PASS (structured/text, separate default/advanced sessions, "
+              "cold rejection, unauthorized fields). "
               "Indexed lifecycle/partial/complete/>32KB/scope/version NOT RUN.")
     else:
         print("Docs MCP installed-artifact stdio smoke: PASS")
