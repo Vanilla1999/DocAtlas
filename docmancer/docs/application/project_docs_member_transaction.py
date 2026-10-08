@@ -345,7 +345,10 @@ def _execute_pinned(root: Path, pinned: PinnedProject, request: MemberTransactio
         spent += len(data)
         if spent > boundary.max_scanned_bytes or time.monotonic() >= deadline:
             raise ValueError("member transaction exceeds configured read budget")
-        documents.append(member_document(root, member, entry, data))
+        document = member_document(root, member, entry, data)
+        # Reporting metadata comes from the same checked descriptor as the bytes.
+        document.metadata["project_doc_mtime_ns"] = pinned.versions[pinned.members[member.path]][1]
+        documents.append(document)
     store = SQLiteStore.__new__(SQLiteStore)
     store.db_path = storage
     store.extracted_dir = storage.parent / "extracted"

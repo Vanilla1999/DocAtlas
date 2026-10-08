@@ -198,13 +198,34 @@ def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkey
 
 
 def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, monkeypatch):
+    from tests._fixture_member_transaction import (
+        fixture_member_state, indexed_fixture_member_service,
+    )
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
     readme.write_text("# App\n\nStable project docs.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored project overview fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(tmp_path, monkeypatch, project, ("README.md",))
 
     original = readme.stat().st_mtime_ns
+    before = service.inspect_project_docs(str(project))
+    assert before.reason_code == "project_docs_ready"
+    assert before.project_docs["stale"] == []
+    assert before.project_docs["indexed"][0]["mtime_ns"] == original
+    assert before.project_docs["indexed"][0].get("metadata_drift_reasons", []) == []
+    original_hash = before.project_docs["indexed"][0]["content_hash"]
+    original_state = fixture_member_state(service)
     os.utime(readme, ns=(original + 10_000_000, original + 10_000_000))
 
     result = service.inspect_project_docs(str(project))
@@ -212,6 +233,10 @@ def test_inspect_project_docs_does_not_mark_mtime_only_change_stale(tmp_path, mo
     assert result.reason_code == "project_docs_ready"
     assert result.project_docs["stale"] == []
     assert result.project_docs["indexed"][0]["metadata_drift_reasons"] == ["mtime_changed"]
+    assert result.project_docs["indexed"][0]["content_hash"] == original_hash
+    assert result.project_docs["indexed"][0]["mtime_ns"] == original
+    assert result.project_docs["indexed"][0]["current_mtime_ns"] == original + 10_000_000
+    assert fixture_member_state(service) == original_state
 
 
 def test_ingest_project_docs_indexes_only_discovered_candidates_with_metadata(tmp_path, monkeypatch):

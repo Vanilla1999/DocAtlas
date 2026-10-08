@@ -235,10 +235,22 @@ roots:
 
 
 def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
+    from tests._fixture_member_transaction import indexed_fixture_member_service
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nProjectAnswer uses the local ADR flow.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored project overview fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(tmp_path, monkeypatch, project, ("README.md",))
 
     result = service.get_project_docs(str(project), "ProjectAnswer ADR", tokens=1200, limit=3)
 
@@ -252,6 +264,7 @@ def test_get_project_docs_returns_scoped_docs_result(tmp_path, monkeypatch):
     assert result.results[0].heading_path == "Architecture"
     assert result.results[0].content_hash is not None
     assert result.results[0].mtime_ns is not None
+    assert result.results[0].mtime_ns == (project / "README.md").stat().st_mtime_ns
     assert "ProjectAnswer" in result.results[0].content
     assert result.indexed_sources[0]["path"] == "README.md"
     assert result.next_actions == []
