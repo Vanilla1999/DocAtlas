@@ -176,8 +176,21 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
         read_resource=read_resource,
     )
     if revoked:
+        from docmancer.docs.project_docs_catalog import read_project_docs_catalog
+
         catalog = tmp_path / "docatlas.project-docs.yaml"
-        catalog.write_text(catalog.read_text().replace("source_of_truth", "historical"))
+        catalog.write_text(catalog.read_text().replace(
+            "authority: source_of_truth", "authority: historical\n    impact: search_only",
+        ))
+        current_catalog = read_project_docs_catalog(tmp_path)
+        assert current_catalog.present and current_catalog.valid
+        assert len(current_catalog.entries) == 1
+        entry = current_catalog.entries[0]
+        assert entry.path == target["path"]
+        assert entry.scope == "project"
+        assert entry.status == "active"
+        assert entry.authority == "historical"
+        assert entry.impact == "search_only"
     accepted = controller.read(target["source_uri"], missing_fact_id="rule")
     assert len(reads) == 1
     if revoked:
