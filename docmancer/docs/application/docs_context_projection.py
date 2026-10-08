@@ -171,6 +171,9 @@ def _finalize_quality(
     plan = retrieval.get("documentation_query_plan")
     if not isinstance(plan, dict):
         plan = {}
+    # Match the core's retrieval-only policy and persist it for recovery/trials.
+    # A source-local assignment proves surviving bytes, not component meaning.
+    plan.update(_component_contract=[], component_scope_complete=False)
     selection = retrieval.get("selection_decision")
     assignments = tuple(
         item for item in ((selection or {}).get("assignments") or ()) if isinstance(item, dict)
@@ -182,7 +185,7 @@ def _finalize_quality(
     coverage = component_coverage_decision(
         plan.get("_component_contract") or (), assignments, final_sources,
         unresolved_residue=plan.get("unresolved_parts") or (),
-        component_scope_complete=plan.get("component_scope_complete", True),
+        component_scope_complete=plan["component_scope_complete"],
     ).as_payload()
     omissions = _annotate_budget_omissions(retrieval, coverage, assignments)
     plan["_component_coverage"] = coverage

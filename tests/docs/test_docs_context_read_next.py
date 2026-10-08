@@ -136,15 +136,51 @@ def _continuation_document():
 
 
 @pytest.mark.parametrize("revoked", [False, True], ids=["authorized", "revoked"])
-def test_final_public_handler_continuation_preserves_quality_and_usable_reference(tmp_path, request, revoked):
+@pytest.mark.parametrize("legacy_scope", ["control", "absent", True, False])
+def test_final_public_handler_continuation_preserves_quality_and_usable_reference(
+    tmp_path, request, monkeypatch, revoked, legacy_scope,
+):
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from docmancer.docs.interfaces.mcp import context_tools
+
     service = _real_service(tmp_path, request, content=_continuation_document())
+    real_project = context_tools.project_docs_context
+    attempts = []
+    witness = "Job polling uses docs_status to inspect progress until a terminal status is observed."
+
+    def negative_probe(*args, **kwargs):
+        # Inject legacy metadata at a unit boundary, not into acquisition or a
+        # fabricated successful payload. Normal producers do not emit this proof.
+        retrieval = kwargs["retrieval"]
+        if legacy_scope != "control":
+            original = next(row for row in retrieval["context_pack"] if witness in row["content"])
+            start = original["content"].index(witness)
+            plan = retrieval["documentation_query_plan"]
+            plan["_component_contract"] = [{"component_id": "opaque:negative-probe"}]
+            if legacy_scope == "absent":
+                plan.pop("component_scope_complete", None)
+            else:
+                plan["component_scope_complete"] = legacy_scope
+            retrieval["selection_decision"] = {"assignments": [{
+                "requirement_id": "opaque:negative-probe",
+                "evidence_id": original.get("stable_id") or original["stable_chunk_id"],
+                "projected_content_hash": hashlib.sha256(witness.encode()).hexdigest(),
+                "unit_char_start": start, "unit_char_end": start + len(witness),
+            }]}
+        result = real_project(*args, **kwargs)
+        attempts.append(deepcopy((retrieval, result[1])))
+        return result
+
+    monkeypatch.setattr(context_tools, "project_docs_context", negative_probe)
     payload = call_docs_tool_payload("get_docs_context", {
         "question": "How does docs_status polling progress work?",
         "project_path": str(tmp_path),
         "scope": "all",
     }, service)
-    assert payload["kind"] == "docs_context"
-    assert payload["context_quality"]["status"] in {"unverified", "partial"}
+    assert payload.get("kind") == "docs_context", payload
+    assert payload["context_quality"] == {
+        "status": "unverified", "reasons": ["coverage_unverified"],
+    }, payload["read_next"]
     assert len(payload["read_next"]) == 1
     target = payload["read_next"][0]
     assert target["reason"] in {"inspect_source_context", "requested_part_missing"}
@@ -152,6 +188,11 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
+    assert payload["support_status"] == "retrieval_only"
+    assert payload["answer_policy"] == "cite_only"
+    assert len(attempts) == 1
+    retrieval, snapshot = attempts[0]
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
     raw = (tmp_path / "docs/polling.md").read_bytes()
     assert target["path"] == "docs/polling.md"
     assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
@@ -162,6 +203,20 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert source["project_identity"] == target["project_identity"]
     assert (source["line_start"], source["line_end"]) == (1, 11)
     assert source["snippet"].encode() == b"\n".join(raw.splitlines()[:11])
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    bound = snapshot[source["evidence_id"]]["source"]
+    assert bound["_source_snapshot_sha256"] == target["snapshot_sha256"]
+    assert bound["_reference_evidence"]["raw_document"].encode() == raw
+    if legacy_scope != "control":
+        assignment = retrieval["selection_decision"]["assignments"][0]
+        assert witness in source["snippet"]
+        assert hashlib.sha256(witness.encode()).hexdigest() == assignment["projected_content_hash"]
+    plan = retrieval["documentation_query_plan"]
+    assert plan["_component_contract"] == []
+    assert plan["component_scope_complete"] is False
+    assert plan["_component_coverage"]["mandatory_component_ids"] == []
+    assert plan["_component_coverage"]["covered_component_ids"] == []
+    assert plan["_component_coverage"]["unresolved_residue"] == ["unverified_original_component_scope"]
     assert source["line_end"] < target["line_start"] <= target["line_end"]
     reads = []
 
@@ -343,14 +398,39 @@ def test_binding_failure_removes_dead_read_next_and_reports_cause():
     assert docs_context_budget_tokens(payload) <= 800
 
 
-def test_final_projection_quality_uses_surviving_component_witness():
-    from docmancer.docs.application.docs_context_projection import project_docs_context
+@pytest.mark.parametrize("legacy_scope", ["absent", True, False])
+@pytest.mark.parametrize("component_id", ["project_answer:verify", "opaque:negative-probe", None])
+@pytest.mark.parametrize("with_source", [True, False], ids=["visible", "unavailable"])
+def test_final_projection_quality_uses_surviving_component_witness(
+    monkeypatch, legacy_scope, component_id, with_source,
+):
+    from docmancer.docs.application import docs_context_projection as projection
+    from docmancer.docs.application.model_visible_projection import _source_digest, validate_model_visible_projection
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 
+    real_coverage = projection.component_coverage_decision
+    final_sources = []
+
+    def observe_coverage(contract, assignments, sources, **kwargs):
+        result = real_coverage(contract, assignments, sources, **kwargs)
+        final_sources.append(deepcopy(tuple(sources)))
+        return result
+
+    monkeypatch.setattr(projection, "component_coverage_decision", observe_coverage)
     witness = "Verify the installation with the health check."
     content = "Install locally. " + witness
     witness_start = content.index(witness)
     witness_hash = hashlib.sha256(witness.encode()).hexdigest()
-    payload, _ = project_docs_context(retrieval={
+    # A valid literal plan keeps this negative control on the real projection
+    # path; a source-local byte witness must not certify a component's meaning.
+    plan = build_documentation_query_plan("install verify health check").as_payload()
+    if legacy_scope == "absent":
+        plan.pop("component_scope_complete")
+    else:
+        plan["component_scope_complete"] = legacy_scope
+    if component_id is not None:
+        plan["_component_contract"] = [{"component_id": component_id}]
+    retrieval = {
         "context_pack": [{
             "stable_id": "project:quality-doc", "source_class": "project_doc",
             "path": "docs/install.md", "content": content,
@@ -361,19 +441,57 @@ def test_final_projection_quality_uses_surviving_component_witness():
             }},
         }],
         "selection_decision": {"assignments": [{
-            "requirement_id": "project_answer:verify", "evidence_id": "project:quality-doc",
+            "requirement_id": component_id, "evidence_id": "project:quality-doc",
             "projected_content_hash": witness_hash,
             "unit_char_start": witness_start, "unit_char_end": witness_start + len(witness),
         }]},
-        "documentation_query_plan": {
-            "original_question": "install verify health check",
-            "query_ids": ["query-original"], "public_query_ids": ["query-original"],
-            "queries": [{"query_id": "query-original", "text": "install verify health check", "origin": "original"}],
-            "_component_contract": [{"component_id": "project_answer:verify"}],
-        },
-    })
-    assert payload["context_quality"] == {"status": "checked", "reasons": []}
+        "documentation_query_plan": plan,
+    }
+    if component_id is None:
+        retrieval.pop("selection_decision")
+    if not with_source:
+        retrieval["context_pack"] = []
+        plan["unresolved_parts"] = ["opaque:unresolved"]
+    expected_hash = _source_digest(retrieval["context_pack"][0]) if with_source else None
+    diagnostics = {}
+    payload, snapshot = projection.project_docs_context(retrieval=retrieval, selection_diagnostics=diagnostics)
+    assert payload["context_quality"] == (
+        {"status": "unverified", "reasons": ["coverage_unverified"]} if with_source
+        else {"status": "unavailable", "reasons": ["source_unavailable"]}
+    )
     assert payload["read_next"] == []
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    if with_source:
+        assert payload["support_status"] == "retrieval_only"
+        assert payload["answer_policy"] == "cite_only"
+        assert len(payload["sources"]) == 1
+        source = payload["sources"][0]
+        assert source["snippet"] == content
+        assert source["content_sha256"] == expected_hash
+        assert snapshot[source["evidence_id"]]["content_sha256"] == source["content_sha256"]
+        assert snapshot[source["evidence_id"]]["source"]["content"] == content
+        final = final_sources[-1][0]
+        assert final["snippet"] == source["snippet"]
+        assert final["content_sha256"] == source["content_sha256"]
+        assert final["_visible_assignment_hashes"] == ([witness_hash] if component_id else [])
+        assert final["_assigned_requirement_ids"] == ([component_id] if component_id else [])
+    else:
+        assert payload.get("sources", []) == []
+        assert snapshot == {}
+        assert final_sources[-1] == ()
+    final_plan = retrieval["documentation_query_plan"]
+    assert final_plan["_component_contract"] == []
+    assert final_plan["component_scope_complete"] is False
+    assert final_plan["_projection_omissions"] == []
+    assert final_plan["_component_coverage"] == diagnostics["component_coverage"] == {
+        "mandatory_component_ids": [], "covered_component_ids": [],
+        "missing_component_ids": [], "evidence_ids": [],
+        "unresolved_residue": [*(plan.get("unresolved_parts") or ()), "unverified_original_component_scope"],
+        "status": "unavailable", "recognized_component_status": "unavailable",
+    }
 
 
 def test_public_schema_exposes_quality_and_registered_range_contract():
