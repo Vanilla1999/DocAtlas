@@ -200,21 +200,49 @@ def test_evaluator_only_requirement_provenance_is_rejected():
 
 
 def test_stable_identity_collision_fails_closed_before_action_packet_rendering():
+    from docmancer.docs.application.action_packet import validate_action_packet
+
     candidates = [
         _candidate("same", "The worker must preserve isolation."),
         _candidate("same", "The worker must disable isolation."),
     ]
     decision = select_evidence(
         candidates, question="Update worker",
-        config=patch_selection_config(1500),
+        config=patch_selection_config(),
     )
     packet = build_action_packet(
-        question="Update worker", context_pack=candidates, max_tokens=1500,
+        question="Update worker", context_pack=candidates,
     )
 
     assert decision.status == "insufficient_evidence"
     assert "stable_identity_collision:same" in decision.missing_requirements
-    assert packet["status"] == "insufficient_evidence"
+    assert packet["result"] == "failure"
+    assert packet["completeness"] == "unavailable"
+    assert packet["edit_ready"] is False
+    assert "stable_identity_collision:same" in packet["missing"]
+    assert "no_admitted_evidence" in packet["missing"]
+    assert "sources" not in packet
+
+    identical = [dict(candidates[0]), dict(candidates[0])]
+    duplicate_decision = select_evidence(
+        identical, question="Update worker", config=patch_selection_config(),
+    )
+    duplicate_packet = build_action_packet(
+        question="Update worker", context_pack=identical,
+    )
+
+    assert _ids(duplicate_decision) == ["same"]
+    assert duplicate_decision.selected_candidates[0].display_text == candidates[0]["display_text"]
+    assert "stable_identity_collision:same" not in duplicate_decision.missing_requirements
+    assert duplicate_packet["result"] == "data"
+    assert duplicate_packet["completeness"] == "partial"
+    assert duplicate_packet["edit_ready"] is False
+    assert "visible_content_assignment_required" in duplicate_packet["missing"]
+    assert "stable_identity_collision:same" not in duplicate_packet["missing"]
+    assert len(duplicate_packet["sources"]) == 1
+    assert duplicate_packet["sources"][0]["stable_id"] == "same"
+    assert duplicate_packet["sources"][0]["text"] == candidates[0]["display_text"]
+    assert validate_action_packet(duplicate_packet, evidence_items=identical) == []
 
 
 def test_requested_scope_rejects_candidates_with_missing_identity():
