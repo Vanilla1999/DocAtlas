@@ -7,6 +7,8 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "tests/docs/test_context_projection_boundaries.py",  # Reviewed consent-scope regressions.
+    "tests/diagnostic_labels.projection_boundaries.json",
     "eval/evidence_quality_v2/runtime.py",
     "tests/test_evidence_quality_v2_fixture_runtime.py",
     "tests/diagnostic_labels.evidence_quality_v2_fixture_runtime.json",

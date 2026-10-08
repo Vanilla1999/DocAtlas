@@ -499,3 +499,32 @@ binding fabrication authorized by this observation. Final evidence:
   проверенной installation route. Версия runtime/release отдельно фиксируется.
 - Live replacement, push/merge/publish и удаление старой БД остаются отдельными
   действиями. Одна MCP registration с сохранением существующего имени.
+
+### Reviewed consent candidate (2026-10-08)
+
+Latest authorization permits agents, normal PR push and unchanged offline
+historical/evaluation diagnostics; earlier prohibitions above are historical.
+External providers, live user-index replacement, publication and merge remain
+excluded. The original /tmp worktrees/evidence disappeared; saved Git commits
+were recovered into separate checkouts without changing the user's old checkout.
+
+Independent review APPROVED `1ac550c1`; integrated as `aa153e39` in
+`implementation/mcp-ci-reviewed-candidate`. Proposed gap-write consent stays
+on the action; authorized read-only quotes are delivered without certifying an
+answer or granting edit permission. Genuine preflight/network/source-read and
+mutation vetoes remain. Independent final systemic run: 80 cases, 29/48 sufficient
+in both lanes, frozen floors 28/48 and 18/48 PASS, no operational/integrity errors,
+maximum 798 tokens. Evidence: /tmp/opencode/consent-review-1ac550c1-systemic-report.json.
+
+Bootstrap test update `1d70fba3` independently checked, integrated as `383762d7`:
+obsolete blocked/empty-projector assertions replaced by exact retrieval-only,
+unverified partial-delivery and source/hash/snapshot checks. No runtime/gold/
+threshold change. Combined candidate: 56 infrastructure tests and 5 consent
+regressions PASS. Scope ownership records include the two reviewed projection
+test paths; D1 catalog and all other checks remain unchanged.
+
+CI triage confirms representative removed max_tokens caller, generated-alias,
+risk-label eligibility and retired retrieval_need failures; source-capture setup
+also fails without a diagnosed cause. No bulk semantic migration authorized.
+The historical core run remains incomplete (2 787 unfinished nodes). Updated
+remote CI is needed; this candidate does not establish full-CI or merge readiness.
