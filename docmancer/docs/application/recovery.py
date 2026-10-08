@@ -15,8 +15,6 @@ from docmancer.docs.application.proofability import diagnose_proofability
 from docmancer.retrieval.query_planning import extract_document_locator
 
 RECOVERY_SCHEMA_VERSION = 1
-MAX_PROBLEM_SPANS = 2
-MAX_RECOGNIZED_SPANS = 6
 MAX_SUGGESTED_QUESTIONS = 2
 
 # These are operational states with a concrete recovery that is more precise
@@ -36,9 +34,9 @@ def _selection_decision(value: Any) -> Any | None:
     return nested if nested is not None else value
 
 
-def _clean_fragment(value: object, *, max_chars: int = 180) -> str:
+def _clean_fragment(value: object) -> str:
     text = " ".join(str(value or "").strip().split())
-    return text.strip(" \t\r\n,;:.!?")[:max_chars]
+    return text.strip(" \t\r\n,;:.!?")
 
 
 def _requirement_spans(requirements: Any, question: str) -> list[str]:
@@ -55,14 +53,14 @@ def _requirement_spans(requirements: Any, question: str) -> list[str]:
         ):
             rows.append((start, end, text))
     rows.sort(key=lambda row: (row[0], row[1], row[2].casefold()))
-    return list(dict.fromkeys(text for _, _, text in rows))[:MAX_RECOGNIZED_SPANS]
+    return list(dict.fromkeys(text for _, _, text in rows))
 
 
 def _exact_question_hints(requirements: Any, question: str) -> list[str]:
     folded = question.casefold()
     rows: list[str] = []
     for value in getattr(requirements, "retrieval_hints", ()) or ():
-        text = _clean_fragment(value, max_chars=140)
+        text = _clean_fragment(value)
         if not text or text.casefold() not in folded:
             continue
         rows.append(text)
@@ -77,16 +75,16 @@ def _exact_question_hints(requirements: Any, question: str) -> list[str]:
             text.casefold(),
         )
     )
-    return rows[:MAX_RECOGNIZED_SPANS]
+    return rows
 
 
 def _problem_spans(question: str, requirements: Any) -> list[str]:
-    """Bound the original request for diagnostics, without inferred clauses.
+    """Preserve the original request for diagnostics, without inferred clauses.
 
     Requirement spans cannot establish semantic coverage of a clause. This
     fragment is display/retry guidance only, never a generated retrieval lane.
     """
-    text = question.strip()[:220]
+    text = question.strip()
     return [text] if text else []
 
 
@@ -122,7 +120,7 @@ def build_recovery_diagnosis(
     if projection is None and support is not None and bool(getattr(support, "answer_supported", False)):
         return {}
 
-    operational_reason = _clean_fragment(operational_reason_code, max_chars=120)
+    operational_reason = _clean_fragment(operational_reason_code)
     evidence_path = extract_document_locator(question)
     profile = "project_document_answer" if evidence_path else "project_docs_answer"
     requirements = build_requirements(
@@ -180,7 +178,7 @@ def build_recovery_diagnosis(
     if requirements.unresolved_parts and not evidence_path:
         origin = "parsing"
         reason_code = "question_parse_uncertain"
-        detail_reasons = list(requirements.unresolved_parts)[:4]
+        detail_reasons = list(requirements.unresolved_parts)
     elif proof_origin == "retrieval":
         origin = "retrieval"
         reason_code = "retrieval_miss"
@@ -199,7 +197,7 @@ def build_recovery_diagnosis(
                 "reason_code": reason_code,
                 "disposition": "resolve_authoritative_conflict",
                 "hard_stop": True,
-                "detail_reasons": detail_reasons[:4],
+                "detail_reasons": detail_reasons,
             })
             return result
         if "fragmented_support_exceeds_bound" in proof_reasons:
@@ -217,7 +215,7 @@ def build_recovery_diagnosis(
     result.update({
         "origin": origin,
         "reason_code": reason_code,
-        "detail_reasons": detail_reasons[:4],
+        "detail_reasons": detail_reasons,
     })
 
     if origin in {"eligibility", "source_documentation"}:
@@ -231,10 +229,10 @@ def build_recovery_diagnosis(
         if hint.casefold() not in {item.casefold() for item in recognized}:
             recognized.append(hint)
     if recognized:
-        result["recognized_spans"] = recognized[:MAX_RECOGNIZED_SPANS]
+        result["recognized_spans"] = recognized
     problems = _problem_spans(question, requirements)
     if problems:
-        result["problem_spans"] = problems[:MAX_PROBLEM_SPANS]
+        result["problem_spans"] = problems
 
     # Uncertain proof permits bounded investigation, never a synthesized retry.
     result["disposition"] = "search_local_source"
@@ -278,10 +276,10 @@ def recovery_action(
         return None
     if disposition == "search_local_source":
         terms = [
-            str(value)[:160]
+            str(value)
             for value in diagnosis.get("recognized_spans") or diagnosis.get("problem_spans") or []
             if str(value).strip()
-        ][:8]
+        ]
         return {
             "type": "search_local_source",
             "tool": "code_search",

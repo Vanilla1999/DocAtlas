@@ -80,10 +80,8 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
             for key in ("module_name", "module_type"):
                 value = str(row.get(key) or "").strip()
                 if value:
-                    item[key] = value[:120]
+                    item[key] = value
             candidates.append(item)
-            if len(candidates) >= 8:
-                break
         if candidates:
             result["module_candidates"] = candidates
     return result
@@ -94,9 +92,7 @@ def _prioritize_module_recovery_projection(payload: dict[str, Any]) -> None:
 
     if str(payload.get("operational_reason_code") or "") not in _MODULE_RECOVERY_REASON_CODES:
         return
-    missing = payload.get("missing")
-    if isinstance(missing, list) and len(missing) > 2:
-        payload["missing"] = missing[:2]
+    # Already accepted missing data is not sacrificed to prioritize an action.
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -363,10 +359,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     )
     blocked = (
         None if blocked_kind == "patch_context" else
-        _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=800)
+        _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=None)
     )
     if blocked is not None:
-        errors = validate_model_visible_projection(blocked, snapshot={}, max_tokens=800)
+        errors = validate_model_visible_projection(blocked, snapshot={})
         if errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(errors))
         _record_model_visible_bytes(result, raw, blocked)
@@ -404,7 +400,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     ):
         kind = "docs_context"
     if kind in {"docs_answer", "docs_context", "patch_context"}:
-        output_budget = 1_500
+        output_budget = None
         recovery = bind_module_recovery_selector(_bounded_recovery_action(raw), raw)
         source_search_allowed = bool(
             kind == "patch_context"
@@ -420,7 +416,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 if reader is not None and source_root:
                     raw["_source_continuation_project_root"] = source_root
                 projection, snapshot = project_docs_context(
-                    retrieval=raw, max_tokens=min(800, output_budget), selection_diagnostics=selection_trace,
+                    retrieval=raw, selection_diagnostics=selection_trace,
                 )
                 if reader is not None and source_root:
                     bind_project_source_continuations(reader, source_root, projection, snapshot)
@@ -432,7 +428,6 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 projection, snapshot = project_docs_answer(
                     question=question,
                     retrieval=raw,
-                    max_tokens=min(DOCS_ANSWER_MAX_TOKENS, output_budget),
                     selection_diagnostics=selection_trace,
                     canonical_selection=canonical_selection,
                 )
@@ -445,10 +440,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 if kind == "docs_context" and projection.get("context_available")
                 else None
             )
-            projection_budget = min(
-                800 if kind == "docs_context" else DOCS_ANSWER_MAX_TOKENS,
-                output_budget,
-            )
+            projection_budget = None
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
                 projection.update(_recovery_summary(raw))
@@ -467,7 +459,6 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     kind=kind,
                     missing=projection.get("missing") or [],
                     recommended_next_action=recovery,
-                    max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
                 projection.update(_recovery_summary(raw))
@@ -493,12 +484,6 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
-            if retained_read_projection is not None and projection["estimated_tokens"] > projection_budget:
-                # Optional recovery metadata yields to the projector's bounded
-                # read packet; do not alter its admitted sources or snapshot.
-                projection = retained_read_projection
-                _omit_nullable_reason_code(projection)
-                _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
@@ -719,11 +704,11 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             if action.get(key) not in (None, {}, [])
         }
         if isinstance(action.get("options"), list):
-            bounded["options"] = [_bounded_action_mapping(option) for option in action["options"][:3] if isinstance(option, dict)]
+            bounded["options"] = [_bounded_action_mapping(option) for option in action["options"] if isinstance(option, dict)]
         if isinstance(action.get("decision_options"), list):
             bounded["decision_options"] = [
                 _bounded_action_mapping(option)
-                for option in action["decision_options"][:3]
+                for option in action["decision_options"]
                 if isinstance(option, dict)
             ]
         bounded = _bounded_action_mapping(bounded)
@@ -733,21 +718,19 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
-    if depth > 2:
-        return {}
     result: dict[str, Any] = {}
-    for key in sorted(value)[:20]:
+    for key in sorted(value):
         item = value[key]
         if isinstance(item, str):
-            result[str(key)] = item[:300]
+            result[str(key)] = item
         elif isinstance(item, (bool, int, float)) or item is None:
             result[str(key)] = item
         elif isinstance(item, dict):
             result[str(key)] = _bounded_action_mapping(item, depth=depth + 1)
         elif isinstance(item, list):
             result[str(key)] = [
-                _bounded_action_mapping(child, depth=depth + 1) if isinstance(child, dict) else str(child)[:200]
-                for child in item[:5]
+                _bounded_action_mapping(child, depth=depth + 1) if isinstance(child, dict) else deepcopy(child)
+                for child in item
             ]
     return result
 

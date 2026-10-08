@@ -69,7 +69,7 @@ def _current_bundles(records, key: SourceKey) -> tuple[EvidenceSet, ...] | None:
 
 def iter_need_context_variants(
     candidates, *, query_plan: dict[str, Any], expected_project_identity: str | None,
-    max_tokens: int, diagnostics: dict[str, Any],
+    max_tokens: int | None, diagnostics: dict[str, Any],
 ):
     """Yield freshly checked original-byte alternatives, without selecting one."""
     question = str(query_plan.get('original_question') or '')
@@ -107,18 +107,17 @@ def iter_need_context_variants(
         records = {key: {'source': identity, 'raw_document': raw_document}}
         contracts = compile_need_contracts(question, plan)
         # Use existing finite window/block alternatives, not full-parent rescue.
-        ranges = {(a, b) for a, b in source_block_alternatives(raw).spans if b - a <= 640}
+        ranges = set(source_block_alternatives(raw).spans)
         if any(c.requirement in {'set', 'set_with_explanations'} for c in contracts):
             # Whole introduced lists are finite source structures, not parents.
-            # Their real DTO cost, not a character cap, decides delivery.
+            # The existing finite list enumeration remains a work bound.
             for intro, items in source_graph(raw_document, key).lists:
                 left, right = intro.start, max((s.end for s in items), default=intro.end)
                 if start <= left < right <= end and len(items) <= 8:
                     ranges.add((left - start, right - start))
         for limit in _projection_limits(raw):
             _, a, b = _focused_snippet(raw, (question,), limit=limit)
-            if b - a <= 640:
-                ranges.add((a, b))
+            ranges.add((a, b))
         ranges = sorted(ranges, key=lambda s: (
             not _is_complete_source_span(raw, raw[s[0]:s[1]], span_start=s[0]),
             -(s[1] - s[0]), s[0]))[:16]
@@ -150,8 +149,6 @@ def iter_need_context_variants(
             normalized['retrieval_query_ids'] = []
             decision = context_selection_decision([normalized], public_ids)
             payload = _payload([normalized], decision=decision, query_plan=query_plan)
-            if docs_context_budget_tokens(payload) > max_tokens:
-                continue
             yield dict(original), normalized, contracts, permitted
 
 

@@ -176,8 +176,7 @@ class _ProjectDocsServicePart03:
         effective_limit = limit or agent.config.query.default_limit
         if requirements is not None:
             # Candidate generation needs enough diversity for deterministic
-            # lane/facet selection; the model-visible projection remains capped
-            # at three sources and owns the final token ceiling.
+            # lane/facet selection. This remains an acquisition bound.
             effective_limit = max(effective_limit, 20)
         budget = tokens or DEFAULT_DOC_TOKENS
         effective_expand = (expand or "none") if requirements is not None else expand
@@ -392,7 +391,10 @@ class _ProjectDocsServicePart03:
                     },
                 })
                 continue
-            if len(selected) >= effective_limit:
+            matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
+            admitted = any(trace.get("qualified") is True for query_id, trace in matches.items()
+                           if isinstance(trace, dict) and (query_id == "query-original" or query_id.startswith("query-lookup-")))
+            if not admitted and len(selected) >= effective_limit:
                 anchor = selected[0]
                 same_authoritative_source = (
                     chunk.source == anchor.source
@@ -401,7 +403,7 @@ class _ProjectDocsServicePart03:
                 if not same_authoritative_source:
                     continue
             chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
-            if token_total + chunk_tokens > budget:
+            if not admitted and token_total + chunk_tokens > budget:
                 continue
             selected.append(chunk)
             seen.add(key)
@@ -410,8 +412,8 @@ class _ProjectDocsServicePart03:
             _control_chunks.extend(selected)
         if not retain_found_windows:
             return selected
-        # Acquisition and the bounded operational view above are unchanged.
-        # Only independently qualified, already-prepared candidates bypass packing.
+        # Acquisition is unchanged. Only independently qualified, already-prepared
+        # candidates bypass representation packing above and retention below.
         retained = {(chunk.source, chunk.chunk_index): chunk for chunk in selected}
         for chunk in candidates:
             matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}

@@ -29,11 +29,6 @@ from docmancer.docs.application.evidence_selection import (
 from docmancer.docs.domain.answer_units import materialize_answer_units
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
-from docmancer.docs.application.insufficient_projection import (
-    apply_terminal_insufficient_projection,
-    bounded_missing_value,
-    compact_recovery_action_for_budget,
-)
 from docmancer.docs.application.model_visible_projection_helpers import (
     bounded_action as _bounded_action,
     cited_patch_items as _cited_patch_items,
@@ -49,7 +44,7 @@ from ._model_visible_docs_support import (
 )
 
 DOCS_ANSWER_MAX_TOKENS = 800
-# Transitional legacy constants; remaining caller migration is pending.
+# Transitional aliases: only coordinator-owned core imports remain.
 DOCS_CONTEXT_MAX_TOKENS = 800
 INSUFFICIENT_EVIDENCE_MAX_TOKENS = 300
 MAX_DOCS_SOURCES = 3
@@ -480,7 +475,7 @@ def _explicit_delivery_block(
                  or ("confirmation_required" if confirmation else "delivery_blocked"))[:120]
     payload = project_insufficient(
         kind=kind, missing=[reason], recommended_next_action=None,
-        max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+        max_tokens=max_tokens,
     )
     payload.update(
         reason_code=reason, context_available=False, answer_supported=False,
@@ -489,7 +484,7 @@ def _explicit_delivery_block(
         delivery_decision={"deliverable": False, "reason_code": reason},
     )
     if retrieval.get("confirmation_reason"):
-        payload["confirmation_reason"] = str(retrieval["confirmation_reason"])[:120]
+        payload["confirmation_reason"] = str(retrieval["confirmation_reason"])
     if retrieval.get("status"):
         payload["operational_status"] = str(retrieval["status"])[:120]
     bound_insufficient_projection(payload, max_tokens=max_tokens)
@@ -516,68 +511,9 @@ def _docs_support_decision(*, retrieval: dict[str, Any], decision: Any, context_
     return support
 
 
-def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int) -> None:
-    """Produce a valid bounded failure projection for every requested budget."""
-
-    limit = min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max(1, int(max_tokens)))
-    envelope = _compact_insufficient_support(payload)
+def bound_insufficient_projection(payload: dict[str, Any], *, max_tokens: int | None) -> None:
+    """Refresh failure diagnostics without discarding accepted recovery data."""
     _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        if envelope is not None:
-            payload["support_envelope"] = envelope
-            _refresh_estimate(payload)
-            if estimate_projection_tokens(payload) <= limit:
-                return
-            payload.pop("support_envelope", None)
-            _refresh_estimate(payload)
-        return
-    action = payload.get("recommended_next_action")
-    original_action = deepcopy(action) if isinstance(action, dict) else None
-    action_fits, protected_confirmation = compact_recovery_action_for_budget(
-        payload, limit, estimate_tokens=estimate_projection_tokens, refresh_estimate=_refresh_estimate
-    )
-    if action_fits:
-        return
-    if not protected_confirmation:
-        payload.pop("recommended_next_action", None)
-    missing = payload.get("missing")
-    bounded_missing = bounded_missing_value(missing, default=_MINIMAL_MISSING)
-    while (
-        estimate_projection_tokens(payload) > limit
-        and isinstance(missing, list)
-        and len(missing) > 1
-    ):
-        missing.pop()
-        _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-    for key in _OPTIONAL_INSUFFICIENT_KEYS:
-        payload.pop(key, None)
-        _refresh_estimate(payload)
-        if estimate_projection_tokens(payload) <= limit:
-            return
-    payload["missing"] = [bounded_missing]
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) <= limit:
-        return
-    # Terminal fallback retains only bounded support/recovery metadata and, when
-    # it fits, one compact machine-readable missing requirement id.
-    apply_terminal_insufficient_projection(
-        payload,
-        kind=payload.get("kind"),
-        missing=bounded_missing,
-        original_action=original_action,
-        support_keys=_INSUFFICIENT_SUPPORT_KEYS,
-    )
-    _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > limit:
-        payload.pop("recommended_next_action", None)
-        _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > limit and bounded_missing != _MINIMAL_MISSING:
-        payload["missing"] = [_MINIMAL_MISSING]
-        _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > limit:
-        raise ValueError("minimum insufficient-evidence projection exceeds the requested budget")
 
 
 def _compact_insufficient_support(payload: dict[str, Any]) -> dict[str, str] | None:
@@ -678,9 +614,9 @@ def patch_search_targets(packet: dict[str, Any]) -> list[dict[str, str]]:
 
 
 def project_insufficient(
-    *, kind: str, missing: Iterable[str], recommended_next_action: Any, max_tokens: int = INSUFFICIENT_EVIDENCE_MAX_TOKENS
+    *, kind: str, missing: Iterable[str], recommended_next_action: Any, max_tokens: int | None = None
 ) -> dict[str, Any]:
-    messages = [str(item).strip() for item in missing if str(item).strip()][:5]
+    messages = [str(item).strip() for item in missing if str(item).strip()]
     payload: dict[str, Any] = {
         "status": "insufficient_evidence",
         "kind": kind,
@@ -699,11 +635,6 @@ def project_insufficient(
     if action:
         payload["recommended_next_action"] = action
     _refresh_estimate(payload)
-    while estimate_projection_tokens(payload) > min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens) and len(payload["missing"]) > 1:
-        payload["missing"].pop()
-        _refresh_estimate(payload)
-    if estimate_projection_tokens(payload) > min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens):
-        bound_insufficient_projection(payload, max_tokens=max_tokens)
     return payload
 
 

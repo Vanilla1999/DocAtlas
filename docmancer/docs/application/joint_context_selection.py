@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from itertools import product, combinations
+from itertools import product, combinations, islice
 
 from .joint_context_candidates import source_options
 from docmancer.docs.domain.evidence_qualification import evidence_policy_rejection_reason
 from .joint_context_lineage import retained_seed_mapping
 from .model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS, MAX_DOCS_SOURCES, _refresh_estimate, _snapshot_entry,
+    _refresh_estimate, _snapshot_entry,
     docs_context_budget_tokens, validate_model_visible_projection,
 )
 from .source_continuation import (
@@ -39,7 +39,7 @@ def unread_lines(start: int, end: int, visible: list[tuple[int, int]]) -> list[t
     return out
 
 
-def _finish(payload: dict, snapshot: dict, retrieval: dict, root: str, budget: int):
+def _finish(payload: dict, snapshot: dict, retrieval: dict, root: str, budget: int | None):
     # Ordinary quality/capability primitives on private clones. The real handler
     # registers only the winning DTO, not these candidate drafts.
     from .docs_context_projection import _finalize_quality, _strip_legacy_locators
@@ -48,9 +48,6 @@ def _finish(payload: dict, snapshot: dict, retrieval: dict, root: str, budget: i
     b.pop("__read_next__", None)
     _strip_legacy_locators(p, b)
     _finalize_quality(r, p, b)
-    if docs_context_budget_tokens(p) > budget:
-        from .context_packet_labels import compact_section_labels
-        p, b = compact_section_labels(p, b)
     if root:
         previous = payload.get("read_next") or []
         if previous:
@@ -91,61 +88,66 @@ def _draft_subsets(payload: dict, snapshot: dict, trial: dict, bindings: dict, r
     plan = retrieval.get("documentation_query_plan") or {}
     texts = {str(q.get("query_id") or ""): str(q.get("text") or "")
              for q in plan.get("queries") or () if isinstance(q, dict)}
-    for n in range(1, len(trial["sources"])):
-        for rows in combinations(trial["sources"], n):
-            p = deepcopy(trial)
-            p["sources"] = list(deepcopy(rows))
-            mapping = retained_seed_mapping(payload, snapshot, p, bindings)
-            if not mapping:
-                continue
-            b = deepcopy(bindings)
-            qualified_rows = []
-            policy_rejected = False
-            for row in p["sources"]:
-                original = b[row["evidence_id"]]["source"]
-                # Re-run the existing qualifier for the probes attached to
-                # every retained occurrence. Never copy its old qualified flag.
-                inherited = [original]
-                inherited.extend(snapshot[eid]["source"] for eid, covering in mapping.items()
-                                 if covering == row["evidence_id"] and eid != row["evidence_id"])
-                checked = []
-                for origin in inherited:
-                    if any(evidence_policy_rejection_reason(
-                        probe, visible_text=row["snippet"],
-                        catalog_role=str(original.get("catalog_role") or ""), candidate=original,
-                        expected_project_identity=row["project_identity"],
-                        lifecycle_intent=original.get("_lifecycle_intent", "current"),
-                    ) for probe in (origin.get("retrieval_query_matches") or {}).values() if isinstance(probe, dict)):
-                        policy_rejected = True
-                        break
-                    visible = _requalify_visible_source({
-                        **original, **row, "_qualification_candidate": original,
-                        "_expected_project_identity": row["project_identity"],
-                        "retrieval_query_matches": origin.get("retrieval_query_matches") or {},
-                    }, query_text=texts)
-                    checked.append(visible["retrieval_query_matches"])
-                if policy_rejected:
+    subsets = (rows for n in range(1, len(trial["sources"]))
+               for rows in combinations(trial["sources"], n))
+    for rows in islice(subsets, 6):
+        p = deepcopy(trial)
+        p["sources"] = list(deepcopy(rows))
+        mapping = retained_seed_mapping(payload, snapshot, p, bindings)
+        if not mapping:
+            continue
+        b = deepcopy(bindings)
+        qualified_rows = []
+        policy_rejected = False
+        for row in p["sources"]:
+            original = b[row["evidence_id"]]["source"]
+            # Re-run the existing qualifier for the probes attached to
+            # every retained occurrence. Never copy its old qualified flag.
+            inherited = [original]
+            inherited.extend(snapshot[eid]["source"] for eid, covering in mapping.items()
+                             if covering == row["evidence_id"] and eid != row["evidence_id"])
+            checked = []
+            for origin in inherited:
+                if any(evidence_policy_rejection_reason(
+                    probe, visible_text=row["snippet"],
+                    catalog_role=str(original.get("catalog_role") or ""), candidate=original,
+                    expected_project_identity=row["project_identity"],
+                    lifecycle_intent=original.get("_lifecycle_intent", "current"),
+                ) for probe in (origin.get("retrieval_query_matches") or {}).values() if isinstance(probe, dict)):
+                    policy_rejected = True
                     break
-                matches = merge_query_matches(*checked)
-                original = {**original, "retrieval_query_matches": matches,
-                    "retrieval_query_ids": [key for key, value in matches.items() if value.get("qualified") is True]}
-                visible = {**visible, "retrieval_query_matches": matches,
-                           "retrieval_query_ids": original["retrieval_query_ids"]}
-                b[row["evidence_id"]] = _snapshot_entry(original, row)
-                qualified_rows.append(visible)
-            if policy_rejected or not set(payload.get("covered_query_ids") or ()) <= attributable_query_ids(qualified_rows):
-                continue
-            yield p, b
+                visible = _requalify_visible_source({
+                    **original, **row, "_qualification_candidate": original,
+                    "_expected_project_identity": row["project_identity"],
+                    "retrieval_query_matches": origin.get("retrieval_query_matches") or {},
+                }, query_text=texts)
+                checked.append(visible["retrieval_query_matches"])
+            if policy_rejected:
+                break
+            matches = merge_query_matches(*checked)
+            original = {**original, "retrieval_query_matches": matches,
+                "retrieval_query_ids": [key for key, value in matches.items() if value.get("qualified") is True]}
+            visible = {**visible, "retrieval_query_matches": matches,
+                       "retrieval_query_ids": original["retrieval_query_ids"]}
+            b[row["evidence_id"]] = _snapshot_entry(original, row)
+            qualified_rows.append(visible)
+        if policy_rejected or not set(payload.get("covered_query_ids") or ()) <= attributable_query_ids(qualified_rows):
+            continue
+        yield p, b
 
 
-def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int):
-    """Yield fully validated bounded candidates; no labels, no URI registration."""
+def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
+    """Yield validated candidates with bounded work, not bounded representation."""
     if (payload.get("kind") != "docs_context" or payload.get("support_status") != "retrieval_only"
         or any(payload.get(k) is not False for k in ("answer_supported", "answer_available", "edit_ready"))
         or (payload.get("context_quality") or {}).get("status") == "checked"
-        or not 0 < len(payload.get("sources", [])) <= MAX_DOCS_SOURCES):
+        or not payload.get("sources")):
         return
-    budget = min(max_tokens, DOCS_CONTEXT_MAX_TOKENS)
+    # Validate the admitted seed before any draft can rebind its projected row.
+    # Otherwise a forged line range could become its own canonical snapshot.
+    if validate_model_visible_projection(payload, snapshot=snapshot):
+        return
+    budget = max_tokens
     groups, intros = [], {}
     for row in payload["sources"]:
         original = (snapshot.get(row["evidence_id"]) or {}).get("source")
@@ -164,8 +166,10 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
     _finalize_quality(baseline_retrieval, baseline_payload, snapshot)
     old_components = set(((baseline_retrieval.get("documentation_query_plan") or {})
         .get("_component_coverage") or {}).get("covered_component_ids") or ())
-    # <= 180 structural combinations, each <= 7 subsets of three citations.
-    for choices in product(*groups):
+    # Optional optimization work, not a representation limit. Exhaustion leaves
+    # the admitted baseline intact; larger packets never widen Cartesian work.
+    drafts = 0
+    for choices in islice(product(*groups), 180):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
             bound = deepcopy(snapshot)
@@ -173,20 +177,23 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
                 bound[row["evidence_id"]] = _snapshot_entry(original, row)
             if intro is not None:
                 row, original = intro
-                if len(rows) >= MAX_DOCS_SOURCES or any(row["path_or_url"] == x["path_or_url"]
+                if any(row["path_or_url"] == x["path_or_url"]
                     and row["snippet"] in x["snippet"] for x in rows):
                     continue
                 rows.append(deepcopy(row))
                 bound[row["evidence_id"]] = _snapshot_entry(original, row)
             trial = deepcopy(payload)
             trial["sources"] = rows
-            for draft, draft_bound in _draft_subsets(payload, snapshot, trial, bound, retrieval):
+            for draft, draft_bound in islice(_draft_subsets(payload, snapshot, trial, bound, retrieval), 7):
+                if drafts >= 1260:
+                    return
+                drafts += 1
                 finished = _finish(draft, draft_bound, retrieval, root, budget)
                 if finished is None:
                     continue
                 p, b, r = finished
                 mapping = retained_seed_mapping(payload, snapshot, p, b)
-                if not mapping or docs_context_budget_tokens(p) > budget:
+                if not mapping:
                     continue
                 if validate_model_visible_projection(p, snapshot=b, max_tokens=budget):
                     continue
@@ -202,7 +209,7 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
                 yield p, b, r, kinds, has_intro
 
 
-def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int):
+def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
     """Close admitted seed units, not maximize a count of arbitrary paragraphs.
 
     First prefer closure of incomplete seed atoms and explicit ancestor subject

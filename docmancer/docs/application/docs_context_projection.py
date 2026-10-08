@@ -16,7 +16,6 @@ from .context_selection import (
     context_selection_decision,
 )
 from .model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
     docs_context_budget_tokens,
     _refresh_estimate,
@@ -211,7 +210,7 @@ def _run_core(
 
 
 def project_docs_context(
-    *, retrieval: dict[str, Any], max_tokens: int = DOCS_CONTEXT_MAX_TOKENS,
+    *, retrieval: dict[str, Any], max_tokens: int | None = None,
     selection_diagnostics: dict[str, Any] | None = None,
     _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "module_labels": {"tests/docs/test_docs_lossless_remaining_caps.py": "behavioral"},
+  "node_overrides": {},
+  "module_node_hashes": {"tests/docs/test_docs_lossless_remaining_caps.py": "71aa0c9044765a91c08f7e5dbf60a574bb9c2d0d11d39053aad85350d44d6c45"}
+}
