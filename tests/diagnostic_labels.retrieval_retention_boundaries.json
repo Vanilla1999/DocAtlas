@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_retrieval_retention_boundaries.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_retrieval_retention_boundaries.py": "97d646f59e9c4fe6c9b8077e79fbbb950d34218f55a8ac74600e28193dadf509"
+  }
+}
