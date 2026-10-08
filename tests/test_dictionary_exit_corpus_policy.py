@@ -165,7 +165,8 @@ def test_installed_templates_render_literal_policy_and_current_identity(template
     assert public_agent_contract_identity() in rendered
     assert "{{CANONICAL_AGENT_CONTRACT}}" not in rendered
     assert "Use only explicitly supplied `lookup_queries`" in rendered
-    assert "A lookup does not establish coverage" in rendered
+    assert ("A lookup does not establish coverage of the original question." in rendered
+            or "Lookup coverage does not transfer to the original question." in rendered)
     assert "Mutation requires a separate explicit target and authorization" in rendered
     assert "Accept explicit logical implications" not in rendered
     assert "For onboarding/cross-module" not in rendered
