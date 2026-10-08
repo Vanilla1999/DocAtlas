@@ -79,15 +79,20 @@ def test_quote_budget_and_visible_snapshot_binding_remain_enforced():
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
     changed = {**payload, "sources": [{**payload["sources"][0], "snippet": "Different source bytes."}]}
     assert validate_model_visible_projection(changed, snapshot=snapshot, max_tokens=800)
-    large = candidate("Storage records persist. " * 200)
+    text = "\n".join(f"Storage records field_{index} must equal value-{index}." for index in range(100))
+    large = candidate(text)
     bounded, bound_snapshot = project_docs_answer(question="storage records", retrieval={"context_pack": [large]}, max_tokens=256)
-    assert not bounded.get("sources") and not bound_snapshot
+    assert bounded["sources"][0]["snippet"] == text
+    assert set(bound_snapshot) == {row["evidence_id"] for row in bounded["sources"]}
     assert validate_model_visible_projection(bounded, snapshot=bound_snapshot, max_tokens=256) == []
     facts = [f"Storage {name} records persist." for name in ("alpha", "bravo", "charlie", "delta")]
-    selection = select_evidence([candidate(text, stable_chunk_id=f"quote-{index}") for index, text in enumerate(facts)],
+    selection = select_evidence([candidate(text, stable_chunk_id=f"quote-{index}", parent_logical_id=f"document-{index}",
+                                          source=f"docs/storage-{index}.md") for index, text in enumerate(facts)],
         question="storage records", config=docs_selection_config(800), public_requirements=facts)
     capped, capped_snapshot = project_docs_answer(question="storage records", retrieval={"status": "success"}, canonical_selection=selection)
-    assert 0 < len(capped["sources"]) <= 3
+    assert len(capped["sources"]) == 4
+    assert {row["path_or_url"] for row in capped["sources"]} == {f"docs/storage-{index}.md" for index in range(4)}
+    assert {row["snippet"] for row in capped["sources"]} == set(facts)
     assert set(capped_snapshot) == {row["evidence_id"] for row in capped["sources"]}
     assert validate_model_visible_projection(capped, snapshot=capped_snapshot, max_tokens=800) == []
 

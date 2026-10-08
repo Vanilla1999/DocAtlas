@@ -460,15 +460,13 @@ def project_docs_context(
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
         if id(variant) in context_needs:
             novel = context_needs[id(variant)] - selected_context_needs
-            if not novel or len(sources) >= MAX_DOCS_SOURCES or variant['evidence_id'] in seen_ids:
+            if not novel or variant['evidence_id'] in seen_ids:
                 continue
             candidate_sources = [*sources, variant]
             decision = context_selection_decision(candidate_sources, public_query_ids)
             packet_cost = docs_context_budget_tokens(_payload(
                 candidate_sources, decision=decision, query_plan=query_plan,
             ))
-            if packet_cost > max_tokens:
-                continue
             sources = candidate_sources
             snapshot[variant['evidence_id']] = _snapshot_entry(original, variant)
             seen_ids[variant['evidence_id']] = len(sources) - 1
@@ -540,16 +538,6 @@ def project_docs_context(
         packet_cost = docs_context_budget_tokens(_payload(
             candidate_sources, decision=decision, query_plan=query_plan,
         ))
-        if packet_cost > max_tokens:
-            projection_diagnostics["budget_rejections"] += 1
-            if len(projection_diagnostics["projection_rejections"]) < 32:
-                projection_diagnostics["projection_rejections"].append({
-                    "candidate_id": candidate_id,
-                    "evidence_id": str(variant.get("evidence_id") or ""),
-                    "reason": "token_budget",
-                })
-            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
-            continue
         normalized = variant
         qualified_ids = qualified_query_ids((normalized,))
         attributable_ids = attributable_query_ids((normalized,))
@@ -633,25 +621,16 @@ def project_docs_context(
             packet_cost = docs_context_budget_tokens(
                 _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
             )
-            if packet_cost <= max_tokens:
-                decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
-                                      budget_tokens=packet_cost, previous=sources[existing_index])
-                sources = candidate_sources
-                snapshot[evidence_id] = _snapshot_entry(
-                    original, sources[existing_index],
-                )
-                projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
-                if candidate_footprint is not None:
-                    selected_footprints[evidence_id] = candidate_footprint
-                selected_host_query_ids.update(host_ids)
-            else:
-                decision_trace.record('selection', 'rejected', 'token_budget', original, normalized,
-                                      budget_tokens=packet_cost)
-            continue
-        if len(sources) >= MAX_DOCS_SOURCES:
-            # Source cap blocks new rows, not content-preserving replacement of
-            # an already selected row. Keep scanning prepared same-origin upgrades.
-            decision_trace.record('selection', 'rejected', 'source_cap', original, variant)
+            decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
+                                  budget_tokens=packet_cost, previous=sources[existing_index])
+            sources = candidate_sources
+            snapshot[evidence_id] = _snapshot_entry(
+                original, sources[existing_index],
+            )
+            projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
+            if candidate_footprint is not None:
+                selected_footprints[evidence_id] = candidate_footprint
+            selected_host_query_ids.update(host_ids)
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
@@ -659,9 +638,6 @@ def project_docs_context(
             candidate_sources, decision=candidate_decision, query_plan=query_plan,
         )
         packet_cost = docs_context_budget_tokens(candidate_payload)
-        if packet_cost > max_tokens:
-            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
-            continue
         decision_trace.record('selection', 'accepted', 'accepted', original, normalized,
                               budget_tokens=packet_cost)
         sources = candidate_sources
@@ -750,7 +726,6 @@ def project_docs_context(
     if (
         fallback_ids
         and not _allow_context_hints
-        and len(payload["sources"]) < MAX_DOCS_SOURCES
         and (decision.missing_query_ids or component_decision.missing_component_ids)
     ):
         # A safe retrieval hint is a read-only supplement, not a replacement
@@ -787,7 +762,6 @@ def project_docs_context(
         if (
             primary_ids < hinted_ids
             and retains_visible_sources(payload, hinted_payload)
-            and docs_context_budget_tokens(hinted_payload) <= max_tokens
         ):
             retrieval["retrieval_diagnostics"]["docs_context_projection"] = hinted_diagnostics
             return hinted_payload, hinted_snapshot
@@ -812,13 +786,18 @@ def _expand_selected_snippets(
         if values is None:
             continue
         raw_snippet, focus_queries, source_line_start = values
-        for limit in _projection_limits(raw_snippet):
+        candidates = [
+            (limit, *_focused_snippet(raw_snippet, focus_queries, limit=limit))
+            for limit in _projection_limits(raw_snippet)
+        ]
+        candidates.extend(
+            (end - start, raw_snippet[start:end], start, end)
+            for start, end in source_block_alternatives(raw_snippet).spans
+        )
+        for limit, snippet, snippet_start, snippet_end in candidates:
             # Each round protects the latest accepted span, not the initial
             # short snippet captured before the expansion loop.
             source = expanded[index]
-            snippet, snippet_start, snippet_end = _focused_snippet(
-                raw_snippet, focus_queries, limit=limit,
-            )
             if len(snippet) <= len(str(source.get("snippet") or "")):
                 continue
             # Preserve the current bound quote uniformly, without interpreting
@@ -860,11 +839,7 @@ def _expand_selected_snippets(
                 continue
             candidate = bind_visible_assignments(original, candidate, retained)
             candidate_sources = [*expanded[:index], candidate, *expanded[index + 1:]]
-            decision = context_selection_decision(candidate_sources, public_query_ids)
-            if docs_context_budget_tokens(_payload(
-                candidate_sources, decision=decision, query_plan=query_plan,
-            )) <= max_tokens:
-                expanded = candidate_sources
+            expanded = candidate_sources
     return expanded
 
 def _requalify_visible_source(

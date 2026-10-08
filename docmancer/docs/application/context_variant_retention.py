@@ -173,8 +173,7 @@ def qualified_fragments(
     preserve_required_blocks = bool(required_ids & query_ids and not obligations and not assignments)
     required_blocks: list[tuple[int, int]] = []
     for snippet_start, snippet_end in source_block_alternatives(raw_snippet).spans:
-        if ((snippet_start, snippet_end) in seen_spans
-                or (snippet_end - snippet_start > 640 and not preserve_required_blocks)):
+        if (snippet_start, snippet_end) in seen_spans:
             continue
         snippet = raw_snippet[snippet_start:snippet_end]
         candidate = dict(source)
@@ -241,7 +240,7 @@ def qualified_fragments(
             union_ids = left_ids | right_ids
             union_start = min(left_start, right_start)
             union_end = max(left_end, right_end)
-            if union_end - union_start > 640 or (union_start, union_end) in seen_spans:
+            if (union_start, union_end) in seen_spans:
                 continue
             union_snippet = raw_snippet[union_start:union_end].strip()
             union_visible_start = raw_snippet.find(
