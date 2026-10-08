@@ -59,4 +59,4 @@ def test_recovery_diagnostics_do_not_split_or_inherit_clauses(monkeypatch, quest
     requirements = SimpleNamespace(query_requirement_spans=(("old", 0, 2, "supported"),))
     assert recovery._problem_spans(question, requirements) == [question]
     assert recovery._problem_spans(" ", requirements) == []
-    assert len(recovery._problem_spans(question * 30, requirements)[0]) <= 220
+    assert recovery._problem_spans(question * 30, requirements) == [question * 30]
