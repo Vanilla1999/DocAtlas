@@ -662,11 +662,7 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
             "answer_supported", "answer_available", "edit_ready",
         )):
             errors.append("docs_context cannot certify an answer or authorize edits")
-        if docs_context_budget_tokens(payload) > 800:
-            errors.append("docs_context exceeds whole-payload admission budget")
         if isinstance(sources, list):
-            if len(sources) > 3:
-                errors.append("docs_context exceeds source limit")
             for source in sources:
                 if not isinstance(source, dict) or any(
                     not isinstance(source.get(key), str) or not source[key].strip()

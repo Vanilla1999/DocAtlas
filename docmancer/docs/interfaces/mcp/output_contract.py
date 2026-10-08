@@ -220,14 +220,16 @@ def compact_mcp_payload(
     # transport capacity. V4 patch evidence is deliberately indivisible.
     if is_v4_patch_projection(payload):
         return payload
+    if payload.get("kind") in {"docs_context", "docs_answer"}:
+        return payload
     if json_bytes(payload) <= max_bytes:
         return payload
 
     # Canonical projections bind citations, coordinates and support decisions.
     # Once finalized, the entire projection is indivisible: terminal transport
     # must not shorten text or lists while retaining the original source claims.
-    # Keep the existing finite default and explicit caller-supplied byte limit.
-    if payload.get("kind") in {"docs_context", "docs_answer", "patch_context"}:
+    # Invalid patch projections do not inherit the valid-v4 exemption.
+    if payload.get("kind") == "patch_context":
         failure = {
             "status": "failed",
             "reason_code": "transport_size_limit",

@@ -207,9 +207,8 @@ class SourceReadController:
         patch = context.get('kind') == 'patch_context'
         if patch:
             validate_patch_context_payload(context)
-        elif (context.get('kind') != 'docs_context' or len(context.get('sources') or ()) > 3
-              or docs_context_budget_tokens(context) > 800):
-            raise ValueError('source reads require bounded docs_context')
+        elif context.get('kind') != 'docs_context':
+            raise ValueError('source reads require docs_context')
         if not requested_facts or (not patch and len(requested_facts) > 3) or any(
             not isinstance(value, str) or not value.strip() or len(value) > 500
             for value in requested_facts.values()

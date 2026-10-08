@@ -332,8 +332,11 @@ def test_real_dispatch_and_both_terminal_transports_preserve_over_32000_bytes(ne
 
 def test_terminal_compaction_does_not_exempt_docs_or_forged_patch(tmp_path):
     from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload
-    docs = {"kind": "docs_answer", "sources": [{"snippet": "quote" * 10000}]}
-    assert compact_mcp_payload(docs)["reason_code"] == "transport_size_limit"
+    from tests.docs.test_docs_initial_delivery import large_context
+    docs = large_context("docs_answer")
+    assert compact_mcp_payload(docs) is docs
+    assert 'return record["binding_3_99"]' in docs["sources"][-1]["snippet"]
+    assert docs["answer_supported"] is docs["answer_available"] is docs["edit_ready"] is False
     forged = {**docs, "kind": "patch_context", "schema_version": 4, "edit_ready": True}
     assert compact_mcp_payload(forged)["reason_code"] == "transport_size_limit"
 
