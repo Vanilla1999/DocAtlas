@@ -411,7 +411,8 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             metrics.update({
                 "delivery_retrieval_calls": 1,
                 "delivery_attempts": 1,
-                "action_packet_status": "ok",
+                "action_packet_result": "data",
+                "action_packet_completeness": "complete",
                 "evidence_fingerprint": "shared-evidence",
                 "action_packet_project_doc_coverage": 0.5,
                 "action_packet_project_doc_paths": list(TASK33C_REQUIRED_EVIDENCE_PATHS),

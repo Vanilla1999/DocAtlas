@@ -38,10 +38,17 @@ def test_similar_chunks_with_distinct_symbols_and_versions_are_preserved():
         _candidate("two", "same repeated table header and body", symbols=["second"], version="1.0"),
         _candidate("three", "same repeated table header and body", symbols=["first"], version="2.0"),
     ]
-    config = replace(patch_selection_config(1500), max_items_per_source=5)
+    config = patch_selection_config()
     decision = select_evidence(candidates, question="Edit symbols", config=config)
 
     assert set(_ids(decision)) == {"one", "two", "three"}
+    assert {
+        (item.path_or_url, item.symbols, item.resolved_version, item.display_text)
+        for item in decision.selected_candidates
+    } == {
+        (item["source"], tuple(item["symbols"]), item["version"], item["display_text"])
+        for item in candidates
+    }
 
 
 def test_mandatory_reservation_prefers_short_complete_evidence():
