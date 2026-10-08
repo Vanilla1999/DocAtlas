@@ -1,6 +1,90 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Последний полный прогон: 04ff1dd; четыре migrations подтверждены
+## Последний полный прогон: 991638f; member/mtime и self-host setup
+
+Обновление: 2026-10-08. Полный [CI 37840422988](https://github.com/Vanilla1999/DocAtlas/actions/runs/37840422988)
+завершён на HEAD `991638f28ecff659c320b45738edfaa8b9fd375e`, merge checkout
+`e499c39704d4923164dc50c1460a2e1c50b81d7f`, tree
+`955bac94d5ca6b847f558b0e7dbd0dcb8265e9df`. Все 25 опубликованных файлов сверены
+с reviewed bytes; четыре commits — обычный fast-forward обеих веток.
+
+- Python 3.11/3.12/3.13: **8513 = 6496 PASS / 1946 FAIL / 61 ERROR / 10 SKIP**.
+  Полные concrete roster и outcomes одинаковы. Против 04ff ровно **7 FAIL→PASS**,
+  добавлены шесть новых self-host nodes: пять PASS, один FAIL. Удалений и прежних
+  PASS regressions нет. Реконструкция полного roster из baseline + delta точная.
+- Семь из восьми member/read/mtime targets прошли, включая foreign same-path,
+  hash-first stale reads, exact descriptor mtime и mtime-only touch без read writes.
+  Module manifest target прошёл explicit sync, но сохранил FAIL уже на public
+  `insufficient_evidence / required_evidence_missing`; исходные вопросы не изменены.
+- **141/141** member/descriptor/trusted-storage/hash/CAS controls PASS в каждой Python.
+  Из 2006 старых nodes с прежним FAIL/ERROR у десяти первый barrier прошёл дальше:
+  module manifest и девять self-host downstream consumers. Остальные 1996 первые
+  причины прежние; 47 diagnostic ERROR сохранили exact messages и barriers.
+  Эти десять advances не являются PASS или исправлением deferred retrieval.
+- Пять новых self-host safety tests PASS: полный tracked mirror/config/hash
+  fidelity, точный catalog membership с physical distractors, cold no-grant,
+  conflict/hash/CAS отказ до записи и environment/original preservation.
+  Шестой test прошёл cold/prepare/generation/store guards, затем получил public
+  `status=insufficient_evidence`. JUnit содержит только status; reason/kind и полный
+  DTO этого нового node не раскрыты, CRLF failure не установлен.
+- Advanced: **622 = 524 PASS / 98 FAIL**, прежние roster/states. Девять независимых
+  downstream steps фактически FAIL; dependent adversarial mutation SKIP после
+  красного baseline. Critical baseline **19/28 PASS**, mutants не стартовали.
+- Legacy self-host JSON подтверждает **2807 tracked files / 119478143 bytes**, exact
+  merge/tree, cold_read_verified=True, **10 members / 98 sections**, zero deletions
+  и origin_unchanged_after_calls=True. Теперь **10/16 cases PASS**; оставшиеся
+  frozen floors включают original_query_coverage **0 < 12** и contamination count 1.
+- V2 остановился на validate_corpus: `witness is not an active catalog document:
+  wiki/Commands.md`. Его JSON/provenance не создан; собственный V2 prepare не
+  объявляется доказанным только из порядка вызовов. Catalog/gold не подменялись.
+- Все **6 platform SDK jobs PASS**. Main package/CLI **77/77** на Ubuntu, macOS ARM
+  и Intel. Проверены **19 logs / 15 SDK invocations / 30 lanes / 420 observations**;
+  source bindings и outcomes совпадают с 04ff. Во всех 30 restart/repeat lanes
+  derived_writes=0, stale-null CAS rejected, source/generation rows unchanged.
+- Installed scripted harness **1/1 PASS**. Release build, три wheels,
+  sdist/installer и required-release **PASS**; публикация release SKIP.
+  Actual Claude Code/Codex/OpenCode sessions **NOT RUN**; SDK не заменяет эти apps.
+- Все 17 workflows completed: **8 SUCCESS / 8 FAILURE / 1 SKIPPED**. Required CI
+  **113532153123 FAILURE**, P1 aggregate **113532324954 FAILURE**.
+
+Catalog source не менялся: прежние **6918 bytes**, docs output schema **860 bytes**.
+Владелец снял fixed catalog ceilings; продолжается минимизация с сохранением guards.
+Отдельные output <1000 и frozen retrieval 800 сохранены. Все 80 BPE values прежние,
+80/80 canonical UTF-8 byte measurements сверены; max **1451** и **24/48** within-budget
+cases выше 800. Это pinned offline BPE, не цена actual app/model sessions.
+
+[Полный acceptance 991638f](PR211_991638F_ACCEPTANCE.json) содержит завершённые jobs,
+actual runtime, downstream/Legacy provenance и границы утверждений.
+[Core delta](PR211_991638F_CORE_ACCEPTANCE.json) содержит все семь transitions,
+шесть новых состояний, три JUnit bindings и security/first-barrier comparison.
+Исторические reports ниже не переносят PASS на последующие commits.
+
+### Следующий узкий successor нового synthetic positive
+
+Source review установил самостоятельный literal qualification blocker: исходный
+вопрос ``What does `MirrorNeedle` require?`` даёт четыре raw terms; в прежнем RULES
+совпадает только MirrorNeedle. require не равен requires по текущему контракту,
+1/4 < 0.4. Это source-grounded blocker, не восстановленный hidden CI reason.
+
+В новом fixture test сохраняются исходные question, RULES/CRLF и все source/hash/
+snapshot/storage guards. Только prepared public call получает отдельно заданный
+host lookup `` `MirrorNeedle` explicit preparation ``. Lookup должен иметь собственный
+credit, не credit query-original; answer/edit authority остаются False. Это
+synthetic lifecycle/read-wiring positive, не исправление original-question quality.
+[Author review](PR211_SELF_HOST_LITERAL_LOOKUP_REVIEW_RU.md) и
+[independent review](PR211_SELF_HOST_LITERAL_LOOKUP_INDEPENDENT_REVIEW_RU.md).
+Runtime этого successor **NOT RUN** на момент записи; следующий actual CI проверяется
+на новом HEAD после обычного push. Frozen downstream questions/corpus/scoring,
+production retrieval и qualification не меняются.
+
+**PR пока НЕ ГОТОВ к merge.** Required gates остаются красными. Отдельный
+[critical contract proposal](PR211_CRITICAL_CONTRACT_PROPOSAL_RU.md) описывает
+устаревшие classifier expectations и отсутствующий mutation anchor; это PENDING
+согласования frozen criteria. Три deferred retrieval направления, gold и остальные
+gates сохранены по CURRENT_WAVE_DECISIONS_RU.md. Merge/force-push/release не выполнялись.
+
+
+## Исторический полный прогон: 04ff1dd; четыре migrations подтверждены
 
 Обновление: 2026-10-08. Полный [CI 37833279436](https://github.com/Vanilla1999/DocAtlas/actions/runs/37833279436)
 завершён на HEAD `04ff1dda57efb5236d7b3577d4e2736b2820df5b`, merge checkout
