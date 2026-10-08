@@ -158,21 +158,35 @@ def test_empty_question_does_not_create_snippets_absence_or_universal_support(tm
 
 @pytest.mark.parametrize("flag", [None, False, 1, "true", True])
 @pytest.mark.parametrize("collector", ["facts", "snippets"])
-def test_generated_requires_boolean_true_even_for_explicit_path(tmp_path, flag, collector):
+def test_generated_requires_boolean_true_even_for_explicit_path(tmp_path, flag, collector, monkeypatch):
     _write(tmp_path, "lib/a.dart", "class OrdinaryQuux {}\n")
     _write(tmp_path, "lib/generated/a.g.dart", "class GeneratedQuux {}\n")
-    if collector == "facts":
-        rows = source_map.collect_project_source_facts(
-            tmp_path, question="include generated lib/generated/a.g.dart GeneratedQuux",
-            include_unmatched=True, include_generated=flag,
-        )
-    else:
-        rows = source_map.build_project_source_evidence(
-            tmp_path, requirements=["lib/generated/a.g.dart", "OrdinaryQuux"], include_generated=flag,
-        )
-    paths = {row["path"] for row in rows if row.get("path")}
-    assert "lib/a.dart" in paths
-    assert ("lib/generated/a.g.dart" in paths) is (flag is True)
+    mixed_members = ("lib/a.dart", "lib/generated/a.g.dart")
+    source_bytes = {path: (tmp_path / path).read_bytes() for path in mixed_members}
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+
+    # Two authored grants, identical for every flag. A denied mixed declaration
+    # never falls back to a subset; the normal-only grant is a separate control.
+    for members in (mixed_members, ("lib/a.dart",)):
+        _declare_code_files(tmp_path, *members)
+        observed.clear()
+        if collector == "facts":
+            rows = source_map.collect_project_source_facts(
+                tmp_path, question="include generated lib/generated/a.g.dart GeneratedQuux",
+                include_unmatched=True, include_generated=flag,
+            )
+        else:
+            rows = source_map.build_project_source_evidence(
+                tmp_path, requirements=["lib/generated/a.g.dart", "OrdinaryQuux"], include_generated=flag,
+            )
+        if members == mixed_members and flag is not True:
+            assert rows == []
+            assert observed == {}
+        else:
+            assert {row["path"] for row in rows if row.get("path")} == set(members)
+            assert observed == {
+                path: [hashlib.sha256(source_bytes[path]).hexdigest()] for path in members
+            }
 
 
 def test_generated_consent_never_bypasses_roots_excludes_gitignore_or_symlinks(tmp_path, monkeypatch):

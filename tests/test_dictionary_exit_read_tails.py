@@ -1,7 +1,9 @@
 """Live read tails retain literal context and explicit technical boundaries."""
 import builtins
+import hashlib
 import json
 from dataclasses import replace
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -133,25 +135,47 @@ def test_projection_recovery_keeps_bounded_nonautomatic_local_inspection(monkeyp
     'alpha.g.dart Alpha', 'alpha.freezed.dart Alpha', 'alpha.pb.go Alpha',
 ])
 @pytest.mark.parametrize('include_generated', [None, False, True])
-def test_only_explicit_generated_opt_in_authorizes_source_scanning(tmp_path, question, include_generated):
+def test_only_explicit_generated_opt_in_authorizes_source_scanning(tmp_path, question, include_generated, monkeypatch):
     (tmp_path / 'normal.py').write_text('Alpha = "literal"\n')
     (tmp_path / 'alpha.g.dart').write_text('class Alpha {}\n')
     (tmp_path / 'alpha.freezed.dart').write_text('class Alpha {}\n')
     (tmp_path / 'alpha.pb.go').write_text('type Alpha struct {}\n')
     kwargs = {'include_generated': include_generated}
-    facts = source_map.collect_project_source_facts(tmp_path, question=question, **kwargs)
-    repo = source_map.build_project_repo_map(tmp_path, question=question, **kwargs)
-    evidence = source_map.build_project_source_evidence(
-        tmp_path, question=question,
-        requirements=['normal.py', 'alpha.g.dart', 'alpha.freezed.dart', 'alpha.pb.go'],
-        **kwargs,
-    )
-    for rows in (facts, repo, evidence):
-        paths = {row['path'] for row in rows if row.get('path')}
-        assert 'normal.py' in paths
-        assert ('alpha.g.dart' in paths) is (include_generated is True)
-        assert ('alpha.freezed.dart' in paths) is (include_generated is True)
-        assert ('alpha.pb.go' in paths) is (include_generated is True)
+    mixed_members = ('normal.py', 'alpha.g.dart', 'alpha.freezed.dart', 'alpha.pb.go')
+    source_bytes = {path: (tmp_path / path).read_bytes() for path in mixed_members}
+    original_read_text = Path.read_text
+    observed = {}
+
+    def observe_read(path, *args, **options):
+        value = original_read_text(path, *args, **options)
+        if path.is_relative_to(tmp_path) and path.suffix in {'.py', '.dart', '.go'}:
+            observed.setdefault(path.relative_to(tmp_path).as_posix(), []).append(
+                hashlib.sha256(value.encode('utf-8')).hexdigest()
+            )
+        return value
+
+    monkeypatch.setattr(Path, 'read_text', observe_read)
+    # Membership is never derived from the question, flag, or returned rows.
+    # Each authored declaration is exercised with the same original arguments.
+    for members in (mixed_members, ('normal.py',)):
+        _declare_code_files(tmp_path, *members)
+        observed.clear()
+        facts = source_map.collect_project_source_facts(tmp_path, question=question, **kwargs)
+        repo = source_map.build_project_repo_map(tmp_path, question=question, **kwargs)
+        evidence = source_map.build_project_source_evidence(
+            tmp_path, question=question,
+            requirements=['normal.py', 'alpha.g.dart', 'alpha.freezed.dart', 'alpha.pb.go'],
+            **kwargs,
+        )
+        if members == mixed_members and include_generated is not True:
+            assert (facts, repo, evidence) == ([], [], [])
+            assert observed == {}
+        else:
+            for rows in (facts, repo, evidence):
+                assert {row['path'] for row in rows if row.get('path')} == set(members)
+            assert observed == {
+                path: [hashlib.sha256(source_bytes[path]).hexdigest()] * 3 for path in members
+            }
 
 
 def test_query_words_remain_literal_without_nl_stopwords():
