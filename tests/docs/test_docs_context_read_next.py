@@ -294,10 +294,26 @@ def _raw_recovery_fixture():
 
 
 def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+
+    retrieval = _raw_recovery_fixture()
+    question = retrieval["documentation_query_plan"]["original_question"]
+    lookup_queries = ["complete runnable example"]
+    retrieval["documentation_query_plan"] = build_documentation_query_plan(
+        question, lookup_queries=tuple(lookup_queries),
+    ).as_payload()
+    example = retrieval["context_pack"][1]
+    retrieval["context_pack"][1] = _candidate(
+        "docs/example.md", example["content"].replace(
+            "complete runnable example for export identifiers",
+            "Export operation preserves original identifiers in a complete runnable example.",
+        ), query_id="query-lookup-1", line_start=100, stable_id="example",
+    )
     reader = _Reader()
-    service = _ContextApp(_raw_recovery_fixture(), reader)
+    service = _ContextApp(retrieval, reader)
     payload = handle_context_tool("get_docs_context", {
-        "question": "How does the export operation preserve original identifiers?",
+        "question": question,
+        "lookup_queries": lookup_queries,
         "project_path": "/repo",
         "scope": "all",
     }, service)
@@ -305,11 +321,13 @@ def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
     assert docs_context_budget_tokens(payload) <= 800
     assert len(payload["read_next"]) == 1
     target = payload["read_next"][0]
-    assert target["path"] in {"docs/direct.md", "docs/example.md"}
-    assert all(source["path_or_url"] != target["path"] for source in payload["sources"]) or target["path"] == "docs/direct.md"
-    if target["path"] == "docs/example.md":
-        assert all(source["path_or_url"] != "docs/example.md" for source in payload["sources"])
-    assert reader.ranges
+    assert target["path"] == "docs/example.md"
+    assert (target["line_start"], target["line_end"]) == (100, 139)
+    assert all(source["path_or_url"] != "docs/example.md" for source in payload["sources"])
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert reader.ranges == [("docs/example.md", 100, 139, target["source_uri"])]
 
 
 def test_binding_failure_removes_dead_read_next_and_reports_cause():
@@ -377,9 +395,15 @@ def test_public_schema_exposes_quality_and_registered_range_contract():
 def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
     from docmancer.docs.application import docs_context_projection as projection
     from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
     from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
 
     retrieval = _host_lookup_context_retrieval()
+    plan = retrieval["documentation_query_plan"]
+    retrieval["documentation_query_plan"] = build_documentation_query_plan(
+        plan["queries"][0]["text"],
+        lookup_queries=tuple(row["text"] for row in plan["queries"] if row["origin"] == "host_lookup"),
+    ).as_payload()
     retrieval["_source_continuation_project_root"] = "/repo"
     retrieval["context_pack"] = retrieval["context_pack"][:2]
     target = {"source_uri": "docatlas://source/range", "path": "docs/extra.md",
@@ -398,6 +422,8 @@ def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
     monkeypatch.setattr(projection, "attach_docs_context_read_next", lambda *args, **kwargs: False)
     payload, _ = projection.project_docs_context(retrieval=retrieval)
     assert len(calls) == 2
+    assert len(calls[0]["sources"]) == 2
+    assert {s["evidence_id"] for s in calls[0]["sources"]} - {s["evidence_id"] for s in calls[1].get("sources", [])}
     assert {s["evidence_id"] for s in payload["sources"]} == {s["evidence_id"] for s in calls[0]["sources"]}
     assert payload["covered_query_ids"] == calls[0]["covered_query_ids"]
     assert payload["read_next"] == []
