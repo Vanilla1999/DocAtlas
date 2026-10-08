@@ -9,6 +9,7 @@ import pytest
 
 from docmancer.docs.application import evidence_selection as selector
 from docmancer.docs.application.evidence_models import EvidenceRequirement, EvidenceRequirementSet
+from docmancer.docs.application.model_visible_projection import project_docs_answer, validate_model_visible_projection
 from docmancer.docs.domain.answer_units import extract_answer_units
 
 
@@ -55,8 +56,50 @@ def test_patch_config_has_no_budget_or_count_sentinel():
             replace(config, **{name: 10**9})
     with pytest.raises(TypeError):
         selector.patch_selection_config(2000)
+    _assert_docs_profile_fidelity(selector.docs_selection_config(800))
     with pytest.raises(ValueError):
-        replace(selector.docs_selection_config(800), hard_tokens=None)
+        replace(selector.docs_selection_config(800), target_tokens=650)
+
+
+def _assert_docs_profile_fidelity(config):
+    facts = [f"Route {index} requires approval {index} before deployment." for index in range(27)]
+    long_text = facts[0] + "\n" + "\n".join(
+        f"Route 0 field {index} retains its exact configured value {index}." for index in range(120)
+    ) + "\nException: route 0 must not retry an opted-out recipient."
+    items = [row(index, long_text if index == 0 else fact, path=f"docs/routes_{index // 3}.md")
+             for index, fact in enumerate(facts)]
+    requirements = EvidenceRequirementSet(tuple(
+        EvidenceRequirement(f"fact-{index}", "required_fact", fact)
+        for index, fact in enumerate(facts)
+    ))
+    decision = selector.select_evidence(items, question="", config=config, requirements=requirements)
+    assert len(decision.selected_candidates) == len(decision.assignments) == 27
+    assert decision.metrics["selected_sources"] == 9
+    assert not decision.omissions
+    assert not decision.support_decision.answer_supported
+    by_id = {item["stable_chunk_id"]: item for item in items}
+    by_requirement = {item.requirement_id: item for item in requirements}
+    by_candidate = {item.stable_id: item for item in decision.selected_candidates}
+    for candidate in decision.selected_candidates:
+        original = by_id[candidate.stable_id]
+        assert candidate.display_text == candidate.projected_text == original["display_text"]
+        assert candidate.content_sha256 == original["display_content_hash"]
+        assert (candidate.char_start, candidate.char_end) == (original["char_start"], original["char_end"])
+    for assignment in decision.assignments:
+        assert selector.validate_assignment_binding(
+            by_requirement[assignment.requirement_id], by_candidate[assignment.evidence_id], assignment,
+        )
+    assert not selector.validate_evidence_sufficiency(decision, result_kind="docs_answer")
+    payload, snapshot = project_docs_answer(
+        question="", retrieval={"status": "success", "selection_profile": config.profile},
+        canonical_selection=decision,
+    )
+    assert len(payload["sources"]) == len(snapshot) == 27
+    assert payload["estimated_tokens"] > 800
+    assert {source["evidence_id"]: source["snippet"] for source in payload["sources"]} == {
+        item["stable_chunk_id"]: item["display_text"] for item in items
+    }
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
 
 def test_unique_necessary_witnesses_exceed_all_old_caps():
@@ -219,18 +262,14 @@ def test_eligibility_identity_scope_version_and_freshness_guards_remain():
 def test_docs_profiles_keep_original_representation_policy(factory, profile):
     config = factory(5000)
     assert asdict(config) == {
-        "result_kind": "docs_answer", "target_tokens": 650, "hard_tokens": 800,
+        "result_kind": "docs_answer", "target_tokens": None, "hard_tokens": None,
         "profile": profile, "schema_version": selector.SELECTOR_SCHEMA_VERSION,
-        "max_candidates": 20, "max_sources": 3, "max_items_per_source": 2,
-        "max_documents": 3, "max_spans": 6, "near_duplicate_threshold": 850,
+        "max_candidates": None, "max_sources": None, "max_items_per_source": None,
+        "max_documents": None, "max_spans": None, "near_duplicate_threshold": 850,
         "overlap_threshold": 800, "marginal_utility_threshold": 100,
-        "shingle_size": 5, "wrapper_reserve_tokens": 120, "cache_enabled": False,
+        "shingle_size": 5, "wrapper_reserve_tokens": None, "cache_enabled": False,
     }
-    decision = selector.select_evidence([row(index) for index in range(27)], question="", config=config)
-    assert sum(item.reason_code == "candidate_cap" for item in decision.omissions) == 7
-    assert len(decision.selected_candidates) <= 6
-    assert decision.metrics["projected_total_tokens"] <= 800
-    assert not selector.validate_evidence_sufficiency(decision, result_kind="docs_answer")
+    _assert_docs_profile_fidelity(config)
 
 
 def test_long_exact_required_fact_has_lossless_hash_bound_witness():

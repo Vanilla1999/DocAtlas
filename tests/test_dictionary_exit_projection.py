@@ -65,12 +65,48 @@ def test_old_supported_canonical_decision_cannot_bypass_projection_policy():
 def test_old_selected_quotes_are_rechecked_for_current_technical_guards(change):
     selection = select_evidence([candidate(project_identity="repo", module_id="module-1")], question="storage records", config=docs_selection_config(800))
     selected = selection.selected_candidates[0]
-    old = replace(selection, selected_candidates=(replace(selected, original={**selected.original, **change}),))
-    payload, snapshot = project_docs_answer(question="storage records", retrieval={
+    retrieval = {
         "status": "success", "project_identity": "repo", "requested_version": "2.0", "docs_exactness": "exact",
         "module_id": "module-1", "required_evidence_paths": ["docs/storage.md"],
-    }, canonical_selection=old)
-    assert not payload.get("sources") and not snapshot
+    }
+    positive, positive_snapshot = project_docs_answer(
+        question="storage records", retrieval=retrieval, canonical_selection=selection,
+    )
+    assert positive["sources"][0]["snippet"] == selected.display_text
+    assert positive_snapshot
+    assert validate_model_visible_projection(positive, snapshot=positive_snapshot, max_tokens=800) == []
+    old = replace(selection, selected_candidates=(replace(selected, original={**selected.original, **change}),))
+    payload, snapshot = project_docs_answer(question="storage records", retrieval=retrieval, canonical_selection=old)
+    if "risk_flags" not in change:
+        assert not payload.get("sources") and not snapshot
+        return
+    # Cached descriptive flags cannot create an authoritative veto or edit/proof
+    # authority. Current operational policy, not document metadata, owns delivery.
+    assert payload == positive and set(snapshot) == set(positive_snapshot)
+    assert snapshot[selected.stable_id]["projected_source"] == positive_snapshot[selected.stable_id]["projected_source"]
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
+    for metadata in (
+        {"risk_flags": []},
+        {"metadata": {"risk_flags": ["unsafe"]}},
+        {"delivery_decision": {"deliverable": False}, "requires_confirmation": True},
+    ):
+        cached = replace(selection, selected_candidates=(replace(selected, original={**selected.original, **metadata}),))
+        visible, bound = project_docs_answer(question="storage records", retrieval=retrieval, canonical_selection=cached)
+        assert visible == positive and set(bound) == set(positive_snapshot)
+        assert bound[selected.stable_id]["projected_source"] == positive_snapshot[selected.stable_id]["projected_source"]
+        assert validate_model_visible_projection(visible, snapshot=bound, max_tokens=800) == []
+    for policy in (
+        {"delivery_decision": {"deliverable": False, "reason_code": "source_access_revoked"}},
+        {"requires_confirmation": True},
+        {"status": "confirmation_required"},
+    ):
+        blocked, bound = project_docs_answer(
+            question="storage records", retrieval={**retrieval, **policy}, canonical_selection=old,
+        )
+        assert not blocked.get("sources") and not bound
+        assert blocked["delivery_decision"]["deliverable"] is False
+        assert blocked["answer_supported"] is blocked["answer_available"] is blocked["edit_ready"] is False
 
 
 def test_quote_budget_and_visible_snapshot_binding_remain_enforced():
