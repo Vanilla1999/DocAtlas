@@ -11,8 +11,10 @@
    multi-section/long и qualification/admission partial facts. Анализ сохранён
    в `after-merge/RETRIEVAL_DEFERRED_ANALYSIS_RU.md` для возвращения после релиза.
    Это не означает PASS этих сценариев или автоматическое изменение gates.
-3. Новые числовые schema ceilings 22000/13000 НЕ одобрены. Сохраняются старые
-   проверки. Увеличение числа не подменяет экономный интерфейс.
+3. Новые числовые schema ceilings 22000/13000 НЕ одобрены. Правило о сохранении
+   прежних catalog ceilings заменено позднейшим решением владельца ниже.
+   Остальные schema/validation проверки сохраняются; увеличение числа не
+   подменяет экономный интерфейс.
 4. Разрешено сократить основной docs MCP interface: обычный поиск не должен
    рекламировать сложный patch-формат; patch остаётся в явно включаемом
    расширенном режиме. Использовать существующую конфигурацию, без нового
@@ -24,6 +26,32 @@
 6. Schema bytes не равны фактическим model tokens. Catalog включает outputSchema;
    эти размеры нельзя складывать. Реальная client/model-visible стоимость
    остаётся предметом проверки, а не обещанным token savings.
+
+## Уточнение владельца от 2026-10-08: catalog без фиксированного потолка
+
+Владелец отменил фиксированный catalog limit 6144 bytes и указал стремиться
+к минимуму. Для default `tools/list` больше нет
+repository-wide числового merge gate: прежние target 6 KiB и hard 10 KiB из Task 35
+сняты. Новый magic number, включая ранее предложенные 7168 bytes, не вводится.
+
+Каждое изменение catalog должно сохранять или обоснованно сокращать ненужный объём
+при сохранении discoverability, смысла guidance, полного input/output contract,
+runtime validation, source bindings, consent и отсутствия automatic edit authority.
+Canonical UTF-8 размер и attribution по tools/input/output/descriptions продолжают
+измеряться и публиковаться для review. Рост оценивается по назначению добавленного
+контракта, а не скрывается увеличением ceiling или удалением guards.
+
+Нормальная поверхность по-прежнему содержит ровно get_docs_context, prepare_docs и
+docs_status; подробный patch schema остаётся в существующем advanced mode.
+Действующий отдельный output schema gate <1000 bytes не отменён этим указанием.
+Локальный optional `--max-tools-list-bytes` остаётся явным выбором вызывающего
+measurement CLI и не является default CI/merge requirement.
+
+Это согласованное изменение catalog acceptance policy, а не исправление runtime
+поведения. Оно не отменяет retrieval/work/read/acquisition bounds, gold, остальные
+CI/downstream gates, client checks и запрет из пункта 2 исправлять deferred retrieval.
+Исторические checkpoint/review reports с 6144/7168 сохраняют measurements и статус
+своей даты; для текущего catalog gate применяется это более позднее решение.
 
 Read-only измерение D delta c91af9b0: catalog 21409 bytes, docs output branch
 860 bytes, patch branch 11993 bytes; весь outputSchema 12866 bytes. Гипотетический

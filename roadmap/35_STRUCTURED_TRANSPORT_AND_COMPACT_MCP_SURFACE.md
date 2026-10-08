@@ -98,20 +98,20 @@ This task explicitly approves changing the default behavior when a public caller
 6. Replace full text JSON with a marker whenever structured content is present.
 7. Add the text-only compatibility mode with mutually exclusive transport channels.
 8. Remove the full ActionPacket schema from the default tool catalog while continuing internal validation before return.
-9. Run the Task 34 footprint command in tests and check the catalog budget.
+9. Run the Task 34 footprint command in tests and review measured catalog size and attribution while preserving the public contract.
 10. Update generated/installed agent contract fixtures deterministically.
 
 ## Hard local gates
 
 - default public tool count: exactly `3`;
-- serialized default `tools/list`: at most `10 KiB`;
-- target serialized default `tools/list`: at most `6 KiB`;
+- serialized default `tools/list`: measure canonical UTF-8 bytes and attribute them to tools, descriptions, input schemas, and output schemas;
+- minimize catalog overhead while preserving explicit fields, validation, guidance, source binding, consent, and the normal/advanced boundary;
 - marker text: at most `128 bytes`;
 - `mcp_duplicate_payload_bytes`: exactly `0` for every default fixture;
 - one normal model call need not provide `delivery_strategy`, `packet_tokens`, `output_mode`, pagination, or diagnostics flags;
 - no raw `context_pack` appears because the model omitted a bounded-delivery argument.
 
-The target may be stricter than the hard gate. A PR above 6 KiB must explain the remaining catalog bytes by tool/field using Task 34 output.
+Owner update, 2026-10-08: the former 6 KiB target and 10 KiB hard catalog gate are retired. There is no replacement numeric catalog ceiling. Review changes by their measured size and the contract they carry; preserve the separate output-schema and runtime gates. See `v2plan/CURRENT_WAVE_DECISIONS_RU.md` for the current decision. An explicitly chosen local footprint CLI limit is diagnostic, not a default merge gate.
 
 ## Expected implementation areas
 
@@ -139,7 +139,7 @@ No benchmark or provider call is required. Existing local behavioral tests must 
 
 - The default public surface still exposes exactly `get_docs_context`, `prepare_docs`, and `docs_status`.
 - A normal agent call is bounded without model-selected delivery/budget/debug arguments.
-- The default catalog meets the 10 KiB hard budget and reports its measured size.
+- The default catalog reports its exact measured size and per-tool attribution; compaction preserves the public contract without a fixed catalog byte ceiling.
 - Full payload duplication between text and structured channels is impossible by construction and covered by tests.
 - Text fallback is explicit, mutually exclusive, bounded, and documented.
 - The detailed packet schema remains enforced internally even when omitted from `tools/list`.
