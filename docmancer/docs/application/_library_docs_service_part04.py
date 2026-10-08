@@ -22,12 +22,15 @@ class _LibraryDocsApplicationServicePart04:
         docs_snapshot_exact: bool | None,
         exact_version_match: bool | None,
     ) -> dict[str, Any]:
-        """Prove an omission only from a complete manifest-owned corpus.
+        """Diagnose an indexed literal omission in a complete manifest-owned corpus.
 
         The probe is diagnostic-only and retains no text in public diagnostics.
         It never upgrades a support verdict; it only replaces the insufficiency
         reason after finding a missing requirement outside dispatcher results.
+        This is not semantic proof, absence proof, or edit permission.
         """
+
+        from ._library_docs_service_part03 import _indexed_library_source
 
         if support_decision.answer_supported or not support_decision.missing_requirement_ids:
             return {"status": "not_needed"}
@@ -54,17 +57,13 @@ class _LibraryDocsApplicationServicePart04:
             metadata = dict(getattr(chunk, "metadata", None) or {})
             if _drop_low_value_library_section(str(getattr(chunk, "text", "")), metadata.get("title")):
                 continue
-            content = str(getattr(chunk, "text", ""))
-            source = str(getattr(chunk, "source", ""))
-            stable_id = str(
-                metadata.get("stable_chunk_id")
-                or metadata.get("section_id")
-                or metadata.get("chunk_id")
-                or "library-witness-" + hashlib.sha256(
-                    f"{source}\0{metadata.get('title')}\0{content}".encode("utf-8")
-                ).hexdigest()[:16]
-            )
+            content = getattr(chunk, "text", "")
+            source = getattr(chunk, "source", "")
+            binding = _indexed_library_source(source, content, metadata)
+            if binding is None:
+                continue
             candidates.append({
+                **binding,
                 "title": metadata.get("title"),
                 "content": content,
                 "source": source,
@@ -81,9 +80,6 @@ class _LibraryDocsApplicationServicePart04:
                     "docs_exactness": docs_exactness,
                     "exact_version_match": exact_version_match,
                 },
-                "stable_chunk_id": stable_id,
-                "parent_logical_id": str(metadata.get("parent_logical_id") or metadata.get("source_id") or source),
-                "display_content_hash": hashlib.sha256(content.encode("utf-8")).hexdigest(),
                 "authority": metadata.get("authority") or "official",
                 "docs_exactness": metadata.get("docs_exactness") or docs_exactness,
                 "resolved_version": metadata.get("version") or resolved_version,

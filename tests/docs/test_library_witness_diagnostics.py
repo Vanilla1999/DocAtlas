@@ -163,7 +163,8 @@ def test_unproven_complete_manifest_never_queries_witness_store(tmp_path, comple
 
 def test_native_sufficient_no_gap_decision_does_not_schedule_diagnosis(tmp_path):
     fixture = _fixture(tmp_path)
-    item = {"stable_chunk_id": "primary", "path": fixture.primary.source, "display_text": fixture.primary.text}
+    item = _indexed_library_source(fixture.primary.source, fixture.primary.text, fixture.primary.metadata)
+    assert item is not None
     requirements = EvidenceRequirementSet((EvidenceRequirement("present", "required_fact", fixture.primary.text),))
     decision = selector.select_evidence([item], question="", config=selector.patch_selection_config(), requirements=requirements)
     assert decision.support_decision.answer_supported and not decision.support_decision.missing_requirement_ids
@@ -177,7 +178,9 @@ def test_incomplete_probe_is_not_an_omission_or_absence_verdict(tmp_path):
     fixture = _fixture(tmp_path, mode="no-hit")
     fixture.store.responses["deployment_region"] = RuntimeError("fixture query unavailable")
     requirements = selector.build_requirements("deployment_region retention_policy", profile="library_docs_answer", exact_version="1")
-    item = {"stable_chunk_id": "primary", "source": fixture.primary.source, "content": fixture.primary.text, "resolved_version": "1", "version_binding": "exact"}
+    item = _indexed_library_source(fixture.primary.source, fixture.primary.text, fixture.primary.metadata)
+    assert item is not None
+    item["version_binding"] = "exact"
     decision = selector.select_evidence([item], question="deployment_region retention_policy", config=selector.library_docs_selection_config(4000), requirements=requirements)
     assert decision.selected_candidates and decision.support_decision.missing_requirement_ids
     assert not decision.support_decision.answer_supported
