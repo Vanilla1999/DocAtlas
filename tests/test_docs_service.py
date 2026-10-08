@@ -150,11 +150,28 @@ def test_inspect_project_docs_requires_preflight_for_unsupported_root_doc_before
 
 
 def test_inspect_project_docs_reports_indexed_and_stale_sources(tmp_path, monkeypatch):
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
     readme.write_text("# App\n\nOriginal project docs.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored project overview fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md",),
+    )
 
     indexed = service.inspect_project_docs(str(project))
 
@@ -367,11 +384,37 @@ def test_get_project_docs_never_returns_deleted_orphaned_file_content(tmp_path, 
 
 
 def test_get_project_docs_never_returns_hash_mismatched_stale_content(tmp_path, monkeypatch):
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
     readme.write_text("# App\n\nOriginalNeedle should not be returned after edits.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored project overview fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md",),
+    )
+
+    before = service.get_project_docs(str(project), "OriginalNeedle", tokens=1200, limit=5)
+    assert before.results
+    assert {chunk.path for chunk in before.results} == {"README.md"}
+    assert {chunk.source for chunk in before.results} == {str(readme)}
+    assert {chunk.content_hash for chunk in before.results} == {
+        "sha256:" + hashlib.sha256(readme.read_bytes()).hexdigest(),
+    }
+    assert any("OriginalNeedle" in chunk.content for chunk in before.results)
     readme.write_text("# App\n\nCurrent docs without the old needle.", encoding="utf-8")
 
     result = service.get_project_docs(str(project), "OriginalNeedle", tokens=1200, limit=5)
