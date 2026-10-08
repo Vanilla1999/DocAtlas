@@ -7,32 +7,64 @@ import pytest
 
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.mcp.agent_workflow_contract import public_agent_contract, runtime_public_tool_dicts
-from docmancer.mcp.docs_server import MCP_RESOURCES
+from docmancer.mcp.docs_server import DocsServerConfig, MCP_RESOURCES, build_docs_surface
 
 
 def test_coding_policy_examples_resources_and_template_explicitly_select_v4():
     contract = public_agent_contract()
     policy = contract['workflow']['first_call']
-    assert policy['coding_context_format'] == 'patch_context'
+    assert policy['coding_context_format'] is None
     assert policy['documentation_context_format'] is None
     assert policy['context_format_inferred_from_prose'] is False
-    assert policy['patch_evidence_representation_cap'] is None
+    assert policy['skill_read_required'] is False
+    assert contract['workflow']['advanced_patch'] == {
+        'default_available': False,
+        'startup_setting': 'DOCATLAS_MCP_ADVANCED_TOOLS=1',
+        'context_format': 'patch_context',
+        'patch_evidence_representation_cap': None,
+        'authorizes_edit': False,
+    }
     examples = {row['id']: row for row in contract['examples']}
-    assert examples['coding-first-call']['arguments']['context_format'] == 'patch_context'
+    assert 'context_format' not in examples['coding-first-call']['arguments']
     assert 'context_format' not in examples['repository-first-call']['arguments']
     tools = {tool['name']: tool for tool in runtime_public_tool_dicts()}
     assert set(tools) == {'get_docs_context', 'prepare_docs', 'docs_status'}
     for example in contract['examples']:
         jsonschema.validate(example['arguments'], tools[example['tool']]['inputSchema'])
-    assert 'explicitly pass context_format=patch_context' in tools['get_docs_context']['description']
+    default = tools['get_docs_context']
+    assert 'context_format' not in default['inputSchema']['properties']
+    assert default['inputSchema']['additionalProperties'] is False
+    assert default['outputSchema']['properties']['kind']['enum'] == ['docs_answer', 'docs_context']
+    advanced = next(spec for spec in build_docs_surface(DocsServerConfig(expose_advanced=True)).tools
+                    if spec.name == 'get_docs_context')
+    for value in (None, 'patch_context'):
+        arguments = {**examples['coding-first-call']['arguments'], 'context_format': value}
+        jsonschema.validate(arguments, advanced.input_schema)
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate(arguments, default['inputSchema'])
+    assert advanced.validation_schema == advanced.input_schema
+    assert advanced.output_schema['oneOf'][0] == default['outputSchema']
+    assert advanced.output_schema['oneOf'][1]['properties']['kind']['const'] == 'patch_context'
     for uri in ('docmancer://agent/quickstart', 'docmancer://workflow/project-docs', 'docmancer://agent/tool-selection'):
         text = next(row['text'] for row in MCP_RESOURCES if row['uri'] == uri)
-        assert 'context_format="patch_context"' in text
-        assert 'Omitted/null' in text
+        assert 'DOCATLAS_MCP_ADVANCED_TOOLS=1' in text
+        assert 'default' in text and 'patch' in text
+        assert 'explicit' in text and 'startup' in text
+        assert 'advertised schema' in text and 'automatically' in text
     template = files('docmancer.templates').joinpath('agent_contract.md').read_text()
-    assert 'context_format="patch_context"' in template
-    assert 'attribution, not source-read capabilities' in template
-    assert 'no internal representation cap' in template
+    for name in ('patch.md', 'troubleshooting.md'):
+        assert f'(docatlas-references/{name})' in template
+    patch = files('docmancer.templates').joinpath('references/patch.md').read_text()
+    troubleshooting = files('docmancer.templates').joinpath('references/troubleshooting.md').read_text()
+    assert 'context_format="patch_context"' in patch
+    assert 'DOCATLAS_MCP_ADVANCED_TOOLS=1' in patch
+    assert 'Do not change host configuration automatically' in patch
+    assert 'actual advertised' in patch
+    assert 'no internal evidence representation cap' in patch
+    assert 'separate explicit target and authorization' in patch
+    assert 'attribution, not source-read capabilities' in troubleshooting
+    assert 'never construct one' in troubleshooting
+    assert 'consent, network and I/O budgets' in troubleshooting
 
 
 def test_omitted_null_and_prose_never_change_docs_routing():
@@ -59,8 +91,14 @@ def test_prepare_mutation_schema_is_additive_nullable_and_strict():
     for value in (None, mutation(), {**mutation(), 'expected_generation_id': 'gen-' + 'd' * 32}):
         jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
     jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo'}, schema)
-    assert 'omission/null supplies no mutation permission' in schema['properties']['mutation']['description']
-    assert 'No deletion, vector or artifact writes' in tools['prepare_docs']['description']
+    description = schema['properties']['mutation']['description']
+    assert 'omitted/null grants no writes' in description
+    assert 'Confirmed lexical member upserts only' in description
+    assert 'No deletion/vector/artifact writes' in description
+    guide = files('docmancer.templates').joinpath('references/prepare.md').read_text()
+    assert 'without an explicit mutation contract is read-only' in guide
+    assert 'explicit target and separate host authorization' in guide
+    assert 'do not synthesize consent, broaden scope or redirect storage' in guide
     unknown_document = mutation()
     unknown_document['documents'][0]['allow_delete'] = True
     for arguments in (
@@ -127,10 +165,24 @@ def test_prepare_storage_schema_leaves_platform_and_exact_existing_store_to_runt
     jsonschema.validate({'action': 'sync_project_docs', 'project_path': r'C:\repo', 'mutation': value}, schema)
     storage = schema['properties']['mutation']['properties']['storage_path']
     assert 'pattern' not in storage
-    assert 'exact host-selected private app-data store outside the project' in schema['properties']['mutation']['description']
-    assert 'Explicit expected_generation_id=null' in schema['properties']['mutation']['description']
-    assert 'unexpected existing DB is never adopted' in schema['properties']['mutation']['description']
-    assert 'currently POSIX' in schema['properties']['mutation']['description']
-    assert 'unsupported platforms fail closed' in schema['properties']['mutation']['description']
-    assert 'exact host-selected private SQLite store outside the project' in tools['prepare_docs']['description']
-    assert 'Project configuration and caller paths cannot redirect storage' in storage['description']
+    description = schema['properties']['mutation']['description']
+    assert 'Null generation permits only absent-store initialization' in description
+    assert 'POSIX no-follow reads required' in description
+    assert 'unsupported platforms fail closed' in description
+    assert 'Exact absolute host-selected private DB outside project' in storage['description']
+    assert 'Caller/project configuration cannot redirect it' in storage['description']
+    guide = files('docmancer.templates').joinpath('references/prepare.md').read_text()
+    # Relocated security handoff is required, even while the skill fix is pending.
+    guide = ' '.join(guide.split())
+    for retained in (
+        'exact host-selected private SQLite store outside the project',
+        'project configuration and caller paths cannot redirect it',
+        'explicit null generation initializes only an absent store',
+        'unexpected existing databases are refused',
+        'lexical upserts only: no deletion, vector or artifact writes',
+        'POSIX descriptor-relative no-follow checks',
+        'unsupported platforms fail closed',
+        'trusted OS isolation and the current UID',
+        'not protection against a hostile process running as that same UID',
+    ):
+        assert retained in guide, retained

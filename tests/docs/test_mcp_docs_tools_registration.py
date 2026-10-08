@@ -293,7 +293,9 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1
     assert "stop before editing on `insufficient_evidence`" not in canonical_raw
     assert "hard_stop=true" in canonical_raw
-    assert "documentation-governance meta-question" in canonical_raw
+    assert "(docatlas-references/troubleshooting.md)" in canonical_raw
+    troubleshooting = files("docmancer.templates").joinpath("references/troubleshooting.md").read_text(encoding="utf-8")
+    assert "documentation-governance meta-question" in troubleshooting
 
     advertised = runtime_tools["get_docs_context"]["description"]
     assert "Stop before editing on insufficient_evidence" not in advertised

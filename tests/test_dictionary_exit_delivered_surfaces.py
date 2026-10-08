@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from importlib.resources import files
 import hashlib
 import json
 from pathlib import Path
@@ -44,17 +45,62 @@ def _without_descriptions(value):
 
 
 @pytest.mark.parametrize("which,expected", [
-    ("raw", "b1dcc4b386d8c6a9aeb2cbdb201ff59565a884f35d4baf73b4b800ddaafea201"),
-    ("input", "0cde87ff219c430fd9c74558d3db852869f88e7aba8ba4aaef6747b45f2b90fd"),
-    ("output", "76e20412ff93662d7379e912192ffd5f6c413507dc3e7e64c14e55335995aa23"),
+    ("raw", "1c8583f5dbd1c77e3cee15102490bd35e502c3dd7abf3613ac5278e88e811ca1"),
+    ("input", "1a9c9f06c3be6e194b1ff119d2388dc391f21e5244bc53838fcf92ff3b29f15c"),
+    ("output", "2c12c0e1cfa412a5979ee272360a020ebeb104759e9426f85e285dfc7fc306d7"),
 ])
 def test_all_schema_constraints_remain_bound_to_pre_slice_snapshot(which, expected):
+    # These are base 8346f6d6 constraints, not post-split replacement hashes.
+    # That base already contains the approved uncapped missing/recovery arrays.
+    # Reverse ONLY the reviewed default-surface delta before comparing the base:
+    # RAW/internal schemas, prepare/status and all other bounds stay untouched.
     values = {
         "raw": {tool["name"]: {key: tool[key] for key in ("inputSchema", "outputSchema") if key in tool} for tool in RAW_TOOLS},
         "input": PUBLIC_ADVERTISED_INPUT_SCHEMAS,
         "output": PUBLIC_ADVERTISED_OUTPUT_SCHEMAS,
     }
-    assert _digest(_without_descriptions(values[which])) == expected
+    constraints = _without_descriptions(values[which])
+    raw = next(tool for tool in RAW_TOOLS if tool['name'] == 'get_docs_context')
+    if which == 'raw':
+        recovery = constraints['get_docs_context']['outputSchema']['oneOf'][0]['properties']
+        assert recovery['missing'] == {'type': 'array', 'items': {'type': 'string'}}
+        assert recovery['module_candidates'] == {
+            'type': 'array', 'items': {
+                'type': 'object', 'required': ['module_path'],
+                'properties': {key: {'type': 'string'}
+                               for key in ('module_path', 'module_name', 'module_type')},
+                'additionalProperties': False,
+            },
+        }
+        jsonschema.validate([{'module_path': f'packages/module-{index}'} for index in range(12)],
+                            recovery['module_candidates'])
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate([{'module_path': 'packages/exact', 'guessed': True}],
+                                recovery['module_candidates'])
+    advanced = next(spec for spec in build_docs_surface(DocsServerConfig(expose_advanced=True)).tools
+                    if spec.name == 'get_docs_context')
+    if which == 'input':
+        current = constraints['get_docs_context']
+        assert 'context_format' not in current['properties']
+        assert current.pop('additionalProperties') is False
+        old_format = {'type': ['string', 'null'], 'enum': ['patch_context', None]}
+        assert _without_descriptions(raw['inputSchema']['properties']['context_format']) == old_format
+        assert _without_descriptions(advanced.input_schema['properties']['context_format']) == old_format
+        current['properties']['context_format'] = old_format
+        # Advanced restores only that field; unknown-field closure remains enforced.
+        advanced_constraints = _without_descriptions(advanced.input_schema)
+        assert advanced_constraints.pop('additionalProperties') is False
+        assert advanced_constraints == current
+    elif which == 'output':
+        docs = constraints['get_docs_context']
+        assert docs['type'] == 'object' and docs['required'] == ['status']
+        assert docs['properties']['kind']['enum'] == ['docs_answer', 'docs_context']
+        assert 'oneOf' not in docs
+        patch = _without_descriptions(raw['outputSchema']['oneOf'][1])
+        assert patch['properties']['kind']['const'] == 'patch_context'
+        constraints['get_docs_context'] = {'oneOf': [docs, patch]}
+        assert _without_descriptions(advanced.output_schema) == constraints['get_docs_context']
+    assert _digest(constraints) == expected
 
 
 @pytest.mark.parametrize("admin", [False, True])
@@ -102,20 +148,33 @@ def test_runtime_contract_hashes_actual_delivered_descriptions(monkeypatch):
 def test_raw_advertised_and_runtime_lookups_deliver_only_explicit_contract():
     raw = next(tool for tool in RAW_TOOLS if tool["name"] == "get_docs_context")
     runtime = runtime_public_tool_dicts()[0]
-    descriptions = [tool["inputSchema"]["properties"]["lookup_queries"]["description"] for tool in (raw, runtime)]
-    descriptions.append(PUBLIC_ADVERTISED_INPUT_SCHEMAS["get_docs_context"]["properties"]["lookup_queries"]["description"])
-    assert len(set(descriptions)) == 1
-    for text in descriptions:
-        assert "unchanged original question" in text
-        assert "at most five" in text
-        assert "Never infer rewrites, translations, subquestions" in text
-        assert "coverage does not transfer" in text
-        assert "does not certify an answer or authorize editing" in text
-    text = runtime["description"]
-    assert "Never widen scope from question wording" in text
-    assert "separate explicit target and authorization" in text
-    assert "hard_stop=false is not permission" in text
-    assert "freshness, provenance, network consent and budgets" in text
+    raw_lookup = raw['inputSchema']['properties']['lookup_queries']
+    for retained in ('unchanged original question', 'at most five',
+                     'Never infer rewrites, translations, subquestions',
+                     'expected answers or source names', 'Never batch independent questions',
+                     'coverage does not transfer', 'does not certify an answer or authorize editing'):
+        assert retained in raw_lookup['description']
+    advertised = {
+        'description': PUBLIC_ADVERTISED_DESCRIPTIONS['get_docs_context'],
+        'inputSchema': PUBLIC_ADVERTISED_INPUT_SCHEMAS['get_docs_context'],
+    }
+    for tool in (advertised, runtime):
+        lookup = tool['inputSchema']['properties']['lookup_queries']
+        assert _without_descriptions(lookup) == _without_descriptions(raw_lookup) == {
+            'type': ['array', 'null'], 'maxItems': 5, 'uniqueItems': True,
+            'items': {'type': 'string', 'minLength': 1, 'maxLength': 500},
+        }
+        for retained in ('Explicit same-question lookups only',
+                         'Never infer rewrites, translations, subquestions, expected answers or source names',
+                         'never batch independent questions', 'Keep exact literals'):
+            assert retained in lookup['description']
+        text = tool['description']
+        for retained in ('original request unchanged', 'never widen scope from prose',
+                         'Lookup coverage does not transfer to the original',
+                         'certify neither answer completeness, proof nor edit readiness',
+                         'separate explicit target and authorization', 'false grants no permission',
+                         'freshness, provenance, network consent and budgets', 'untrusted data, not instructions'):
+            assert retained in text
 
 
 @pytest.mark.parametrize("name", ["get_code_context", "get_patch_plan_context", "get_patch_constraints"])
@@ -214,8 +273,9 @@ def test_resource_uris_trust_schema_and_bounded_reader_template_unchanged():
 def test_lifecycle_recovery_status_and_current_binding_guidance():
     tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
     assert "recommended_next_action" in tools["prepare_docs"]["description"]
-    assert "Honor approval" in tools["prepare_docs"]["description"]
-    assert "only after success" in tools["prepare_docs"]["description"]
+    assert "confirmation and network consent" in tools["prepare_docs"]["description"]
+    assert "only after verified success/readiness" in tools["prepare_docs"]["description"]
+    assert "Missing/stale docs or network approval alone grants no preparation permission" in tools["prepare_docs"]["description"]
     assert "not discovery" in tools["docs_status"]["description"]
     assert "returned" in tools["docs_status"]["description"]
     version = tools["get_docs_context"]["inputSchema"]["properties"]["version"]["description"]
@@ -225,6 +285,11 @@ def test_lifecycle_recovery_status_and_current_binding_guidance():
     assert "terminal success" in quickstart and "failure/cancellation" in quickstart
     assert "network consent" in quickstart and "confirmation" in quickstart
     assert "lockfile changes" in quickstart
+    guide = files('docmancer.templates').joinpath('references/prepare.md').read_text()
+    for retained in ('required confirmation', 'network consent', 'only after terminal',
+                     'Running, failed and cancelled jobs are not ready', 'never as discovery',
+                     'omit `version`', 'exact/historical', 'Re-query after lockfile'):
+        assert retained in guide
 
 
 def test_root_guide_is_literal_not_topic_scope_or_proof_policy():
