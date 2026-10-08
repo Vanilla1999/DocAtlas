@@ -361,7 +361,7 @@ def test_final_projection_quality_uses_surviving_component_witness():
 def test_public_schema_exposes_quality_and_registered_range_contract():
     from docmancer.mcp._docs_server_schema import PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
 
-    properties = PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["properties"]
+    properties = PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["oneOf"][0]["properties"]
     assert set(properties["context_quality"]["properties"]["status"]["enum"]) == {
         "checked", "partial", "unverified", "unavailable",
     }
