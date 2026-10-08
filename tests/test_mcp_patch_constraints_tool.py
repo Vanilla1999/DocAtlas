@@ -82,10 +82,40 @@ def test_mcp_tool_returns_grouped_constraints(tmp_path: Path):
 
 
 def test_mcp_tool_respects_max_constraints_and_max_tokens(tmp_path: Path):
-    payload = _payload(tmp_path, max_constraints=2, max_tokens=180)
+    root = _workspace(tmp_path)
+    changed = ["lib/models/permission.g.dart", "pubspec.lock"]
+    arguments = {
+        "question": "Update permission handling", "project_path": str(root),
+        "changed_files": changed, "include_sources": True,
+    }
+    service = LibraryDocsService()
+    wide = handle_project_tool("get_patch_constraints", {
+        **arguments, "max_constraints": 12, "max_tokens": 1200,
+    }, service)
+    assert len(wide["constraints"]) > 2
+    assert wide["token_estimate"] > 180
+    assert wide["token_budget"]["truncated"] is False
+    generated = next(row for row in wide["constraints"] if row["type"] == "generated_file")
+    assert generated["source"] == "changed_files"
+    assert generated["files"] == ["lib/models/permission.g.dart"]
+    assert generated["severity"] == "should"
+    assert any("dependency/lockfile consistency checks" in check for check in wide["suggested_checks"])
+
+    payload = handle_project_tool("get_patch_constraints", {
+        **arguments, "max_constraints": 2, "max_tokens": 180,
+    }, service)
     assert len(payload["constraints"]) <= 2
     assert payload["token_estimate"] <= 180
     assert any("constraints truncated by budget" in warning for warning in payload["warnings"])
+    assert payload["token_budget"]["max_constraints"] == 2
+    assert payload["token_budget"]["max_tokens"] == 180
+    assert payload["token_budget"]["truncated"] is True
+    for packet in (wide, payload):
+        assert packet["packet_available"] is True
+        assert packet["policy_coverage"] == "unresolved"
+        for field in ("answer_available", "answer_supported", "mutation_authorized", "edit_ready"):
+            assert packet[field] is False
+    assert changed == ["lib/models/permission.g.dart", "pubspec.lock"]
 
 
 def test_mcp_tool_applies_compact_cap_without_debug_noise(tmp_path: Path):
