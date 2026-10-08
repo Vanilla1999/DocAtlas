@@ -10,6 +10,7 @@ import pytest
 import yaml
 
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 from docmancer.docs.application.project_docs_member_transaction import catalog_entry_hash
 from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 from docmancer.mcp import _docs_server_part01 as mcp
@@ -83,11 +84,17 @@ def test_confirmed_prepare_retrieval_and_diagnostics_share_actual_store(tmp_path
         from eval.evidence_quality_v2.observer import observe_call
         request = {'question': QUESTION, 'project_path': str(root), 'scope': 'all'}
         payload, trace = observe_call(service, request)
-        # Bootstrap cannot restore removed natural-language answer authority.
-        # Check real acquisition independently of that production delivery
-        # decision; never add expected facts as public runtime requirements.
-        assert payload['status'] == 'insufficient_evidence', payload
-        assert payload['reason_code'] == 'required_evidence_missing'
+        # Eligible read-only quotes are delivered even without answer authority.
+        # Public "ok" means retrieval-only context, not semantic certification;
+        # never add expected facts as public runtime requirements.
+        assert payload['status'] == 'ok', payload
+        assert payload['kind'] == 'docs_context' and payload['context_status'] == 'ready'
+        assert payload['context_available'] is True and payload['answer_available'] is False
+        assert payload['support_status'] == 'retrieval_only'
+        assert payload['answer_policy'] == 'cite_only'
+        assert payload['coverage_policy'] == 'retrieval_attribution_only'
+        assert payload['facet_coverage'] == 'unverified'
+        assert payload['context_quality'] == {'status': 'unverified', 'reasons': ['coverage_unverified']}
         assert payload['answer_supported'] is False and payload['edit_ready'] is False
         assert len(trace['stages']['retrieved_candidates']) == 1
         assert len(trace['stages']['query_window']) == 1
@@ -95,7 +102,48 @@ def test_confirmed_prepare_retrieval_and_diagnostics_share_actual_store(tmp_path
         assert {row['path_or_url'] for row in acquired} == {'docs/rules.md'}
         assert all(row['snippet'] in DOCUMENTS['docs/rules.md'] for row in acquired)
         assert all(row['retrieval_query_matches']['query-original']['qualified'] for row in acquired)
-        assert not trace['stages']['projector_inputs'] and not trace['snapshot']
+        assert len(trace['stages']['projector_inputs']) == 1
+        assert len(trace['stages']['projector_outputs']) == 1
+        projected = trace['stages']['projector_inputs'][0]
+        assert projected['question'] == projected['documentation_query_plan']['original_question'] == QUESTION
+        assert projected['requires_confirmation'] is False
+        assert projected['delivery_decision'] == {'deliverable': True, 'reason_code': None}
+        assert projected['support_decision']['answer_supported'] is False
+        assert projected['support_decision']['reason_code'] == 'required_evidence_missing'
+        assert not projected['selection_decision']['assignments']
+        completeness = projected['answer_completeness']
+        assert completeness['status'] == 'partial'
+        assert completeness['reason_codes'] == ['context_only_no_semantic_certification']
+        assert completeness['canonical_support'] == {
+            'answer_supported': False, 'mandatory_requirement_ids': [], 'assigned_requirement_ids': [],
+        }
+        assert trace['stages']['projector_outputs'][0]['payload'] == payload
+        assert len(payload['sources']) == len(trace['snapshot']) == 1
+        source = payload['sources'][0]
+        assert source['path_or_url'] == 'docs/rules.md'
+        assert source['snippet'] == DOCUMENTS['docs/rules.md'].rstrip()
+        # The public digest binds path/section/raw content/version, not just the
+        # trimmed visible snippet; the member hash separately binds file bytes.
+        digest_material = {
+            'path': 'docs/rules.md', 'section': 'Fixture constraints',
+            'content': DOCUMENTS['docs/rules.md'], 'snippet': None, 'version': None,
+        }
+        assert source['content_sha256'] == hashlib.sha256(json.dumps(
+            digest_material, ensure_ascii=False, sort_keys=True, separators=(',', ':'),
+        ).encode()).hexdigest()
+        assert (source['line_start'], source['line_end']) == (1, 3)
+        assert source['project_identity'] == acquired[0]['project_identity']
+        bound = trace['snapshot'][source['evidence_id']]
+        assert bound['projected_source'] == source
+        assert bound['source']['path'] == source['path_or_url']
+        assert bound['source']['content'] == DOCUMENTS['docs/rules.md']
+        assert bound['source']['generation_id'] == ingest['generation_id']
+        assert bound['source']['display_content_hash'] == grant['documents'][0]['content_sha256']
+        assert bound['source']['_source_catalog_hash'] == grant['documents'][0]['catalog_entry_hash']
+        assert bound['qualification']['_assigned_requirement_ids'] == []
+        assert bound['qualification']['_visible_assignment_hashes'] == []
+        assert bound['qualification']['retrieval_query_matches']['query-original']['context_only'] is True
+        assert validate_model_visible_projection(payload, snapshot=trace['snapshot'], max_tokens=800) == []
         assert mcp._service_for_project_path(service, request) is service._cold.materialize()
         assert str(service.agent_gateway.agent_instance().store.db_path) == str(policy.db_path)
         assert not hasattr(service._cold._service, '_same_call_diagnostics_observer')
