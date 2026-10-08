@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+from hashlib import sha256
+from pathlib import Path
 
 from docmancer.docs.domain.code_graph import (
     CodeGraph,
@@ -18,6 +20,37 @@ from docmancer.docs.domain.code_graph import (
     render_code_graph_path,
     score_code_graph_file,
 )
+
+
+_DART_HELP_CODE_FILES = (
+    "lib/screens/help_request_screen.dart",
+    "lib/cubit/help_requests_cubit.dart",
+    "lib/services/help_requests_service.dart",
+)
+
+
+def _declare_code_files(root, *paths):
+    # Test-owned literal membership; never discover grants by walking the tree.
+    (root / "docatlas.project-docs.yaml").write_text(
+        json.dumps({"schema_version": 1, "documents": [], "code_files": list(paths)}),
+        encoding="utf-8",
+    )
+
+
+def _observe_source_reads(monkeypatch, root):
+    original_read_text = Path.read_text
+    observed = {}
+
+    def read_text(path, *args, **kwargs):
+        value = original_read_text(path, *args, **kwargs)
+        if path.is_relative_to(root) and path.suffix in {".py", ".dart", ".ts"}:
+            observed.setdefault(path.relative_to(root).as_posix(), []).append(
+                sha256(value.encode("utf-8")).hexdigest()
+            )
+        return value
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    return observed
 
 
 def test_make_file_node_id_normalizes_windows_separators():
@@ -121,7 +154,7 @@ def test_mutable_metadata_defaults_are_not_shared():
     assert second_graph.diagnostics == {}
 
 
-def test_build_project_code_graph_links_python_local_import_and_reference(tmp_path):
+def test_build_project_code_graph_links_python_local_import_and_reference(tmp_path, monkeypatch):
     app = tmp_path / "app"
     app.mkdir()
     (app / "api.py").write_text(
@@ -144,6 +177,17 @@ class TicketService:
         encoding="utf-8",
     )
 
+    (app / "unlisted.py").write_text("class TicketService: pass\n", encoding="utf-8")
+    members = ("app/api.py", "app/service.py")
+    source_bytes = {path: (tmp_path / path).read_bytes() for path in members}
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+    denied = build_project_code_graph(tmp_path, question="TicketService route reopen_request")
+    assert denied.nodes == []
+    assert denied.edges == []
+    assert denied.diagnostics["status"] == "unresolved_membership"
+    assert observed == {}
+
+    _declare_code_files(tmp_path, *members)
     graph = build_project_code_graph(tmp_path, question="TicketService route reopen_request")
 
     nodes = graph.node_by_id()
@@ -156,6 +200,18 @@ class TicketService:
     assert any(edge.kind == "references" and edge.from_path == "app/api.py" and edge.to_node_id == ticket_node.id for edge in graph.edges)
     assert graph.diagnostics["edge_count"] == len(graph.edges)
     assert graph.diagnostics["edge_kinds"]["contains"] >= 1
+    assert observed == {
+        path: [sha256(data).hexdigest()] for path, data in source_bytes.items()
+    }
+    assert {node.path for node in graph.nodes} == set(members)
+    for node in graph.nodes:
+        lines = source_bytes[node.path].decode("utf-8").splitlines()
+        assert 1 <= node.line_start <= node.line_end <= len(lines)
+        if node.kind == "file":
+            assert node.metadata["line_count"] == len(lines)
+            assert node.metadata["char_count"] == len(source_bytes[node.path].decode("utf-8"))
+    assert all(edge.from_node_id in nodes for edge in graph.edges)
+    assert all(edge.to_node_id is None or edge.to_node_id in nodes for edge in graph.edges)
 
 
 def test_build_project_code_graph_links_dart_relative_imports_and_references(tmp_path):
@@ -201,6 +257,7 @@ class HelpRequestsService {
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, *_DART_HELP_CODE_FILES)
     graph = build_project_code_graph(
         tmp_path,
         question="HelpRequestScreen HelpRequestsCubit HelpRequestsService Вернуть в работу",
@@ -225,11 +282,16 @@ def test_build_project_code_graph_skips_generated_files(tmp_path):
     (generated / "GeneratedPluginRegistrant.dart").write_text("class GeneratedPluginRegistrant {}\n", encoding="utf-8")
     (tmp_path / "lib" / "public_api.dart").write_text("class PublicApi {}\n", encoding="utf-8")
 
+    _declare_code_files(tmp_path, "lib/public_api.dart")
     graph = build_project_code_graph(tmp_path, question="PublicApi GeneratedPluginRegistrant")
 
     paths = {node.path for node in graph.nodes}
     assert "lib/public_api.dart" in paths
     assert "lib/generated/GeneratedPluginRegistrant.dart" not in paths
+    _declare_code_files(tmp_path, "lib/public_api.dart", "lib/generated/GeneratedPluginRegistrant.dart")
+    denied = build_project_code_graph(tmp_path, question="PublicApi GeneratedPluginRegistrant")
+    assert denied.nodes == []
+    assert denied.edges == []
 
 
 def test_build_project_code_graph_marks_unresolved_external_import(tmp_path):
@@ -245,6 +307,7 @@ class HelpRequestScreen {}
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "lib/screen.dart")
     graph = build_project_code_graph(tmp_path, question="HelpRequestScreen external_pkg")
 
     edge = next(edge for edge in graph.edges if edge.kind == "unresolved_import")
@@ -322,6 +385,7 @@ class ExternalOnly {}
         + "\n",
         encoding="utf-8",
     )
+    _declare_code_files(tmp_path, "lib/screen.dart", "lib/external_only.dart")
     graph = build_project_code_graph(tmp_path, question="external_pkg Вернуть в работу HelpRequestScreen")
 
     items = build_code_graph_context_items(graph, question="external_pkg Вернуть в работу")
@@ -400,6 +464,7 @@ class HelpRequestsService {
         + "\n",
         encoding="utf-8",
     )
+    _declare_code_files(tmp_path, *_DART_HELP_CODE_FILES)
     return build_project_code_graph(
         tmp_path,
         question="HelpRequestScreen HelpRequestsCubit HelpRequestsService Вернуть в работу",
@@ -438,6 +503,12 @@ def test_find_code_graph_paths_can_reach_service_with_target_terms_and_depth_two
 def test_find_code_graph_paths_respects_max_depth(tmp_path):
     graph = _dart_help_graph(tmp_path)
 
+    reachable = find_code_graph_paths(
+        graph, start_terms=["Вернуть в работу"],
+        target_terms=["HelpRequestsService"], max_depth=2,
+    )
+    assert any("lib/services/help_requests_service.dart" in render_code_graph_path(path) for path in reachable)
+
     paths = find_code_graph_paths(
         graph,
         start_terms=["Вернуть в работу"],
@@ -462,7 +533,9 @@ class HelpRequestScreen {
         + "\n",
         encoding="utf-8",
     )
+    _declare_code_files(tmp_path, "lib/screen.dart")
     graph = build_project_code_graph(tmp_path, question="Вернуть в работу external_pkg")
+    assert any(edge.kind == "unresolved_import" for edge in graph.edges)
 
     paths = find_code_graph_paths(graph, start_terms=["Вернуть в работу"], target_terms=["external_pkg"], max_depth=2)
 
@@ -522,6 +595,7 @@ class Screen {}
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "lib/screen.dart")
     graph = build_project_code_graph(tmp_path, question="Screen provider async")
 
     unresolved = [edge for edge in graph.edges if edge.kind == "unresolved_import"]
@@ -549,6 +623,7 @@ class Api:
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "app/api.py", "app/service.py")
     graph = build_project_code_graph(tmp_path, question="Api TicketService service")
 
     import_edges = [edge for edge in graph.edges if edge.kind == "imports" and edge.from_path == "app/api.py"]
@@ -575,6 +650,7 @@ export class Main {
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "src/main.ts", "src/foo.ts")
     graph = build_project_code_graph(tmp_path, question="Main Foo")
 
     edge = next(edge for edge in graph.edges if edge.kind == "imports" and edge.from_path == "src/main.ts")
@@ -592,6 +668,7 @@ def test_build_project_code_graph_does_not_pick_random_basename_when_import_ambi
     (src / "foo.ts").write_text("export class FooTs {}\n", encoding="utf-8")
     (src / "foo" / "index.ts").write_text("export class FooIndex {}\n", encoding="utf-8")
 
+    _declare_code_files(tmp_path, "src/main.ts", "src/foo.ts", "src/foo/index.ts")
     graph = build_project_code_graph(tmp_path, question="Main Foo")
 
     edge = next(edge for edge in graph.edges if edge.kind == "unresolved_import" and edge.from_path == "src/main.ts")
@@ -632,7 +709,9 @@ def test_code_graph_diagnostics_caps_lists_and_excludes_source_text(tmp_path):
     for index in range(25):
         (lib / f"file_{index}.dart").write_text(full_source_text, encoding="utf-8")
 
+    _declare_code_files(tmp_path, *(f"lib/file_{index}.dart" for index in range(25)))
     graph = build_project_code_graph(tmp_path, question="VeryLongSecretSource", max_files=30, token_budget=12000)
+    assert len([node for node in graph.nodes if node.kind == "file"]) == 25
     diagnostics = code_graph_diagnostics(graph)
     text = json.dumps(diagnostics, ensure_ascii=False, sort_keys=True)
 
@@ -678,6 +757,7 @@ class WidgetNoise {
         + "\n",
         encoding="utf-8",
     )
+    _declare_code_files(tmp_path, "lib/screen.dart", "lib/flutter_noise.dart")
     graph = build_project_code_graph(tmp_path, question="Вернуть в работу Widget provider")
 
     items = build_code_graph_context_items(graph, question="Вернуть в работу Widget provider", token_budget=1200, max_items=3)
@@ -691,6 +771,7 @@ def test_code_graph_ranking_specific_symbol_beats_generic_cubit_match(tmp_path):
     graph = _dart_help_graph(tmp_path)
     lib = tmp_path / "lib"
     (lib / "generic_cubit.dart").write_text("class Cubit {}\n", encoding="utf-8")
+    _declare_code_files(tmp_path, *_DART_HELP_CODE_FILES, "lib/generic_cubit.dart")
     graph = build_project_code_graph(tmp_path, question="HelpRequestsCubit Cubit", max_files=10, token_budget=4000)
 
     items = build_code_graph_context_items(graph, question="HelpRequestsCubit Cubit", token_budget=1200, max_items=5)
