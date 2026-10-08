@@ -563,3 +563,26 @@ updated only for migrated nodes; ownership records include its reviewed shard.
 Integrated infrastructure, validation, capture and migrated recovery tests:
 74 PASS. Four independently confirmed baseline recovery failures remain outside
 this approval. Required CI must be rerun; no full-CI-green or merge claim.
+
+### Reviewed final quality consistency (2026-10-08)
+
+CI `37747055285` at `ecf6bd89` remained red: Python 3.13 core 2 405 FAIL /
+5 615 PASS / 61 ERROR, advanced 128 FAIL / 494 PASS. Recovery/capture migration,
+retrieval, installed harness, installer and Linux/macOS smoke passed.
+
+Independent review APPROVED test fixes `10ac2597` and `8b819072`, integrated as
+`0976ceb3` and `67d6660b`: select docs schema branch without weakening assertions;
+use production literal plans in the two unit recovery/reservation fixtures.
+
+User authorized production consistency repair; independent review APPROVED
+`eda8906e`, integrated as `b5cba75a`. Finalizer now persists the same empty
+component contract/incomplete scope policy as core before final coverage. Legacy
+metadata cannot produce false checked quality or suppress real continuation;
+byte bindings, unresolved residue, unavailable/no-source and delivery vetoes remain.
+Negative probes are explicit internal injections, not proof of a public exploit.
+No dictionaries, coefficients, ranking, budgets, validators or permissions changed.
+Ownership records add only the specifically authorized production path.
+
+Integrated focused matrix: 107 PASS. Independent expanded review: 71 PASS /
+2 FAIL; both failures reproduced on an actual base checkout (legacy mutation
+grant and partial-quality fixtures). No full-suite-green or merge claim.

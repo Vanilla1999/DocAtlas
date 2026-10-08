@@ -7,6 +7,7 @@ import subprocess
 
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
+    "docmancer/docs/application/docs_context_projection.py",  # Authorized, reviewed final quality consistency repair.
     "tests/docs/test_docs_context_read_next.py",  # Reviewed confirmed fixture lifecycle only.
     "tests/diagnostic_labels.docs_context_read_next.json",  # Reviewed recovery test node inventory.
     "tests/docs/test_context_capture_integrity.py",
