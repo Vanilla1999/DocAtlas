@@ -182,7 +182,7 @@ def test_optional_selection_config_preserves_explicit_bounds_and_validation():
 
 
 def test_mixed_large_bound_lanes_preserve_child_support_and_exact_gaps():
-    def lane(identity, missing=False):
+    def _make_lane(identity, missing=False):
         items = []
         for index in range(4):
             routes = ",".join(f'{{"route":"/{identity}/{index}/{route}","handler":"dispatch_{route}","timeout":{route + 1}}}' for route in range(24))
@@ -191,7 +191,7 @@ def test_mixed_large_bound_lanes_preserve_child_support_and_exact_gaps():
         requirements = EvidenceRequirementSet(tuple(EvidenceRequirement(f"fact-{index}", "required_fact", row["display_text"]) for index, row in enumerate(items)) + ((EvidenceRequirement("absent", "required_fact", "Unavailable regional deployment contract."),) if missing else ()))
         return selector.select_evidence(items, question="", config=selector.patch_selection_config(), requirements=requirements)
 
-    project, library = lane("project"), lane("library")
+    project, library = _make_lane("project"), _make_lane("library")
     for child in (project, library):
         assert child.support_decision.answer_supported
         assert len(child.selected_candidates) == len(child.assignments) == 4
@@ -220,7 +220,7 @@ def test_mixed_large_bound_lanes_preserve_child_support_and_exact_gaps():
     assert mixed.child_decision_hash == reversed_mixed.child_decision_hash
     assert mixed.child_assignment_hash == reversed_mixed.child_assignment_hash
     assert decision.selection_hash == reversed_mixed.selection_decision.selection_hash
-    incomplete = lane("library", missing=True)
+    incomplete = _make_lane("library", missing=True)
     assert not incomplete.support_decision.answer_supported
     partial = selector.aggregate_mixed_selection([entries[0], ("library", "library-fixture", incomplete)])
     assert not partial.selection_decision.support_decision.answer_supported
