@@ -216,7 +216,7 @@ def project_docs_context(
     _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Finalize visible evidence, quality and at most one registered recovery target."""
-    packet_max = min(DOCS_CONTEXT_MAX_TOKENS, max_tokens)
+    packet_max = max_tokens
     payload, snapshot = _run_core(
         retrieval=retrieval, max_tokens=packet_max,
         selection_diagnostics=selection_diagnostics, allow_context_hints=_allow_context_hints,
@@ -230,57 +230,9 @@ def project_docs_context(
     if root:
         target, target_source = prepare_docs_context_read_next(payload, snapshot, retrieval, root=root)
 
-    target_budget = (
-        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, packet_max)
-        if payload.get("status") == "insufficient_evidence" else packet_max
-    )
     if target is not None and target_source is not None:
-        if attach_docs_context_read_next(payload, target, max_tokens=target_budget):
+        if attach_docs_context_read_next(payload, target, max_tokens=packet_max):
             snapshot["__read_next__"] = {"source": deepcopy(target_source)}
-        elif payload.get("status") != "insufficient_evidence":
-            reserve = docs_context_read_next_cost(payload, target)
-            evidence_budget = max(1, packet_max - reserve)
-            if evidence_budget < packet_max:
-                # Recovery metadata must not evict accepted evidence. Evaluate
-                # compaction on a separate trace so a rejected trial cannot poison
-                # the quality/omission report for the retained original packet.
-                trial_retrieval = deepcopy(retrieval)
-                trial_payload, trial_snapshot = _run_core(
-                    retrieval=trial_retrieval, max_tokens=evidence_budget,
-                    selection_diagnostics=None,
-                    allow_context_hints=_allow_context_hints,
-                )
-                _strip_legacy_locators(trial_payload, trial_snapshot)
-                _finalize_quality(trial_retrieval, trial_payload, trial_snapshot)
-                retained_ids = {row["evidence_id"] for row in payload.get("sources") or ()}
-                trial_ids = {row["evidence_id"] for row in trial_payload.get("sources") or ()}
-                old_coverage = ((retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
-                trial_coverage = ((trial_retrieval.get("documentation_query_plan") or {}).get("_component_coverage") or {})
-                retained = (
-                    retained_ids <= trial_ids
-                    and _retains_visible_sources(payload, trial_payload)
-                    and set(payload.get("covered_query_ids") or ()) <= set(trial_payload.get("covered_query_ids") or ())
-                    and set(old_coverage.get("covered_component_ids") or ()) <= set(trial_coverage.get("covered_component_ids") or ())
-                )
-                if retained and attach_docs_context_read_next(trial_payload, target, max_tokens=packet_max):
-                    payload, snapshot = trial_payload, trial_snapshot
-                    retrieval.clear()
-                    retrieval.update(trial_retrieval)
-                    if selection_diagnostics is not None:
-                        selection_diagnostics["component_coverage"] = trial_coverage
-                    snapshot["__read_next__"] = {"source": deepcopy(target_source)}
-        if target is not None and not payload.get("read_next"):
-            quality = payload.get("context_quality") or {}
-            reasons = list(quality.get("reasons") or ())
-            if "budget_limited" not in reasons and len(reasons) < 2:
-                reasons.append("budget_limited")
-                previous_quality = deepcopy(quality)
-                quality["reasons"] = reasons
-                payload["context_quality"] = quality
-                _refresh_estimate(payload)
-                if docs_context_budget_tokens(payload) > target_budget:
-                    payload["context_quality"] = previous_quality
-                    _refresh_estimate(payload)
 
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)

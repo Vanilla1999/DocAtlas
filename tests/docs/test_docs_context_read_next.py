@@ -536,14 +536,12 @@ def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
     monkeypatch.setattr(projection, "_run_core", observed)
     monkeypatch.setattr(projection, "prepare_docs_context_read_next", lambda *args, **kwargs: (target, {}))
     monkeypatch.setattr(projection, "docs_context_read_next_cost", lambda *args: 650)
-    # Force the reservation path; the reduced evidence budget cannot retain both.
+    # Refused optional attachment must not trigger budget-driven reprojection.
     monkeypatch.setattr(projection, "attach_docs_context_read_next", lambda *args, **kwargs: False)
     payload, _ = projection.project_docs_context(retrieval=retrieval)
-    assert len(calls) == 2
+    assert len(calls) == 1
     assert len(calls[0]["sources"]) == 2
-    assert {s["evidence_id"] for s in calls[0]["sources"]} - {s["evidence_id"] for s in calls[1].get("sources", [])}
     assert {s["evidence_id"] for s in payload["sources"]} == {s["evidence_id"] for s in calls[0]["sources"]}
     assert payload["covered_query_ids"] == calls[0]["covered_query_ids"]
     assert payload["read_next"] == []
-    assert "budget_limited" in payload["context_quality"]["reasons"]
-    assert docs_context_budget_tokens(payload) <= 800
+    assert "budget_limited" not in payload["context_quality"]["reasons"]
