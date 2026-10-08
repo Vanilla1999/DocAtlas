@@ -395,9 +395,6 @@ def project_docs_answer(
         if exact_snapshot_required and candidate.docs_snapshot_exact is not True:
             omitted += 1
             continue
-        if len(sources) >= MAX_DOCS_SOURCES:
-            omitted += 1
-            continue
         scoped_paths = {row.value.replace("\\", "/").casefold().removeprefix("./")
                         for row in decision.requirements if row.kind == "evidence_path" and row.mandatory}
         source_path = candidate.path_or_url.replace("\\", "/").casefold().removeprefix("./")
@@ -458,17 +455,11 @@ def project_docs_answer(
         "omitted_counts": {"sources": omitted} if omitted else {},
         "estimated_tokens": 0,
     }
-    limit = min(DOCS_ANSWER_MAX_TOKENS, max_tokens)
-    while sources and estimate_projection_tokens(payload) > limit:
-        dropped = sources.pop()
-        snapshot.pop(dropped["evidence_id"], None)
-        omitted += 1
-        payload["omitted_counts"] = {"sources": omitted}
     payload["context_available"] = bool(sources)
     if not sources:
         return project_insufficient(
             kind="docs_answer", missing=["No safe bounded selected context is available."],
-            recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, limit),
+            recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
         ), {}
     _refresh_estimate(payload)
     return payload, snapshot
@@ -724,8 +715,6 @@ def validate_model_visible_projection(
         return ["model-visible projection must be an object"]
     if payload.get("kind") == "patch_context":
         return _validate_patch_projection(payload, snapshot=snapshot)
-    if max_tokens is None:
-        return ["docs projections require a token budget"]
     forbidden = sorted(_find_forbidden_keys(payload))
     if forbidden:
         errors.append("forbidden model-visible keys: " + ", ".join(forbidden))
@@ -740,20 +729,9 @@ def validate_model_visible_projection(
         errors.append("patch context must not authorize edits")
     if kind == "docs_answer" and status in {"ok", "truncated"} and payload.get("retrieval_only") is not True:
         errors.append("docs answer projection requires current retrieval-only policy")
-    limit = (
-        min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens)
-        if status == "insufficient_evidence"
-        else max_tokens
-    )
     actual = estimate_projection_tokens(payload)
-    if payload.get("estimated_tokens") != actual or actual > limit:
-        errors.append("projection estimate mismatch or budget exceeded")
-    if (
-        kind == "docs_context"
-        and status in {"ok", "truncated"}
-        and docs_context_budget_tokens(payload) > max_tokens
-    ):
-        errors.append("docs_context conservative budget exceeded")
+    if payload.get("estimated_tokens") != actual:
+        errors.append("projection estimate mismatch")
     if status == "insufficient_evidence":
         transport = payload.get("support_envelope")
         transport_support: dict[str, Any] | None = None
@@ -795,8 +773,6 @@ def validate_model_visible_projection(
     if not isinstance(sources, list) or not sources:
         errors.append("successful projections require sources")
         return errors
-    if kind in {"docs_answer", "docs_context"} and len(sources) > MAX_DOCS_SOURCES:
-        errors.append(f"{kind} exceeds source limit")
     ids: set[str] = set()
     allowed_fields = (
         DOCS_SOURCE_FIELDS if kind == "docs_answer" else

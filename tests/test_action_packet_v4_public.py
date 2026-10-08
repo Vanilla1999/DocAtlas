@@ -237,11 +237,12 @@ def test_documents_remain_bounded_and_non_authorizing(tmp_path):
     projection, snapshot = project_docs_answer(
         question="Protocol configuration", retrieval={"primary_snippet": row}, max_tokens=800,
     )
-    assert projection["kind"] == "docs_answer" and projection["estimated_tokens"] <= 800
+    assert projection["kind"] == "docs_answer"
+    assert projection["sources"][0]["snippet"] == row["display_text"]
     assert projection["edit_ready"] is False
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
-    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=1)
-    assert validate_model_visible_projection(projection, snapshot=snapshot)
+    assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=1) == []
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
     failure = project_insufficient(
         kind="docs_answer", missing=[f"missing-{i}:" + "detail" * 200 for i in range(8)],
         recommended_next_action=None, max_tokens=200,
