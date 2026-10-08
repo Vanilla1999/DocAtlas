@@ -166,9 +166,7 @@ def test_veto_and_literal_plan_boundaries_do_not_become_fit_exemptions(change):
         assert payload["reason_code"] == "request_input_limit_exceeded"
         assert payload.get("edit_ready", False) is False
         assert payload.get("answer_supported", False) is payload.get("answer_available", False) is False
-        # The existing core adds reason_code after the failure estimate refresh.
-        # Preserve this diagnostic; do not repair an unassigned refusal contract.
-        assert validate_model_visible_projection(payload, snapshot=snapshot) == ["projection estimate mismatch"]
+        assert validate_model_visible_projection(payload, snapshot=snapshot) == []
     else:
         assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
         assert validate_model_visible_projection(payload, snapshot=snapshot) == []

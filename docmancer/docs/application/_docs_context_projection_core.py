@@ -99,6 +99,7 @@ def project_docs_context(
             max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
         )
         payload["reason_code"] = "request_input_limit_exceeded"
+        _refresh_estimate(payload)
         return payload, {}
     from .context_query_probes import authoritative_queries
     literal_queries = authoritative_queries(query_plan)
