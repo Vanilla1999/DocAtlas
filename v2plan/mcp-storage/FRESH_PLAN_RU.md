@@ -549,3 +549,17 @@ Independent review APPROVED `d684791e`, integrated as `f8427bb5`: only unused
 max_tokens keyword removed from validation test stub. Baseline 10 PASS / 1 FAIL,
 candidate 11 PASS. Original three assertions and protocol budget 2000 unchanged.
 These local pilots do not replace full CI or authorize semantic migrations.
+
+### Reviewed recovery-test migration (2026-10-08)
+
+Independent review APPROVED `0af97d0b` plus `f579ebd7`, integrated as `624fcbdb`
+and `506d9e0a`. Complete-window delivery verifies exact admitted quotes and empty
+read_next. Separate real public preparation/retrieval/source-read fixture quotes
+lines 1–11 and registers unread lines 12–25, checking bytes and snapshot binding.
+Reviewer caught invalid-catalog revocation false positive; follow-up now validates
+active historical/search_only catalog before genuine authority/binding denial.
+No production, schema, gold, thresholds or budgets changed. Diagnostic inventory
+updated only for migrated nodes; ownership records include its reviewed shard.
+Integrated infrastructure, validation, capture and migrated recovery tests:
+74 PASS. Four independently confirmed baseline recovery failures remain outside
+this approval. Required CI must be rerun; no full-CI-green or merge claim.

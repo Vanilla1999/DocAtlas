@@ -8,6 +8,7 @@ import subprocess
 BASE = "2d060bf06904cc84a98b7de39f86529a94ea7c39"
 ALLOWED = {
     "tests/docs/test_docs_context_read_next.py",  # Reviewed confirmed fixture lifecycle only.
+    "tests/diagnostic_labels.docs_context_read_next.json",  # Reviewed recovery test node inventory.
     "tests/docs/test_context_capture_integrity.py",
     "tests/task_level/test_task33_validation.py",  # Unused test-stub keyword removal only.
     "tests/docs/test_context_projection_boundaries.py",  # Reviewed consent-scope regressions.
