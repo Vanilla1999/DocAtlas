@@ -75,3 +75,72 @@ def _ready_patch_fixture(*, policy_content: str | None = None):
         packet, evidence_items=evidence, project_path="/project",
     ) == []
     return packet, evidence
+
+
+def _assert_oversized_insufficient_projection_fidelity(budget):
+    payload = {
+        "status": "insufficient_evidence",
+        "kind": "docs_answer",
+        "missing": ["missing " * 2_000],
+        "recommended_next_action": {
+            "tool": "prepare_docs",
+            "observations": {"unbounded": "value " * 2_000},
+            "requires_confirmation": True,
+            "confirmation_reason": "project_docs_preflight",
+            "auto_execute": False,
+        },
+        "answer_supported": False,
+        "answer_available": False,
+        "edit_ready": False,
+        "documentation_supported": False,
+        "hard_stop": True,
+        "requires_confirmation": True,
+        "support_status": "insufficient_evidence",
+        "missing_requirement_ids": [f"requirement-{index}" for index in range(100)],
+        "requirements_hash": "a" * 64,
+        "selector_config_hash": "b" * 64,
+        "eligibility_contract_hash": "c" * 64,
+        "candidate_trace_hash": "d" * 64,
+        "selection_hash": "e" * 64,
+        "assignment_hash": "f" * 64,
+        "decision_hash": "0" * 64,
+    }
+    original = deepcopy(payload)
+
+    bound_insufficient_projection(payload, max_tokens=budget)
+
+    # These legacy budgets must not discard an already-formed public DTO.
+    # Expected content comes from the input, independently of the projector.
+    measured_tokens = estimate_projection_tokens(payload)
+    assert measured_tokens > budget
+    assert payload == {**original, "estimated_tokens": measured_tokens}
+    assert payload["missing"] == original["missing"]
+    assert payload["missing_requirement_ids"] == original["missing_requirement_ids"]
+    assert payload["recommended_next_action"] == original["recommended_next_action"]
+    assert payload["answer_supported"] is payload["answer_available"] is False
+    assert payload["edit_ready"] is payload["documentation_supported"] is False
+    assert payload["hard_stop"] is payload["requires_confirmation"] is True
+    assert payload["recommended_next_action"]["requires_confirmation"] is True
+    assert payload["recommended_next_action"]["auto_execute"] is False
+    assert "support_envelope" not in payload
+    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=budget) == []
+
+    # Removing a representation cap must not weaken format, disclosure, or
+    # fail-closed authority validation. Each mutation targets its own guard.
+    for field, value, error in (
+        ("kind", "invalid", "invalid projection kind"),
+        ("status", "invalid", "invalid projection status"),
+        ("answer_supported", True, "insufficient evidence has inconsistent answer_supported"),
+        ("answer_available", True, "insufficient evidence has inconsistent answer_available"),
+        ("support_status", "ok", "insufficient evidence has inconsistent support_status"),
+        ("edit_ready", True, "context projection must not authorize edits"),
+        ("implementation_guidance", ["Edit without source evidence."],
+         "insufficient evidence must not authorize edits"),
+        ("diagnostics", {"internal": "not public"}, "forbidden model-visible keys: diagnostics"),
+    ):
+        tampered = deepcopy(payload)
+        tampered[field] = value
+        tampered["estimated_tokens"] = estimate_projection_tokens(tampered)
+        assert error in validate_model_visible_projection(
+            tampered, snapshot={}, max_tokens=budget,
+        )
