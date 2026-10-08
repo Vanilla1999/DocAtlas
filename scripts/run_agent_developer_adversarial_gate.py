@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 from collections import defaultdict, deque
+from contextlib import ExitStack
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -400,7 +401,7 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
         }
 
     try:
-        with TemporaryDirectory(prefix=f"docatlas-agent-v2-{case_id}-") as raw_tmp:
+        with TemporaryDirectory(prefix=f"docatlas-agent-v2-{case_id}-") as raw_tmp, ExitStack() as fixture_lifetime:
             tmp = Path(raw_tmp)
             project = tmp / "project"
             shutil.copytree(fixture, project)
@@ -414,17 +415,7 @@ def _run_adversarial_case(case: dict[str, Any]) -> dict[str, Any]:
                     "errors": ["working_path is missing or unsafe"],
                     "events": [],
                 }
-            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
-            service = base._service(tmp)
-            sync = service.sync_project_docs(str(project), with_vectors=False)
-            if getattr(sync, "status", None) != "success":
-                return {
-                    "case_id": case_id,
-                    "passed": False,
-                    "trajectory_tokens": 0,
-                    "errors": [f"sync status={getattr(sync, 'status', None)!r}"],
-                    "events": [],
-                }
+            service = fixture_lifetime.enter_context(base._service(tmp, project))
 
             mutation = case.get("mutation_before_calls")
             if isinstance(mutation, dict):

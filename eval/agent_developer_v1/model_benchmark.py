@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import shutil
+from contextlib import ExitStack
 from pathlib import Path, PurePosixPath
 from tempfile import TemporaryDirectory
 from typing import Any, Protocol
@@ -469,16 +470,12 @@ def run_task(
     usage_rows: list[dict[str, Any]] = []
     planning_errors: list[str] = []
     try:
-        with TemporaryDirectory(prefix=f"docatlas-agent-model-{public_task['id']}-") as raw_tmp:
+        with TemporaryDirectory(prefix=f"docatlas-agent-model-{public_task['id']}-") as raw_tmp, ExitStack() as fixture_lifetime:
             tmp = Path(raw_tmp)
             project = tmp / "project"
             fixture = oracle_gate.PROJECTS_ROOT / str(public_task["fixture"])
             shutil.copytree(fixture, project)
-            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
-            service = oracle_gate._service(tmp)
-            sync = service.sync_project_docs(str(project), with_vectors=False)
-            if getattr(sync, "status", None) != "success":
-                raise RuntimeError(f"fixture sync failed: {getattr(sync, 'status', None)!r}")
+            service = fixture_lifetime.enter_context(oracle_gate._service(tmp, project))
 
             mutation = oracle_task.get("mutation_before_calls")
             if isinstance(mutation, dict):

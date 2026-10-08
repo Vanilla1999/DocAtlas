@@ -13,6 +13,7 @@ import json
 import os
 import shutil
 from collections import Counter
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -23,6 +24,7 @@ from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
+from eval.evidence_quality_v2.runtime import index_project, isolated_service
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -230,16 +232,19 @@ def _load_protocol() -> dict[str, Any]:
     }
 
 
-def _service(tmp: Path) -> LibraryDocsService:
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp / "docmancer.db")
-    config.index.extracted_dir = str(tmp / "extracted")
-    return LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
-    )
+@contextmanager
+def _service(tmp: Path, project: Path):
+    """Confirm every authored catalog member in a fresh private host store."""
+    with isolated_service(tmp / "state") as (service, config):
+        assert not service.member_storage_policy.app_home.exists()
+        prepared = index_project(service, config, project)
+        assert prepared["indexed_paths"] == prepared["expected_paths"]
+        assert not prepared["excluded_or_failed_paths"]
+        assert not prepared["unexpected_paths"]
+        metrics = prepared["transaction_metrics"]
+        assert metrics["members"] == metrics["new_count"] == len(prepared["expected_paths"])
+        assert metrics["changed_count"] == metrics["sources_deleted"] == 0
+        yield service
 
 
 def _source_paths(payload: dict[str, Any] | None) -> tuple[str, ...]:
@@ -528,16 +533,11 @@ def run_protocol() -> dict[str, Any]:
             if not fixture.is_dir():
                 errors.append(f"{task_id}: fixture missing: {fixture.relative_to(REPO_ROOT)}")
                 continue
-            with TemporaryDirectory(prefix=f"docatlas-agent-dev-{task_id}-") as raw_tmp:
+            with TemporaryDirectory(prefix=f"docatlas-agent-dev-{task_id}-") as raw_tmp, ExitStack() as fixture_lifetime:
                 tmp = Path(raw_tmp)
                 project = tmp / "project"
                 shutil.copytree(fixture, project)
-                os.environ["DOCATLAS_HOME"] = str(tmp / "home")
-                service = _service(tmp)
-                sync = service.sync_project_docs(str(project), with_vectors=False)
-                if getattr(sync, "status", None) != "success":
-                    errors.append(f"{task_id}: sync status={getattr(sync, 'status', None)!r}")
-                    continue
+                service = fixture_lifetime.enter_context(_service(tmp, project))
 
                 mutation = task.get("mutation_before_calls")
                 if isinstance(mutation, dict):
