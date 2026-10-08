@@ -191,7 +191,7 @@ def test_evaluator_only_requirement_provenance_is_rejected():
         select_evidence(
             [_candidate("source", "hidden fact")],
             question="Apply change",
-            config=patch_selection_config(1500),
+            config=patch_selection_config(),
             public_requirements=[{
                 "text": "hidden fact",
                 "public_provenance": "hidden_test_answer",
