@@ -838,21 +838,55 @@ class TestDiscovery:
 
 class TestWebFetcherDartdoc:
     def test_direct_dartdoc_class_page_without_browser(self):
-        def mock_get(url, **kwargs):
+        selected = "https://api.flutter.dev/flutter/widgets/SizedBox-class.html"
+        robots = "https://api.flutter.dev/robots.txt"
+        calls = []
+        policy = DocsFetchPolicy(
+            allowed_hosts=("api.flutter.dev",),
+            path_prefixes=("/flutter/widgets/SizedBox-class.html", "/robots.txt"),
+            resolver=lambda _host: (ipaddress.ip_address("93.184.216.34"),),
+        )
+
+        def respond(request):
+            # Exercise the ordinary pinned transport, entirely inside MockTransport.
+            assert request.url.host == "93.184.216.34"
+            url = f"{request.url.scheme}://{request.headers['host']}{request.url.raw_path.decode('ascii')}"
+            calls.append(url)
+            if url == robots:
+                return httpx.Response(200, text="User-agent: *\nAllow: /\n",
+                                      headers={"content-type": "text/plain"}, request=request)
             assert url == "https://api.flutter.dev/flutter/widgets/SizedBox-class.html"
-            return _mock_response(DARTDOC_SIZED_BOX_HTML)
+            return httpx.Response(200, text=DARTDOC_SIZED_BOX_HTML,
+                                  headers={"content-type": "text/html"}, request=request)
 
-        mock_client = _make_mock_client(mock_get)
+        client_type = httpx.Client
 
-        with patch("docmancer.connectors.fetchers.web.httpx.Client", return_value=mock_client):
-            fetcher = WebFetcher(max_pages=10, browser=False, doc_format="dartdoc")
+        def fixture_client(**kwargs):
+            return client_type(transport=httpx.MockTransport(respond), **kwargs)
+
+        with patch("docmancer.connectors.fetchers.web.httpx.Client", side_effect=fixture_client):
+            fetcher = WebFetcher(
+                max_pages=10, browser=False, doc_format="dartdoc", fetch_policy=policy,
+                exact_urls=[selected], robots_urls=[robots],
+            )
             docs = fetcher.fetch("https://api.flutter.dev/flutter/widgets/SizedBox-class.html")
+            assert calls == [robots, selected]
+            with pytest.raises(ValueError, match="finite_member_seed_mismatch"):
+                fetcher.fetch(selected + "?unselected=1")
+            with pytest.raises(ValueError, match="explicit_robots_member_required"):
+                WebFetcher(
+                    max_pages=10, browser=False, doc_format="dartdoc", fetch_policy=policy,
+                    exact_urls=[selected],
+                ).fetch(selected)
+            assert calls == [robots, selected]
 
         assert len(docs) == 1
         assert "SizedBox class" in docs[0].content
         assert "Constructors" in docs[0].content
         assert "width" in docs[0].content
         assert fetcher._browser is False
+        assert docs[0].source == selected
+        assert fetcher._respect_robots is True
 
     def test_dartdoc_root_empty_does_not_fail_when_seed_page_succeeds(self):
         def mock_get(url, **kwargs):
