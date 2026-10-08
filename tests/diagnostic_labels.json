@@ -466,7 +466,7 @@
     "tests/test_mcp_slug.py": "9f551410be16741dfbbe484d8205e0f7105c2318d13d6804522473c90ae572c3",
     "tests/test_models.py": "aa44feb79ac96bbd6084fa9ed199bec1317b83199ebfe8a2a595b82832452aca",
     "tests/test_multilingual_retrieval_quality_protocol.py": "afdb30822771fc0a20476d1397f9fdbd4404c50c736461346304f5631b21f241",
-    "tests/test_named_document_context_integration.py": "eaff9513762bd40ad6e4ac82de43d8682344b3916383813aadaf84853389ca76",
+    "tests/test_named_document_context_integration.py": "893160586869bb120062a243c879b0a6c140243940eded52f6c9f0a729a22dd5",
     "tests/test_network_guard.py": "3378f2e024f6f4d8c3b82980ca1c835fa0126e603257ccff63ef076ca9d30011",
     "tests/test_openai_embeddings.py": "a1c9f63dd80242fe19d55ce7e6e2da7bd832b0cc2afb37dd6f76bd373d6fb430",
     "tests/test_opencode_environment_validation.py": "f5802e7d8e2e515834ab1ee854ca0bbc58120948f87c1e19db7dd81bcbecfd5e",
