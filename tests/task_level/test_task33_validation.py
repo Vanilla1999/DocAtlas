@@ -194,7 +194,7 @@ def test_bounded_validator_reconstructs_host_owned_validation_evidence(
     _write(tmp_path / "delivery_prompt_sources.json", [])
     captured: dict[str, object] = {}
 
-    def fake_validate(packet, *, evidence_items, max_tokens):
+    def fake_validate(packet, *, evidence_items):
         captured["evidence_items"] = list(evidence_items)
         return []
 
