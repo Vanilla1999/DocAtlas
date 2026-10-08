@@ -1,6 +1,70 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Последний полный прогон: 3be9c34; следующий пакет test/guidance successors
+## Последний полный прогон: 0358365; четыре contract-fixture migrations
+
+Обновление: 2026-10-08. Полный [CI 37830452263](https://github.com/Vanilla1999/DocAtlas/actions/runs/37830452263)
+завершён на HEAD `03583656617336a746e9192249467017d6131f29`, merge checkout
+`96767d8d8499b28a701bc20055277a7362d63aa3`, tree
+`b77cb4c3ed5bd60dd0ab47cd0398f1664bfd6ae1`.
+
+- Все три Python 3.11/3.12/3.13: **8507 = 6480 PASS / 1956 FAIL /
+  61 ERROR / 10 SKIP**. Против 3be9c34 ровно **24 FAIL→PASS**, ноль новых,
+  удалённых, PASS→FAIL или неожиданных state transitions. Исходный focused
+  791/801 не был этой полной CI-матрицей.
+- Из предыдущих 25 targets прошли 24. Source-continuation fixture теперь
+  действительно проходит confirmed member preparation, затем останавливается
+  на `assert 'query-original' in ['query-lookup-1']`. Перенос lookup coverage на
+  исходный вопрос не разрешён; этот deferred retrieval failure не скрывается.
+- Промежуточный `4320a68` добавил module-size regression (1039 строк). В
+  `0358365` тело fidelity test AST-exact перенесено в существующий shared helper;
+  test IDs и guards прежние, модуль теперь 974 строки. Static, P2 federated и
+  соответствующий core guard снова **PASS**, предел 1000 не изменён.
+- Advanced: **622 = 524 PASS / 98 FAIL**, roster/states совпадают с 3be9c34 и
+  4320a68. Все девять независимых downstream steps выполнены и FAIL с прежними
+  первыми причинами. Critical baseline **19/28 PASS**, mutants не запускались.
+- Все **6 platform SDK jobs PASS**; main package/CLI — **77/77 PASS** на каждой
+  платформе. 19 actual logs подтвердили 15 SDK invocations, 30 structured/text
+  lanes и 420 prepared observations. Source-binding digests и outcomes прежние.
+  Release build, три wheels, sdist/installer и required-release **PASS**.
+- Все 17 workflows завершились: **8 SUCCESS / 8 FAILURE / 1 SKIPPED**.
+  `required-ci` job **113497770623 FAILURE**, P1 aggregate **113498272845 FAILURE**.
+  Actual Claude Code/Codex/OpenCode sessions по-прежнему **NOT RUN**.
+
+Catalog остаётся **6918 bytes**, отдельная docs output schema **860 bytes**.
+Фиксированные catalog ceilings 6144/10240 сняты владельцем; нового magic number
+нет. Остальные guards, output schema <1000 и frozen retrieval criterion 800
+сохраняются. Retrieval gate: maximum **1451 pinned offline BPE tokens**,
+**24/48** within-budget cases выше 800; все 80 measurements прежние. Это не
+фактическая стоимость в приложениях или за целую задачу.
+
+### Следующий пакет и границы его проверки
+
+| Slice | Сохранённое проверяемое свойство |
+|---|---|
+| Provenance API fixture | Точный ValueError для hidden_test_answer; убран только retired positional display budget |
+| Identity collision | Разные content bindings одного stable ID отвергаются; одинаковые bindings дают валидные непустые data без edit authority |
+| Policy text fidelity | Все три исходные фразы и весь text/hash/path сохраняются как untrusted source data; не выводятся policy или edit permissions |
+| Exact Dartdoc fixture | Прежний class URL и отдельный robots control; настоящий pinned transport через MockTransport, те же extraction/browser guards, negatives без дополнительных requests |
+| Guard setup diagnostics | 47 прежних ERROR остаются; metadata/stage counts должны показать настоящий upstream reason вместо одного IndexError |
+
+Production, retrieval, исходные вопросы/corpora, gold, thresholds и workflows
+не меняются. Collection IDs/параметры сохранены. Независимые reviews описывают
+точные bytes; source-collision и provenance меняют разные nodes одного файла,
+поэтому их integration проверяется отдельно по AST. Runtime следующего пакета
+**NOT RUN** на момент записи: результаты 0358365 на него не переносятся.
+
+[Полный compact acceptance 0358365](PR211_CONTRACT_FIXTURE_ACCEPTANCE.json) содержит
+завершённые workflows/jobs, advanced/downstream/retrieval, actual installed SDK
+matrix и границы claims. [Core delta](PR211_CONTRACT_FIXTURE_CORE_ACCEPTANCE.json)
+содержит все 24 transitions, hashes и три JUnit artifacts. Исторические baseline
+и оставшиеся причины ниже сохраняются. Deferred retrieval не исправлялся.
+
+**PR пока НЕ ГОТОВ к merge:** полный core/advanced и required gates красные,
+actual app-client acceptance отсутствует. Обычный push разрешён; merge,
+release и force-push не выполнялись. Продолжаются только обоснованные narrow
+migrations и диагностика; ошибки не переводятся в PASS заменой gold/thresholds.
+
+## Исторический полный прогон: 3be9c34 и пакет из 25 targets
 
 Обновление: 2026-10-08. Последний полностью выполненный main CI:
 [37824782946](https://github.com/Vanilla1999/DocAtlas/actions/runs/37824782946),
