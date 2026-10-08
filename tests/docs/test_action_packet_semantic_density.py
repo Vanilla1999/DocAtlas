@@ -221,6 +221,8 @@ def test_source_fact_witness_prefers_explicit_config_value_over_shorter_prohibit
 
 
 def test_every_safe_canonical_policy_fact_survives_packet_formatting():
+    from docmancer.docs.application.action_packet import validate_action_packet
+
     policy = _candidate(
         "policy",
         "PermissionService must own decisions. BrowserGate must delegate decisions. Do not bypass PermissionService.",
@@ -231,18 +233,29 @@ def test_every_safe_canonical_policy_fact_survives_packet_formatting():
         question="Fix PermissionService and BrowserGate.",
         context_pack=[policy],
         trust_contract={"selected": [], "risky": [], "rejected": []},
-        max_tokens=2_000,
         project_path="/repo",
     )
 
     visible = "\n".join(
         str(row.get("text") or "")
-        for key in ("required_invariants", "forbidden_changes", "implementation_guidance")
-        for row in packet[key]
+        for row in packet["sources"]
     )
     assert "PermissionService must own decisions." in visible
     assert "BrowserGate must delegate decisions." in visible
     assert "Do not bypass PermissionService." in visible
+    assert packet["result"] == "data"
+    assert packet["edit_ready"] is False
+    assert len(packet["sources"]) == 1
+    source = packet["sources"][0]
+    assert source["text"] == policy["display_text"]
+    assert source["content_sha256"] == hashlib.sha256(policy["display_text"].encode("utf-8")).hexdigest()
+    assert source["path"] == policy["path"]
+    assert source["stable_id"] == policy["stable_chunk_id"]
+    assert source["instruction_trust"] == "untrusted_data"
+    assert not any(key in packet for key in (
+        "required_invariants", "forbidden_changes", "implementation_guidance", "mutation_intent",
+    ))
+    assert validate_action_packet(packet, evidence_items=[policy], project_path="/repo") == []
 
 
 def test_project_rule_authority_must_match_the_validated_project_manifest(tmp_path):
