@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from importlib.resources import files
+import re
 
 from docmancer.cli.commands import _get_template_content
 from docmancer.mcp.agent_workflow_contract import public_agent_contract, runtime_public_tool_dicts
@@ -29,4 +30,4 @@ def test_public_tool_and_agent_template_explain_scope_without_hidden_widening():
         assert 'scope="project"' in text
         assert 'scope="module"' in text
         assert 'scope="all"' in text
-        assert "never widen" in text.lower()
+        assert re.search(r"\bnever (?:infer or )?widen scope from (?:question wording|prose)\b", text, re.I)
