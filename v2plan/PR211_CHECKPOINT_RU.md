@@ -1,4 +1,51 @@
-# PR #211: checkpoint после reviewed migrations и полного CI
+# PR #211: checkpoint продолжения merge-readiness
+
+## Текущая волна от df9b682 — review завершено, новый CI ожидается
+
+Обновление: 2026-10-08. Работа продолжается от
+`df9b682fdd13d8f4d1c5bff6cc4bfc0286e5f8ce`; это следующий snapshot существующей
+PR #211. Новые runtime outcomes пока **NOT RUN** и не наследуют PASS исходного CI.
+
+Владелец явно отменил фиксированный catalog ceiling и указал стремиться к минимуму.
+Прежние 6144/10240 bytes больше не являются default merge gates; нового числового
+порога нет. Canonical catalog сокращён 7066→6918 bytes, output schema остаётся
+860 bytes. Measurement, per-tool attribution, normal/advanced separation,
+validation и source/consent/authority guards сохранены.
+[Актуальное решение](CURRENT_WAVE_DECISIONS_RU.md),
+[policy review](PR211_CATALOG_POLICY_REVIEW_RU.md).
+
+Собраны отдельные reviewed slices:
+
+- [Confirmed member transactions](PR211_MUTATION_FIXTURE_REVIEW_RU.md),
+  [независимый review](PR211_MUTATION_FIXTURE_INDEPENDENT_REVIEW_RU.md) и
+  [точечное обновление diagnostic inventory](PR211_MUTATION_INVENTORY_INDEPENDENT_REVIEW_RU.md).
+  Сохранены 21 прежний concrete case, добавлены два integrity tests.
+- [Finite code membership fixtures](PR211_MEMBERSHIP_FIXTURE_REVIEW_RU.md) и
+  [независимый review](PR211_MEMBERSHIP_FIXTURE_INDEPENDENT_REVIEW_RU.md).
+  Все 64 прежних test nodes и 218 assert AST сохранены.
+- [Literal question boundary](PR211_QUESTION_BOUNDARY_REVIEW_RU.md) и
+  [независимый review](PR211_QUESTION_BOUNDARY_INDEPENDENT_REVIEW_RU.md).
+  303 прежних concrete nodes сохранены; изменены 295 cases в шести functions.
+  Это producer-boundary tests, не сертификат downstream semantic sufficiency.
+- [Дополнительное сокращение catalog](PR211_CATALOG_CONTINUATION_REVIEW_RU.md) и
+  [независимый review](PR211_CATALOG_CONTINUATION_INDEPENDENT_REVIEW_RU.md):
+  constraints и output прежние, 38 meaningful negative controls проверены review.
+- [Literal source/gap fixtures](PR211_DICTIONARY_FIXTURE_REVIEW_RU.md) и
+  [независимый review](PR211_DICTIONARY_FIXTURE_INDEPENDENT_REVIEW_RU.md):
+  27 затронутых baseline failures, все 129 прежних nodes и 112 assert AST сохранены.
+
+Последний полностью выполненный baseline —
+[df9b682 CI 37811010878](https://github.com/Vanilla1999/DocAtlas/actions/runs/37811010878):
+core на каждой Python 3.11/3.12/3.13 — 8505 cases, 6031 PASS, 2403 FAIL,
+61 ERROR, 10 SKIP; advanced — 622 cases, 524 PASS, 98 FAIL.
+После публикации нового snapshot обязателен полный совместный CI с concrete-node
+сравнением, отдельным учётом двух новых tests и проверкой прежних PASS.
+
+Deferred retrieval и frozen gold остаются без изменений. Остальные CI/downstream
+и installed/client requirements не отменены. PR пока **НЕ ГОТОВ к merge**.
+Merge, release и force-push не разрешены.
+
+## Исторический checkpoint предыдущей волны
 
 Дата: 2026-10-08. **PR пока НЕ ГОТОВ к merge.** Это evidence и точный остаток,
 не merge/release approval. Retrieval, frozen gold, thresholds и действующие
