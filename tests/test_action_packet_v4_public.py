@@ -233,6 +233,8 @@ def test_mcp_delivery_block_is_v4_failure_without_sources(necessary_evidence, tm
 
 
 def test_documents_remain_bounded_and_non_authorizing(tmp_path):
+    # Historical node retained: output-size caps were removed; source binding
+    # and non-authority guards remain. Every missing detail must survive.
     row = source("Protocol configuration: set `protocol_mode = strict`.")
     projection, snapshot = project_docs_answer(
         question="Protocol configuration", retrieval={"primary_snippet": row}, max_tokens=800,
@@ -243,12 +245,33 @@ def test_documents_remain_bounded_and_non_authorizing(tmp_path):
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=1) == []
     assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    missing = [f"missing-{i}:" + "detail" * 200 + f":required-tail-{i}" for i in range(8)]
+    expected_missing = tuple(missing)
     failure = project_insufficient(
-        kind="docs_answer", missing=[f"missing-{i}:" + "detail" * 200 for i in range(8)],
+        kind="docs_answer", missing=missing,
         recommended_next_action=None, max_tokens=200,
     )
-    assert failure["estimated_tokens"] <= 200
+    assert tuple(failure["missing"]) == expected_missing
+    assert tuple(missing) == expected_missing
+    assert failure["estimated_tokens"] > 200
+    assert failure["status"] == "insufficient_evidence"
+    assert failure["answer_supported"] is failure["answer_available"] is failure["edit_ready"] is False
+    assert not failure.get("sources")
+    assert "recommended_next_action" not in failure
+    expected = deepcopy(failure)
+    refresh(expected)
+    assert failure == expected
     assert validate_model_visible_projection(failure, snapshot={}, max_tokens=200) == []
+    # Negatives start with the valid complete payload and change one guard.
+    for key in ("answer_supported", "answer_available", "edit_ready"):
+        forged = deepcopy(failure)
+        forged[key] = True
+        refresh(forged)
+        assert validate_model_visible_projection(forged, snapshot={}, max_tokens=200)
+    forged = deepcopy(projection)
+    forged["sources"][0]["content_sha256"] = "0" * 64
+    refresh(forged)
+    assert validate_model_visible_projection(forged, snapshot=snapshot, max_tokens=1)
 
 
 def test_public_caller_kind_and_mutation_do_not_change_docs_policy(tmp_path):

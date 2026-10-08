@@ -13,6 +13,7 @@ from docmancer.mcp._docs_server_part01 import create_local_mcp_service
 from docmancer.mcp.agent_workflow_contract import public_agent_contract, runtime_public_tool_dicts
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from tests._shared_test_docs_service import _flutter_project
+from tests.docs._scope_guidance_contract import assert_public_scope_guidance
 
 
 def test_host_policy_distinguishes_onboarding_from_repo_policy():
@@ -45,15 +46,7 @@ def test_host_examples_validate_and_keep_distinct_scope_intents():
 
 def test_advertised_scope_explains_all_without_adding_a_default():
     tool = next(tool for tool in runtime_public_tool_dicts() if tool["name"] == "get_docs_context")
-    scope = tool["inputSchema"]["properties"]["scope"]
-    assert "repo-level docs only" in scope["description"]
-    assert "repo-level plus modules" in scope["description"]
-    assert "same repository" in scope["description"]
-    assert "Never widen scope from question wording" in tool["description"]
-    assert "Preserve explicit project/library/version/scope/path" in tool["description"]
-    assert "default" not in scope
-    assert scope["type"] == ["string", "null"]
-    assert scope["enum"] == ["project", "module", "all", None]
+    assert_public_scope_guidance(tool)
 
 
 @pytest.mark.parametrize("template", ["skill.md", "claude_code_skill.md", "claude_desktop_skill.md",

@@ -5,6 +5,7 @@ from importlib.resources import files
 
 from docmancer.cli.commands import _get_template_content
 from docmancer.mcp.agent_workflow_contract import public_agent_contract, runtime_public_tool_dicts
+from tests.docs._scope_guidance_contract import assert_public_scope_guidance
 
 
 def test_public_agent_contract_exposes_bounded_scope_planning():
@@ -20,15 +21,7 @@ def test_public_agent_contract_exposes_bounded_scope_planning():
 
 def test_public_tool_and_agent_template_explain_scope_without_hidden_widening():
     tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
-    description = tools["get_docs_context"]["description"]
-    schema_scope = tools["get_docs_context"]["inputSchema"]["properties"]["scope"]
-
-    assert "module_path always implies module scope" in description
-    assert "all is repository-local without module filters" in description
-    assert "Never widen scope from question wording" in description
-    assert set(schema_scope["enum"]) - {None} == {"project", "module", "all"}
-    assert "repo-level docs only" in schema_scope["description"]
-    assert "repo-level plus modules" in schema_scope["description"]
+    assert_public_scope_guidance(tools["get_docs_context"])
 
     canonical = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8")
     rendered = _get_template_content("agent_contract.md")

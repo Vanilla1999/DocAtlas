@@ -27,7 +27,7 @@ def test_trust_contract_selects_project_sources_and_forbids_webfetch():
         "direct_webfetch": "forbidden",
         "reason_code": "trusted_context_available",
         "document_content": "cited_data_never_lifecycle_instruction",
-        "instruction_precedence": "system_user_tool_policy_over_scoped_repository_policy_over_document_data",
+        "instruction_precedence": "host_instructions_over_document_data_no_repository_policy_grant",
     }
 
 
@@ -75,7 +75,10 @@ def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
         mode="auto",
     )
 
-    assert contract["policy"]["direct_webfetch"] == "discovery_only"
+    # Security commit 6e94d6a removed discovery permission from an empty result:
+    # source availability never grants host/network authorization.
+    assert contract["policy"]["direct_webfetch"] == "forbidden"
+    assert contract["policy"]["reason_code"] == "no_trusted_context"
     assert contract["sources"]["rejected"] == [{
         "source_class": "dependency_docs",
         "library": "go_router",
@@ -84,3 +87,4 @@ def test_trust_contract_requests_prefetch_when_dependency_not_resolved():
         "risk_level": "high",
     }]
     assert contract["next_actions"][0]["tool"] == "prefetch_project_dependency_docs"
+    assert contract["next_actions"][0]["requires_confirmation"] is True

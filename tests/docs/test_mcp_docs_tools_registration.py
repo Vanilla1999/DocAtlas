@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+import ast
 import json
+import re
 
 import jsonschema
 import pytest
@@ -794,8 +796,29 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert "`sources`" in workflow["text"]
     assert library_workflow is not None
     assert "get_docs_context" in library_workflow["text"]
-    assert "mode=\"library\"" in library_workflow["text"]
-    assert "get_docs_context" in library_workflow["text"]
+    # The unified public call binds a library directly. Parse and validate the
+    # actual examples so the migration cannot pass with an obsolete mode or a
+    # prose mention of the right parameter next to an invalid invocation.
+    context_tool = next(tool for tool in current_tools({}) if tool["name"] == "get_docs_context")
+    library_calls = []
+    for example in re.findall(r"`(get_docs_context\([^\n]*\))`", library_workflow["text"]):
+        expression = ast.parse(example, mode="eval").body
+        assert isinstance(expression, ast.Call) and not expression.args
+        assert isinstance(expression.func, ast.Name) and expression.func.id == "get_docs_context"
+        arguments = {}
+        for keyword in expression.keywords:
+            assert keyword.arg is not None and keyword.arg not in arguments
+            assert isinstance(keyword.value, ast.Constant) and keyword.value.value is Ellipsis
+            arguments[keyword.arg] = {
+                "question": "Original library question?", "library": "mcp",
+                "version": "1.28.0", "project_path": "/repo",
+            }[keyword.arg]
+        jsonschema.validate(arguments, context_tool["inputSchema"])
+        assert "mode" not in arguments
+        if "library" in arguments:
+            assert arguments == {"question": "Original library question?", "library": "mcp", "version": "1.28.0"}
+            library_calls.append(arguments)
+    assert library_calls
     assert "prepare_docs" in library_workflow["text"]
     assert "docs_status" in library_workflow["text"]
     assert "Do not use WebFetch" in library_workflow["text"]
