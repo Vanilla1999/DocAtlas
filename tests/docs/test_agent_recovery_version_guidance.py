@@ -111,17 +111,24 @@ def test_advertised_tool_guidance_matches_installed_recovery_and_question_rules(
     properties = tools["get_docs_context"]["inputSchema"]["properties"]
     assert properties["version"]["type"] == ["string", "null"]
     assert "version" not in tools["get_docs_context"]["inputSchema"]["required"]
-    for name, old, new in (
-        ("get_docs_context", "Current project: omit version", "Current project: pin previous version"),
-        ("get_docs_context", "requery after lockfile changes", "reuse context after lockfile changes"),
-        ("prepare_docs", "retry unchanged once only after verified success/readiness", "retry after job start"),
-        ("prepare_docs", "confirmation and network consent", "network availability"),
-        ("docs_status", "no discovery", "allow discovery"),
-        ("docs_status", "a returned job_id from prepare_docs", "any guessed job_id"),
+    for name, guard, old, new in (
+        ("get_docs_context", "version.current", "Current project: omit version", "Current project: pin previous version"),
+        ("get_docs_context", "version.lockfile", "requery after lockfile changes", "reuse context after lockfile changes"),
+        ("prepare_docs", "prepare.retry", "retry unchanged once only after verified success/readiness", "retry after job start"),
+        ("prepare_docs", "prepare.consent", "confirmation/network consent", "network availability"),
+        ("docs_status", "status.no_discovery", "no discovery", "allow discovery"),
+        ("docs_status", "status.job", "returned prepare_docs job_id", "any guessed job_id"),
+        ("get_docs_context", "version.current", "Current project: omit version", "Current library: omit version"),
+        ("get_docs_context", "version.explicit", "exact/historical versions only if explicit", "infer exact/historical versions"),
+        ("prepare_docs", "prepare.explicit", "or explicit docs lifecycle request", "or guessed preparation need"),
+        ("prepare_docs", "prepare.consent", "source bindings/confirmation/network consent", "source guesses/confirmation/network consent"),
+        ("prepare_docs", "prepare.consent", "confirmation/network consent", "confirmation/network availability"),
+        ("prepare_docs", "prepare.no_speculation", "missing/stale docs/network approval alone grants no preparation", "missing docs authorize preparation"),
+        ("docs_status", "status.action", "returned recommended_next_action", "invented recommended_next_action"),
     ):
         mutated = deepcopy(tools)
         mutated[name] = _replace_guidance(mutated[name], old, new)
         assert advertised_guidance(mutated[name]) != advertised_guidance(tools[name])
-        with pytest.raises(AssertionError):
+        with pytest.raises(AssertionError, match=re.escape(guard)):
             assert_public_context_guidance(mutated["get_docs_context"])
             assert_public_lifecycle_guidance(mutated)

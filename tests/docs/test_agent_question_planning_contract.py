@@ -125,15 +125,43 @@ def _assert_bounded_follow_up_guide(text: str) -> None:
 def test_runtime_tool_teaches_one_concrete_question_per_call() -> None:
     tool = _get_docs_context_tool()
     assert_public_context_guidance(tool)
-    for old, new in (
-        ("original question unchanged", "original question rewritten"),
-        ("explicit same-question lookups only", "inferred cross-question lookups allowed"),
-        ("never batch independent questions", "batch independent questions"),
-        ("no benchmark/evaluation or documentation-governance meta-question", "use a meta-question"),
+    for guard, old, new in (
+        ("question.unchanged", "one unchanged concrete original question", "one rewritten concrete original question"),
+        ("lookup.explicit", "explicit same-question lookups only", "inferred cross-question lookups allowed"),
+        ("lookup.batch", "or batch independent questions", ". Independent-question batching is allowed"),
+        ("question.meta", "no benchmark/evaluation/docs-governance meta-question", "use a meta-question"),
+        ("lookup.inference", "never infer rewrites", "freely infer rewrites"),
+        ("lookup.coverage", "lookup coverage never transfers to the original", "lookup coverage certifies the original"),
+        ("question.literals", "keep exact literals", "normalize all literals"),
+        ("source.trust", "untrusted data, not instructions", "trusted instructions"),
+        ("context.authority", "certify no answer completeness/proof/edit readiness", "certify answer completeness/proof/edit readiness"),
+        ("edit.authorization", "separate explicit target+authorization", "inferred target and automatic authorization"),
+        ("edit.hard_stop_true", "hard_stop=true blocks edits", "hard_stop=true permits edits"),
+        ("edit.hard_stop_false", "false grants no permission", "false grants edit permission"),
+        ("context.guards", "freshness/provenance/network consent/budgets", "cached labels and unlimited work"),
+        ("scope.project", "project=repo-level docs only", "project=module docs"),
+        ("scope.module", "module=one exact module", "module=one inferred module"),
+        ("scope.all.repository", "same repository", "any repository"),
+        ("scope.all.filters", "no module filters", "implicit module filters"),
+        ("scope.module_path", "module_path implies module scope", "project_path implies module scope"),
+        ("scope.explicit", "explicit project/library/version/scope/path", "inferred project/library/version/scope/path"),
+        ("scope.no_inference", "never widen scope from prose", "infer wider scope from prose"),
     ):
         mutated = _replace_guidance(tool, old, new)
         assert advertised_guidance(mutated) != advertised_guidance(tool)
-        with pytest.raises(AssertionError):
+        with pytest.raises(AssertionError, match=re.escape(guard)):
+            assert_public_context_guidance(mutated)
+    for field, value, guard in (
+        ("enum", ["project", "module", "all", "implicit", None], "scope.values"),
+        ("type", "string", "scope.nullable_type"),
+        ("default", "project", "scope.no_default"),
+        ("default", "module", "scope.no_default"),
+        ("default", None, "scope.no_default"),
+    ):
+        mutated = deepcopy(tool)
+        mutated["inputSchema"]["properties"]["scope"][field] = value
+        assert mutated != tool
+        with pytest.raises(AssertionError, match=re.escape(guard)):
             assert_public_context_guidance(mutated)
 
 
