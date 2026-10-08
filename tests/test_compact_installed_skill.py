@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import zipfile
 
+import click
 import jsonschema
 import pytest
 
@@ -142,3 +143,64 @@ def test_wheel_contains_templates_and_all_linked_guide_bytes(tmp_path):
             assert package.read("docmancer/templates/references/" + source.name) == source.read_bytes()
         for name in ("skill.md", "claude_code_skill.md", "claude_desktop_skill.md", "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md"):
             assert package.read("docmancer/templates/" + name) == files("docmancer.templates").joinpath(name).read_bytes()
+
+
+@pytest.mark.parametrize("writer", ["skill", "instructions"])
+@pytest.mark.parametrize("attack", ["directory_symlink", "directory_file", "guide_symlink", "dangling_guide", "guide_directory", "malformed_main", "missing_main_markers", "unsupported_no_follow"])
+@pytest.mark.parametrize("guide", ["prepare.md", "troubleshooting.md", "cli.md", "patch.md"])
+def test_reference_refusal_preserves_all_guides_and_outside_targets(tmp_path, monkeypatch, writer, attack, guide):
+    content = guidance._get_template_content("skill.md" if writer == "skill" else "project_bootstrap.md")
+    destination = tmp_path / "installed" / ("SKILL.md" if writer == "skill" else "AGENTS.md")
+
+    def install():
+        if writer == "skill":
+            guidance._install_skill_file(content, destination)
+        else:
+            guidance._install_or_append_agents_md(destination, content)
+
+    # A real admissible positive precedes each hostile-path negative.
+    install()
+    refs = destination.parent / "docatlas-references"
+    names = ["prepare.md", "troubleshooting.md", "cli.md", "patch.md"]
+    for name in names:
+        assert (refs / name).is_file()
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    for name in names:
+        (outside / name).write_text(f"Outside user bytes: {name}\n")
+    absent = outside / "never-created.md"
+    if attack in {"directory_symlink", "directory_file"}:
+        for name in names:
+            (refs / name).unlink()
+        refs.rmdir()
+        if attack == "directory_symlink":
+            refs.symlink_to(outside, target_is_directory=True)
+        else:
+            refs.write_text("Not a directory\n")
+    elif attack in {"guide_symlink", "dangling_guide", "guide_directory"}:
+        (refs / guide).unlink()
+        if attack == "guide_directory":
+            (refs / guide).mkdir()
+        else:
+            (refs / guide).symlink_to(outside / guide if attack == "guide_symlink" else absent)
+    elif attack == "malformed_main":
+        destination.write_text(destination.read_text().replace(guidance._AGENTS_MD_END, "broken-end"))
+    elif attack == "missing_main_markers":
+        if writer == "skill":
+            destination.write_text("---\nname: docatlas\n---\n" + guidance._SKILL_FILE_OWNER + "\nOwned file missing markers\n")
+        else:
+            destination.write_text(guidance._AGENTS_MD_START + "\nUnterminated block\n")
+    else:
+        monkeypatch.delattr(guidance.os, "O_NOFOLLOW")
+    before_main = destination.read_bytes()
+    before_outside = {name: (outside / name).read_bytes() for name in names}
+    before_guides = {name: (refs / name).read_bytes() for name in names
+                     if (refs / name).is_file() and not (refs / name).is_symlink()}
+    with pytest.raises(click.ClickException):
+        install()
+    assert destination.read_bytes() == before_main
+    assert {name: (outside / name).read_bytes() for name in names} == before_outside
+    assert not absent.exists() and not absent.is_symlink()
+    assert set(path.name for path in outside.iterdir()) == set(names)
+    for name, original in before_guides.items():
+        assert (refs / name).read_bytes() == original
