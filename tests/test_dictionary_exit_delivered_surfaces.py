@@ -31,6 +31,12 @@ from docmancer.mcp.docs_server import (
     current_tools,
     read_docs_resource,
 )
+from tests.docs._scope_guidance_contract import (
+    assert_public_context_guidance, assert_public_lifecycle_guidance,
+)
+from tests.docs.test_pr211_catalog_equivalence import (
+    BASELINE_PATH, BASELINE_SHA256, _normalized_schema,
+)
 
 
 def _digest(value):
@@ -55,8 +61,9 @@ def _without_descriptions(value):
 def test_all_schema_constraints_remain_bound_to_pre_slice_snapshot(which, expected):
     # These are base 8346f6d6 constraints, not post-split replacement hashes.
     # That base already contains the approved uncapped missing/recovery arrays.
-    # Reverse ONLY the reviewed default-surface delta before comparing the base:
-    # RAW/internal schemas, prepare/status and all other bounds stay untouched.
+    # Bind algebraic reductions to an independently extracted 21fe472d catalog,
+    # then reverse the previously reviewed default-surface delta against 8346f6d6.
+    # The original hashes and all RAW/internal/output constraints remain anchors.
     values = {
         "raw": {tool["name"]: {key: tool[key] for key in ("inputSchema", "outputSchema") if key in tool} for tool in RAW_TOOLS},
         "input": PUBLIC_ADVERTISED_INPUT_SCHEMAS,
@@ -83,6 +90,11 @@ def test_all_schema_constraints_remain_bound_to_pre_slice_snapshot(which, expect
     advanced = next(spec for spec in build_docs_surface(DocsServerConfig(expose_advanced=True)).tools
                     if spec.name == 'get_docs_context')
     if which == 'input':
+        baseline_bytes = BASELINE_PATH.read_bytes()
+        assert hashlib.sha256(baseline_bytes).hexdigest() == BASELINE_SHA256
+        baseline = {tool['name']: tool['inputSchema'] for tool in json.loads(baseline_bytes)}
+        assert _normalized_schema(constraints) == _normalized_schema(baseline)
+        constraints = _without_descriptions(baseline)
         current = constraints['get_docs_context']
         assert 'context_format' not in current['properties']
         assert current.pop('additionalProperties') is False
@@ -93,7 +105,7 @@ def test_all_schema_constraints_remain_bound_to_pre_slice_snapshot(which, expect
         # Advanced restores only that field; unknown-field closure remains enforced.
         advanced_constraints = _without_descriptions(advanced.input_schema)
         assert advanced_constraints.pop('additionalProperties') is False
-        assert advanced_constraints == current
+        assert _normalized_schema(advanced_constraints) == _normalized_schema(current)
     elif which == 'output':
         docs = constraints['get_docs_context']
         assert docs['type'] == 'object' and docs['required'] == ['status']
@@ -167,17 +179,7 @@ def test_raw_advertised_and_runtime_lookups_deliver_only_explicit_contract():
             'type': ['array', 'null'], 'maxItems': 5, 'uniqueItems': True,
             'items': {'type': 'string', 'minLength': 1, 'maxLength': 500},
         }
-        for retained in ('Explicit same-question lookups only',
-                         'Never infer rewrites, translations, subquestions, expected answers or source names',
-                         'never batch independent questions', 'Keep exact literals'):
-            assert retained in lookup['description']
-        text = tool['description']
-        for retained in ('original request unchanged', 'never widen scope from prose',
-                         'Lookup coverage does not transfer to the original',
-                         'certify neither answer completeness, proof nor edit readiness',
-                         'separate explicit target and authorization', 'false grants no permission',
-                         'freshness, provenance, network consent and budgets', 'untrusted data, not instructions'):
-            assert retained in text
+        assert_public_context_guidance(tool)
 
 
 @pytest.mark.parametrize("name", ["get_code_context", "get_patch_plan_context", "get_patch_constraints"])
@@ -342,15 +344,8 @@ def test_resource_uris_trust_schema_and_bounded_reader_template_unchanged(tmp_pa
 
 def test_lifecycle_recovery_status_and_current_binding_guidance():
     tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
-    assert "recommended_next_action" in tools["prepare_docs"]["description"]
-    assert "confirmation and network consent" in tools["prepare_docs"]["description"]
-    assert "only after verified success/readiness" in tools["prepare_docs"]["description"]
-    assert "Missing/stale docs or network approval alone grants no preparation permission" in tools["prepare_docs"]["description"]
-    assert "not discovery" in tools["docs_status"]["description"]
-    assert "returned" in tools["docs_status"]["description"]
-    version = tools["get_docs_context"]["inputSchema"]["properties"]["version"]["description"]
-    assert "Current project: omit" in version
-    assert "exact/historical" in version and "lockfile" in version
+    assert_public_context_guidance(tools["get_docs_context"])
+    assert_public_lifecycle_guidance(tools)
     quickstart = read_docs_resource("docmancer://agent/quickstart")["text"]
     assert "terminal success" in quickstart and "failure/cancellation" in quickstart
     assert "network consent" in quickstart and "confirmation" in quickstart

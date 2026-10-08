@@ -23,6 +23,9 @@ from docmancer.mcp.docs_server import (
     current_tools,
     read_docs_resource,
 )
+from tests.docs._scope_guidance_contract import (
+    assert_public_context_guidance, assert_public_lifecycle_guidance,
+)
 
 
 def test_mcp_public_prepare_docs_advertises_project_local_library_removal():
@@ -669,8 +672,7 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
 
     assert set(tools) == PUBLIC_TOOL_NAMES
     context_tool = tools["get_docs_context"]
-    assert "Source-grounded documentation tool" in context_tool["description"]
-    assert 'never widen scope from prose' in context_tool["description"]
+    assert_public_context_guidance(context_tool)
     context_properties = context_tool["inputSchema"]["properties"]
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
@@ -679,12 +681,6 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
         "question", "lookup_queries", "project_path", "library", "version",
         "module_path", "scope",
     }
-    assert "always implies module scope" in context_properties["module_path"]["description"]
-    assert "repo-level docs only" in context_properties["scope"]["description"]
-    assert "same repository without module filters" in context_properties["scope"]["description"]
-    assert "original request unchanged" in context_tool["description"]
-    assert "Context/flags certify neither answer completeness, proof nor edit readiness" in context_tool["description"]
-    assert "Edits need a separate explicit target and authorization" in context_tool["description"]
     assert "context_format" not in context_tool["description"]
     assert "patch_context" not in json.dumps(context_tool["outputSchema"])
     output_properties = context_tool["outputSchema"]["properties"]
@@ -693,8 +689,7 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     jsonschema.validate({"status": "insufficient_evidence", "kind": "docs_context",
                          "module_candidates": [{"module_path": f"packages/module-{i}"} for i in range(12)]},
                         context_tool["outputSchema"])
-    assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
-    assert "explicit health, freshness, indexing, or job-progress request" in tools["docs_status"]["description"]
+    assert_public_lifecycle_guidance(tools)
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
         "project",

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_pr211_catalog_equivalence.py": "schema"
+  },
+  "node_overrides": {
+    "tests/docs/test_pr211_catalog_equivalence.py::test_pr211_unknown_fields_and_invalid_mutation_never_reach_service": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_pr211_catalog_equivalence.py": "234d14a2ca37ed6a1cce1f4a86b283fa8951bf6e73b55112194d2e7eb3011468"
+  }
+}
