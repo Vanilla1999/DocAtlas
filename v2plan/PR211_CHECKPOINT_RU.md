@@ -1,5 +1,83 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Последний полный прогон: 40032f7; два следующих fixture slices reviewed
+
+Обновление: 2026-10-08. Последний полностью выполненный main CI:
+[37822521243](https://github.com/Vanilla1999/DocAtlas/actions/runs/37822521243),
+HEAD `40032f7be3c6d0822e8c25a2e2c53acf9a46aeea`, merge checkout
+`5736ec7b2ba2dcd55892b6085aff6107bae15e4f`, одинаковый tree
+`701ba7a4e529e0b197c6d28d4ec9ce7ac7dbdfb4`.
+
+- Core Python 3.11/3.12/3.13: на каждой **8507 = 6450 PASS / 1986 FAIL /
+  61 ERROR / 10 SKIP**. Roster и outcomes совпали; против f0ed956 ровно
+  **35 FAIL→PASS**, без новых/удалённых nodes, PASS regressions и иных state changes.
+  Закрыты registration companion и все 34 generated-consent cases.
+- Advanced: **622 = 524 PASS / 98 FAIL**, без изменений относительно f0.
+  Новые CI conditions выполнили все девять независимых downstream steps;
+  все девять FAIL. Adversarial mutation правильно SKIPPED после красного
+  полного adversarial baseline. Required CI **FAILURE**.
+- Docs contract, static, installer и installed MCP harness PASS. Все три main
+  platform suites дали **77/77 PASS**, затем реальный SDK stdio PASS.
+  Все три P1 stack platform SDK также PASS. Release build, wheels 3.11/3.12/3.13,
+  sdist/installer и required-release PASS; release не публиковался.
+- Actual SDK: 15 invocations, 30 structured/text prepared lanes; source bindings
+  совпадают с f0, case outcomes/metrics — с f0/df9. Large delivery: 39372 unique UTF-8 bytes,
+  50 sources; partial: 94 bytes, один source и прежний missing marker.
+  Claude Code, Codex и OpenCode application sessions по-прежнему NOT RUN.
+
+Catalog **6918 bytes**, output schema **860 bytes**. Владелец снял фиксированные
+catalog ceilings 6144/10240; продолжаются минимизация и измерение без нового
+magic number. Output schema <1000 и остальные guards/gates не отменены.
+[Актуальные решения](CURRENT_WAVE_DECISIONS_RU.md).
+
+Подготовлен отдельный reviewed slice шести indexed MCP fixture cases:
+[author review](PR211_INDEXED_MCP_FIXTURE_REVIEW_RU.md),
+[independent review](PR211_INDEXED_MCP_FIXTURE_INDEPENDENT_REVIEW_RU.md).
+Он заменяет implicit indexing настоящим confirmed hash-bound member transaction,
+сохраняет все content/fidelity/authority assertions и существующий <=800 criterion.
+Runtime этого следующего slice пока NOT RUN; PASS версии 40032f7 не наследуется.
+Agent gate preparation также прошла [author review](PR211_AGENT_GATE_FIXTURE_REVIEW_RU.md)
+и [independent review](PR211_AGENT_GATE_FIXTURE_INDEPENDENT_REVIEW_RU.md).
+Три связанных callers используют current cold preparation в пределах context
+lifetime; provider/planner/scoring и evaluator tails сохранены. Missing catalogs
+не генерируются автоматически и остаются явным FAIL. Runtime нового Agent slice
+пока NOT RUN. После публикации совместного snapshot нужен полный CI с
+concrete-node сравнением.
+
+## Подтверждённые оставшиеся причины
+
+| Gate | Первая фактическая граница на 40032f7 |
+|---|---|
+| Recovery | Ожидаемый parsing origin против actual retrieval_miss; до fixture setup |
+| Recovery mutation | Красный полный recovery baseline; mutants не запускались |
+| Hermetic project context | 1/16 PASS, 15 FAIL по frozen query-plan/intent contract; retrieval не выполнялся |
+| Legacy и V2 self-host | Legacy sync без explicit mutation; отдельный project-config/host-storage conflict также требует решения |
+| Question surface | 0/100 по frozen semantic expectations |
+| Agent V1 и adversarial | Legacy fixture sync без explicit mutation; adversarial cases ещё не достигнуты |
+| Critical mutation | Baseline 28 cases: 19 PASS / 9 FAIL по normative modality; mutants не запускались |
+| Retrieval evidence | Неизменённый полный model-visible DTO превысил 800-token criterion |
+
+Это не разрешение заменить ожидания фактическими значениями, снизить thresholds,
+переписать frozen gold или исправлять deferred retrieval. В группе 51 legacy
+lifecycle failures есть проверки auto-prune/vector semantics; всю группу
+нельзя механически превращать в member-upsert tests. Исторический полный CI
+от начального 21fe472d не выполнялся, поэтому весь остаток не называется
+«pre-existing» относительно исходной точки.
+
+Полное f0 evidence и baseline roster сохранены в
+[PR211_CONTINUATION_ACCEPTANCE.json](PR211_CONTINUATION_ACCEPTANCE.json),
+[PR211_CONTINUATION_OUTCOMES.json.gz](PR211_CONTINUATION_OUTCOMES.json.gz) и
+[русском отчёте](PR211_CONTINUATION_ACCEPTANCE_RU.md).
+Отдельный [core delta 40032f7](PR211_FOLLOWUP_CORE_ACCEPTANCE.json) фиксирует
+точные 35 переходов, hashes и matrix provenance без повторного огромного roster.
+
+**PR НЕ ГОТОВ к merge:** required CI и семантические gates красные, actual client
+acceptance не выполнен. Обычный push разрешён; merge, release и force-push — нет.
+Deferred retrieval остаётся без изменений. Следующий CI должен определить
+результаты нового fixture slice, а не скрыть оставшиеся conflicts.
+
+## Историческое состояние перед f0ed956
+
 ## Текущая волна от df9b682 — review завершено, новый CI ожидается
 
 Обновление: 2026-10-08. Работа продолжается от
