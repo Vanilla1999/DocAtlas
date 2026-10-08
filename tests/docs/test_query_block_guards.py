@@ -53,6 +53,17 @@ def seed(tmp_path):
                 "question": "Из каких компонентов состоит origin в CORS?",
                 "project_path": str(project), "scope": "all",
             })
+    assert trace["stages"]["projector_inputs"], {
+        "response": {key: payload.get(key) for key in (
+            "status", "kind", "reason_code", "message", "operational_reason_code",
+            "requires_confirmation", "hard_stop",
+        )},
+        "error": ({key: payload["error"].get(key) for key in (
+            "reason_code", "message", "exception_type",
+        )} if isinstance(payload.get("error"), dict) else None),
+        "source_count": len(payload.get("sources") or []),
+        "stage_counts": {key: len(rows) for key, rows in trace["stages"].items()},
+    }
     return payload, trace["snapshot"], trace["stages"]["projector_inputs"][0], project
 
 

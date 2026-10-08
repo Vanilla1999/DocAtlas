@@ -57,7 +57,18 @@ def empty_seed(tmp_path):
         index_project(service, config, root)
         with patch("docmancer.docs.application.query_block_recovery.select_query_block_recovery",
                    side_effect=lambda p, s, r, **kw: (p, s)):
-            _, trace = observe_call(service, {"question": case["question"], "project_path": str(root), "scope": "all"})
+            payload, trace = observe_call(service, {"question": case["question"], "project_path": str(root), "scope": "all"})
+    assert trace["stages"]["projector_outputs"], {
+        "response": {key: payload.get(key) for key in (
+            "status", "kind", "reason_code", "message", "operational_reason_code",
+            "requires_confirmation", "hard_stop",
+        )},
+        "error": ({key: payload["error"].get(key) for key in (
+            "reason_code", "message", "exception_type",
+        )} if isinstance(payload.get("error"), dict) else None),
+        "source_count": len(payload.get("sources") or []),
+        "stage_counts": {key: len(rows) for key, rows in trace["stages"].items()},
+    }
     first = trace["stages"]["projector_outputs"][0]["payload"]
     return first, trace["snapshot"], trace["stages"]["projector_inputs"][0], root
 
