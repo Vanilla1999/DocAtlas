@@ -428,6 +428,9 @@ def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_pac
     packet = build_action_packet(
         question="Fix the permission gate.",
         context_pack=evidence,
+        # This fixture explicitly requests its literal source statement. The
+        # natural-language objective alone must not invent a content obligation.
+        public_requirements=(source_text,),
     )
     assert validate_action_packet(packet, evidence_items=evidence) == []
     projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
@@ -439,6 +442,16 @@ def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_pac
     assert source["content_sha256"] == hashlib.sha256(source_text.encode()).hexdigest()
     assert (source["char_start"], source["char_end"], source["line_start"], source["line_end"]) == (0, len(source_text), 1, 1)
     assert source["instruction_trust"] == "untrusted_data" and projection["edit_ready"] is False
+    requirement, = projection["requirements"]
+    assert requirement["kind"] == "required_fact" and requirement["value"] == source_text
+    assert requirement["mandatory"] is True and requirement["public_provenance"] == "public_task_contract"
+    assignment, = projection["assignments"]
+    assert assignment["requirement_id"] == requirement["requirement_id"]
+    assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+    assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+    assert assignment["unit_content_hash"] == source["content_sha256"]
+    assert (assignment["unit_char_start"], assignment["unit_char_end"]) == (0, len(source_text))
+    assert "missing" not in projection
     valid_result = json.dumps(projection)
     action = {"tool": "get_docs_context", "query": request.task_objective}
     positive = _required_once_retrieval_metadata(request, action, valid_result)
@@ -446,6 +459,21 @@ def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_pac
     assert positive["retrieval_succeeded"] is True
     assert positive["action_packet_result"] == "data"
     assert positive["action_packet_completeness"] == "complete"
+
+    # Whole source bytes without a content witness remain valid partial data;
+    # required-once metadata must not count that as successful retrieval.
+    partial_packet = build_action_packet(question=request.task_objective, context_pack=evidence)
+    assert validate_action_packet(partial_packet, evidence_items=evidence) == []
+    partial, partial_snapshot = project_patch_context(packet=partial_packet, evidence_items=evidence)
+    assert validate_model_visible_projection(partial, snapshot=partial_snapshot) == []
+    assert partial["result"] == "data" and partial["completeness"] == "partial"
+    assert partial["sources"] == projection["sources"] and partial["edit_ready"] is False
+    assert partial["missing"] == ["visible_content_assignment_required"]
+    partial_metadata = _required_once_retrieval_metadata(request, action, json.dumps(partial))
+    assert partial_metadata["question_matches_task_objective"] is True
+    assert partial_metadata["action_packet_result"] == "data"
+    assert partial_metadata["action_packet_completeness"] == "partial"
+    assert partial_metadata["retrieval_succeeded"] is False
 
     assert _required_once_retrieval_metadata(
         request,

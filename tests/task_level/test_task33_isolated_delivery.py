@@ -92,11 +92,16 @@ def _snapshot() -> HostEvidenceSnapshot:
 
 def _packet(*, evidence: list[dict] | None = None) -> dict:
     items = evidence if evidence is not None else _evidence()
+    # The fixture requests each authored source sentence explicitly. The
+    # selector must not derive behavioral obligations from the objective.
+    content_literals = tuple(items[0]["content"].splitlines())
+    assert content_literals and all(content_literals)
     packet = build_action_packet(
         question=_envelope().task_objective,
         context_pack=items,
         trust_contract={"selected": [{"source": "AGENTS.md"}], "rejected": [], "risky": []},
         project_path="/repo",
+        public_requirements=content_literals,
     )
     assert validate_action_packet(packet, evidence_items=items, project_path="/repo") == []
     assert packet["result"] == "data" and packet["completeness"] == "complete"
@@ -106,6 +111,18 @@ def _packet(*, evidence: list[dict] | None = None) -> dict:
     assert source["content_sha256"] == hashlib.sha256(items[0]["content"].encode()).hexdigest()
     assert source["instruction_trust"] == "untrusted_data" and packet["edit_ready"] is False
     assert "task_interpretation" not in packet and "mutation_intent" not in packet
+    requirements = {row["requirement_id"]: row for row in packet["requirements"]}
+    assert {row["value"] for row in requirements.values()} == set(content_literals)
+    assert all(row["kind"] == "required_fact" and row["mandatory"] is True
+               and row["public_provenance"] == "public_task_contract" for row in requirements.values())
+    assert len(packet["assignments"]) == len(requirements) == len(content_literals)
+    for assignment in packet["assignments"]:
+        literal = requirements[assignment["requirement_id"]]["value"]
+        assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+        assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+        assert source["text"][assignment["unit_char_start"]:assignment["unit_char_end"]] == literal
+        assert assignment["unit_content_hash"] == hashlib.sha256(literal.encode()).hexdigest()
+    assert "missing" not in packet
     assert packet["estimated_tokens"] == estimate_action_packet_tokens(packet)
     return packet
 

@@ -198,6 +198,7 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
         },
     )
     envelope = _envelope()
+    source_literal = "Keep permission checks centralized in lib/modules/permission/service.dart."
 
     def worker_output(evidence):
         packet = build_action_packet(
@@ -206,13 +207,19 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
             trust_contract=evidence.trust_contract,
             required_evidence_paths=envelope.required_evidence_paths,
             required_target_paths=envelope.suspected_modules,
+            # Path assignments establish identities only; this authored quote
+            # supplies the separate visible-content witness.
+            public_requirements=(source_literal,),
         )
         assert validate_action_packet(packet, evidence_items=evidence.evidence_items) == []
         assert packet["result"] == "data" and packet["edit_ready"] is False
         return IsolatedWorkerOutput(packet=packet, usage=usage, wall_time_seconds=0.5)
 
     evidence = _snapshot()
+    assert evidence.evidence_items[0]["content"] == source_literal
     output = worker_output(evidence)
+    assert output.packet["completeness"] == "partial"
+    assert output.packet["missing"] == ["target_path:0:" + envelope.suspected_modules[0]]
     monkeypatch.setattr(CodexExploratoryWorker, "run", lambda *args, **kwargs: output)
     with pytest.raises(IsolatedDeliveryError, match="action_packet_missing_required_target_modules"):
         deliver_with_exploratory_worker(
@@ -276,6 +283,19 @@ def test_explicit_exploratory_delivery_is_persisted_as_non_causal(
     selected_target = next(source for source in projection["sources"] if source["path"] == target)
     assert (selected_target["char_start"], selected_target["char_end"], selected_target["line_start"], selected_target["line_end"]) == (0, len(target_text), 1, 1)
     assert any(row["path"] == target and row["proof_role"] == "target_identity" for row in projection["assignments"])
+    literal_requirement, = [row for row in projection["requirements"] if row["kind"] == "required_fact"]
+    assert literal_requirement["value"] == source_literal and literal_requirement["mandatory"] is True
+    assert literal_requirement["public_provenance"] == "public_task_contract"
+    content_assignment, = [row for row in projection["assignments"]
+                           if row["requirement_id"] == literal_requirement["requirement_id"]]
+    doc_source = next(source for source in projection["sources"]
+                      if source["path"] == envelope.required_evidence_paths[0])
+    assert content_assignment["evidence_id"] == doc_source["stable_id"]
+    assert content_assignment["path"] == doc_source["path"]
+    assert content_assignment["proof_role"] == "generic_fact" and content_assignment["unit_id"]
+    assert content_assignment["unit_content_hash"] == doc_source["content_sha256"]
+    assert (content_assignment["unit_char_start"], content_assignment["unit_char_end"]) == (0, len(source_literal))
+    assert "missing" not in projection
     assert metrics["evidence_fingerprint"] == evidence.fingerprint
     assert metrics["attempts"] == metrics["retrieval_calls"] == 1
     assert metrics["evidence_tier"] == "exploratory"
