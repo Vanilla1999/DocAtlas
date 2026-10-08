@@ -6,24 +6,28 @@ from contextlib import ExitStack
 import hashlib
 import json
 
+import pytest
+
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
 from docmancer.docs.interfaces.host_context import SourceReadController
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
 
 
-def _real_service(tmp_path, request):
+def _real_service(tmp_path, request, *, content=None):
     from eval.evidence_quality_v2 import runtime
 
     tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir()
     (tmp_path / "pyproject.toml").write_text('[project]\nname="recovery-smoke"\nversion="0.1"\n')
     path = tmp_path / "docs/polling.md"
-    body = ["# Polling", "", "Retry only after a terminal status is observed.", ""]
-    body.extend(f"Polling context line {index}." for index in range(1, 18))
-    body.append("Job polling uses docs_status to inspect progress until terminal status.")
-    body.extend(f"Additional polling context {index}." for index in range(18, 36))
-    path.write_text("\n".join(body) + "\n")
+    if content is None:
+        body = ["# Polling", "", "Retry only after a terminal status is observed.", ""]
+        body.extend(f"Polling context line {index}." for index in range(1, 18))
+        body.append("Job polling uses docs_status to inspect progress until terminal status.")
+        body.extend(f"Additional polling context {index}." for index in range(18, 36))
+        content = "\n".join(body) + "\n"
+    path.write_text(content)
     (tmp_path / "docatlas.project-docs.yaml").write_text(
         "schema_version: 1\ndocuments:\n  - path: docs/polling.md\n    role: runbook\n"
         "    scope: project\n    authority: source_of_truth\n    status: active\n"
@@ -45,7 +49,10 @@ def _real_service(tmp_path, request):
     return service
 
 
-def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path, request):
+def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_path, request):
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from eval.project_context_quality.capture_public_context import capture_public_call
+
     service = _real_service(tmp_path, request)
     args = {
         "question": "How does docs_status polling progress work?",
@@ -53,32 +60,141 @@ def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path, r
         "project_path": str(tmp_path),
         "scope": "all",
     }
-    payload = call_docs_tool_payload("get_docs_context", args, service)
+    # The observer forwards the real projector unchanged and records its bindings.
+    record = capture_public_call(service, args)
+    payload = record["public_payload"]
+    assert payload["kind"] == "docs_context"
+    assert payload["context_quality"]["status"] in {"unverified", "partial"}
+    assert payload["read_next"] == []
+    assert docs_context_budget_tokens(payload) <= 800
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert len(payload["sources"]) == 1
+    source = payload["sources"][0]
+    assert source["path_or_url"] == "docs/polling.md"
+    assert (source["line_start"], source["line_end"]) == (5, 40)
+    raw = (tmp_path / source["path_or_url"]).read_bytes()
+    quote = b"\n".join(raw.splitlines()[4:40])
+    assert source["snippet"].encode() == quote
+    snapshot = record["projection_attempts"][0]["snapshot"]
+    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    bound = snapshot[source["evidence_id"]]["source"]
+    assert bound["content"].rstrip("\n").encode() == quote
+    assert (bound["line_start"], bound["line_end"]) == (5, 40)
+    assert bound["project_identity"] == source["project_identity"]
+    assert bound["_source_snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    assert bound["_reference_evidence"]["raw_document"].encode() == raw
+    reference = bound["_reference_evidence"]["source"]
+    assert reference["content_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert reference["scope"]["snapshot_id"] == bound["generation_id"]
+    assert reference["scope"]["project_id"] == source["project_identity"]
+    assert source["source_uri"].startswith("docatlas://source/")
+
+
+def _continuation_document():
+    # Distinct lifecycle instructions, not repeated padding or oracle requirements.
+    return "# Polling\n\n" + "\n\n".join([
+        "Job polling uses docs_status to inspect progress until a terminal status is observed. "
+        "Start by recording the job identifier returned by preparation. Keep the identifier "
+        "with the project path so that subsequent status requests address the same job.",
+        "For a queued job, wait for the worker to accept the request. Queue position is an "
+        "observation rather than a completion promise. Do not start another preparation "
+        "request while the original job is still queued; overlapping requests make diagnosis harder.",
+        "For a running job, compare the current progress with the previous observation and "
+        "retain any reported error details. A progress counter can remain unchanged while the "
+        "worker processes one document. Lack of a counter change alone does not establish that the job has failed.",
+        "The polling loop stops when the status becomes succeeded, failed, or cancelled. "
+        "A succeeded job can be inspected through the indexed documentation. A failed job "
+        "requires diagnosis before retrying. A cancelled job must not be treated as successfully prepared.",
+        "When docs_status polling reports progress, record the observation time alongside "
+        "the completed and pending counts. These counts describe that job only. Comparing "
+        "counts from different job identifiers does not measure progress of the original preparation request.",
+        "If a status request fails, retain the last successful observation without treating "
+        "it as the current state. Retry the status request for the same job identifier. "
+        "A transport error is not a terminal job state and does not authorize a second preparation request.",
+        "Before retrying a failed preparation job, inspect the reported error and check "
+        "whether its cause has been addressed. Record the new job identifier separately. "
+        "Preserve the failed job observation so that the retry can be distinguished from the original attempt.",
+        "Cancellation requests and cancellation completion are separate events. Continue "
+        "polling the existing job after requesting cancellation until docs_status reports "
+        "a terminal status. A cancellation request may race with successful completion, so retain the observed result.",
+        "After a successful preparation job, inspect the prepared documentation using the "
+        "same project path. If the expected source is absent, investigate that source rather "
+        "than assuming the polling loop verified document coverage. Job completion is not an answer-quality guarantee.",
+        "For polling diagnostics, report the job identifier, observation times, status "
+        "transitions, and the last error message. Do not replace the actual sequence with "
+        "an inferred transition. A queued observation followed by success does not prove that a running observation was received.",
+        "For polling shutdown, stop issuing requests only after preserving the final "
+        "observation or recording that the host stopped waiting. If the host exits before "
+        "a terminal result, mark the investigation as incomplete. Do not label that interrupted observation sequence as success.",
+        "Keep polling records separate from credentials and configuration secrets. Store "
+        "only the status fields needed to identify the job and explain its progress. When "
+        "sharing the diagnostic record, include the source project identity and omit unrelated local environment details.",
+    ]) + "\n"
+
+
+@pytest.mark.parametrize("revoked", [False, True], ids=["authorized", "revoked"])
+def test_final_public_handler_continuation_preserves_quality_and_usable_reference(tmp_path, request, revoked):
+    service = _real_service(tmp_path, request, content=_continuation_document())
+    payload = call_docs_tool_payload("get_docs_context", {
+        "question": "How does docs_status polling progress work?",
+        "project_path": str(tmp_path),
+        "scope": "all",
+    }, service)
     assert payload["kind"] == "docs_context"
     assert payload["context_quality"]["status"] in {"unverified", "partial"}
     assert len(payload["read_next"]) == 1
     target = payload["read_next"][0]
     assert target["reason"] in {"inspect_source_context", "requested_part_missing"}
-    assert target["snapshot_sha256"].startswith("sha256:")
     assert docs_context_budget_tokens(payload) <= 800
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    raw = (tmp_path / "docs/polling.md").read_bytes()
+    assert target["path"] == "docs/polling.md"
+    assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    assert (target["line_start"], target["line_end"]) == (12, 25)
+    assert len(payload["sources"]) == 1
+    source = payload["sources"][0]
+    assert source["path_or_url"] == target["path"]
+    assert source["project_identity"] == target["project_identity"]
+    assert (source["line_start"], source["line_end"]) == (1, 11)
+    assert source["snippet"].encode() == b"\n".join(raw.splitlines()[:11])
+    assert source["line_end"] < target["line_start"] <= target["line_end"]
+    reads = []
 
-    read = json.loads(read_docs_resource(target["source_uri"], service)["text"])
-    assert read["line_start"] == target["line_start"]
-    assert read["line_end"] <= target["line_end"]
-    assert read["content_sha256"] == target["snapshot_sha256"]
+    def read_resource(uri):
+        result = json.loads(read_docs_resource(uri, service)["text"])
+        reads.append(result)
+        return result
 
-    service = _real_service(tmp_path / "second", request)
-    payload = call_docs_tool_payload("get_docs_context", {
-        **args, "project_path": str(tmp_path / "second"),
-    }, service)
-    target = payload["read_next"][0]
     controller = SourceReadController(
         payload,
         requested_facts={"rule": "What rule appears around the polling evidence?"},
-        read_resource=lambda uri: json.loads(read_docs_resource(uri, service)["text"]),
+        read_resource=read_resource,
     )
+    if revoked:
+        catalog = tmp_path / "docatlas.project-docs.yaml"
+        catalog.write_text(catalog.read_text().replace("source_of_truth", "historical"))
     accepted = controller.read(target["source_uri"], missing_fact_id="rule")
-    assert accepted["status"] in {"complete", "truncated"}
+    assert len(reads) == 1
+    if revoked:
+        assert reads[0] == {"status": "source_unavailable", "reason_code": "source_policy_or_snapshot_changed"}
+        assert accepted == {"status": "stopped", "reason_code": "source_policy_or_snapshot_changed"}
+        assert controller.results == []
+    else:
+        assert accepted == reads[0]
+        assert accepted["status"] == "complete"
+        assert accepted["line_start"] == target["line_start"]
+        assert accepted["line_end"] == target["line_end"]
+        assert accepted["path"] == target["path"]
+        assert accepted["project_identity"] == target["project_identity"]
+        assert accepted["content_sha256"] == target["snapshot_sha256"]
+        assert accepted["snippet"].encode() == b"\n".join(raw.splitlines()[11:25])
+        assert docs_context_budget_tokens(accepted) <= 600
+        assert controller.results == [accepted]
 
 
 class _Reader:
