@@ -2,18 +2,19 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from contextlib import ExitStack
 import hashlib
 import json
 
-from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
 from docmancer.docs.interfaces.host_context import SourceReadController
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
-from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
 
 
-def _real_service(tmp_path):
+def _real_service(tmp_path, request):
+    from eval.evidence_quality_v2 import runtime
+
     tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir()
     (tmp_path / "pyproject.toml").write_text('[project]\nname="recovery-smoke"\nversion="0.1"\n')
@@ -28,17 +29,24 @@ def _real_service(tmp_path):
         "    scope: project\n    authority: source_of_truth\n    status: active\n"
         "    description: Polling lifecycle\n"
     )
-    config = DocmancerConfig()
-    config.index.provider = "sqlite"
-    config.index.db_path = str(tmp_path / "state/index.db")
-    config.index.extracted_dir = str(tmp_path / "state/extracted")
-    service = LibraryDocsService(config=config, config_source="explicit")
-    assert service.sync_project_docs(str(tmp_path), with_vectors=False).status == "success"
+    state = (tmp_path / "state").resolve()
+    lifecycle = ExitStack()
+    request.addfinalizer(lifecycle.close)
+
+    def cleanup_home():
+        home = runtime._FIXTURE_HOMES.pop(state, None)
+        if home is not None:
+            home.cleanup()
+
+    # LIFO: restore the fixture environment before removing its private store.
+    lifecycle.callback(cleanup_home)
+    service, config = lifecycle.enter_context(runtime.isolated_service(state))
+    runtime.index_project(service, config, tmp_path)
     return service
 
 
-def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path):
-    service = _real_service(tmp_path)
+def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path, request):
+    service = _real_service(tmp_path, request)
     args = {
         "question": "How does docs_status polling progress work?",
         "lookup_queries": ["docs_status polling progress"],
@@ -59,7 +67,7 @@ def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path):
     assert read["line_end"] <= target["line_end"]
     assert read["content_sha256"] == target["snapshot_sha256"]
 
-    service = _real_service(tmp_path / "second")
+    service = _real_service(tmp_path / "second", request)
     payload = call_docs_tool_payload("get_docs_context", {
         **args, "project_path": str(tmp_path / "second"),
     }, service)

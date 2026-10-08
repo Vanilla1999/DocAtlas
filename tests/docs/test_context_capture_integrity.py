@@ -21,12 +21,12 @@ def test_capture_keeps_full_public_payload_without_aliasing():
     assert record["request"] == request
 
 
-def test_capture_public_call_records_full_serializable_projection_trace(tmp_path):
+def test_capture_public_call_records_full_serializable_projection_trace(tmp_path, request):
     import json
     from eval.project_context_quality.capture_public_context import capture_public_call
     from tests.docs.test_docs_context_read_next import _real_service
 
-    service = _real_service(tmp_path)
+    service = _real_service(tmp_path, request)
     request = {
         "question": "How does docs_status polling progress work?",
         "lookup_queries": ["docs_status polling progress"],
@@ -76,7 +76,8 @@ def test_build_run_manifest_records_frozen_strategy_and_cost():
     assert manifest["admission_tokens"] > 0
 
 
-def test_capture_observer_does_not_change_public_evidence(tmp_path):
+def test_capture_observer_does_not_change_public_evidence(tmp_path, request):
+    fixture_request = request
     from copy import deepcopy
     from eval.project_context_quality.capture_public_context import capture_public_call
     from docmancer.mcp.docs_server import call_docs_tool_payload
@@ -89,8 +90,8 @@ def test_capture_observer_does_not_change_public_evidence(tmp_path):
     }
     plain_root = tmp_path / "plain"
     observed_root = tmp_path / "observed"
-    plain_service = _real_service(plain_root)
-    observed_service = _real_service(observed_root)
+    plain_service = _real_service(plain_root, fixture_request)
+    observed_service = _real_service(observed_root, fixture_request)
 
     plain = call_docs_tool_payload(
         "get_docs_context", {**deepcopy(request), "project_path": str(plain_root)}, plain_service,
