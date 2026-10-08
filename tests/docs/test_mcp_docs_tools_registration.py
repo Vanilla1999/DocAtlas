@@ -305,7 +305,7 @@ def test_agent_templates_include_three_tool_selection_guidance():
     advertised = runtime_tools["get_docs_context"]["description"]
     assert "Stop before editing on insufficient_evidence" not in advertised
     assert "hard_stop=true" in advertised
-    assert "documentation-governance meta-question" in advertised
+    assert_public_context_guidance(runtime_tools["get_docs_context"])
 
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
