@@ -755,11 +755,11 @@ PUBLIC_ADVERTISED_OUTPUT_SCHEMAS: dict[str, dict[str, Any]] = {
             "documentation_supported": {"type": "boolean"}, "investigation_allowed": {"type": "boolean"},
             "hard_stop": {"type": "boolean"}, "recovery_origin": {"type": "string"},
             "recovery_reason_code": {"type": "string"}, "recovery_disposition": {"type": "string"},
-            "module_candidates": {"type": "array", "maxItems": 8, "items": {
+            "module_candidates": {"type": "array", "items": {
                 "type": "object", "required": ["module_path"],
                 "properties": {"module_path": {"type": "string"}},
             }},
-            "missing": {"type": "array", "maxItems": 5, "items": {"type": "string"}},
+            "missing": {"type": "array", "items": {"type": "string"}},
             "recommended_next_action": {"type": "object"},
         },
     }, copy.deepcopy(PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["oneOf"][1])]},

@@ -140,7 +140,6 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
         "recovery_disposition": {"type": "string"},
         "module_candidates": {
             "type": "array",
-            "maxItems": 8,
             "items": {
                 "type": "object",
                 "required": ["module_path"],
@@ -152,7 +151,7 @@ _DOCS_CONTEXT_OUTPUT_SCHEMA: dict[str, Any] = {
                 "additionalProperties": False,
             },
         },
-        "missing": {"type": "array", "items": {"type": "string"}, "maxItems": 5},
+        "missing": {"type": "array", "items": {"type": "string"}},
         "recommended_next_action": {"type": "object"},
     },
 }
