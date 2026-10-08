@@ -143,8 +143,12 @@ def test_gate_cli_failure_still_fails(monkeypatch):
     ("Health checks the installation.", False),
 ])
 def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet, expected):
+    from contextlib import contextmanager
+    from pathlib import Path
     from types import SimpleNamespace
     from scripts import run_project_docs_self_host_gate as gate
+    from scripts._project_docs_self_host_fixture import SelfHostFixture
+    from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload
 
     arguments = []
     payload = {
@@ -159,15 +163,29 @@ def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet
 
     def preflight(tool, args, service):
         arguments.append(args)
-        return {"recommended_next_action": {"arguments_patch": {"action": "sync_project_docs"}}}
+        return build_mcp_error_payload(
+            reason_code="permission_denied", message="permission_denied: request failed",
+            exception=PermissionError("member_store_uninitialized"),
+            tool="get_docs_context", phase="execution",
+        )
+
+    @contextmanager
+    def fixture_context(origin):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            service = SimpleNamespace(_cold=SimpleNamespace(
+                _service=None, member_storage_policy=SimpleNamespace(
+                    db_path=root / "uninitialized.db", marker=root / "uninitialized.owner",
+                ),
+            ))
+            fixture = SelfHostFixture(root, service, None, {}, {})
+            fixture.prepare = lambda: None
+            yield fixture
 
     monkeypatch.setattr(gate, "_call_with_snapshot", capture)
     monkeypatch.setattr(gate, "call_docs_tool_payload", preflight)
-    monkeypatch.setattr(gate, "LibraryDocsService", lambda **kw: SimpleNamespace(
-        sync_project_docs=lambda *a, **kw: SimpleNamespace(status="success"),
-    ))
-    monkeypatch.setattr(gate, "LibraryRegistry", lambda *a: None)
-    monkeypatch.setattr(gate, "DocmancerAgent", lambda **kw: None)
+    monkeypatch.setattr(gate, "self_host_fixture", fixture_context)
     case = gate.LiveCase(
         question="How can I set up and verify the tool?", scope="all", case_id="stable-compound-id",
         relevant_paths=("preferred.md", "alternative.md"), expected_kind="docs_context",

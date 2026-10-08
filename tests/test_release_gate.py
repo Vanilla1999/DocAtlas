@@ -15,10 +15,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def self_host_payload_runner(monkeypatch, tmp_path):
+    from contextlib import contextmanager
     from types import SimpleNamespace
     from unittest.mock import Mock
 
     from scripts import run_project_docs_self_host_gate as gate
+    from scripts._project_docs_self_host_fixture import SelfHostFixture
+    from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload
     from docmancer.docs.interfaces.mcp import context_tools
     from docmancer.docs.application.model_visible_projection import _snapshot_entry, _source_digest
 
@@ -48,13 +51,22 @@ def self_host_payload_runner(monkeypatch, tmp_path):
         }])),
     )
     service = SimpleNamespace(
-        sync_project_docs=Mock(return_value=SimpleNamespace(status="success")),
+        _cold=SimpleNamespace(_service=None, member_storage_policy=SimpleNamespace(
+            db_path=tmp_path / "uninitialized.db", marker=tmp_path / "uninitialized.owner",
+        )),
         unified_context=app,
         get_docs_context=Mock(side_effect=AssertionError("Do not replay the facade query")),
     )
-    monkeypatch.setattr(gate, "LibraryDocsService", lambda **kwargs: service)
-    monkeypatch.setattr(gate, "LibraryRegistry", lambda *args: None)
-    monkeypatch.setattr(gate, "DocmancerAgent", lambda **kwargs: None)
+
+    @contextmanager
+    def fixture_context(origin):
+        fixture = SelfHostFixture(tmp_path, service, None, {}, {})
+        fixture.prepare = Mock()
+        yield fixture
+        if not fixture.cold_read_verified:
+            fixture.prepare.assert_not_called()
+
+    monkeypatch.setattr(gate, "self_host_fixture", fixture_context)
     monkeypatch.setattr(context_tools, "validate_model_visible_projection", lambda *args, **kwargs: [])
 
     def run(
@@ -81,7 +93,11 @@ def self_host_payload_runner(monkeypatch, tmp_path):
             nonlocal calls
             calls += 1
             if calls == 1:
-                return preflight_transform({"recommended_next_action": {"arguments_patch": {"action": "sync_project_docs"}}})
+                return preflight_transform(build_mcp_error_payload(
+                    reason_code="permission_denied", message="permission_denied: request failed",
+                    exception=PermissionError("member_store_uninitialized"),
+                    tool="get_docs_context", phase="execution",
+                ))
             instance.unified_context.get_docs_context(arguments["question"], project_path=arguments["project_path"])
             if arguments["question"] == "negative":
                 return negative

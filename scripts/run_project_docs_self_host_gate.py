@@ -17,12 +17,21 @@ import hashlib
 import json
 import os
 import re
+import sys
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
+
+# Preserve direct `python scripts/run_project_docs_self_host_gate.py` as well as
+# imported evaluator entrypoints; the mirrored checkout is never an import root.
+_SCRIPT_ROOT = Path(__file__).resolve().parents[1]
+if str(_SCRIPT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_ROOT))
+
+from scripts._project_docs_self_host_fixture import self_host_fixture
 
 import yaml
 
@@ -419,56 +428,33 @@ def run(
     cases: tuple[LiveCase, ...] = GOLD_CASES,
     negative_cases: tuple[str | LiveCase, ...] = NEGATIVE_CASES,
 ) -> dict[str, object]:
-    previous_home = os.environ.get("DOCATLAS_HOME")
     errors: list[str] = []
     results: list[dict[str, object]] = []
     historical_paths = _historical_paths()
-    try:
-        with TemporaryDirectory(prefix="docatlas-self-host-") as raw_tmp:
-            tmp = Path(raw_tmp)
-            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
-            config = DocmancerConfig()
-            config.index.db_path = str(tmp / "docmancer.db")
-            config.index.extracted_dir = str(tmp / "extracted")
-            service = LibraryDocsService(
-                config=config,
-                config_source="explicit",
-                registry=LibraryRegistry(config.index.db_path),
-                agent=DocmancerAgent(config=config),
-                job_tracker=DocsJobTracker(),
-            )
-
-            preflight_question = cases[0].question if cases else "How do Project Docs work?"
-            preflight = call_docs_tool_payload(
-                "get_docs_context",
-                {
-                    "question": preflight_question,
-                    "project_path": str(REPO_ROOT),
-                    "scope": cases[0].scope if cases else "project",
-                },
-                service,
-            )
-            preflight_payload = preflight if isinstance(preflight, Mapping) else {}
-            preflight_action = (
-                preflight_payload.get("recommended_next_action")
-                or preflight_payload.get("next_action")
-                or {}
-            )
-            action_patch = preflight_action.get("arguments_patch") if isinstance(preflight_action, Mapping) else {}
-            action_patch = action_patch if isinstance(action_patch, Mapping) else {}
-            if action_patch.get("action") != "sync_project_docs":
-                errors.append(f"pre-sync query did not recommend sync_project_docs: {preflight!r}")
-
-            sync = service.sync_project_docs(str(REPO_ROOT), with_vectors=False)
-            if getattr(sync, "status", None) != "success":
-                errors.append(f"self-host sync status={getattr(sync, 'status', None)!r}")
+    with self_host_fixture(REPO_ROOT) as fixture:
+        service = fixture.service
+        setup_provenance = fixture.provenance
+        preflight_question = cases[0].question if cases else "How do Project Docs work?"
+        preflight = call_docs_tool_payload(
+            "get_docs_context",
+            {
+                "question": preflight_question,
+                "project_path": str(fixture.root),
+                "scope": cases[0].scope if cases else "project",
+            },
+            service,
+        )
+        if not fixture.verify_cold_read(preflight):
+            errors.append(f"pre-sync query did not preserve the cold read boundary: {preflight!r}")
+        else:
+            fixture.prepare()
 
             for index, case in enumerate(cases, 1):
                 question = case.question
                 payload, snapshot = _call_with_snapshot(
                     {
                         "question": question,
-                        "project_path": str(REPO_ROOT),
+                        "project_path": str(fixture.root),
                         **({"lookup_queries": list(case.lookup_queries)} if case.lookup_queries else {}),
                         "scope": case.scope,
                     },
@@ -686,7 +672,7 @@ def run(
                 question = negative.question if isinstance(negative, LiveCase) else negative
                 scope = negative.scope if isinstance(negative, LiveCase) else "project"
                 payload, _ = _call_with_snapshot(
-                    {"question": question, "project_path": str(REPO_ROOT), "scope": scope},
+                    {"question": question, "project_path": str(fixture.root), "scope": scope},
                     service,
                 )
                 if not isinstance(payload, Mapping):
@@ -710,12 +696,6 @@ def run(
                     "checks": {"correct_abstention": safe_abstention},
                     "passed": safe_abstention,
                 })
-    finally:
-        if previous_home is None:
-            os.environ.pop("DOCATLAS_HOME", None)
-        else:
-            os.environ["DOCATLAS_HOME"] = previous_home
-
     positives = results[:len(cases)]
     source_count = sum(len(row.get("payload", {}).get("sources") or ()) for row in positives)
     distractor_count = sum(len(row.get("ranking", {}).get("distractor_paths", ())) for row in positives)
@@ -735,6 +715,7 @@ def run(
         "schema_version": "project-answer-quality-live-result-v1",
         "run_mode": "live_self_host",
         "provider_free": True,
+        "setup_provenance": setup_provenance,
         "case_count": len(results),
         "positive_case_count": len(positives),
         "positive_passed_count": sum(bool(row.get("passed")) for row in positives),

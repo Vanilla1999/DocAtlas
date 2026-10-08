@@ -426,6 +426,8 @@ def run_live() -> dict[str, Any]:
     report["production_runner_verdict"] = production.get("verdict")
     report["production_runner_errors"] = production.get("errors")
     report["production_results"] = production["results"]
+    if "setup_provenance" in production:
+        report["production_setup_provenance"] = production["setup_provenance"]
     return report
 
 
