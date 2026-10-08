@@ -6,10 +6,15 @@ import pytest
 
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
-from docmancer.docs.domain.project_answer_contract import build_project_answer_contract
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.project_answer_contract import (
+    build_project_answer_contract,
+    can_authorize_docs_answer,
+)
 from docmancer.docs.domain.question_frame_core import split_question_clause_spans
 from docmancer.docs.domain.question_ownership import frozen_ownership_mismatches
 from docmancer.docs.domain.question_plan import compile_question_plan
+from docmancer.docs.domain.question_retrieval_needs import retrieval_needs
 
 
 _ADVERSARIAL_TAILS = (
@@ -42,6 +47,34 @@ def _unit(text: str) -> AnswerUnit:
         content_sha256=hashlib.sha256(text.encode()).hexdigest(),
         proposition=True,
     )
+
+
+def _assert_literal_context_boundary(question: str) -> None:
+    """Untyped text stays retrievable without supplying semantic authority."""
+    plan = compile_question_plan(question)
+    assert plan.clauses == (question,)
+    assert plan.unresolved_parts == ("unresolved_question_semantics",)
+    assert not plan.facets
+    assert not plan.consumed_spans
+    assert plan.component_scope_complete is False
+
+    needs = retrieval_needs(question)
+    assert len(needs) == 1
+    need = needs[0]
+    assert (need.query_span_start, need.query_span_end, need.query_span_text) == (
+        0, len(question), question,
+    )
+    assert need.subject == ""
+    assert need.relation == "unresolved"
+    assert need.context == ""
+
+    contract = build_project_answer_contract(question)
+    assert not contract.proof_obligations
+    assert not contract.subjects
+    assert not contract.retrieval_hints
+    assert not contract.concept_queries
+    assert contract.component_scope_complete is False
+    assert can_authorize_docs_answer(contract) is False
 
 
 def test_governance_question_models_scope_and_every_including_facet() -> None:
@@ -126,13 +159,26 @@ def test_known_frame_never_authorizes_an_unknown_tail(prefix: str, tail: str) ->
 
     assert plan.handled
     assert plan.unresolved_parts, (question, plan)
-    assert any(
-        row.startswith("unresolved_question_clause:")
-        for row in plan.unresolved_parts
-    )
+    _assert_literal_context_boundary(question)
 
     contract = build_project_answer_contract(question)
-    assert contract.unresolved_parts
+    assert contract.question_hash != build_project_answer_contract(prefix).question_hash
+
+    # A real, explicit host lookup may retrieve the prefix. It cannot replace
+    # the original request or claim coverage of its unknown tail.
+    queries = build_documentation_query_plan(question, lookup_queries=(prefix,))
+    assert queries.original_question == question
+    assert [row.text for row in queries.queries] == [question, prefix]
+    original, lookup = queries.queries
+    assert (original.query_id, original.origin, original.coverage_required) == (
+        "query-original", "original", True,
+    )
+    assert (lookup.origin, lookup.relation, lookup.coverage_required) == (
+        "host_lookup", "host_lookup", False,
+    )
+    assert all(row.public_parent_query_id is None for row in queries.queries)
+    assert not queries.component_contract
+    assert queries.component_scope_complete is False
 
 
 @pytest.mark.parametrize(
@@ -145,45 +191,50 @@ def test_known_frame_never_authorizes_an_unknown_tail(prefix: str, tail: str) ->
 )
 def test_unresolved_residue_reaches_the_requirements_gate(question: str) -> None:
     requirements = build_requirements(question, profile="project_docs_answer")
-    assert any(row.kind == "unsupported_query" for row in requirements)
+    _assert_literal_context_boundary(question)
+    assert requirements.component_scope_complete is False
+    assert not requirements.required_entities
+    assert not requirements.required_facets
+    assert not requirements.retrieval_hints
+    assert not requirements.concept_queries
+    assert all(row.kind == "exact_term" and not row.mandatory for row in requirements)
 
-
-
+    # The conservative question boundary still carries explicit requirements;
+    # it must not make this negative pass by discarding every request.
+    explicit = build_requirements(
+        question,
+        profile="project_docs_answer",
+        required_evidence_paths=("docs/fixture-evidence.md",),
+    )
+    paths = [row for row in explicit if row.kind == "evidence_path"]
+    assert len(paths) == 1
+    assert (paths[0].value, paths[0].source_path, paths[0].public_provenance) == (
+        "docs/fixture-evidence.md", "docs/fixture-evidence.md", "required_evidence_paths",
+    )
+    assert paths[0].mandatory is True
+    assert explicit.component_scope_complete is False
+    with pytest.raises(ValueError, match="unsupported evidence requirement provenance"):
+        build_requirements(question, public_requirements=({
+            "value": "fixture fact", "public_provenance": "inferred_question_semantics",
+        },))
 
 def test_legacy_behavior_usage_fallback_rejects_extra_compound_tail() -> None:
-    contract = build_project_answer_contract(
+    question = (
         "What does docs_status report and when should it be used, and tell me the Bitcoin price?"
     )
-    assert contract.unresolved_parts
-    assert any(
-        row.startswith("unresolved_question_clause:")
-        for row in contract.unresolved_parts
-    )
+    _assert_literal_context_boundary(question)
+
 
 def test_plan_retains_exact_source_spans_after_wrapper_and_whitespace_normalization() -> None:
     question = "Please,   Which source   types are supported for indexing?"
-    plan = compile_question_plan(question)
-
-    assert not plan.unresolved_parts
-    assert plan.consumed_spans == ((0, len(question)),)
-    assert len(plan.facets) == 1
-    facet = plan.facets[0]
-    assert facet.query_span_start is not None
-    assert facet.query_span_end is not None
-    assert question[facet.query_span_start:facet.query_span_end] == (
-        "Which source   types are supported for indexing?"
-    )
-
-    contract = build_project_answer_contract(question)
-    obligation = contract.proof_obligations[0]
-    assert (
-        obligation.query_span_start,
-        obligation.query_span_end,
-        obligation.query_span_text,
-    ) == (
-        facet.query_span_start,
-        facet.query_span_end,
-        question[facet.query_span_start:facet.query_span_end],
+    _assert_literal_context_boundary(question)
+    queries = build_documentation_query_plan(question)
+    assert [row.text for row in queries.queries] == [question]
+    assert queries.original_question == question
+    # Wrappers and whitespace are literal input, not permission to rewrite it.
+    normalized = "Which source types are supported for indexing?"
+    assert build_project_answer_contract(question).question_hash != (
+        build_project_answer_contract(normalized).question_hash
     )
 
 
@@ -197,10 +248,19 @@ def test_clause_scanner_preserves_original_offsets_and_noun_coordination() -> No
     assert tuple(question[row.start:row.end] for row in clauses) == tuple(
         row.text for row in clauses
     )
-    assert [row.text for row in clauses] == [
-        "How does indexing split documents into sections and chunks",
-        "What is contamination protection in the eval protocols?",
+    assert [row.text for row in clauses] == [question]
+
+    # Blank paragraphs are structural boundaries. Sentence punctuation and
+    # noun coordination alone do not establish independent semantic requests.
+    first = "How does indexing split documents into sections and chunks?"
+    second = "What is contamination protection in the eval protocols?"
+    paragraphs = first + "\n\n" + second
+    split = split_question_clause_spans(paragraphs)
+    assert [row.text for row in split] == [first, second]
+    assert [(row.start, row.end) for row in split] == [
+        (0, len(first)), (len(first) + 2, len(paragraphs)),
     ]
+    assert all(paragraphs[row.start:row.end] == row.text for row in split)
 
 
 def test_existing_compounds_and_paraphrases_remain_supported() -> None:
@@ -287,10 +347,11 @@ def test_russian_ambiguous_inventory_and_action_frames_fail_closed() -> None:
         ("Перечисли форматы.", "unresolved_inventory_category:formats"),
         ("Как обновить индекс документации?", "unresolved_requested_operation"),
     )
-    for question, reason in cases:
+    for question, former_semantic_reason in cases:
         plan = compile_question_plan(question)
         assert not plan.facets
-        assert reason in plan.unresolved_parts
+        _assert_literal_context_boundary(question)
+        assert former_semantic_reason not in plan.unresolved_parts
 
 
 @pytest.mark.parametrize(
