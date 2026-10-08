@@ -134,6 +134,8 @@ def test_unversioned_project_packet_keeps_optional_field_abi():
 
 
 def test_runtime_public_schema_and_mcp_validation_preserve_null_docs_route():
+    from docmancer.mcp.docs_server import current_docs_surface
+
     class Service:
         def __init__(self):
             self.calls = []
@@ -147,18 +149,25 @@ def test_runtime_public_schema_and_mcp_validation_preserve_null_docs_route():
     service = Service()
     omitted = {"question": "Patch code before editing"}
     null = {**omitted, "context_format": None}
-    jsonschema.validate(null, schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(null, schema)
+    rejected = call_docs_tool_payload("get_docs_context", null, service)
+    assert rejected["error"]["reason_code"] == "validation_error" and not service.calls
+    advanced = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
+    advanced_schema = next(spec.input_schema for spec in advanced.tools if spec.name == "get_docs_context")
+    jsonschema.validate(null, advanced_schema)
     left = call_docs_tool_payload("get_docs_context", omitted, service)
-    right = call_docs_tool_payload("get_docs_context", null, service)
+    right = call_docs_tool_payload("get_docs_context", null, service, surface=advanced)
     assert left == right and left["kind"] != "patch_context"
     assert len(service.calls) == 2 and service.calls[0] == service.calls[1]
     for arguments in ({**omitted, "context_format": "docs_answer"},
                       {**omitted, "question": None}):
-        with pytest.raises(jsonschema.ValidationError):
-            jsonschema.validate(arguments, schema)
-        result = call_docs_tool_payload("get_docs_context", arguments, service)
-        assert result["error"]["reason_code"] == "validation_error"
-    result = call_docs_tool_payload("get_docs_context", {**null, "allow_edit": True}, service)
+        for checked_schema, surface in ((schema, None), (advanced_schema, advanced)):
+            with pytest.raises(jsonschema.ValidationError):
+                jsonschema.validate(arguments, checked_schema)
+            result = call_docs_tool_payload("get_docs_context", arguments, service, surface=surface)
+            assert result["error"]["reason_code"] == "validation_error"
+    result = call_docs_tool_payload("get_docs_context", {**null, "allow_edit": True}, service, surface=advanced)
     assert result["error"]["reason_code"] == "validation_error"
     assert len(service.calls) == 2
     for name in ("prepare_docs", "docs_status"):

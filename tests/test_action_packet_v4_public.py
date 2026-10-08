@@ -310,14 +310,16 @@ def test_real_dispatch_and_both_terminal_transports_preserve_over_32000_bytes(ne
     from docmancer.mcp._docs_server_schema import PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
 
     service = OfflineRetrieval(necessary_evidence)
+    surface = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
     result = call_docs_tool_payload(
         "get_docs_context", {"question": "Inspect protocol implementations", "context_format": "patch_context"}, service,
+        surface=surface,
     )
     canonical = json.dumps(result, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     assert len(canonical.encode("utf-8")) > 32000
     assert result["estimated_tokens"] > 2000 and len(result["sources"]) == 12
     jsonschema.validate(result, PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA)
-    tool = next(tool for tool in current_docs_surface(env={}).tools if tool.name == "get_docs_context")
+    tool = next(tool for tool in surface.tools if tool.name == "get_docs_context")
     jsonschema.validate(result, tool.output_schema)
     assert "context_format" in tool.input_schema["properties"]
     assert "context_format=patch_context" in tool.description
@@ -382,12 +384,13 @@ def test_real_advertised_output_schema_accepts_partial_v4_without_missing_cap(ne
     from docmancer.mcp._docs_server_part01 import call_docs_tool_payload, current_docs_surface
 
     necessary_evidence["context_pack"] = necessary_evidence["context_pack"][:5]
+    surface = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
     result = call_docs_tool_payload("get_docs_context", {
         "question": "Inspect protocol implementations", "context_format": "patch_context",
-    }, OfflineRetrieval(necessary_evidence))
+    }, OfflineRetrieval(necessary_evidence), surface=surface)
     assert result["result"] == "data" and result["completeness"] == "partial"
     assert len(result["missing"]) > 5 and "status" not in result
-    tool = next(tool for tool in current_docs_surface(env={}).tools if tool.name == "get_docs_context")
+    tool = next(tool for tool in surface.tools if tool.name == "get_docs_context")
     jsonschema.validate(result, tool.to_tool_dict()["outputSchema"])
     forged = {**result, "edit_ready": True}
     with pytest.raises(jsonschema.ValidationError):

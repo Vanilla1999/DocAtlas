@@ -12,8 +12,9 @@ from docmancer.mcp.docs_server import current_tools
 def _schema(layer):
     if layer == "internal":
         return PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
-    return next(tool["outputSchema"] for tool in current_tools({})
-                if tool["name"] == "get_docs_context")
+    # Keep the shared branch checks while the default advertises docs only.
+    return {"oneOf": [next(tool["outputSchema"] for tool in current_tools({})
+                          if tool["name"] == "get_docs_context")]}
 
 
 def _recovery():

@@ -160,11 +160,17 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
 
     service = Service()
     schema = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")["inputSchema"]
+    advanced = build_docs_surface(DocsServerConfig(expose_advanced=True))
+    advanced_schema = next(spec.input_schema for spec in advanced.tools if spec.name == "get_docs_context")
     omitted = {"question": "Patch code before editing"}
     nullable = {**omitted, "context_format": None}
-    jsonschema.validate(nullable, schema)
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(nullable, schema)
+    jsonschema.validate(nullable, advanced_schema)
     default = call_docs_tool_payload("get_docs_context", omitted, service)
-    explicit_null = call_docs_tool_payload("get_docs_context", nullable, service)
+    rejected_null = call_docs_tool_payload("get_docs_context", nullable, service)
+    assert rejected_null["error"]["reason_code"] == "validation_error"
+    explicit_null = call_docs_tool_payload("get_docs_context", nullable, service, surface=advanced)
     assert explicit_null == default
     assert default["kind"] == "docs_answer"
     assert len(service.calls) == 2
@@ -173,8 +179,9 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
         {**omitted, "context_format": "docs_answer"},
         {**nullable, "unexpected": True},
     ):
-        rejected = call_docs_tool_payload("get_docs_context", invalid, service)
-        assert rejected["error"]["reason_code"] == "validation_error"
+        for surface in (None, advanced):
+            rejected = call_docs_tool_payload("get_docs_context", invalid, service, surface=surface)
+            assert rejected["error"]["reason_code"] == "validation_error"
     assert len(service.calls) == 2
 
 
@@ -659,26 +666,29 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
     assert set(tools) == PUBLIC_TOOL_NAMES
     context_tool = tools["get_docs_context"]
     assert "Source-grounded documentation tool" in context_tool["description"]
-    assert 'module_path always implies module scope' in context_tool["description"]
-    assert 'Never widen scope from question wording' in context_tool["description"]
-    assert 'all is repository-local without module filters' in context_tool["description"]
+    assert 'never widen scope from prose' in context_tool["description"]
     context_properties = context_tool["inputSchema"]["properties"]
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
     )
     assert set(context_properties) == {
         "question", "lookup_queries", "project_path", "library", "version",
-        "module_path", "scope", "context_format",
+        "module_path", "scope",
     }
     assert "always implies module scope" in context_properties["module_path"]["description"]
     assert "repo-level docs only" in context_properties["scope"]["description"]
+    assert "same repository without module filters" in context_properties["scope"]["description"]
     assert "original request unchanged" in context_tool["description"]
-    assert "Context and flags do not certify an answer" in context_tool["description"]
-    assert "Mutation requires a separate explicit target and authorization" in context_tool["description"]
-    assert "explicitly pass context_format=patch_context" in context_tool["description"]
-    output_properties = context_tool["outputSchema"]["oneOf"][0]["properties"]
-    assert output_properties["module_candidates"]["maxItems"] == 8
+    assert "Context/flags certify neither answer completeness, proof nor edit readiness" in context_tool["description"]
+    assert "Edits need a separate explicit target and authorization" in context_tool["description"]
+    assert "context_format" not in context_tool["description"]
+    assert "patch_context" not in json.dumps(context_tool["outputSchema"])
+    output_properties = context_tool["outputSchema"]["properties"]
+    assert "maxItems" not in output_properties["module_candidates"]
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]
+    jsonschema.validate({"status": "insufficient_evidence", "kind": "docs_context",
+                         "module_candidates": [{"module_path": f"packages/module-{i}"} for i in range(12)]},
+                        context_tool["outputSchema"])
     assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
     assert "explicit health, freshness, indexing, or job-progress request" in tools["docs_status"]["description"]
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]

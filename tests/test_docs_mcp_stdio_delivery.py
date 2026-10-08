@@ -16,6 +16,10 @@ from scripts.docs_mcp_stdio_smoke import (
     validate_blocked_preparation, validate_patch_payload,
 )
 from docmancer.docs.application.action_packet import build_action_packet, refresh_action_packet_estimate
+from docmancer.mcp.docs_server import current_docs_surface
+
+
+ADVANCED_SURFACE = current_docs_surface({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
 
 
 @pytest.fixture
@@ -76,7 +80,7 @@ def test_real_library_public_graph_preserves_versions_and_source_spans(library_s
     service, project, fixtures = library_service
     before = {version: fixture_database_state(Path(row["database"])) for version, row in fixtures.items()}
     for version, command in (("1.0.0", "fixture-open"), ("2.0.0", "fixture-connect")):
-        response = call_docs_tool_payload("get_docs_context", _library_arguments(version), service)
+        response = call_docs_tool_payload("get_docs_context", _library_arguments(version), service, surface=ADVANCED_SURFACE)
         validate_patch_payload(response, completeness="complete")
         assert response["result"] == "data" and response["edit_ready"] is False
         assert {row["path"] for row in response["sources"]} == {fixtures[version]["source"]}
@@ -87,7 +91,7 @@ def test_real_library_public_graph_preserves_versions_and_source_spans(library_s
         assert other not in "".join(row["text"] for row in response["sources"])
         assert evidence_sizes(response, project)["unique_nonoverlap_utf8_bytes"] > 0
     assert {version: fixture_database_state(Path(row["database"])) for version, row in fixtures.items()} == before
-    missing = call_docs_tool_payload("get_docs_context", _library_arguments("99.0.0"), service)
+    missing = call_docs_tool_payload("get_docs_context", _library_arguments("99.0.0"), service, surface=ADVANCED_SURFACE)
     validate_patch_payload(missing, completeness="unavailable")
     assert not missing.get("sources")
 
@@ -99,7 +103,9 @@ def test_real_library_omitted_and_null_format_keep_docs_delivery(library_service
     arguments = _library_arguments()
     arguments.pop("context_format")
     omitted = call_docs_tool_payload("get_docs_context", arguments, service)
-    null = call_docs_tool_payload("get_docs_context", {**arguments, "context_format": None}, service)
+    rejected = call_docs_tool_payload("get_docs_context", {**arguments, "context_format": None}, service)
+    assert rejected["error"]["reason_code"] == "validation_error"
+    null = call_docs_tool_payload("get_docs_context", {**arguments, "context_format": None}, service, surface=ADVANCED_SURFACE)
     assert omitted == null
     assert omitted.get("kind") == "docs_answer" and omitted.get("status") == "ok", omitted
     assert not omitted.get("edit_ready")
@@ -130,7 +136,7 @@ def test_real_library_cleaning_keeps_original_unicode_bytes_and_carrier_is_overw
         assert row["display_content_hash"] == hashlib.sha256(row["display_text"].encode()).hexdigest()
         assert row["source_content_hash"] == hashlib.sha256(text.encode()).hexdigest()
         assert "verified" not in result.results[0].metadata["_indexed_source"]
-    response = call_docs_tool_payload("get_docs_context", _library_arguments(), service)
+    response = call_docs_tool_payload("get_docs_context", _library_arguments(), service, surface=ADVANCED_SURFACE)
     validate_patch_payload(response, completeness="complete")
     assert evidence_sizes(response, project)["unique_nonoverlap_utf8_bytes"] == len(text.encode())
 
@@ -272,10 +278,12 @@ def test_real_library_postprocessing_cannot_rebind_a_transformed_or_derived_chil
     assert service.unified_context._library_context_pack(result) == []
 
 
-def test_acquisition_observer_uses_real_small_public_route_without_changing_results(library_service):
+def test_acquisition_observer_uses_real_small_public_route_without_changing_results(library_service, monkeypatch):
     from docmancer.mcp.docs_server import call_docs_tool_payload
 
     service, project, _fixtures = library_service
+    # The trace and both direct dispatches must use the same explicit startup mode.
+    monkeypatch.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
     (project / "README.md").write_text("# Server\n\nStart the server with `doc-atlas mcp docs-serve`.\n")
     initialize_fixture_members(project)
     bootstrap_ready_fixture(project)
