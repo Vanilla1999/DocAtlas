@@ -61,7 +61,7 @@ def test_advertised_scope_explains_all_without_adding_a_default():
 def test_generated_host_guides_include_the_scope_decision(template):
     rendered = _get_template_content(template)
     for phrase in ('scope="all"', 'scope="project"', 'scope="module"', 'project_path',
-                   'explicit project/library/module/version scope', 'never widen it from question wording'):
+                   'Preserve project/library/version/path bindings', 'Never infer or widen scope from question wording'):
         assert phrase in rendered
 
 

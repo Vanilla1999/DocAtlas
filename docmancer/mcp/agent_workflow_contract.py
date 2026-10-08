@@ -32,10 +32,17 @@ WORKFLOW_POLICY: dict[str, Any] = {
         "before_first_edit": True,
         "max_calls_before_first_edit": 1,
         "call_limit_scope": "per_concrete_question_and_evidence_scope",
-        "coding_context_format": "patch_context",
+        "coding_context_format": None,
         "documentation_context_format": None,
         "context_format_inferred_from_prose": False,
+        "skill_read_required": False,
+    },
+    "advanced_patch": {
+        "default_available": False,
+        "startup_setting": "DOCATLAS_MCP_ADVANCED_TOOLS=1",
+        "context_format": "patch_context",
         "patch_evidence_representation_cap": None,
+        "authorizes_edit": False,
     },
     "prepare_docs": {
         "tool": "prepare_docs",
@@ -112,7 +119,6 @@ PUBLIC_EXAMPLES: tuple[dict[str, Any], ...] = (
         "arguments": {
             "question": "Which documented constraints apply to changing authentication?",
             "project_path": "/repo",
-            "context_format": "patch_context",
         },
     },
     {

@@ -6,6 +6,8 @@ from ._commands_shared import *  # noqa: F401,F403
 from ._commands_part01 import _build_skill_content, _configure_ingest_logging, _effective_config, _emit_index_summary, _emit_status_line, _get_agent_class, _get_codex_skill_path, _get_config_class, _get_copilot_user_instructions_path, _get_shared_agent_skill_path, _get_template_content, _get_user_config_dir, _install_or_append_agents_md, _load_config, _split_front_matter
 
 def _create_claude_desktop_zip(config_path: str | Path | None) -> Path:
+    from importlib.resources import files
+
     content = _build_skill_content("claude_desktop_skill.md", config_path)
     owned_home = _ensure_user_home(home_dir=Path.home())
     export_dir = owned_home / "exports" / "claude-desktop"
@@ -13,6 +15,12 @@ def _create_claude_desktop_zip(config_path: str | Path | None) -> Path:
     zip_path = export_dir / "docatlas.zip"
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("docatlas/Skill.md", content)
+        for reference in files("docmancer.templates").joinpath("references").iterdir():
+            if reference.name.endswith(".md"):
+                zf.writestr(
+                    f"docatlas/docatlas-references/{reference.name}",
+                    reference.read_text(encoding="utf-8"),
+                )
     return zip_path
 
 

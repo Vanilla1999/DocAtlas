@@ -616,6 +616,7 @@ def _build_skill_content(template_name: str, config_path: str | Path | None) -> 
 
 
 def _install_skill_file(content: str, dest: Path) -> None:
+    _install_skill_references(content, dest.parent)
     front_matter, body = _split_front_matter(content)
     marker_block = f"{_AGENTS_MD_START}\n{body.strip()}\n{_AGENTS_MD_END}\n"
     if not dest.exists():
@@ -664,7 +665,22 @@ def _split_front_matter(content: str) -> tuple[str, str]:
     return content[:boundary], content[boundary:]
 
 
+def _install_skill_references(content: str, directory: Path) -> None:
+    """Ship optional guides beside rendered skills and instruction fallbacks."""
+    if "Agent workflow contract schema: `docatlas-agent-contract-v1`" not in content:
+        return
+    from importlib.resources import files
+
+    for reference in files("docmancer.templates").joinpath("references").iterdir():
+        if reference.name.endswith(".md"):
+            _install_or_append_agents_md(
+                directory / "docatlas-references" / reference.name,
+                reference.read_text(encoding="utf-8"),
+            )
+
+
 def _install_or_append_agents_md(dest: Path, content_body: str) -> None:
+    _install_skill_references(content_body, dest.parent)
     marker_block = f"{_AGENTS_MD_START}\n{content_body.strip()}\n{_AGENTS_MD_END}"
     dest.parent.mkdir(parents=True, exist_ok=True)
 
