@@ -561,7 +561,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         ROOT / "docs/project-docs-demo.md",
         ROOT / "docs/INDEX.md",
         ROOT / "wiki/Architecture.md",
-        ROOT / "docmancer/mcp/_docs_server_resources.py",
     )
     for contract_path in maintained_contracts:
         contract_text = contract_path.read_text(encoding="utf-8")
@@ -569,6 +568,27 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
             "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
         ):
             assert result_kind in contract_text, (contract_path, result_kind)
+
+    # The short MCP resources describe the workflow; result variants are the
+    # delivered schema contract, not required literal words in a Python file.
+    from docmancer.mcp.docs_server import current_tools, read_docs_resource
+
+    context = next(tool for tool in current_tools({}) if tool["name"] == "get_docs_context")
+    output = context["outputSchema"]
+    assert output["properties"]["kind"]["enum"] == ["docs_answer", "docs_context"]
+    assert "insufficient_evidence" in output["properties"]["status"]["enum"]
+    assert "oneOf" not in output
+    assert "context_format" not in context["inputSchema"]["properties"]
+    advanced = next(tool for tool in current_tools({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
+                    if tool["name"] == "get_docs_context")
+    assert advanced["outputSchema"]["oneOf"][0] == output
+    assert advanced["outputSchema"]["oneOf"][1]["properties"]["kind"]["const"] == "patch_context"
+    resource = read_docs_resource("docmancer://agent/quickstart")
+    assert resource and resource["uri"] == "docmancer://agent/quickstart"
+    for guard in ("get_docs_context", "recommended_next_action", "hard_stop=true",
+                  "hard_stop=false", "is not permission", "DOCATLAS_MCP_ADVANCED_TOOLS=1",
+                  "does not enable this setting or load tools automatically"):
+        assert guard in resource["text"], guard
 
 
 def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:
