@@ -528,3 +528,24 @@ risk-label eligibility and retired retrieval_need failures; source-capture setup
 also fails without a diagnosed cause. No bulk semantic migration authorized.
 The historical core run remains incomplete (2 787 unfinished nodes). Updated
 remote CI is needed; this candidate does not establish full-CI or merge readiness.
+
+### Full CI and bounded fixture pilots (2026-10-08)
+
+PR head `aa4dab6c`, CI `37739011872`: retrieval-evidence, installed-mcp-harness,
+installer, static/docs contracts and all three platform smokes PASS. Core Python
+3.13 completed normally: 2 408 FAIL, 5 610 PASS, 10 skipped, 61 ERROR, 8 089 selected;
+no INTERNALERROR. Advanced: 129 FAIL / 493 PASS. Other Python lane counts not
+verified. Required CI remains red; later advanced steps skipped after pytest.
+
+Independent review APPROVED fixture pilot `fcd6b990`, integrated as `47280ab1`:
+two capture failures closed through confirmed finite preparation and pytest
+lifecycle cleanup. Both modules baseline 3 PASS / 7 FAIL, candidate 5 PASS / 5 FAIL.
+All 53 test assertions, catalog/corpus writes and questions preserved. Environment,
+home/global cleanup verified on normal execution and injected failures. Four
+remaining failures reproduce on baseline; public-handler empty read_next is newly
+exposed after preparation and not established as baseline. Assertion retained.
+
+Independent review APPROVED `d684791e`, integrated as `f8427bb5`: only unused
+max_tokens keyword removed from validation test stub. Baseline 10 PASS / 1 FAIL,
+candidate 11 PASS. Original three assertions and protocol budget 2000 unchanged.
+These local pilots do not replace full CI or authorize semantic migrations.
