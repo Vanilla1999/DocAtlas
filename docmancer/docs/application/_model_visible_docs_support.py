@@ -28,7 +28,7 @@ def _docs_source(item: dict[str, Any], *, evidence_id: str | None = None,
     snippet = str(snippet or "").strip()
     version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
     if (not path or not snippet or len(path) > 500 or len(section) > 300
-        or len(snippet) > 3_000 or len(version) > 100):
+        or len(version) > 100):
         return None
     digest = public._source_digest(item)
     identity = canonical_projection_bytes({"path": path, "section": section, "sha256": digest})
