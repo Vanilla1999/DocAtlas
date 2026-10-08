@@ -140,7 +140,7 @@ def discover_relevant_source_files(
         supported_extensions=frozenset({".py", ".dart", ".ts", ".tsx", ".js", ".go", ".rs", ".kt", ".java"})))
     for path in selected_paths:
         rel_path = path.relative_to(root).as_posix()
-        text = _read_text(path)
+        text = _read_text(path, root=root)
         if text is None:
             continue
         candidate = _score_source_file(rel_path, text, ordered_terms, variants_by_term)

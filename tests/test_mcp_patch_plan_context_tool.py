@@ -271,6 +271,18 @@ def test_get_patch_plan_context_response_is_json_serializable():
 
 def test_get_patch_plan_context_finds_relevant_source_files_by_exact_terms(tmp_path: Path):
     root = _source_fixture(tmp_path)
+    _write(
+        root / "docatlas.project-docs.yaml",
+        json.dumps({
+            "schema_version": 1,
+            "documents": [],
+            "code_files": [
+                "lib/modules/tsd_browser/presentation/menu/menu_line.dart",
+                "lib/modules/system_line/presentation/system_line.dart",
+                "lib/modules/tsd_browser/presentation/menu/provider/menu_notifier.dart",
+            ],
+        }),
+    )
 
     payload = handle_project_tool(
         "get_patch_plan_context",
