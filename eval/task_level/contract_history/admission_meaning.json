@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "contract": "literal-admission-meaning-boundary-v1",
+  "migration_status": "precheck-original-tests-still-collected",
+  "base_commit": "067dd56044fb1fe292af2d17783154c8a4b7c092",
+  "runner_base_blob": "9dc4669bc37bcc06b68e182abe08cbad6778e67f",
+  "source": {
+    "original_path": "tests/docs/test_admission_meaning.py",
+    "archive_path": "eval/task_level/contract_history/admission_meaning.py.txt",
+    "git_blob_sha": "87434b28d5460eae97f7d59ed763e4a8a65aadbf",
+    "sha256": "3ecadb74c344ba2613adcf8a1c5ecbc937a8f42e77a88e538972102238dedfd7",
+    "encoding": "utf-8"
+  },
+  "frozen_roster_sha256": "a6614b8f127c742d7d9ef39c3df3c56f16a175cd52cad8f4b927c89ab694fdbf",
+  "historical_baseline": {
+    "pr_head_sha": "067dd56044fb1fe292af2d17783154c8a4b7c092",
+    "run_id": 37991321138,
+    "reader_job_id": 114029489614,
+    "module_counts": {
+      "test_functions": 9,
+      "collected_cases": 34,
+      "passed": 4,
+      "failed": 30,
+      "errors": 0,
+      "skipped": 0
+    },
+    "selected_source_classification": {
+      "test_functions": 5,
+      "collected_cases": 30
+    },
+    "retained_live_guards": {
+      "test_functions": 4,
+      "collected_cases": 4
+    },
+    "suite_counts_per_python": {
+      "passed": 6000,
+      "failed": 1837,
+      "errors": 0,
+      "skipped": 10
+    },
+    "reader_integrity_issues": [],
+    "omitted_rows": 0,
+    "note": "Actual compact JUNIT_MODULE totals were read from this job. The split into five inferred-expectation functions and four retained guards is static source classification, not a new runtime report."
+  },
+  "current_contract": {
+    "demand_dto": "Every nonblank original question remains one full-span unresolved RetrievalNeed in an unknown AdmissionDemand, with exact raw text and literal hard_exact identities. Empty input is distinct from unsupported input.",
+    "literal_identity": "All six archived quoted values remain explicit symbols at original character offsets. Canonical phrase is literal identity; raw QueueHub/queuehub stay distinct while hard_exact uses documented casefolding.",
+    "unknown_semantics": "Neither equal compiled unknown demands nor caller-supplied identical complete MeaningSlot DTOs establish supported natural-language equivalence. same_supported_meaning and the whole-question adapter remain false.",
+    "query_plan": "Original query and explicitly supplied good/changed host lookup bytes remain separate direct/host_lookup lanes without inferred relation or parent coverage.",
+    "finite_reference_resolution": "A separate pure CatalogSource control preserves positive finite membership while testing foreign scope, prefix-neighbor paths, missing/incomplete catalogs and ambiguity. It is not evidence-body or filesystem access proof.",
+    "retained_rule": "All four retained functions remain independently collected. Their full function ASTs are frozen against the original archive. Source preservation checks do not execute or certify their behavior.",
+    "guards": [
+      "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    ],
+    "expected_mutation": "admission_meaning_no_inferred_equivalence",
+    "expected_failure_guard": "critical_admission_meaning_no_inferred_equivalence",
+    "mutant_first_assertion": "Identical forged complete AdmissionDemand/MeaningSlot values must fail the named no-equivalence assertion when the real production function is changed from False to True.",
+    "critical_gate_delta": {
+      "before_cases": 30,
+      "after_cases": 31,
+      "before_mutants": 8,
+      "after_mutants": 9
+    },
+    "retirement_rule": "Only the five marked functions may be considered for retirement in a separate reviewed change after an exact-published-SHA green baseline and one expected named mutant kill with no errors/skips. All four live guards and their helpers remain collected.",
+    "scope_limit": "No production or retrieval changes, no selected test deletion, no source-binding/quality/installed/client proof, and no claim that alias/intent proof covers this API."
+  },
+  "roster": [
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_supported_ru_en_frames_preserve_roles",
+      "definition_line": 28,
+      "source_lines": [
+        18,
+        34
+      ],
+      "collected_cases": 8,
+      "action": "replace-inferred-meaning-expectations",
+      "historical_expectation": "Infer one shared semantic operator and supported paraphrase relation for eight RU/EN pairs; original spans remain a current preservation obligation.",
+      "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_changed_arguments_conditions_and_unparsed_tails_are_not_audited",
+      "definition_line": 49,
+      "source_lines": [
+        37,
+        53
+      ],
+      "collected_cases": 10,
+      "action": "replace-inferred-meaning-expectations",
+      "historical_expectation": "Require a previously inferred supported left-side meaning before rejecting ten changed arguments, conditions, polarity or unknown tails.",
+      "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_quoted_literals_and_original_offsets_are_preserved",
+      "definition_line": 57,
+      "source_lines": [
+        56,
+        62
+      ],
+      "collected_cases": 6,
+      "action": "replace-inferred-meaning-expectations",
+      "historical_expectation": "Promote six quoted literals to semantic owner slots. Only the owner nomination is retired; raw identity, spans, case and hard_exact are independently preserved.",
+      "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_unknown_question_does_not_disappear",
+      "definition_line": 65,
+      "source_lines": [
+        65,
+        70
+      ],
+      "collected_cases": 1,
+      "action": "retain-live-residue-reference-guard",
+      "historical_expectation": "Keep unknown source text as explicit unsupported residue.",
+      "current_guard": "tests/docs/test_admission_meaning.py::test_unknown_question_does_not_disappear"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_question_with_an_unsupported_second_clause_is_not_fully_supported",
+      "definition_line": 73,
+      "source_lines": [
+        73,
+        76
+      ],
+      "collected_cases": 1,
+      "action": "retain-live-residue-reference-guard",
+      "historical_expectation": "Keep an unsupported second clause; never silently declare the whole question supported.",
+      "current_guard": "tests/docs/test_admission_meaning.py::test_question_with_an_unsupported_second_clause_is_not_fully_supported"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_arguments_with_and_or_are_not_made_equivalent",
+      "definition_line": 79,
+      "source_lines": [
+        79,
+        82
+      ],
+      "collected_cases": 1,
+      "action": "retain-live-residue-reference-guard",
+      "historical_expectation": "Never equate A and B with A or B.",
+      "current_guard": "tests/docs/test_admission_meaning.py::test_arguments_with_and_or_are_not_made_equivalent"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_mismatched_reference_plan_cannot_verify_a_rewrite",
+      "definition_line": 85,
+      "source_lines": [
+        85,
+        88
+      ],
+      "collected_cases": 1,
+      "action": "retain-live-residue-reference-guard",
+      "historical_expectation": "A ReferencePlan for a different question cannot certify a rewrite.",
+      "current_guard": "tests/docs/test_admission_meaning.py::test_mismatched_reference_plan_cannot_verify_a_rewrite"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_actual_query_planner_emits_original_derived_need",
+      "definition_line": 98,
+      "source_lines": [
+        91,
+        102
+      ],
+      "collected_cases": 5,
+      "action": "replace-inferred-meaning-expectations",
+      "historical_expectation": "Generate five inferred retrieval_need lanes and relation labels from prose.",
+      "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_meaning.py::test_only_fully_verified_reformulation_can_derive_original",
+      "definition_line": 105,
+      "source_lines": [
+        105,
+        115
+      ],
+      "collected_cases": 1,
+      "action": "replace-inferred-meaning-expectations",
+      "historical_expectation": "Promote a purported semantic reformulation to audited parent coverage.",
+      "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
+    }
+  ]
+}

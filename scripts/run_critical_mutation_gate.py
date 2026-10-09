@@ -23,14 +23,19 @@ TARGET_TESTS = (
     "tests/task_level/test_github_models_adapter.py::test_github_models_runner_stops_at_host_owned_turn_limit",
     "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
     "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+    "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.project_retrieval_intent",
     "docmancer.docs.domain.project_query_intent",
     "docmancer.docs.domain.project_doc_ranking",
     "docmancer.docs.domain.query_terms",
+    "docmancer.docs.domain.admission_meaning",
+    "docmancer.docs.domain.admission_grammar",
+    "docmancer.docs.domain.question_retrieval_needs",
+    "docmancer.docs.domain.query_reference_binding",
     "docmancer.docs.domain.documentation_query_plan",
     "docmancer.docs.application.action_packet",
     "docmancer.docs.application._action_packet_shared",
@@ -136,6 +141,19 @@ MUTANTS = (
         TARGET_TESTS[4],
         1,
         "critical_project_intent_no_inferred_roles",
+    ),
+    Mutant(
+        "admission_meaning_no_inferred_equivalence",
+        "docmancer/docs/domain/admission_meaning.py",
+        "def same_supported_meaning(left: AdmissionDemand, right: AdmissionDemand) -> bool:\n"
+        '    """Equal supplied slots are not a witness of NL meaning equivalence."""\n'
+        "    return False",
+        "def same_supported_meaning(left: AdmissionDemand, right: AdmissionDemand) -> bool:\n"
+        '    """Equal supplied slots are not a witness of NL meaning equivalence."""\n'
+        "    return True",
+        TARGET_TESTS[5],
+        1,
+        "critical_admission_meaning_no_inferred_equivalence",
     ),
 )
 
