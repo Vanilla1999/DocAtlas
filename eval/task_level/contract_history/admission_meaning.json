@@ -48,7 +48,7 @@
     "unknown_semantics": "Neither equal compiled unknown demands nor caller-supplied identical complete MeaningSlot DTOs establish supported natural-language equivalence. same_supported_meaning and the whole-question adapter remain false.",
     "query_plan": "Original query and explicitly supplied good/changed host lookup bytes remain separate direct/host_lookup lanes without inferred relation or parent coverage.",
     "finite_reference_resolution": "A separate pure CatalogSource control preserves positive finite membership while testing foreign scope, prefix-neighbor paths, missing/incomplete catalogs and ambiguity. It is not evidence-body or filesystem access proof.",
-    "retained_rule": "All four retained functions remain independently collected. Their full function ASTs are frozen against the original archive. Source preservation checks do not execute or certify their behavior.",
+    "retained_rule": "All four retained functions remain independently collected. Their full ASTs and both shared fixture helpers demands/demand are frozen against the original archive. Source preservation checks do not execute or certify behavior of these tests or their external consumers.",
     "guards": [
       "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
     ],
@@ -244,16 +244,51 @@
     "independent_control_collected_cases": 1,
     "current_family_collected_cases": 5,
     "original_module_path": "tests/docs/test_admission_meaning.py",
-    "working_module_sha256": "387129f078ac1ae05ef74647a2d1323454cc76c854ac001d97bd31c96ea8c8ab",
+    "working_module_sha256": "8fa012052657ab5e6426a677ae8e0a338c207aee39c070af9f581556ee892fe9",
     "working_module_node_hash": "964abdbdef8f5e41b0107bdb9fd757842d8296ebbbb986a2473d520fa434af1b",
     "diagnostic_shard": "tests/diagnostic_labels.admission_contract.json",
     "helper_demands_sha256": "07c3951473ae03fba4acf380c59969e2817f75d6d0d079d2303f09cad2875130",
     "contiguous_retained_functions_sha256": "e3a4f45a86a01bbe045cf375cad423905ffd634baae70d2549758f4227e91b5a",
-    "byte_preservation": "The complete contiguous source block containing all four live functions and the exact demands helper are copied without edits; the independent control also checks their AST against the frozen archive.",
+    "byte_preservation": "The complete contiguous source block containing all four live functions and both original demands/demand fixture helpers are preserved without edits. The independent control checks all four function ASTs and both shared helper ASTs against the frozen archive; the latter includes demand imported by another collected module.",
     "archive_and_frozen_roster_unchanged": true,
-    "independent_control_blob_unchanged": "ddecc43b1cbd744b9f1e47d5d48a22c37f03a371",
     "critical_runner_blob_unchanged": "769c961ebebc40c31b49d7fa6fb15d13c15df5b3",
     "selector_review": "The original module path remains present. The current core/direct-question/Task33 workflows, pytest configuration, inventory hook and critical runner contain no explicit selector for one of the five removed functions. This is a review of the actual acceptance chain, not an exhaustive historical-link search.",
-    "final_published_sha_acceptance": "pending"
+    "final_published_sha_acceptance": "pending",
+    "helper_demand_sha256": "5f2d41e36c2adee81b294a78316736955076abf575ab5c934a9149561f7b162b",
+    "independent_control_blob_at_retirement": "ddecc43b1cbd744b9f1e47d5d48a22c37f03a371",
+    "independent_control_blob": "ff3e04a9ea4c5917908a1ea8c5dc2a2cae8781ae",
+    "integration_fix": {
+      "reason": "Retirement removed demand as locally unused, but another collected test module imports it. Restore the exact helper; do not alter its old assertions or any consuming test.",
+      "pr_head_sha": "38da10d347ae2227eee6d1624db58dbf30938674",
+      "run_id": 38000724569,
+      "run_attempt": 1,
+      "core_python311_job_id": 114057857971,
+      "reader_job_id": 114058136097,
+      "actual_core_counts_each_python": {
+        "passed": 0,
+        "failed": 0,
+        "errors": 1,
+        "skipped": 0
+      },
+      "python_versions": [
+        "3.11",
+        "3.12",
+        "3.13"
+      ],
+      "error_node": "tests/docs/test_admission_mapping_assignments.py",
+      "failure": "ImportError: cannot import name 'demand' from 'tests.docs.test_admission_meaning'",
+      "consumer_blob": "af245d2112267b68a9a55b9873a034e7462481e9",
+      "review_scope": "This exact external import was independently read. It is not an exhaustive repository-wide consumer inventory.",
+      "working_module_before_blob": "307457b4704847a20ae67c3f043def715192fec9",
+      "working_module_after_blob": "add20a09db326dbb6497017b01b38b28b3f0129a",
+      "restored_shared_helpers": [
+        "demands",
+        "demand"
+      ],
+      "definitions_and_case_counts_unchanged": true,
+      "archive_roster_runtime_proof_unchanged": true,
+      "updated_control_only_adds_shared_helper_ast_preservation": true,
+      "final_published_sha_acceptance": "pending"
+    }
   }
 }

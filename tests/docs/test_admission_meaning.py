@@ -8,6 +8,12 @@ def demands(question):
     return compile_admission_demands(question, refs)
 
 
+def demand(question):
+    result = demands(question)
+    assert len(result) == 1 and not result[0].unsupported_spans
+    return result[0]
+
+
 def test_unknown_question_does_not_disappear():
     question = 'Explain the undocumented zygomatic activation of OrbitHub.'
     row = demands(question)

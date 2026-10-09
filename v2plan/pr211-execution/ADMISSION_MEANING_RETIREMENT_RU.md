@@ -1,7 +1,8 @@
 # PR #211: retirement отменённых admission-meaning ожиданий
 
-Статус: узкое сокращение после фактического normal critical proof; acceptance на конечном SHA ещё требуется.
-Base: `a348cafb4807a5b4af852e0029cf6b98ff7a3f91`.
+Статус: узкое сокращение после фактического normal critical proof. Следующий full core обнаружил ошибку collection из-за удалённого общего helper; ниже зафиксировано её восстановление. Acceptance на конечном SHA ещё требуется.
+Base retirement: `a348cafb4807a5b4af852e0029cf6b98ff7a3f91`.
+Base helper fix: `38da10d347ae2227eee6d1624db58dbf30938674`.
 
 ## Полученный runtime proof
 
@@ -39,18 +40,18 @@ Mutation меняет реальный `same_supported_meaning` с False на Tr
 
 Эти обязательства проверяет уже прошедший независимый current control.
 В quoted `for` connective [14, 17) и quoted occurrence [19, 22) различаются по исходным координатам.
-Сам current control, его finite-reference positive/foreign/prefix/missing/incomplete/ambiguity checks и directed production mutant не изменены.
+При retirement current control, его finite-reference positive/foreign/prefix/missing/incomplete/ambiguity checks и directed production mutant не менялись. Follow-up ниже усиливает только сохранение двух общих fixture helpers по frozen AST.
 
-Удалены также неиспользуемые `demand()` и `pytest` import.
-В рабочем модуле остаются точный прежний `demands()`, его imports и все четыре содержательных функции:
+`pytest` import удалён. `demand()` был ошибочно признан неиспользуемым по локальным вызовам: его импортирует другой collected module. Follow-up восстанавливает этот helper побайтно, включая исходное assertion; поведение потребителя не меняется.
+В рабочем модуле сохраняются точные прежние `demands()` и `demand()`, необходимые imports и все четыре содержательных функции:
 
 - `test_unknown_question_does_not_disappear`;
 - `test_question_with_an_unsupported_second_clause_is_not_fully_supported`;
 - `test_arguments_with_and_or_are_not_made_equivalent`;
 - `test_mismatched_reference_plan_cannot_verify_a_rewrite`.
 
-Весь contiguous block этих четырёх функций и helper перенесены без изменения bytes.
-Existing current control дополнительно сравнивает AST каждой живой функции с frozen archive.
+Весь contiguous block этих четырёх функций и оба helper сохранены без изменения bytes относительно frozen archive.
+Current control сравнивает AST каждой живой функции и обоих shared helpers с frozen archive.
 Это проверка сохранения исходников; runtime этих четырёх guards остаётся самостоятельным обязательством общего CI.
 
 ## Учёт и сохранение истории
@@ -74,7 +75,7 @@ Label остаётся behavioral; основной diagnostic JSON и друг�
 в этой acceptance цепочке нет явного selector на одну из пяти удаляемых функций.
 Это не утверждение об отсутствии historical references во всём репозитории; archive/crosswalk ссылки намеренно остаются.
 
-## Exact manifest
+## Exact manifest retirement (исторический)
 
 | Файл | Base blob | Proposed blob | Mode |
 | --- | --- | --- | --- |
@@ -82,8 +83,39 @@ Label остаётся behavioral; основной diagnostic JSON и друг�
 | tests/diagnostic_labels.admission_contract.json | c7296179030f7bac424638eda24cdce43611bae9 | a429929eb2ae3cbdb53b201eb4a0605b512a8990 | 100644 |
 | eval/task_level/contract_history/admission_meaning.json | 4c85b843c096df3612588c30a8d7dc4efb9aee5c | 1d302adcc304e71207d61329bc2243a0f42f1ca4 | 100644 |
 
-Неизменные guards: current control `ddecc43b1cbd744b9f1e47d5d48a22c37f03a371`;
-critical runner `769c961ebebc40c31b49d7fa6fb15d13c15df5b3`.
+В момент retirement current control имел blob `ddecc43b1cbd744b9f1e47d5d48a22c37f03a371`.
+Critical runner остаётся `769c961ebebc40c31b49d7fa6fb15d13c15df5b3`.
 Production/retrieval, frozen source bodies/questions и source-binding/quality/installed/client obligations не меняются.
 Нужны independent review и обычные acceptance jobs на конечном опубликованном SHA.
 Локальные imports/pytest/subprocesses не выполнялись; commits/refs не создавались.
+
+## Follow-up: восстановление общего fixture helper
+
+[Full core Python 3.11 / job 114057857971](https://github.com/Vanilla1999/DocAtlas/actions/runs/38000724569/job/114057857971)
+на PR head `38da10d347ae2227eee6d1624db58dbf30938674` завершился collection ERROR:
+
+`tests/docs/test_admission_mapping_assignments.py:5` импортирует `demand` из `tests.docs.test_admission_meaning`.
+Фактическая ошибка — `ImportError: cannot import name 'demand'`.
+[Общий JUnit reader 114058136097](https://github.com/Vanilla1999/DocAtlas/actions/runs/38000724569/job/114058136097)
+подтвердил для каждого Python 3.11/3.12/3.13 **0 PASS / 0 FAIL / 1 ERROR / 0 SKIP**, integrity issues пусты.
+Это остановка collection; нули не означают прохождение остальных тестов. Historical 31/9 normal critical proof выше остаётся историческим и не заменяет полный прогон.
+
+Восстановлен ровно исходный `demand()` из frozen blob `87434b28d5460eae97f7d59ed763e4a8a65aadbf`.
+Удаление только этого добавленного блока побайтно восстанавливает предыдущий working blob `307457b4704847a20ae67c3f043def715192fec9`.
+SHA-256 restored helper с завершающим LF — `5f2d41e36c2adee81b294a78316736955076abf575ab5c934a9149561f7b162b`.
+Точный new working SHA-256 — `8fa012052657ab5e6426a677ae8e0a338c207aee39c070af9f581556ee892fe9`.
+
+Current control дополнен сравнением AST `demands` и `demand`; раньше он сохранял только четыре test function AST.
+Test names, collected case counts, module node hash, diagnostic shard, frozen source/roster и historical runtime receipt не изменены.
+Проверен конкретный внешний consumer, blob `af245d2112267b68a9a55b9873a034e7462481e9`; это не exhaustive inventory всех импортов репозитория.
+Работа остальных legacy mapping assertions и новый full core остаются runtime обязательством: восстановление импорта не объявляет их PASS.
+
+| Файл | Base blob на 38da | Proposed blob | Mode |
+| --- | --- | --- | --- |
+| tests/docs/test_admission_meaning.py | 307457b4704847a20ae67c3f043def715192fec9 | add20a09db326dbb6497017b01b38b28b3f0129a | 100644 |
+| tests/docs/test_admission_meaning_contract.py | ddecc43b1cbd744b9f1e47d5d48a22c37f03a371 | ff3e04a9ea4c5917908a1ea8c5dc2a2cae8781ae | 100644 |
+| eval/task_level/contract_history/admission_meaning.json | 1d302adcc304e71207d61329bc2243a0f42f1ca4 | a94ff790f90afd6f3d11fdca24c2def86dbfb435 | 100644 |
+
+Crosswalk обновляет только текущий working hash, сохранение shared helpers и честный integration-failure ledger.
+Ни один старый вопрос/assertion потребителя, production source, selector или critical mutant не изменён.
+Локальное выполнение отсутствует. Нужны independent review и повторный full core на следующем опубликованном SHA.

@@ -118,11 +118,28 @@ def test_current_admission_meaning_preserves_literals_without_inferred_equivalen
     ]
 
     # These four independent working tests continue to run; preservation is not their proof.
-    working, _ = _archive_functions_and_roster((_ROOT / _ORIGINAL).read_text(encoding="utf-8"))
+    working_source = (_ROOT / _ORIGINAL).read_text(encoding="utf-8")
+    working, _ = _archive_functions_and_roster(working_source)
     for name in _RETAINED:
         frozen = next(function for function in functions if function.name == name)
         live = next(function for function in working if function.name == name)
         assert ast.dump(live, include_attributes=False) == ast.dump(frozen, include_attributes=False)
+
+
+    # Shared fixtures may be imported by other independently collected modules.
+    frozen_helpers = {
+        node.name: node for node in ast.parse(archived.decode("utf-8")).body
+        if isinstance(node, ast.FunctionDef) and node.name in {"demands", "demand"}
+    }
+    working_helpers = {
+        node.name: node for node in ast.parse(working_source).body
+        if isinstance(node, ast.FunctionDef) and node.name in {"demands", "demand"}
+    }
+    assert set(frozen_helpers) == set(working_helpers) == {"demands", "demand"}
+    for name in ("demands", "demand"):
+        assert ast.dump(working_helpers[name], include_attributes=False) == ast.dump(
+            frozen_helpers[name], include_attributes=False,
+        )
 
     records, lookup_case = _archived_questions(functions)
     assert len(records) == 50 and all(isinstance(question, str) for question, _, _ in records)
