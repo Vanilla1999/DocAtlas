@@ -8,7 +8,7 @@ import pytest
 
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application._action_packet_part03 import build_action_packet as shard_packet
-from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+from docmancer.docs.application.model_visible_projection import _refresh_estimate, validate_model_visible_projection
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.domain.mutation_intent import (
     MutationIntentContract, RequestedTarget, build_mutation_intent,
@@ -157,7 +157,8 @@ def test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator(mo
     assert captured["projection"]["context_available"]
     assert captured["validated_projection"]["sources"] == captured["projection"]["sources"]
     assert captured["snapshot"] == captured["validated_snapshot"]
-    assert captured["validation_budget"] == 800
+    # Cost is observed without imposing an output ceiling; snapshot validation is mandatory.
+    assert captured["validation_budget"] is None
     if partial_status == "insufficient_evidence":
         # OPEN validator dependency: the current transport rejects this status
         # paired with retrieval_only. Ingress must retain sources for validation
@@ -170,7 +171,13 @@ def test_partial_read_recovery_keeps_projector_sources_snapshot_and_validator(mo
     assert result["query_coverage"] == "partial"
     assert result["context_available"] and not result["edit_ready"]
     assert result["support_status"] == "retrieval_only"
-    assert validate_model_visible_projection(result, snapshot=captured["snapshot"], max_tokens=800) == []
+    assert validate_model_visible_projection(result, snapshot=captured["snapshot"], max_tokens=None) == []
+    forged = deepcopy(result)
+    forged["sources"][0]["snippet"] += "\nForged material outside the captured source."
+    _refresh_estimate(forged)
+    errors = validate_model_visible_projection(forged, snapshot=captured["snapshot"], max_tokens=None)
+    assert "projection source snippet does not match the internal snapshot" in errors
+    assert "projection estimate mismatch" not in errors
 
 
 def test_public_empty_read_preserves_operational_block_and_terminal_cap(tmp_path):

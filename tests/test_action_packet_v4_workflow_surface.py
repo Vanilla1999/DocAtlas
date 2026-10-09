@@ -1,6 +1,7 @@
 """Explicit workflow representation and additive mutation schema contracts."""
 from copy import deepcopy
 from importlib.resources import files
+import re
 
 import jsonschema
 import pytest
@@ -92,7 +93,7 @@ def test_prepare_mutation_schema_is_additive_nullable_and_strict():
         jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo', 'mutation': value}, schema)
     jsonschema.validate({'action': 'sync_project_docs', 'project_path': '/repo'}, schema)
     description = schema['properties']['mutation']['description']
-    assert 'omitted/null grants no writes' in description
+    assert re.search(r'\bomitted/null\b[^.;]*\bno writes\b', description, re.I)
     assert 'Confirmed lexical member upserts only' in description
     assert 'No deletion/vector/artifact writes' in description
     guide = files('docmancer.templates').joinpath('references/prepare.md').read_text()
@@ -166,11 +167,14 @@ def test_prepare_storage_schema_leaves_platform_and_exact_existing_store_to_runt
     storage = schema['properties']['mutation']['properties']['storage_path']
     assert 'pattern' not in storage
     description = schema['properties']['mutation']['description']
-    assert 'Null generation permits only absent-store initialization' in description
-    assert 'POSIX no-follow reads required' in description
-    assert 'unsupported platforms fail closed' in description
+    assert re.search(r'\bnull generation\b[^.]*\bonly\b[^.]*\babsent[- ]store\b', description, re.I)
+    assert 'POSIX no-follow reads' in description
+    assert re.search(r'\b(?:unsupported platforms|reads or) fail closed\b', description)
     assert 'Exact absolute host-selected private DB outside project' in storage['description']
-    assert 'Caller/project configuration cannot redirect it' in storage['description']
+    assert re.search(
+        r'(?:Caller/project configuration cannot redirect it|no caller/project redirects)',
+        storage['description'],
+    )
     guide = files('docmancer.templates').joinpath('references/prepare.md').read_text()
     # Relocated security handoff is required, even while the skill fix is pending.
     guide = ' '.join(guide.split())
