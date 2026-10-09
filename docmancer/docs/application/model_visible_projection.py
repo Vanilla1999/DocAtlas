@@ -31,6 +31,7 @@ from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
 from docmancer.docs.domain.context_budget import PROJECT_CONTEXT_BUDGET
 from docmancer.docs.application.model_visible_projection_helpers import (
     bounded_action as _bounded_action,
+    source_choice_action as _source_choice_action,
     cited_patch_items as _cited_patch_items,
     sanitized_projection_manifest,
     canonical_projection_bytes,
@@ -471,7 +472,8 @@ def _explicit_delivery_block(
     reason = str(delivery.get("reason_code") or retrieval.get("reason_code")
                  or ("confirmation_required" if confirmation else "delivery_blocked"))[:120]
     payload = project_insufficient(
-        kind=kind, missing=[reason], recommended_next_action=None,
+        kind=kind, missing=[reason],
+        recommended_next_action=_source_choice_action(retrieval),
         max_tokens=max_tokens,
     )
     payload.update(

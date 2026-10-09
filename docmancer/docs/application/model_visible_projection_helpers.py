@@ -11,6 +11,8 @@ from typing import Any
 def bounded_action(value: Any) -> dict[str, Any] | None:
     if not isinstance(value, dict):
         return None
+    if value.get("type") == "ask_user_for_library_docs_source":
+        return _source_choice_advisory(value)
     allowed = (
         "tool", "type", "action", "handled_by", "arguments_patch", "question",
         "requires_confirmation", "confirmation_reason", "reason", "observations",
@@ -24,6 +26,128 @@ def bounded_action(value: Any) -> dict[str, Any] | None:
         if value.get(key) not in (None, {}, [])
     }
     result["auto_execute"] = False
+    return result
+
+
+def source_choice_action(retrieval: dict[str, Any]) -> dict[str, Any] | None:
+    """Retain only a producer-authored source question, never a tool grant."""
+    if (
+        retrieval.get("status") != "confirmation_required"
+        or retrieval.get("requires_confirmation") is not True
+        or retrieval.get("reason_code") != "library_docs_source_required"
+        or retrieval.get("confirmation_reason") != "library_docs_source"
+        or retrieval.get("hard_stop")
+        or retrieval.get("unresolved_conflicts")
+        or retrieval.get("recovery_origin") == "conflict"
+        or retrieval.get("recovery_reason_code") == "authoritative_evidence_conflict"
+    ):
+        return None
+    delivery = retrieval.get("delivery_decision")
+    if delivery is not None:
+        if not isinstance(delivery, dict):
+            return None
+        deliverable = delivery.get("deliverable")
+        if deliverable is not None and deliverable is not True:
+            return None
+    selection = retrieval.get("selection_decision")
+    selection = (
+        selection.get("selection_decision", selection) if isinstance(selection, dict)
+        else getattr(selection, "selection_decision", selection)
+    )
+    conflicts = (
+        selection.get("unresolved_conflicts") if isinstance(selection, dict)
+        else getattr(selection, "unresolved_conflicts", None)
+    )
+    if conflicts:
+        return None
+    support = retrieval.get("support_decision")
+    support_reason = (
+        support.get("reason_code") if isinstance(support, dict)
+        else getattr(support, "reason_code", None)
+    )
+    if support_reason is not None and not isinstance(support_reason, str):
+        return None
+    if support_reason in {"authoritative_evidence_conflict", "conflicting_authoritative_evidence"}:
+        return None
+    return _source_choice_advisory(retrieval.get("next_action"))
+
+
+def _source_choice_advisory(value: Any) -> dict[str, Any] | None:
+    if (
+        not isinstance(value, dict)
+        or value.get("type") != "ask_user_for_library_docs_source"
+        or value.get("tool") is not None
+        or value.get("requires_confirmation") is not True
+        or not isinstance(value.get("question"), str)
+        or not value["question"].strip()
+    ):
+        return None
+    result: dict[str, Any] = {
+        "type": "ask_user_for_library_docs_source",
+        "tool": None,
+        "question": value["question"],
+        "requires_confirmation": True,
+        "auto_execute": False,
+    }
+    if "quality_warning" in value:
+        if not isinstance(value["quality_warning"], str):
+            return None
+        result["quality_warning"] = value["quality_warning"]
+    if "options" in value:
+        if not isinstance(value["options"], list):
+            return None
+        options = [_source_choice_option(option) for option in value["options"]]
+        if any(option is None for option in options):
+            return None
+        result["options"] = options
+    return result
+
+
+def _source_choice_option(value: Any) -> dict[str, Any] | None:
+    if not isinstance(value, dict):
+        return None
+    result: dict[str, Any] = {}
+    for key in ("id", "label", "docs_url", "why"):
+        if key not in value:
+            continue
+        item = value[key]
+        if not isinstance(item, str) and not (key == "why" and item is None):
+            return None
+        result[key] = item
+    if "confidence" in value:
+        confidence = value["confidence"]
+        if (isinstance(confidence, bool) or (
+            confidence is not None and not isinstance(confidence, (str, int, float))
+        )):
+            return None
+        if isinstance(confidence, float) and not math.isfinite(confidence):
+            return None
+        result["confidence"] = confidence
+    for key in ("requires_confirmation", "quality_guarantee"):
+        if key in value:
+            if not isinstance(value[key], bool):
+                return None
+            if key == "requires_confirmation" and value[key] is not True:
+                return None
+            if key == "quality_guarantee" and value[key] is not False:
+                return None
+            result[key] = value[key]
+    if "arguments_patch" in value:
+        arguments = value["arguments_patch"]
+        if not isinstance(arguments, dict):
+            return None
+        patch: dict[str, Any] = {}
+        for key in ("library", "ecosystem", "version", "source_type", "docs_url"):
+            if key in arguments:
+                if arguments[key] is not None and not isinstance(arguments[key], str):
+                    return None
+                patch[key] = arguments[key]
+        if "action" in arguments:
+            if (not isinstance(arguments["action"], str)
+                or arguments["action"] not in {"discover_library_docs", "prefetch_library_docs"}):
+                return None
+            patch["action"] = arguments["action"]
+        result["arguments_patch"] = patch
     return result
 
 
@@ -67,7 +191,7 @@ def sanitized_projection_manifest(
     ]
 
 
-__all__ = ["bounded_action", "cited_patch_items", "sanitized_projection_manifest"]
+__all__ = ["bounded_action", "source_choice_action", "cited_patch_items", "sanitized_projection_manifest"]
 
 
 def canonical_projection_bytes(value: Any) -> bytes:

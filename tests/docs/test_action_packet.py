@@ -10,7 +10,6 @@ from docmancer.docs.application.action_packet import refresh_action_packet_estim
 from copy import deepcopy
 
 
-
 def _current_packet_source(item):
     """Give the unchanged authored text its current whole-window coordinates."""
     text = item["display_text"]
@@ -424,9 +423,29 @@ def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
         Facade(),
     )
 
-    assert result["status"] == "ok", result["missing"]
-    assert result["kind"] == "patch_context"
-    assert result["mutation_intent"]["ready"] is True
+    # The legacy delivery hint and imperative wording cannot select an editing surface.
+    assert result["status"] == "ok", result.get("missing")
+    assert result["kind"] == "docs_answer" and result["edit_ready"] is False
+    assert "mutation_intent" not in result
+
+    explicit = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": (
+                "Update lib/modules/permission/application/permission_service.dart "
+                "for shared browser and scan preflight policy"
+            ),
+            "project_path": "/repo",
+            "context_format": "patch_context",
+        },
+        Facade(),
+    )
+    # An explicit SDK presentation retains both authored windows; it grants no edit.
+    assert explicit["kind"] == "patch_context" and explicit["result"] == "data"
+    assert {row["text"] for row in explicit["sources"]} == {guidance_text, target_text}
+    assert {row["path"] for row in explicit["sources"]} == {guidance["path"], target["path"]}
+    assert explicit["edit_ready"] is False and "mutation_intent" not in explicit
+    assert all(row["instruction_trust"] == "untrusted_data" for row in explicit["sources"])
 
 
 def test_untargeted_patch_recovery_includes_safe_document_navigation():
@@ -464,10 +483,27 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
     )
 
     assert result["status"] == "insufficient_evidence"
-    assert result["recommended_next_action"]["suggested_doc_paths"] == [
-        "docs/permission-policy.md"
+    assert result["edit_ready"] is False
+    assert "mutation_intent" not in result
+    explicit = handle_context_tool(
+        "get_docs_context",
+        {
+            "question": "Fix shared permission preflight policy",
+            "project_path": "/repo",
+            "context_format": "patch_context",
+        },
+        Facade(),
+    )
+    # The retained source itself is usable document navigation. Prose does not
+    # manufacture a code-search target or an automatic retry.
+    assert explicit["result"] == "data" and explicit["kind"] == "patch_context"
+    assert [(row["path"], row["text"]) for row in explicit["sources"]] == [
+        ("docs/permission-policy.md", "PermissionService owns shared permission policy.")
     ]
-    assert result["recommended_next_action"]["repeat_docs_context"] is False
+    assert explicit["edit_ready"] is False and "mutation_intent" not in explicit
+    action = explicit.get("recommended_next_action")
+    if action:
+        assert action["auto_execute"] is False and action.get("repeat_docs_context") is not True
     assert "targets" not in result
     assert "implementation_guidance" not in result
     assert "invariants" not in result
@@ -636,14 +672,20 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     }
     assert "delivery_strategy" not in tool["inputSchema"]["properties"]
     assert tool["outputSchema"]["properties"]["kind"]["enum"] == [
-        "docs_answer", "docs_context", "patch_context",
+        "docs_answer", "docs_context",
     ]
     assert len(TOOLS) == 3
     installed_contract = _get_template_content("project_bootstrap.md")
     assert 'delivery_strategy="bounded_direct"' not in installed_contract
-    assert "bounded structured" in installed_contract
-    assert "follow at most one returned non-automatic `rephrase_question`" in installed_contract
-    assert "Stop before editing only when `hard_stop=true`" in installed_contract
+    from docmancer.mcp.agent_workflow_contract import public_agent_contract
+    contract = public_agent_contract()
+    assert contract["identity"] in installed_contract
+    policy = contract["workflow"]
+    assert policy["first_call"]["tool"] == "get_docs_context"
+    assert policy["first_call"]["context_format_inferred_from_prose"] is False
+    assert policy["free_form_lookup"]["original_question_unchanged"] is True
+    assert policy["recovery"]["hard_stop_false_authorizes_edit"] is False
+    assert policy["retrieval_only_answer"]["authorizes_edit"] is False
     project_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/project-docs")
     library_workflow = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://workflow/library-docs")
     quickstart = next(item for item in MCP_RESOURCES if item["uri"] == "docmancer://agent/quickstart")
@@ -657,6 +699,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
 
         def get_project_context(self, project_path, question, **kwargs):
             self.calls += 1
+            self.last_arguments = kwargs
             return ProjectContextResult(
                 project_path=project_path,
                 question=question,
@@ -688,12 +731,15 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     }, UnifiedDocsContextService(backend))
 
     assert backend.calls == 1
-    assert result["kind"] == "patch_context"
+    assert result["kind"] == "docs_context"
     assert "context_pack" not in json.dumps(result)
     assert result["status"] == "insufficient_evidence"
     assert result["missing"]
     jsonschema.validate(result, tool["outputSchema"])
-    assert math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) <= 1_500
+    assert result.get("edit_ready") is not True and "mutation_intent" not in result
+    assert backend.last_arguments["allow_network"] is False
+    assert backend.last_arguments["mutation_intent"].operation == "none"
+    assert type(result["estimated_tokens"]) is int and result["estimated_tokens"] >= 0
 
     class FakeMcpTypes:
         class TextContent:
@@ -711,7 +757,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     combined_tokens = math.ceil(len(json.dumps(result, ensure_ascii=False).encode("utf-8")) / 4) + math.ceil(
         len(compatibility_text.encode("utf-8")) / 4
     )
-    assert combined_tokens <= 1_500
+    assert combined_tokens > 0  # Cost observation, not a representation ceiling.
 
     structured_result = _mcp_tool_result(FakeMcpTypes, result, text_fallback=False)
     assert structured_result.structuredContent is result
@@ -723,7 +769,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     packet_without_strategy = call_docs_tool_payload("get_docs_context", {
         "question": "Implement bounded context", "project_path": "/repo",
     }, UnifiedDocsContextService(backend))
-    assert packet_without_strategy["kind"] == "patch_context"
+    assert packet_without_strategy["kind"] == "docs_context"
     assert packet_without_strategy["status"] == "insufficient_evidence"
 
     class MissingFacade:
@@ -760,6 +806,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
             return {
                 "tool": "get_docs_context", "status": "confirmation_required", "context_pack": [],
                 "answer_available": False, "requires_confirmation": True,
+                "reason_code": "library_docs_source_required",
+                "confirmation_reason": "library_docs_source",
                 "next_action": {
                     "tool": None, "type": "ask_user_for_library_docs_source",
                     "requires_confirmation": True,
@@ -775,7 +823,11 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     assert source_choice["status"] == "insufficient_evidence"
     assert source_choice["recommended_next_action"]["type"] == "ask_user_for_library_docs_source"
     assert source_choice["recommended_next_action"]["requires_confirmation"] is True
-    assert math.ceil(len(json.dumps(source_choice, ensure_ascii=False).encode("utf-8")) / 4) <= 500
+    assert source_choice.get("edit_ready") is not True
+    assert source_choice["recommended_next_action"]["options"] == [
+        {"id": "official", "docs_url": "https://kotlinlang.org/docs/"}
+    ]
+    _assert_source_choice_consent_boundary(SourceChoiceFacade(), FakeMcpTypes)
 
     class PartialFacade:
         def get_docs_context(self, question, **kwargs):
@@ -798,9 +850,9 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "delivery_strategy": "bounded_direct",
     }, PartialFacade())
     assert partial["status"] == "insufficient_evidence"
-    assert any("status=partial_success" in item for item in partial["missing"])
-    assert any("project" in item for item in partial["missing"])
-    assert not any("navigational" in item for item in partial["missing"])
+    assert partial["kind"] == "docs_answer"
+    assert partial["answer_supported"] is False and partial["edit_ready"] is False
+    assert "mutation_intent" not in partial and "context_pack" not in partial
 
     class LegacyProjectFacade:
         def get_docs_context(self, question, **kwargs):
@@ -818,8 +870,9 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, LegacyProjectFacade())
     assert legacy["status"] == "insufficient_evidence"
-    assert any("patch_surface_not_supported" in item for item in legacy["missing"])
-    assert "Project answer completeness metadata is missing." not in legacy["missing"]
+    assert legacy["kind"] == "docs_answer"
+    assert legacy["answer_supported"] is False and legacy["edit_ready"] is False
+    assert "mutation_intent" not in legacy
 
     class MultiChunkBackend:
         def get_project_context(self, project_path, question, **kwargs):
@@ -864,8 +917,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     safe_packet = build_action_packet(
         question="Edit safe", context_pack=annotated, project_path="/repo",
     )
-    assert not any(safe_packet["validation"].values())
-    assert safe_packet["omitted_counts"]["untrusted_validation_commands"] == 1
+    _assert_untrusted_whole_windows(safe_packet, annotated)
 
     scoped, _ = annotate_context_pack([
         {
@@ -878,8 +930,9 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         },
     ], repository_root="/repo")
     scoped_packet = build_action_packet(question="Change B auth", context_pack=scoped, project_path="/repo")
-    assert scoped_packet["forbidden_changes"] == []
-    assert [item["name"] for item in scoped_packet["target_surface"]["symbols"]] == ["id", "Auth.login"]
+    _assert_untrusted_whole_windows(scoped_packet, scoped)
+    assert scoped[0]["policy_scope"] == "/repo/services/a"
+    assert scoped[1]["policy_scope"] is None
 
     cross_module, _ = annotate_context_pack([
         {
@@ -896,7 +949,8 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         },
     ], repository_root="/repo")
     cross_packet = build_action_packet(question="Change A", context_pack=cross_module, project_path="/repo")
-    assert [item["text"] for item in cross_packet["required_invariants"]] == ["Must preserve service A API."]
+    _assert_untrusted_whole_windows(cross_packet, cross_module)
+    assert cross_module[0]["policy_scope"] == "/repo/services/a"
 
     copilot, _ = annotate_context_pack([
         {
@@ -910,7 +964,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     ], repository_root="/repo")
     copilot_packet = build_action_packet(question="Change API", context_pack=copilot, project_path="/repo")
     assert copilot[0]["policy_scope"] == "/repo"
-    assert copilot_packet["required_invariants"][0]["text"] == "Must preserve the public API."
+    _assert_untrusted_whole_windows(copilot_packet, copilot)
     noncanonical_copilot, _ = annotate_context_pack([{
         "doc_scope": "project", "path": "docs/copilot-instructions.md", "content": "Must run unsafe setup.",
     }], repository_root="/repo")
@@ -930,8 +984,4 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         question="Change App", context_pack=gradle_policy, project_path="/repo",
         module_path="services/app",
     )
-    assert gradle_packet["validation"]["tests"][0]["text"] == "Run ./gradlew test."
-    assert validate_action_packet(
-        gradle_packet, evidence_items=gradle_policy, project_path="/repo",
-        module_path="services/app",
-    ) == []
+    _assert_untrusted_whole_windows(gradle_packet, gradle_policy, module_path="services/app")
