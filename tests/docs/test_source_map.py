@@ -162,18 +162,48 @@ def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_pa
     assert sha256(ev["snippet"].encode("utf-8")).hexdigest() == observed[declared_path][0]
 
 
-def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path):
-    source = tmp_path / "lib/modules/sync/application/offline_sync_gate.dart"
+def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path, monkeypatch):
+    relative = "lib/modules/sync/application/offline_sync_gate.dart"
+    source = tmp_path / relative
     source.parent.mkdir(parents=True)
-    source.write_text("class OfflineSyncGate {}\n", encoding="utf-8")
-    _declare_code_files(tmp_path, "lib/modules/sync/application/offline_sync_gate.dart")
+    declaration = "class OfflineSyncGate {}\n"
+    source.write_text(declaration, encoding="utf-8")
+    # An unlisted declaration cannot supply evidence or consume the term pool.
+    unlisted = tmp_path / "lib/unlisted.dart"
+    unlisted.write_text(declaration, encoding="utf-8")
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+    assert build_project_source_evidence(tmp_path, question="OfflineSyncGate") == []
+    assert observed == {}
+    _declare_code_files(tmp_path, relative)
 
     items = build_project_source_evidence(
         tmp_path, question="OfflineSyncGate", max_items=4, token_budget=700,
     )
 
-    match = next(item for item in items if item.get("path") == source.relative_to(tmp_path).as_posix())
+    match = next(item for item in items if item.get("path") == relative)
     assert match["symbols"][0]["name"] == "OfflineSyncGate"
+    assert match["line_start"] == 1
+    assert observed == {relative: [sha256(declaration.encode("utf-8")).hexdigest()]}
+
+    # Crossing the former eight-match cutoff must preserve this declaration.
+    # Only its source coordinate changes when earlier uses are prepended.
+    for earlier_uses in (8, 16):
+        prefix = "".join(
+            f"final gate_{index} = OfflineSyncGate();\n"
+            for index in range(earlier_uses)
+        )
+        padded = prefix + declaration
+        source.write_text(padded, encoding="utf-8")
+        observed.clear()
+        items = build_project_source_evidence(
+            tmp_path, question="OfflineSyncGate", max_items=4, token_budget=700,
+        )
+        assert [(item["path"], item["line_start"]) for item in items] == [
+            (relative, earlier_uses + 1), (relative, 1),
+        ]
+        assert items[0]["symbols"][0]["name"] == match["symbols"][0]["name"]
+        assert items[0]["snippet"] == match["snippet"] == declaration.strip()
+        assert observed == {relative: [sha256(padded.encode("utf-8")).hexdigest()]}
 
 
 def test_build_project_source_evidence_finds_camel_case_from_nl(tmp_path):

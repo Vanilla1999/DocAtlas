@@ -240,7 +240,21 @@ def build_project_source_evidence(
 
     term_keys = {term: _normalize(term) for term in terms}
     matches: list[dict[str, Any]] = []
+    body_matches: dict[str, list[dict[str, Any]]] = {}
     match_counts: dict[str, int] = {}
+
+    def match_priority(value: dict[str, Any]) -> tuple[int, int, str, int]:
+        return (
+            0 if value.get("match_type") == "exact_path" else 1,
+            0 if any(
+                str(symbol.get("name") or "").casefold()
+                == str((value.get("matched_terms") or [""])[0]).casefold()
+                for symbol in value.get("symbols") or []
+            ) else 1,
+            value.get("path") or "",
+            int(value.get("line_start") or 0),
+        )
+
     include_generated_files = include_generated is True
     selected_paths = list(_iter_source_files(
         root,
@@ -276,8 +290,6 @@ def build_project_source_evidence(
             if not normalized_line:
                 continue
             for term in terms:
-                if match_counts.get(term, 0) >= 8:
-                    continue
                 normalized_term = term_keys.get(term) or ""
                 if not normalized_term:
                     continue
@@ -286,7 +298,7 @@ def build_project_source_evidence(
                     continue
                 confidence_label = _confidence_for_line(line, match_type)
                 declarations = _extract_generic_symbols(line)
-                matches.append(_source_snippet_evidence_item(
+                item = _source_snippet_evidence_item(
                     path=relative,
                     language=language,
                     line_number=line_number,
@@ -296,8 +308,17 @@ def build_project_source_evidence(
                     confidence=confidence_label,
                     confidence_score=confidence_score,
                     symbols=declarations,
-                ))
+                )
+                # Keep eight best body witnesses per term. A later declaration
+                # can replace earlier uses without retaining every source line.
+                retained = body_matches.setdefault(term, [])
+                retained.append(item)
+                retained.sort(key=match_priority)
+                del retained[8:]
                 match_counts[term] = match_counts.get(term, 0) + 1
+
+    for retained in body_matches.values():
+        matches.extend(retained)
 
     selected: list[dict[str, Any]] = []
     spent = 0
@@ -307,14 +328,7 @@ def build_project_source_evidence(
         matches,
         key=lambda value: (
             term_order.get((value.get("matched_terms") or [""])[0], 999),
-            0 if value.get("match_type") == "exact_path" else 1,
-            0 if any(
-                str(symbol.get("name") or "").casefold()
-                == str((value.get("matched_terms") or [""])[0]).casefold()
-                for symbol in value.get("symbols") or []
-            ) else 1,
-            value.get("path") or "",
-            int(value.get("line_start") or 0),
+            *match_priority(value),
         ),
     )
 
