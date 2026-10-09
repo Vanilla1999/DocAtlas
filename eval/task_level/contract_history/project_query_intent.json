@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "literal-project-query-intent-boundary-v1",
-  "migration_status": "precheck-original-tests-still-collected",
+  "migration_status": "classifier-functions-retired-ranking-guard-retained",
   "base_commit": "841e770e644dba369ab441ba2ec9f2a8807cac7f",
   "source": {
     "original_path": "tests/docs/test_project_query_intent.py",
@@ -48,7 +48,7 @@
     "expected_mutation": "project_query_intent_no_inferred_roles",
     "expected_failure_guard": "critical_project_intent_no_inferred_roles",
     "scope_limit": "Not evidence of original-query retrieval credit, factual completeness, answer/edit permission or client acceptance. No production behavior changes.",
-    "retirement_rule": "The five classifier-only functions may be retired only in a later reviewed change after this exact published baseline and directed production mutant are green/expected-killed. The mixed ranking function must remain collected.",
+    "retirement_rule": "The five frozen classifier-only functions are retired after the recorded exact-head normal baseline and expected named production mutant kill. The complete mixed ranking function, its imports and fixture helper remain collected and unchanged; its legacy premise and actual ranking behavior require a separate reviewed migration.",
     "alias_proof": "The separately proven alias API control and its production mutant do not cover classify_project_query_intent."
   },
   "roster": [
@@ -124,5 +124,65 @@
       "historical_expectation": "Infer a mandatory code-symbol role for four implementation questions.",
       "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
     }
-  ]
+  ],
+  "retirement": {
+    "source_base_commit": "2acfaa4fdac8cc599d84ae1c48836335e9cd29a7",
+    "original_working_blob": "73505df55c4533e2426c460f9b26ad8517179a5c",
+    "removed_functions": [
+      "tests/docs/test_project_query_intent.py::test_classify_project_query_intent",
+      "tests/docs/test_project_query_intent.py::test_package_terms_do_not_trigger_packs_mcp",
+      "tests/docs/test_project_query_intent.py::test_explicit_mcp_packs_terms_trigger_packs_mcp",
+      "tests/docs/test_project_query_intent.py::test_package_with_docs_mcp_is_docs_mcp_not_disambiguation",
+      "tests/docs/test_project_query_intent.py::test_explicit_source_identity_questions_require_code_symbol_evidence"
+    ],
+    "removed_collected_cases": 31,
+    "retained_nodeid": "tests/docs/test_project_query_intent.py::test_documentation_files_do_not_imply_code_symbol_evidence",
+    "retained_full_function_sha256": "6f6a60601566a0660ae4307ef5b7982773c4baefd85f3cc794a014192ca0df43",
+    "working_module_collected_cases": 1,
+    "replacement_contract_collected_cases": 1,
+    "total_after_precheck_and_retirement": 2,
+    "historical_total_before_precheck": 32,
+    "net_case_reduction_from_historical": 30,
+    "archive_and_frozen_roster": "Unchanged; original source bytes, source lines, classification actions and roster hash remain the inputs of the proven contract control.",
+    "diagnostic_update": {
+      "path": "tests/diagnostic_labels.json",
+      "module_label": "behavioral",
+      "old_module_node_hash": "0eafbe4965943e7383f0c62a27355463fc62e564d25b1e1c5c9275e44718ce60",
+      "new_module_node_hash": "b59c81023d1f4a1bd0c7b09e028d6988a51d06e93fe72492f47a4e25b2dca1e5",
+      "node_overrides_changed": false
+    },
+    "runtime_proof": {
+      "run_id": 37994136625,
+      "run_attempt": 1,
+      "job_id": 114035684048,
+      "head_sha": "2acfaa4fdac8cc599d84ae1c48836335e9cd29a7",
+      "run_conclusion": "failure",
+      "normal_critical_gate_conclusion": "PASS",
+      "normal_baseline": {
+        "tests": 30,
+        "passed": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 0,
+        "roster_sha256": "e1e594cd89c78e4c812b9b7c5ae713808041c57e3a84dd9ed4012b52df3618f9"
+      },
+      "intended_mutants_killed": 8,
+      "intent_mutant": {
+        "name": "project_query_intent_no_inferred_roles",
+        "killer": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+        "guard": "critical_project_intent_no_inferred_roles",
+        "anchor_count": 1,
+        "tests": 1,
+        "failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "roster_sha256": "5543c4fc19c6dad0e4853efcb14590f43d3b23eaa50c329d52e5119da8415ea4",
+        "before_sha256": "0a909dfd15fc0217930d304503928612bf8d00a256c28c9889ad41404d50871e",
+        "after_sha256": "69f00fbd9f8645db43feaec378e89f9aa3a227455218f5523e076c7c6fdc7a68"
+      },
+      "note": "Normal critical section only. The workflow as a whole failed other gates; this evidence does not validate the retained mixed ranking test, source quality, or final acceptance."
+    }
+  }
 }

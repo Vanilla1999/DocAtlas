@@ -320,7 +320,7 @@
     "tests/docs/test_project_docs_service.py": "272af3feb3e948ac440a691afda05a483a572f3e4176e616c34d35f68c985846",
     "tests/docs/test_project_evidence_production.py": "d6495a762c9e4aaaf4d3807d0d4fa45c829ce6e75c4ad3cc51ef60a9d97f8882",
     "tests/docs/test_project_metadata_reader.py": "d7171b8e4234a3e7dfc347411a9aeb09839b6cb10e087f8ea7c6437e43ba1032",
-    "tests/docs/test_project_query_intent.py": "0eafbe4965943e7383f0c62a27355463fc62e564d25b1e1c5c9275e44718ce60",
+    "tests/docs/test_project_query_intent.py": "b59c81023d1f4a1bd0c7b09e028d6988a51d06e93fe72492f47a4e25b2dca1e5",
     "tests/docs/test_project_state.py": "5f73de11b67e9d06df3bbc99e075ef813211be122e6e29d4ba559a4a317aa0b7",
     "tests/docs/test_python_module_policy_and_manifest.py": "3c283c23fab5cd09d5aded7e39e8c155e06a2eda69c6bdac39e15d682ebe17da",
     "tests/docs/test_question_frame_paraphrase_e2e.py": "91fa910c5bc5d44d34221819cd5527cdd4e9dd5ba139392e7cc8891112569bda",
