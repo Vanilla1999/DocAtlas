@@ -291,7 +291,8 @@ def test_pr211_unknown_fields_and_invalid_mutation_never_reach_service(monkeypat
         effects["destructive_scope"] += 1
         return None
 
-    def service_for_project(service, arguments):
+    def service_for_project(service, arguments, *, read_only_startup):
+        assert read_only_startup is True
         effects["service"] += 1
         return service
 

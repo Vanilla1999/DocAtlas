@@ -48,7 +48,8 @@ def test_missing_grant_has_no_project_service_initialization(monkeypatch):
 def test_other_project_tools_keep_existing_routing(monkeypatch):
     calls = []
 
-    def refuse(service, args):
+    def refuse(service, args, *, read_only_startup):
+        assert read_only_startup is True
         calls.append(args)
         raise PermissionError("fixture read topology denied")
 

@@ -355,9 +355,13 @@ def test_gap_quote_is_not_a_mutation_grant(lexical_gap_project, monkeypatch):
         "action": "sync_project_docs", "project_path": str(project),
     }, service._cold)
     assert result["error"]["reason_code"] in {"validation_error", "permission_denied"}
-    monkeypatch.setattr(service.materialize(), "_project_sync_project_docs_impl", forbidden, raising=False)
+    reader = service.materialize(read_only_startup=True)
+    assert reader is service._cold._read_service
+    assert service.sync_project_docs.__self__ is reader
+    monkeypatch.setattr(reader, "_project_sync_project_docs_impl", forbidden, raising=False)
     with pytest.raises(PermissionError, match="no explicit mutation grant"):
         service.sync_project_docs(str(project))
+    assert service._cold._service is None
     assert policy.generation() == generation and policy.db_path.read_bytes() == before
     assert not (project / "ARCHITECTURE.md").exists()
 
