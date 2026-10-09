@@ -944,6 +944,7 @@ class _ProjectDocsServicePart03:
             stale_sources=stale_sources,
             ignored_sources=ignored_sources,
             source_state_guidance=self._source_state_guidance(),
+            diagnostics=preflight_diagnostics,
             next_actions=[{
                 "tool": "sync_project_docs" if stale_sources else "inspect_project_docs",
                 "requires_confirmation": False,
