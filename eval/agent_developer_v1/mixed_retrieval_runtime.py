@@ -57,6 +57,7 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
     from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
     from scripts.run_project_docs_self_host_gate import _call_with_snapshot
     from docmancer.docs.interfaces.mcp import context_tools
+    from docmancer.core.product_identity import ensure_owned_home
 
     documents = project_documents(case)
     remote = {row["source"]: row["text"] for row in case["candidates"]
@@ -73,6 +74,10 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
         if key in binding:
             arguments[key] = binding[key]
     with isolated_service(workspace / "state") as (service, config):
+        if targets:
+            # Provision the selected fixture host before member preparation makes
+            # it nonempty. The real initializer still rejects unowned contents.
+            ensure_owned_home(service.member_storage_policy.app_home)
         project_preparation = index_project(service, config, project)
         actual = service.materialize()
         project_children = read_stored_children(actual.member_storage_policy.db_path)
