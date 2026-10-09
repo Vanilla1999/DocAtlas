@@ -109,6 +109,15 @@ MUTANTS = (
            '        if closed:\n            return mention',
            '        if True:\n            return mention',
            "closed_literal_context", "recovery_closed_complete_syntax"),
+    Mutant("requirements-context-disabled", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "r\"[ \\t]+(?:do|require)\\?\\s*\"",
+           "r\"[ \\t]+do\\?\\s*\"",
+           "closed_literal_context", "recovery_closed_literal_source_fact"),
+    Mutant("requirements-context-extra-modifier", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "r\"\\s*(?:what[ \\t]+is|which[ \\t]+conditions[ \\t]+are[ \\t]+required[ \\t]+by)[ \\t]+\"",
+           "r\"\\s*(?:what[ \\t]+is|which[ \\t]+(?:optional[ \\t]+)?conditions[ \\t]+are[ \\t]+required[ \\t]+by)[ \\t]+\"",
+           "closed_literal_context", "recovery_closed_complete_syntax"),
+
 )
 
 

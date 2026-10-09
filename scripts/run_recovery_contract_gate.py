@@ -581,6 +581,7 @@ def closed_literal_context() -> dict[str, Any]:
         "OrdersDraftStore": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
         "PaymentOutbox": "PaymentOutbox writes pending payment events until confirmation.",
         "RelayBufferCell": "RelayBufferCell preserves opaque λ bytes before upload.",
+        "DispatchInvariant": "DispatchInvariant rejects records missing an id or a currency.",
     }
     positives, negatives, read_checks = [], [], 0
     with tempfile.TemporaryDirectory(prefix="docatlas-closed-context-") as temporary:
@@ -696,6 +697,9 @@ def closed_literal_context() -> dict[str, Any]:
                     context(f"What is {literal}?", literal, body)
                 if literal == "RelayBufferCell":
                     context(" \tWhat does RelayBufferCell do?\r\n", literal, body)
+                if literal == "DispatchInvariant":
+                    context(f"What does {literal} require?", literal, body)
+                    context(f"Which conditions are required by {literal}?", literal, body)
 
             indexed_body(bodies["OrdersDraftStore"])
             for question in (
@@ -706,6 +710,9 @@ def closed_literal_context() -> dict[str, Any]:
                 "What quantum policy does OrdersDraftStore use?",
                 "What is OrdersDraftStore under the lunar policy?",
                 "What is OrdersDraftStore? What is PaymentOutbox?",
+                "What does OrdersDraftStore require when preview is disabled?",
+                "Which conditions are required by OrdersDraftStore under the lunar policy?",
+                "Which optional conditions are required by OrdersDraftStore?",
             ):
                 rejected(question, question, "recovery_closed_complete_syntax")
 

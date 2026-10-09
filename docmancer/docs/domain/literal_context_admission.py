@@ -20,7 +20,9 @@ def _closed_context_literal(question: str) -> QueryMention | None:
     """Recognize only a completely consumed request for one literal's context.
 
     This does not resolve the mention, infer its source role or qualify the
-    original question. Extra conditions, modifiers and clauses remain rejected.
+    original question. Identity, behavior and requirements forms only select
+    context; they do not prove an answer or derive a requirement. Extra
+    conditions, modifiers and clauses remain rejected.
     """
     for mention in query_mentions(question):
         if mention.explicit or mention.syntax_role != "unresolved" or not mention.text.isidentifier():
@@ -28,9 +30,10 @@ def _closed_context_literal(question: str) -> QueryMention | None:
         before, after = question[:mention.start], question[mention.end:]
         closed = (
             re.fullmatch(r"\s*what[ \t]+does[ \t]+", before, re.I) is not None
-            and re.fullmatch(r"[ \t]+do\?\s*", after, re.I) is not None
+            and re.fullmatch(r"[ \t]+(?:do|require)\?\s*", after, re.I) is not None
         ) or (
-            re.fullmatch(r"\s*what[ \t]+is[ \t]+", before, re.I) is not None
+            re.fullmatch(r"\s*(?:what[ \t]+is|which[ \t]+conditions[ \t]+are[ \t]+required[ \t]+by)[ \t]+",
+                         before, re.I) is not None
             and re.fullmatch(r"\?\s*", after) is not None
         )
         if closed:
