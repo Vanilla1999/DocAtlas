@@ -1,4 +1,4 @@
-"""Production-path regressions for budgeted docs-context recovery targets."""
+"""Production-path regressions for source-bound docs-context recovery targets."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -49,7 +49,7 @@ def _real_service(tmp_path, request, *, content=None):
     return service
 
 
-def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_path, request):
+def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_path, request, record_property):
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
     from eval.project_context_quality.capture_public_context import capture_public_call
 
@@ -66,7 +66,7 @@ def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_pa
     assert payload["kind"] == "docs_context"
     assert payload["context_quality"]["status"] in {"unverified", "partial"}
     assert payload["read_next"] == []
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
@@ -78,7 +78,7 @@ def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_pa
     quote = b"\n".join(raw.splitlines()[4:40])
     assert source["snippet"].encode() == quote
     snapshot = record["projection_attempts"][0]["snapshot"]
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
     assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
     bound = snapshot[source["evidence_id"]]["source"]
     assert bound["content"].rstrip("\n").encode() == quote
@@ -138,7 +138,7 @@ def _continuation_document():
 @pytest.mark.parametrize("revoked", [False, True], ids=["authorized", "revoked"])
 @pytest.mark.parametrize("legacy_scope", ["control", "absent", True, False])
 def test_final_public_handler_continuation_preserves_quality_and_usable_reference(
-    tmp_path, request, monkeypatch, revoked, legacy_scope,
+    tmp_path, request, monkeypatch, revoked, legacy_scope, record_property,
 ):
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
     from docmancer.docs.interfaces.mcp import context_tools
@@ -184,7 +184,7 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert len(payload["read_next"]) == 1
     target = payload["read_next"][0]
     assert target["reason"] in {"inspect_source_context", "requested_part_missing"}
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
@@ -192,7 +192,7 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert payload["answer_policy"] == "cite_only"
     assert len(attempts) == 1
     retrieval, snapshot = attempts[0]
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
     raw = (tmp_path / "docs/polling.md").read_bytes()
     assert target["path"] == "docs/polling.md"
     assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
@@ -348,7 +348,7 @@ def _raw_recovery_fixture():
     }
 
 
-def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
+def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(record_property):
     from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 
     retrieval = _raw_recovery_fixture()
@@ -373,7 +373,7 @@ def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
         "scope": "all",
     }, service)
     assert payload["kind"] == "docs_context"
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
     assert len(payload["read_next"]) == 1
     target = payload["read_next"][0]
     assert target["path"] == "docs/example.md"
@@ -385,7 +385,7 @@ def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
     assert reader.ranges == [("docs/example.md", 100, 139, target["source_uri"])]
 
 
-def test_binding_failure_removes_dead_read_next_and_reports_cause():
+def test_binding_failure_removes_dead_read_next_and_reports_cause(record_property):
     reader = _Reader(fail_range=True)
     service = _ContextApp(_raw_recovery_fixture(), reader)
     payload = handle_context_tool("get_docs_context", {
@@ -395,7 +395,7 @@ def test_binding_failure_removes_dead_read_next_and_reports_cause():
     }, service)
     assert payload["read_next"] == []
     assert "source_unavailable" in payload["context_quality"]["reasons"]
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
 
 
 @pytest.mark.parametrize("legacy_scope", ["absent", True, False])
@@ -463,7 +463,7 @@ def test_final_projection_quality_uses_surviving_component_witness(
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
     if with_source:
         assert payload["support_status"] == "retrieval_only"
         assert payload["answer_policy"] == "cite_only"

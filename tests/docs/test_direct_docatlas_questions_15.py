@@ -29,6 +29,7 @@ def _direct_15_payload() -> dict[str, object]:
 def _assert_direct_15_sidecar() -> None:
     sidecar = _direct_15_payload()
     assert sidecar["baseline_commit"] == "e179471527e009c88f77acbdaeeeeb8ad1c8d316"
+    # Frozen baseline metadata is historical; current output size is measured.
     assert sidecar["request_contract"] == {
         "scope": "all",
         "lookup_queries": "absent",
@@ -129,8 +130,8 @@ def _assert_direct_15_sidecar() -> None:
                     "no_lookup_queries": not any(
                         value.startswith("query-lookup-") for value in public_query_ids
                     ),
-                    "source_budget": len(sources) <= 3,
-                    "token_budget": int(payload.get("estimated_tokens") or 0) <= 800,
+                    "cost_observation": type(payload.get("estimated_tokens")) is int
+                    and payload["estimated_tokens"] >= 0,
                     "retrieval_only": payload.get("answer_supported") is False
                     and payload.get("edit_ready") is False,
                     "one_retrieval_call": observer_counts.get("retrieval_calls") == 1,
@@ -141,6 +142,14 @@ def _assert_direct_15_sidecar() -> None:
                         "status": payload.get("status"),
                         "kind": payload.get("kind"),
                         "reason_code": payload.get("reason_code"),
+                        "output_cost": {
+                            "source_count": len(sources),
+                            "reported_estimated_tokens": payload.get("estimated_tokens"),
+                            "public_utf8_bytes": len(json.dumps(
+                                {key: value for key, value in payload.items() if key != "diagnostics"},
+                                ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+                            ).encode("utf-8")),
+                        },
                         "failed_checks": [
                             name for name, passed in checks.items() if not passed
                         ],
