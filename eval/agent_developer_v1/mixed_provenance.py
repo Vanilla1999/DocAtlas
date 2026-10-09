@@ -82,6 +82,16 @@ def expected_migration(protocol: dict) -> dict:
             "project_owner": "explicit_request_project_identity",
             "scope": "project", "authority": "source_of_truth",
         },
+        "library_source_representation": {
+            "snapshot_top": "raw_candidate_fields",
+            "snapshot_metadata": "raw_candidate_metadata_fields",
+            "join_rule": "all_present_claims_must_agree",
+            "content_hash_alias": "stored_content_hash_equals_display_content_hash",
+            "version_alias": "candidate_version_equals_resolved_version",
+            "coordinates": "exact_integer_char_byte_line_pairs_and_scalar_edges",
+            "child_binding": "same_path_stable_chunk_generation_and_full_lineage",
+            "exactness": "top_boolean_metadata_boolean_or_sqlite_integer_exact_true_required",
+        },
         "infrastructure_member": {
             "path": INFRASTRUCTURE_MEMBER, "text": INFRASTRUCTURE_TEXT,
             "only_when": "no_authored_project_document",
@@ -282,6 +292,66 @@ def preparation_errors(case: dict, observation: dict) -> list[str]:
     return sorted(set(errors))
 
 
+def _library_source_lineage(binding: dict) -> tuple[dict, list[str]]:
+    """Read the documented library DTO; contradictory raw claims always fail."""
+    top = binding.get("lineage", {})
+    nested = binding.get("metadata_lineage", {})
+    if not isinstance(top, dict) or not isinstance(nested, dict):
+        return {}, ["source_lineage_malformed"]
+    errors = []
+
+    def same(key, left, right):
+        if key == "docs_snapshot_exact":
+            return (type(left) in (bool, int) and type(right) in (bool, int)
+                    and left in (0, 1) and right in (0, 1) and left == right)
+        return type(left) is type(right) and left == right
+
+    for key in top.keys() & nested.keys():
+        if not same(key, top[key], nested[key]):
+            errors.append("library_lineage_conflict:" + key)
+    lineage = {**nested, **top}
+    for canonical, alias in (("resolved_version", "version"), ("display_content_hash", "content_hash")):
+        if canonical in lineage and alias in lineage and not same(canonical, lineage[canonical], lineage[alias]):
+            errors.append("library_lineage_conflict:" + canonical)
+        if canonical not in lineage and alias in lineage:
+            lineage[canonical] = lineage[alias]
+    # The public candidate flag is a bool; SQLite-backed metadata also uses 0/1.
+    if "docs_snapshot_exact" in top and type(top["docs_snapshot_exact"]) is not bool:
+        errors.append("library_exact_snapshot_shape")
+    if "docs_snapshot_exact" in nested and (
+        type(nested["docs_snapshot_exact"]) not in (bool, int) or nested["docs_snapshot_exact"] not in (0, 1)
+    ):
+        errors.append("library_exact_snapshot_shape")
+    for dimension in ("char", "byte", "line"):
+        start, end, packed = dimension + "_start", dimension + "_end", dimension + "_span"
+        floor = 1 if dimension == "line" else 0
+        pairs = []
+        for raw in (top, nested):
+            if start in raw or end in raw:
+                if (start not in raw or end not in raw
+                        or type(raw[start]) is not int or type(raw[end]) is not int
+                        or not floor <= raw[start] <= raw[end]):
+                    errors.append("library_span_shape:" + dimension)
+                else:
+                    pairs.append([raw[start], raw[end]])
+            if packed in raw:
+                span = raw[packed]
+                if (not isinstance(span, list) or len(span) != 2
+                        or any(type(value) is not int for value in span)
+                        or not floor <= span[0] <= span[1]):
+                    errors.append("library_span_shape:" + dimension)
+                else:
+                    pairs.append(span)
+        if not pairs:
+            errors.append("library_span_missing:" + dimension)
+        elif any(pair != pairs[0] for pair in pairs[1:]):
+            errors.append("library_span_conflict:" + dimension)
+        if pairs:
+            lineage.setdefault(start, pairs[0][0])
+            lineage.setdefault(end, pairs[0][1])
+    return lineage, sorted(set(errors))
+
+
 def source_errors(case: dict, observation: dict) -> list[str]:
     payload = observation.get("public_payload") or {}
     if not isinstance(payload, dict):
@@ -353,13 +423,16 @@ def source_errors(case: dict, observation: dict) -> list[str]:
             ):
                 errors.append("different_public_project_binding")
         else:
+            lineage, lineage_errors = _library_source_lineage(binding)
+            errors.extend(lineage_errors)
             _, _, version, library_id = _library_identity(frozen)
             matching = [row for row in records if row.get("library_id") == library_id]
             stored = matching[0].get("stored_children") or [] if len(matching) == 1 else []
             if (request.get("library") != library_id or lineage.get("library_id") != library_id
                     or lineage.get("canonical_id") != library_id or lineage.get("doc_scope") != "library"
                     or lineage.get("source_class") != "library_doc" or lineage.get("resolved_version") != version
-                    or lineage.get("docs_snapshot_exact") is not True):
+                    or type(lineage.get("docs_snapshot_exact")) not in (bool, int)
+                    or lineage.get("docs_snapshot_exact") != 1):
                 errors.append("different_library_identity_or_exact_snapshot")
         candidates = [row for row in stored if isinstance(row, dict) and (
             row.get("path") == path and row.get("stable_chunk_id") == lineage.get("stable_chunk_id")

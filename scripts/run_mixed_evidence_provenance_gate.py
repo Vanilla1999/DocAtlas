@@ -84,6 +84,8 @@ def _source_binding_diagnostics(observation: dict) -> list[dict]:
             "evidence_id": evidence_id, "source_fields": _body_free(source),
             "binding_fields_present": sorted(binding), "lineage_fields_present": sorted(lineage),
             "snapshot_lineage": _body_free(lineage),
+            "snapshot_metadata_lineage": _body_free(binding.get("metadata_lineage")),
+            "comparison_basis": "raw_top_level_lineage_only",
             "projected_source": _body_free(binding.get("projected_source")),
             "same_call_source_equal": binding.get("projected_source") == source,
             "candidate_hash_material": _body_free(binding.get("candidate_hash_material")),

@@ -33,6 +33,24 @@ LINEAGE_FIELDS = (
     "project_identity", "authority", "scope", "doc_scope", "source_class",
     "char_start", "char_end", "byte_start", "byte_end", "line_start", "line_end",
 )
+SNAPSHOT_LINEAGE_FIELDS = (*LINEAGE_FIELDS, "content_hash", "version", "char_span", "byte_span", "line_span")
+
+
+def capture_source_binding(bound: dict) -> dict:
+    """Retain the snapshot's two raw representations without merging claims."""
+    original = bound.get("source") or {}
+    result = {
+        "projected_source": deepcopy(bound.get("projected_source")),
+        "candidate_hash_material": candidate_hash_material(original),
+        "lineage": {key: deepcopy(original[key]) for key in SNAPSHOT_LINEAGE_FIELDS if key in original},
+    }
+    if "metadata" in original:
+        metadata = original["metadata"]
+        result["metadata_lineage"] = (
+            {key: deepcopy(metadata[key]) for key in SNAPSHOT_LINEAGE_FIELDS if key in metadata}
+            if isinstance(metadata, dict) else deepcopy(metadata)
+        )
+    return result
 
 
 def _observed_fields(value, fields) -> dict:
@@ -199,12 +217,7 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
                     continue
                 evidence_id = str(source.get("evidence_id") or "")
                 bound = snapshot.get(evidence_id) or {}
-                original = bound.get("source") or {}
-                bindings[evidence_id] = {
-                    "projected_source": deepcopy(bound.get("projected_source")),
-                    "candidate_hash_material": candidate_hash_material(original),
-                    "lineage": {key: deepcopy(original.get(key)) for key in LINEAGE_FIELDS if key in original},
-                }
+                bindings[evidence_id] = capture_source_binding(bound)
     return {
         "execution": "public_fixture_runtime", "error": None, "project_identity": identity,
         "request": expected_request(case, identity), "service_requests": calls,

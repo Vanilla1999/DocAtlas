@@ -332,5 +332,15 @@
     "project_owner": "explicit_request_project_identity",
     "scope": "project",
     "authority": "source_of_truth"
+  },
+  "library_source_representation": {
+    "snapshot_top": "raw_candidate_fields",
+    "snapshot_metadata": "raw_candidate_metadata_fields",
+    "join_rule": "all_present_claims_must_agree",
+    "content_hash_alias": "stored_content_hash_equals_display_content_hash",
+    "version_alias": "candidate_version_equals_resolved_version",
+    "coordinates": "exact_integer_char_byte_line_pairs_and_scalar_edges",
+    "child_binding": "same_path_stable_chunk_generation_and_full_lineage",
+    "exactness": "top_boolean_metadata_boolean_or_sqlite_integer_exact_true_required"
   }
 }

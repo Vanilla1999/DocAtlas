@@ -10,7 +10,9 @@ from urllib.parse import urlsplit
 
 from eval.agent_developer_v1.current_retrieval_runtime import bytes_sha256, sha256_json, verify_runtime_manifest
 from eval.agent_developer_v1.finite_http_fixture import finite_target
-from eval.agent_developer_v1.mixed_retrieval_runtime import REQUEST_BINDINGS, expected_request, project_documents
+from eval.agent_developer_v1.mixed_retrieval_runtime import (
+    REQUEST_BINDINGS, capture_source_binding, expected_request, project_documents,
+)
 from eval.agent_developer_v1.mixed_provenance import (
     P15_RUNTIME_PATHS, PROTECTED_PROOF_ROLES, _stored_errors, load_json, load_protocol, score_observation, verify_report,
 )
@@ -133,6 +135,39 @@ def _control(case: dict, *, source_paths: list[str] | None = None) -> dict:
     }
 
 
+def _library_snapshot(binding: dict) -> dict:
+    """Independent canonical-candidate layout, built without the verifier."""
+    lineage, material = binding["lineage"], binding["candidate_hash_material"]
+    original = {key: deepcopy(lineage[key]) for key in (
+        "stable_chunk_id", "parent_logical_id", "display_content_hash", "display_text",
+        "authority", "resolved_version", "docs_snapshot_exact",
+    )}
+    original.update(source=material["path"], title=material["section"],
+                    content=material["content"], snippet=material["snippet"], version=material["version"])
+    metadata = {key: deepcopy(lineage[key]) for key in (
+        "stable_chunk_id", "parent_logical_id", "generation_id", "source_identity",
+        "source_content_hash", "library_id", "canonical_id", "resolved_version",
+        "docs_snapshot_exact", "project_identity", "doc_scope", "source_class", "authority",
+    )}
+    metadata.update(content_hash=lineage["display_content_hash"], version=lineage["resolved_version"])
+    for dimension in ("char", "byte", "line"):
+        metadata[dimension + "_span"] = [lineage[dimension + "_start"], lineage[dimension + "_end"]]
+    original["metadata"] = metadata
+    return {"source": original, "projected_source": deepcopy(binding["projected_source"])}
+
+
+def _with_library_metadata(observation: dict) -> dict:
+    result = deepcopy(observation)
+    for evidence_id, binding in observation["bindings"].items():
+        if binding["lineage"].get("library_id"):
+            raw = _library_snapshot(binding)
+            before = deepcopy(raw)
+            result["bindings"][evidence_id] = capture_source_binding(raw)
+            assert raw == before
+            assert result["bindings"][evidence_id]["metadata_lineage"] == raw["source"]["metadata"]
+    return result
+
+
 def _case(case_id: str) -> dict:
     return next(case for case in load_protocol()["cases"] if case["id"] == case_id)
 
@@ -155,12 +190,118 @@ def test_exact_claim_local_assignments() -> None:
     assert result["visible_full_fact_sources"] == sorted(case["expected_assignment_sources"])
     assert result["checks"]["output_cost_observed"]
     assert not score_observation(case, observation)["checks"]["runtime_completed"]
+    nested = _with_library_metadata(observation)
+    assert _score(case, nested)["passed"]
+    assert _score(case, nested)["visible_full_fact_sources"] == sorted(case["expected_assignment_sources"])
+    assert not score_observation(case, nested)["checks"]["runtime_completed"]
 
 
 def test_provenance_gap_is_retained_but_not_hidden() -> None:
     case = _case("dependency_fact_prefers_dependency_docs")
     baseline = _control(case)
     assert _score(case, baseline)["passed"]
+    # The real collector retains the canonical candidate's two raw views.
+    raw = _library_snapshot(baseline["bindings"]["ev-unit-0"])
+    nested = _with_library_metadata(baseline)
+    assert _score(case, nested)["passed"]
+    assert nested["public_payload"] == baseline["public_payload"]
+    for exact in (True, 1):
+        valid = deepcopy(raw)
+        valid["source"]["metadata"]["docs_snapshot_exact"] = exact
+        changed = deepcopy(baseline)
+        changed["bindings"]["ev-unit-0"] = capture_source_binding(valid)
+        assert _score(case, changed)["passed"]
+
+    def rejected_snapshot(raw_snapshot, expected_error):
+        changed = deepcopy(baseline)
+        before = deepcopy(raw_snapshot)
+        changed["bindings"]["ev-unit-0"] = capture_source_binding(raw_snapshot)
+        assert raw_snapshot == before
+        result = _score(case, changed)
+        assert changed["public_payload"] == baseline["public_payload"]
+        assert result["checks"]["required_full_facts"] and result["checks"]["finite_public_preparation"]
+        assert expected_error in result["source_errors"], (expected_error, result)
+        assert not result["checks"]["source_integrity"] and not result["passed"]
+
+    # Contradictory top-level claims cannot mask the independently retained metadata.
+    for key, value in (
+        ("stable_chunk_id", "wrong-child"), ("parent_logical_id", "wrong-parent"),
+        ("generation_id", "wrong-generation"), ("source_identity", "wrong-source"),
+        ("source_content_hash", "0" * 64), ("library_id", "wrong-library"),
+        ("canonical_id", "wrong-canonical"), ("resolved_version", "8.2.2"),
+        ("version", "latest"), ("docs_snapshot_exact", False),
+        ("doc_scope", "project"), ("source_class", "project_doc"), ("authority", "source_of_truth"),
+    ):
+        changed = deepcopy(raw)
+        changed["source"][key] = value
+        rejected_snapshot(changed, "library_lineage_conflict:" + key)
+    for container, field, value, guard in (
+        ("top", "display_content_hash", "0" * 64, "display_content_hash"),
+        ("nested", "content_hash", "0" * 64, "display_content_hash"),
+        ("nested", "display_text", "different retained window", "display_text"),
+        ("nested", "version", "8.2.2", "version"),
+    ):
+        changed = deepcopy(raw)
+        target = changed["source"] if container == "top" else changed["source"]["metadata"]
+        target[field] = value
+        rejected_snapshot(changed, "library_lineage_conflict:" + guard)
+    for container, value in (("top", 1), ("nested", 1.0), ("nested", "true"), ("nested", 2)):
+        changed = deepcopy(raw)
+        target = changed["source"] if container == "top" else changed["source"]["metadata"]
+        target["docs_snapshot_exact"] = value
+        rejected_snapshot(changed, "library_exact_snapshot_shape")
+    for malformed in (None, False, [], 1):
+        changed = deepcopy(raw)
+        changed["source"]["metadata"] = malformed
+        rejected_snapshot(changed, "source_lineage_malformed")
+    for field in ("stable_chunk_id", "parent_logical_id", "generation_id", "source_identity",
+                  "source_content_hash", "library_id", "canonical_id", "resolved_version",
+                  "docs_snapshot_exact", "doc_scope", "source_class", "display_content_hash", "display_text"):
+        changed = deepcopy(raw)
+        aliases = {"resolved_version": "version", "display_content_hash": "content_hash"}
+        for target in (changed["source"], changed["source"]["metadata"]):
+            target.pop(field, None)
+            if field in aliases:
+                target.pop(aliases[field], None)
+        guard = ("different_library_identity_or_exact_snapshot" if field in (
+            "library_id", "canonical_id", "resolved_version", "docs_snapshot_exact", "doc_scope", "source_class"
+        ) else "source_not_bound_to_committed_child")
+        rejected_snapshot(changed, guard)
+    for field, value in (("generation_id", "different-generation"), ("source_content_hash", "0" * 64)):
+        changed = deepcopy(raw)
+        changed["source"][field] = changed["source"]["metadata"][field] = value
+        rejected_snapshot(changed, "source_not_bound_to_committed_child")
+
+    for dimension in ("char", "byte", "line"):
+        start, end, packed = dimension + "_start", dimension + "_end", dimension + "_span"
+        span = raw["source"]["metadata"][packed]
+        for container in ("top", "nested"):
+            valid = deepcopy(raw)
+            target = valid["source"] if container == "top" else valid["source"]["metadata"]
+            target[start], target[end] = span
+            changed = deepcopy(baseline)
+            changed["bindings"]["ev-unit-0"] = capture_source_binding(valid)
+            assert _score(case, changed)["passed"]
+            invalid = deepcopy(valid)
+            target = invalid["source"] if container == "top" else invalid["source"]["metadata"]
+            target[end] += 1
+            rejected_snapshot(invalid, "library_span_conflict:" + dimension)
+            invalid = deepcopy(valid)
+            target = invalid["source"] if container == "top" else invalid["source"]["metadata"]
+            del target[end]
+            rejected_snapshot(invalid, "library_span_shape:" + dimension)
+            invalid = deepcopy(valid)
+            target = invalid["source"] if container == "top" else invalid["source"]["metadata"]
+            target[start] = bool(span[0])
+            rejected_snapshot(invalid, "library_span_shape:" + dimension)
+        for malformed in (None, False, {}, 1, [], [span[0]], [*span, 9],
+                          [True, span[1]], [span[0], float(span[1])], [span[1] + 1, span[0]]):
+            invalid = deepcopy(raw)
+            invalid["source"]["metadata"][packed] = malformed
+            rejected_snapshot(invalid, "library_span_shape:" + dimension)
+        missing = deepcopy(raw)
+        del missing["source"]["metadata"][packed]
+        rejected_snapshot(missing, "library_span_missing:" + dimension)
     # Promotion accepts exact bool/SQLite 1, never arbitrary truthy values.
     for exact in (True, 1):
         changed = deepcopy(baseline)
@@ -270,6 +411,12 @@ def test_assignment_source_ledgers_fail_closed() -> None:
         assert result["checks"]["required_full_facts"] and result["checks"]["finite_public_preparation"]
         assert "different_committed_project_scope_or_authority" in result["source_errors"]
         assert not result["checks"]["source_integrity"] and not result["passed"]
+    # Nested library representation never repairs a contradictory project DTO.
+    changed = deepcopy(baseline)
+    changed["bindings"]["ev-unit-0"]["metadata_lineage"] = deepcopy(
+        changed["bindings"]["ev-unit-0"]["lineage"])
+    changed["bindings"]["ev-unit-0"]["lineage"]["source_class"] = "project_file"
+    assert "different_project_scope_or_authority" in _score(case, changed)["source_errors"]
     wrong_document = _control(case, source_paths=["docs/release-notes.md"])
     assert _score(case, wrong_document)["checks"]["source_integrity"]
     assert not _score(case, wrong_document)["checks"]["required_full_facts"]
