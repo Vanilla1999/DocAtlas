@@ -402,5 +402,5 @@ def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None
     }
     monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
 
-    assert agent_gate.main() == 1
+    assert agent_gate.main([]) == 1
     assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out
