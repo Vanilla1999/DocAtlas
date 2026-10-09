@@ -161,6 +161,31 @@ def test_provenance_gap_is_retained_but_not_hidden() -> None:
     case = _case("dependency_fact_prefers_dependency_docs")
     baseline = _control(case)
     assert _score(case, baseline)["passed"]
+    # Promotion accepts exact bool/SQLite 1, never arbitrary truthy values.
+    for exact in (True, 1):
+        changed = deepcopy(baseline)
+        for child in changed["preparation"]["external"]["records"][0]["stored_children"]:
+            child["docs_snapshot_exact"] = exact
+        assert _score(case, changed)["passed"]
+    # The registry and visible fact remain intact while either committed member
+    # loses the exact filter binding; even the non-cited robots row must fail.
+    for member_index in (0, 1):
+        for field, value in (
+            ("resolved_version", ""), ("resolved_version", None),
+            ("resolved_version", "latest"), ("resolved_version", "8.2.2"),
+            ("docs_snapshot_exact", False), ("docs_snapshot_exact", None),
+            ("docs_snapshot_exact", 0), ("docs_snapshot_exact", 2),
+            ("docs_snapshot_exact", "true"), ("docs_snapshot_exact", 1.0),
+        ):
+            changed = deepcopy(baseline)
+            child = changed["preparation"]["external"]["records"][0]["stored_children"][member_index]
+            child[field] = value
+            result = _score(case, changed)
+            assert changed["public_payload"] == baseline["public_payload"]
+            assert result["checks"]["required_full_facts"]
+            assert "prepared_member_exact_version_binding" in result["preparation_errors"], (
+                member_index, field, value, result)
+            assert not result["checks"]["finite_public_preparation"] and not result["passed"]
     for field, value in (
         ("library_id", "web:unrelated@8.2.3:reference"), ("resolved_version", "latest"),
         ("docs_snapshot_exact", False), ("generation_id", "another-generation"),

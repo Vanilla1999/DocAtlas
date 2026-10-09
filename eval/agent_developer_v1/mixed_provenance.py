@@ -35,6 +35,7 @@ P15_RUNTIME_PATHS = (RUNTIME_REQUIRED_PATHS - {"eval/agent_developer_v1/paraphra
     "docmancer/docs/interfaces/mcp/prefetch_tools.py",
     "docmancer/docs/application/docs_manifest_service.py",
     "docmancer/docs/application/docs_prefetch_service.py",
+    "docmancer/docs/application/library_refresh_policy.py",
     "docmancer/docs/manifest_contract.py",
     "docmancer/docs/fetch_policy.py",
     "docmancer/docs/fetch_transport.py",
@@ -240,6 +241,14 @@ def preparation_errors(case: dict, observation: dict) -> list[str]:
             isinstance(child, dict) and child.get("library_id") != library_id for child in stored_children
         ):
             errors.append("prepared_member_library_identity")
+        if official and isinstance(stored_children, list) and any(
+            isinstance(child, dict) and (
+                child.get("resolved_version") != version
+                or type(child.get("docs_snapshot_exact")) not in (bool, int)
+                or child.get("docs_snapshot_exact") != 1
+            ) for child in stored_children
+        ):
+            errors.append("prepared_member_exact_version_binding")
     network = observation.get("network_input") or {}
     urls = {row["source"]: row["text"] for row in remote}
     hosts = {urlsplit(url).hostname for url in urls}

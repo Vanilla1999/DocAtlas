@@ -133,6 +133,8 @@ def main(argv: list[str] | None = None) -> int:
                 "observer_counts": observation.get("observer_counts"),
                 "project_identity": observation.get("project_identity"),
                 "source_bindings": _source_binding_diagnostics(observation),
+                "prepared_libraries": _body_free(_rows(_mapping(
+                    _mapping(observation.get("preparation")).get("external")).get("records"))),
                 "pipeline_diagnostics": _body_free(observation.get("pipeline_diagnostics") or {}),
             }
             print("DIAGNOSTICS " + json.dumps(details, ensure_ascii=False, sort_keys=True))
