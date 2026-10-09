@@ -1,75 +1,77 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Текущая точка исполнения: 589a6366, 2026-10-09 19:00 UTC
+## Текущая точка исполнения: slices33–39, 2026-10-09 21:04 UTC
 
-**PR ещё не готов к merge.** Arbitrary output ceilings **6144 bytes / 800 tokens /
-3 sources** не являются gates: оцениваем стоимость и сохраняем доказательства.
+**PR ещё не готов к merge.** Output ceilings **6144 bytes / 800 tokens / 3 sources**
+не являются gates: измеряем стоимость, сохраняем полные факты и guards.
 Operational input/read/work/consent boundaries остаются. Retrieval исправляется
-в рамках позднее утверждённого плана, исходное blanket deferral больше не блокирует
-подтверждённые потери фактов; о качестве судим по исходным вопросам и источникам.
+по позднее утверждённому плану; исходное blanket deferral больше не блокирует работу.
 
-Последний завершённый joint CI — `589a6366e33278fe542a0e3c971d2502e5e9f99f`:
-[main 37975999319](https://github.com/Vanilla1999/DocAtlas/actions/runs/37975999319).
-- core-tests-3.11.xml: **5996 PASS / 1883 FAIL / 0 ERROR / 10 SKIP**; XML SHA256 `359210d288a9a23f25bd430a5b052db063a6e707c90450e4d8cc11db34a1ac33`.
-- core-tests-3.12.xml: **5996 PASS / 1883 FAIL / 0 ERROR / 10 SKIP**; XML SHA256 `c5f7797184e864c1872e63d6c9aa0b02a6e9dc83c56bd4d798f611a4c961c10c`.
-- core-tests-3.13.xml: **5996 PASS / 1883 FAIL / 0 ERROR / 10 SKIP**; XML SHA256 `bf7471b05fa0a55b751ffed6a66fd675787f96379a0bbdbe38de9a1447dde065`.
+Последний проверенный полный core run — `10277b269ff686320cb191da93747b73e1f37f4b`:
+[main37977510715](https://github.com/Vanilla1999/DocAtlas/actions/runs/37977510715).
+В каждой из Python3.11/3.12/3.13: **6005 PASS / 1874 FAIL / 0 ERROR / 10 SKIP**.
+Матрица не суммируется в искусственно большой набор.
+[Diagnostics113983753511](https://github.com/Vanilla1999/DocAtlas/actions/runs/37977510715/job/113983753511)
+читает существующие XML; нет duplicate/count integrity issues или пропущенных console rows.
+- XML3.11 SHA256: `16e4f6366be325c95ab94068497056d59c6b11e345ceccce5d0df691cd009707`.
+- XML3.12 SHA256: `26c67e0ff0fd2948e47dcfca9f5fadaa3754601266ea51a5050fe775dff9d768`.
+- XML3.13 SHA256: `7e89df62fbbe68662116873f9793e62ce6e22933b6dad5ee91d79226cabd9f0e`.
 
-[JUnit diagnostics job113978187064](https://github.com/Vanilla1999/DocAtlas/actions/runs/37975999319/job/113978187064)
-пересчитывает существующие raw XML, не запускает тесты повторно. Нет расхождений
-suite/case counts, duplicate IDs или скрытых console rows; полный JSON приложен
-к этому же run. Matrix counts не складываются в один искусственно большой набор.
-228 failing modules предыдущего ec85 не классифицируются целиком как legacy:
-среди них есть настоящие fixture, source admission и retrieval quality проблемы.
+Девять прежних read-next failures устранены на10277 при прежних исходных cases.
+Static/docs contract/retrieval/installer/installed MCP/три platform jobs SUCCESS.
+Core/advanced/required-ci и P1/downstream остаются красными;227 failing modules
+не считаются автоматически устаревшими — среди них реальные quality/fixture проблемы.
+Настоящие Claude Code/Codex/OpenCode sessions **NOT RUN**.
 
-Подтверждено на 589a6366:
+## Реальные причины и новые reviewed slices
 
-- Task33: **57 PASS / 7 FAIL** ([job113974342130](https://github.com/Vanilla1999/DocAtlas/actions/runs/37975999425/job/113974342130)).
-  Все4 fixes slices27/28 прошли: authority aliases и typed literal requirements.
-  Два prior multi-target collisions уже закрыты slice25. Остаются три
-  ActionPacket public/SDK cases и четыре task-level adapter cases.
-- SourceMap late declaration/window identity положительные guards проходят.
-  Generated-artifact fixture пока не получил текущий explicit finite grant.
-- Read-next остаётся **22 PASS / 9 FAIL**. Slice31 сохраняет все исходные31cases,
-  но меняет budget-driven range expectations на полные raw prefix/suffix и full
-  183-line code block с snapshot binding. Его runtime ещё предстоит.
-- Recovery: **11 baseline / 14 intended guard kills**, normal critical gate:
-  **29 baseline PASS / 7 mutants killed**. Новый alias mutant падает только в
-  `critical_alias_no_generated_queries` (1 failure, no errors/skips, exit1).
-  [Advanced job113974342691](https://github.com/Vanilla1999/DocAtlas/actions/runs/37975999319/job/113974342691)
-  также подтверждает неизменённый historical702/compact82 comparison с51mutants.
-  Старые49 alias cases в этом SHA ещё собраны; отдельный retirement теперь можно
-  готовить по frozen archive/crosswalk, без приписывания им source-quality coverage.
-- Static, docs contract, installer, retrieval evidence, installed MCP и три
-  platform smoke jobs SUCCESS. Required-ci, advanced/P1/downstream всё ещё FAIL.
-  Настоящие Claude Code/Codex/OpenCode sessions **NOT RUN**; fixture SDK/stdio
-  executions не выдаются за клиентский/модельный acceptance.
+P1.4 на10277: [job113979401576](https://github.com/Vanilla1999/DocAtlas/actions/runs/37977510748/job/113979401576)
+подтвердил изменение только store_sha256 во всех14 случаях при прежних generation/catalog/docs.
+Read-only FAIL не является отсутствием фактов: отдельно остаются3/10 discovery
+и2/5 complete facts;5 independent controls и report integrity PASS.
 
-P1.4 наконец выполняет все14 frozen original-question cases на настоящем public
-fixture retrieval. На ec85a496 **0/14 overall, 3/10 discovery, 2/5 complete facts,
-0 runtime errors**; пять independent oracle controls и report integrity PASS.
-Все14 дали read_only failure. Slice30 исправляет только optional missing sources
-на honest insufficient и выводит actual before/after state diagnostics. Store
-hash/generation/checks не ослаблены, warmup не вводится. Предполагаемая запись
-при lazy SQLiteStore initialization требует проверки этими наблюдениями.
+P1.5 впервые исполняется через реальные public fixture prepare/read на `841e770e644dba369ab441ba2ec9f2a8807cac7f`.
+[Job114021107539](https://github.com/Vanilla1999/DocAtlas/actions/runs/37989905374/job/114021107539):
+1/7 cases,0/6 complete facts,5 partial-preparation runtime errors.
+Отдельный project case подтверждает first-read DB write. Self-control выявил
+ошибку line-range oracle при terminal newline. Syntax/always-upload SUCCESS;
+gold семь вопросов/13candidates/шесть полных фактов/два negatives не меняется.
 
-Текущая работа после этого snapshot:
+| Slice | Commit | Смысл |
+| --- | --- | --- |
+|33|841e770|Frozen P1.5 corpus на реальных public fixture sources; отдельный новый отчёт.|
+|34|6d93dcd|Явный host path не обязан повторяться в body; Task33 сохраняет VALUE1→VALUE2 и real model delivery.|
+|35|cc42a7b|Сохраняет producer source-choice question/options;32 negative guards, no auto execution/evidence grant.|
+|36|6acefce|Retirement49 старых alias cases после доказанного current baseline/mutant; архив и guards сохранены.|
+|37|a360d02|Line oracle сохраняет LF/CRLF; partial-job target causes наблюдаются без подмены verdict.|
+|38|39def56|Generated SourceMap fixture получает exact finite member + boolean opt-in; zero-read negatives остаются.|
+|39|b9c2b51|Отдельный owned member SQLite reader; mode=ro/query_only/active-generation validation, writer сохраняется.|
 
-1. Довести source-choice consent handoff: production сейчас теряет typed ask и
-   его options при blanket confirmation veto. Evidence остаётся запрещено;
-   source-embedded actions и автоматическое выполнение не разрешаются.
-2. Task33 positive сохраняет VALUE=2 и исходные источники: явный filename source
-   identity ошибочно превращается в body literal obligation. Исправлять только
-   при explicit path DTO, сохранять отдельные public exact_term/fact guards.
-3. Проверить read_next и P1.4 state diagnostics на следующем опубликованном SHA,
-   затем закрывать фактические original-query/fact/contamination failures.
-4. P1.5 finite public library/mixed fixtures и остальные P1 gates ещё открыты.
-   Никакой финальный acceptance не заявлен, пока joint exact-SHA gates красные.
+Slices34–39 прошли отдельное source review и exact parent/tree/blob verification.
+Их runtime **PENDING** до CI общего опубликованного SHA; source review не объявляется PASS.
+Подробности: `PR211_SOURCE_CHOICE_DELIVERY_RU.md`,
+`PR211_READ_ONLY_MEMBER_ACCESSOR_RU.md` и соответствующие notes в `v2plan/pr211-execution/`.
 
-Рабочие refs: `implementation/pr211-merge-readiness` и PR ref
-`integration/stage3-v2-identity-pr1`, ordinary fast-forward only. Local checkout
-после0049c6d не синхронизирован: exec transport недоступен с18:09UTC. Все поздние
-изменения готовятся exact-file GitHub API, source-reviewed и проверяются обычным
-PR CI. Local AST/compile/import/runtime после outage **NOT RUN**.
+Alias precheck на589a636 реально дал29 baseline PASS/7 intended mutants killed;
+alias killer — один named assertion,0errors/skips. Historical702/82/51 proof
+не приписывается alias API. Retirement семьи49→1 не закрывает retrieval quality.
+Source/ranking, original-query credit, finite scope и downstream guards остаются.
+
+## Следующие действия
+
+1. Проверить Task33/public consent/SourceMap и first-read P1.4 на общем SHA.
+2. Получить фактические P1.5 target causes и исправить подготовку, не принимать partial за success.
+3. Закрывать оставшиеся original-only discovery/full-fact/contamination причины;
+   P1.6, closure/stack, Legacy/V2 и итоговые required gates ещё открыты.
+4. Продолжать только доказанные сокращения: следующий intent precheck сохраняет
+   содержательный ranking guard и старую collection до отдельного mutant evidence.
+5. Общий acceptance на конечном SHA; installed SDK/stdio не выдавать за real clients.
+
+Refs: `implementation/pr211-merge-readiness`, `integration/stage3-v2-identity-pr1`.
+Ordinary fast-forward only; force/merge/release не выполнялись.
+Local checkout после0049c6d не синхронизирован, exec transport недоступен с18:09UTC.
+После outage local AST/import/compile/runtime **NOT RUN**; изменения идут exact-file
+GitHub API и проверяются обычным PR CI.
 
 ## История до текущего snapshot
 
