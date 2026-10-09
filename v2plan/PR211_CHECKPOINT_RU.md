@@ -1,5 +1,47 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Подтверждённый результат 2199002 и продолжение исполнения
+
+На `2199002b96253fdaa538515056969713876993a6`
+[main CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37963786931)
+завершился FAILURE. Это актуальная проверенная точка; разделы ниже сохраняют историю.
+
+- **Core Python 3.13:** 8504 = 6565 PASS / 1929 FAIL / 0 ERROR / 10 SKIP.
+  Все прежние 61 setup ERROR устранены. На 8473 совпадающих с `99106c9` node IDs:
+  29 ERROR → PASS, 16 FAIL → PASS и **16 PASS → FAIL**; 31 node добавлен, 40 удалены.
+  Новые падения отдельно разбираются: восемь старых output ceilings, catalog/docs
+  contracts, argv из pytest и историческая provenance отчётов. В других двух
+  Python jobs итог FAILURE; их raw JUnit этим подсчётом отдельно не сертифицируется.
+- **Recovery:** 10/10 PASS на этом SHA. На `50694b9` все 12 intended mutants
+  обнаружены ожидаемыми assertion guards, без setup errors; исходные вопрос и
+  source bytes, source-change и revocation controls проверены. Это не подтверждает
+  весь retrieval quality.
+- **Сокращение тестов:** historical 702/702 и compact 82/82 PASS. Все 51 production
+  mutants обнаружены в обоих режимах. Независимая сверка всех 102 raw JUnit,
+  rosters, изменённых source SHA и same-pytest imports сохранена в
+  [LITERAL_REDUCTION_EVIDENCE.json](pr211-execution/LITERAL_REDUCTION_EVIDENCE.json).
+  Следующий slice активирует compact default и требует нового core результата.
+- **Agent adversarial:** 24/28 PASS, без execution errors; пять module-path
+  диагностик исправлены. Четыре полезных положительных сценария остаются красными.
+  V1 historical target-closed 8/11; отдельный explicit-catalog positive ещё красный.
+- Advanced: 524 PASS / 98 FAIL из 622. V2 protocol 48/48 и release gate 52/52
+  проходят в core. Общий quality/downstream acceptance остаётся незакрытым.
+- Docs impact, static, installer, retrieval evidence, installed MCP harness и
+  три platform smoke jobs SUCCESS. Реальные Claude Code/Codex/OpenCode sessions
+  **NOT RUN**; SDK harness не заменяет client acceptance.
+
+Артефакты main CI: core `11632303946`, ZIP SHA256
+`6ab7fbce04f7e17009eedf95620f4396f9d3d6c88cc1cf0eaab94ad740fb5f41`;
+advanced `11631544543`, SHA256
+`bc40ef98720eb382c04c2c49aef80c99948b32d845d88e3a02bcb4a0decd8fad`;
+mutation comparison `11631624539`, SHA256
+`eafd9b4d52616e713d7fcb1492ac257b152f85d8ad79761c9549db0a8173f3b4`.
+
+Продолжение: активировать доказанное сокращение, устранить оставшиеся cost-only
+падения без потери source/consent guards, сохранить исторические model reports
+без выдачи их за новый runtime, мигрировать явно заданные SDK mutation contracts,
+затем продолжить P1/quality/retrieval. **PR пока не готов к merge.**
+
 ## Проверка docs/Agent slices и исправление collection
 
 На `0e456906cc460e469e5e1f28ecde6f010bd59732` V2 впервые выполнился полностью:

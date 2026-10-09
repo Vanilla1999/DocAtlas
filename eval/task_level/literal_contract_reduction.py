@@ -1,7 +1,8 @@
 """Two reviewed case selections for the existing literal-contract tests.
 
-Historical is the default until the ordinary CI comparison proves the compact
-selection. This module selects cases; it does not implement a second evaluator.
+Compact is the default after the reviewed 2199002 CI comparison. The historical
+selection remains explicitly available for reproducible diagnostic runs. This
+module selects cases; it does not implement a second evaluator.
 The optional pytest hook records the source actually imported by that process.
 """
 from __future__ import annotations
@@ -30,7 +31,7 @@ COMPACT_INDICES = {
 
 
 def case_mode() -> str:
-    value = os.environ.get(MODE_ENV, "historical")
+    value = os.environ.get(MODE_ENV, "compact")
     if value not in MODES:
         raise ValueError(f"unknown literal-contract case selection: {value!r}")
     return value
