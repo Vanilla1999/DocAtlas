@@ -444,7 +444,7 @@ def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
     )
     # An explicit SDK presentation retains both authored windows; it grants no edit.
     assert explicit["schema_version"] == 4 and explicit["result"] == "data"
-    _assert_untrusted_whole_windows(explicit, [guidance, target])
+    _assert_untrusted_whole_windows(explicit, [guidance, target], projection=True)
     assert {row["text"] for row in explicit["sources"]} == {guidance_text, target_text}
     assert {row["path"] for row in explicit["sources"]} == {guidance["path"], target["path"]}
     assert explicit["edit_ready"] is False and "mutation_intent" not in explicit
@@ -501,7 +501,7 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
     # The retained source itself is usable document navigation. Prose does not
     # manufacture a code-search target or an automatic retry.
     assert explicit["schema_version"] == 4 and explicit["result"] == "data"
-    _assert_untrusted_whole_windows(explicit, [document])
+    _assert_untrusted_whole_windows(explicit, [document], projection=True)
     assert [(row["path"], row["text"]) for row in explicit["sources"]] == [
         ("docs/permission-policy.md", "PermissionService owns shared permission policy.")
     ]

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import math
+from copy import deepcopy
 
 import jsonschema
 import pytest
@@ -15,6 +16,7 @@ from docmancer.docs.application.action_packet import (
     ACTION_PACKET_OUTPUT_SCHEMA,
     build_action_packet,
     estimate_action_packet_tokens,
+    refresh_action_packet_estimate,
     validate_action_packet,
 )
 
@@ -37,7 +39,7 @@ def _assert_citation_only_answer(payload, expected_sources):
     assert not {"mutation_intent", "context_pack", "target_surface", "validation"}.intersection(payload)
 
 
-def _assert_untrusted_whole_windows(packet, evidence, *, module_path=None):
+def _assert_untrusted_whole_windows(packet, evidence, *, module_path=None, projection=False):
     assert packet["result"] == "data" and packet["edit_ready"] is False
     assert {(row["path"], row["text"]) for row in packet["sources"]} == {
         (item["path"], item.get("display_text") or item.get("snippet") or item["content"])
@@ -48,8 +50,14 @@ def _assert_untrusted_whole_windows(packet, evidence, *, module_path=None):
         assert row["content_sha256"] == hashlib.sha256(row["text"].encode()).hexdigest()
     assert not {"mutation_intent", "validation", "required_invariants",
                 "forbidden_changes", "target_surface"}.intersection(packet)
-    assert validate_action_packet(packet, evidence_items=evidence, project_path="/repo",
-                                  module_path=module_path) == []
+    if projection:
+        assert packet["estimated_tokens"] == estimate_action_packet_tokens(packet)
+        packet = deepcopy(packet)
+        assert packet.pop("kind") == "patch_context"
+        refresh_action_packet_estimate(packet)
+    errors = validate_action_packet(packet, evidence_items=evidence, project_path="/repo",
+                                    module_path=module_path)
+    assert errors == [], errors
 
 
 def _assert_source_choice_consent_boundary(source_facade, mcp_types):

@@ -10,8 +10,9 @@
 `_RetentionCompletion` не завершён producer-ом. Fixture уже владеет всеми исходными
 окнами, поэтому теперь явно реализует `retain_found_windows` / `_retention_ack`
 и проходит через действующий `_found_window_retention_producer`. Обходов completion
-или замены handler/validator нет. Ответ SDK проверяется по `schema_version=4`;
-поле `kind=patch_context` не входит в текущий ActionPacket v4.
+или замены handler/validator нет. Ответ SDK проверяется по `schema_version=4` и presentation envelope
+`kind=patch_context`. Raw ActionPacket v4 schema не содержит `kind`; SDK projection
+добавляет его и пересчитывает estimate. Эти два уровня проверяются отдельно.
 
 Оба теста сохраняют исходные вопросы, авторские тексты и пути. Дополнительно проверяются
 полные окна, SHA256 каждого текста, untrusted-data boundary и реальный
@@ -45,3 +46,19 @@ identity/hash/lineage/version/trust, binding validator и измеряемая �
 20 имён main ActionPacket tests и два имени completion tests сохранены.
 Production не изменён. Выполнен source review и проверка точных replacements;
 локальный Python/runtime не запускался. Полный PASS определяется последующим CI.
+
+## Уточнение по фактическому CI 2acfaa4f
+
+[Task33 job 114035683952](https://github.com/Vanilla1999/DocAtlas/actions/runs/37994136568/job/114035683952):
+**62 PASS / 2 FAIL**. Retention completion, оба SDK data payloads, все авторские окна,
+hashes и giant negative/source-choice test прошли. Два assertions падали при
+дополнительной raw validation SDK projection в общем helper.
+
+Причина установлена повторным чтением `project_patch_context`: он добавляет
+`kind=patch_context` к raw packet. Прежнее описание «SDK без kind» было ошибочным;
+исправлено выше. Helper теперь явно различает только два известных входа.
+Для SDK сначала проверяются целые wire source fields, exact kind и wire estimate;
+затем из независимой копии удаляется только envelope key `kind`, пересчитывается
+raw estimate и выполняется настоящий bound validator. Другие поля не удаляются,
+ошибки не фильтруются; raw builder callers остаются прежними. При падении печатается
+настоящий список validator errors. Это не ослабление source/assignment/schema guards.
