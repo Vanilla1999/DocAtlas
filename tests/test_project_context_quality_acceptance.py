@@ -19,27 +19,32 @@ def _v2_report():
             metrics[metric] = {"numerator": numerator, "denominator": threshold["denominator"]}
         lanes[lane] = {"metrics": metrics}
     return {
-        "schema_version": "project-context-quality-v2-result-2",
+        "schema_version": "project-context-quality-v2-result-3",
         "run_mode": "live_self_host",
+        "output_cost_policy": deepcopy(lock["output_cost_policy"]),
         "validation": {"case_count": 25},
         "lanes": lanes,
     }
 
 
-def test_v2_acceptance_requires_full_semantic_safety_budget_and_zero_false_full():
+def test_v2_acceptance_requires_semantics_safety_sources_cost_observations_and_zero_false_full():
     report = _v2_report()
     assert verify_v2_acceptance(report) == []
     for lane, metric in (
         ("natural", "semantic_usefulness"),
         ("exposed_paraphrases", "semantic_usefulness"),
         ("natural", "safety"),
-        ("exposed_paraphrases", "budget_compliance"),
+        ("exposed_paraphrases", "source_limit_compliance"),
+        ("natural", "cost_observation_completeness"),
     ):
         broken = deepcopy(report)
         broken["lanes"][lane]["metrics"][metric]["numerator"] -= 1
         assert verify_v2_acceptance(broken)
     broken = deepcopy(report)
     broken["lanes"]["natural"]["metrics"]["false_full_coverage"]["numerator"] = 1
+    assert verify_v2_acceptance(broken)
+    broken = deepcopy(report)
+    broken.pop("output_cost_policy")
     assert verify_v2_acceptance(broken)
 
 

@@ -82,3 +82,35 @@ documents:
     authority: source_of_truth
     status: active
     impact: track
+  - path: wiki/Commands.md
+    role: api_contract
+    scope: project
+    module_path: null
+    description: Maintained CLI commands for local setup, ingest, search, and diagnostics.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/index-cleanup.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Preview and confirmed cleanup of derived index state while preserving sources and configuration.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/modules/project-context-retrieval.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs
+    description: Documentation retrieval application, gateway, query lineage, and source qualification boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/modules/evidence-selection.md
+    role: module_architecture
+    scope: module
+    module_path: docmancer/docs
+    description: Current source eligibility, visible evidence selection, fidelity, and absence of answer authorization.
+    authority: source_of_truth
+    status: active
+    impact: track

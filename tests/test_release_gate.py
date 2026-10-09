@@ -25,7 +25,7 @@ def self_host_payload_runner(monkeypatch, tmp_path):
     from docmancer.docs.interfaces.mcp import context_tools
     from docmancer.docs.application.model_visible_projection import _snapshot_entry, _source_digest
 
-    text = "Docs provide grounded project documentation.\nPacks build code context bundles.\n"
+    text = "Docs provide grounded project documentation.\ndoc-atlas mcp packs-serve\n"
     (tmp_path / "wiki").mkdir()
     (tmp_path / "wiki/Commands.md").write_text(text)
     monkeypatch.setattr(gate, "REPO_ROOT", tmp_path)
@@ -172,16 +172,17 @@ def _assert_self_host_metadata_is_not_top1_fact(self_host_payload_runner):
     assert report["metrics"]["top1_fact_bearing_count"] == 0
 
 
-def _assert_self_host_measures_full_budgets(self_host_payload_runner):
+def _assert_self_host_measures_cost_and_retained_source_limit(self_host_payload_runner):
     report, _ = self_host_payload_runner(lambda p: p.update(sources=p["sources"] * 4, answer="x" * 4000))
     assert report["metrics"]["max_source_count"] == 4
     assert report["metrics"]["source_budget_violation_count"] == 15
     assert report["metrics"]["max_estimated_tokens"] > 800
-    assert report["metrics"]["token_budget_violation_count"] == 15
+    assert "token_budget_violation_count" not in report["metrics"]
+    assert report["metrics"]["max_public_utf8_bytes"] > 3200
 
 
 def _assert_self_host_packs_content_is_intent_scoped(self_host_payload_runner, question, expected):
-    snippet = "Docs provide grounded project documentation.\nPacks build code context bundles."
+    snippet = "Docs provide grounded project documentation.\ndoc-atlas mcp packs-serve"
 
     def snapshot_mutator(snapshot):
         snapshot["e1"]["projected_source"]["snippet"] = snippet
@@ -193,6 +194,24 @@ def _assert_self_host_packs_content_is_intent_scoped(self_host_payload_runner, q
     )
     assert report["metrics"]["packs_contamination_count"] == expected
     assert report["verdict"] == ("FAIL" if expected else "PASS"), report["errors"]
+    from scripts.run_project_docs_self_host_gate import _packs_contamination
+    assert not _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "docs/PROJECT_MAP.md", "snippet": "The runtime also has a Packs gateway.",
+    }]})
+    assert not _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "wiki/Commands.md", "snippet": "Do not run doc-atlas mcp packs-serve for Docs.",
+    }]})
+    assert _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "wiki/Commands.md",
+        "snippet": "Use doc-atlas mcp packs-serve instead of doc-atlas mcp docs-serve.",
+    }]})
+    for substituted in (
+        "Do not run doc-atlas mcp docs-serve; use doc-atlas mcp packs-serve for Docs.",
+        "For Docs use doc-atlas mcp packs-serve; doc-atlas mcp docs-serve is broken.",
+    ):
+        assert _packs_contamination("How do I start Docs MCP?", {"sources": [{
+            "path_or_url": "wiki/Commands.md", "snippet": substituted,
+        }]})
 
 
 def _assert_self_host_missing_payload_preserves_case_partitions(self_host_payload_runner):
@@ -230,7 +249,7 @@ def _assert_self_host_attribution_rejects_same_path_different_identity(self_host
     assert report["results"][0]["observed"]["coverage_attribution"] == []
 
 
-def _assert_self_host_token_boundary(self_host_payload_runner):
+def _assert_self_host_cost_has_no_fixed_token_ceiling(self_host_payload_runner):
     from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
 
     def resize(payload, target):
@@ -239,13 +258,13 @@ def _assert_self_host_token_boundary(self_host_payload_runner):
         payload["padding"] = "x" * (4 * (target - estimate_projection_tokens(payload)))
         assert estimate_projection_tokens(payload) == target
 
-    for target in (800, 801):
+    for target in (800, 801, 1600):
         report, _ = self_host_payload_runner(
             lambda payload: resize(payload, target), negative={"status": "insufficient_evidence"},
         )
         assert report["metrics"]["max_estimated_tokens"] == target
-        assert report["metrics"]["token_budget_violation_count"] == (15 if target > 800 else 0)
-        assert report["verdict"] == ("FAIL" if target > 800 else "PASS")
+        assert "token_budget_violation_count" not in report["metrics"]
+        assert report["verdict"] == "PASS", report["errors"]
 
 
 def _assert_self_host_expected_public_inventory(self_host_payload_runner):
@@ -458,10 +477,10 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes(tmp_path) 
     *[(check, ()) for check in (
         _assert_self_host_payload_baseline,
         _assert_self_host_metadata_is_not_top1_fact,
-        _assert_self_host_measures_full_budgets,
+        _assert_self_host_measures_cost_and_retained_source_limit,
         _assert_self_host_missing_payload_preserves_case_partitions,
         _assert_self_host_attribution_rejects_same_path_different_identity,
-        _assert_self_host_token_boundary,
+        _assert_self_host_cost_has_no_fixed_token_ceiling,
         _assert_self_host_expected_public_inventory,
         _assert_self_host_attribution_rejects_changed_snapshot,
         _assert_self_host_private_qualification_projection,
@@ -550,7 +569,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         "docs_analysis_contamination_count": 0,
         "false_docs_answer_count": 0,
         "source_budget_violation_count": 0,
-        "token_budget_violation_count": 0,
     }
     assert _threshold_failures(passing_metrics, 20) == []
     for key, value in (
@@ -565,7 +583,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         ("docs_analysis_contamination_count", 1),
         ("false_docs_answer_count", 1),
         ("source_budget_violation_count", 1),
-        ("token_budget_violation_count", 1),
     ):
         assert _threshold_failures({**passing_metrics, key: value}, 20)
 

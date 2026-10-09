@@ -1,27 +1,83 @@
 {
-  "schema_version": "project-context-quality-v2-acceptance-v1",
-  "v2_protocol_lock_sha256": "a48010f3432327e996a37bcf92b2891b2ce324d3a81b87139c6b3db090d80477",
+  "schema_version": "project-context-quality-v2-acceptance-v2",
+  "v2_protocol_lock_sha256": "08b22f4d6f23ad388afbb6482bef13a9ab815296b19337f66945df5c63d1c306",
   "legacy_protocol_lock_sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516",
   "lanes": {
     "natural": {
-      "semantic_usefulness": {"minimum": 15, "denominator": 15},
-      "lookup_attribution": {"minimum": 33, "denominator": 36},
-      "safety": {"minimum": 19, "denominator": 19},
-      "budget_compliance": {"minimum": 19, "denominator": 19},
-      "negative_correctness": {"minimum": 2, "denominator": 2},
-      "unsupported_answer_control_correctness": {"minimum": 2, "denominator": 2},
-      "evaluator_verified_full_semantic_component_coverage": {"minimum": 15, "denominator": 15},
-      "false_full_coverage": {"maximum": 0, "denominator": 15}
+      "semantic_usefulness": {
+        "minimum": 15,
+        "denominator": 15
+      },
+      "lookup_attribution": {
+        "minimum": 33,
+        "denominator": 36
+      },
+      "safety": {
+        "minimum": 19,
+        "denominator": 19
+      },
+      "negative_correctness": {
+        "minimum": 2,
+        "denominator": 2
+      },
+      "unsupported_answer_control_correctness": {
+        "minimum": 2,
+        "denominator": 2
+      },
+      "evaluator_verified_full_semantic_component_coverage": {
+        "minimum": 15,
+        "denominator": 15
+      },
+      "false_full_coverage": {
+        "maximum": 0,
+        "denominator": 15
+      },
+      "source_limit_compliance": {
+        "minimum": 19,
+        "denominator": 19
+      },
+      "cost_observation_completeness": {
+        "minimum": 19,
+        "denominator": 19
+      }
     },
     "exposed_paraphrases": {
-      "semantic_usefulness": {"minimum": 5, "denominator": 5},
-      "lookup_attribution": {"minimum": 12, "denominator": 12},
-      "safety": {"minimum": 6, "denominator": 6},
-      "budget_compliance": {"minimum": 6, "denominator": 6},
-      "negative_correctness": {"minimum": 1, "denominator": 1},
-      "unsupported_answer_control_correctness": {"minimum": 0, "denominator": 0},
-      "evaluator_verified_full_semantic_component_coverage": {"minimum": 5, "denominator": 5},
-      "false_full_coverage": {"maximum": 0, "denominator": 5}
+      "semantic_usefulness": {
+        "minimum": 5,
+        "denominator": 5
+      },
+      "lookup_attribution": {
+        "minimum": 12,
+        "denominator": 12
+      },
+      "safety": {
+        "minimum": 6,
+        "denominator": 6
+      },
+      "negative_correctness": {
+        "minimum": 1,
+        "denominator": 1
+      },
+      "unsupported_answer_control_correctness": {
+        "minimum": 0,
+        "denominator": 0
+      },
+      "evaluator_verified_full_semantic_component_coverage": {
+        "minimum": 5,
+        "denominator": 5
+      },
+      "false_full_coverage": {
+        "maximum": 0,
+        "denominator": 5
+      },
+      "source_limit_compliance": {
+        "minimum": 6,
+        "denominator": 6
+      },
+      "cost_observation_completeness": {
+        "minimum": 6,
+        "denominator": 6
+      }
     }
   },
   "legacy_lineage_floor": {
@@ -33,8 +89,13 @@
       "packs_contamination_count",
       "docs_analysis_contamination_count",
       "false_docs_answer_count",
-      "source_budget_violation_count",
-      "token_budget_violation_count"
+      "source_budget_violation_count"
     ]
+  },
+  "output_cost_policy": {
+    "objective": "minimize_full_public_dto_without_fixed_token_ceiling",
+    "measurement": "canonical_utf8_bytes_and_serialized_token_estimate",
+    "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
+    "tokenizer_claim": "serialized_utf8_estimate_not_actual_client_tokens"
   }
 }

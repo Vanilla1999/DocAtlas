@@ -70,25 +70,24 @@ def test_contract_labels_and_executes_planning_not_retrieval(lane):
     with patch.object(protocol, "build_documentation_query_plan", wraps=protocol.build_documentation_query_plan) as planner:
         report = protocol.run_contract(lane)
     assert planner.call_count == report["case_count"] * (2 if lane == "legacy" else 1)
-    assert report["evaluation_kind"] == ("alias_and_query_plan_contract" if lane == "legacy" else "query_plan_public_inventory_contract")
+    assert report["evaluation_kind"] == "literal_query_identity_and_lineage_contract"
     assert report["retrieval_executed"] is False
 
 
-def test_fact_alternatives_are_active_document_text():
-    import yaml
+def test_historical_v1_facts_are_not_relabelled_as_current_witnesses():
+    from eval import project_context_quality_v2_protocol as current
 
-    catalog = yaml.safe_load((protocol.ROOT / "docatlas.project-docs.yaml").read_text())
-    inactive = {row["path"] for row in catalog["documents"] if row.get("status") != "active"}
-    alternatives = []
-    for lane in ("natural", "paraphrases"):
-        for case in protocol.load_cases(lane):
-            assert not inactive.intersection(case.get("allowed_paths") or case["sources"])
-            for group in case["required_fact_groups"]:
-                alternatives.append(len(group))
-                for path, text in group:
-                    assert path not in inactive
-                    assert text.casefold() in (protocol.ROOT / path).read_text().casefold(), (path, text)
-    assert max(alternatives) > 1
+    # Loading still verifies the immutable v1 locks. Only V2 is the maintained
+    # document oracle; retired automatic-prune/proof wording is not current truth.
+    legacy_rows = {row["id"]: row for lane in ("natural", "paraphrases")
+                   for row in protocol.load_cases(lane)}
+    for row in current.load_cases():
+        previous = legacy_rows.get(row.get("migrated_from"))
+        if previous is not None:
+            assert row["question"] == previous["question"]
+            assert row["lookup_queries"] == previous["lookup_queries"]
+            assert row["scope"] == previous["scope"]
+    assert current.validate_corpus()["case_count"] == 25
     legacy = next(case for case in protocol.load_cases() if case["id"] == "ru-troubleshoot")
     assert "docs/adr/0002-context-retrieval-vs-answer-proof.md" in legacy["allowed_paths"]
 
@@ -221,3 +220,22 @@ def test_project_context_quality_contract_passes():
 
     assert report["verdict"] == "PASS"
     assert report["passed_count"] == report["case_count"] == 16
+
+
+def test_literal_contract_detects_changed_original_and_inferred_extra_query(monkeypatch):
+    from dataclasses import replace
+    from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
+
+    original = protocol.build_documentation_query_plan
+    for mutation in ("changed_original", "inferred_query"):
+        def corrupted(question, **kwargs):
+            plan = original(question, **kwargs)
+            if mutation == "changed_original":
+                return replace(plan, original_question=question + "!")
+            return replace(plan, queries=(*plan.queries, DocumentationLookup(
+                "query-inferred", "invented expected answer", "canonical_intent", False,
+            )))
+        monkeypatch.setattr(protocol, "build_documentation_query_plan", corrupted)
+        report = protocol.run_contract("legacy")
+        assert report["passed_count"] == 0
+        assert report["verdict"] == "FAIL"

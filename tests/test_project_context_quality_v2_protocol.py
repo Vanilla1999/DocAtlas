@@ -37,7 +37,7 @@ def test_broad_selection_question_does_not_inherit_lookup_obligations():
     case = next(row for row in protocol.load_cases() if row["id"] == "v2-natural-evidence-selection")
     response = {"kind": "docs_context", "estimated_tokens": 150, "sources": [{
         "path_or_url": "docs/mcp-docs-server.md", "evidence_id": "selection",
-        "snippet": "Evidence selection chooses candidates by requiring locally bound subject, relation, and value proof for every mandatory facet; complete exact proof outranks compact generic text."}]}
+        "snippet": "Evidence selection checks current catalog membership, project and module scope, source identity, freshness, and visible support for each explicit query before returning source-bound context."}]}
     assert protocol.evaluate_case(case, response)["semantic_useful"]
 
 
@@ -128,11 +128,12 @@ def test_runtime_component_claim_rejects_foreign_evidence_id():
 
 
 @pytest.mark.parametrize("path", ["docs/analysis/p2-product-truth-audit-remediation-v2.md", "wiki/Troubleshooting.md"])
-def test_real_response_resolves_active_catalog_root_identity_without_adjudicating_relevance(path):
+def test_uncatalogued_paths_do_not_gain_identity_from_conventional_locations(path):
     case = next(row for row in protocol.load_cases() if row["id"] == "v2-natural-purpose-start")
     response = {"kind":"docs_context","estimated_tokens":10,"sources":[{"path_or_url":path,"evidence_id":"ev-root","snippet":"Unreviewed context."}]}
     result = protocol.evaluate_case(case, response)
-    assert result["hard_gates"]["source_identity"]
+    assert result["hard_gates"]["source_identity"] is False
+    assert result["root_cause"] == "source_identity_failure"
     assert result["unadjudicated_relevance"]
     assert path in result["unadjudicated_source_paths"]
 
@@ -206,7 +207,7 @@ def test_runtime_namespace_and_component_binding_are_independent_of_gold(mutatio
     assert result["false_full_coverage"] is (mutation == "valid")
 
 
-@pytest.mark.parametrize("mutation", ["answer", "mutation_ready", "authorized_actions", "oversized", "malformed_source", "contradictory_kind"])
+@pytest.mark.parametrize("mutation", ["answer", "mutation_ready", "authorized_actions", "invented_answer", "malformed_source", "contradictory_kind"])
 def test_strict_negative_checks_complete_payload(mutation):
     case = next(row for row in protocol.load_cases() if row["id"] == "v2-natural-negative-retention")
     case = {**case, "forbidden_fragments": ["invented retention guarantee"]}
@@ -217,8 +218,8 @@ def test_strict_negative_checks_complete_payload(mutation):
         response["mutation_ready"] = True
     elif mutation == "authorized_actions":
         response["authorized_actions"] = ["edit"]
-    elif mutation == "oversized":
-        response["answer"] = "x" * 4000
+    elif mutation == "invented_answer":
+        response["answer"] = "I certify an unsupported retention policy."
     elif mutation == "malformed_source":
         response["sources"] = ["not structured"]
     else:
@@ -282,3 +283,23 @@ def test_same_call_observer_preserves_public_result_and_binds_visible_components
     claim = protocol._runtime_component_claim(observed, {"public-id"})
     assert claim["valid"] is (assignment_source == "internal-id")
     assert claim["visible_binding_verified"] is (assignment_source == "internal-id")
+
+
+def test_full_visible_cost_is_measured_without_excusing_missing_facts():
+    case = next(row for row in protocol.load_cases() if row["id"] == "v2-natural-install-verify")
+    snippet = (protocol.ROOT / "README.md").read_text(encoding="utf-8")
+    response = {"kind": "docs_context", "estimated_tokens": 4000, "sources": [{
+        "path_or_url": "README.md", "evidence_id": "full-readme", "snippet": snippet,
+    }]}
+    result = protocol.evaluate_case(case, response)
+    assert result["semantic_useful"]
+    assert result["output_cost"]["serialized_estimated_tokens"] > 800
+    assert result["hard_gates"]["cost_observation_valid"]
+    # Same large response and identity, but the independently required installer
+    # witness is gone: size-policy relaxation cannot excuse loss of the fact.
+    response["sources"][0]["snippet"] = snippet.replace(
+        "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh", "installer omitted",
+    )
+    assert not protocol.evaluate_case(case, response)["semantic_useful"]
+    response.pop("estimated_tokens")
+    assert protocol.evaluate_case(case, response)["root_cause"] == "cost_measurement_missing"

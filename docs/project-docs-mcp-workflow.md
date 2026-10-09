@@ -1,203 +1,44 @@
 # Project docs MCP workflow
 
-Project docs are the reviewable documentation files that belong to a repository: `README.md`, `docs/`, `wiki/`, `ARCHITECTURE.md`, ADRs, runbooks, roadmap files, module/package docs, and similar files. DocAtlas can discover, index, reconcile, and query those files through MCP so coding agents answer from the repo's own docs before falling back to generic public documentation.
+Project docs are reviewable repository-owned documentation. DocAtlas retrieves
+only explicit, current catalog members. A conventional filename, a README link,
+or a module name does not grant permission to discover other files.
 
-## Use this workflow when
-
-Use project-docs MCP tools when the user asks about:
-
-- how this repository works;
-- architecture, conventions, runbooks, ADRs, or roadmap;
-- repo-specific implementation guidance;
-- package, app, service, crate, library, or feature-area docs inside a monorepo;
-- deploy/runbook or conventions for a specific module;
-- project-owned docs as context for a code change;
-- a Context7-like docs workflow but grounded in the local repository.
-
-## Canonical lifecycle: sync
-
-After editing project documentation files, refresh the repository index with the
-returned `prepare_docs(action="sync_project_docs")` action. This is the canonical
-workflow for reconciling changed files before retrying `get_docs_context`.
-
-`sync_project_docs` is the recommended lifecycle action. It replaces the old two-step `inspect → ingest` loop:
-
-1. **discovers** current candidates from the filesystem;
-2. **prunes** orphaned indexed sources (files that no longer exist);
-3. **deduplicates** duplicate indexed sources by path, keeping the most recently ingested row;
-4. **removes** stale indexed sections (files that changed on disk);
-5. **indexes** new and changed candidates;
-6. **reports** current_count, new_count, changed_count, orphaned_removed, dedup_removed, stale_removed, indexed_sources.
-
-No need to call `inspect` first: sync does a full reconcile. Call `inspect` only when you need read-only discovery without side effects.
-
-## Preferred happy path
-
-For public MCP clients, start with context and follow its decision:
+## Context first
 
 ```text
 get_docs_context(project_path=..., question=..., scope="all")
--> returned prepare_docs action when required
--> retry get_docs_context
+→ explicit returned lifecycle action, if preparation is needed
+→ satisfy confirmation and exact source bindings
+→ after verified preparation success and readiness, retry the unchanged question
 ```
 
-The default surface has exactly three tools: `get_docs_context`, `prepare_docs`, and `docs_status`. `get_docs_context` only inspects lifecycle state and never performs an implicit sync. For a clean committed Git snapshot it may return `prepare_docs(action="sync_project_docs", plan_digest=...)`; preparation revalidates the whole worktree and `HEAD` before reconciling. Dirty or indeterminate state and semantic preflight risks require confirmation. An explicit user-requested sync remains available without the automatic-policy digest:
-
-- discovers current reviewable project-doc candidates;
-- removes orphaned indexed docs whose files were deleted or are no longer discovered;
-- removes stale indexed sections for changed files;
-- indexes new and changed reviewable docs;
-- verifies the final indexed state before reporting results.
-
-Agent instructions use `prepare_docs(action="sync_project_docs")` because project docs are owned by the repository filesystem, and the index is only a cache of that current state.
-
-## Advanced low-level flow
-
-Agents that enable `DOCATLAS_MCP_ADVANCED_TOOLS=1` can use lower-level inspection tools:
-
-```text
-inspect_project_docs(project_path)
-```
-
-Then follow the returned `reason_code`:
-
-| `reason_code` | What it means | Agent action |
-|---|---|---|
-| `project_docs_ready` | Project docs are discovered and current. | Call `get_docs_context(scope="all", question=...)`. |
-| `project_docs_found_not_indexed` | Reviewable docs exist but are not indexed. | Call `prepare_docs(action="sync_project_docs")`. |
-| `project_docs_stale` | Indexed docs changed on disk, were deleted, or are no longer part of current discovery. | Call `prepare_docs(action="sync_project_docs")`. |
-| `no_project_docs` | No reviewable docs were discovered. | Ask before creating a reviewable `ARCHITECTURE.md`. |
-| `architecture_doc_creation_recommended` | Some docs exist, but no high-level overview/architecture doc was found. | Ask before creating `ARCHITECTURE.md`. |
-| `no_project_docs_results` | Indexed docs did not answer the query. | Inspect docs and reconcile with `prepare_docs(action="sync_project_docs")` before guessing. |
-
-After sync, proceed to:
-
-```text
-get_docs_context(project_path=..., question=..., scope="all")
-```
-
-`get_docs_context(project_path=..., scope="all", question=...)` returns retrieval-only `docs_context` for project reads, source-bound `patch_context` for an explicit change task, or fail-closed `insufficient_evidence` when no safe project source exists. Certified `docs_answer` remains limited to library, dependency, and mixed evidence lanes.
-
-For module-specific queries, use exact module filters:
-
-```text
-get_docs_context(
-  project_path=...,
-  question=...,
-  module_path="packages/backend",
-  scope="module"
-)
-```
-
-The advanced `inspect_project_docs` surface exposes discovered and indexed module summaries. Normal agents recover module ambiguity through the `docs_status` action returned by `get_docs_context`, then retry with the exact `module_path`.
-
-
-## Current versus historical authority
-
-For questions about current behavior, contracts, configuration, or workflows,
-current documentation answers should use maintained source-of-truth
-documentation as primary evidence. `CHANGELOG.md` is release-history/change
-history evidence: treat it as primary when the question asks about releases,
-changes, migration, deprecation, or compatibility history.
-
-For present-state questions, `CHANGELOG.md` may supplement maintained current
-documentation, but it must not outrank the current source-of-truth merely
-because it mentions the same feature.
-
-## Module docs workflow
-
-Use module docs when the user asks about a specific package, app, service, crate, library, module, feature-area, deploy/runbook, or module-specific convention.
-
-Common discovered module roots include:
-
-```text
-packages/*
-apps/*
-services/*
-modules/*
-libs/*
-crates/*
-plugins/*
-components/*
-```
-
-Within each module root, DocAtlas looks for maintained docs such as `README*`, `ARCHITECTURE*`, `CHANGELOG*`, `CONTRIBUTING*`, `docs/`, `doc/`, ADR folders, and runbook folders. It does not index source code as module docs.
-
-Prefer `module_path` over `module` when known:
-
-| Argument | Use |
-|---|---|
-| `module_path="services/auth"` | Exact and unambiguous. Preferred for agent retries. |
-| `module="auth"` | Exact module id/name lookup. May return `module_ambiguous`. |
-| `scope="module"` | Restrict retrieval to module docs. A resolved module path also implies module scope. |
-| `scope="project"` | Restrict retrieval to repo-level docs. |
-| `scope="all"` | Search both repo-level and module docs. |
-
-If the request is vague and multiple modules could match, the agent must ask the user instead of choosing silently.
-
-If the requested module has no maintained docs, do not invent architecture. The agent may search project-level docs if appropriate, or ask before creating reviewable module documentation such as `services/auth/README.md` or `services/auth/ARCHITECTURE.md`.
-
-## Confirmation gates
-
-Project-docs onboarding has explicit safety gates.
-
-| Gate | `confirmation_reason` | Why it exists |
-|---|---|---|
-| Repository write | `repo_write` | Creating or editing `ARCHITECTURE.md` changes official project docs and must be reviewable by the user. |
-| Module docs write | `repo_write` | Creating or editing module README/ARCHITECTURE docs changes official module knowledge and must be reviewable by the user. |
-| Dependency-docs network fetch | `network_fetch` | Prefetching dependency docs may download external documentation and should not happen silently. |
-
-When `requires_confirmation` is `true`, the agent should explain the proposed action and ask the user before continuing.
-
-## Creating `ARCHITECTURE.md`
-
-DocAtlas does not create architecture docs itself. If `get_docs_context` returns `no_project_docs` or an `architecture_doc_creation_recommended` recovery action, the coding agent should ask:
-
-```text
-I could inspect the repository and create ARCHITECTURE.md as a reviewable project doc. Should I do that?
-```
-
-If approved, the coding agent should:
-
-1. inspect the codebase;
-2. write `ARCHITECTURE.md` as a normal repository file;
-3. call `get_docs_context` for the original question;
-4. run its returned `prepare_docs(action="sync_project_docs")` action when requested;
-5. retry the original `get_docs_context(scope="all", question=...)` question unchanged.
-
-Do not store generated architecture only in hidden memory. Official project knowledge should remain a file humans can review and edit.
-
-## Dependency docs are separate
-
-Project documentation comes from repository-owned files and is scoped by project identity and optional module scope. Dependency/library documentation comes from external sources bound to a library identity and version; manifests and lockfiles supply project-version evidence. This external documentation is not the same as project-owned docs, even when `project_path` is used to resolve its dependency version.
-
-Advanced inspection reports supported dependency metadata. For example, direct npm dependencies from `package.json` resolve through the authoritative `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`.
-
-Use:
-
-```text
-prepare_docs(action="sync_project_docs", project_path=...)
-```
-
-for repository files such as README/docs/wiki/ADR (discovers, reconciles, and indexes).
-
-Use `prepare_docs(action="prefetch_project_dependency_docs", project_path=...)` for exact dependency documentation from manifests/lockfiles.
+The default surface has exactly three tools: `get_docs_context`, `prepare_docs`,
+and `docs_status`. Readiness and returned context are not edit permission.
+Project reads return retrieval-only `docs_context`; missing safe evidence uses
+`status="insufficient_evidence"`. Compatibility `docs_answer` does not certify a
+free-form repository answer. `patch_context` is an explicitly enabled advanced
+representation, not a grant to mutate files.
 
 ## Maintained project-doc catalog
 
-For repositories with nonstandard documentation names or more than a few files, keep a reviewable `docatlas.project-docs.yaml` catalog. When it exists, DocAtlas indexes only validated catalog entries: exact documents and configured roots. Without it, common README/docs/module locations remain a cold-start fallback.
+For explicit documentation membership, keep a reviewable `docatlas.project-docs.yaml` catalog.
+List each admitted document by a literal relative path. The current public
+member path does not recursively discover `roots`, glob patterns, linked files,
+code files, or conventional README/docs locations.
 
 ```yaml
 schema_version: 1
+code_files: []
 documents:
   - path: ARCHITECTURE.md
     role: project_architecture
     scope: project
+    module_path: null
     description: Whole-project architecture and component boundaries.
     authority: source_of_truth
     status: active
     impact: track
-
   - path: packages/auth/design.md
     role: module_architecture
     scope: module
@@ -206,161 +47,88 @@ documents:
     authority: source_of_truth
     status: active
     impact: track
-
-roots:
-  - path: backend/docs
-    scope: module
-    module_path: backend
-    authority: source_of_truth
-
-  - path: frontend/guides
-    scope: module
-    module_path: frontend
-    authority: supporting
-    index: INDEX.md
 ```
 
-An entry under `roots` enables bounded recursive discovery below that exact repository directory. When `index` is present, discovery is narrower: DocAtlas includes the index and follows only local documentation links that stay inside the configured root. External links, traversal, symlink targets, missing targets, and index loops cannot expand the project-doc boundary and are reported as warnings.
+Catalog paths, descriptions, authority labels, and source text remain untrusted
+data. Source-of-truth status describes documentary authority and cannot grant
+network access, file access beyond membership, or mutation permission.
 
-The host coding model may edit this normal Git file after inspecting the repository. DocAtlas only validates and consumes it. Invalid paths, root traversal, symlinked roots, duplicates, missing files, and unsupported formats fail closed with warnings. An invalid explicit catalog blocks retrieval, ingestion, and synchronization without pruning the existing index; fix the catalog and inspect again. Catalog paths and descriptions are untrusted routing metadata, not agent instructions. Use `status: completed` or `superseded` and `impact: search_only` for exact historical documents. Completed and superseded sources are excluded from ordinary retrieval and remain searchable only for explicit history or completed-roadmap questions.
+An invalid explicit catalog blocks retrieval and synchronization without pruning the existing index.
+Fix the reviewed catalog before retrying. Traversal, absolute paths, symlink
+escapes, unsupported formats, and ambiguous membership are rejected rather than
+silently broadening scope.
 
-When project documentation is missing, the returned authoring handoff reports `complete`, `partial`, or `missing` per required section, including named evidence paths/facts and bounded missing-evidence requests. The complete serialized handoff is capped at 12 KiB. If evidence must be omitted, missing categories and the existing sync/retry actions remain present and `documentation_gap.bounds.omitted_counts` records the truncation.
+## Confirmed member synchronization
 
-## Verification loop
+`prepare_docs(action="sync_project_docs", project_path=...)` alone is read-only.
+Omitting `mutation` or passing null performs no writes. The current public sync
+operation accepts an explicit confirmed `mutation` with:
 
-After adding, moving, deleting, refreshing, or reorganizing project docs, verify that discovery, indexing, and retrieval agree before relying on answers.
+- `operation="sync_project_docs"` and `confirm=true`;
+- the exact absolute `storage_path` selected by the host, private and outside the project;
+- the current `catalog_sha256`;
+- `expected_generation_id`, null only when the selected store is absent;
+- a finite list of documents with exact `path`, `content_sha256`, and `catalog_entry_hash`.
 
-Checklist:
+The host obtains those bindings from the reviewed current sources and its
+trusted storage policy. A repository-controlled setting or returned source path
+cannot redirect the host store. Do not guess hashes or generation IDs.
 
-1. Run `inspect_project_docs(project_path)`.
-   - Confirm the expected files appear in `project_docs.found`.
-   - Check `project_docs.ignored`, `project_docs.stale`, and `source_state_guidance`.
+Confirmed synchronization replaces the indexed sections of selected members.
+The source descriptor and hashes are rechecked; generation comparison and
+publication belong to the same transaction. A stale or mismatched request fails
+closed and must be inspected before another attempt. An unknown commit outcome
+is not automatic permission to repeat a write.
 
-2. If docs are new, changed, stale, orphaned, or missing from the index, run:
+Changed source hashes prevent stale indexed sections from appearing in current retrieval.
+Deleted files and documents removed from the catalog are excluded from current retrieval.
+These read guards apply even before another synchronization. The confirmed
+upsert only writes selected members: it does not physically prune orphaned rows,
+delete unselected members, write vectors, or create generated docs. Physical
+cleanup is a separate explicitly requested operation; see
+[index cleanup](./index-cleanup.md).
 
-   ```text
-   prepare_docs(action="sync_project_docs", project_path=..., with_vectors=false)
-   ```
+After a document is renamed, review the new literal catalog entry and confirm
+an upsert for the new path. The old path cannot supply current evidence once it
+is absent or no longer admitted. This is a retrieval visibility guarantee, not
+a claim that all historical storage rows were physically deleted.
 
-   Use the exact `with_vectors` value returned by the next action. Lexical
-   retrieval returns `false` so synchronization does not build an unused
-   vector index. Dense, sparse, and hybrid retrieval return `true`.
+## Scope and module selection
 
-3. Run `inspect_project_docs(project_path)` again.
-   - Confirm `reason_code` is `project_docs_ready` or follow the returned `next_action`.
+| Argument | Meaning |
+|---|---|
+| `scope="project"` | Repo-level catalog members only. |
+| `module_path="packages/auth"` | One exact module; implies module scope. |
+| `scope="module"` | Requires an exact selected module path. |
+| `scope="all"` | Repo-level and module docs in the same repository, without module filters. |
 
-4. Ask two or three project-specific smoke-test questions with `get_docs_context(scope="all", question=...)`.
-   - Use terms that should only appear in the expected docs.
-   - Confirm the expected files are cited in `selected_sources`, `indexed_sources`, or result chunks.
-5. If expected files are not cited, fix the source map instead of guessing:
-   - add or correct entries in `docatlas.project-docs.yaml`;
-   - move maintained docs under `docs/`, `wiki/`, ADR, roadmap, or runbook-style locations;
-   - update discovery configuration or `docatlas.docs.yaml` manifest entries if the docs are external dependency/public docs;
-   - re-run sync and repeat the smoke test.
+The public `get_docs_context` schema has `module_path`, not a legacy `module`
+name filter. If multiple modules could match, preserve the returned candidates
+and ask which exact module is intended. Do not select one silently or fall back
+to another scope. Missing module documentation stays missing.
 
-Suggested smoke-test questions:
+## Documentation changes and verification
 
-```text
-get_docs_context(project_path=..., question="What is the architecture decision for <unique ADR term>?", scope="all")
-get_docs_context(project_path=..., question="How do we deploy <unique service/module name>?", scope="all")
-get_docs_context(project_path=..., question="<description or unique phrase from a cataloged document>", scope="all")
-get_docs_context(project_path=..., question="<unique module phrase>", module_path="<module>", scope="module")
-get_docs_context(project_path=..., question="<module-specific question>", module_path="<module>", scope="module")
-```
+DocAtlas does not generate or commit official repository documentation. When the
+user authorizes a documentation change, create a normal Git patch, review the
+catalog membership, then perform only the exact required confirmed sync.
 
-Agents should recommend this verification loop whenever docs were just added, refreshed, reorganized, or when a user expected a source that was not cited.
+Verify the resulting state through the existing public surface:
 
-## Example response handling
+1. Ask the original question with the intended explicit scope.
+2. If a lifecycle action is returned, satisfy its confirmation and bindings.
+3. After verified successful preparation and readiness, retry the question unchanged.
+4. Check useful facts, source paths, hashes, and coordinates. Changed or deleted
+   material must not appear; lookup credit must not be substituted for original coverage.
+5. Use `docs_status` for an explicit health/freshness request or returned job, not discovery.
 
-Example: docs exist but are not indexed.
+Finite input and source-read bounds protect acquisition. The complete returned
+DTO is measured and minimized without a fixed 800-token acceptance ceiling;
+retaining evidence and its guards takes precedence over an arbitrary output cap.
 
-```json
-{
-  "reason_code": "project_docs_found_not_indexed",
-  "requires_confirmation": false,
-  "next_action": {
-    "type": "prepare_docs",
-    "tool": "prepare_docs"
-  },
-  "arguments_patch": {
-    "action": "sync_project_docs",
-    "project_path": "/path/to/repo",
-    "with_vectors": false
-  }
-}
-```
+## Dependency docs are separate
 
-The agent should call `prepare_docs` with the provided arguments.
-
-Example: stale or orphaned docs.
-
-```json
-{
-  "reason_code": "project_docs_stale",
-  "requires_confirmation": false,
-  "next_action": {
-    "type": "sync_project_docs",
-    "tool": "sync_project_docs"
-  },
-  "arguments_patch": {
-    "project_path": "/path/to/repo",
-    "with_vectors": false
-  }
-}
-```
-
-The agent should call `sync_project_docs` to reconcile.
-
-Example: module name is ambiguous.
-
-```json
-{
-  "status": "module_ambiguous",
-  "reason_code": "module_ambiguous",
-  "answer_available": false,
-  "next_action": {
-    "type": "inspect_project_docs",
-    "tool": "inspect_project_docs"
-  },
-  "message": "Module name 'auth' matches multiple module paths. Retry with module_path."
-}
-```
-
-The agent should show the candidate module paths from `inspect_project_docs` and ask which one to use.
-
-Example: no high-level architecture doc.
-
-```json
-{
-  "reason_code": "architecture_doc_creation_recommended",
-  "requires_confirmation": true,
-  "confirmation_reason": "repo_write",
-  "next_action": {
-    "type": "ask_user_to_create_project_doc",
-    "suggested_file": "ARCHITECTURE.md",
-    "handled_by": "coding_agent"
-  }
-}
-```
-
-The agent should ask before creating the file.
-
-Example: dependency docs available but missing locally.
-
-```json
-{
-  "dependency_sources": {
-    "dependency_next_action": {
-      "type": "ask_user_to_prefetch_dependency_docs",
-      "tool_after_confirmation": "prepare_docs",
-      "arguments_patch": {
-        "action": "prefetch_project_dependency_docs"
-      },
-      "requires_confirmation": true,
-      "confirmation_reason": "network_fetch"
-    }
-  }
-}
-```
-
-The agent should ask before prefetching dependency docs.
+External documentation remains bound to an explicit library identity, version,
+and approved source. Repository membership does not authorize a network fetch.
+Use only the `prepare_docs` action returned for the dependency, or a corresponding
+explicit user lifecycle request, with required network consent and source binding.

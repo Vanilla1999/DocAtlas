@@ -5,9 +5,9 @@ The gate indexes this repository into an isolated temporary SQLite store and the
 runs canonical Project Docs questions through the unpatched public
 ``get_docs_context`` MCP handler. It proves the current production chain:
 
-question -> retrieval -> proof metadata -> final answer-or-context projection.
+question -> explicit retrieval lineage -> current source qualification -> final visible context.
 
-The corpus intentionally covers the stable QuestionPlan families plus two
+The immutable historical corpus retains its original questions plus two
 premise/condition cases that depend on the clear-index source of truth.
 """
 from __future__ import annotations
@@ -189,8 +189,6 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
     payload = {key: value for key, value in payload.items() if key != "diagnostics"}
     if len(payload.get("sources") or ()) > 3:
         return "result exceeds the three-source budget"
-    if estimate_projection_tokens(payload) > 800:
-        return "result exceeds the 800-token budget"
     kind = str(payload.get("kind") or "")
     if kind == "docs_answer":
         if (
@@ -207,6 +205,7 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
             and payload.get("edit_ready") is False
             and payload.get("answer_policy") == "cite_only"
             and isinstance(payload.get("facets"), list)
+            and not payload.get("answer")
         ):
             return "docs_context violates the context-first safety contract"
     else:
@@ -278,7 +277,7 @@ def _threshold_failures(metrics: dict[str, object], case_count: int) -> list[str
     for name in (
         "metadata_only_evidence_count", "packs_contamination_count",
         "docs_analysis_contamination_count", "false_docs_answer_count",
-        "source_budget_violation_count", "token_budget_violation_count",
+        "source_budget_violation_count",
     ):
         if int(metrics[name]):
             failures.append(f"{name} must be zero")
@@ -401,15 +400,36 @@ def _coverage_attribution(snapshot: dict, payload: dict) -> set[str]:
 
 
 def _packs_contamination(question: str, payload: dict) -> bool:
+    """Detect Docs→Packs command substitution, not a mention of another subsystem.
+
+    Relevance and required Docs facts are checked separately. A project-map
+    paragraph mentioning the Packs gateway can be irrelevant without claiming
+    that Packs is the Docs server. Paths and titles alone never establish this
+    factual substitution.
+    """
     explicit_docs = re.search(r"\bdocs\b|get_docs_context|prepare_docs|docs_status", question, re.I)
     requested_packs = re.search(r"\bpacks?\b", question, re.I)
     excluded_packs = re.search(r"\b(?:not|without|excluding)\s+(?:the\s+)?packs?\b", question, re.I)
     if not explicit_docs or (requested_packs and not excluded_packs):
         return False
-    return any(
-        re.search(r"\bpacks?\b", str(source.get("path_or_url") or "") + "\n" + str(source.get("snippet") or ""), re.I)
-        for source in payload.get("sources") or () if isinstance(source, dict)
+    pack_command = re.compile(
+        r"\b(?:doc-atlas|docmancer)\s+(?:mcp\s+packs-serve|install-pack)\b"
+        r"|\bdocmancer_(?:search_tools|call_tool)\s*\(", re.I,
     )
+    snippets = [str(source.get("snippet") or "") for source in payload.get("sources") or ()
+                if isinstance(source, dict)]
+    if payload.get("answer"):
+        snippets.append(str(payload["answer"]))
+    for snippet in snippets:
+        for line in snippet.splitlines():
+            for command in pack_command.finditer(line):
+                # Negation must govern this exact Packs occurrence. A correct
+                # Docs command elsewhere cannot excuse a Packs substitution.
+                prefix = line[:command.start()]
+                if re.search(r"\b(?:do not|don't|never|must not|not)\s+(?:run\s+|use\s+)?[` ]*$", prefix, re.I):
+                    continue
+                return True
+    return False
 
 
 def _safe_abstention(payload: Mapping) -> bool:
@@ -627,6 +647,7 @@ def run(
                         "original_query_covered": original_query_covered and bool(attribution),
                         "coverage_attribution": sorted(attribution),
                         "packs_contamination": packs_contamination,
+                        "public_utf8_bytes": len(json.dumps({key: value for key, value in payload.items() if key != "diagnostics"}, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")),
                         "actual_estimated_tokens": estimate_projection_tokens({key: value for key, value in payload.items() if key != "diagnostics"}),
                         "metadata_only_sources": metadata_only_sources,
                     },
@@ -761,9 +782,9 @@ def run(
             ),
             "false_docs_answer_count": sum(row.get("observed", {}).get("kind") == "docs_answer" and row.get("expected", {}).get("kind") != "docs_answer" for row in positives),
             "max_source_count": max((len(row.get("payload", {}).get("sources") or ()) for row in positives), default=0),
+            "max_public_utf8_bytes": max((row.get("observed", {}).get("public_utf8_bytes", 0) for row in positives), default=0),
             "max_estimated_tokens": max((row.get("observed", {}).get("actual_estimated_tokens", 0) for row in positives), default=0),
             "source_budget_violation_count": sum(len(row.get("payload", {}).get("sources") or ()) > 3 for row in positives),
-            "token_budget_violation_count": sum(row.get("observed", {}).get("actual_estimated_tokens", 0) > 800 for row in positives),
             "false_abstention_count": sum(
                 row.get("expected", {}).get("kind") != "insufficient_evidence"
                 and not bool(row.get("checks", {}).get("status_ok"))
@@ -773,6 +794,11 @@ def run(
             "operational_contamination_count": distractor_count,
             "cases_scoring_8_plus": sum(score >= 8.0 for score in scores),
             "mean_score": sum(scores) / max(len(scores), 1),
+        },
+        "output_cost_policy": {
+            "objective": "minimize_full_public_dto_without_fixed_token_ceiling",
+            "measurement": "canonical_utf8_bytes_and_existing_serialized_token_estimate",
+            "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
         },
         "verdict": "FAIL" if errors else "PASS",
         "errors": errors,

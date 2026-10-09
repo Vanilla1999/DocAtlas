@@ -1,5 +1,31 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Проверка 99106c9 и следующий docs/catalog/quality slice
+
+На `99106c93b48def75c13ee411473b1f6fef1c418e`
+[advanced/downstream CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37959180386/job/113917342535)
+подтвердил question surface PASS, включая original positive, absent negative и
+source-removal metamorphic case. Recovery: 8 PASS / 2 FAIL / 0 ERROR — оба
+положительных сценария теряют исходный факт при delivery. Mutation gate честно
+останавливается на красной baseline; kills для recovery не заявляются.
+
+Core Python 3.13: 8513 = 6513 PASS / 1929 FAIL / 61 ERROR / 10 SKIP.
+Все 303 span и 399 direct-compiler cases PASS; это зелёная baseline для
+предстоящего сравнения старого и сокращённого набора. Advanced: 524 PASS / 98 FAIL
+из 622. ZIP core SHA256 `9c47b5d0d25ae34d0f4c2bd478be619e75a231e93beec9080728b9281e8f7e17`,
+advanced `6690ee979325f1679d1cec68a39693dd18c5698998cd578c7c1302f951ee0559`.
+Остальные Python core jobs этим подсчётом не подтверждаются.
+
+Docs/static/retrieval-evidence, installed-MCP harness и три platform smoke jobs
+завершены SUCCESS. Это не успешные реальные Claude Code/Codex/OpenCode sessions.
+Main CI ещё не является зелёным; PR не готов к merge.
+
+Следующий [docs/catalog/quality slice](pr211-execution/SLICE_02_DOCS_QUALITY_RU.md)
+прошёл независимый source review: 14 explicit members, 25 исходных V2 вопросов и
+41 obligation ID сохранены; 6 witness migrations описаны отдельно. 800-token
+ceiling в self-host/V2 заменён измерениями; Legacy original floor 12 и source/
+safety/identity controls сохранены. Runtime этого slice ожидается после публикации.
+
 ## Исполнение плана: первый contract slice
 
 2026-10-09 владелец поручил оценить, скорректировать и выполнить план.
@@ -29,7 +55,8 @@ docs/catalog/quality, затем retrieval и оставшиеся семьи п
 миграция контрактов и fixtures, согласование docs/catalog/quality, независимые
 oracles и mutation controls, обоснованное сокращение тестов, устранение повторного
 core CI и совместный acceptance. Это план; перечисленные изменения ещё не выполнены.
-Прежнее ограничение на реализацию deferred retrieval сохраняется.
+Историческое ограничение на deferred retrieval действовало до поручения выполнить план;
+более позднее решение об исполнении приведено выше.
 
 На HEAD `e4f0ae09221b80ba1afddf983a2a6e3001220c52` удаление обязательного
 800-token ceiling проверено: [retrieval job](https://github.com/Vanilla1999/DocAtlas/actions/runs/37950861568/job/113888965198)

@@ -29,9 +29,9 @@ your coding agent answers with sources
 | Instead of | DocAtlas |
 |---|---|
 | Guessing from model memory or latest-only docs | Uses project-owned docs and version-bound dependency evidence |
-| Dumping whole pages into the prompt | Returns compact, server-bounded context |
+| Dumping whole pages into the prompt | Returns compact context with source fidelity |
 | Treating every retrieved chunk as trustworthy | Keeps source authority, provenance, scope, and version binding explicit |
-| Making up an answer when proof is missing | Fails closed when mandatory evidence is unavailable |
+| Missing or partial documentation | Returns known evidence with explicit gaps and no answer-certification claim |
 
 ### Try it
 
@@ -51,7 +51,7 @@ The installer can register the Docs MCP server for **Claude Code**, **Codex**, a
 
 ## What DocAtlas is and what problem it solves
 
-Local-first documentation context remains the runtime foundation: DocAtlas solves the problem of coding agents guessing from stale or generic documentation. It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit and fails closed when mandatory evidence is unavailable. Its default MCP surface is deliberately small so agents select the correct operation reliably.
+Local-first documentation context remains the runtime foundation: DocAtlas solves the problem of coding agents guessing from stale or generic documentation. It turns reviewable project docs, lockfiles, and approved dependency documentation into compact, source-attributed evidence for coding agents. It keeps authority, scope, and version binding explicit, reports missing evidence, and leaves the answer to the host. Its default MCP surface is deliberately small so agents select the correct operation reliably.
 
 The primary journey is:
 
@@ -120,7 +120,7 @@ By default the server exposes exactly three mutually exclusive tools:
 | Tool | Purpose |
 |---|---|
 | `get_docs_context` | Default first call for project, library, dependency, or mixed documentation questions. It performs read-only preflight and returns the next action when preparation is required. |
-| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call it from bounded `recommended_next_action`, unbounded `next_action`, or an explicit user request. Network actions require approval. |
+| `prepare_docs` | Lifecycle work only: sync, refresh, index, or prefetch. Call only the returned `recommended_next_action` or an explicit user lifecycle request, preserving confirmation and exact source bindings. Network actions require approval. |
 | `docs_status` | Explicit health, freshness, index, or background-job status requests only. It is not a discovery step. |
 
 ### Recommended workflow
@@ -133,18 +133,13 @@ get_docs_context(question=..., project_path=...)
 → retry get_docs_context(...)
 ```
 
-This makes `get_docs_context` the single high-level entry point. Natural-language project questions retrieve bounded current repository documentation first. Narrow typed questions with complete relation-specific proof receive `docs_answer`; broader questions receive cited retrieval-only `docs_context`; coding and patch tasks receive source-bound `patch_context`; missing safe evidence returns fail-closed `insufficient_evidence`. Parser uncertainty blocks answer certification, not safe project-scoped retrieval. Retrieval-only aliases never authorize an answer or edit. Delivery strategy, debug shape, and packet budget are server-owned policy.
+`get_docs_context` is the single high-level entry point. Project questions return source-attributed, retrieval-only `docs_context`; missing safe evidence uses `status="insufficient_evidence"`. Original questions and explicit host lookups retain separate coverage. The compatibility `docs_answer` schema does not promise lexical answer certification. Explicitly enabled advanced `patch_context` carries evidence and grants no edit permission. The host explains supported facts and identifies gaps.
 
-MCP response delivery, shape, diagnostics, and packet budgets are server-owned. OpenCode registration automatically sets `DOCATLAS_MCP_TEXT_FALLBACK=1` because current OpenCode releases do not preserve `structuredContent` in model-visible tool output; manually configured OpenCode entries need the same environment setting. Other clients receive the server-selected structured lane.
+The complete model-visible response and tool catalog are measured and minimized without fixed 800-token or 6144-byte acceptance ceilings. Preserve admitted text, source identity, hashes, coordinates, and safety guards. Source-read, candidate-work, input, and host-session bounds remain separate. MCP response shape and diagnostics are server-owned. OpenCode registration sets `DOCATLAS_MCP_TEXT_FALLBACK=1`; manual entries need it when the client does not expose `structuredContent` to the model. Other clients receive the server-selected structured lane. Verify actual client delivery separately from SDK transport.
 
 An optional provider-neutral [one-call host-loop contract](./docs/one-call-agent-loop.md) locally enforces cumulative request, retained-history, repair, test, and output budgets after a model initiates DocAtlas retrieval. Existing generic clients remain supported but are not labelled verified unless their host proves every required control.
 
-`prepare_docs(action="sync_project_docs")` replaces the old two-step `inspect → ingest` loop. It:
-1. discovers current candidates from the filesystem;
-2. prunes orphaned indexed sources (deleted files);
-3. removes stale indexed sections (changed files);
-4. indexes new and changed candidates;
-5. returns `current_count`, `new_count`, `changed_count`, `orphaned_removed`, and `indexed_sources`.
+`prepare_docs(action="sync_project_docs")` without a confirmed `mutation` performs no writes. The current public sync contract accepts only explicit lexical member upserts bound to a finite `docatlas.project-docs.yaml` catalog, exact source hashes, a host-selected private store outside the project, and the expected generation. Confirmed synchronization replaces the indexed sections of selected members. Changed source hashes prevent stale indexed sections from appearing in current retrieval. Deleted files and documents removed from the catalog are excluded from current retrieval. This operation does not physically prune unselected rows, write vectors, or generate official documentation. See [the project-docs workflow](./docs/project-docs-mcp-workflow.md).
 
 For an unknown library, DocAtlas does not guess a documentation site silently. It asks for a source and offers `prepare_docs(action="discover_library_docs", ...)`. After approval, this action reads bounded package-registry metadata (PyPI or npm) or constructs the canonical Pub/docs.rs API URL, returns reviewable candidates, and requires confirmation before indexing one. If registry metadata has no authoritative docs URL, the response explains that `docs_url` must be supplied manually.
 
@@ -164,24 +159,13 @@ Documentation evidence is reported separately for package identity, source autho
 
 ### MCP responses
 
-Project-docs lifecycle responses are bounded by the server:
-
-```json
-{
-  "tool": "sync_project_docs",
-  "status": "success",
-  "current_count": 3,
-  "new_count": 1,
-  "changed_count": 0,
-  "orphaned_removed": 1
-}
-```
+Project-docs lifecycle responses report the outcome of the exact requested operation. A returned action must retain its source binding and required confirmation; a successful read is not permission to write. For member synchronization, verify the returned generation and terminal success before retrying the unchanged question. Consult the current advertised schema and [detailed MCP contract](./docs/mcp-docs-server.md) instead of copying historical response counters.
 
 ### When to use each tool
 
 | Situation | Tool |
 |---|---|
-| First time in a repo | `get_docs_context`; follow its `next_action` if preparation is needed |
+| First time in a repo | `get_docs_context`; follow its `recommended_next_action` if preparation is needed |
 | Check what docs are relevant | `get_docs_context` |
 | Check health, freshness, or a job | `docs_status` |
 | Reconcile after file changes | `prepare_docs(action="sync_project_docs")` |
