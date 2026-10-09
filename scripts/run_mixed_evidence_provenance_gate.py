@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -13,6 +14,82 @@ from eval.agent_developer_v1.mixed_provenance import derive_from_paths, verify_r
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 DEFAULT_OUTPUT = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())) / "p1.5-current-provenance.json"
+
+
+# Only render already captured evidence. Retrieved bodies stay in the saved
+# report; these log diagnostics expose hashes, lengths and binding coordinates.
+_BODY_FIELDS = frozenset({"content", "text", "display_text", "raw_document", "snippet",
+                          "answer", "section", "title", "preview", "excerpt"})
+_CHILD_FIELDS = ("parent_logical_id", "source_identity", "source_content_hash", "display_text",
+                 "display_content_hash", "char_start", "char_end", "byte_start", "byte_end",
+                 "line_start", "line_end")
+
+
+def _body_free(value, *, field=""):
+    if field in _BODY_FIELDS and isinstance(value, str):
+        raw = value.encode("utf-8")
+        return {"characters": len(value), "utf8_bytes": len(raw),
+                "sha256": hashlib.sha256(raw).hexdigest()}
+    if isinstance(value, dict):
+        return {key: _body_free(item, field=key) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_body_free(item, field=field) for item in value]
+    return value
+
+
+def _mapping(value):
+    return value if isinstance(value, dict) else {}
+
+
+def _rows(value):
+    return value if isinstance(value, (list, tuple)) else ()
+
+
+def _source_binding_diagnostics(observation: dict) -> list[dict]:
+    """Compare saved snapshot lineage with saved committed same-path children.
+
+    Lane and identity matches are reported separately from field mismatches.
+    This does not choose a replacement source or alter the provenance oracle.
+    """
+    prepared = _mapping(observation.get("preparation"))
+    stored = [("project", row) for row in _rows(prepared.get("project_stored_children"))]
+    for record in _rows(_mapping(prepared.get("external")).get("records")):
+        if isinstance(record, dict):
+            stored.extend((record.get("library_id"), row) for row in _rows(record.get("stored_children")))
+    bindings = _mapping(observation.get("bindings"))
+    result = []
+    for source in _rows(_mapping(observation.get("public_payload")).get("sources")):
+        if not isinstance(source, dict):
+            continue
+        evidence_id = source.get("evidence_id")
+        binding = _mapping(bindings.get(evidence_id)) if isinstance(evidence_id, str) else {}
+        lineage = _mapping(binding.get("lineage"))
+        same_path = []
+        for lane, child in stored:
+            if not isinstance(child, dict) or child.get("path") != source.get("path_or_url"):
+                continue
+            identity_matches = all(isinstance(lineage.get(key), str) and bool(lineage[key])
+                                   and child.get(key) == lineage[key]
+                                   for key in ("stable_chunk_id", "generation_id"))
+            same_path.append({
+                "storage_lane": lane, "identity_matches": identity_matches,
+                "stored_child": _body_free(child),
+                "field_mismatches": [{
+                    "field": key, "lineage_present": key in lineage,
+                    "snapshot_value": _body_free(lineage.get(key), field=key),
+                    "stored_value": _body_free(child.get(key), field=key),
+                } for key in _CHILD_FIELDS if lineage.get(key) != child.get(key)],
+            })
+        result.append({
+            "evidence_id": evidence_id, "source_fields": _body_free(source),
+            "binding_fields_present": sorted(binding), "lineage_fields_present": sorted(lineage),
+            "snapshot_lineage": _body_free(lineage),
+            "projected_source": _body_free(binding.get("projected_source")),
+            "same_call_source_equal": binding.get("projected_source") == source,
+            "candidate_hash_material": _body_free(binding.get("candidate_hash_material")),
+            "same_path_children": same_path,
+        })
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -46,6 +123,12 @@ def main(argv: list[str] | None = None) -> int:
                                       for key in sorted(set(before) | set(after)) if before.get(key) != after.get(key)],
                 "generation_before": before.get("generation"), "runtime_error": observation.get("error"),
                 "output_cost": assessment["output_cost"],
+                "request": observation.get("request"),
+                "service_requests": observation.get("service_requests"),
+                "observer_counts": observation.get("observer_counts"),
+                "project_identity": observation.get("project_identity"),
+                "source_bindings": _source_binding_diagnostics(observation),
+                "pipeline_diagnostics": _body_free(observation.get("pipeline_diagnostics") or {}),
             }
             print("DIAGNOSTICS " + json.dumps(details, ensure_ascii=False, sort_keys=True))
     if report["source_identities"]["runtime_error"]:
