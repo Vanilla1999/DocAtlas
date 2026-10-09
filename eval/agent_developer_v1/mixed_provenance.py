@@ -75,6 +75,12 @@ def expected_migration(protocol: dict) -> dict:
         "remote_preparation": "actual_public_manifest_job_and_record_specific_index",
         "atomic_library_staging_claimed": False,
         "cost_policy": "measure_and_minimize_without_fixed_output_ceiling",
+        "project_source_representation": {
+            "committed_child_class": "project_file", "snapshot_context_class": "project_doc",
+            "child_binding": "same_path_stable_chunk_generation",
+            "project_owner": "explicit_request_project_identity",
+            "scope": "project", "authority": "source_of_truth",
+        },
         "infrastructure_member": {
             "path": INFRASTRUCTURE_MEMBER, "text": INFRASTRUCTURE_TEXT,
             "only_when": "no_authored_project_document",
@@ -326,7 +332,7 @@ def source_errors(case: dict, observation: dict) -> list[str]:
         if local:
             stored = prepared.get("project_stored_children") or []
             if (not request.get("project") or lineage.get("project_identity") != observation.get("project_identity")
-                    or lineage.get("source_class") != "project_file" or lineage.get("doc_scope") != "project"
+                    or lineage.get("source_class") != "project_doc" or lineage.get("doc_scope") != "project"
                     or lineage.get("authority") != "source_of_truth"):
                 errors.append("different_project_scope_or_authority")
             if payload.get("kind") == "docs_context" and any(
@@ -354,6 +360,16 @@ def source_errors(case: dict, observation: dict) -> list[str]:
                   "display_content_hash", "char_start", "char_end", "byte_start", "byte_end", "line_start", "line_end")
         if len(candidates) != 1 or any(lineage.get(key) != candidates[0].get(key) for key in fields):
             errors.append("source_not_bound_to_committed_child")
+        # The project context DTO has a distinct class from its committed
+        # source member. Both exact representations and the same owner are
+        # required; accepting either string at either stage would erase trust.
+        if local and len(candidates) == 1:
+            committed = candidates[0]
+            if (committed.get("source_class") != "project_file"
+                    or committed.get("project_identity") != observation.get("project_identity")
+                    or committed.get("doc_scope") != "project"
+                    or committed.get("authority") != "source_of_truth"):
+                errors.append("different_committed_project_scope_or_authority")
         display = lineage.get("display_text")
         if not isinstance(display, str) or snippet not in display:
             errors.append("visible_source_outside_committed_window")

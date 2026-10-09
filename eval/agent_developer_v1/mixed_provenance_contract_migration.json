@@ -324,5 +324,13 @@
     "indexing_contract": "all_explicit_members_are_indexed",
     "may_satisfy_original_fact": false,
     "may_be_model_visible": false
+  },
+  "project_source_representation": {
+    "committed_child_class": "project_file",
+    "snapshot_context_class": "project_doc",
+    "child_binding": "same_path_stable_chunk_generation",
+    "project_owner": "explicit_request_project_identity",
+    "scope": "project",
+    "authority": "source_of_truth"
   }
 }

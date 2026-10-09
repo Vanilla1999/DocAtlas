@@ -70,6 +70,10 @@ def _control(case: dict, *, source_paths: list[str] | None = None) -> dict:
         lineage = {key: deepcopy(value) for key, value in stored.items() if key != "path"}
         if stored["library_id"]:
             lineage["canonical_id"] = stored["library_id"]
+        else:
+            # Independent expected representation at the context DTO boundary.
+            # The committed child above remains a project_file.
+            lineage["source_class"] = "project_doc"
         material = {"path": path, "section": "unit-fixture", "content": frozen["text"],
                     "snippet": frozen["text"], "version": stored["resolved_version"] or "unversioned"}
         source = {
@@ -214,6 +218,33 @@ def test_assignment_source_ledgers_fail_closed() -> None:
     raw = deepcopy(baseline)
     assert _score(case, baseline)["passed"]
     assert baseline == raw
+    path = case["expected_assignment_sources"][0]
+    # Keep the complete visible fact, its digest and same-call binding fixed.
+    # A bad type at either side, including swapping both, must fail integrity.
+    for stored_class, snapshot_class in (
+        ("project_doc", "project_doc"), ("project_file", "project_file"),
+        ("project_doc", "project_file"), ("external_advisory", "external_advisory"),
+        (None, "project_doc"), ("project_file", None),
+    ):
+        changed = deepcopy(baseline)
+        stored = next(row for row in changed["preparation"]["project_stored_children"] if row["path"] == path)
+        stored["source_class"] = stored_class
+        changed["bindings"]["ev-unit-0"]["lineage"]["source_class"] = snapshot_class
+        result = _score(case, changed)
+        assert changed["public_payload"] == baseline["public_payload"]
+        assert result["checks"]["required_full_facts"] and result["checks"]["finite_public_preparation"]
+        assert not result["checks"]["source_integrity"] and "source_integrity" in result["failed_checks"], (
+            stored_class, snapshot_class, result)
+        assert not result["passed"]
+    for field, value in (("project_identity", "local:" + "9" * 64),
+                         ("doc_scope", "library"), ("authority", "supporting")):
+        changed = deepcopy(baseline)
+        stored = next(row for row in changed["preparation"]["project_stored_children"] if row["path"] == path)
+        stored[field] = value
+        result = _score(case, changed)
+        assert result["checks"]["required_full_facts"] and result["checks"]["finite_public_preparation"]
+        assert "different_committed_project_scope_or_authority" in result["source_errors"]
+        assert not result["checks"]["source_integrity"] and not result["passed"]
     wrong_document = _control(case, source_paths=["docs/release-notes.md"])
     assert _score(case, wrong_document)["checks"]["source_integrity"]
     assert not _score(case, wrong_document)["checks"]["required_full_facts"]
