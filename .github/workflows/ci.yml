@@ -401,6 +401,37 @@ jobs:
             ${{ runner.temp }}/retrieval-evidence
           retention-days: 14
 
+  acceptance-diagnostics:
+    if: ${{ !cancelled() }}
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+      - name: Download existing core JUnit artifacts
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: pytest-core-*-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/core-junit
+      - name: Summarize exact existing executions
+        run: >-
+          python scripts/summarize_pytest_acceptance.py
+          --input-dir "$RUNNER_TEMP/core-junit"
+          --output "$RUNNER_TEMP/pytest-acceptance-diagnostics.json"
+      - name: Upload complete diagnostic ledger
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pytest-acceptance-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/pytest-acceptance-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 14
+
   required-ci:
     name: required-ci
     if: always()
