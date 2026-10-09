@@ -234,6 +234,53 @@ def test_unobserved_retrieval_is_not_a_no_hit_diagnosis():
     assert result["root_cause"] == "semantic_obligation_missing"
 
 
+@pytest.mark.parametrize("question,has_candidates", [
+    ("Как DocAtlas отправляет сообщения через квантовый канал?", True),
+    ("zzxqv_missing_fixture_topic_73291", False),
+])
+def test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acquisition(
+    tmp_path, question, has_candidates,
+):
+    from docmancer.mcp.docs_server import call_docs_tool_payload
+    from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
+    from scripts import run_project_docs_self_host_gate as runner
+
+    root = tmp_path / "project"
+    text = "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n"
+    write_project(root, {"docs/store.md": text})
+    with isolated_service(tmp_path / "state") as (service, config):
+        index_project(service, config, root)
+        request = {"question": question, "project_path": str(root), "scope": "project"}
+        plain = call_docs_tool_payload("get_docs_context", request, service)
+        observed, snapshot = runner._call_with_snapshot(request, service)
+        assert {key: value for key, value in observed.items() if key != "diagnostics"} == plain
+        assert plain["status"] == "insufficient_evidence" and not plain.get("sources")
+        assert not plain.get("context_available") and not plain.get("answer_supported")
+        assert not plain.get("answer_available") and not plain.get("edit_ready")
+        assert snapshot == {} and "diagnostics" not in plain
+        diagnostics = observed["diagnostics"]
+        assert diagnostics["observer_counts"] == {"retrieval_calls": 1, "validation_calls": 1}
+        assert diagnostics["stage_status"]["retrieval"] == "observed"
+        assert diagnostics["stage_status"]["qualification"] == "observed"
+        assert diagnostics["stage_status"]["delivery"] == "blocked_before_projection"
+        assert all(diagnostics["stage_status"][stage] == "not_reached"
+                   for stage in ("ranking", "projection", "coverage"))
+        assert bool(diagnostics["retrieved_candidate_ids"]) is has_candidates
+        assert diagnostics["delivery_decision"]["deliverable"] is False
+        assert not diagnostics.get("pre_projection_qualified_ids")
+        assert not hasattr(service, "_same_call_diagnostics_observer")
+        assert (root / "docs/store.md").read_text() == text
+        # Observers are optional diagnostics; a broken callback cannot change
+        # the already validated result or convert the veto into a successful read.
+        def broken_observer(value):
+            raise RuntimeError("observer-only failure")
+        service._same_call_diagnostics_observer = broken_observer
+        try:
+            assert call_docs_tool_payload("get_docs_context", request, service) == plain
+        finally:
+            del service._same_call_diagnostics_observer
+
+
 @pytest.mark.parametrize("assignment_source", ["internal-id", "foreign-id"])
 def test_same_call_observer_preserves_public_result_and_binds_visible_components(monkeypatch, assignment_source):
     from types import SimpleNamespace

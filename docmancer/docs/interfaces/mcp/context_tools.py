@@ -373,6 +373,8 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         if errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(errors))
         _record_model_visible_bytes(result, raw, blocked)
+        if blocked_kind == "docs_context":
+            _observe_same_call_diagnostics(service, raw, blocked, {}, delivery_blocked=True)
         return blocked
     operational_answer_available = bool(raw.get("answer_available", True))
     operational_reason_code = raw.get("reason_code")
@@ -586,7 +588,7 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
 
 def _observe_same_call_diagnostics(
     service: LibraryDocsService, raw: dict[str, Any], projection: dict[str, Any],
-    selection_trace: dict[str, Any],
+    selection_trace: dict[str, Any], *, delivery_blocked: bool = False,
 ) -> None:
     """Send bounded internals to an in-process observer, never the MCP payload."""
     observer = getattr(service, "_same_call_diagnostics_observer", None)
@@ -612,11 +614,23 @@ def _observe_same_call_diagnostics(
             "planning": "observed" if service_trace.get("planned_query_ids") is not None else "unclassified",
             "retrieval": "observed" if service_trace.get("retrieved_candidates") is not None else "unclassified",
             "qualification": "observed" if service_trace.get("qualification_outcomes") is not None else "unclassified",
-            "ranking": "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
-            "projection": "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
-            "coverage": "observed" if isinstance(coverage, dict) else "unclassified",
+            "ranking": "not_reached" if delivery_blocked else "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
+            "projection": "not_reached" if delivery_blocked else "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
+            "coverage": "not_reached" if delivery_blocked else "observed" if isinstance(coverage, dict) else "unclassified",
+            "delivery": "blocked_before_projection" if delivery_blocked else "projected",
         },
     }
+    if delivery_blocked:
+        # Observe the decision already enforced above. The private callback
+        # cannot retry retrieval, bypass the veto or alter the public payload.
+        decision = raw.get("delivery_decision")
+        diagnostics["delivery_decision"] = {
+            "deliverable": False,
+            "reason_code": str(
+                (decision.get("reason_code") if isinstance(decision, dict) else None)
+                or projection.get("reason_code") or "unspecified_delivery_veto"
+            )[:120],
+        }
     if service_trace.get("planned_query_ids") is not None:
         diagnostics["planned_query_ids"] = list(service_trace.get("planned_query_ids") or ())[:32]
     if service_trace.get("retrieved_candidates") is not None:
