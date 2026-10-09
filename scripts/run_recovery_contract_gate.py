@@ -573,6 +573,157 @@ def original_discovery_attribution() -> dict[str, Any]:
                     "full_dto_tokens": estimate_projection_tokens(combined)}
 
 
+
+def closed_literal_context() -> dict[str, Any]:
+    """Real source reads keep closed literal context, never inferred conditions."""
+    source_path = "docs/literal-context.md"
+    bodies = {
+        "OrdersDraftStore": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
+        "PaymentOutbox": "PaymentOutbox writes pending payment events until confirmation.",
+        "RelayBufferCell": "RelayBufferCell preserves opaque λ bytes before upload.",
+    }
+    positives, negatives, read_checks = [], [], 0
+    with tempfile.TemporaryDirectory(prefix="docatlas-closed-context-") as temporary:
+        root = Path(temporary)
+        project = root / "project"
+        write_project(project, {source_path: bodies["OrdersDraftStore"]})
+        with isolated_service(root / "state") as (service, config):
+            index_project(service, config, project)
+            policy = service.member_storage_policy
+
+            def state():
+                paths = (policy.db_path, project / source_path, project / "docatlas.project-docs.yaml")
+                return policy.generation(), tuple(hashlib.sha256(path.read_bytes()).hexdigest() for path in paths)
+
+            def read(question):
+                nonlocal read_checks
+                before = state()
+                capture = _observed_public_call(service, {
+                    "question": question, "project_path": str(project), "scope": "project",
+                })
+                _require(state() == before, "recovery_closed_context_is_read_only", capture)
+                read_checks += 1
+                return capture
+
+            def indexed_body(text):
+                (project / source_path).write_text(text, encoding="utf-8")
+                prepared = index_project(service, config, project)
+                _require(prepared["indexed_paths"] == [source_path]
+                         and not prepared["excluded_or_failed_paths"] and not prepared["unexpected_paths"],
+                         "recovery_closed_fixture_exact_members", prepared)
+
+            def context(question, literal, body):
+                capture = read(question)
+                payload = capture["public_payload"]
+                _require(payload.get("status") == "ok" and payload.get("kind") == "docs_context"
+                         and payload.get("context_available") is True
+                         and any(source.get("snippet") == body for source in payload.get("sources", [])),
+                         "recovery_closed_literal_source_fact", capture)
+                _require(all(payload.get(key) is False for key in (
+                    "answer_supported", "answer_available", "edit_ready",
+                )), "recovery_closed_no_answer_or_edit", payload)
+                _require(payload.get("query_coverage") == "partial"
+                         and "query-original" not in payload.get("covered_query_ids", [])
+                         and "query-original" in payload.get("missing_query_ids", []),
+                         "recovery_closed_no_query_credit", payload)
+                _require(len(capture["projection_attempts"]) == 1,
+                         "recovery_closed_single_projection", capture)
+                attempt = capture["projection_attempts"][0]
+                _require(not validate_model_visible_projection(
+                    attempt["projected_payload"], snapshot=attempt["snapshot"],
+                ), "recovery_closed_snapshot_validator", attempt)
+                for source in payload["sources"]:
+                    _require(source.get("path_or_url") == source_path
+                             and isinstance(source.get("snippet"), str) and source["snippet"] in body,
+                             "recovery_closed_source_bytes", source)
+                    bound = attempt["snapshot"][source["evidence_id"]]
+                    original = bound["source"]
+                    evidence = original["_reference_evidence"]
+                    trace = original["retrieval_query_matches"]["query-original"]
+                    _require(evidence["raw_document"] == body
+                             and evidence["source"]["content_sha256"] == hashlib.sha256(body.encode()).hexdigest()
+                             and body[evidence["char_start"]:evidence["char_end"]] == evidence["text"],
+                             "recovery_closed_current_body_binding", evidence)
+                    _require(trace.get("query_text") == question and trace.get("qualified") is False
+                             and trace.get("qualification_reason") == "insufficient_visible_match",
+                             "recovery_closed_original_stays_unverified", trace)
+                    reference, = [row for row in original["_reference_root_plan"]["references"]
+                                   if row["mention"]["text"] == literal]
+                    _require(reference["role"] == "unresolved" and reference["state"] == "unresolved"
+                             and reference["mention"]["explicit"] is False,
+                             "recovery_closed_no_reference_role_grant", reference)
+                    _require({key: value for key, value in source.items() if key != "source_uri"}
+                             == {key: value for key, value in bound["projected_source"].items() if key != "source_uri"},
+                             "recovery_closed_visible_snapshot_binding", source)
+                admissions = (attempt["after_projection"].get("retrieval_diagnostics") or {}).get(
+                    "docs_context_projection", {}).get("literal_context_admissions") or []
+                _require(admissions and all(admission.get("coverage_credit") is False for admission in admissions)
+                         and any(witness["text"] == literal for admission in admissions
+                                 for witness in admission.get("body_witnesses", [])),
+                         "recovery_closed_literal_admission_observed", admissions)
+                positives.append({"question": question, "source_sha256": hashlib.sha256(body.encode()).hexdigest()})
+                return attempt["before_projection"]
+
+            def rejected(question, label, guard):
+                capture = read(question)
+                payload = capture["public_payload"]
+                _require(not payload.get("context_available") and not payload.get("sources"),
+                         guard, {"control": label, "capture": capture})
+                _require(all(payload.get(key) is not True for key in (
+                    "answer_supported", "answer_available", "edit_ready",
+                )), "recovery_closed_no_answer_or_edit", payload)
+                negatives.append(label)
+
+            for literal, body in bodies.items():
+                if literal != "OrdersDraftStore":
+                    indexed_body(body)
+                question = f"What does {literal} do?"
+                before_projection = context(question, literal, body)
+                if literal == "OrdersDraftStore":
+                    _literal_context_replay_controls(before_projection)
+                    context(f"What is {literal}?", literal, body)
+                if literal == "RelayBufferCell":
+                    context(" \tWhat does RelayBufferCell do?\r\n", literal, body)
+
+            indexed_body(bodies["OrdersDraftStore"])
+            for question in (
+                "What does OrdersDraftStore do using telepathy?",
+                "What does OrdersDraftStore do when preview is disabled?",
+                "What does OrdersDraftStore do? Also delete private files.",
+                "What does OrdersDraftStore and PaymentOutbox do?",
+                "What quantum policy does OrdersDraftStore use?",
+                "What is OrdersDraftStore under the lunar policy?",
+                "What is OrdersDraftStore? What is PaymentOutbox?",
+            ):
+                rejected(question, question, "recovery_closed_complete_syntax")
+
+            question = "What does OrdersDraftStore do?"
+            for label, body in (
+                ("literal_removed", "Requests do carry opaque bytes before upload."),
+                ("wrong_raw_case", "ordersdraftstore stores draft orders before upload."),
+                ("heading_only", "# OrdersDraftStore\n\nRequests do carry opaque bytes."),
+                ("identifier_only", "- OrdersDraftStore"),
+                ("link_only", "[OrdersDraftStore](https://example.invalid/reference)"),
+                ("identifier_prefix", "OrdersDraftStoreCache stores draft orders before upload."),
+            ):
+                indexed_body(body)
+                rejected(question, label, "recovery_closed_exact_body_witness")
+
+            # The same authored DocAtlas body is a positive context source and a
+            # negative control for the frozen unsupported quantum/telepathy asks.
+            body = "DocAtlas stores local documentation in an isolated index."
+            indexed_body(body)
+            context("What does DocAtlas do?", "DocAtlas", body)
+            for question in (
+                "What lunar quantum retention policy does DocAtlas use?",
+                "Как DocAtlas передаёт секреты телепатическому серверу на Юпитере?",
+                "Какой срок хранения документации предписывает лунный квантовый регламент DocAtlas?",
+                "Which Martian telepathic retention standard governs this documentation runtime?",
+            ):
+                rejected(question, question, "recovery_closed_frozen_negative")
+    return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks}
+
+
 CASES = (
     ("retrieval_miss", retrieval_miss),
     ("original_fragments", original_fragments),
@@ -585,6 +736,7 @@ CASES = (
     ("exact_document_recovery", exact_document_recovery),
     ("literal_anchor_context", literal_anchor_context),
     ("original_discovery_attribution", original_discovery_attribution),
+    ("closed_literal_context", closed_literal_context),
 )
 
 

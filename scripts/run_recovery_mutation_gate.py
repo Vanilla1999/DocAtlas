@@ -20,6 +20,7 @@ CASE_ROSTER = (
     "retrieval_miss", "original_fragments", "operational_precedence", "no_semantic_retry",
     "evidence_eligibility", "documentation_gap", "authoritative_conflict", "projection_states",
     "exact_document_recovery", "literal_anchor_context", "original_discovery_attribution",
+    "closed_literal_context",
 )
 MODULE_PATHS = {
     "docmancer.docs.application.recovery": "docmancer/docs/application/recovery.py",
@@ -100,6 +101,14 @@ MUTANTS = (
            '                if lookup.origin == "original":\n                    trace["admission_only"] = True',
            '                if False and lookup.origin == "original":\n                    trace["admission_only"] = True',
            "original_discovery_attribution", "retrieval_lookup_cannot_mint_original_discovery"),
+    Mutant("closed-literal-context-disabled", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'closed_literal = _closed_context_literal(question)',
+           'closed_literal = None',
+           "closed_literal_context", "recovery_closed_literal_source_fact"),
+    Mutant("closed-literal-context-ignores-extra-conditions", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           '        if closed:\n            return mention',
+           '        if True:\n            return mention',
+           "closed_literal_context", "recovery_closed_complete_syntax"),
 )
 
 
