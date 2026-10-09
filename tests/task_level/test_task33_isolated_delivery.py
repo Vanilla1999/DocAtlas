@@ -423,10 +423,31 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
         context_pack=evidence,
         required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
     )
-    assert {row["path"] for row in packet["source_of_truth"]} == set(TASK33C_REQUIRED_EVIDENCE_PATHS)
-    assert [
-        row["text"] for row in packet["task_interpretation"]["acceptance_conditions"]
-    ] == ["Sync must call evaluateFlowEntry with allowOfflineFallback: false."]
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    expected = {path: "Task33 source evidence." for path in TASK33C_REQUIRED_EVIDENCE_PATHS}
+    assert {row["path"]: row["text"] for row in packet["sources"]} == expected
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert packet["completeness"] == "partial"
+    assert packet["missing"] == ["visible_content_assignment_required"]
+    # The existing acceptance phrase appears only in metadata, not in any
+    # source window. It must not become a claimed fact or edit permission.
+    metadata_only = "Sync must call evaluateFlowEntry with allowOfflineFallback: false."
+    assert metadata_only not in json.dumps(packet)
+    literal_packet = build_action_packet(
+        question=domain_objective, context_pack=evidence,
+        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+        public_requirements=("Task33 source evidence.",),
+    )
+    assert validate_action_packet(literal_packet, evidence_items=evidence) == []
+    assert literal_packet["result"] == "data" and literal_packet["completeness"] == "complete"
+    assert literal_packet["edit_ready"] is False
+    assert {row["path"]: row["text"] for row in literal_packet["sources"]} == expected
+    assert all(
+        row["content_sha256"] == hashlib.sha256(expected[row["path"]].encode()).hexdigest()
+        and row["instruction_trust"] == "untrusted_data"
+        for row in literal_packet["sources"]
+    )
+    assert metadata_only not in json.dumps(literal_packet)
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
     required = CONDITIONS["docatlas_tool_required_once"].tool_policy
@@ -435,7 +456,7 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     assert not direct.allow_docatlas
     assert "`get_docs_context` exactly once" in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert 'project_path="."' in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert 'delivery_strategy="bounded_direct"' in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert 'context_format="patch_context"' in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert "Do not make another documentation retrieval call" in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert "Do not call `prepare_docs`" in TOOL_REQUIRED_ONCE_INSTRUCTION
     _, mcp_path = build_tool_policy("docatlas_tool_required_once", tmp_path)
@@ -444,10 +465,11 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     trajectory.write_text(json.dumps([{
         "sequence": 1, "tool_name": "mcp", "arguments": {
             "server": "docmancer-docs", "tool": "get_docs_context",
-            "delivery_strategy": "bounded_direct",
+            "context_format": "patch_context",
             "question_matches_task_objective": True,
             "retrieval_succeeded": True,
-            "action_packet_status": "ok",
+            "action_packet_result": literal_packet["result"],
+            "action_packet_completeness": literal_packet["completeness"],
         },
     }]), encoding="utf-8")
     audit = audit_trajectory("docatlas_tool_required_once", trajectory)

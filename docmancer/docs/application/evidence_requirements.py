@@ -198,17 +198,26 @@ def build_requirements(
     required_evidence_paths = tuple(required_evidence_paths)
     required_target_paths = tuple(required_target_paths)
     public_requirements = tuple(public_requirements)
+    declared_paths = {
+        str(path).strip().replace("\\", "/")
+        for path in (*required_evidence_paths, *required_target_paths) if str(path).strip()
+    }
 
     requirements: list[EvidenceRequirement] = []
     input_limits: set[str] = set()
     answer_contract: ProjectAnswerContract | None = None
     for index, term in enumerate(extract_exact_terms(question)):
+        # An exact caller-declared path has its own mandatory identity binding.
+        # Retain the original term/span as a diagnostic, without demanding that
+        # the filename also occur inside its source body. Unlisted symbols and
+        # independently supplied public content requirements remain unchanged.
+        declared_path = term.value.replace("\\", "/") in declared_paths
         requirements.append(EvidenceRequirement(
             requirement_id=f"query_exact:{index}:{term.normalized_value}",
             kind="exact_term", value=term.value,
-            mandatory=term.kind != "path" and profile != "project_docs_answer",
+            mandatory=term.kind != "path" and not declared_path and profile != "project_docs_answer",
             public_provenance="query_exact_term",
-            query_extraction_kind=term.kind,
+            query_extraction_kind="declared_path" if declared_path else term.kind,
             proof_role="document_statement" if profile == "project_document_answer" else "generic_fact",
         ))
     existing_exact_values = {
