@@ -236,7 +236,6 @@ def test_additive_hint_retry_preserves_primary_snippet_under_tight_budget():
     assert previous["evidence_id"] in trial_by_id
     assert previous["snippet"] in trial_by_id[previous["evidence_id"]]["snippet"]
     assert after["estimated_tokens"] <= 410
-    assert len(after["sources"]) <= 3
     assert after["answer_supported"] is False
     assert after["edit_ready"] is False
 

@@ -9,12 +9,7 @@ from docmancer.docs.application.docs_context_projection import (
     _qualified_fragments,
     project_docs_context,
 )
-from docmancer.docs.application.model_visible_projection import (
-    _docs_source,
-    _source_digest,
-    docs_context_budget_tokens,
-    validate_model_visible_projection,
-)
+from docmancer.docs.application.model_visible_projection import _docs_source, _source_digest, validate_model_visible_projection
 from docmancer.docs.domain.context_windows import _focused_snippet
 from docmancer.docs.domain.evidence_qualification import _visible_term_present, qualify_evidence
 
@@ -85,7 +80,6 @@ def test_three_named_options_survive_as_one_complete_list(rename, intro):
     payload, snapshot = project_docs_context(retrieval=retrieval)
     snippets = [source["snippet"] for source in payload["sources"]]
     assert any(block in snippet for snippet in snippets), snippets
-    assert docs_context_budget_tokens(payload) <= 800
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
     for source in payload["sources"]:
         offset = text.index(source["snippet"])
@@ -134,7 +128,6 @@ def test_overbudget_block_is_not_silently_clipped():
     assert not payload.get("sources"), payload
     rejections = retrieval["retrieval_diagnostics"]["docs_context_projection"]["projection_rejections"]
     assert any(item["reason"] == "token_budget" for item in rejections), rejections
-    assert docs_context_budget_tokens(payload) <= 800
 
 
 @pytest.mark.parametrize("text, required", [

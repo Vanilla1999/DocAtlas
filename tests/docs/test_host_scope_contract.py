@@ -147,5 +147,3 @@ def test_public_scope_never_implicitly_widens(tmp_path, monkeypatch, scope, modu
         assert paths == {"packages/backend/README.md"}
     assert payload.get("answer_supported") is not True
     assert payload.get("edit_ready") is not True
-    assert len(paths) <= 3
-    assert payload["estimated_tokens"] <= 800

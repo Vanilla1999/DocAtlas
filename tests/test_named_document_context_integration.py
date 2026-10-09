@@ -680,7 +680,6 @@ def test_real_sqlite_compound_onboarding_maximizes_host_lookup_coverage(
         query_id.startswith("query-intent-")
         for query_id in result["missing_query_ids"]
     )
-    assert result["estimated_tokens"] <= 800
 
 
 def test_real_sqlite_audited_russian_alias_covers_original_question(

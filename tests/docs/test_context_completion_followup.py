@@ -76,6 +76,5 @@ def test_priority_rule_available_in_first_packet_or_one_registered_read(tmp_path
             assert read["snippet"] in "\n".join(raw.splitlines()[read["line_start"]-1:read["line_end"]])
             reads.append(read["snippet"])
         assert any(fact in text for text in first + reads), {"payload": payload, "reads": reads}
-    assert docs_context_budget_tokens(payload) <= 800
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False

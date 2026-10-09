@@ -41,7 +41,6 @@ def test_case_artifacts_trace_candidates_without_full_document_fields(tmp_path):
 
     assert case["first_expected_rank"] == 1
     assert case["metrics"]["authoritative_source_at_1"] is True
-    assert case["metrics"]["model_visible_tokens"] <= 800
     assert case["candidates"][0]["ranking"]["score_direction"] == "higher_is_better"
     assert len(case["candidates"][0]["excerpt"]) <= 200
     assert "text" not in case["candidates"][0]

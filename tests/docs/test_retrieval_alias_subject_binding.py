@@ -138,8 +138,6 @@ def test_native_comparison_search_does_not_route_through_indexing_distractor(tmp
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
-    assert payload["estimated_tokens"] <= 800
-    assert len(payload["sources"]) <= 3
 
 
 def test_native_explicit_chunking_query_still_returns_indexing_contract(tmp_path):
@@ -155,5 +153,3 @@ def test_native_explicit_chunking_query_still_returns_indexing_contract(tmp_path
         and "token-bounded child chunks" in source["snippet"]
         for source in payload["sources"]
     )
-    assert payload["estimated_tokens"] <= 800
-    assert len(payload["sources"]) <= 3

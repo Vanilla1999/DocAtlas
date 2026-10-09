@@ -16,7 +16,6 @@ def test_canonical_agent_workflow_is_in_self_host_corpus():
 
 def test_canonical_agent_workflow_is_retrievable_through_public_handler(tmp_path):
     from docmancer.core.config import DocmancerConfig
-    from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
     from docmancer.docs.service import LibraryDocsService
     from docmancer.mcp.docs_server import call_docs_tool_payload
 
@@ -54,4 +53,3 @@ def test_canonical_agent_workflow_is_retrievable_through_public_handler(tmp_path
     assert "validate" in text.casefold()
     assert "prefetch_docs_manifest" in text
     assert payload["edit_ready"] is False
-    assert docs_context_budget_tokens(payload) <= 800

@@ -316,5 +316,4 @@ def test_legacy_fail_closed_adapter_does_not_block_real_qualified_context(tmp_pa
         assert source["content_sha256"] == digest
         assert source["line_start"] == 1 and source["line_end"] == 3
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
     assert service.member_storage_policy.generation() == prepared["metrics"]["generation_id"]

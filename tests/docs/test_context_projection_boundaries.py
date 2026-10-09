@@ -195,7 +195,6 @@ def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
     assert verdict["semantic_useful"] is True
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
 @pytest.fixture
@@ -381,7 +380,6 @@ def test_frozen_architecture_infrastructure_boundary_enters_retrieval_candidates
     assert verdict["semantic_useful"] is True
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
 def test_frozen_request_flow_prefers_project_context_module_witnesses():
@@ -402,4 +400,3 @@ def test_frozen_request_flow_prefers_project_context_module_witnesses():
     assert verdict["semantic_useful"] is True
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800

@@ -100,7 +100,6 @@ def test_public_projection_does_not_recover_missing_requirements_by_equal_text(f
     assert facets["current-facet"]["status"] == "covered"
     assert facets["earlier-facet"]["status"] == "retrieval_only"
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
 

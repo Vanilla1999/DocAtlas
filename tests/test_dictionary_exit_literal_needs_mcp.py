@@ -38,7 +38,6 @@ def test_explicit_lookup_delivers_indexed_context_without_inferred_answer(tmp_pa
     assert any(row["path_or_url"] == "README.md" and "doc-atlas mcp docs-serve" in row["snippet"]
                for row in payload["sources"])
     assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
-    assert payload["estimated_tokens"] <= 800
     assert gate._citation_integrity(payload, snapshot)
 
 

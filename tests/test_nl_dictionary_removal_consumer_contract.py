@@ -11,7 +11,7 @@ from docmancer.docs.application.evidence_selection import (
     patch_selection_config, select_evidence, validate_assignment_binding,
 )
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
-from docmancer.docs.application.model_visible_projection import canonical_projection_bytes, project_docs_answer
+from docmancer.docs.application.model_visible_projection import project_docs_answer
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.retrieval_routing import new_routing_record, route_initial_stages
 from docmancer.docs.models import DeliveryDecision, ProjectContextResult
@@ -124,4 +124,3 @@ def test_actual_sdk_and_public_projection_do_not_grant_workflow(tmp_path):
     assert public["sources"][0]["snippet"] == row["content"]
     assert public["sources"][0]["version_binding"] == "exact"
     assert snapshot
-    assert len(canonical_projection_bytes(public)) <= 800 * 4

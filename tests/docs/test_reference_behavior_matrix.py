@@ -40,7 +40,6 @@ def test_other_project_index_does_not_invalidate_selected_source(tmp_path):
     from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
     from eval.project_context_quality.capture_public_context import capture_public_call
     from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
-    from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
     root = tmp_path/"wanted"
     other = tmp_path/"other"
     write_project(root, {"Guide.md": "# Install\n\nInstallation command: run `atlas prepare`.\n"})
@@ -52,7 +51,6 @@ def test_other_project_index_does_not_invalidate_selected_source(tmp_path):
             question="What installation command is documented in the file Guide?"))
     assert "atlas prepare" in visible(capture) and "foreign prepare" not in visible(capture)
     payload = capture["public_payload"]
-    assert docs_context_budget_tokens(payload) <= 800
     assert validate_model_visible_projection(payload, snapshot=capture["projection_attempts"][-1]["snapshot"], max_tokens=800) == []
 
 

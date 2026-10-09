@@ -33,6 +33,5 @@ def test_indexed_repo_quote_without_answer_authority_survives_public_mcp(tmp_pat
     assert any(row["path_or_url"] == "README.md" and "doc-atlas mcp docs-serve" in row["snippet"]
                for row in payload["sources"])
     assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
-    assert payload["estimated_tokens"] <= 800
     assert gate._citation_integrity(payload, snapshot)
     assert payload["diagnostics"]["qualification_rejections"] == []

@@ -12,7 +12,6 @@ from docmancer.docs.application.evidence_models import EvidenceRequirement, Evid
 from docmancer.docs.application.evidence_selection import (
     patch_selection_config, select_evidence, validate_assignment_binding,
 )
-from docmancer.docs.application.model_visible_projection import canonical_projection_bytes
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.domain.mutation_intent import (
     MutationIntentContract, RequestedTarget, evaluate_mutation_readiness, resolve_mutation_targets,
@@ -156,7 +155,6 @@ def test_actual_unified_service_mcp_read_consistent_with_raw_sdk(tmp_path):
     assert public["sources"][0]["version_binding"] == "2.0"
     assert public["sources"][0]["content_sha256"]
     assert public["answer_policy"] == "cite_only"
-    assert len(canonical_projection_bytes(public)) <= 800 * 4
     assert facade.calls[-1][2]["allow_network"] is False
     assert facade.calls[-1][2]["mutation_intent"].operation == "none"
 

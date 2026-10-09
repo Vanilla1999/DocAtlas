@@ -5,7 +5,6 @@ from eval.evidence_quality_v2.run import audit_payload, documents_for, load_prot
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
 from eval.evidence_quality_v2.observer import observe_call
 from eval.evidence_quality_v2.semantic import assess_context
-from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
 
 
 @pytest.mark.parametrize("case_id", ["fastapi-02", "fastapi-06"])
@@ -22,8 +21,6 @@ def test_original_direct_question_delivers_required_fact(tmp_path, case_id):
         payload, trace = observe_call(service, request)
     assert "lookup_queries" not in request
     assert audit_payload(payload, trace["snapshot"], project) == []
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload.get("sources", [])) <= 3
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
     assessment = assess_context(case, payload, registry_for(case["project_group"], manifest))

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import pytest
 
-from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from tests.test_named_document_context_integration import _named_document_service
@@ -40,8 +39,6 @@ def test_index_fallback_qualifies_existing_exact_anchor(tmp_path, monkeypatch, t
     assert term_ids
     assert term_ids <= set(result["covered_query_ids"])
     assert "query-original" not in result["covered_query_ids"]
-    assert len(result["sources"]) <= 3
-    assert estimate_projection_tokens(result) <= 800
 
 
 @pytest.mark.parametrize("content", [

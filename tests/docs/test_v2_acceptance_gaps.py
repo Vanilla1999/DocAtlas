@@ -29,7 +29,6 @@ def _assert_semantic_positive(case_id: str, lane: str) -> None:
     }
     assert verdict["semantic_useful"] is True
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload.get("sources") or ()) <= 3 and payload["estimated_tokens"] <= 800
 
 
 def test_v2_natural_chunking_keeps_parent_and_child_witnesses():

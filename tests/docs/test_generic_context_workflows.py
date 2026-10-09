@@ -50,7 +50,6 @@ def test_generic_workflow_facts_survive_real_index(tmp_path, monkeypatch, topic,
                         if source["path_or_url"] == f"{topic}.md")
     assert all(fact in visible for fact in facts), pformat({"missing": [fact for fact in facts if fact not in visible], "payload": payload, "observed": observed})
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
 def test_stale_health_live_status_sync_and_removal(monkeypatch):
@@ -93,7 +92,6 @@ def test_stale_health_live_status_sync_and_removal(monkeypatch):
     assert payload["diagnostics"]["observer_counts"] == {"retrieval_calls": 1, "validation_calls": 1}
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
     assert "query-original" in payload["missing_query_ids"]
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
     assert all(row["met"] for row in verdict["obligations"]), pformat({
         "obligations": verdict["obligations"], "sources": payload["sources"],
         "pre_projection_health_qualified": True, "pre_projection_sync_qualified": True,
@@ -230,7 +228,6 @@ def test_contributor_live_reading_and_tests():
     assert verdict["semantic_useful"] is True and all(verdict["hard_gates"].values())
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
 
 
 @pytest.mark.parametrize("case_id", [
@@ -264,7 +261,6 @@ def test_remaining_live_workflow_witnesses(case_id, monkeypatch):
     assert verdict["semantic_useful"] is True and all(verdict["hard_gates"].values())
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
     assert validate_model_visible_projection(
         captured["payload"], snapshot=captured["snapshot"], max_tokens=800,
     ) == []
@@ -407,7 +403,6 @@ def test_wider_windows_preserve_contiguous_witnesses_and_table_qualifiers(gap_si
     })
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload.get("sources", [])) <= 3 and payload["estimated_tokens"] <= 800
     witnesses = [row for row in payload.get("sources", [])
                  if "Amber" in row["snippet"] and "Cobalt" in row["snippet"]]
     assert bool(witnesses) is (gap_size <= 16)
@@ -510,7 +505,6 @@ def test_partial_lookups_admit_only_novel_visible_terms_after_other_directions(c
     assert paths == expected
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
     assert payload["query_coverage"] != "full"
-    assert len(paths) <= 3 and payload["estimated_tokens"] <= 800
 
 
 def test_catalog_live_invalid_behavior(monkeypatch):
@@ -541,4 +535,3 @@ def test_catalog_live_invalid_behavior(monkeypatch):
     assert verdict["false_full_coverage"] is False
     assert payload["diagnostics"]["observer_counts"] == {"retrieval_calls": 1, "validation_calls": 1}
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800

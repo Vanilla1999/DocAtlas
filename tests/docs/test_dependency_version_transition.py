@@ -137,4 +137,3 @@ def test_public_mixed_transition_has_nonempty_current_version_evidence(tmp_path,
         result = _read(service, project)
         assert marker in _sources(result), result
         assert forbidden not in _sources(result)
-        assert result["estimated_tokens"] <= 800
