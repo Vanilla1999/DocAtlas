@@ -185,6 +185,30 @@ def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path, monke
     assert match["line_start"] == 1
     assert observed == {relative: [sha256(declaration.encode("utf-8")).hexdigest()]}
 
+    from copy import deepcopy
+    from docmancer.docs.application.action_packet import (
+        build_action_packet, evidence_identity_for_item, validate_action_packet,
+    )
+    variants = build_project_source_evidence(
+        tmp_path, question="OfflineSyncGate", requirements=["OfflineSyncGate", "sync gate"],
+        max_items=4, token_budget=700,
+    )
+    assert {item["match_type"] for item in variants} == {"exact_substring", "symbol"}
+    assert {tuple(item["matched_terms"]) for item in variants} == {("OfflineSyncGate",), ("sync gate",)}
+    assert len({evidence_identity_for_item(item)[0] for item in variants}) == 1
+    packet = build_action_packet(
+        question="OfflineSyncGate", context_pack=variants,
+        public_requirements=[declaration.strip()],
+    )
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert len(packet["sources"]) == 1 and packet["sources"][0]["text"] == declaration.strip()
+    assert validate_action_packet(packet, evidence_items=variants) == []
+    # Reusing the identity while asserting a different window still fails.
+    forged = deepcopy(variants[1])
+    forged["line_start"] = forged["line_end"] = 2
+    errors = validate_action_packet(packet, evidence_items=[variants[0], forged])
+    assert any(error.startswith("stable_identity_collision:") for error in errors)
+
     # Crossing the former eight-match cutoff must preserve this declaration.
     # Only its source coordinate changes when earlier uses are prepended.
     for earlier_uses in (8, 16):

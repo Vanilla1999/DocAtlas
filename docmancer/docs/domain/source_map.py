@@ -467,11 +467,10 @@ def _source_snippet_evidence_item(
         "why_selected": "requirement term matched a concrete project source line",
         "content": content,
         "token_estimate": max(1, len(content) // 4),
+        # The same source window has one identity across lookup terms.
         "source": {
             "source_class": "source_evidence",
             "evidence_class": "source_snippet",
-            "match_type": match_type,
-            "confidence": confidence,
             "path": path,
             "line_start": line_number,
             "line_end": line_number,
