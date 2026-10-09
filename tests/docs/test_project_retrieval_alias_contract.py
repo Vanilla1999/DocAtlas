@@ -25,7 +25,7 @@ def test_current_alias_boundary_preserves_explicit_queries_without_inference():
     assert crosswalk["source"]["sha256"] == _FROZEN_SOURCE_SHA256
     assert hashlib.sha256(frozen).hexdigest() == _FROZEN_SOURCE_SHA256
     # Parse the archive as data. Its historical assertions are never executed
-    # by this control; the original module remains independently collected.
+    # by this control; its original module was also collected during precheck.
     functions = [
         node for node in ast.parse(frozen.decode("utf-8")).body
         if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")
