@@ -296,7 +296,7 @@ def test_post_format_sufficiency_fails_closed_when_exact_symbol_is_dropped():
         "authority": "official",
     })
     packet = build_action_packet(question="Apply the change", context_pack=[item],
-                                 public_requirements=["RareExactSymbol"])
+                                 public_requirements=[{"kind": "exact_term", "value": "RareExactSymbol"}])
     assert packet["result"] == "data" and packet["completeness"] == "complete"
     assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
     assert validate_action_packet(packet, evidence_items=[item]) == []
@@ -485,7 +485,10 @@ def test_selected_exact_terms_keep_protected_witness_during_budget_fitting():
     })
     packet = build_action_packet(
         question="Implement `MCP` resumable `fetch/index` ingestion",
-        context_pack=[item], public_requirements=["MCP", "fetch/index"],
+        context_pack=[item], public_requirements=[
+            {"kind": "exact_term", "value": "MCP"},
+            {"kind": "exact_term", "value": "fetch/index"},
+        ],
     )
     assert packet["result"] == "data" and packet["completeness"] == "complete"
     assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
@@ -574,7 +577,8 @@ def test_display_only_canonical_child_is_rendered_and_hash_bound():
     })
     packet = build_action_packet(
         question="Update src/formatter.py", context_pack=[item, target],
-        public_requirements=[text, "format_packet"],
+        public_requirements=[text, {"kind": "exact_term", "value": "format_packet"}],
+        required_evidence_paths=["src/formatter.py"],
     )
     assert packet["result"] == "data" and packet["completeness"] == "complete"
     assert {row["text"] for row in packet["sources"]} == {text, target_text}
