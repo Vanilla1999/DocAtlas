@@ -18,3 +18,24 @@ Git/server descendants, без изменения permissions или обход�
 
 Изменения рассматриваются узкими slices. Обычный push в существующий PR разрешён
 решениями текущей волны; force-push, merge и release не выполняются.
+
+## Critical slice от 2026-10-09
+
+База: `7a78c516a62304fc258bda5d5eb2b11544c829b5`.
+Изолированная рабочая ветка: `implementation/pr211-critical-contract-20261009`.
+Продолжение реализует `PR211_CRITICAL_CONTRACT_PROPOSAL_RU.md` после указания
+владельца продолжить; уточнение текущего literal-coverage контракта записано в
+`CURRENT_WAVE_DECISIONS_RU.md`.
+
+| Writer | Единственная область записи |
+| --- | --- |
+| normative_tests | `tests/docs/test_normative_language.py`, `PR211_CRITICAL_TEST_MIGRATION_REVIEW_RU.md` |
+| critical_mutants | `scripts/run_critical_mutation_gate.py`, `PR211_CRITICAL_MUTATION_MIGRATION_REVIEW_RU.md` |
+| critical_review | Только `PR211_CRITICAL_MIGRATION_INDEPENDENT_REVIEW_RU.md`; исходники авторов читает |
+| Координатор | Current decisions, этот ledger, checkpoint, совместный source/artifact audit и публикация |
+
+Новые concrete test nodes не планируются: исходные 26 tuples и остальные tests
+normative module сохраняются. Локальная работа ограничена source/AST и чтением
+GitHub artifacts; actual project execution выполняет существующий PR CI.
+Production, deferred retrieval, остальные gold/gates и пользовательский checkout
+не входят в изменяемые пути slice.

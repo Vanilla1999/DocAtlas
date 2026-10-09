@@ -1,6 +1,57 @@
 # PR #211: checkpoint продолжения merge-readiness
 
-## Последний полный прогон: 991638f; member/mtime и self-host setup
+## Последний полный прогон: 7a78c51; продолжение critical slice
+
+Обновление: 2026-10-09. На опубликованном HEAD
+`7a78c516a62304fc258bda5d5eb2b11544c829b5` завершены все 17 workflows:
+**8 SUCCESS / 8 FAILURE / 1 SKIPPED**. Merge checkout
+`8ecb256bb6e3fbacae3529df6ce60a631485830a` имеет то же дерево
+`a439647fdd726d4db65f9cd7f0fb17fa5e772958`, что и HEAD.
+
+- Main Python 3.11/3.12/3.13: **8513 = 6497 PASS / 1945 FAIL / 61 ERROR / 10 SKIP**.
+  Полные roster/outcomes одинаковы; против `991638f` ровно один FAIL→PASS,
+  добавлений/удалений и PASS regressions нет. Все шесть self-host tests,
+  семь предыдущих member/mtime fixes и 141 security controls PASS.
+- Исправленный новый self-host positive использует явно переданный literal lookup,
+  сохраняет исходный question/CRLF/hash/generation/store guards и обязательно
+  оставляет `query-original` missing. Original-only retrieval этим не исправлен.
+- Advanced: **622 = 524 PASS / 98 FAIL**. Critical baseline **28 = 19 PASS / 9 FAIL**;
+  прежние critical mutants не запущены из-за baseline failure. Девять независимых
+  downstream steps FAIL; dependent adversarial mutation SKIPPED.
+- Все шесть main/P1 platform SDK jobs SUCCESS. Actual runtime audit: 19 scoped
+  logs, 15 SDK invocations, 30 structured/text lanes, 420 prepared observations.
+  Во всех 30 restart/repeat lanes `derived_writes=0`, source/generation сохранены,
+  stale-null CAS отклонён. Installed scripted harness 1/1 PASS.
+- Release build/wheels/sdist/installer/required-release SUCCESS; publish/public/
+  registry SKIPPED. Реальные Claude Code/Codex/OpenCode sessions — **NOT RUN**.
+- Legacy self-host: 2812 tracked files / 119596587 bytes, 10 members / 98 sections;
+  подготовка подтверждена, quality **10/16**, original-query lineage **0 < 12**.
+  V2 останавливается на inactive catalog witness `wiki/Commands.md`; собственного
+  V2 JSON/provenance нет. Retrieval evidence: 24/48 budget cases выше сохранённого
+  800-token gate, максимум 1451 по pinned offline BPE. Все эти gates остаются FAIL.
+
+Источники: [main CI 37843013319](https://github.com/Vanilla1999/DocAtlas/actions/runs/37843013319),
+[P1 37843013402](https://github.com/Vanilla1999/DocAtlas/actions/runs/37843013402),
+[release 37843013743](https://github.com/Vanilla1999/DocAtlas/actions/runs/37843013743).
+`required-ci` job `113541340466` и `p1-stack-exact` job `113541501846` — FAILURE.
+Это полный наблюдавшийся CI, а не merge-ready результат.
+
+Перед critical migration исходные core JUnit повторно получены из GitHub artifacts
+и проверены по опубликованным ZIP SHA256:
+
+| Python | Artifact ID | ZIP SHA256 |
+| --- | --- | --- |
+| 3.11 | 11579011225 | `b9d31db8369a9de5fb8f0f71d1b8d473697ebe63bcf2b1a76cc291e23371138f` |
+| 3.12 | 11578144988 | `1112bd66f10cab9f91471e457dcca457820d090d735b91499ca7babe1d234abd` |
+| 3.13 | 11578578769 | `21efeb193c23b5c9e2bd489d6e2d773657da97ad8686c903a97b3621b2eb0c2f` |
+
+Следующее разрешённое продолжение — узкая миграция
+`PR211_CRITICAL_CONTRACT_PROPOSAL_RU.md`; ownership и уточнение двух literal
+complete cases зафиксированы в current decisions и completion ledger.
+Этот раздел сохраняет baseline **7a78c51**. Новый slice считается проверенным
+только по фактическому CI его последующего HEAD; чужой PASS не наследуется.
+
+## Исторический полный прогон: 991638f; member/mtime и self-host setup
 
 Обновление: 2026-10-08. Полный [CI 37840422988](https://github.com/Vanilla1999/DocAtlas/actions/runs/37840422988)
 завершён на HEAD `991638f28ecff659c320b45738edfaa8b9fd375e`, merge checkout

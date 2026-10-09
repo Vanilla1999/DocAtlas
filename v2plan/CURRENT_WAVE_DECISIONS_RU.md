@@ -62,3 +62,39 @@ Detailed patch branch включает mutation_intent (5816), requirements (218
 
 Итог реализации и проверки фиксируется отдельно после integration на одном SHA.
 Результаты компонентов не сертифицируют installed-wheel, реальные clients или CI.
+
+## Продолжение от 2026-10-09: узкая миграция critical contract
+
+После результата полного CI на `7a78c51` и конкретного предложения
+`PR211_CRITICAL_CONTRACT_PROPOSAL_RU.md` владелец указал продолжить работу.
+Следующий slice реализует описанную миграцию retired normative-modality acceptance:
+source-data fidelity, отсутствие implicit authority и действующая Python grammar.
+
+- Сохраняются все 26 исходных fixture texts, legacy labels и concrete node IDs.
+  Старые labels остаются историческими данными; текущий adapter проверяется как
+  unknown. Полная доставка исходного текста и отрицательные controls обязательны.
+- Устаревший normative mutant заменяется действующими проверками recognition
+  Python declarations, unknown modality, whole-source fidelity и bound-window
+  validation. Два прежних Task33/host-turn-limit mutants сохраняются.
+- Baseline и mutants исполняются через существующий PR CI. Каждый новый mutant
+  обязан изменить используемый source и упасть на конкретном ожидаемом assertion;
+  collection/import errors, skips и случайный иной failure не считаются kill.
+- Изменения проходят независимый review до ordinary push в существующий PR.
+  Production retrieval, corpus/gold, другие thresholds/gates и отложенные
+  направления из пункта 2 этим продолжением не изменяются.
+
+Статический review уточнил предварительное предположение proposal о девяти
+uniform partial packets. Два неизменённых вопроса содержат `PermissionService`
+и `PermissionDecision.deferFollowUp`: текущий `build_requirements` создаёт для
+них точные `query_exact_term` requirements, а действительный literal unit witness
+может обеспечить `complete`. Для этих двух cases нужны exact requirement IDs,
+values, provenance и bound assignment spans/hashes. Остальные семь prose cases
+сохраняют `partial` и `visible_content_assignment_required`. Во всех девяти
+случаях source остаётся `untrusted_data`, `edit_ready=False`, без inferred policy,
+behavioral или validation authority. Question, source bytes и selector не меняются.
+
+Основание уточнения: `evidence_requirements.py::build_requirements`, literal-only
+`_witness_for_requirement`, assignment construction в `_evidence_selection_part03.py`,
+`_action_packet_part03.py::build_action_packet`, bound validation в
+`_action_packet_part04.py` и `action-packet-v4/CONTRACT.md` (completeness/assignments).
+Результаты новой реализации фиксируются только после фактического CI на её SHA.
