@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 from contextlib import contextmanager
 from copy import deepcopy
+from dataclasses import replace
 import hashlib
 import importlib
 import json
@@ -37,7 +38,7 @@ from docmancer.docs.interfaces.mcp.recovery_projection import _attach_recovery_d
 from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.retrieval.query_planning import extract_document_locator
-from eval.evidence_quality_v2.runtime import index_project, isolated_service
+from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
 from eval.project_context_quality.capture_public_context import capture_public_call
 
 REPORT_SCHEMA = "recovery-contract-v2"
@@ -493,6 +494,85 @@ def _literal_context_state_controls(service: Any, project: Path, request: dict[s
     _require(not result.get("sources"), "recovery_literal_catalog_revocation", result)
 
 
+def original_discovery_attribution() -> dict[str, Any]:
+    """A real original hit survives lookups; lookup hits cannot invent that hit."""
+    from docmancer.retrieval.dispatch import RetrievalDispatcher
+
+    question = "Storage persists records"
+    lookups = ["Compression reduces record size", "Journal recovers committed state"]
+    path = "docs/storage.md"
+    text = ("# Storage\n\nStorage persists records on disk. Compression reduces record size. "
+            "Journal recovers committed state.\n")
+    with tempfile.TemporaryDirectory(prefix="docatlas-original-discovery-") as temporary:
+        root = Path(temporary)
+        project = root / "project"
+        write_project(project, {path: text})
+        with isolated_service(root / "state") as (service, config):
+            index_project(service, config, project)
+            request = {"question": question, "project_path": str(project), "scope": "project"}
+
+            def checked_call(arguments: dict[str, Any]) -> dict[str, Any]:
+                capture = _observed_public_call(service, arguments)
+                payload = capture["public_payload"]
+                _require(payload.get("status") == "ok" and payload.get("context_available") is True
+                         and any("Storage persists records on disk." in source.get("snippet", "")
+                                 for source in payload.get("sources", [])),
+                         "retrieval_original_discovery_source_fact", capture)
+                _require(all(payload.get(key) is False for key in (
+                    "answer_supported", "answer_available", "edit_ready",
+                )), "retrieval_discovery_never_authorizes_answer", payload)
+                _require(all(source.get("path_or_url") == path and source.get("snippet", "") in text
+                             for source in payload["sources"]), "retrieval_discovery_exact_source_bytes", payload)
+                _require(len(capture["projection_attempts"]) == 1,
+                         "retrieval_discovery_one_public_projection", capture)
+                attempt = capture["projection_attempts"][0]
+                _require(not validate_model_visible_projection(attempt["projected_payload"], snapshot=attempt["snapshot"]),
+                         "retrieval_discovery_valid_snapshot", attempt)
+                return payload
+
+            original = checked_call(request)
+            _require("query-original" in original.get("covered_query_ids", []),
+                     "retrieval_original_coverage_survives_lookups", original)
+            combined_request = {**request, "lookup_queries": lookups}
+            combined = checked_call(combined_request)
+            _require(set(combined.get("covered_query_ids", [])) == {
+                "query-original", "query-lookup-1", "query-lookup-2",
+            }, "retrieval_original_coverage_survives_lookups", combined)
+
+            real_run = RetrievalDispatcher.run
+            withheld = []
+            def lookup_only_dispatch(dispatcher, query, *args, **kwargs):
+                result = real_run(dispatcher, query, *args, **kwargs)
+                if query == question:
+                    withheld.append(len(result.chunks))
+                    return replace(result, chunks=[])
+                # A source may claim it was returned for the original. Only
+                # the host's actual acquisition ledger can establish that fact.
+                chunks = [chunk.model_copy(update={"metadata": {
+                    **(chunk.metadata or {}), "original_discovery": True,
+                    "retrieval_query_ids": ["query-original"],
+                    "retrieval_query_matches": {"query-original": {
+                        "query_text": question, "query_origin": "original", "relation": "direct",
+                        "qualified": True, "admission_only": False, "lexical_score": 999,
+                    }},
+                }}) for chunk in result.chunks]
+                return replace(result, chunks=chunks)
+            with patch.object(RetrievalDispatcher, "run", lookup_only_dispatch):
+                lookup_only = checked_call(combined_request)
+            _require(withheld and any(withheld), "retrieval_control_withheld_real_original_hits", withheld)
+            _require(set(lookup_only.get("covered_query_ids", [])) == {"query-lookup-1", "query-lookup-2"}
+                     and "query-original" in lookup_only.get("missing_query_ids", [])
+                     and lookup_only.get("query_coverage") == "partial",
+                     "retrieval_lookup_cannot_mint_original_discovery", lookup_only)
+            _require((project / path).read_text(encoding="utf-8") == text,
+                     "retrieval_discovery_read_preserves_source")
+            return {"original_covered_ids": original["covered_query_ids"],
+                    "combined_covered_ids": combined["covered_query_ids"],
+                    "lookup_only_covered_ids": lookup_only["covered_query_ids"],
+                    "withheld_original_acquisitions": len(withheld),
+                    "full_dto_tokens": estimate_projection_tokens(combined)}
+
+
 CASES = (
     ("retrieval_miss", retrieval_miss),
     ("original_fragments", original_fragments),
@@ -504,6 +584,7 @@ CASES = (
     ("projection_states", projection_states),
     ("exact_document_recovery", exact_document_recovery),
     ("literal_anchor_context", literal_anchor_context),
+    ("original_discovery_attribution", original_discovery_attribution),
 )
 
 

@@ -277,6 +277,7 @@ def test_host_qualification_precedes_window_regardless_of_discovery(facts, quali
 
 def test_cross_lane_qualification_retains_exact_identity_and_discovery_scores():
     from docmancer.docs.application._project_docs_service_part03 import _qualify_candidate_lookups
+    from docmancer.docs.application.reference_query_tagging import _record_query_discovery
     from docmancer.docs.domain.documentation_query_plan import DocumentationQueryPlan
     lookup = DocumentationLookup('query-lookup-1', 'Use `storage_mode` for compression', 'host_lookup')
     chunk = RetrievedChunk(source='docs/storage.md', chunk_index=0,
@@ -287,8 +288,10 @@ def test_cross_lane_qualification_retains_exact_identity_and_discovery_scores():
     assert not result.metadata['retrieval_query_matches']['query-lookup-1']['qualified']
     tagged = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup,
         expected_project_identity='repo')[0]
+    receipts = {}
+    _record_query_discovery(receipts, [tagged], lookup)
     result = _qualify_candidate_lookups([tagged], plan,
-        expected_project_identity='repo', lifecycle_intent='current')[0]
+        expected_project_identity='repo', lifecycle_intent='current', discovery_records=receipts)[0]
     assert result.metadata == tagged.metadata
 
 

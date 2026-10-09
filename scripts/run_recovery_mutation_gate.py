@@ -19,7 +19,7 @@ GATE = "scripts/run_recovery_contract_gate.py"
 CASE_ROSTER = (
     "retrieval_miss", "original_fragments", "operational_precedence", "no_semantic_retry",
     "evidence_eligibility", "documentation_gap", "authoritative_conflict", "projection_states",
-    "exact_document_recovery", "literal_anchor_context",
+    "exact_document_recovery", "literal_anchor_context", "original_discovery_attribution",
 )
 MODULE_PATHS = {
     "docmancer.docs.application.recovery": "docmancer/docs/application/recovery.py",
@@ -92,6 +92,14 @@ MUTANTS = (
            'if not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes):',
            'if False and (not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes)):',
            "literal_anchor_context", "recovery_literal_snapshot_binding"),
+    Mutant("later-lookup-erases-prior-public-credit", MODULE_PATHS["docmancer.docs.application._project_docs_service_part03"],
+           '            matches[lookup.query_id] = trace',
+           '            matches = {key: {**value, "admission_only": True} for key, value in matches.items()}\n            matches[lookup.query_id] = trace',
+           "original_discovery_attribution", "retrieval_original_coverage_survives_lookups"),
+    Mutant("lookup-only-hit-mints-original-discovery", MODULE_PATHS["docmancer.docs.application._project_docs_service_part03"],
+           '                if lookup.origin == "original":\n                    trace["admission_only"] = True',
+           '                if False and lookup.origin == "original":\n                    trace["admission_only"] = True',
+           "original_discovery_attribution", "retrieval_lookup_cannot_mint_original_discovery"),
 )
 
 

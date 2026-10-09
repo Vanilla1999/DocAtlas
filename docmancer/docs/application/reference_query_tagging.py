@@ -1,11 +1,54 @@
 """Pure tagging adapter for prepared source references and retrieval lanes."""
 from __future__ import annotations
+from copy import deepcopy
+import hashlib
+import json
 from typing import Any
 from dataclasses import asdict
 from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
 from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
 from .context_query_probes import literal_query_probe
+
+
+def _discovery_window_key(chunk: Any) -> str:
+    """Identify the actual acquired window, independently of claimed query tags."""
+    metadata = chunk.metadata or {}
+    reference = metadata.get("_reference_evidence")
+    if not isinstance(reference, dict):
+        reference = {}
+    binding = {
+        "source": str(chunk.source), "chunk_index": chunk.chunk_index,
+        "content_sha256": hashlib.sha256(chunk.text.encode("utf-8")).hexdigest(),
+        "source_identity": reference.get("source"),
+        "member_binding": reference.get("member_binding"),
+        "reference_span": [reference.get("char_start"), reference.get("char_end")],
+        **{key: metadata.get(key) for key in (
+            "stable_chunk_id", "project_identity", "generation_id", "source_class",
+            "project_doc_path", "doc_scope", "module_path", "char_span",
+        )},
+    }
+    return hashlib.sha256(json.dumps(binding, sort_keys=True, ensure_ascii=False,
+                                     separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def _record_query_discovery(
+    records: dict[str, dict[str, dict[str, Any]]], chunks: Any,
+    lookup: DocumentationLookup,
+) -> None:
+    """Record a completed application-owned acquisition; metadata is not a receipt.
+
+    The ledger stays in the current service call and is never read from a source
+    or a public request. A receipt records discovery, not relevance or authority.
+    Every later admission still recomputes the canonical body qualification.
+    """
+    for chunk in chunks:
+        matches = records.setdefault(_discovery_window_key(chunk), {})
+        receipt = {"query": asdict(lookup), "lexical_score": float(chunk.score)}
+        previous = matches.get(lookup.query_id)
+        if previous is None or receipt["lexical_score"] > previous["lexical_score"]:
+            matches[lookup.query_id] = deepcopy(receipt)
+
 
 def _tag_retrieval_query(
     chunks: Any, query_id: str | None, query_text: str | None = None,

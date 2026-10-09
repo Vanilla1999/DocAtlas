@@ -29,7 +29,9 @@ from docmancer.docs.domain.query_terms import (
 )
 
 
-from .reference_query_tagging import _tag_retrieval_query
+from .reference_query_tagging import (
+    _discovery_window_key, _record_query_discovery, _tag_retrieval_query,
+)
 from .source_reference_evidence import SourceReferenceContext
 
 _INTERNAL_DIAGNOSTIC_LIMIT = 32
@@ -108,31 +110,47 @@ from ._project_docs_continuations import (
 def _qualify_candidate_lookups(
     chunks: list[Any], plan: DocumentationQueryPlan, *,
     expected_project_identity: str, lifecycle_intent: str,
+    discovery_records: dict[str, dict[str, dict[str, Any]]] | None = None,
 ) -> list[Any]:
     """Check independent public lookups before admission, across discovery lanes.
 
     No extra retrieval is performed and no original/parent coverage is derived.
-    Existing discovery traces keep their scores; a cross-check has no BM25 score.
+    Discovery receipts belong to this application call and exact source window.
+    Requalify every independent direction before merging, so adding a lookup
+    cannot erase another direction or trust pre-existing metadata-issued credit.
     """
     lookups = [item for item in plan.queries
                if item.origin in {"original", "host_lookup", "retrieval_need"} and not item.public_parent_query_id]
     result = []
     for chunk in chunks:
+        metadata = dict(chunk.metadata or {})
+        matches = {key: {**value, "admission_only": True}
+                   for key, value in (metadata.get("retrieval_query_matches") or {}).items()
+                   if isinstance(value, dict)}
+        receipts = (discovery_records or {}).get(_discovery_window_key(chunk), {})
         for lookup in lookups:
-            if lookup.query_id in (chunk.metadata or {}).get("retrieval_query_matches", {}):
-                continue
-            chunk = _tag_retrieval_query(
+            checked = _tag_retrieval_query(
                 [chunk], lookup.query_id, lookup.text, lookup,
                 expected_project_identity=expected_project_identity,
                 lifecycle_intent=lifecycle_intent,
             )[0]
-            trace = chunk.metadata["retrieval_query_matches"][lookup.query_id]
-            for field in ("bm25_cost", "field_matches", "mode"):
-                trace.pop(field, None)
-            trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
-                         query_term_count=len(trace.get("query_terms") or ()))
-            if lookup.origin == "original": trace["admission_only"] = True
-        result.append(chunk)
+            trace = dict(checked.metadata["retrieval_query_matches"][lookup.query_id])
+            receipt = receipts.get(lookup.query_id)
+            discovered = isinstance(receipt, dict) and receipt.get("query") == asdict(lookup)
+            if discovered:
+                trace["lexical_score"] = receipt["lexical_score"]
+            else:
+                for field in ("bm25_cost", "field_matches", "mode"):
+                    trace.pop(field, None)
+                trace.update(lexical_score=0.0, qualification_route="cross_lane_body",
+                             query_term_count=len(trace.get("query_terms") or ()))
+                if lookup.origin == "original":
+                    trace["admission_only"] = True
+            matches[lookup.query_id] = trace
+        metadata.update(retrieval_query_matches=matches,
+                        retrieval_query_ids=tuple(key for key, value in matches.items()
+                                                  if value.get("qualified") is True))
+        result.append(chunk.model_copy(update={"metadata": metadata}))
     return result
 class _ProjectDocsServicePart03:
     @_found_window_retention_producer
@@ -252,8 +270,13 @@ class _ProjectDocsServicePart03:
                 )
 
         _retrieve = _run
+        discovery_records: dict[str, dict[str, dict[str, Any]]] = {}
         def _run(text, **kwargs):
-            return reference_context.prepare(_retrieve(text, **kwargs), text)
+            prepared = reference_context.prepare(_retrieve(text, **kwargs), text)
+            for lookup in documentation_query_plan.queries:
+                if lookup.text == text and lookup.origin in {"original", "host_lookup"}:
+                    _record_query_discovery(discovery_records, prepared, lookup)
+            return prepared
 
         chunks = _run(
             query,
@@ -356,6 +379,7 @@ class _ProjectDocsServicePart03:
             candidates, documentation_query_plan,
             expected_project_identity=filters["project_identity"],
             lifecycle_intent=answer_lifecycle_intent,
+            discovery_records=discovery_records,
         )
         candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
         if internal_diagnostics is not None:

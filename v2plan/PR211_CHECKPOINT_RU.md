@@ -1,5 +1,42 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Подтверждённый результат 118e5d1; compact активирован
+
+[Main CI 37968005070](https://github.com/Vanilla1999/DocAtlas/actions/runs/37968005070)
+на `118e5d17af58679f3b109fb69e10586bc2423c72` завершился FAILURE.
+Core Python 3.13: **7886 = 5979 PASS / 1897 FAIL / 0 ERROR / 10 SKIP**.
+ZIP artifact `11634597182`, SHA256
+`57fa3fa659bc23a6c9bbc445d6be6c6d03fb43a4ca2fea8695bb790af0716163`.
+Остальные Python jobs также FAILURE; их JUnit здесь отдельно не пересчитаны.
+
+- `docs-contract` теперь SUCCESS. Core подтверждает tool-choice archive 9/9,
+  local membership 31/31, member transactions 109/109, active MCP examples 6/6,
+  module policy 4/4 и historical atlas 7/7. Исторические model reports не стали
+  evidence нового live model/client запуска.
+- Compact уже подтверждён ordinary core на `fdbdc58`: 33 span + 49 compiler PASS,
+  вместо 303 + 399. Всего на том SHA 7884 = 5960 PASS / 1914 FAIL / 0 ERROR /
+  10 SKIP. Artifact `11633843530`, SHA256
+  `5add6587bae801e9da165ecbcf5126d7a7f25f6ab884c1222d2d545df86a3f64`.
+- 81 cost-only assert в 44 файлах изменён отдельным reviewed slice; исходные
+  вопросы, facts, parameterization и guards сохранены по полному AST comparison.
+  Full DTO cost остаётся измерением; operational read/work limits сохранены.
+- ActionPacket 17 PASS / 14 FAIL. Пятнадцать мигрированных cases прошли; последний
+  positive получил finite source grant, но выявил дальнейшую потерю поздней
+  PermissionService declaration после ранних references. Это расследуемый product
+  defect, а не основание снять требование найти все mutation/preserve targets.
+- Continuation 22 PASS / 9 FAIL: после удаления output ceiling остаются следующие
+  контрактные/фактические проверки. У observer quantum-rejection control PASS,
+  no-candidate control FAIL на unclassified stage. V2 protocol 49 PASS / 1 FAIL;
+  unobserved не приравнивается к observed empty.
+- Static, installer, retrieval evidence, installed MCP harness и три platform
+  smoke jobs SUCCESS. Реальные client sessions по-прежнему NOT RUN.
+
+Следующий reviewed source-discovery slice сохраняет настоящий original hit при
+добавлении lookup через private same-call receipt и fresh canonical qualification.
+Он расширяет recovery до 11 programs / 14 intended mutants; прежние 10/12 outcomes
+не переносятся на него без нового CI. P1/quality и остальные 1897 failures остаются
+блокерами; PR ещё не готов к merge.
+
 ## Подтверждённый результат 2199002 и продолжение исполнения
 
 На `2199002b96253fdaa538515056969713876993a6`
