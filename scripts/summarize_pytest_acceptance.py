@@ -106,6 +106,31 @@ def main() -> int:
     # Each Python lane has its own counts. Never add matrix repetitions together.
     for lane in reports:
         emit("JUNIT_COUNTS", {key: value for key, value in lane.items() if key != "cases"})
+    tracked_modules = {
+        "tests/docs/test_action_packet.py",
+        "tests/docs/test_action_packet_part02.py",
+        "tests/docs/test_context_completion_followup.py",
+        "tests/docs/test_docs_context_read_next.py",
+        "tests/docs/test_source_map.py",
+        "tests/docs/test_project_retrieval_alias_contract.py",
+        "tests/docs/test_project_query_intent_contract.py",
+        "tests/test_mcp_delivery_member_transaction.py",
+    }
+    for lane in reports:
+        for module in sorted(tracked_modules):
+            selected = [row for row in lane["cases"] if row["module"] == module]
+            counts = Counter(row["outcome"] for row in selected)
+            emit("JUNIT_TRACKED", {
+                "artifact_file": lane["artifact_file"], "xml_sha256": lane["xml_sha256"],
+                "module": module, "collected": len(selected),
+                "counts": {key: counts[key] for key in ("PASS", "FAIL", "ERROR", "SKIP")},
+                "nodes": [{"node": row["node"], "outcome": row["outcome"]} for row in selected
+                          if module.endswith("_contract.py") or any(name in row["node"] for name in (
+                              "test_member_read_rejects_invalid_storage_without_repair",
+                              "test_real_service_retrieves_committed_fixture_member_bytes",
+                              "test_source_map_includes_generated_path_for_explicit_artifact_question",
+                          ))],
+            })
     preferred = next((lane for lane in reports if lane["artifact_file"].endswith("core-tests-3.13.xml")), reports[0])
     by_module = defaultdict(Counter)
     first_failure = {}
