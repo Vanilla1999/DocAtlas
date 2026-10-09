@@ -4,6 +4,8 @@ import hashlib
 
 import pytest
 
+from eval.task_level.literal_contract_reduction import unknown_tail_pairs
+
 from docmancer.docs.application.evidence_selection import build_requirements
 from docmancer.docs.domain.answer_units import AnswerUnit, local_proof_for_obligation
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
@@ -39,6 +41,28 @@ _ADVERSARIAL_TAILS = (
     "\nWhat is the Bitcoin price?",
 )
 
+_KNOWN_PREFIXES = (
+    "Which source types are supported for indexing",
+    "Which command syncs project docs after file changes",
+    "Which command starts the Docs MCP server",
+    "How do I run the offline test suite for DocAtlas",
+    "How do I run the project answer quality v4 protocol",
+    "How does the two-cell smoke procedure verify provider-call cardinality",
+    "Which docs files must stay under the 1000-line release limit",
+    "What is the storage mutation coordination contract for cleanup and refresh",
+    "What happens if remove_library_docs runs while a library refresh is in flight",
+    "What is the release checklist and what gates block release",
+    "What is the model-visible projection and how is the answer token-bounded",
+    "What does clear-index do when a live process holds the index",
+    "How do I configure a project in docmancer.yaml",
+    "How does evidence selection choose which candidates are selected",
+    "What is contamination protection in the eval protocols",
+    "What is the two-cell smoke procedure for local Task 33 benchmarks",
+    "What does the two-cell smoke procedure require",
+    "How do I sync project docs after changing a file",
+)
+_TAIL_PAIRS = unknown_tail_pairs(_KNOWN_PREFIXES, _ADVERSARIAL_TAILS)
+
 
 def _unit(text: str) -> AnswerUnit:
     return AnswerUnit(
@@ -55,9 +79,9 @@ def _unit(text: str) -> AnswerUnit:
 def _assert_literal_context_boundary(question: str) -> None:
     """Untyped text stays retrievable without supplying semantic authority."""
     plan = compile_question_plan(question)
-    assert plan.clauses == (question,)
-    assert plan.unresolved_parts == ("unresolved_question_semantics",)
-    assert not plan.facets
+    assert plan.clauses == (question,), "literal_original_question"
+    assert plan.unresolved_parts == ("unresolved_question_semantics",), "literal_unresolved_semantics"
+    assert not plan.facets, "literal_no_inferred_facets"
     assert not plan.consumed_spans
     assert plan.component_scope_complete is False
 
@@ -77,7 +101,7 @@ def _assert_literal_context_boundary(question: str) -> None:
     assert not contract.retrieval_hints
     assert not contract.concept_queries
     assert contract.component_scope_complete is False
-    assert can_authorize_docs_answer(contract) is False
+    assert can_authorize_docs_answer(contract) is False, "literal_no_answer_authority"
 
 
 def test_governance_question_models_scope_and_every_including_facet() -> None:
@@ -119,30 +143,7 @@ def test_governance_question_rejects_nested_request_tail() -> None:
     assert plan.unresolved_parts
 
 
-@pytest.mark.parametrize(
-    "prefix",
-    (
-        "Which source types are supported for indexing",
-        "Which command syncs project docs after file changes",
-        "Which command starts the Docs MCP server",
-        "How do I run the offline test suite for DocAtlas",
-        "How do I run the project answer quality v4 protocol",
-        "How does the two-cell smoke procedure verify provider-call cardinality",
-        "Which docs files must stay under the 1000-line release limit",
-        "What is the storage mutation coordination contract for cleanup and refresh",
-        "What happens if remove_library_docs runs while a library refresh is in flight",
-        "What is the release checklist and what gates block release",
-        "What is the model-visible projection and how is the answer token-bounded",
-        "What does clear-index do when a live process holds the index",
-        "How do I configure a project in docmancer.yaml",
-        "How does evidence selection choose which candidates are selected",
-        "What is contamination protection in the eval protocols",
-        "What is the two-cell smoke procedure for local Task 33 benchmarks",
-        "What does the two-cell smoke procedure require",
-        "How do I sync project docs after changing a file",
-    ),
-)
-@pytest.mark.parametrize("tail", _ADVERSARIAL_TAILS)
+@pytest.mark.parametrize("prefix,tail", _TAIL_PAIRS, ids=[f"{tail}-{prefix}" for prefix, tail in _TAIL_PAIRS])
 def test_known_frame_never_authorizes_an_unknown_tail(prefix: str, tail: str) -> None:
     question = prefix + tail
     plan = compile_question_plan(question)
@@ -152,21 +153,21 @@ def test_known_frame_never_authorizes_an_unknown_tail(prefix: str, tail: str) ->
     _assert_literal_context_boundary(question)
 
     contract = build_project_answer_contract(question)
-    assert contract.question_hash != build_project_answer_contract(prefix).question_hash
+    assert contract.question_hash != build_project_answer_contract(prefix).question_hash, "literal_unknown_tail_identity"
 
     # A real, explicit host lookup may retrieve the prefix. It cannot replace
     # the original request or claim coverage of its unknown tail.
     queries = build_documentation_query_plan(question, lookup_queries=(prefix,))
     assert queries.original_question == question
-    assert [row.text for row in queries.queries] == [question, prefix]
+    assert [row.text for row in queries.queries] == [question, prefix], "literal_explicit_lookup_text"
     original, lookup = queries.queries
     assert (original.query_id, original.origin, original.coverage_required) == (
         "query-original", "original", True,
-    )
+    ), "literal_original_coverage_preserved"
     assert (lookup.origin, lookup.relation, lookup.coverage_required) == (
         "host_lookup", "host_lookup", False,
-    )
-    assert all(row.public_parent_query_id is None for row in queries.queries)
+    ), "literal_lookup_no_coverage_credit"
+    assert all(row.public_parent_query_id is None for row in queries.queries), "literal_lookup_no_parent_credit"
     assert not queries.component_contract
     assert queries.component_scope_complete is False
 
@@ -238,7 +239,7 @@ def test_clause_scanner_preserves_original_offsets_and_noun_coordination() -> No
     assert tuple(question[row.start:row.end] for row in clauses) == tuple(
         row.text for row in clauses
     )
-    assert [row.text for row in clauses] == [question]
+    assert [row.text for row in clauses] == [question], "literal_paragraphs_only"
 
     # Blank paragraphs are structural boundaries. Sentence punctuation and
     # noun coordination alone do not establish independent semantic requests.

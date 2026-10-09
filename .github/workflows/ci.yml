@@ -275,6 +275,10 @@ jobs:
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
         run: python scripts/run_critical_mutation_gate.py
 
+      - name: Compare historical and compact literal contract tests
+        if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
+        run: PYTHONPATH=. python scripts/run_critical_mutation_gate.py --compare-literal-contracts --output-dir "$RUNNER_TEMP/literal-contract-comparison"
+
       - name: Run Agent Developer adversarial mutation gate
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' && steps.agent_adversarial.outcome == 'success' }}
         run: python scripts/run_agent_developer_adversarial_mutation_gate.py
@@ -288,6 +292,7 @@ jobs:
             ${{ runner.temp }}/docmancer-mutation-*
             ${{ runner.temp }}/docatlas-agent-v2-mutant-*
             ${{ runner.temp }}/docatlas-recovery-evidence-*
+            ${{ runner.temp }}/literal-contract-comparison
             ${{ runner.temp }}/recovery-contract.json
             ${{ runner.temp }}/agent-developer-v1.json
             ${{ runner.temp }}/agent-developer-v2.json

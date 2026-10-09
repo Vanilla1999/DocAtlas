@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
+import ast
 import hashlib
 import json
 import os
@@ -8,8 +10,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -47,6 +50,7 @@ class Mutant:
     killer: str
     expected_failures: int = 1
     failure_guard: str | None = None
+    compact_expected_failures: int | None = None
 
 
 MUTANTS = (
@@ -128,25 +132,30 @@ def _copy_source(destination: Path) -> None:
         shutil.copy2(ROOT / filename, destination / filename)
 
 
-def _environment(copy_root: Path) -> dict[str, str]:
+def _environment(copy_root: Path, extra: dict[str, str] | None = None) -> dict[str, str]:
     env = os.environ.copy()
     existing = env.get("PYTHONPATH")
     env["PYTHONPATH"] = str(copy_root) + (os.pathsep + existing if existing else "")
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     env["DOCATLAS_OFFLINE"] = "1"
     env.pop("PYTEST_ADDOPTS", None)
+    env.update(extra or {})
     return env
 
 
-def _run(copy_root: Path, args: list[str], name: str) -> subprocess.CompletedProcess[str]:
+def _run(
+    copy_root: Path, args: list[str], name: str,
+    *, extra_env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
         [sys.executable, *args],
         cwd=copy_root,
-        env=_environment(copy_root),
+        env=_environment(copy_root, extra_env),
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
+        timeout=600,
     )
     (copy_root / f"{name}.stdout.log").write_text(completed.stdout, encoding="utf-8")
     (copy_root / f"{name}.stderr.log").write_text(completed.stderr, encoding="utf-8")
@@ -181,6 +190,7 @@ def _apply_mutant(copy_root: Path, mutant: Mutant) -> dict[str, object]:
         )
     before = hashlib.sha256(source.encode()).hexdigest()
     mutated = source.replace(mutant.old, mutant.new, 1)
+    ast.parse(mutated, filename=str(path))
     after = hashlib.sha256(mutated.encode()).hexdigest()
     if before == after:
         raise RuntimeError(f"{mutant.name}: mutation did not change source hash")
@@ -221,6 +231,7 @@ def _junit_report(path: Path) -> dict[str, Any]:
             "classname": case.get("classname", ""), "name": case.get("name", ""),
             "outcome": outcomes[0].tag if outcomes else "passed",
             "message": outcomes[0].get("message", "") if outcomes else "",
+            "seconds": float(case.get("time", "0")),
         })
     observed = {
         "tests": len(cases),
@@ -234,6 +245,7 @@ def _junit_report(path: Path) -> dict[str, Any]:
         raise RuntimeError("JUnit contains duplicate or empty testcase identities")
     return {
         **counts, "cases": cases,
+        "testcase_seconds": sum(case["seconds"] for case in cases),
         "roster_sha256": hashlib.sha256(json.dumps(roster, ensure_ascii=False).encode()).hexdigest(),
     }
 
@@ -280,7 +292,7 @@ def _save_evidence(
 ) -> None:
     destination = evidence_root / name
     destination.mkdir()
-    for pattern in ("*.junit.xml", "*.stdout.log", "*.stderr.log"):
+    for pattern in ("*.junit.xml", "*.stdout.log", "*.stderr.log", "*.imports.json"):
         for path in copy_root.glob(pattern):
             shutil.copy2(path, destination / path.name)
     evidence = {"run": name, "validated": True, "returncode": returncode,
@@ -294,7 +306,197 @@ def _save_evidence(
     ))
 
 
+_LITERAL_PLUGIN = "eval.task_level.literal_contract_reduction"
+_LITERAL_HELPER = "eval/task_level/literal_contract_reduction.py"
+_LITERAL_MANIFEST = "eval/task_level/literal_contract_mutations.json"
+
+
+def _literal_protocol() -> tuple[dict[str, Any], tuple[Mutant, ...]]:
+    protocol = json.loads((ROOT / _LITERAL_MANIFEST).read_text(encoding="utf-8"))
+    if (protocol.get("schema_version") != 1
+            or protocol.get("protocol") != "literal-contract-reduction-comparison-v1"
+            or protocol.get("case_counts") != {"historical": [303, 399], "compact": [33, 49]}):
+        raise RuntimeError("unreviewed literal comparison protocol or case counts")
+    mutants = tuple(Mutant(**row["mutation"]) for row in protocol["mutations"])
+    if not mutants or len({m.name for m in mutants}) != len(mutants):
+        raise RuntimeError("literal comparison requires unique nonempty mutants")
+    for mutant in mutants:
+        if (not mutant.path.startswith("docmancer/docs/domain/") or ".." in Path(mutant.path).parts
+                or mutant.killer.split("::", 1)[0] not in protocol["test_files"]
+                or not mutant.failure_guard or not mutant.old or mutant.old == mutant.new
+                or type(mutant.expected_failures) is not int or mutant.expected_failures < 1
+                or type(mutant.compact_expected_failures) is not int or mutant.compact_expected_failures < 1):
+            raise RuntimeError(f"invalid production comparison mutation: {mutant.name}")
+    return protocol, mutants
+
+
+def _literal_input_hashes(root: Path) -> dict[str, str]:
+    # Freeze the tests, historical inputs, production source and collection
+    # configuration. Only the one reviewed production mutation may differ.
+    paths = [root / name for name in ("pyproject.toml", "pytest.ini", _LITERAL_HELPER, _LITERAL_MANIFEST)]
+    for directory in ("docmancer", "tests"):
+        paths.extend(path for path in (root / directory).rglob("*")
+                     if path.is_file() and not any(part in {"__pycache__", ".pytest_cache"} for part in path.parts)
+                     and path.suffix not in {".pyc", ".pyo"})
+    return {path.relative_to(root).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(paths)}
+
+
+def _verify_literal_inputs(
+    root: Path, expected: dict[str, str], mutation: dict[str, object] | None,
+) -> None:
+    wanted = dict(expected)
+    if mutation:
+        wanted[str(mutation["path"])] = str(mutation["after_sha256"])
+    actual = _literal_input_hashes(root)
+    if actual != wanted:
+        changed = sorted(key for key in set(actual) | set(wanted) if actual.get(key) != wanted.get(key))
+        raise RuntimeError(f"comparison inputs changed outside the reviewed mutation: {changed}")
+
+
+def _literal_child(
+    root: Path, *, mode: str, selections: tuple[str, ...], name: str,
+    inputs: dict[str, str], mutation: dict[str, object] | None = None,
+) -> tuple[dict[str, Any], int]:
+    _verify_literal_inputs(root, inputs, mutation)
+    imports = sorted({_LITERAL_HELPER, *(selection.split("::", 1)[0] for selection in selections),
+                      *([str(mutation["path"])] if mutation else [])})
+    import_report = root / f"{name}.imports.json"
+    junit_path = root / f"{name}.junit.xml"
+    started = time.monotonic()
+    completed = _run(root, ["-m", "pytest", "-p", _LITERAL_PLUGIN, *selections, "-q", f"--junitxml={junit_path}"], name,
+                     extra_env={"DOCATLAS_LITERAL_CONTRACT_MODE": mode, "PYTHONPATH": str(root),
+                                "DOCATLAS_LITERAL_IMPORT_REPORT": str(import_report),
+                                "DOCATLAS_LITERAL_IMPORT_PATHS": json.dumps(imports)})
+    elapsed = time.monotonic() - started
+    # A collection/setup/import failure is never an assertion kill, even if it
+    # happens to leave an old-looking artifact on disk.
+    if completed.returncode not in (0, 1):
+        raise RuntimeError(f"{name}: invalid child exit {completed.returncode}; no mutation credit")
+    _verify_literal_inputs(root, inputs, mutation)
+    identity = json.loads(import_report.read_text(encoding="utf-8"))
+    if (identity.get("schema_version") != 1 or identity.get("mode") != mode
+            or identity.get("exitstatus") != completed.returncode
+            or set(identity.get("source_identity") or {}) != set(imports)):
+        raise RuntimeError(f"{name}: missing or inconsistent same-process import evidence")
+    for relative, row in identity["source_identity"].items():
+        expected = root / relative
+        if (row.get("expected_path") != str(expected.resolve())
+                or row.get("imported_from_checkout") is not True or not row.get("imported_as")
+                or row.get("sha256") != hashlib.sha256(expected.read_bytes()).hexdigest()):
+            raise RuntimeError(f"{name}: pytest did not import the reviewed source: {relative}")
+    report = _junit_report(junit_path)
+    if completed.returncode != (1 if report["failures"] or report["errors"] else 0):
+        raise RuntimeError(f"{name}: child exit contradicts JUnit outcomes")
+    report.update(wall_seconds=elapsed, case_mode=mode, source_identity=identity["source_identity"],
+                  input_roster_sha256=hashlib.sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest())
+    return report, completed.returncode
+
+
+def _literal_baseline(report: dict[str, Any], mode: str, protocol: dict[str, Any]) -> None:
+    classes = [name.removesuffix(".py").replace("/", ".") for name in protocol["test_files"]]
+    counts = [sum(row["classname"] == name for row in report["cases"]) for name in classes]
+    if (counts != protocol["case_counts"][mode] or report["tests"] != sum(counts)
+            or any(report[key] for key in ("failures", "errors", "skipped"))):
+        raise RuntimeError(f"{mode}: complete green literal baseline required; got {counts}")
+    if mode == "historical" and report["roster_sha256"] != protocol["historical_baseline"]["roster_sha256"]:
+        raise RuntimeError("historical questions, parameter identities or roster changed since the green baseline")
+
+
+def _literal_evaluator_controls() -> tuple[str, ...]:
+    """Known valid assertion plus invalid reports, without executing a mutant."""
+    target = "tests/test_literal_control.py::test_expected"
+    mutant = Mutant("control", "unused", "old", "new", target, 1, "literal_control")
+    case = {"classname": "tests.test_literal_control", "name": "test_expected", "outcome": "passed", "message": ""}
+    baseline = {"cases": [case]}
+    valid = {"cases": [{**case, "outcome": "failure", "message": "AssertionError: literal_control"}],
+             "failures": 1, "errors": 0, "skipped": 0}
+    _validate_kill(valid, baseline, mutant)
+    controls = ["expected_assertion_accepted"]
+    invalid = {
+        "missing_roster_rejected": {**valid, "cases": []},
+        "skipped_case_rejected": {**valid, "skipped": 1},
+        "setup_error_rejected": {**valid, "errors": 1},
+        "wrong_assertion_rejected": {**valid, "cases": [{**case, "outcome": "failure", "message": "AssertionError: unrelated"}]},
+        "runtime_exception_rejected": {**valid, "cases": [{**case, "outcome": "failure", "message": "KeyError: missing"}]},
+        "survivor_rejected": {**valid, "failures": 0, "cases": [case]},
+    }
+    for name, report in invalid.items():
+        try:
+            _validate_kill(report, baseline, mutant)
+        except RuntimeError:
+            controls.append(name)
+        else:
+            raise RuntimeError(f"comparison evaluator accepted invalid evidence: {name}")
+    return tuple(controls)
+
+
+def _compare_literal_contracts(output: Path | None) -> int:
+    evidence_root = output or Path(tempfile.mkdtemp(prefix="docatlas-literal-comparison-", dir=Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir()))))
+    evidence_root.mkdir(parents=True, exist_ok=True)
+    retained = []
+    summary: dict[str, Any] = {"schema_version": 1, "protocol": "literal-contract-reduction-comparison-v1", "passed": False}
+    try:
+        protocol, mutants = _literal_protocol()
+        inputs = _literal_input_hashes(ROOT)
+        summary.update(historical_baseline=protocol["historical_baseline"], evaluator_controls=_literal_evaluator_controls())
+        baselines = {}
+        for mode in ("historical", "compact"):
+            root = _new_copy()
+            retained.append(root)
+            name = f"baseline-{mode}"
+            report, code = _literal_child(root, mode=mode, selections=tuple(protocol["test_files"]), name=name, inputs=inputs)
+            _literal_baseline(report, mode, protocol)
+            if code != 0:
+                raise RuntimeError(f"{name}: baseline must be green")
+            baselines[mode] = report
+            _save_evidence(root, evidence_root, name, report, code)
+            shutil.rmtree(root)
+            retained.remove(root)
+        historical_ids = {(row["classname"], row["name"]) for row in baselines["historical"]["cases"]}
+        compact_ids = {(row["classname"], row["name"]) for row in baselines["compact"]["cases"]}
+        if not compact_ids <= historical_ids:
+            raise RuntimeError("compact case selection invented or changed historical input identities")
+        summary["baselines"] = {mode: {key: value for key, value in report.items() if key not in {"cases", "source_identity"}}
+                                for mode, report in baselines.items()}
+        kills = []
+        for mutant in mutants:
+            comparisons = {}
+            for mode in ("historical", "compact"):
+                root = _new_copy()
+                retained.append(root)
+                mutation = _apply_mutant(root, mutant)
+                name = f"{mutant.name}-{mode}"
+                report, code = _literal_child(root, mode=mode, selections=(mutant.killer,), name=name, inputs=inputs, mutation=mutation)
+                if code != 1:
+                    raise RuntimeError(f"{name}: production mutant survived")
+                expected = mutant if mode == "historical" else replace(mutant, expected_failures=mutant.compact_expected_failures)
+                _validate_kill(report, baselines[mode], expected)
+                _save_evidence(root, evidence_root, name, report, code, mutation)
+                comparisons[mode] = {key: report[key] for key in ("tests", "failures", "roster_sha256", "wall_seconds", "testcase_seconds")}
+                shutil.rmtree(root)
+                retained.remove(root)
+            kills.append({"name": mutant.name, "guard": mutant.failure_guard, "modes": comparisons})
+            print(f"COMPARE KILLED: {mutant.name}; both case selections hit {mutant.failure_guard}")
+        summary.update(passed=True, mutations=kills, activated_compact_default=False,
+                       activation="Separate reviewed default change only after this exact-SHA comparison is green.")
+    except Exception as exc:
+        summary.update(error=str(exc), retained_workspaces=[str(path) for path in retained])
+        print(f"LITERAL COMPARISON ERROR: {exc}; retained={retained}", file=sys.stderr)
+    (evidence_root / "comparison.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"Literal comparison {'PASS' if summary['passed'] else 'FAIL'}; evidence={evidence_root}")
+    return 0 if summary["passed"] else 1
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Critical mutations or a staged literal-contract case comparison")
+    parser.add_argument("--compare-literal-contracts", action="store_true")
+    parser.add_argument("--output-dir", type=Path)
+    args = parser.parse_args()
+    if args.compare_literal_contracts:
+        return _compare_literal_contracts(args.output_dir.resolve() if args.output_dir else None)
+    if args.output_dir:
+        parser.error("--output-dir is available with --compare-literal-contracts")
     retained: list[Path] = []
     temp_base = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir()))
     evidence_root = Path(tempfile.mkdtemp(prefix="docmancer-mutation-evidence-", dir=temp_base))
