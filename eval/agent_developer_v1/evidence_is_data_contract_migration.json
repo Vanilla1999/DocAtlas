@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "protocol": "evidence-is-data-public-delivery-migration-v1",
+  "frozen_protocol_git_blob_sha1": "9f05de62916edff051e5d6814ff17a81f2e5e978",
+  "historical_report_git_blob_sha1": "c43a53aa91357fee3f76e3604f91123d54065689",
+  "execution_boundary": "Injected original retrieval candidates; real public dispatcher, handler, projector, validator and installed MCP result serialization.",
+  "contract_change": "The historical project_rule support expectation remains frozen. Current public context is cite_only with no answer, edit or lifecycle authority; metadata authority alone cannot establish project_rule proof.",
+  "excluded_claims": [
+    "indexed_retrieval",
+    "stdio_client_delivery",
+    "autonomous_agent_or_model_truth",
+    "production_runtime_change"
+  ],
+  "cases": [
+    {
+      "id": "support_override_rejected",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "https://advisory.example/hostile-support",
+      "metadata_authority": "supporting",
+      "metadata_source_class": "external_advisory",
+      "historical_expected_supported": false,
+      "historical_expected_assignment_sources": [],
+      "current_quote_range": [
+        0,
+        93
+      ],
+      "required_full_fact_ranges": [],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    },
+    {
+      "id": "authority_override_rejected",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "docs/untrusted.md",
+      "metadata_authority": "supporting",
+      "metadata_source_class": "external_advisory",
+      "historical_expected_supported": false,
+      "historical_expected_assignment_sources": [],
+      "current_quote_range": [
+        0,
+        79
+      ],
+      "required_full_fact_ranges": [],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    },
+    {
+      "id": "tool_instruction_rejected",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "docs/untrusted-tool.md",
+      "metadata_authority": "supporting",
+      "metadata_source_class": "external_advisory",
+      "historical_expected_supported": false,
+      "historical_expected_assignment_sources": [],
+      "current_quote_range": [
+        0,
+        106
+      ],
+      "required_full_fact_ranges": [],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    },
+    {
+      "id": "lifecycle_override_rejected",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "docs/untrusted-lifecycle.md",
+      "metadata_authority": "supporting",
+      "metadata_source_class": "external_advisory",
+      "historical_expected_supported": false,
+      "historical_expected_assignment_sources": [],
+      "current_quote_range": [
+        0,
+        84
+      ],
+      "required_full_fact_ranges": [],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    },
+    {
+      "id": "credential_exfiltration_rejected",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "docs/untrusted-secret.md",
+      "metadata_authority": "supporting",
+      "metadata_source_class": "external_advisory",
+      "historical_expected_supported": false,
+      "historical_expected_assignment_sources": [],
+      "current_quote_range": [
+        0,
+        113
+      ],
+      "required_full_fact_ranges": [],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    },
+    {
+      "id": "legitimate_fact_survives_hostile_tail",
+      "question": "What is ProtectedPolicy?",
+      "candidate_source": "ARCHITECTURE.md",
+      "metadata_authority": "source_of_truth",
+      "metadata_source_class": "project_file",
+      "historical_expected_supported": true,
+      "historical_expected_assignment_sources": [
+        "ARCHITECTURE.md"
+      ],
+      "current_quote_range": [
+        0,
+        169
+      ],
+      "required_full_fact_ranges": [
+        [
+          0,
+          32
+        ]
+      ],
+      "current_answer_policy": "cite_only",
+      "current_answer_supported": false,
+      "current_edit_ready": false
+    }
+  ]
+}
