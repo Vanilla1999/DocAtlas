@@ -63,6 +63,8 @@ def _observed_result(result) -> dict:
     } for chunk in (getattr(result, "results", None) or ())]
     diagnostics = getattr(result, "diagnostics", None) or {}
     data["diagnostic_fields"] = sorted(diagnostics)
+    data["project_pipeline"] = _observed_fields(diagnostics.get("same_call_pipeline"),
+                                                 ("planned_query_ids", "retrieved_candidates", "qualification_outcomes"))
     data["library_retrieval"] = _observed_fields(diagnostics.get("retrieval"),
                                                 ("requested", "used", "post_guard"))
     data["library_index_witness"] = _observed_fields((diagnostics.get("retrieval") or {}).get("index_witness"),
@@ -121,11 +123,12 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
             external = prepare_external_sources(actual, project, targets, workspace)
             before = index_state(actual, project, documents, external)
             calls, validations = [], []
-            unified_returns, library_returns, resolution_returns = [], [], []
+            unified_returns, library_returns, resolution_returns, project_returns = [], [], [], []
             app = actual.unified_context
             retrieve = app.get_docs_context
             resolve = actual.resolve_library
             read_library = actual.get_docs
+            read_project = actual.get_project_context
             validate = context_tools.validate_model_visible_projection
 
             @wraps(retrieve)
@@ -160,6 +163,20 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
                 library_returns.append(_observed_result(result))
                 return result
 
+            @wraps(read_project)
+            def observe_project(*args, **kwargs):
+                result = read_project(*args, **kwargs)
+                captured = _observed_result(result)
+                captured["request"] = {
+                    "project_path": args[0] if args else kwargs.get("project_path"),
+                    "question": args[1] if len(args) > 1 else kwargs.get("question"),
+                    **_observed_fields(kwargs, ("mode", "scope", "module", "module_path", "library",
+                                               "libraries", "ecosystem", "version", "allow_network",
+                                               "lookup_queries")),
+                }
+                project_returns.append(captured)
+                return result
+
             def observe_validation(payload, **kwargs):
                 validations.append(True)
                 return validate(payload, **kwargs)
@@ -169,6 +186,7 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
                 patch.object(app, "get_docs_context", observe),
                 patch.object(actual, "resolve_library", observe_resolution),
                 patch.object(actual, "get_docs", observe_library),
+                patch.object(actual, "get_project_context", observe_project),
                 patch.object(context_tools, "validate_model_visible_projection", observe_validation),
             ):
                 payload, snapshot = _call_with_snapshot(arguments, actual)
@@ -192,7 +210,7 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
         "request": expected_request(case, identity), "service_requests": calls,
         "observer_counts": {"retrieval_calls": len(calls), "validation_calls": len(validations)},
         "service_returns": {"unified": unified_returns, "library": library_returns,
-                            "resolution": resolution_returns},
+                            "resolution": resolution_returns, "project": project_returns},
         "preparation": {
             "project": {key: project_preparation[key] for key in (
                 "expected_paths", "indexed_paths", "excluded_or_failed_paths", "unexpected_paths")},
