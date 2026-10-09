@@ -6,7 +6,31 @@ from docmancer.docs.domain.patch_request_plan import (
     build_patch_request_plan, PatchRequestPlan, PatchTarget,
 )
 from docmancer.docs.domain.mutation_intent import MutationIntentContract, RequestedTarget
+from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+from copy import deepcopy
 
+
+
+def _current_packet_source(item):
+    """Give the unchanged authored text its current whole-window coordinates."""
+    text = item["display_text"]
+    return {**item, "path": item["source"], "content": text,
+            "source_class": item.get("source_class", "project_doc"),
+            "char_start": 0, "char_end": len(text),
+            "line_start": 1, "line_end": 1 + text.count("\n")}
+
+
+def _assert_replacement_of_bound_source_is_rejected(packet, evidence, replacement):
+    changed = deepcopy(packet)
+    row = changed["sources"][0]
+    row["text"] = replacement
+    row["content_sha256"] = hashlib.sha256(replacement.encode()).hexdigest()
+    row["char_end"] = row["char_start"] + len(replacement)
+    row["line_end"] = row["line_start"] + replacement.count("\n")
+    refresh_action_packet_estimate(changed)
+    assert "source differs from bound retrieval window" in validate_action_packet(
+        changed, evidence_items=evidence,
+    )
 
 
 PERMISSION_PATCH_QUERY = (
@@ -230,42 +254,38 @@ def test_documentation_governance_meta_question_is_not_mutation_intent():
 
 def test_post_format_sufficiency_fails_closed_when_public_fact_is_not_rendered():
     text = "OpaqueContractValue-739 is the selected contract value."
-    packet = build_action_packet(
-        question="Apply the change",
-        context_pack=[{
-            "stable_chunk_id": "fact",
-            "parent_logical_id": "parent:fact",
-            "source": "docs/fact.md",
-            "display_text": text,
-            "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-            "authority": "official",
-        }],
-        public_requirements=[text],
-        max_tokens=1500,
+    item = _current_packet_source({
+        "stable_chunk_id": "fact", "parent_logical_id": "parent:fact",
+        "source": "docs/fact.md", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+    })
+    packet = build_action_packet(question="Apply the change", context_pack=[item],
+                                 public_requirements=[text])
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
+    assert validate_action_packet(packet, evidence_items=[item]) == []
+    _assert_replacement_of_bound_source_is_rejected(
+        packet, [item], "The selected contract value is omitted.",
     )
-
-    assert packet["status"] == "insufficient_evidence"
-    assert packet["omitted_counts"]["mandatory_requirements"] >= 1
 
 
 def test_post_format_sufficiency_fails_closed_when_exact_symbol_is_dropped():
     text = "Change RareExactSymbol without altering public behavior."
-    packet = build_action_packet(
-        question="Apply the change",
-        context_pack=[{
-            "stable_chunk_id": "symbol",
-            "parent_logical_id": "parent:symbol",
-            "source": "src/example.py",
-            "display_text": text,
-            "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-            "authority": "official",
-        }],
-        public_requirements=["RareExactSymbol"],
-        max_tokens=1500,
+    item = _current_packet_source({
+        "stable_chunk_id": "symbol", "parent_logical_id": "parent:symbol",
+        "source": "src/example.py", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "authority": "official",
+    })
+    packet = build_action_packet(question="Apply the change", context_pack=[item],
+                                 public_requirements=["RareExactSymbol"])
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
+    assert validate_action_packet(packet, evidence_items=[item]) == []
+    _assert_replacement_of_bound_source_is_rejected(
+        packet, [item], text.replace("RareExactSymbol", "DifferentSymbol"),
     )
-
-    assert packet["status"] == "insufficient_evidence"
-    assert packet["omitted_counts"]["mandatory_requirements"] == 1
 
 
 def test_selected_document_terms_survive_action_packet_formatting():
@@ -492,35 +512,32 @@ def test_post_format_sufficiency_accepts_camel_case_symbol_in_snake_case_source_
 
 def test_validator_rejects_truncated_packets_with_unclosed_required_evidence():
     text = "Required: preserve the source-backed permission contract."
-    item = {
-        "stable_chunk_id": "required-contract",
-        "parent_logical_id": "parent:required-contract",
-        "source": "docs/contract.md",
-        "display_text": text,
+    item = _current_packet_source({
+        "stable_chunk_id": "required-contract", "parent_logical_id": "parent:required-contract",
+        "source": "docs/contract.md", "display_text": text,
         "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "authority": "official",
-    }
-    packet = build_action_packet(
-        question="Apply the permission contract",
-        context_pack=[item],
-        max_tokens=1500,
+    })
+    packet = build_action_packet(question="Apply the permission contract", context_pack=[item],
+                                 public_requirements=[text])
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
+    assert packet["assignments"] and validate_action_packet(packet, evidence_items=[item]) == []
+
+    # A lost mandatory witness cannot keep the complete verdict. Recompute the
+    # estimate so a stale size field cannot substitute for the fidelity guard.
+    changed = deepcopy(packet)
+    changed.pop("assignments")
+    refresh_action_packet_estimate(changed)
+    assert "complete data is missing mandatory assignments" in validate_action_packet(
+        changed, evidence_items=[item],
     )
-    assert packet["status"] == "ok"
-
-    packet["status"] = "truncated"
-    packet["missing_evidence"] = ["Required evidence was not preserved."]
-    packet["omitted_counts"] = {"implementation_guidance": 1}
-    for _ in range(3):
-        packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
-    errors = validate_action_packet(packet, evidence_items=[item], max_tokens=1500)
-    assert "missing evidence requires insufficient_evidence status" in errors
-
-    packet["missing_evidence"] = []
-    packet["omitted_counts"] = {"mandatory_requirements": 1}
-    for _ in range(3):
-        packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
-    errors = validate_action_packet(packet, evidence_items=[item], max_tokens=1500)
-    assert "critical omissions require insufficient_evidence status" in errors
+    changed["completeness"] = "partial"
+    changed["missing"] = sorted(row["requirement_id"] for row in packet["requirements"] if row["mandatory"])
+    refresh_action_packet_estimate(changed)
+    assert changed["missing"] and changed["sources"][0]["text"] == text
+    assert changed["edit_ready"] is False
+    assert validate_action_packet(changed, evidence_items=[item]) == []
 
 
 def test_display_only_canonical_child_is_rendered_and_hash_bound():
