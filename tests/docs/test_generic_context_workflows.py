@@ -2,7 +2,7 @@
 import pytest
 from pprint import pformat
 
-from tests.docs.test_question_frame_paraphrase_e2e import _service
+from eval.evidence_quality_v2.runtime import index_project, isolated_service
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.docs.interfaces.mcp import context_tools
 
@@ -34,22 +34,26 @@ def test_generic_workflow_facts_survive_real_index(tmp_path, monkeypatch, topic,
             "    description: Lumen local workflow.\n    authority: source_of_truth\n"
             "    status: active\n    impact: track\n"
             for path in ("README.md", f"{topic}.md")))
-    service = _service(tmp_path, monkeypatch)
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
-    observed = {}
-    project_context = context_tools.project_docs_context
-    def capture(**kwargs):
-        observed["candidates"] = [(row.get("path"), row.get("content"), row.get("retrieval_query_matches"))
-                                  for row in kwargs["retrieval"].get("context_pack", [])]
-        return project_context(**kwargs)
-    monkeypatch.setattr(context_tools, "project_docs_context", capture)
-    payload = call_docs_tool_payload("get_docs_context", {
-        "question": question, "lookup_queries": lookups, "project_path": str(project), "scope": "project",
-    }, service)
-    visible = "\n".join(source["snippet"] for source in payload.get("sources", [])
-                        if source["path_or_url"] == f"{topic}.md")
-    assert all(fact in visible for fact in facts), pformat({"missing": [fact for fact in facts if fact not in visible], "payload": payload, "observed": observed})
-    assert payload["answer_supported"] is False and payload["edit_ready"] is False
+    with isolated_service(tmp_path / "state") as (service, config):
+        preparation = index_project(service, config, project)
+        assert preparation["expected_paths"] == sorted(("README.md", f"{topic}.md"))
+        assert preparation["indexed_paths"] == preparation["expected_paths"]
+        assert preparation["excluded_or_failed_paths"] == []
+        assert preparation["unexpected_paths"] == []
+        observed = {}
+        project_context = context_tools.project_docs_context
+        def capture(**kwargs):
+            observed["candidates"] = [(row.get("path"), row.get("content"), row.get("retrieval_query_matches"))
+                                      for row in kwargs["retrieval"].get("context_pack", [])]
+            return project_context(**kwargs)
+        monkeypatch.setattr(context_tools, "project_docs_context", capture)
+        payload = call_docs_tool_payload("get_docs_context", {
+            "question": question, "lookup_queries": lookups, "project_path": str(project), "scope": "project",
+        }, service)
+        visible = "\n".join(source["snippet"] for source in payload.get("sources", [])
+                            if source["path_or_url"] == f"{topic}.md")
+        assert all(fact in visible for fact in facts), pformat({"missing": [fact for fact in facts if fact not in visible], "payload": payload, "observed": observed})
+        assert payload["answer_supported"] is False and payload["edit_ready"] is False
 
 
 def test_stale_health_live_status_sync_and_removal(monkeypatch):

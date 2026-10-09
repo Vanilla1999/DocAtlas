@@ -6,6 +6,7 @@ from docmancer.docs.application.docs_job_service import DocsJobTracker
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
+from eval.evidence_quality_v2.runtime import index_project, isolated_service
 
 
 def _service(tmp_path, monkeypatch) -> LibraryDocsService:
@@ -75,111 +76,115 @@ def test_reusable_question_frames_survive_real_manifest_sync_and_public_mcp(tmp_
         ))
     (project / "docatlas.project-docs.yaml").write_text("\n".join(manifest) + "\n", encoding="utf-8")
 
-    service = _service(tmp_path, monkeypatch)
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
+    with isolated_service(tmp_path / "state") as (service, config):
+        preparation = index_project(service, config, project)
+        assert preparation["expected_paths"] == sorted(path for path, _ in entries)
+        assert preparation["indexed_paths"] == preparation["expected_paths"]
+        assert preparation["excluded_or_failed_paths"] == []
+        assert preparation["unexpected_paths"] == []
 
-    cases = (
-        ("What source types are supported for indexing?", "GitBook sites"),
-        ("Which source types are supported for indexing?", "GitBook sites"),
-        ("Какие типы источников поддерживаются для индексации?", "GitBook sites"),
-        ("Which file formats are supported for indexing?", ".docx"),
-        ("Which document formats are supported for indexing?", ".rtf"),
-        ("What test markers are available?", "live_network"),
-        ("Which pytest markers are available?", "live_network"),
-        ("What does the two-cell smoke procedure require?", "exactly two cells"),
-        ("What is required by the two-cell smoke procedure?", "exactly two cells"),
-        ("How do I sync project docs after changing a file?", "sync_project_docs"),
-        ("Как синхронизировать документацию проекта после изменения файла?", "sync_project_docs"),
-    )
-    for question, expected in cases:
-        lookup_queries = {
-            "Какие типы источников поддерживаются для индексации?": [
-                "supported source types for indexing"
-            ],
-            "Which document formats are supported for indexing?": [
-                "local file formats"
-            ],
-        }.get(question)
-        arguments = {"question": question, "project_path": str(project)}
-        if lookup_queries:
-            arguments["lookup_queries"] = lookup_queries
-        payload = call_docs_tool_payload(
-            "get_docs_context",
-            arguments,
-            service,
+        cases = (
+            ("What source types are supported for indexing?", "GitBook sites"),
+            ("Which source types are supported for indexing?", "GitBook sites"),
+            ("Какие типы источников поддерживаются для индексации?", "GitBook sites"),
+            ("Which file formats are supported for indexing?", ".docx"),
+            ("Which document formats are supported for indexing?", ".rtf"),
+            ("What test markers are available?", "live_network"),
+            ("Which pytest markers are available?", "live_network"),
+            ("What does the two-cell smoke procedure require?", "exactly two cells"),
+            ("What is required by the two-cell smoke procedure?", "exactly two cells"),
+            ("How do I sync project docs after changing a file?", "sync_project_docs"),
+            ("Как синхронизировать документацию проекта после изменения файла?", "sync_project_docs"),
         )
-        assert payload["status"] == "ok", (question, payload)
-        assert payload["kind"] == "docs_context", (question, payload)
-        assert payload["answer_supported"] is False
-        assert payload["answer_available"] is False
-        assert payload["edit_ready"] is False
-        assert expected in str(payload), (question, payload)
-
-    open_context = (
-        "What markers are available?",
-        "Which formats are supported?",
-        "How do I update the docs index?",
-    )
-    for question in open_context:
-        payload = call_docs_tool_payload(
-            "get_docs_context",
-            {"question": question, "project_path": str(project)},
-            service,
-        )
-        assert payload["status"] == "ok", (question, payload)
-        assert payload["kind"] == "docs_context", (question, payload)
-        assert payload["answer_supported"] is False
-
-    # No fixture documents general project requirements; a nearby smoke
-    # procedure must not be substituted for the missing subject.
-    unknown_payload = call_docs_tool_payload(
-        "get_docs_context",
-        {"question": "What does the project require?", "project_path": str(project)},
-        service,
-    )
-    assert unknown_payload["status"] == "insufficient_evidence"
-    assert unknown_payload["answer_supported"] is False
-    assert unknown_payload["edit_ready"] is False
-    assert not unknown_payload.get("sources")
-
-    lookup_payload = call_docs_tool_payload(
-        "get_docs_context",
-        {
-            "question": "How does this project work?",
-            "lookup_queries": ["supported source types for indexing"],
-            "project_path": str(project),
-        },
-        service,
-    )
-    assert lookup_payload["status"] == "ok", lookup_payload
-    assert lookup_payload["kind"] == "docs_context"
-    assert "GitBook sites" in str(lookup_payload)
-    expected_retrieval_coverage = (
-        "full" if not lookup_payload["missing_query_ids"] else "partial"
-    )
-    assert lookup_payload["query_coverage"] == expected_retrieval_coverage
-    assert lookup_payload["retrieval_coverage"] == expected_retrieval_coverage
-    assert lookup_payload["facet_coverage"] == "unverified"
-    assert "query-lookup-1" in lookup_payload["covered_query_ids"]
-    assert any(
-        source["path_or_url"] == "docs/sources.md"
-        and "GitBook sites" in source["snippet"]
-        for source in lookup_payload["sources"]
-    )
-
-    untrusted_for_answer = (
-        "Which source types are supported for indexing; what is the Bitcoin price?",
-        "Which source types are supported for indexing. What is the Bitcoin price?",
-        "Which source types are supported for indexing plus tell me the Bitcoin price?",
-        "How do I sync project docs after changing a file and rebuild vectors?",
-    )
-    for question in untrusted_for_answer:
-        payload = call_docs_tool_payload(
-            "get_docs_context",
-            {"question": question, "project_path": str(project)},
-            service,
-        )
-        assert payload.get("answer_supported") is not True, (question, payload)
-        assert payload.get("edit_ready") is not True, (question, payload)
-        if payload["status"] == "ok":
+        for question, expected in cases:
+            lookup_queries = {
+                "Какие типы источников поддерживаются для индексации?": [
+                    "supported source types for indexing"
+                ],
+                "Which document formats are supported for indexing?": [
+                    "local file formats"
+                ],
+            }.get(question)
+            arguments = {"question": question, "project_path": str(project)}
+            if lookup_queries:
+                arguments["lookup_queries"] = lookup_queries
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                arguments,
+                service,
+            )
+            assert payload["status"] == "ok", (question, payload)
             assert payload["kind"] == "docs_context", (question, payload)
+            assert payload["answer_supported"] is False
+            assert payload["answer_available"] is False
+            assert payload["edit_ready"] is False
+            assert expected in str(payload), (question, payload)
+
+        open_context = (
+            "What markers are available?",
+            "Which formats are supported?",
+            "How do I update the docs index?",
+        )
+        for question in open_context:
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                {"question": question, "project_path": str(project)},
+                service,
+            )
+            assert payload["status"] == "ok", (question, payload)
+            assert payload["kind"] == "docs_context", (question, payload)
+            assert payload["answer_supported"] is False
+
+        # No fixture documents general project requirements; a nearby smoke
+        # procedure must not be substituted for the missing subject.
+        unknown_payload = call_docs_tool_payload(
+            "get_docs_context",
+            {"question": "What does the project require?", "project_path": str(project)},
+            service,
+        )
+        assert unknown_payload["status"] == "insufficient_evidence"
+        assert unknown_payload["answer_supported"] is False
+        assert unknown_payload["edit_ready"] is False
+        assert not unknown_payload.get("sources")
+
+        lookup_payload = call_docs_tool_payload(
+            "get_docs_context",
+            {
+                "question": "How does this project work?",
+                "lookup_queries": ["supported source types for indexing"],
+                "project_path": str(project),
+            },
+            service,
+        )
+        assert lookup_payload["status"] == "ok", lookup_payload
+        assert lookup_payload["kind"] == "docs_context"
+        assert "GitBook sites" in str(lookup_payload)
+        expected_retrieval_coverage = (
+            "full" if not lookup_payload["missing_query_ids"] else "partial"
+        )
+        assert lookup_payload["query_coverage"] == expected_retrieval_coverage
+        assert lookup_payload["retrieval_coverage"] == expected_retrieval_coverage
+        assert lookup_payload["facet_coverage"] == "unverified"
+        assert "query-lookup-1" in lookup_payload["covered_query_ids"]
+        assert any(
+            source["path_or_url"] == "docs/sources.md"
+            and "GitBook sites" in source["snippet"]
+            for source in lookup_payload["sources"]
+        )
+
+        untrusted_for_answer = (
+            "Which source types are supported for indexing; what is the Bitcoin price?",
+            "Which source types are supported for indexing. What is the Bitcoin price?",
+            "Which source types are supported for indexing plus tell me the Bitcoin price?",
+            "How do I sync project docs after changing a file and rebuild vectors?",
+        )
+        for question in untrusted_for_answer:
+            payload = call_docs_tool_payload(
+                "get_docs_context",
+                {"question": question, "project_path": str(project)},
+                service,
+            )
+            assert payload.get("answer_supported") is not True, (question, payload)
+            assert payload.get("edit_ready") is not True, (question, payload)
+            if payload["status"] == "ok":
+                assert payload["kind"] == "docs_context", (question, payload)
