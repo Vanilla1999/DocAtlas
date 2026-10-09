@@ -362,6 +362,13 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=None)
     )
     if blocked is not None:
+        if blocked_kind == "docs_context":
+            # Preserve the actual module-selection failure without weakening
+            # the delivery veto or publishing candidate paths/recovery actions.
+            reason = _bounded_project_operational_diagnostics(raw).get("operational_reason_code")
+            if reason:
+                blocked["operational_reason_code"] = reason
+                _refresh_projection_estimate(blocked)
         errors = validate_model_visible_projection(blocked, snapshot={})
         if errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(errors))
