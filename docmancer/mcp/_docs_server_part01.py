@@ -10,6 +10,8 @@ class LocalMemberService:
 
     Only confirmed member preparation can provision storage. Other handlers use
     the real LibraryDocsService after ownership validation, at this same target.
+    Read startup omits registry/job maintenance; explicit lifecycle keeps its
+    ordinary writable facade and startup recovery.
     """
 
     def __init__(self, resolved):
@@ -25,23 +27,34 @@ class LocalMemberService:
         )
         self.project_docs = ProjectDocsService(self)
         self._service = None
+        self._read_service = None
         self._lock = threading.RLock()
 
-    def materialize(self):
+    def materialize(self, *, read_only_startup: bool = False):
         with self._lock:
             if not self.member_storage_policy.validate(storage_path=self.config.index.db_path):
                 raise PermissionError("member_store_uninitialized: explicit confirmed preparation required")
-            if self._service is None:
-                self._service = LibraryDocsService(
+            if read_only_startup:
+                # Preserve an already materialized same-call service. A separate
+                # reader created first keeps its continuation references later.
+                if self._read_service is not None:
+                    return self._read_service
+                if self._service is not None:
+                    return self._service
+            slot = "_read_service" if read_only_startup else "_service"
+            if getattr(self, slot) is None:
+                service = LibraryDocsService(
                     config=self.config, config_source=self.config_source,
                     config_path=self.config_path,
                     library_index_root=self.member_storage_policy.db_path.parent / "docs-indexes",
                     member_storage_policy=self.member_storage_policy,
+                    **({"read_only_startup": True} if read_only_startup else {}),
                 )
-            return self._service
+                setattr(self, slot, service)
+            return getattr(self, slot)
 
     def __getattr__(self, name):
-        return getattr(self.materialize(), name)
+        return getattr(self.materialize(read_only_startup=True), name)
 
 
 def create_local_mcp_service(config_path: str | Path | None = None) -> LocalMemberService:
@@ -81,11 +94,12 @@ def _public_handler_arguments(name: str, args: dict[str, Any]) -> dict[str, Any]
 def _service_for_project_path(
     service: LibraryDocsService,
     arguments: dict[str, Any],
+    *, read_only_startup: bool = False,
 ) -> LibraryDocsService:
     if isinstance(service, LocalMemberService):
         project = arguments.get("project_path")
         service.member_storage_policy.validate(Path(project) if project is not None else None)
-        return service.materialize()
+        return service.materialize(read_only_startup=True) if read_only_startup else service.materialize()
     if isinstance(service, LibraryDocsService) and getattr(service, "member_storage_policy", None) is not None:
         project = arguments.get("project_path")
         service.member_storage_policy.validate(
@@ -197,7 +211,9 @@ def call_docs_tool_payload(
         # bindings before opening the existing store. Constructing a project
         # facade here would initialize registries/jobs before that validation.
         member_sync = name == "prepare_docs" and handler_args.get("action") == "sync_project_docs"
-        active_service = service if member_sync else _service_for_project_path(service, handler_args)
+        active_service = service if member_sync else _service_for_project_path(
+            service, handler_args, read_only_startup=name in {"get_docs_context", "docs_status"},
+        )
         payload = handler(name, handler_args, active_service)
     except Exception as exc:
         reason_code = _exception_reason_code(exc)
@@ -229,7 +245,7 @@ def call_docs_tool_payload(
 def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:
     if uri.startswith("docatlas://source/"):
         if isinstance(service, LocalMemberService):
-            service = service.materialize() if service.member_storage_policy.validate() else None
+            service = service.materialize(read_only_startup=True) if service.member_storage_policy.validate() else None
         result = {"status": "source_unavailable", "reason_code": "unknown_or_expired_reference"}
         if service is not None:
             with service._project_service_cache_lock:

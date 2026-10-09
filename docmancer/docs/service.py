@@ -37,14 +37,17 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None):
+    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None, read_only_startup: bool = False):
+        if read_only_startup and (member_storage_policy is None or registry is not None or job_tracker is not None):
+            raise PermissionError("read-only startup requires the selected member store and its own read dependencies")
+        self.read_only_startup = read_only_startup
         self.config_source = config_source or ("provided" if config is not None else "defaults")
         self.config_path = str(Path(config_path).expanduser().resolve()) if config_path else None
         self.config = config or DocmancerConfig()
         self.member_storage_policy = member_storage_policy
         self._project_service_cache: OrderedDict[tuple[str, str, str], LibraryDocsService] = OrderedDict()
         self._project_service_cache_lock = threading.RLock()
-        self.registry = registry or LibraryRegistry(self.config.index.db_path)
+        self.registry = registry if read_only_startup else registry or LibraryRegistry(self.config.index.db_path)
         self.agent_gateway = AgentIndexGateway(
             self.config,
             default_agent=agent,
@@ -52,6 +55,13 @@ class LibraryDocsService:
             library_index_root=library_index_root,
             member_storage_policy=member_storage_policy,
         )
+        read_dependencies = {}
+        if read_only_startup:
+            # Reuse the owned member reader's current-generation SQL snapshot.
+            # Ancillary lookups must not create/repair a ledger on a first read.
+            read_connection = self.agent_gateway.read_agent_instance().store._connect
+            read_dependencies = {"read_only": True, "read_connection": read_connection}
+            self.registry = LibraryRegistry(self.config.index.db_path, **read_dependencies)
         from docmancer.docs.application.source_continuation import SourceContinuationReader
         from docmancer.docs.infrastructure.project_source_read_gateway import ProjectSourceReadGateway
         self.source_reader = SourceContinuationReader(
@@ -69,6 +79,7 @@ class LibraryDocsService:
                     max_history=self.config.docs_jobs.max_terminal_jobs,
                     retention_days=self.config.docs_jobs.retention_days,
                     max_events=self.config.docs_jobs.max_events,
+                    **read_dependencies,
                 )
             )
         )
@@ -83,7 +94,7 @@ class LibraryDocsService:
         self.docs_targets = DocsTargetService(self._render_docs_url, self.jobs)
         self.docs_prefetch = DocsPrefetchService(self)
         self.docs_manifest = DocsManifestService(self)
-        self.resumed_docs_job_ids = self.library_docs.resume_interrupted_jobs()
+        self.resumed_docs_job_ids = [] if read_only_startup else self.library_docs.resume_interrupted_jobs()
 
     def _now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -95,6 +106,8 @@ class LibraryDocsService:
         return self.agent_gateway.index_config_for(record)
 
     def _agent_instance(self, record: LibraryRecord | None = None) -> Any:
+        if self.read_only_startup:
+            raise PermissionError("member read facade cannot open a writer; explicit preparation required")
         return self.agent_gateway.agent_instance(record)
 
     def _read_agent_instance(self) -> Any:

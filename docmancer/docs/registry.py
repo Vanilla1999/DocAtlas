@@ -4,6 +4,7 @@ import json
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 from docmancer.docs.resolver import (
     canonical_library_id,
@@ -45,17 +46,50 @@ class LibraryRecord:
 
 
 class LibraryRegistry:
-    def __init__(self, db_path: str | Path):
+    def __init__(self, db_path: str | Path, *, read_only: bool = False,
+                 read_connection: Callable[[], sqlite3.Connection] | None = None):
         self.db_path = Path(db_path).expanduser()
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._ensure_schema()
+        self._read_only = read_only
+        self._read_connection = read_connection
+        if not read_only:
+            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+            self._ensure_schema()
 
     def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
+        if self._read_only:
+            conn = (self._read_connection() if self._read_connection is not None else
+                    sqlite3.connect(self.db_path.resolve().as_uri() + "?mode=ro", uri=True))
+            conn.execute("PRAGMA query_only=ON")
+        else:
+            conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         return conn
 
+    def _require_writable(self) -> None:
+        if self._read_only:
+            raise PermissionError("library registry is read-only; explicit preparation required")
+
+    def _has_read_schema(self, conn: sqlite3.Connection) -> bool:
+        if not self._read_only:
+            return True
+        entry = conn.execute("SELECT type FROM sqlite_master WHERE name = 'doc_libraries'").fetchone()
+        if entry is None:
+            return False  # A verified member-only store has no library ledger yet.
+        if entry["type"] != "table":
+            raise PermissionError("invalid library registry schema")
+        required = {
+            "library_id", "source_id", "canonical_id", "name", "normalized_name", "ecosystem",
+            "version", "source_type", "docs_url", "docs_url_template", "aliases_json", "status",
+            "added_at", "last_checked_at", "last_refreshed_at", "last_error", "requested_version",
+            "resolved_version", "version_source", "version_confidence", "version_inferred",
+            "docs_url_resolved", "docs_snapshot_exact", "target_spec_json",
+        }
+        if not required <= {row["name"] for row in conn.execute("PRAGMA table_info(doc_libraries)")}:
+            raise PermissionError("invalid library registry schema")
+        return True
+
     def _ensure_schema(self) -> None:
+        self._require_writable()
         with self._connect() as conn:
             conn.execute(
                 """
@@ -94,6 +128,7 @@ class LibraryRegistry:
 
     def restore(self, record: LibraryRecord) -> None:
         """Restore an exact pre-publication registry snapshot during rollback."""
+        self._require_writable()
         with self._connect() as conn:
             conn.execute(
                 """
@@ -182,6 +217,8 @@ class LibraryRegistry:
         normalized_source_type = normalize_library_name(source_type or "api")
         library_id = canonical_library_id(library, ecosystem, normalized_version, normalized_source_type)
         with self._connect() as conn:
+            if not self._has_read_schema(conn):
+                return None
             row = conn.execute(
                 "SELECT * FROM doc_libraries WHERE library_id = ?",
                 (library,),
@@ -268,6 +305,8 @@ class LibraryRegistry:
         matches: list[LibraryRecord] = []
         seen: set[str] = set()
         with self._connect() as conn:
+            if not self._has_read_schema(conn):
+                return []
             for row in conn.execute("SELECT * FROM doc_libraries ORDER BY name, version"):
                 if ecosystem and row["ecosystem"] != ecosystem:
                     continue
@@ -313,6 +352,7 @@ class LibraryRegistry:
         version_inferred: bool | None = None,
         docs_snapshot_exact: bool | None = None,
     ) -> LibraryRecord:
+        self._require_writable()
         normalized_version = normalize_version(version)
         normalized_source_type = normalize_library_name(source_type or "api")
         canonical_id = canonical_library_id(library, ecosystem, normalized_version, normalized_source_type)
@@ -412,6 +452,7 @@ class LibraryRegistry:
 
 
     def delete(self, library_id: str) -> bool:
+        self._require_writable()
         with self._connect() as conn:
             cursor = conn.execute("DELETE FROM doc_libraries WHERE library_id = ?", (library_id,))
             return cursor.rowcount > 0
@@ -423,4 +464,6 @@ class LibraryRegistry:
             sql += " LIMIT ?"
             args = (limit,)
         with self._connect() as conn:
+            if not self._has_read_schema(conn):
+                return []
             return [self._row_to_record(row) for row in conn.execute(sql, args)]

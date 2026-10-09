@@ -30,19 +30,19 @@ class _FixtureService(LocalMemberService):
     def __init__(self, cold):
         object.__setattr__(self, '_cold', cold)
 
-    def materialize(self):
-        return self._cold.materialize()
+    def materialize(self, *, read_only_startup: bool = False):
+        return self._cold.materialize(read_only_startup=read_only_startup)
 
     def __getattr__(self, name):
         if name in {'config', 'config_source', 'config_path', 'member_storage_policy'}:
             return getattr(self._cold, name)
-        return getattr(self.materialize(), name)
+        return getattr(self.materialize(read_only_startup=True), name)
 
     def __setattr__(self, name, value):
-        setattr(self.materialize(), name, value)
+        setattr(self.materialize(read_only_startup=True), name, value)
 
     def __delattr__(self, name):
-        delattr(self.materialize(), name)
+        delattr(self.materialize(read_only_startup=True), name)
 
 
 def digest(value: bytes) -> str:

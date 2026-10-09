@@ -21,11 +21,13 @@ class _LibraryDocsApplicationServicePart01:
         )
         # Preserve startup cleanup for real services while lightweight facade doubles
         # can still construct the public read delegates without ingest dependencies.
-        if getattr(facade, "config", None) is not None:
+        if getattr(facade, "config", None) is not None and not getattr(facade, "read_only_startup", False):
             _ = self.refresh_ops
 
     @property
     def refresh_ops(self) -> LibraryRefreshOps:
+        if getattr(self.facade, "read_only_startup", False):
+            raise PermissionError("library maintenance requires explicit writable preparation")
         if self._refresh_ops is None:
             ports = LibraryRefreshPorts(
                 staging_parent=lambda: Path(self.config.index.db_path).expanduser().resolve().parent,

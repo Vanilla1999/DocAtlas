@@ -161,17 +161,48 @@ def bound_job_diagnostics(jobs: list[DocsJob], max_bytes: int = MAX_DOCS_JOB_PAY
 class SQLiteDocsJobStore:
     """Versioned durable store for the observable Docs job state."""
 
-    def __init__(self, db_path: str | Path):
+    def __init__(self, db_path: str | Path, *, read_only: bool = False,
+                 read_connection: Callable[[], sqlite3.Connection] | None = None):
         self.db_path = str(Path(db_path).expanduser())
-        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
-        self._migrate()
+        self._read_only = read_only
+        self._read_connection = read_connection
+        if not read_only:
+            Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+            self._migrate()
 
     def _connect(self) -> sqlite3.Connection:
-        connection = sqlite3.connect(self.db_path, timeout=30)
+        if self._read_only:
+            connection = (self._read_connection() if self._read_connection is not None else
+                          sqlite3.connect(Path(self.db_path).resolve().as_uri() + "?mode=ro", uri=True, timeout=30))
+            connection.execute("PRAGMA query_only=ON")
+        else:
+            connection = sqlite3.connect(self.db_path, timeout=30)
         connection.row_factory = sqlite3.Row
         return connection
 
+    def _require_writable(self) -> None:
+        if self._read_only:
+            raise PermissionError("docs job store is read-only; explicit lifecycle operation required")
+
+    def _has_read_schema(self, connection: sqlite3.Connection) -> bool:
+        if not self._read_only:
+            return True
+        entries = {row["name"]: row["type"] for row in connection.execute(
+            "SELECT name, type FROM sqlite_master WHERE name IN ('docs_jobs', 'docs_job_schema')")}
+        if not entries:
+            return False  # No job ledger has been provisioned in this owned member store.
+        if entries != {"docs_jobs": "table", "docs_job_schema": "table"}:
+            raise PermissionError("invalid docs job schema")
+        version = connection.execute("SELECT version FROM docs_job_schema WHERE singleton = 1").fetchone()
+        if version is None or type(version["version"]) is not int or version["version"] != _DOCS_JOB_SCHEMA_VERSION:
+            raise PermissionError("unsupported docs job schema")
+        required = {"job_id", "status", "updated_at", "finished_at", "generation_id", "predecessor_job_id", "payload_json"}
+        if not required <= {row["name"] for row in connection.execute("PRAGMA table_info(docs_jobs)")}:
+            raise PermissionError("invalid docs job schema")
+        return True
+
     def _migrate(self) -> None:
+        self._require_writable()
         with self._connect() as connection:
             connection.execute(
                 "CREATE TABLE IF NOT EXISTS docs_job_schema (singleton INTEGER PRIMARY KEY CHECK(singleton = 1), version INTEGER NOT NULL)"
@@ -203,6 +234,7 @@ class SQLiteDocsJobStore:
             )
 
     def save(self, job: DocsJob) -> None:
+        self._require_writable()
         with self._connect() as connection:
             self._save(connection, job)
 
@@ -234,6 +266,7 @@ class SQLiteDocsJobStore:
         )
 
     def update(self, job_id: str, *, expected_lease_id: str, now: str, changes: dict[str, Any]) -> DocsJob | None:
+        self._require_writable()
         changes = _safe_changes(changes)
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
@@ -266,6 +299,7 @@ class SQLiteDocsJobStore:
         max_items: int,
         now: str,
     ) -> DocsJob | None:
+        self._require_writable()
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute("SELECT payload_json FROM docs_jobs WHERE job_id = ?", (job_id,)).fetchone()
@@ -289,6 +323,8 @@ class SQLiteDocsJobStore:
 
     def get(self, job_id: str) -> DocsJob | None:
         with self._connect() as connection:
+            if not self._has_read_schema(connection):
+                return None
             row = connection.execute("SELECT payload_json FROM docs_jobs WHERE job_id = ?", (job_id,)).fetchone()
         return self._decode(row["payload_json"]) if row else None
 
@@ -308,10 +344,13 @@ class SQLiteDocsJobStore:
         sql += " LIMIT ?"
         args.append(min(limit or DEFAULT_DOCS_JOB_LIST_LIMIT, MAX_DOCS_JOB_LIST_LIMIT))
         with self._connect() as connection:
+            if not self._has_read_schema(connection):
+                return []
             rows = connection.execute(sql, args).fetchall()
         return [self._decode(row["payload_json"]) for row in rows]
 
     def interrupt_active(self, now: str, current_lease_id: str) -> None:
+        self._require_writable()
         with self._connect() as connection:
             connection.execute("BEGIN IMMEDIATE")
             rows = connection.execute("SELECT payload_json FROM docs_jobs").fetchall()
@@ -334,6 +373,7 @@ class SQLiteDocsJobStore:
                     )
 
     def prune(self, *, now: datetime, max_terminal_jobs: int, retention_days: int) -> None:
+        self._require_writable()
         cutoff = (now - timedelta(days=retention_days)).isoformat(timespec="seconds")
         terminal = tuple(sorted(TERMINAL_DOCS_JOB_STATUSES))
         placeholders = ",".join("?" for _ in terminal)
@@ -360,7 +400,12 @@ class DocsJobTracker:
         max_events: int = 50,
         now: Callable[[], datetime] | None = None,
         lease_id: str = _PROCESS_LEASE_ID,
+        read_only: bool = False,
+        read_connection: Callable[[], sqlite3.Connection] | None = None,
     ):
+        if read_only and db_path is None:
+            raise ValueError("read-only docs jobs require existing member storage")
+        self._read_only = read_only
         self._jobs: dict[str, DocsJob] = {}
         self._cancel_requested: set[str] = set()
         self._job_order: dict[str, int] = {}
@@ -371,13 +416,20 @@ class DocsJobTracker:
         self.max_events = max_events
         self._clock = now or (lambda: datetime.now(timezone.utc))
         self.lease_id = lease_id
-        self._store = SQLiteDocsJobStore(db_path) if db_path is not None else None
-        if self._store is not None:
+        self._store = (
+            SQLiteDocsJobStore(db_path, read_only=True, read_connection=read_connection) if read_only else
+            SQLiteDocsJobStore(db_path) if db_path is not None else None
+        )
+        if self._store is not None and not read_only:
             self._store.interrupt_active(self._now(), self.lease_id)
             self._store.prune(now=self._clock(), max_terminal_jobs=self.max_history, retention_days=self.retention_days)
 
     def _now(self) -> str:
         return self._clock().isoformat(timespec="seconds")
+
+    def _require_writable(self) -> None:
+        if self._read_only:
+            raise PermissionError("docs job tracker is read-only; explicit lifecycle operation required")
 
     def _trim_locked(self) -> None:
         if len(self._jobs) <= self.max_history:
@@ -399,6 +451,7 @@ class DocsJobTracker:
         with_generation: bool = True,
         request_payload: dict[str, Any] | None = None,
     ) -> DocsJob:
+        self._require_writable()
         now = self._now()
         request_identity = _safe_text(request_identity) if request_identity else None
         if predecessor_job_id is None and request_identity and self._store is not None:
@@ -439,6 +492,7 @@ class DocsJobTracker:
         return job
 
     def update(self, job_id: str, **changes: Any) -> DocsJob | None:
+        self._require_writable()
         now = self._now()
         with self._lock:
             if self._store is not None:
@@ -467,6 +521,7 @@ class DocsJobTracker:
             return job
 
     def append_warning(self, job_id: str, warning: str) -> None:
+        self._require_writable()
         warning = _safe_text(warning)
         if self._store is not None:
             with self._lock:
@@ -488,6 +543,7 @@ class DocsJobTracker:
         self.update(job_id, warnings=warnings)
 
     def append_error(self, job_id: str, error: str) -> None:
+        self._require_writable()
         error = _safe_text(error)
         if self._store is not None:
             with self._lock:
@@ -509,6 +565,7 @@ class DocsJobTracker:
         self.update(job_id, errors=errors)
 
     def append_event(self, job_id: str, event: dict[str, Any], max_events: int | None = None) -> None:
+        self._require_writable()
         now = self._now()
         max_events = max_events or self.max_events
         event = _safe_event_value(event)
@@ -550,6 +607,7 @@ class DocsJobTracker:
         return jobs[:min(limit or DEFAULT_DOCS_JOB_LIST_LIMIT, MAX_DOCS_JOB_LIST_LIMIT)]
 
     def cancel(self, job_id: str) -> DocsJobCancelResult:
+        self._require_writable()
         with self._lock:
             job = self._store.get(job_id) if self._store is not None else self._jobs.get(job_id)
             if job is None:

@@ -767,7 +767,11 @@ def test_root_local_identity_never_reads_git_metadata(local, git_kind, monkeypat
 def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, monkeypatch):
     """Actual member preparation feeds real lexical retrieval with bound bytes."""
     from docmancer.core.config import DocmancerConfig
-    from docmancer.mcp._docs_server_part01 import LocalMemberService
+    from docmancer.mcp._docs_server_part01 import LocalMemberService, call_docs_tool_payload
+    from docmancer.docs.registry import LibraryRegistry
+    from docmancer.docs.application.docs_job_service import SQLiteDocsJobStore
+    from docmancer.docs.application.library_docs_service import LibraryDocsApplicationService
+    from docmancer.docs.application.library_refresh_ops import LibraryRefreshOps
     root, store, _app = local
     command = "doc-atlas mcp docs-serve"
     original = f"# Docs MCP server Ω e\u0301\n\nThe command that starts the Docs MCP server is `{command}`.\n".encode()
@@ -800,21 +804,47 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     config.index.extracted_dir = str(store.extracted_dir)
     config.retrieval.default_mode = "lexical"
     cold = LocalMemberService(SimpleNamespace(config=config, source="explicit", path=None))
-    service = cold.materialize()
+    assert cold._service is None and cold._read_service is None
     policy = cold.member_storage_policy
     store.extracted_dir.rmdir()  # Preparation did not write extraction files.
-    assert service.agent_gateway._default_agent is None
-    assert service.agent_gateway._read_default_agent is None
     before_read = _member_storage_files(policy)
     original_schema_initializer = SQLiteStore._ensure_schema
-    def unexpected_schema_write(_store):
-        pytest.fail("reading a prepared member store attempted schema initialization")
+    def unexpected_schema_write(*_args, **_kwargs):
+        pytest.fail("cold member read attempted schema or lifecycle maintenance")
     monkeypatch.setattr(SQLiteStore, "_ensure_schema", unexpected_schema_write)
     original_open = Path.open
     def open_path(path, *args, **kwargs):
         assert ".git" not in path.parts and "/unselected" not in str(path), "Git identity read"
         return original_open(path, *args, **kwargs)
     monkeypatch.setattr(Path, "open", open_path)
+    from copy import deepcopy
+    from docmancer.docs.interfaces.mcp import context_tools
+    snapshots = []
+    validator = context_tools.validate_model_visible_projection
+    def observe_validation(payload, *, snapshot, **kwargs):
+        errors = validator(payload, snapshot=snapshot, **kwargs)
+        snapshots.append(deepcopy(snapshot))
+        return errors
+    with monkeypatch.context() as observed:
+        for owner, method in ((LibraryRegistry, "_ensure_schema"), (SQLiteDocsJobStore, "_migrate"),
+                              (SQLiteDocsJobStore, "interrupt_active"), (SQLiteDocsJobStore, "prune"),
+                              (LibraryRefreshOps, "_cleanup_orphaned_staging"),
+                              (LibraryDocsApplicationService, "resume_interrupted_jobs")):
+            observed.setattr(owner, method, unexpected_schema_write)
+        observed.setattr(context_tools, "validate_model_visible_projection", observe_validation)
+        payload = call_docs_tool_payload("get_docs_context", {
+            "question": "Which command starts the Docs MCP server?", "project_path": str(root),
+        }, cold)
+    assert _member_storage_files(policy) == before_read and cold._service is None
+    service = cold.materialize(read_only_startup=True)
+    assert service is cold._read_service and service.read_only_startup
+    assert service.registry.list() == service.registry.find_candidates("absent") == []
+    assert service.registry.get("absent") is None and service.jobs.get("absent") is None
+    assert service.jobs.list() == [] and service.resumed_docs_job_ids == []
+    for attempt in (lambda: service.registry.delete("absent"), lambda: service.jobs.create("fixture"),
+                    service._agent_instance, lambda: service.library_docs.refresh_ops):
+        with pytest.raises(PermissionError):
+            attempt()
     identity = local_project_identity(root)
     chunks = service.project_docs.query_project_docs(str(root), command, tokens=8000, limit=20, scope="project")
     assert chunks
@@ -841,19 +871,6 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     assert not agent.query(command, budget=8000, filters={
         "project_path": str(root), "project_identity": "git:invalid.example/fixture", "source_class": "project_file",
     })
-    from copy import deepcopy
-    from docmancer.docs.interfaces.mcp import context_tools
-    snapshots = []
-    validator = context_tools.validate_model_visible_projection
-    def observe_validation(payload, *, snapshot, **kwargs):
-        errors = validator(payload, snapshot=snapshot, **kwargs)
-        snapshots.append(deepcopy(snapshot))
-        return errors
-    with monkeypatch.context() as observed:
-        observed.setattr(context_tools, "validate_model_visible_projection", observe_validation)
-        payload = context_tools.handle_context_tool("get_docs_context", {
-            "question": "Which command starts the Docs MCP server?", "project_path": str(root),
-        }, service)
     assert payload["sources"]
     assert any(command in row["snippet"] for row in payload["sources"])
     assert payload["status"] == "ok" and len(snapshots) == 1
@@ -901,24 +918,52 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     assert (root / "protocols.md").read_bytes() == large
     if git_kind == "none":
         monkeypatch.setattr(SQLiteStore, "_ensure_schema", original_schema_initializer)
-        writer = service._agent_instance()
+        write_service = cold.materialize()
+        assert write_service is not service and not write_service.read_only_startup
+        job = write_service.jobs.create("fixture_read_boundary")
+        write_service.jobs.update(job.job_id, status="succeeded", phase="done")
+        record = write_service.registry.upsert(library="fixture-ledger", ecosystem=None, docs_url=None,
+                                               now="2026-10-09T00:00:00+00:00")
+        writer = write_service._agent_instance()
         assert writer is not agent and writer.store is not agent.store
         assert writer.store.db_path == agent.store.db_path
         with closing(writer.store._connect()) as conn:
             assert conn.execute("PRAGMA query_only").fetchone()[0] == 0
         updated = b"# Overview\n\nMemberReadRevision proves the confirmed update was committed.\n"
         (root / "README.md").write_bytes(updated)
-        changed = sync(local, request(local, generation=outcome["generation_id"]))
-        assert changed.status == "success"
-        new_generation = changed.diagnostics["metrics"]["generation_id"]
+        changed = call_docs_tool_payload("prepare_docs", {"action": "sync_project_docs", "project_path": str(root),
+            "mutation": request(local, generation=outcome["generation_id"])}, cold)
+        assert changed["status"] == "success"
+        new_generation = changed["metrics"]["generation_id"]
         assert new_generation and new_generation != outcome["generation_id"]
         after_write = _member_storage_files(policy)
+        assert service.jobs.get(job.job_id).status == "succeeded"
+        assert service.registry.get(record.library_id) == record
+        assert cold.materialize(read_only_startup=True) is service
         updated_chunks = service.project_docs.query_project_docs(str(root), "MemberReadRevision", scope="project")
         assert updated_chunks and any("MemberReadRevision" in chunk.text for chunk in updated_chunks)
         assert all(chunk.text.encode() in updated for chunk in updated_chunks)
         assert service._read_agent_instance() is agent
         assert agent.store.active_generation_id() == new_generation
         assert _member_storage_files(policy) == after_write
+        # Existing broken ledgers must never masquerade as unprovisioned ones.
+        for corrupt, restore, read in (
+            ("ALTER TABLE doc_libraries RENAME COLUMN aliases_json TO obsolete_aliases_json",
+             "ALTER TABLE doc_libraries RENAME COLUMN obsolete_aliases_json TO aliases_json", service.registry.list),
+            ("ALTER TABLE docs_jobs RENAME COLUMN payload_json TO obsolete_payload_json",
+             "ALTER TABLE docs_jobs RENAME COLUMN obsolete_payload_json TO payload_json", service.jobs.list),
+            ("UPDATE docs_job_schema SET version = 2", "UPDATE docs_job_schema SET version = 1", service.jobs.list),
+            ("ALTER TABLE docs_job_schema RENAME TO withheld_docs_job_schema",
+             "ALTER TABLE withheld_docs_job_schema RENAME TO docs_job_schema", service.jobs.list),
+        ):
+            with writer.store._connect() as conn:
+                conn.execute(corrupt)
+            corrupted = _member_storage_files(policy)
+            with pytest.raises(PermissionError):
+                read()
+            assert _member_storage_files(policy) == corrupted
+            with writer.store._connect() as conn:
+                conn.execute(restore)
     print(json.dumps({"identity_fixture": git_kind, "README_file_bytes": len(original),
                       "README_retrieved_bytes": sum(len(chunk.text.encode()) for chunk in chunks if chunk.metadata["project_doc_path"] == "README.md"),
                       "protocols_file_bytes": len(large),
