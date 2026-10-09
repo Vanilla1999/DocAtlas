@@ -196,13 +196,23 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     raw = (tmp_path / "docs/polling.md").read_bytes()
     assert target["path"] == "docs/polling.md"
     assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
-    assert (target["line_start"], target["line_end"]) == (12, 25)
     assert len(payload["sources"]) == 1
     source = payload["sources"][0]
     assert source["path_or_url"] == target["path"]
     assert source["project_identity"] == target["project_identity"]
-    assert (source["line_start"], source["line_end"]) == (1, 11)
-    assert source["snippet"].encode() == b"\n".join(raw.splitlines()[:11])
+    raw_lines = raw.splitlines()
+    # Keep every previously required line when the quote grows. Selection may
+    # retain additional source facts after the output ceiling was removed.
+    assert source["line_start"] == 1
+    assert 11 <= source["line_end"] < len(raw_lines)
+    assert source["snippet"].encode() == b"\n".join(raw_lines[:source["line_end"]])
+    # Recovery must cover the whole unseen suffix; only blank separator lines
+    # may be skipped between the visible prefix and its continuation.
+    assert source["line_end"] < target["line_start"] <= target["line_end"]
+    assert target["line_end"] == len(raw_lines)
+    assert not any(line.strip() for line in raw_lines[
+        source["line_end"]:target["line_start"] - 1
+    ])
     assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
     bound = snapshot[source["evidence_id"]]["source"]
     assert bound["_source_snapshot_sha256"] == target["snapshot_sha256"]
@@ -217,7 +227,6 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert plan["_component_coverage"]["mandatory_component_ids"] == []
     assert plan["_component_coverage"]["covered_component_ids"] == []
     assert plan["_component_coverage"]["unresolved_residue"] == ["unverified_original_component_scope"]
-    assert source["line_end"] < target["line_start"] <= target["line_end"]
     reads = []
 
     def read_resource(uri):
@@ -260,7 +269,9 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
         assert accepted["path"] == target["path"]
         assert accepted["project_identity"] == target["project_identity"]
         assert accepted["content_sha256"] == target["snapshot_sha256"]
-        assert accepted["snippet"].encode() == b"\n".join(raw.splitlines()[11:25])
+        assert accepted["snippet"].encode() == b"\n".join(raw_lines[
+            target["line_start"] - 1:target["line_end"]
+        ])
         assert docs_context_budget_tokens(accepted) <= 600
         assert controller.results == [accepted]
 
@@ -348,8 +359,10 @@ def _raw_recovery_fixture():
     }
 
 
-def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(record_property):
+def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(record_property, monkeypatch):
     from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from docmancer.docs.interfaces.mcp import context_tools
 
     retrieval = _raw_recovery_fixture()
     question = retrieval["documentation_query_plan"]["original_question"]
@@ -364,6 +377,16 @@ def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(reco
             "Export operation preserves original identifiers in a complete runnable example.",
         ), query_id="query-lookup-1", line_start=100, stable_id="example",
     )
+    expected_example = deepcopy(retrieval["context_pack"][1])
+    real_project = context_tools.project_docs_context
+    snapshots = []
+
+    def capture_projection(*args, **kwargs):
+        result = real_project(*args, **kwargs)
+        snapshots.append(deepcopy(result[1]))
+        return result
+
+    monkeypatch.setattr(context_tools, "project_docs_context", capture_projection)
     reader = _Reader()
     service = _ContextApp(retrieval, reader)
     payload = handle_context_tool("get_docs_context", {
@@ -374,15 +397,30 @@ def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(reco
     }, service)
     assert payload["kind"] == "docs_context"
     record_property("public_output_tokens", docs_context_budget_tokens(payload))
-    assert len(payload["read_next"]) == 1
-    target = payload["read_next"][0]
-    assert target["path"] == "docs/example.md"
-    assert (target["line_start"], target["line_end"]) == (100, 139)
-    assert all(source["path_or_url"] != "docs/example.md" for source in payload["sources"])
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
+    # This historical fixture forced omission under the removed token ceiling.
+    # The complete admitted code block must now survive without a redundant
+    # read capability; an empty or shortened source is not successful delivery.
+    examples = [source for source in payload["sources"]
+                if source["path_or_url"] == expected_example["path"]]
+    assert len(examples) == 1, payload["sources"]
+    source = examples[0]
+    assert source["snippet"] == expected_example["content"]
+    assert (source["line_start"], source["line_end"]) == (
+        expected_example["line_start"], expected_example["line_end"],
+    )
+    assert source["project_identity"] == expected_example["project_identity"]
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    assert snapshot[source["evidence_id"]]["source"]["content"] == expected_example["content"]
+    assert payload["read_next"] == []
+    assert reader.ranges == []
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
     assert payload["edit_ready"] is False
-    assert reader.ranges == [("docs/example.md", 100, 139, target["source_uri"])]
+    assert payload["support_status"] == "retrieval_only"
+    assert payload["answer_policy"] == "cite_only"
 
 
 def test_binding_failure_removes_dead_read_next_and_reports_cause(record_property):
