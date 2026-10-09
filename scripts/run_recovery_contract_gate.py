@@ -592,8 +592,12 @@ def closed_literal_context() -> dict[str, Any]:
             policy = service.member_storage_policy
 
             def state():
-                paths = (policy.db_path, project / source_path, project / "docatlas.project-docs.yaml")
-                return policy.generation(), tuple(hashlib.sha256(path.read_bytes()).hexdigest() for path in paths)
+                return {
+                    "generation": policy.generation(),
+                    "store_sha256": hashlib.sha256(policy.db_path.read_bytes()).hexdigest(),
+                    "document_sha256": hashlib.sha256((project / source_path).read_bytes()).hexdigest(),
+                    "catalog_sha256": hashlib.sha256((project / "docatlas.project-docs.yaml").read_bytes()).hexdigest(),
+                }
 
             def read(question):
                 nonlocal read_checks
@@ -601,7 +605,15 @@ def closed_literal_context() -> dict[str, Any]:
                 capture = _observed_public_call(service, {
                     "question": question, "project_path": str(project), "scope": "project",
                 })
-                _require(state() == before, "recovery_closed_context_is_read_only", capture)
+                after = state()
+                if after != before:
+                    print("RECOVERY_READ_STATE " + json.dumps({
+                        "case": "closed_literal_context", "read_number": read_checks + 1,
+                        "question": question, "source_path": source_path,
+                        "differences": [{"field": key, "before": before[key], "after": after[key]}
+                                        for key in before if before[key] != after[key]],
+                    }, ensure_ascii=False, sort_keys=True))
+                _require(after == before, "recovery_closed_context_is_read_only", capture)
                 read_checks += 1
                 return capture
 
