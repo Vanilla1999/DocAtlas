@@ -590,18 +590,47 @@ def test_source_boundary_generated_paths_require_explicit_opt_in(tmp_path):
     )) == []
 
 
-def test_source_map_includes_generated_path_for_explicit_artifact_question(tmp_path):
+def test_source_map_includes_generated_path_for_explicit_artifact_question(tmp_path, monkeypatch):
     generated = tmp_path / "generated/model.py"
     generated.parent.mkdir()
-    generated.write_text("class GeneratedModel: pass\n", encoding="utf-8")
+    content = "class GeneratedModel: pass\n"
+    generated.write_text(content, encoding="utf-8")
+    generated.with_name("other.py").write_text("class HiddenGeneratedModel: pass\n", encoding="utf-8")
+    question = "Inspect the generated file GeneratedModel"
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+
+    # The original prose is unchanged. A generated-file opt-in cannot replace
+    # the caller's finite member grant, and that grant cannot replace opt-in.
+    assert collect_project_source_facts(
+        tmp_path, question=question, include_unmatched=True, include_generated=True,
+    ) == []
+    assert observed == {}
+    _declare_code_files(tmp_path, "generated/model.py")
+    for opt_in in (None, False, "true"):
+        assert collect_project_source_facts(
+            tmp_path, question=question, include_unmatched=True, include_generated=opt_in,
+        ) == []
+    assert observed == {}
 
     items = collect_project_source_facts(
-        tmp_path,
-        question="Inspect the generated file GeneratedModel",
-        include_unmatched=True,
+        tmp_path, question=question, include_unmatched=True, include_generated=True,
     )
 
     assert [item["path"] for item in items] == ["generated/model.py"]
+    assert items[0]["char_count"] == len(content) and items[0]["line_count"] == 1
+    assert items[0]["symbols"] == [
+        {"kind": "class", "name": "GeneratedModel", "line_start": 1, "line_end": 1}
+    ]
+    assert observed == {"generated/model.py": [sha256(content.encode("utf-8")).hexdigest()]}
+
+    # Explicit generated opt-in still cannot override exclusions or read siblings.
+    observed.clear()
+    excluded = replace(SourceBoundary.from_project(tmp_path), exclude_paths=("generated/**",))
+    assert collect_project_source_facts(
+        tmp_path, question=question, include_unmatched=True,
+        source_boundary=excluded, include_generated=True,
+    ) == []
+    assert observed == {}
 
 
 def test_source_boundary_never_follows_symlink_outside_project(tmp_path):
