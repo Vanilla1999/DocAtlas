@@ -343,13 +343,21 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "## Maintained project-doc catalog" in text
     assert "docatlas.project-docs.yaml" in text
     assert "schema_version: 1" in text
-    assert "indexes only validated catalog entries" in text
-    assert "cold-start fallback" in text
-    assert "fail closed with warnings" in text
-    assert "## Verification loop" in text
-    assert "inspect_project_docs(project_path)" in text
-    assert "prepare_docs(action=\"sync_project_docs\"" in text
-    assert "Confirm the expected files are cited" in text
+    # Preserve the documented membership/consent/verification contract, without
+    # requiring retired automatic cold-start discovery or internal helper names.
+    prose = " ".join(text.split())
+    for guard, claim in (
+        ("explicit_membership", "List each admitted document by a literal relative path."),
+        ("no_discovery", "does not recursively discover `roots`, glob patterns, linked files"),
+        ("invalid_catalog", "An invalid explicit catalog blocks retrieval and synchronization without pruning the existing index."),
+        ("read_only_without_mutation", "Omitting `mutation` or passing null performs no writes."),
+        ("confirmed_generation", "`expected_generation_id`, null only when the selected store is absent"),
+        ("verified_retry", "After verified successful preparation and readiness, retry the question unchanged."),
+        ("source_fidelity", "Check useful facts, source paths, hashes, and coordinates."),
+        ("no_lookup_credit", "lookup credit must not be substituted for original coverage."),
+    ):
+        assert claim in prose, guard
+    assert 'prepare_docs(action="sync_project_docs"' in text
     assert "get_docs_context(project_path=" in text
 
 
@@ -360,9 +368,17 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     assert "## Project documentation" in text
     assert "get_docs_context" in text
     assert "prepare_docs(action=\"sync_project_docs\"" in text
-    assert "## Response and source rules" in text
     assert "docs_status" in text
-    assert "does not generate or commit official documentation" in text
+    prose = " ".join(text.split())
+    for guard, claim in (
+        ("retrieval_only", "Project reads return source-attributed `docs_context`."),
+        ("no_answer_authority", "`answer_supported=false`, `answer_available=false`, `edit_ready=false`, and `answer_policy=cite_only`"),
+        ("source_fidelity", "Sources retain path, source identity, authority, scope, content hash, contiguous verbatim snippet, and source-local coordinates."),
+        ("read_only", "Reads never reconcile an index or write to the repository."),
+        ("no_generated_docs", "does not delete unselected members, prune orphans, write vectors, or generate documentation artifacts."),
+        ("explicit_edit_authorization", "Returned context alone is not permission to edit."),
+    ):
+        assert claim in prose, guard
 
 
 def test_mcp_exposes_docs_job_tools():
