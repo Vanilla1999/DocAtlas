@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "literal-admission-meaning-boundary-v1",
-  "migration_status": "precheck-original-tests-still-collected",
+  "migration_status": "retired-inferred-expectations-live-guards-preserved",
   "base_commit": "067dd56044fb1fe292af2d17783154c8a4b7c092",
   "runner_base_blob": "9dc4669bc37bcc06b68e182abe08cbad6778e67f",
   "source": {
@@ -62,7 +62,7 @@
       "after_mutants": 9
     },
     "retirement_rule": "Only the five marked functions may be considered for retirement in a separate reviewed change after an exact-published-SHA green baseline and one expected named mutant kill with no errors/skips. All four live guards and their helpers remain collected.",
-    "scope_limit": "No production or retrieval changes, no selected test deletion, no source-binding/quality/installed/client proof, and no claim that alias/intent proof covers this API."
+    "scope_limit": "Only the five marked inferred-expectation functions are retired after the exact-SHA normal critical proof below. All four live source-residue/reference guards and the independent literal/DTO/finite-reference control remain collected. No production or retrieval changes, no source-binding/quality/installed/client acceptance claim, and no claim that alias/intent proof covers this API."
   },
   "roster": [
     {
@@ -173,5 +173,87 @@
       "historical_expectation": "Promote a purported semantic reformulation to audited parent coverage.",
       "current_guard": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence"
     }
-  ]
+  ],
+  "runtime_proof": {
+    "pr_head_sha": "a348cafb4807a5b4af852e0029cf6b98ff7a3f91",
+    "checkout_commit_sha": "0e84988d21bb06a86c14714e077098e5cf0cb5d9",
+    "checkout_tree_sha": "8e10b447f3f6d7e8ee09ac5e1de05f73eacd6ad4",
+    "pr_head_tree_sha": "8e10b447f3f6d7e8ee09ac5e1de05f73eacd6ad4",
+    "same_tree_as_pr_head": true,
+    "checkout_parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "a348cafb4807a5b4af852e0029cf6b98ff7a3f91"
+    ],
+    "run_id": 37998331818,
+    "job_id": 114049950632,
+    "run_attempt": 1,
+    "step": "Run critical mutation gate",
+    "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37998331818/job/114049950632",
+    "baseline": {
+      "tests": 31,
+      "passed": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "returncode": 0,
+      "roster_sha256": "2452628f600f2730e2491a23666561137b3a3d8c2d6bf4dacbee6db9cb58c424"
+    },
+    "target_mutation": {
+      "name": "admission_meaning_no_inferred_equivalence",
+      "path": "docmancer/docs/domain/admission_meaning.py",
+      "anchor_count": 1,
+      "before_sha256": "9eea34d0250f79d9c12147b1a89efdc8ce3a9ffaf5109f63d67cd3086e53e9ab",
+      "after_sha256": "ff5083bf94616f59455fbf4149e3ff775cec0a347e79175e534528e7da3fd28a",
+      "killer": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+      "failure_guard": "critical_admission_meaning_no_inferred_equivalence",
+      "expected_failures": 1,
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "returncode": 1,
+      "roster_sha256": "47cf9c22cb0a4a9a60c6d498876dd2b3d51044c1cd1cf05652c9235690042d81"
+    },
+    "critical_mutants_killed": [
+      "normative_python_declaration_recognition",
+      "normative_no_implicit_authority",
+      "normative_whole_source_delivery",
+      "normative_bound_source_fidelity",
+      "active_task33_actionability_contract",
+      "github_models_host_turn_limit",
+      "project_retrieval_no_generated_aliases",
+      "project_query_intent_no_inferred_roles",
+      "admission_meaning_no_inferred_equivalence"
+    ],
+    "critical_gate_final": "PASS",
+    "comparison_used_as_retirement_proof": false,
+    "note": "The workflow is tied to the published PR head, while GitHub checked out the PR merge commit recorded above. Both Git commit trees were independently fetched and are exactly equal. Normal EVIDENCE and the successful critical step prove this source tree; the separate historical/compact comparison and other downstream jobs are not substitute proof. The overall PR is not declared merge-ready."
+  },
+  "retirement": {
+    "definitions_removed": 5,
+    "collected_cases_removed": 30,
+    "retained_definitions": 4,
+    "retained_collected_cases": 4,
+    "retained_names": [
+      "test_unknown_question_does_not_disappear",
+      "test_question_with_an_unsupported_second_clause_is_not_fully_supported",
+      "test_arguments_with_and_or_are_not_made_equivalent",
+      "test_mismatched_reference_plan_cannot_verify_a_rewrite"
+    ],
+    "independent_control_definitions": 1,
+    "independent_control_collected_cases": 1,
+    "current_family_collected_cases": 5,
+    "original_module_path": "tests/docs/test_admission_meaning.py",
+    "working_module_sha256": "387129f078ac1ae05ef74647a2d1323454cc76c854ac001d97bd31c96ea8c8ab",
+    "working_module_node_hash": "964abdbdef8f5e41b0107bdb9fd757842d8296ebbbb986a2473d520fa434af1b",
+    "diagnostic_shard": "tests/diagnostic_labels.admission_contract.json",
+    "helper_demands_sha256": "07c3951473ae03fba4acf380c59969e2817f75d6d0d079d2303f09cad2875130",
+    "contiguous_retained_functions_sha256": "e3a4f45a86a01bbe045cf375cad423905ffd634baae70d2549758f4227e91b5a",
+    "byte_preservation": "The complete contiguous source block containing all four live functions and the exact demands helper are copied without edits; the independent control also checks their AST against the frozen archive.",
+    "archive_and_frozen_roster_unchanged": true,
+    "independent_control_blob_unchanged": "ddecc43b1cbd744b9f1e47d5d48a22c37f03a371",
+    "critical_runner_blob_unchanged": "769c961ebebc40c31b49d7fa6fb15d13c15df5b3",
+    "selector_review": "The original module path remains present. The current core/direct-question/Task33 workflows, pytest configuration, inventory hook and critical runner contain no explicit selector for one of the five removed functions. This is a review of the actual acceptance chain, not an exhaustive historical-link search.",
+    "final_published_sha_acceptance": "pending"
+  }
 }
