@@ -17,7 +17,7 @@ _COMMAND_OPTION_VALUE_RE = re.compile(
     r"(?P<value>[A-Za-z0-9][A-Za-z0-9_.:/-]{0,79})(?![\w.-])"
 )
 _TECHNICAL_TERM_PATTERNS = (
-    re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]"),
+    re.compile(r"[`\"]([^`\"\n]{1,160})[`\"]"),
     re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}"),
     re.compile(r"\b(?:ERR(?:OR)?[_-]?\d+|[A-Z][A-Z0-9]+[_-]\d+)\b"),
     re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b"),
@@ -28,7 +28,7 @@ _TECHNICAL_TERM_PATTERNS = (
     re.compile(r"\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b"),
 )
 _EXACT_TERM_PATTERNS = (
-    ("quoted", re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]")),
+    ("quoted", re.compile(r"[`\"]([^`\"\n]{1,160})[`\"]")),
     ("flag", re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}")),
     ("error_code", re.compile(r"\b(?:ERR(?:OR)?[_-]?\d+|[A-Z][A-Z0-9]+[_-]\d+)\b")),
     ("config_key", re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b")),
