@@ -1,17 +1,18 @@
 # PR #211: checkpoint продолжения
 
-Обновлено 2026-10-09, 21:33 UTC. Код и diagnostics этой публикации — до
-`0369fd397ab6a6294da51e2cb07504f555cc2bba`; commit самого checkpoint добавляет только этот файл и точный архив предыдущего.
+Обновлено 2026-10-09, 21:57 UTC. Код и diagnostics этой публикации — до
+`ecf41c57954eb910ce13b6857b9df415f763789b`.
+Commit checkpoint добавляет этот файл и карту последнего полного core.
 
-**PR пока не готов к merge.** Следующий CI ещё должен проверить новые slices на общем SHA.
+**PR пока не готов к merge.** Новый общий CI должен проверить slices52–55.
+Неподтверждённый ожидаемый результат не считается PASS.
 
 ## Действующие решения
 
 - Потолки **6144 bytes / 800 tokens / 3 sources** отменены. Измеряем и сокращаем
   объём, сохраняя полные факты, source identity, scope/version/hash и consent guards.
 - Операционные input/read/work/call/time ограничения сохраняются.
-- Retrieval включён в позднее утверждённый план. Исходный blanket deferral больше
-  не блокирует исправление подтверждённых потерь.
+- Retrieval включён в позднее утверждённый план; прежний blanket deferral снят.
 - Сокращение tests требует собственного зелёного baseline и доказанного обнаружения
   дефектов. Не считать все оставшиеся FAIL устаревшими и не заменять quality facts
   фактическим пустым результатом.
@@ -20,123 +21,143 @@
 
 План: [PR211_TESTS_AND_ACCEPTANCE_PLAN_RU.md](PR211_TESTS_AND_ACCEPTANCE_PLAN_RU.md).
 Решения: [CURRENT_WAVE_DECISIONS_RU.md](CURRENT_WAVE_DECISIONS_RU.md).
-Предыдущий checkpoint сохранён **побайтно**:
+История до067 сохранена побайтно:
 [CHECKPOINT_067dd560_RU.md](pr211-execution/CHECKPOINT_067dd560_RU.md),
 git blob `7659d17450bcb4dff2260cd2481be61d1153f5ff`.
-В архиве остаются вся предшествующая история, ссылки и ограничения.
+Позднейшие checkpoint версии доступны в Git history; не использовать старый local checkout.
 
-## Последний полностью проверенный CI: 067dd560
+## Последний полностью прочитанный core: 2acfaa4f
 
-SHA: `067dd56044fb1fe292af2d17783154c8a4b7c092`.
-[Main run 37991321138](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321138).
-
+SHA: `2acfaa4fdac8cc599d84ae1c48836335e9cd29a7`.
+[Main run37994136625](https://github.com/Vanilla1999/DocAtlas/actions/runs/37994136625).
 Каждая Python lane **3.11 / 3.12 / 3.13**:
-**7847 = 6000 PASS / 1837 FAIL / 0 ERROR / 10 SKIP**.
+**7848 = 6011 PASS / 1827 FAIL / 0 ERROR / 10 SKIP**.
 Не суммировать матричные повторы.
-[JUnit reader 114029489614](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321138/job/114029489614)
-проверил XML counts, concrete node uniqueness и hashes; integrity issues пусты,
-console omissions — 0.
+[JUnit reader114038915258](https://github.com/Vanilla1999/DocAtlas/actions/runs/37994136625/job/114038915258):
+integrity issues пусты, console omissions0.
 
 | Python | SHA256 JUnit |
 |---|---|
-|3.11|`932742113e4cbad9a395a0ec4945558af33a93659504f4035f467b0b113a2cd3`|
-|3.12|`b090b55b76bd328273add6f078da1b071348b55951a8c829646e0f2c8e21d044`|
-|3.13|`400fc3e00820b0a350856915072e22f653a033ae4505a5d42763ebbe895441cb`|
+|3.11|`bd30d0ebc7671cc2f9aa29cbeb9ebc892485add0b5c8534c4d6958c9876a4c0b`|
+|3.12|`9e0dae5e1ab140787006846bbcffe996ab45ab14ca339d9542888483fac8cb1a`|
+|3.13|`9ac5c178e42b8456259de0e5bf8fa95a16e2af4afc281d02759d3fb7c6891569`|
 
-Сравнение с 10277: удалены 49 прежних alias cases после доказанного replacement,
-добавлены 7 reader invalid-storage cases; SourceMap больше не в failing modules.
-Другие per-module failure counts совпали. Новый reader отдельно выведет concrete
-outcomes reader/generated/contract nodes, чтобы не выводить PASS только из отсутствия
-модуля в списке ошибок.
+Карта всех224 failing modules с1827FAIL:
+[CORE_FAILURE_MAP_2acfaa4f.jsonl](pr211-execution/CORE_FAILURE_MAP_2acfaa4f.jsonl).
+Она содержит exact counts/первый node/message, исследованные причины и явный
+`not_investigated` для остальных. Первый failure не классифицирует весь модуль.
+Карта не означает устранение остальных ошибок.
 
-Всего обнаружено **18 workflows: 8 SUCCESS / 9 FAILURE / 1 SKIPPED**.
-Static, docs contract, retrieval evidence, installer, installed MCP и три platform
-smokes прошли. Core, advanced, required-ci, P1 stack/closure/P1.4/P1.5/P1.6,
-Task33 и language investigations остаются красными; Direct question validation
-пропущен условиями workflow и не считается PASS.
+### Точные tracked outcomes на2acf
 
-### Что действительно подтверждено
+| Семейство | PASS / FAIL |
+|---|---|
+|ActionPacket main|29 / 2|
+|ActionPacket part02|8 / 0|
+|Context completion followup|1 / 1|
+|Docs read-next|31 / 0|
+|SourceMap|29 / 0|
+|Member transactions|116 / 0|
+|Alias current contract|1 / 0|
+|Project intent current contract|1 / 0|
 
-- [Advanced 114025929400](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321138/job/114025929400):
-  recovery **11 baseline PASS / 14 intended guard kills**; question surface —
-  **100 original inputs PASS** с реальными member-backed positive, absent-fact
-  negative и source-removal transformation.
-- Critical gate: **29 baseline PASS / 7 intended mutants killed**. Alias mutant
-  падает ровно на `critical_alias_no_generated_queries`, без errors/skips.
-- Literal reduction: historical **702** и compact **82** проходят; все **51**
-  directed mutations обнаружены обоими наборами. Это не доказательство других API.
-- [P1.4 114025928063](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321105/job/114025928063):
-  **14/14 read-only checks PASS**, **7/14 total**, discovery **3/10**, full facts
-  **2/5**, runtime errors **0**. Пять independent oracle controls PASS.
-  Семь оставшихся failures относятся только к discovery/full facts.
-- [P1.5 114025927641](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321081/job/114025927641):
-  **1/7 total**, full facts **0/6**, **5 runtime errors**.
-  Причина всех пяти observed target failures — `explicit_robots_member_required`.
-  Все **6 oracle controls**, report integrity и syntax PASS.
-- [Task33 114025928664](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321112/job/114025928664):
-  **61 PASS / 3 FAIL**. Четыре adapter cases предыдущего slice прошли.
-  Source-choice producer и 32 consent negatives выполнены до более позднего assertion.
-- V2 завершает реальный отчёт: full semantic facts **6/15** natural и **1/5**
-  exposed paraphrases. Legacy original coverage **0 < 12**.
-  Agent Developer target closure **8/11**; adversarial **24/28**.
-  Эти quality gaps не закрыты.
-- [P1.6 114025927870](https://github.com/Vanilla1999/DocAtlas/actions/runs/37991321109/job/114025927870)
-  останавливается на `support mismatch for legitimate_fact_survives_hostile_tail`.
-  Это следующая исследуемая contract/quality граница, а не разрешение снять full fact.
+Generated SourceMap node, семь invalid-storage и три real-service nodes явно
+присутствуют в JUNIT_TRACKED со статусомPASS на каждой lane.
+Второй completion test с полным `mkdocs-05` priority fact остаётся исходным и падает.
 
-## Reviewed slices этой публикации
+На2acf normal critical gate: **30 baseline PASS / 8 intended mutant kills**.
+Новый intent mutant обнаружен ровно guard `critical_project_intent_no_inferred_roles`,
+**1 test / 1 FAIL / 0 ERROR / 0 SKIP**.
+[Advanced114035684048](https://github.com/Vanilla1999/DocAtlas/actions/runs/37994136625/job/114035684048).
+Literal comparison historical702/compact82/51directed mutants такжеPASS.
+Эти данные разрешают только соответствующее узкое сокращение.
+
+## Более новый частичный acceptance: c1e058cb
+
+SHA: `c1e058cb51072f02620329000e2d68706a96bd67`.
+[Main run37995500411](https://github.com/Vanilla1999/DocAtlas/actions/runs/37995500411).
+Полный core reader ещё не получен на момент записи.
+
+- [Task33C114040356892](https://github.com/Vanilla1999/DocAtlas/actions/runs/37995500248/job/114040356892):
+  **64 PASS**, 3.31s, workflowSUCCESS. Исправление SDK envelope/raw packet validation
+  подтвердилось; прежние два failures отсутствуют.
+- [P1.5 114040357202](https://github.com/Vanilla1999/DocAtlas/actions/runs/37995500399/job/114040357202):
+  **2/7 total**, **0/6 verified full facts**, **0 runtime errors**.
+  Все пять внешних preparations завершились; robots/host ownership barriers сняты.
+  Все6oracle controls, report integrity и syntaxPASS.
+  Canonical policy получает исходный полный факт, но source_integrity даёт
+  `different_project_scope_or_authority` и `source_not_bound_to_committed_child`.
+  Четыре других positives не доставляют полные факты. Authority/preparation/state
+  errors пусты; это не разрешает скрыть source/fact failures.
+- [Advanced114040357523](https://github.com/Vanilla1999/DocAtlas/actions/runs/37995500411/job/114040357523):
+  recovery **11 baseline PASS / 14 intended guard kills**.
+  Новый общий critical precheck завершился **BASELINE FAILED** после добавления
+  admission-meaning control; normal9mutants не засчитаны и retirement запрещён.
+  Причина baseline исследуется. Старые34admission cases остаютсяcollected.
+- Installed MCP harness, static/docs contract и часть platform jobs ужеSUCCESS;
+  это не полный итог всех workflows и не real client sessions.
+
+## Сохранённые quality gaps
+
+P1.4 на2acf: **14/14 read-only checks PASS**, **7/14 total**, discovery **3/10**,
+full facts **2/5**, runtime errors0; пятьoracle controlsPASS.
+[Job114035683658](https://github.com/Vanilla1999/DocAtlas/actions/runs/37994136669/job/114035683658).
+Для original `What does OrdersDraftStore do?` весь правильный85-char body найден;
+canonical qualifier отвергает его за1/4lexical ratio, bare mention остаётсяunresolved.
+Новый slice53 адресует эту точную admission boundary; собственный CI ещё обязателен.
+
+Последние подробно разобранные quality результаты067: V2 full facts6/15natural,
+1/5paraphrase; Legacy original coverage0<12; Agent Developer closure8/11,
+adversarial24/28. Новые результаты нельзя подменять этими числами.
+P1.6 ожидает миграцию от устаревшего support certificate к реальному public-delivery
+fixture с полным положительным фактом и наблюдаемыми action/authority/source guards.
+Исходные6questions/texts/metadata и historical report сохраняются.
+
+## Reviewed slices после предыдущего checkpoint
 
 | Slice | Commit | Изменение |
 |---|---|---|
-|41|`2913d626`|P1.4 runner выводит сохранённые stages/requests/preparation и read-state всех 14 случаев.|
-|42|`40062871`|P1.5 явно разрешает original docs URL и exact robots member; независимый oracle проверяет оба stored members.|
-|43|`16113656`|Intent precheck: один current contract и directed mutant; прежние 32 cases пока collected.|
-|44|`71973165`|Task33 fixtures используют настоящий retention completion, полные v4 окна и корректные retrieval-only citations; completion cost вместо ceiling.|
-|45|`33e41cd7`|Private trace копирует уже наблюдаемые BM25/qualification/reference fields и hash окна; нет нового engine вызова.|
-|46|`5f60400b`|JUnit reader показывает collected/counts/concrete outcomes активных controls по каждой Python lane.|
-|47|`0369fd39`|Восемь ActionPacket part02 tests мигрированы на v4 whole-window, exact-version, rejection и literal-witness contracts.|
+|49|`2953de69`|Канонический owned fixture home до P1.5 member/library preparation.|
+|50|`e703d0c5`|SDK wire `kind=patch_context` проверяется отдельно; raw validator получает полный packet без единственного transport key и с корректным estimate.|
+|51|`c1e058cb`|Admission-meaning precheck с независимым oracle/новым mutant; baselineFAIL, старыеcases сохранены.|
+|52|`1171832b`|После actual intent proof удалены31classifier-onlycases; mixed ranking function целиком сохранён.|
+|53|`c7a5af0f`|Полностью замкнутые literal questions получают source-bound context;23real reads/13replay guards/2directed mutants.|
+|54|`d30150e5`|Полный Docs DTO и snapshot fidelity вместо output ceilings; сохранены invalid-patch и schema security guards.|
+|55|`ecf41c57`|Body-free diagnostics actual P1.5 source/committed-child fields; scorer и saved report неизменны.|
 
-Все slices прошли независимое source review и exact parent/tree/blob verification.
-Это **не runtime PASS** новых изменений. Новые Python imports/tests выполнит обычный CI.
+Все slices прошли независимый source review и exact parent/tree/blob verification.
+Runtime новых52–55изменений ещё должен пройти на общемSHA.
+Details: [closed literal](PR211_CLOSED_LITERAL_CONTEXT_RU.md),
+[intent retirement](pr211-execution/PROJECT_QUERY_INTENT_RETIREMENT_RU.md),
+[terminal/schema](pr211-execution/TERMINAL_DELIVERY_AND_SCHEMA_MEANING_RU.md),
+[P1.5 diagnostics](PR211_P15_COMMITTED_CHILD_DIAGNOSTICS_RU.md).
 
-P1.5 frozen **7 questions / 13 candidates / 6 full facts / 2 negatives** сохранены.
-Robots — отдельно объявленная инфраструктура, не question evidence; даже корректно
-bound robots citation отвергается. Production ingest/retrieval/staging не менялись.
-
-Intent precheck только добавляет проверку. Возможное следующее сокращение —
-**31 classifier-only cases → 1**, с отдельным сохранением mixed ranking guard.
-Оно допускается после actual **30 baseline / 8 named mutant** evidence.
-Сокращение ordinary collection не выдаётся за уменьшение числа всех внутренних
-property checks или всех CI executions.
-
-Три Task33 причины разобраны по producer/selector контрактам: реальные retention
-completion, недостающий hash stable child fixture, допустимые generic citations.
-Source texts и вопросы сохранены; `ok/context_available` не означает answer/edit grant.
-Второй completion test про полный `mkdocs-05` priority fact оставлен побайтно прежним.
+Сокращение intent: исходные32cases → current control1 + retained mixed1 =2,
+net−30; этот slice снимает31case из уже расширенной precheck collection.
+Ранее доказаны alias49→1 и literal702→82. Не выдавать уменьшение ordinary collection
+за уменьшение всех внутренних property comparisons или всех CI executions.
 
 ## Следующие действия
 
-1. Прочитать actual Task33/P1.4/P1.5/critical/JUNIT_TRACKED на общем опубликованном SHA.
-   Не переносить старые PASS на изменённый код автоматически.
-2. По P1.4 trace локализовать original `What does OrdersDraftStore do?`:
-   acquisition → canonical qualification → admission → projection.
-   Не вводить blanket CamelCase admission: frozen quantum/absent negatives остаются.
-3. После устранения robots preparation разобрать реальные P1.5 fact/source guards.
-   Partial job не принимается за succeeded, инфраструктура не получает fact credit.
-4. Продолжать подтверждённые миграции и precheck следующего classifier-only семейства.
-   Live finite/source-binding/ranking и quality cases сохраняются отдельно.
-5. Закрыть remaining original-query/full-fact/contamination, P1.6, closure/stack и
-   required gates. Итоговый acceptance — на конечном SHA с полным составом tests.
-6. Указать конкретный недоступный обязательный client run, если он останется;
-   scripted MCP не называть настоящим client. Сам merge — отдельное действие.
+1. Получить actual recovery12baseline/16mutants, P1.4, terminal/schema и full core
+   на SHA этой публикации. НовыеP1.4guarantees не считать подтверждёнными заранее.
+2. Исправить точную причину admission precheck baselineFAIL; доказать baseline/9kills
+   перед retirement30obsolete grammar cases. Четыреliveguards сохранить.
+3. По новымP1.5diagnostics подтвердить source_class mapping и возможную потерю
+   source_identity/source_content_hash/byte spans в context DTO. Проверку настоящего
+   committed child не заменять совпадением видимого текста.
+4. ЗавершитьP1.6public-delivery migration и разобрать remaining original-query/full-fact,
+   closure/adversarial/language/core failures по карте без ослабления gold.
+5. Итоговый acceptance: полный core, advanced, required CI/P1 и обязательные downstream
+   на конечномSHA; установочные/transport/platform проверки и отдельные client evidence.
+6. Готовность к merge заявлять только после всех обязательных gates. Сам merge — отдельное действие.
 
 ## Рабочая среда
 
 Refs: `implementation/pr211-merge-readiness` и `integration/stage3-v2-identity-pr1`.
-Только ordinary fast-forward. Force, merge, release и внешние комментарии не выполнялись.
-
-Local checkout устарел после `0049c6d`; exec transport недоступен с 18:09 UTC.
+Только ordinary fast-forward. Force/merge/release/внешние комментарии не выполнялись.
+Local checkout устарел после0049c6d; exec transport недоступен с18:09UTC.
 После outage local AST/import/compile/runtime **NOT RUN**.
 Изменения готовятся exact-file GitHub API и проверяются разрешённым PR CI.
-Не запускать пользовательские индексы, загрузки моделей, providers или реальные clients
+Не запускать пользовательские индексы, новые модели/providers/реальныеclients
 без соответствующего уже имеющегося разрешения.
