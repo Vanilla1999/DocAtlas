@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "contract": "literal-project-query-intent-boundary-v1",
+  "migration_status": "precheck-original-tests-still-collected",
+  "base_commit": "841e770e644dba369ab441ba2ec9f2a8807cac7f",
+  "source": {
+    "original_path": "tests/docs/test_project_query_intent.py",
+    "archive_path": "eval/task_level/contract_history/project_query_intent.py.txt",
+    "git_blob_sha": "73505df55c4533e2426c460f9b26ad8517179a5c",
+    "sha256": "28d1cd71c5c6981fa23228b14e93bb7b34a42834c9ffce4ac90d8b929752c727",
+    "encoding": "utf-8"
+  },
+  "frozen_roster_sha256": "fc5f914afdd9fb2458620b3a2486bfa3517fd14d74712f08cd068f28db7b8975",
+  "historical_baseline": {
+    "commit": "589a6366e33278fe542a0e3c971d2502e5e9f99f",
+    "job_id": 113978187064,
+    "total": {
+      "test_functions": 6,
+      "collected_cases": 32,
+      "passed": 5,
+      "failed": 27,
+      "errors": 0,
+      "skipped": 0
+    },
+    "selected_classifier_only": {
+      "test_functions": 5,
+      "collected_cases": 31,
+      "passed": 5,
+      "failed": 26
+    },
+    "retained_mixed_guard": {
+      "test_functions": 1,
+      "collected_cases": 1,
+      "failed": 1
+    },
+    "note": "Actual prior core JUnit summary. The retained mixed test fails before its ranking assertions; it is not validated by this precheck."
+  },
+  "current_contract": {
+    "neutral_intent": "Classification is a compatibility DTO: general with every broad/wants flag false. Prose cannot assign topic, source roles or required code evidence.",
+    "literal_signal": "Only exact case-sensitive public protocol names are recognized by mentions_docs_mcp_surface, with word boundaries. Positive literals and exact input/query identity remain operational.",
+    "finite_ranking": "A distinct unit control keeps nonempty explicitly permitted candidates and their source bytes, rejects an unlisted higher-score candidate and preserves score order under input permutation. It does not establish retrieval recall or source qualification.",
+    "retained_ranking_node": "tests/docs/test_project_query_intent.py::test_documentation_files_do_not_imply_code_symbol_evidence",
+    "retained_ranking_body_start": "implementation_question",
+    "retained_ranking_rule": "Keep the original working test and substantive AST from implementation_question through both ranking assertions. This precheck checks preservation only; it does not execute or repair that old quality guard.",
+    "guards": [
+      "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    ],
+    "expected_mutation": "project_query_intent_no_inferred_roles",
+    "expected_failure_guard": "critical_project_intent_no_inferred_roles",
+    "scope_limit": "Not evidence of original-query retrieval credit, factual completeness, answer/edit permission or client acceptance. No production behavior changes.",
+    "retirement_rule": "The five classifier-only functions may be retired only in a later reviewed change after this exact published baseline and directed production mutant are green/expected-killed. The mixed ranking function must remain collected.",
+    "alias_proof": "The separately proven alias API control and its production mutant do not cover classify_project_query_intent."
+  },
+  "roster": [
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_classify_project_query_intent",
+      "definition_line": 32,
+      "source_lines": [
+        10,
+        39
+      ],
+      "collected_cases": 17,
+      "action": "replace-classifier-expectations",
+      "historical_expectation": "Infer 17 topic names and flags from prose.",
+      "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    },
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_package_terms_do_not_trigger_packs_mcp",
+      "definition_line": 52,
+      "source_lines": [
+        42,
+        55
+      ],
+      "collected_cases": 5,
+      "action": "replace-classifier-expectations",
+      "historical_expectation": "Forbid a packs role for five neighboring package questions.",
+      "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    },
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_explicit_mcp_packs_terms_trigger_packs_mcp",
+      "definition_line": 67,
+      "source_lines": [
+        58,
+        69
+      ],
+      "collected_cases": 4,
+      "action": "replace-classifier-expectations",
+      "historical_expectation": "Infer a packs role for four questions.",
+      "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    },
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_package_with_docs_mcp_is_docs_mcp_not_disambiguation",
+      "definition_line": 72,
+      "source_lines": [
+        72,
+        88
+      ],
+      "collected_cases": 1,
+      "action": "replace-classifier-expectations",
+      "historical_expectation": "Infer docs-MCP/troubleshooting roles; retain concept/incident questions as input data.",
+      "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    },
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_documentation_files_do_not_imply_code_symbol_evidence",
+      "definition_line": 91,
+      "source_lines": [
+        91,
+        126
+      ],
+      "collected_cases": 1,
+      "action": "retain-substantive-ranking-guard",
+      "historical_expectation": "Contains original implementation/inventory questions, original source texts/scores and two ranking assertions; must remain collected.",
+      "current_guard": "tests/docs/test_project_query_intent.py::test_documentation_files_do_not_imply_code_symbol_evidence"
+    },
+    {
+      "original_nodeid": "tests/docs/test_project_query_intent.py::test_explicit_source_identity_questions_require_code_symbol_evidence",
+      "definition_line": 138,
+      "source_lines": [
+        129,
+        139
+      ],
+      "collected_cases": 4,
+      "action": "replace-classifier-expectations",
+      "historical_expectation": "Infer a mandatory code-symbol role for four implementation questions.",
+      "current_guard": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles"
+    }
+  ]
+}

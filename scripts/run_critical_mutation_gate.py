@@ -22,11 +22,15 @@ TARGET_TESTS = (
     "tests/task_level/test_actionability.py::test_active_task33_protocol_has_public_actionability_contract",
     "tests/task_level/test_github_models_adapter.py::test_github_models_runner_stops_at_host_owned_turn_limit",
     "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+    "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.project_retrieval_intent",
+    "docmancer.docs.domain.project_query_intent",
+    "docmancer.docs.domain.project_doc_ranking",
+    "docmancer.docs.domain.query_terms",
     "docmancer.docs.domain.documentation_query_plan",
     "docmancer.docs.application.action_packet",
     "docmancer.docs.application._action_packet_shared",
@@ -121,6 +125,17 @@ MUTANTS = (
         TARGET_TESTS[3],
         1,
         "critical_alias_no_generated_queries",
+    ),
+    Mutant(
+        "project_query_intent_no_inferred_roles",
+        "docmancer/docs/domain/project_query_intent.py",
+        "def classify_project_query_intent(question: str) -> ProjectQueryIntent:\n"
+        '    return ProjectQueryIntent(name="general")',
+        "def classify_project_query_intent(question: str) -> ProjectQueryIntent:\n"
+        '    return ProjectQueryIntent(name="docs_mcp", wants_docs_mcp=True, wants_code_symbols=True)',
+        TARGET_TESTS[4],
+        1,
+        "critical_project_intent_no_inferred_roles",
     ),
 )
 

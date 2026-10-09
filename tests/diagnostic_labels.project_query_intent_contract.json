@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_project_query_intent_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_project_query_intent_contract.py": "e760e0aac46b4e2b54a8d168c1fe923e8b1d1f77e178920add41898908f9cb46"
+  }
+}
