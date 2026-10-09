@@ -36,8 +36,8 @@ class LocalMemberService:
                     config=self.config, config_source=self.config_source,
                     config_path=self.config_path,
                     library_index_root=self.member_storage_policy.db_path.parent / "docs-indexes",
+                    member_storage_policy=self.member_storage_policy,
                 )
-                self._service.member_storage_policy = self.member_storage_policy
             return self._service
 
     def __getattr__(self, name):

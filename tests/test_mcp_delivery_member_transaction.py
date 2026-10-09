@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import closing
 import hashlib
 import json
 import os
@@ -703,6 +704,47 @@ def test_growing_file_never_consumes_more_than_remaining_allowance(local, monkey
     assert sum(consumed) == limit
 
 
+
+def _member_storage_files(policy):
+    """Include new directories as well as every app-storage file's exact bytes."""
+    return {
+        str(path.relative_to(policy.app_home)): (
+            hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+        )
+        for path in policy.app_home.rglob("*")
+    }
+
+
+@pytest.mark.parametrize("invalid", ["missing", "owner", "schema", "generation_column", "generation", "projection", "vector"])
+def test_member_read_rejects_invalid_storage_without_repair(local, invalid):
+    from docmancer.core.member_read_store import MemberReadStore
+    root, store, app = local
+    result = sync(local, request(local))
+    assert result.status == "success"
+    policy = app.facade.member_storage_policy
+    if invalid == "missing":
+        policy.db_path.unlink()
+        policy.marker.unlink()
+    elif invalid == "owner":
+        policy.marker.write_text("{}", encoding="utf-8")
+    else:
+        with store._connect() as conn:
+            if invalid == "schema":
+                conn.execute("DROP TABLE retrieval_fts_projection_state")
+            elif invalid == "generation_column":
+                conn.execute("ALTER TABLE index_generations RENAME COLUMN retrieval_config_hash TO obsolete_retrieval_config_hash")
+            elif invalid == "generation":
+                conn.execute("UPDATE index_state SET active_generation_id = ?", ("gen-" + "0" * 32,))
+            elif invalid == "projection":
+                conn.execute("UPDATE retrieval_fts_projection_state SET projection_version = 'obsolete'")
+            else:
+                conn.execute("UPDATE index_generations SET vector_backend = 'qdrant' WHERE status = 'active'")
+    before = _member_storage_files(policy)
+    with pytest.raises(PermissionError):
+        MemberReadStore(policy)
+    assert _member_storage_files(policy) == before
+    assert (root / "README.md").read_text() == "# Overview\n\nOriginal lexical evidence.\n"
+
 @pytest.mark.parametrize("git_kind", ["none", "repository", "worktree_marker"])
 def test_root_local_identity_never_reads_git_metadata(local, git_kind, monkeypatch):
     root = local[0]
@@ -724,11 +766,8 @@ def test_root_local_identity_never_reads_git_metadata(local, git_kind, monkeypat
 @pytest.mark.parametrize("git_kind", ["none", "repository", "worktree_marker"])
 def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, monkeypatch):
     """Actual member preparation feeds real lexical retrieval with bound bytes."""
-    from docmancer.agent import DocmancerAgent
     from docmancer.core.config import DocmancerConfig
-    from docmancer.docs.application.docs_job_service import DocsJobTracker
-    from docmancer.docs.registry import LibraryRegistry
-    from docmancer.docs.service import LibraryDocsService
+    from docmancer.mcp._docs_server_part01 import LocalMemberService
     root, store, _app = local
     command = "doc-atlas mcp docs-serve"
     original = f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{command}`.\n".encode()
@@ -760,10 +799,17 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     config.index.db_path = str(store.db_path)
     config.index.extracted_dir = str(store.extracted_dir)
     config.retrieval.default_mode = "lexical"
-    agent = DocmancerAgent(config=config)
-    service = LibraryDocsService(config=config, config_source="explicit",
-                                 registry=LibraryRegistry(config.index.db_path), agent=agent,
-                                 job_tracker=DocsJobTracker(), library_index_root=root / "unused-library-indexes")
+    cold = LocalMemberService(SimpleNamespace(config=config, source="explicit", path=None))
+    service = cold.materialize()
+    policy = cold.member_storage_policy
+    store.extracted_dir.rmdir()  # Preparation did not write extraction files.
+    assert service.agent_gateway._default_agent is None
+    assert service.agent_gateway._read_default_agent is None
+    before_read = _member_storage_files(policy)
+    original_schema_initializer = SQLiteStore._ensure_schema
+    def unexpected_schema_write(_store):
+        pytest.fail("reading a prepared member store attempted schema initialization")
+    monkeypatch.setattr(SQLiteStore, "_ensure_schema", unexpected_schema_write)
     original_open = Path.open
     def open_path(path, *args, **kwargs):
         assert ".git" not in path.parts and "/unselected" not in str(path), "Git identity read"
@@ -789,6 +835,9 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     assert any("validate_protocol_" in chunk.text for chunk in large_chunks)
     assert all(chunk.text.encode() in originals[chunk.metadata["project_doc_path"]] for chunk in large_chunks)
     assert not service.project_docs.query_project_docs(str(root), command, scope="module")
+    agent = service._read_agent_instance()
+    assert agent is service._read_agent_instance()
+    assert service.agent_gateway._default_agent is None
     assert not agent.query(command, budget=8000, filters={
         "project_path": str(root), "project_identity": "git:invalid.example/fixture", "source_class": "project_file",
     })
@@ -804,6 +853,35 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     else:
         public_bytes = None
     assert store.active_generation_id() == outcome["generation_id"]
+    assert _member_storage_files(policy) == before_read
+    assert not store.extracted_dir.exists()
+    with closing(agent.store._connect()) as conn:
+        assert conn.execute("PRAGMA query_only").fetchone()[0] == 1
+        with pytest.raises(sqlite3.OperationalError, match="readonly"):
+            conn.execute("DELETE FROM sources")
+    assert _member_storage_files(policy) == before_read
+    assert (root / "README.md").read_bytes() == original
+    assert (root / "protocols.md").read_bytes() == large
+    if git_kind == "none":
+        monkeypatch.setattr(SQLiteStore, "_ensure_schema", original_schema_initializer)
+        writer = service._agent_instance()
+        assert writer is not agent and writer.store is not agent.store
+        assert writer.store.db_path == agent.store.db_path
+        with closing(writer.store._connect()) as conn:
+            assert conn.execute("PRAGMA query_only").fetchone()[0] == 0
+        updated = b"# Overview\n\nMemberReadRevision proves the confirmed update was committed.\n"
+        (root / "README.md").write_bytes(updated)
+        changed = sync(local, request(local, generation=outcome["generation_id"]))
+        assert changed.status == "success"
+        new_generation = changed.diagnostics["metrics"]["generation_id"]
+        assert new_generation and new_generation != outcome["generation_id"]
+        after_write = _member_storage_files(policy)
+        updated_chunks = service.project_docs.query_project_docs(str(root), "MemberReadRevision", scope="project")
+        assert updated_chunks and any("MemberReadRevision" in chunk.text for chunk in updated_chunks)
+        assert all(chunk.text.encode() in updated for chunk in updated_chunks)
+        assert service._read_agent_instance() is agent
+        assert agent.store.active_generation_id() == new_generation
+        assert _member_storage_files(policy) == after_write
     print(json.dumps({"identity_fixture": git_kind, "README_file_bytes": len(original),
                       "README_retrieved_bytes": sum(len(chunk.text.encode()) for chunk in chunks if chunk.metadata["project_doc_path"] == "README.md"),
                       "protocols_file_bytes": len(large),

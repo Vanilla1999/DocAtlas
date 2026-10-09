@@ -4,7 +4,7 @@
     "tests/test_mcp_delivery_member_transaction.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_mcp_delivery_member_transaction.py": "535728923545d7fc060b6369f86fdce175d2f3cbf490528666ff8864019c7d53"
+    "tests/test_mcp_delivery_member_transaction.py": "5b6adab1f5880e91ce6894f1be757811db9f10ba1d9d713bf32bdf46853ef2cb"
   },
   "node_overrides": {}
 }

@@ -21,7 +21,7 @@ class ProjectDocsState:
 
     def indexed_project_doc_sources(self, project_path: str) -> list[dict[str, Any]]:
         root = Path(project_path).expanduser().resolve()
-        agent = self._agent_instance()
+        agent = getattr(self.dependencies, "_read_agent_instance", self._agent_instance)()
         rows: list[dict[str, Any]] = []
         generation_reader = getattr(agent.store, "generation_info", None)
         generation = generation_reader() if callable(generation_reader) else None

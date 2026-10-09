@@ -37,10 +37,11 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None):
+    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None):
         self.config_source = config_source or ("provided" if config is not None else "defaults")
         self.config_path = str(Path(config_path).expanduser().resolve()) if config_path else None
         self.config = config or DocmancerConfig()
+        self.member_storage_policy = member_storage_policy
         self._project_service_cache: OrderedDict[tuple[str, str, str], LibraryDocsService] = OrderedDict()
         self._project_service_cache_lock = threading.RLock()
         self.registry = registry or LibraryRegistry(self.config.index.db_path)
@@ -49,11 +50,12 @@ class LibraryDocsService:
             default_agent=agent,
             agent_factory=agent_factory,
             library_index_root=library_index_root,
+            member_storage_policy=member_storage_policy,
         )
         from docmancer.docs.application.source_continuation import SourceContinuationReader
         from docmancer.docs.infrastructure.project_source_read_gateway import ProjectSourceReadGateway
         self.source_reader = SourceContinuationReader(
-            ProjectSourceReadGateway(lambda: self._agent_instance().store),
+            ProjectSourceReadGateway(lambda: self._read_agent_instance().store),
         )
         self.lock_gateway = FilesystemLockGateway()
         self.project_reader = project_reader or ProjectMetadataReader()
@@ -95,6 +97,9 @@ class LibraryDocsService:
     def _agent_instance(self, record: LibraryRecord | None = None) -> Any:
         return self.agent_gateway.agent_instance(record)
 
+    def _read_agent_instance(self) -> Any:
+        return self.agent_gateway.read_agent_instance()
+
     def active_index_diagnostics(self, project_path: str | None = None) -> dict[str, Any]:
         root = validate_project_path(project_path).path if project_path else None
         db_path = Path(self.config.index.db_path).expanduser().resolve()
@@ -115,7 +120,7 @@ class LibraryDocsService:
         # configured DB has been proven to exist.
         if db_exists:
             try:
-                agent = self._agent_instance()
+                agent = self._read_agent_instance()
                 stats = agent.store.collection_stats()
                 shared_index_counts = {
                     "sources": int(stats.get("sources_count") or 0),
@@ -173,7 +178,7 @@ class LibraryDocsService:
             }
         else:
             try:
-                agent = agent or self._agent_instance()
+                agent = agent or self._read_agent_instance()
                 dispatcher = self.agent_gateway.dispatcher_for(
                     agent, mode=retrieval_mode
                 )

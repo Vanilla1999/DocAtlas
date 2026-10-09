@@ -141,7 +141,7 @@ class _ProjectDocsServicePart03:
             filters["module_path"] = module_path
         if evidence_path:
             filters["project_doc_path"] = evidence_path
-        agent = self._agent_instance()
+        agent = getattr(self.facade, "_read_agent_instance", self._agent_instance)()
         effective_limit = limit or agent.config.query.default_limit
         if requirements is not None:
             # Candidate generation needs enough diversity for deterministic
@@ -682,7 +682,7 @@ class _ProjectDocsServicePart03:
         ):
             exact_source = current_by_exact_path.get(evidence_path) or current_by_path[normalize_doc_path(evidence_path)]
             exact_chunks = _exact_document_index_chunks(
-                self._agent_instance(),
+                getattr(self.facade, "_read_agent_instance", self._agent_instance)(),
                 root=root,
                 evidence_path=str(exact_source.get("path") or evidence_path),
                 indexed_source=str(exact_source.get("source") or ""),
@@ -698,7 +698,7 @@ class _ProjectDocsServicePart03:
             exact_filters = {"project_path": str(root), "project_identity": self._repository_identity(root), "source_class": "project_file"}
             if query_scope: exact_filters["doc_scope"] = query_scope
             if resolved_module_path: exact_filters["module_path"] = resolved_module_path
-            exact_context = SourceReferenceContext(self._agent_instance().store, question=query,
+            exact_context = SourceReferenceContext(getattr(self.facade, "_read_agent_instance", self._agent_instance)().store, question=query,
                 queries=exact_plan.queries, filters=exact_filters,
                 lifecycle_intent=str(getattr(requirements, "lifecycle_intent", "") or lifecycle_intent(query)))
             exact_chunks = exact_context.prepare(exact_chunks)
