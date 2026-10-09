@@ -82,6 +82,21 @@ def test_negative_false_support_fails_closed() -> None:
     case = next(case for case in load_protocol()["cases"] if case["negative_control"])
     baseline = _control(case)
     assert _score(case, baseline)["passed"]
+    absent = deepcopy(baseline)
+    del absent["public_payload"]["sources"]
+    raw = deepcopy(absent["public_payload"])
+    assert _score(case, absent)["passed"]
+    assert absent["public_payload"] == raw, "the source oracle must not rewrite the observed DTO"
+    for value in (None, {}, "", False):
+        malformed = deepcopy(absent)
+        malformed["public_payload"]["sources"] = value
+        assert not _score(case, malformed)["checks"]["source_integrity"], value
+    orphaned = deepcopy(absent)
+    orphaned["bindings"] = {"orphaned-evidence": {}}
+    assert "binding_roster_mismatch" in _score(case, orphaned)["source_errors"]
+    successful = deepcopy(absent)
+    successful["public_payload"]["status"] = "ok"
+    assert "sources_not_list" in _score(case, successful)["source_errors"]
     for key, value in (("answer_supported", True), ("mutation_ready", True), ("answer", "invented answer")):
         changed = deepcopy(baseline)
         changed["public_payload"][key] = value

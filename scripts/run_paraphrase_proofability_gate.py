@@ -15,6 +15,39 @@ ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 DEFAULT_OUTPUT = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())) / "p1.4-current-retrieval.json"
 
 
+def failure_diagnostics(row: dict) -> dict:
+    """Bounded console view of the full saved observation; no verdict changes."""
+    observation = row["observation"]
+    assessment = row["assessment"]
+    before = observation.get("state_before") or {}
+    after = observation.get("state_after") or {}
+    expected_documents = {row["candidate_source"]: row["candidate_text_sha256"]}
+    differences = []
+    for field in ("generation", "store_sha256", "catalog_sha256", "document_sha256"):
+        if before.get(field) != after.get(field):
+            differences.append({"field": field, "before": before.get(field), "after": after.get(field)})
+    state_types = {
+        field: type(before.get(field)).__name__
+        for field in ("generation", "store_sha256", "catalog_sha256", "document_sha256")
+    }
+    return {
+        "id": row["id"],
+        "source_errors": assessment["source_errors"][:12],
+        "authority_errors": assessment["authority_errors"][:12],
+        "read_only": {
+            "state_equal": before == after,
+            "before_types": state_types,
+            "generation_before": before.get("generation"),
+            "generation_after": after.get("generation"),
+            "expected_document_sha256": expected_documents,
+            "document_sha256_before": before.get("document_sha256"),
+            "differences": differences,
+        },
+        "output_cost": assessment["output_cost"],
+        "runtime_error": observation.get("error"),
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Measure P1.4 original-question source facts and provenance")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
@@ -36,6 +69,7 @@ def main(argv: list[str] | None = None) -> int:
     for row in report["cases"]:
         if not row["assessment"]["passed"]:
             print(f"FAIL {row['id']}: {','.join(row['assessment']['failed_checks'])}")
+            print("DIAGNOSTICS " + json.dumps(failure_diagnostics(row), ensure_ascii=False, sort_keys=True))
     if report["source_identities"]["runtime_error"]:
         print(f"FAIL runtime identity: {report['source_identities']['runtime_error']}")
     return 0 if report["passed"] else 1

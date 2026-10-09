@@ -114,8 +114,13 @@ def source_errors(observation: dict, documents: dict[str, str]) -> list[str]:
     errors = []
     payload = observation.get("public_payload") or {}
     sources = payload.get("sources")
+    # Current insufficient responses may omit sources. Preserve the raw DTO:
+    # explicit null/malformed values and successful omissions remain errors.
+    if "sources" not in payload and payload.get("status") == "insufficient_evidence":
+        sources = []
     if not isinstance(sources, list):
-        return ["sources_not_list"]
+        errors.append("sources_not_list")
+        sources = []
     seen = set()
     bindings = observation.get("bindings") or {}
     for source in sources:
