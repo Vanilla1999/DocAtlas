@@ -98,3 +98,29 @@ behavioral или validation authority. Question, source bytes и selector не 
 `_action_packet_part03.py::build_action_packet`, bound validation в
 `_action_packet_part04.py` и `action-packet-v4/CONTRACT.md` (completeness/assignments).
 Результаты новой реализации фиксируются только после фактического CI на её SHA.
+
+## Уточнение владельца от 2026-10-09: retrieval cost без потолка 800
+
+Владелец отдельно отменил обязательный 800-token ceiling в `retrieval-evidence`:
+стремиться к минимальному объёму, не задавать новый числовой потолок. Это последующее
+решение заменяет сохранение именно этого ceiling в предыдущих checkpoint reports;
+отмена catalog 6144 bytes и отмена retrieval 800 tokens — два явных решения.
+
+`scripts/run_systemic_retrieval_plan_gate.py` сохраняет измерение полного публичного
+DTO: canonical UTF-8 bytes, actual tokens по pinned offline tokenizer, распределения
+и максимум. Размер становится метрикой минимизации при сохранении fidelity,
+sufficiency и source safety. Превышение 800 само по себе больше не означает FAIL;
+новый лимит, фиктивный budget PASS или оценка качества по одному размеру не вводятся.
+
+Все 80 исходных cases, историческая группа из 48 `within_budget`, source manifests,
+gold, quality floors, source binding и проверки ошибок сохраняются. Названия
+`within_budget`/`over_budget` обозначают замороженные группы исходного эксперимента,
+а не новый действующий потолок. Исторический 800-token selector/singleton control
+остаётся явно подписанным diagnostic-only сравнением и не ограничивает приёмку
+полного DTO. Report schema v3 объявляет эту границу вместо прежнего budget boolean.
+
+Это изменение acceptance policy, а не сокращение фактически выданного ответа.
+Production retrieval, work/read/acquisition bounds и отложенные направления из
+пункта 2 не меняются. Запрос на сокращение тестов и разбор downstream/quality
+на этой стадии означает анализ; массовое удаление cases, смена gold и подгонка
+ожиданий под фактические failures не выполняются.

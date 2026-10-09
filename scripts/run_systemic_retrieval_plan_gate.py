@@ -5,6 +5,10 @@ Counterfactuals are evaluation-only: they patch production boundaries in-process
 run against fresh isolated indexes, and never alter the public runtime contract.
 Raw traces stay outside the checkout; only the compact acceptance summary may be
 written to the repository.
+
+Full model-visible token and UTF-8 byte counts are minimization metrics, not
+acceptance ceilings. Historical cohort names and bounded selector diagnostics
+remain frozen for comparisons with earlier experiments.
 """
 from __future__ import annotations
 
@@ -33,7 +37,8 @@ REPO = Path(__file__).resolve().parents[1]
 HOLDOUT = REPO / "eval" / "systemic_retrieval_plan" / "holdout"
 DEFAULT_REPORT = REPO / "experiments" / "finalization" / "PR186_SYSTEMIC_RETRIEVAL_ACCEPTANCE.json"
 
-MAX_TOKENS = 800
+# Frozen selector/singleton experiment only; never a current full-DTO gate.
+HISTORICAL_SELECTION_TOKENS = 800
 SELECTION_POOL_LIMIT = 8
 SELECTION_PACKAGE_LIMIT = 3
 BEAM_WIDTH = 4
@@ -394,9 +399,9 @@ def _visible_proxy(payload: dict[str, Any], question: str, tokens: int) -> tuple
 
 
 def _proxy_choice(candidates: list[dict[str, Any]]) -> dict[str, Any] | None:
-    """Select without reading gold sufficiency/support labels."""
+    """Historical bounded selector control, without reading gold labels."""
     feasible = [c for c in candidates if not c.get("error") and not c.get("safety_errors")
-                and c["tokens"] <= MAX_TOKENS and 0 < c["sources"] <= SELECTION_PACKAGE_LIMIT]
+                and c["tokens"] <= HISTORICAL_SELECTION_TOKENS and 0 < c["sources"] <= SELECTION_PACKAGE_LIMIT]
     return max(feasible, key=lambda c: (tuple(c["proxy"]), tuple(-i for i in c["indices"])), default=None)
 
 
@@ -434,13 +439,13 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
             candidate = deepcopy(retrieval)
             candidate["context_pack"] = [deepcopy(pool[index]) for index in indices]
             try:
-                payload, snapshot = projection.project_docs_context(retrieval=candidate, max_tokens=MAX_TOKENS)
+                payload, snapshot = projection.project_docs_context(retrieval=candidate, max_tokens=HISTORICAL_SELECTION_TOKENS)
                 assessment = assess_context(case, payload, registry)
                 safety = evidence.audit_payload(payload, snapshot, root)
                 size = count_input(model_visible_text({"structuredContent": payload}, "structured"))
                 value = {
                     "indices": list(indices),
-                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= MAX_TOKENS,
+                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= HISTORICAL_SELECTION_TOKENS,
                     "required_supported": assessment["required_supported"],
                     "required_count": assessment["required_count"],
                     "tokens": size["actual_tokens"],
@@ -450,7 +455,7 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
                 }
             except Exception as exc:
                 projector_failures += 1
-                value = {"indices": list(indices), "sufficient": False, "required_supported": 0, "required_count": len(case["required_claims"]), "tokens": MAX_TOKENS + 1, "sources": 0, "proxy": [0, 0, 0, -(MAX_TOKENS + 1)], "error": f"{type(exc).__name__}: {exc}"}
+                value = {"indices": list(indices), "sufficient": False, "required_supported": 0, "required_count": len(case["required_claims"]), "tokens": HISTORICAL_SELECTION_TOKENS + 1, "sources": 0, "proxy": [0, 0, 0, -(HISTORICAL_SELECTION_TOKENS + 1)], "error": f"{type(exc).__name__}: {exc}"}
             cache[indices] = value
             return value
 
@@ -489,6 +494,9 @@ def _selection_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
         results.append({"id": case_id, "current_sufficient": False, "pool": _candidate_structure(pool), "exact_oracle_recovery": exact, "exact_proxy_choice": exact_proxy, "simple_choice": simple_success, "beam_choice": beam_success, "enumerated_packages": len(cache)})
     status = "OBSERVED" if exact_recoveries else "NOT_OBSERVED_IN_BOUNDED_POOL"
     return {
+        "experiment": "historical_bounded_selection_diagnostic",
+        "historical_max_tokens": HISTORICAL_SELECTION_TOKENS,
+        "cost_role": "diagnostic_only_not_current_dto_acceptance",
         "candidate_pool_limit": SELECTION_POOL_LIMIT,
         "package_source_limit": SELECTION_PACKAGE_LIMIT,
         "beam_width": BEAM_WIDTH,
@@ -556,7 +564,7 @@ def _singleton_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
             candidate["context_pack"] = [deepcopy(pool[index]) for index in indices]
             try:
                 payload, snapshot = projection.project_docs_context(
-                    retrieval=candidate, max_tokens=MAX_TOKENS
+                    retrieval=candidate, max_tokens=HISTORICAL_SELECTION_TOKENS
                 )
                 assessment = assess_context(case, payload, registry)
                 safety = evidence.audit_payload(payload, snapshot, root)
@@ -565,7 +573,7 @@ def _singleton_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
                 )
                 value = {
                     "indices": list(indices),
-                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= MAX_TOKENS,
+                    "sufficient": assessment["context_sufficiency"] == "sufficient" and not safety and size["actual_tokens"] <= HISTORICAL_SELECTION_TOKENS,
                     "required_supported": assessment["required_supported"],
                     "required_count": assessment["required_count"],
                     "tokens": size["actual_tokens"],
@@ -579,14 +587,14 @@ def _singleton_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
                     "indices": list(indices), "sufficient": False,
                     "required_supported": 0,
                     "required_count": len(case["required_claims"]),
-                    "tokens": MAX_TOKENS + 1, "sources": 0,
-                    "proxy": [0, 0, 0, -(MAX_TOKENS + 1)],
+                    "tokens": HISTORICAL_SELECTION_TOKENS + 1, "sources": 0,
+                    "proxy": [0, 0, 0, -(HISTORICAL_SELECTION_TOKENS + 1)],
                     "error": f"{type(exc).__name__}: {exc}",
                 }
             cache[indices] = value
             return value
 
-        current_tokens = int(row.get("size", {}).get("actual_tokens") or MAX_TOKENS + 1)
+        current_tokens = int(row.get("size", {}).get("actual_tokens") or HISTORICAL_SELECTION_TOKENS + 1)
         current_proxy = list(_visible_proxy(
             row.get("payload") or {}, case["question"], current_tokens,
         ))
@@ -656,6 +664,9 @@ def _singleton_diagnostic(*, cases: list[dict[str, Any]], manifest: dict[str, An
     else:
         decision = "NO_PRODUCTION_SELECTOR_VALIDATED"
     return {
+        "experiment": "historical_bounded_singleton_diagnostic",
+        "historical_max_tokens": HISTORICAL_SELECTION_TOKENS,
+        "cost_role": "diagnostic_only_not_current_dto_acceptance",
         "candidate_pool_limit": SELECTION_POOL_LIMIT,
         "package_source_limit": SELECTION_PACKAGE_LIMIT,
         "blind_singleton_candidate_limit": SELECTION_POOL_LIMIT,
@@ -779,12 +790,15 @@ def main() -> int:
     full80_budget_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_budget_rows), default=0)
     full80_all_valid_max_tokens = max((int(row.get("size", {}).get("actual_tokens") or 0) for row in full80_valid_rows), default=0)
     report = {
-        "schema_version": "systemic-retrieval-plan-acceptance-v2",
+        "schema_version": "systemic-retrieval-plan-acceptance-v3",
         "generated_from_head": head,
         "frozen_configuration": {
             "primary_outcome": PRIMARY_OUTCOME,
             "utility_function": "1 iff context_sufficiency is sufficient and safety_errors is empty; otherwise 0",
-            "max_model_visible_tokens": MAX_TOKENS,
+            "model_visible_cost_policy": "minimize_full_dto_tokens_and_utf8_bytes_without_a_fixed_ceiling",
+            "cost_measurements": "observed_full_DTO_tokens_and_bytes; not_acceptance_booleans",
+            "cost_quality_constraint": "preserve_evidence_fidelity_sufficiency_and_source_safety",
+            "primary_cohort": "frozen_48_cases_named_within_budget; label_does_not_impose_a_current_token_limit",
             "selection_candidate_pool": SELECTION_POOL_LIMIT,
             "selection_package_sources": SELECTION_PACKAGE_LIMIT,
             "beam_width": BEAM_WIDTH,
@@ -801,7 +815,6 @@ def main() -> int:
             "historical_floor_preserved": frozen_current["within_budget"] == 48 and frozen_current["within_budget_sufficient"] >= HISTORICAL_CURRENT_FLOOR,
             "within_budget_max_actual_model_visible_tokens": full80_budget_max_tokens,
             "all_valid_max_actual_model_visible_tokens_diagnostic": full80_all_valid_max_tokens,
-            "actual_full_dto_budget": full80_budget_max_tokens <= MAX_TOKENS,
         },
         "causal_2x2": {"cells": cells, "paired_against_current": paired, "fixed_pre_cap_candidate_pool": fixed_pool, "difference_in_differences_success_rate": interaction, "interpretation": "Counterfactual lanes replay the frozen current pre-cap pools; raw fresh-index drift is reported separately. No causal claim extends beyond this fixed exposed corpus."},
         "contextualization": {"paired_against_current": paired["contextualization_off"], "compact_and_expanded": compact_expanded},
@@ -856,8 +869,6 @@ def main() -> int:
         failures.append("no-contextualization floor regressed below 18/48")
     if len(full80_budget_rows) != 48:
         failures.append("within-budget valid DTO inventory changed")
-    if full80_budget_max_tokens > MAX_TOKENS:
-        failures.append("within-budget full model-visible DTO exceeded the 800-token ceiling")
     if not all(value["same_as_current"] for value in fixed_pool.values()):
         failures.append("2x2/contextualization lanes did not share the same case-level pre-cap support")
     if compact_expanded["lost_evidence_identities"]:

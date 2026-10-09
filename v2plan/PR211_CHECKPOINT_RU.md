@@ -1,5 +1,45 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Полный результат fe48e7b и отмена retrieval ceiling
+
+На HEAD `fe48e7b414f3743b9424e8a7d675f0217b1286ee` завершены все 17 workflows:
+8 SUCCESS / 8 FAILURE / 1 SKIPPED. Merge checkout
+`36cd32b77b15b1c52cc9286b95471c6a61b07674` имеет то же дерево
+`613b051d11df5d9ec94a933f6907b7d1b2fbc011`, что и HEAD.
+
+- Все три Python 3.11/3.12/3.13: 8513 cases = 6506 PASS / 1936 FAIL /
+  61 ERROR / 10 SKIP. Против `7a78c51` ровно девять normative FAIL→PASS,
+  без добавлений/удалений и новых падений. Все 1997 оставшихся FAIL/ERROR
+  сохраняют прежние первые причины.
+- Critical gate: baseline 28 PASS; шесть mutations дают ожидаемые assertion
+  failures 15/26/9/9/1/1, без errors/skips. Проверены raw JUnit и 98 import-origin
+  записей. Advanced сохраняет 524 PASS / 98 FAIL из 622; восемь других downstream
+  gates FAIL, dependent adversarial mutation SKIPPED после красного baseline.
+- Установленный MCP: 15 SDK stdio запусков, 30 structured/text lanes,
+  420 наблюдений; все шесть platform jobs и scripted harness PASS. Release
+  validation PASS; реальные Claude Code/Codex/OpenCode sessions NOT RUN.
+- Legacy self-host: 2815 tracked files, 119662253 bytes, 10 members / 98 sections;
+  quality 10/16, original coverage 0 < 12, contamination 1. V2 останавливается
+  на inactive `wiki/Commands.md`; собственного V2 JSON нет.
+- Retrieval artifact `11597193405`, ZIP SHA256
+  `1230c8d2a7c89c4ba182caca672b59d3656ba519904837f61ac606cfb730b118`:
+  все 80 payloads/assessments/costs совпадают с `7a78c51`. В прежней группе
+  из 48 cases 24 выше прежнего 800-token ceiling; максимум 1451. Это measurement
+  старой политики, не доказательство потери данных или разрешение менять gold.
+
+Источники: [main CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37888242626),
+[P1](https://github.com/Vanilla1999/DocAtlas/actions/runs/37888242618),
+[release](https://github.com/Vanilla1999/DocAtlas/actions/runs/37888242554).
+Required CI `113685640523` и P1 aggregate `113685405445` завершились FAILURE.
+
+Следующее явное решение владельца снимает обязательный 800-token ceiling,
+сохраняя полное измерение объёма и остальные проверки. Оно реализовано отдельным
+узким изменением `run_systemic_retrieval_plan_gate.py`; policy и report v3 описаны
+в current decisions и `eval/systemic_retrieval_plan/README.md`. Новое поведение
+проверяется существующим PR CI после публикации следующего HEAD. Результаты
+`fe48e7b` не переносятся на новый commit автоматически. Сокращение тестов и
+исправление downstream/quality пока остаются предметом запрошенного анализа.
+
 ## Последний полный прогон: 7a78c51; продолжение critical slice
 
 Обновление: 2026-10-09. На опубликованном HEAD
