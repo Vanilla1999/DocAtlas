@@ -384,7 +384,10 @@ def _authority(item: dict[str, Any]) -> str:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
+    if declared & {
+        "canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule",
+        "official", "project_owned",
+    }:
         return "canonical"
     return "supporting"
 
