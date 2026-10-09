@@ -1,5 +1,29 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Текущий план и проверенный результат e4f0ae0
+
+Обновление: 2026-10-09. По запросу владельца составлен
+[план сокращения тестов и завершения acceptance](PR211_TESTS_AND_ACCEPTANCE_PLAN_RU.md):
+миграция контрактов и fixtures, согласование docs/catalog/quality, независимые
+oracles и mutation controls, обоснованное сокращение тестов, устранение повторного
+core CI и совместный acceptance. Это план; перечисленные изменения ещё не выполнены.
+Прежнее ограничение на реализацию deferred retrieval сохраняется.
+
+На HEAD `e4f0ae09221b80ba1afddf983a2a6e3001220c52` удаление обязательного
+800-token ceiling проверено: [retrieval job](https://github.com/Vanilla1999/DocAtlas/actions/runs/37950861568/job/113888965198)
+SUCCESS. Все 80 payload/assessment/cost результатов совпадают с `fe48e7b`;
+все 17 сохранённых проверок соблюдены. Максимум 1451 tokens и 24/48 исторических
+превышения 800 остаются измерениями, не merge gate. Artifact `11625443959`,
+ZIP SHA256 `1c7593cb5c28bc8163da99a78ad77c7cdca1f27d3f197b6de752758014f34be0`.
+Merge checkout `65d959a31bcf4b6ce6f9060ab8afb3a6b6971644` имеет то же дерево
+`d66c5441d148616db03f12f1837683d67f84f7e5`, что и HEAD.
+
+Все 17 workflows этого HEAD завершены: 8 SUCCESS / 8 FAILURE / 1 SKIPPED;
+[main CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37950861568) и
+[P1](https://github.com/Vanilla1999/DocAtlas/actions/runs/37950861406) FAILURE.
+Полные core JUnit counts ниже относятся к `fe48e7b`, отдельно на `e4f0ae0`
+они не пересчитаны. Отмена ceiling не исправляет остальные quality/runtime blockers.
+
 ## Полный результат fe48e7b и отмена retrieval ceiling
 
 На HEAD `fe48e7b414f3743b9424e8a7d675f0217b1286ee` завершены все 17 workflows:
