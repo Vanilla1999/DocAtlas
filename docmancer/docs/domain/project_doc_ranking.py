@@ -7,6 +7,7 @@ from typing import Any
 
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows, lifecycle_intent
 from docmancer.docs.domain.documentation_query_plan import technical_anchors
+from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
 
 
 def normalize_doc_path(path: str | None) -> str:
@@ -204,13 +205,23 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         matches = metadata.get("retrieval_query_matches") or {}
         qualified = {str(key) for key, trace in matches.items()
             if isinstance(trace, dict) and trace.get("qualified") is True}
-        # Failed qualification cannot be rescued by rank. The existing explicit
-        # context-candidate channel still undergoes downstream admission guards.
-        if "retrieval_query_matches" in metadata and not qualified and id(chunk) not in context_candidate_ids:
+        literal_context = None
+        if not qualified:
+            literal_context = admit_original_literal_context(
+                question=question,
+                evidence_text=str(getattr(chunk, "content", None) or getattr(chunk, "text", "") or ""),
+                candidate={**metadata, "path": getattr(chunk, "path", None) or metadata.get("project_doc_path"),
+                           "stale": bool(getattr(chunk, "stale", False))},
+                lifecycle_intent=lifecycle,
+            )
+        # Rank cannot repair failed qualification. A distinct literal body
+        # admission is recomputed from source bytes and confers no query credit.
+        # The explicit context-candidate channel still reaches downstream guards.
+        if "retrieval_query_matches" in metadata and not qualified and literal_context is None and id(chunk) not in context_candidate_ids:
             continue
         public = {key for key in qualified if key == "query-original"
                   or key.startswith("query-lookup-")}
-        if retain_found_windows and not public:
+        if retain_found_windows and not public and literal_context is None:
             continue
         scored.append((chunk_base_score(chunk, index), index, chunk, public))
     scored.sort(key=lambda row: (-row[0], row[1]))

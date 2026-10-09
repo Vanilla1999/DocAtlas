@@ -26,6 +26,11 @@ MODULE_PATHS = {
     "docmancer.docs.application.proofability": "docmancer/docs/application/proofability.py",
     "docmancer.docs.interfaces.mcp.recovery_projection": "docmancer/docs/interfaces/mcp/recovery_projection.py",
     "docmancer.docs.application._project_docs_service_part03": "docmancer/docs/application/_project_docs_service_part03.py",
+    "docmancer.docs.application.source_reference_evidence": "docmancer/docs/application/source_reference_evidence.py",
+    "docmancer.docs.application.reference_query_tagging": "docmancer/docs/application/reference_query_tagging.py",
+    "docmancer.docs.application._docs_context_projection_core": "docmancer/docs/application/_docs_context_projection_core.py",
+    "docmancer.docs.domain.project_doc_ranking": "docmancer/docs/domain/project_doc_ranking.py",
+    "docmancer.docs.domain.literal_context_admission": "docmancer/docs/domain/literal_context_admission.py",
 }
 FROZEN_QUESTION_SHA256 = "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b"
 FROZEN_SOURCE_SHA256 = "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
@@ -71,6 +76,22 @@ MUTANTS = (
            'if (\n            evidence_path\n            and (current_by_exact_path.get(evidence_path) or current_by_path.get(normalize_doc_path(evidence_path)))\n        ):',
            'if (\n            False\n            and evidence_path\n            and (current_by_exact_path.get(evidence_path) or current_by_path.get(normalize_doc_path(evidence_path)))\n        ):',
            "exact_document_recovery", "recovery_exact_document_source_fact"),
+    Mutant("literal-context-admission-disabled", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'if qualification.qualified or qualification.reason != "insufficient_visible_match":',
+           'if True or qualification.qualified or qualification.reason != "insufficient_visible_match":',
+           "literal_anchor_context", "recovery_original_question_source_fact"),
+    Mutant("literal-context-mints-original-credit", MODULE_PATHS["docmancer.docs.application._docs_context_projection_core"],
+           '"retrieval_query_ids": [],\n                    "retrieval_query_matches": dict(original.get("retrieval_query_matches") or {}),',
+           '"retrieval_query_ids": ["query-original"],\n                    "retrieval_query_matches": {"query-original": {**(original.get("retrieval_query_matches") or {}).get("query-original", {}), "qualified": True, "admission_only": False}},',
+           "literal_anchor_context", "recovery_partial_no_query_credit"),
+    Mutant("identifier-only-label-admitted", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'if substantive:\n            witnesses.append(',
+           'if True:\n            witnesses.append(',
+           "literal_anchor_context", "recovery_literal_body_admission_safety"),
+    Mutant("literal-context-accepts-foreign-catalog", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'if not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes):',
+           'if False and (not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes)):',
+           "literal_anchor_context", "recovery_literal_snapshot_binding"),
 )
 
 

@@ -54,6 +54,7 @@ from docmancer.docs.domain.evidence_qualification import (
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
+from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
 
 
 def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
@@ -231,6 +232,7 @@ def project_docs_context(
         if _internal_candidate_id(item)
     ]
     prepared: list[dict[str, Any]] = []
+    literal_context_candidates: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
     variant_inputs: dict[int, tuple[Any, ...]] = {}
     variant_footprints: dict[int, VariantFootprint] = {}
     selected_footprints: dict[str, VariantFootprint] = {}
@@ -275,6 +277,33 @@ def project_docs_context(
             decision_trace.record('candidate', 'rejected', 'missing_attribute', original)
             continue
         if not visible_query_ids and not component_ids:
+            raw_snippet = str(original.get("content") or original.get("display_text") or "")
+            admission = admit_original_literal_context(
+                question=original_question, evidence_text=raw_snippet, candidate=original,
+                expected_project_identity=expected_project_identity,
+                lifecycle_intent=request_lifecycle_intent,
+            )
+            normalized = _docs_source(original, display_snippet=raw_snippet) if admission is not None else None
+            if normalized is not None:
+                start = raw_snippet.find(normalized["snippet"])
+                line_start, line_end = _focused_line_range(
+                    raw_snippet, start, start + len(normalized["snippet"]), original.get("line_start"),
+                )
+                normalized.update({
+                    "project_identity": project_identity, "line_start": line_start, "line_end": line_end,
+                    "authority": str(original.get("authority") or "supporting"),
+                    "scope": str(original.get("doc_scope") or "project"),
+                    "catalog_role": str(original.get("catalog_role") or ""),
+                    "retrieval_query_ids": [],
+                    "retrieval_query_matches": dict(original.get("retrieval_query_matches") or {}),
+                    "_qualification_candidate": original["_qualification_candidate"],
+                    "_independent_query_plan": query_plan,
+                    "_expected_project_identity": expected_project_identity,
+                    "_lifecycle_intent": request_lifecycle_intent,
+                })
+                literal_context_candidates.append((original, normalized, admission))
+                decision_trace.record('candidate', 'prepared', 'literal_symbol_body_context', original, normalized)
+                continue
             decision_trace.record('candidate', 'rejected', 'no_visible_qualification', original)
             continue
         required_ids = qualified_ids & required_query_id_set
@@ -651,6 +680,24 @@ def project_docs_context(
         if candidate_footprint is not None:
             selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
+    # A failed whole-question match may still contain a verified literal body
+    # fragment. Keep the exact acquired window after the qualified directions;
+    # its failed trace contributes no query/answer/edit coverage. No generated
+    # probe, borrowed lookup credit, source read, or alternate projector is used.
+    for original, normalized, admission in literal_context_candidates:
+        evidence_id = normalized["evidence_id"]
+        if evidence_id in seen_ids or any(
+            source.get("path_or_url") == normalized["path_or_url"]
+            and source.get("project_identity") == normalized["project_identity"]
+            and normalized["snippet"] in source.get("snippet", "")
+            for source in sources
+        ):
+            continue
+        sources.append(normalized)
+        snapshot[evidence_id] = _snapshot_entry(original, normalized)
+        seen_ids[evidence_id] = len(sources) - 1
+        projection_diagnostics.setdefault("literal_context_admissions", []).append(admission)
+        decision_trace.record('selection', 'accepted', 'literal_symbol_body_context', original, normalized)
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO

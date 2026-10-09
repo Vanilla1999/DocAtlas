@@ -20,6 +20,7 @@ import sys
 import tempfile
 import traceback
 from typing import Any
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -29,11 +30,15 @@ from docmancer.docs.application.evidence_selection import (
     build_requirements, project_docs_selection_config, select_evidence,
 )
 from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+from docmancer.docs.application._docs_context_projection_core import project_docs_context as project_context_core
 from docmancer.docs.application.recovery import build_recovery_diagnosis, recovery_action
 from docmancer.docs.interfaces.mcp.recovery_projection import _attach_recovery_diagnosis
+from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.retrieval.query_planning import extract_document_locator
 from eval.evidence_quality_v2.runtime import index_project, isolated_service
+from eval.project_context_quality.capture_public_context import capture_public_call
 
 REPORT_SCHEMA = "recovery-contract-v2"
 TARGET_MODULES = (
@@ -41,6 +46,11 @@ TARGET_MODULES = (
     "docmancer.docs.application.proofability",
     "docmancer.docs.interfaces.mcp.recovery_projection",
     "docmancer.docs.application._project_docs_service_part03",
+    "docmancer.docs.application.source_reference_evidence",
+    "docmancer.docs.application.reference_query_tagging",
+    "docmancer.docs.application._docs_context_projection_core",
+    "docmancer.docs.domain.project_doc_ranking",
+    "docmancer.docs.domain.literal_context_admission",
 )
 TREASURE = (
     "What is the documented contract for adaptive treasure gem trip sampling across positions 1,2,3, "
@@ -130,13 +140,28 @@ def _service():
             yield service, project
 
 
-def _assert_public_context(payload: dict[str, Any], project: Path, *, fact_guard: str) -> None:
+def _observed_public_call(service: Any, request: dict[str, Any]) -> dict[str, Any]:
+    """Observe a real delivery veto as well as the authoritative projector."""
+    delivery_inputs = []
+    original = context_tools._explicit_delivery_block
+    def observe(retrieval, **kwargs):
+        delivery_inputs.append(deepcopy(retrieval))
+        return original(retrieval, **kwargs)
+    with patch.object(context_tools, "_explicit_delivery_block", observe):
+        capture = capture_public_call(service, request)
+    capture["delivery_inputs"] = delivery_inputs
+    return capture
+
+
+def _assert_public_context(payload: dict[str, Any], project: Path, *, fact_guard: str,
+                           capture: dict[str, Any] | None = None) -> None:
+    detail = {"payload": payload, "capture": capture} if capture is not None else payload
     _require(payload.get("status") == "ok" and payload.get("kind") == "docs_context",
-             fact_guard, payload)
-    _require(payload.get("context_available") is True, fact_guard, payload)
+             fact_guard, detail)
+    _require(payload.get("context_available") is True, fact_guard, detail)
     sources = payload.get("sources") or []
     _require(any("meet_type uses value 6 for gem counters." in row.get("snippet", "")
-                 for row in sources), fact_guard, payload)
+                 for row in sources), fact_guard, detail)
     _require(all(payload.get(key) is False for key in ("answer_supported", "answer_available", "edit_ready")),
              "recovery_context_no_answer_or_edit_authority", payload)
     identity = "local:" + hashlib.sha256(str(project.resolve()).encode()).hexdigest()
@@ -322,13 +347,14 @@ def exact_document_recovery() -> dict[str, Any]:
             raise RuntimeError("exact-document fallback enumerated the active generation")
         store.list_sections_for_embedding = forbidden_scan
         try:
-            payload = call_docs_tool_payload("get_docs_context", {
+            capture = _observed_public_call(service, {
                 "question": question, "project_path": str(project), "scope": "project",
-            }, service)
+            })
+            payload = capture["public_payload"]
         finally:
             service.project_docs.query_project_docs = original_query
             store.list_sections_for_embedding = original_full_scan
-        _assert_public_context(payload, project, fact_guard="recovery_exact_document_source_fact")
+        _assert_public_context(payload, project, fact_guard="recovery_exact_document_source_fact", capture=capture)
         _require(service.member_storage_policy.generation() == generation, "recovery_read_does_not_mutate_members")
         _require((project / TREASURE_PATH).read_text(encoding="utf-8") == TREASURE_SOURCE,
                  "recovery_read_does_not_mutate_source")
@@ -339,16 +365,132 @@ def exact_document_recovery() -> dict[str, Any]:
 
 def literal_anchor_context() -> dict[str, Any]:
     with _service() as (service, project):
-        payload = call_docs_tool_payload("get_docs_context", {
+        request = {
             "question": TREASURE, "project_path": str(project), "scope": "project",
-        }, service)
-        _assert_public_context(payload, project, fact_guard="recovery_original_question_source_fact")
+        }
+        capture = _observed_public_call(service, request)
+        payload = capture["public_payload"]
+        _assert_public_context(payload, project, fact_guard="recovery_original_question_source_fact", capture=capture)
         _require(payload.get("investigation_allowed") is True, "recovery_context_allows_investigation", payload)
+        attempts = capture["projection_attempts"]
+        _require(len(attempts) == 1, "recovery_literal_single_public_projection", capture)
+        attempt = attempts[0]
+        admissions = (attempt["after_projection"].get("retrieval_diagnostics") or {}).get(
+            "docs_context_projection", {}).get("literal_context_admissions") or []
+        _require(admissions and all(row.get("coverage_credit") is False for row in admissions),
+                 "recovery_literal_admission_observed", attempt)
+        _require(payload.get("query_coverage") == "partial"
+                 and "query-original" not in payload.get("covered_query_ids", [])
+                 and "query-original" in payload.get("missing_query_ids", []),
+                 "recovery_partial_no_query_credit", payload)
+        _require(not validate_model_visible_projection(attempt["projected_payload"], snapshot=attempt["snapshot"]),
+                 "recovery_literal_snapshot_validator", attempt)
+        # Independently bind each delivered quote to the actual immutable source
+        # bytes, rather than accepting a plausible-looking hexadecimal hash.
+        for source in payload["sources"]:
+            bound = attempt["snapshot"][source["evidence_id"]]
+            original = bound["source"]
+            evidence = original["_reference_evidence"]
+            _require(evidence["raw_document"] == TREASURE_SOURCE
+                     and evidence["source"]["content_sha256"] == hashlib.sha256(TREASURE_SOURCE.encode()).hexdigest()
+                     and TREASURE_SOURCE[evidence["char_start"]:evidence["char_end"]] == evidence["text"],
+                     "recovery_literal_actual_source_binding", evidence)
+            _require({key: value for key, value in source.items() if key != "source_uri"}
+                     == {key: value for key, value in bound["projected_source"].items() if key != "source_uri"},
+                     "recovery_literal_visible_snapshot_binding", source)
+        _literal_context_replay_controls(attempt["before_projection"])
+        _literal_context_state_controls(service, project, request)
         # Cost is evidence, not a pass/fail ceiling. Source facts and guards above
         # decide acceptance; trimming their meaning to reach 800 cannot pass.
         return {"full_dto_tokens": estimate_projection_tokens(payload),
                 "full_dto_utf8_bytes": len(json.dumps(payload, ensure_ascii=False, sort_keys=True,
-                                                      separators=(",", ":")).encode())}
+                                                      separators=(",", ":")).encode()),
+                "literal_context_admissions": admissions,
+                "replay_controls": 13, "confirmed_source_changes": 5,
+                "catalog_revocations": 1}
+
+
+def _literal_context_replay_controls(retrieval: dict[str, Any]) -> None:
+    """Replay the admission core on real inputs; no forged flag grants trust.
+
+    Full public delivery and current-file/catalog changes are exercised by the
+    neighbouring calls. These transformations isolate the immutable-source
+    admission from the facade's independent inspection/recovery targets.
+    """
+    _require(bool(retrieval.get("context_pack")), "recovery_literal_controls_have_candidates")
+    for change in ("project", "scope", "catalog", "file_hash", "generation", "stale",
+                   "window", "body", "raw_document", "missing_reference", "forged_admission"):
+        altered = deepcopy(retrieval)
+        for source in altered["context_pack"]:
+            if change == "project":
+                source["project_identity"] = "foreign-project"
+            elif change == "scope":
+                source.update(doc_scope="module", module_path="foreign-module")
+            elif change == "catalog":
+                source["_source_catalog_hash"] = "sha256:" + "0" * 64
+            elif change == "file_hash":
+                source["_source_snapshot_sha256"] = "sha256:" + "0" * 64
+            elif change == "generation":
+                source["generation_id"] = "foreign-generation"
+            elif change == "stale":
+                source["freshness"] = "stale"
+            elif change == "window":
+                source["char_start"] += 1
+            elif change in {"body", "forged_admission"}:
+                source.update(content="meet_type uses value 9 for gem counters.",
+                              display_text="meet_type uses value 9 for gem counters.")
+                if change == "forged_admission":
+                    source.update(qualified=True, context_eligible=True,
+                                  literal_context_admission={"coverage_credit": False})
+                    source["retrieval_query_matches"] = {"query-original": {
+                        "qualified": True, "literal_context_admission": {"coverage_credit": False},
+                        "query_text": TREASURE, "query_origin": "original", "relation": "direct",
+                    }}
+            elif change == "raw_document":
+                source["_reference_evidence"]["raw_document"] += "\nForged snapshot tail.\n"
+            elif change == "missing_reference":
+                source.pop("_reference_evidence", None)
+        result, snapshot = project_context_core(retrieval=altered)
+        _require(not result.get("context_available") and not result.get("sources") and not snapshot,
+                 "recovery_literal_snapshot_binding", {"change": change, "payload": result})
+        _require(not validate_model_visible_projection(result, snapshot=snapshot),
+                 "recovery_literal_negative_projection_valid", {"change": change, "payload": result})
+    for control in ({"requires_confirmation": True},
+                    {"delivery_decision": {"deliverable": False, "reason_code": "source_access_revoked"}}):
+        result, snapshot = project_context_core(retrieval={**deepcopy(retrieval), **control})
+        _require(not result.get("sources") and not snapshot,
+                 "recovery_literal_operational_veto", {"control": control, "payload": result})
+
+
+def _literal_context_state_controls(service: Any, project: Path, request: dict[str, Any]) -> None:
+    """Confirmed source changes preserve literal facts and remove lost evidence."""
+    for name, text in (
+        ("heading_only", "# meet_type\n\nUnrelated orchard fruit details.\n"),
+        ("identifier_only", "# Counters\n\n- meet_type\n"),
+        ("link_only", "# Counters\n\n[meet_type](https://example.invalid/reference)\n"),
+        ("identifier_prefix", "# Counters\n\nmeet_type_cached uses value 6 for gem counters.\n"),
+    ):
+        (project / TREASURE_PATH).write_text(text, encoding="utf-8")
+        index_project(service, service.config, project)
+        result = call_docs_tool_payload("get_docs_context", request, service)
+        _require(not result.get("context_available") and not result.get("sources"),
+                 "recovery_literal_body_admission_safety", {"change": name, "payload": result})
+    changed = TREASURE_SOURCE.replace("meet_type uses value 6", "meet_type uses value 9")
+    (project / TREASURE_PATH).write_text(changed, encoding="utf-8")
+    index_project(service, service.config, project)
+    result = call_docs_tool_payload("get_docs_context", request, service)
+    _require(result.get("context_available") is True and any(
+        "meet_type uses value 9 for gem counters." in row.get("snippet", "") for row in result.get("sources", [])
+    ) and all("meet_type uses value 6" not in row.get("snippet", "") for row in result.get("sources", [])),
+             "recovery_literal_source_change_visible", result)
+    _require(all(result.get(key) is False for key in ("answer_supported", "answer_available", "edit_ready")),
+             "recovery_context_no_answer_or_edit_authority", result)
+    # Removing membership must revoke the old quote even while the source bytes
+    # and the previously committed stored member still physically exist.
+    catalog = CATALOG_SOURCE[:CATALOG_SOURCE.index("  - path: docs/")] + CATALOG_SOURCE[CATALOG_SOURCE.index("  - path: ARCHITECTURE.md"):]
+    (project / "docatlas.project-docs.yaml").write_text(catalog, encoding="utf-8")
+    result = call_docs_tool_payload("get_docs_context", request, service)
+    _require(not result.get("sources"), "recovery_literal_catalog_revocation", result)
 
 
 CASES = (

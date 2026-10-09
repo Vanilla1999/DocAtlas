@@ -392,7 +392,9 @@ class _ProjectDocsServicePart03:
                 })
                 continue
             matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
-            admitted = any(trace.get("qualified") is True for query_id, trace in matches.items()
+            admitted = any((trace.get("qualified") is True
+                            or (query_id == "query-original" and trace.get("literal_context_admission")))
+                           for query_id, trace in matches.items()
                            if isinstance(trace, dict) and (query_id == "query-original" or query_id.startswith("query-lookup-")))
             if not admitted and len(selected) >= effective_limit:
                 anchor = selected[0]
@@ -412,12 +414,15 @@ class _ProjectDocsServicePart03:
             _control_chunks.extend(selected)
         if not retain_found_windows:
             return selected
-        # Acquisition is unchanged. Only independently qualified, already-prepared
-        # candidates bypass representation packing above and retention below.
+        # Acquisition is unchanged. Independently qualified windows and checked
+        # literal body context bypass representation packing. The latter keeps
+        # its failed query trace; ranking/projection recheck its source binding.
         retained = {(chunk.source, chunk.chunk_index): chunk for chunk in selected}
         for chunk in candidates:
             matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
-            if not any(trace.get("qualified") is True for key, trace in matches.items()
+            if not any((trace.get("qualified") is True
+                        or (key == "query-original" and trace.get("literal_context_admission")))
+                       for key, trace in matches.items()
                        if isinstance(trace, dict) and (key == "query-original" or key.startswith("query-lookup-"))):
                 continue
             if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):

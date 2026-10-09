@@ -1,5 +1,37 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Проверка docs/Agent slices и исправление collection
+
+На `0e456906cc460e469e5e1f28ecde6f010bd59732` V2 впервые выполнился полностью:
+25 cases; semantic usefulness natural 5/15, paraphrases 0/5. Legacy original
+coverage остаётся 0 при minimum 12, contamination 0; lookup не засчитывается
+за original. Hermetic quality и question gate PASS. Это диагностика реальных
+потерь retrieval, не успешный quality acceptance.
+[CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37960431539).
+
+На `bfe9709160f4730d51311847ca9e0c5b2ab460a3` Agent v1 выполнил 11 исторических
+задач и отдельный explicit-catalog positive; historical target-closed 8/11.
+Adversarial 19/28 PASS, execution errors отсутствуют. Положительные задачи
+behavior/requirements/comparison/CatalogReader теряют обязательные факты;
+пять отрицательных path cases требуют проверки текущей error taxonomy.
+[CI](https://github.com/Vanilla1999/DocAtlas/actions/runs/37960891349).
+JSON обоих протоколов сохранён CI; artifact `11630609291`, ZIP SHA256
+`500f1da0a1e802fd1de04af99048ed1c8efdde709fcce6730955a34f31b86bbb`.
+
+На этих двух SHA core/advanced pytest остановлен при collection из-за stale
+node hashes двух quality modules: случаев не исполнено, прежние 8513 outcomes
+не приписываются новым SHA. Отдельные docs/platform failures — два ожидания
+retired документационного текста. `59135469dae7bdaf78186d06aa246ed9022ca917`
+исправляет hashes и проверяет действующий смысл docs; source review APPROVE,
+обычный CI ожидается.
+
+Следующий [literal context slice](pr211-execution/SLICE_05_LITERAL_CONTEXT_RU.md)
+прошёл независимое review. Он допускает полезный body-фрагмент с точным
+синтаксическим symbol исходного вопроса, сохраняя missing original, source/member/
+snapshot guards и запрет answer/edit authority. Recovery имеет 10 baseline cases
+и 12 intended mutants; runtime нового slice ещё не подтверждён. Он не заявлен
+решением всей multilingual/quality проблемы. PR пока не готов к merge.
+
 ## Проверка 99106c9 и следующий docs/catalog/quality slice
 
 На `99106c93b48def75c13ee411473b1f6fef1c418e`

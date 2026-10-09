@@ -4,6 +4,7 @@ from typing import Any
 from dataclasses import asdict
 from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
+from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
 from .context_query_probes import literal_query_probe
 
 def _tag_retrieval_query(
@@ -42,6 +43,13 @@ def _tag_retrieval_query(
             lifecycle_intent=lifecycle_intent,
             authoritative_query=authoritative,
         ).trace)
+        if authoritative and query_id == "query-original" and trace.get("qualified") is not True:
+            admission = admit_original_literal_context(
+                question=lookup.text, evidence_text=chunk.text, candidate=metadata,
+                expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+            )
+            if admission is not None:
+                trace["literal_context_admission"] = admission
         matches = {
             key: {**value, "admission_only": True}
             for key, value in (metadata.get("retrieval_query_matches") or {}).items()

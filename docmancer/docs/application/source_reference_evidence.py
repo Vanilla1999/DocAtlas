@@ -23,6 +23,7 @@ class SourceReferenceContext:
         self.plans: dict[str, dict[str, Any]] = {}
         self.sources: dict[str, CatalogSource] = {}
         self.source_file_hashes: dict[str, str] = {}
+        self.source_member_bindings: dict[str, dict[str, str]] = {}
         self.documents: dict[str, Any] = {}
         self.complete = False
         generation = store.active_generation_id() if hasattr(store, "active_generation_id") else None
@@ -56,6 +57,11 @@ class SourceReferenceContext:
                 self.source_file_hashes[source_key] = str(
                     metadata.get("project_doc_content_hash") or ""
                 )
+                self.source_member_bindings[source_key] = {
+                    "doc_scope": str(metadata.get("doc_scope") or "project"),
+                    "module_path": str(metadata.get("module_path") or ""),
+                    "catalog_entry_hash": str(metadata.get("project_doc_catalog_entry_hash") or ""),
+                }
             self.complete = True
         for text in dict.fromkeys((question, *(getattr(query, "text", "") for query in queries))):
             self.plan(text)
@@ -161,6 +167,7 @@ class SourceReferenceContext:
                             metadata["_reference_evidence"] = {
                                 "schema_version": 1, "source": asdict(identity),
                                 "project_doc_content_hash": trusted_file_hash,
+                                "member_binding": dict(self.source_member_bindings[str(chunk.source)]),
                                 "char_start": start, "char_end": end,
                                 "text": content[start:end], "raw_document": content,
                                 "owner": {"text": header, "char_start": owner.char_start,
