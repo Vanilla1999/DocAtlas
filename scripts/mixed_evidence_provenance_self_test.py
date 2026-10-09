@@ -12,7 +12,7 @@ from eval.agent_developer_v1.current_retrieval_runtime import bytes_sha256, sha2
 from eval.agent_developer_v1.finite_http_fixture import finite_target
 from eval.agent_developer_v1.mixed_retrieval_runtime import REQUEST_BINDINGS, expected_request, project_documents
 from eval.agent_developer_v1.mixed_provenance import (
-    P15_RUNTIME_PATHS, PROTECTED_PROOF_ROLES, load_json, load_protocol, score_observation, verify_report,
+    P15_RUNTIME_PATHS, PROTECTED_PROOF_ROLES, _stored_errors, load_json, load_protocol, score_observation, verify_report,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -191,6 +191,16 @@ def test_support_gap_is_retained_but_not_hidden() -> None:
 
 
 def test_assignment_source_ledgers_fail_closed() -> None:
+    # The independent range oracle must retain LF/CRLF and terminal blank lines.
+    path = "docs/line-ending-control.md"
+    for text in ("Whole first line.\n", "Whole first line.\r\nSecond whole line.\r\n",
+                 "Whole first line.\n\n"):
+        child = _child(path, text, identity="local:" + "1" * 64)
+        assert _stored_errors([child], {path: text}) == []
+    forged = deepcopy(child)
+    forged["line_end"] = 1
+    assert "stored_child_bytes" in _stored_errors([forged], {path: text})
+
     case = _case("document_statement_binds_exact_path")
     baseline = _control(case)
     raw = deepcopy(baseline)

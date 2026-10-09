@@ -133,7 +133,13 @@ def prepare_external_sources(service, project: Path, targets: list[dict], worksp
     if (job.get("tool") != "docs_status" or job.get("action") != "job"
             or job.get("job_id") != started["job_id"] or job.get("status") != "succeeded"):
         detail = {key: job.get(key) for key in ("status", "phase", "reason_code", "message", "errors", "warnings") if key in job}
-        raise RuntimeError("public finite fixture preparation failed: " + json.dumps(detail, default=str)[:1200])
+        observed_job = service.jobs.get(started["job_id"])
+        if getattr(observed_job, "job_id", None) == started["job_id"]:
+            detail["observed_job"] = {
+                key: deepcopy(getattr(observed_job, key, None))
+                for key in ("job_id", "status", "target_results", "errors", "warnings")
+            }
+        raise RuntimeError("public finite fixture preparation failed: " + json.dumps(detail, default=str))
     records = []
     for target in targets:
         identity, version = target["identity"], target["version"]["requested"]

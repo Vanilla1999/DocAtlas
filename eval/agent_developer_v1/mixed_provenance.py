@@ -146,7 +146,7 @@ def _stored_errors(rows, documents: dict[str, str]) -> list[str]:
                 or not (1 <= ls <= le <= len(raw.splitlines()))):
             errors.append("stored_child_coordinates")
         elif (raw[cs:ce] != text or raw.encode()[bs:be] != text.encode()
-              or text not in "\n".join(raw.splitlines()[ls - 1:le])):
+              or text not in "".join(raw.splitlines(keepends=True)[ls - 1:le])):
             errors.append("stored_child_bytes")
         if (row.get("display_content_hash") != hashlib.sha256(text.encode()).hexdigest()
                 or row.get("source_content_hash") != hashlib.sha256(raw.encode()).hexdigest()):
@@ -470,7 +470,7 @@ def derive_from_paths(*, repo_root: Path, protocol_path: Path, model_path: Path 
                 import traceback
                 traceback.print_exc()
                 observation = {"execution": "public_fixture_runtime",
-                               "error": {"type": type(exc).__name__, "message": str(exc)[:1400]},
+                               "error": {"type": type(exc).__name__, "message": str(exc)},
                                "public_payload": {}, "bindings": {}}
             rows.append(_case_row(case, observation))
     try:
