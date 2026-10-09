@@ -340,7 +340,7 @@ def exact_document_recovery() -> dict[str, Any]:
                      for item in mandatory), "recovery_path_not_invented_topic", mandatory)
     with _service() as (service, project):
         original_query = service.project_docs.query_project_docs
-        store = service.project_docs._agent_instance().store
+        store = service._read_agent_instance().store
         original_full_scan = store.list_sections_for_embedding
         generation = service.member_storage_policy.generation()
         service.project_docs.query_project_docs = lambda *args, **kwargs: []

@@ -82,3 +82,25 @@ Recovery scripts сейчас редактирует root отдельным с�
 
 Нужны independent static review, обычный recovery baseline/mutation gate и current core controls на опубликованном SHA.
 Локальные imports, pytest, AST и subprocesses не выполнялись. До фактического CI результата merge-readiness не заявляется.
+
+## Actual CI на `1c6c2c8`: холодный read прошёл, fixture требует read accessor
+
+В [run 38003248365 / advanced job 114066061733](https://github.com/Vanilla1999/DocAtlas/actions/runs/38003248365/job/114066061733)
+на PR HEAD `1c6c2c8454cdd6fe797fe80e85f3b651aef01a0a` case `closed_literal_context` прошёл вместе с прежним cold first-read fingerprint guard.
+GitHub исполнял merge checkout `64caa3caf213a6a67d44c92546660ef1ced23d87`; его parent — этот PR HEAD,
+а tree в обоих случаях `8a544267409f0dbf3ab498dfa864c07b13cdfb73`.
+
+Recovery baseline: **11 PASS / 0 FAIL / 1 ERROR**. `exact_document_recovery` остановился в setup:
+`service.project_docs._agent_instance()` отклонён новым read facade с `PermissionError` до public call.
+Mutation gate правильно отказался засчитывать evidence при негрин baseline; 12/18 пока не доказаны.
+
+Узкая fixture migration заменяет только этот writer accessor на `service._read_agent_instance().store`.
+Это именно store production fallback: `_FixtureService.__getattr__` выбирает сохранённый read facade;
+`ProjectDocsService.facade` хранит этот же объект; `_project_docs_service_part03._exact_document_index_chunks` вызывается
+с `self.facade._read_agent_instance()`, а `AgentIndexGateway.read_agent_instance` возвращает кешированный `_read_default_agent`.
+Следовательно прежний forbidden `list_sections_for_embedding` hook установлен на тот же store,
+который fallback использует для bounded `list_sections_for_source`. Это не переход к writer или обход запрета.
+
+Сохранены query denial, full-scan denial, restoration, source/fact/generation assertions, все 12 case names,
+код cold first-read before/after и все 18 production mutation definitions. Новые assertions или вызовы retrieval не добавлены.
+Миграция ещё требует обычного CI; новые member transaction controls и весь acceptance отдельно не объявляются зелёными.
