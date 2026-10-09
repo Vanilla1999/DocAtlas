@@ -264,12 +264,12 @@ jobs:
 
       - name: Run Agent Developer Protocol gate
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
-        run: python scripts/run_agent_developer_gate.py
+        run: python scripts/run_agent_developer_gate.py --output "$RUNNER_TEMP/agent-developer-v1.json"
 
       - name: Run Agent Developer adversarial/token gate
         id: agent_adversarial
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
-        run: python scripts/run_agent_developer_adversarial_gate.py
+        run: python scripts/run_agent_developer_adversarial_gate.py --output "$RUNNER_TEMP/agent-developer-v2.json"
 
       - name: Run critical mutation gate
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
@@ -289,6 +289,8 @@ jobs:
             ${{ runner.temp }}/docatlas-agent-v2-mutant-*
             ${{ runner.temp }}/docatlas-recovery-evidence-*
             ${{ runner.temp }}/recovery-contract.json
+            ${{ runner.temp }}/agent-developer-v1.json
+            ${{ runner.temp }}/agent-developer-v2.json
           if-no-files-found: warn
           retention-days: 14
 

@@ -9,6 +9,8 @@ metric, or edit-readiness drift.
 """
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -20,8 +22,7 @@ from typing import Any
 
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
-from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
-from docmancer.docs.interfaces.mcp.prefetch_tools import handle_prefetch_tool
+from docmancer.mcp._docs_server_part01 import call_docs_tool_payload
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
 from eval.evidence_quality_v2.runtime import index_project, isolated_service
@@ -51,18 +52,28 @@ _ORACLE_ONLY_FIELDS = {
     "mutation_before_calls",
 }
 _PROJECT_PATH_MARKER = "$PROJECT_PATH"
-_REMOVED_REQUEST_FIELDS = {"delivery_strategy", "packet_tokens", "details"}
+_REMOVED_REQUEST_FIELDS = {"delivery_strategy", "packet_tokens"}
+_REQUIRED_MIGRATION_CONTROL_IDS = {"explicit_catalog_module_supported"}
+
+
+def handle_context_tool(name: str, args: dict[str, Any], service: Any) -> dict[str, Any]:
+    """Exercise the advertised schema, ownership check, handler and serialization."""
+    return call_docs_tool_payload(name, args, service)
+
+
+def handle_prefetch_tool(name: str, args: dict[str, Any], service: Any) -> dict[str, Any]:
+    return call_docs_tool_payload(name, args, service)
 
 
 def _scope_signature(call: dict[str, Any]) -> dict[str, str]:
     scope = str(call.get("scope") or "").strip()
-    if not scope and str(call.get("mode") or "") == "dependency":
+    if not scope and (call.get("library") or str(call.get("mode") or "") == "dependency"):
         scope = "dependency"
     if not scope:
         raise ValueError("agent developer context calls require an explicit scope")
     signature = {"scope": scope}
     for key in ("module", "module_path"):
-        value = str(call.get(key) or "").strip()
+        value = str(call.get(key) or (call.get("rejected_arguments") or {}).get(key) or "").strip()
         if value:
             signature[key] = value
     return signature
@@ -139,9 +150,18 @@ def _load_protocol() -> dict[str, Any]:
         raise ValueError("public task ids and oracle trajectory ids must match exactly")
 
     merged_tasks: list[dict[str, Any]] = []
-    for public_task in public_tasks:
+    controls = oracle.get("migration_controls") or []
+    if not isinstance(controls, list):
+        raise ValueError("migration_controls must be a list")
+    control_ids = {str(row.get("id") or "") for row in controls if isinstance(row, dict)}
+    if control_ids != _REQUIRED_MIGRATION_CONTROL_IDS:
+        raise ValueError("required explicit-membership positive control is missing or replaced")
+    if len(control_ids) != len(controls) or "" in control_ids or control_ids & set(task_by_id):
+        raise ValueError("migration controls require distinct nonempty IDs")
+    for public_task in [*public_tasks, *controls]:
         task_id = str(public_task["id"])
-        task = {**public_task, **oracle_by_id[task_id]}
+        task = ({**public_task, **oracle_by_id[task_id]}
+                if task_id in oracle_by_id else dict(public_task))
         calls = task.get("calls")
         if not isinstance(calls, list) or not calls:
             raise ValueError(f"task {task_id} requires at least one context call")
@@ -228,15 +248,24 @@ def _load_protocol() -> dict[str, Any]:
         "schema_version": 1,
         "protocol": "agent-developer-v1",
         "target_metrics": target_metrics,
-        "tasks": merged_tasks,
+        "tasks": [task for task in merged_tasks if task["id"] in task_by_id],
+        "migration_controls": [task for task in merged_tasks if task["id"] in control_ids],
     }
 
 
 @contextmanager
 def _service(tmp: Path, project: Path):
-    """Confirm every authored catalog member in a fresh private host store."""
+    """A catalog is input selection; only confirmed preparation creates members.
+
+    The authored no-catalog fixture stays cold so a public read must fail without
+    creating storage. No fallback discovery or legacy eager SQLite fixture exists.
+    """
     with isolated_service(tmp / "state") as (service, config):
         assert not service.member_storage_policy.app_home.exists()
+        if not (project / "docatlas.project-docs.yaml").is_file():
+            yield service._cold
+            assert not service.member_storage_policy.app_home.exists(), "cold_read_created_storage"
+            return
         prepared = index_project(service, config, project)
         assert prepared["indexed_paths"] == prepared["expected_paths"]
         assert not prepared["excluded_or_failed_paths"]
@@ -303,11 +332,48 @@ def _resolved_expected(value: Any, project_path: str) -> Any:
 def _authorizes_edit(payload: dict[str, Any] | None) -> bool:
     if not isinstance(payload, dict):
         return False
-    if payload.get("edit_ready") is True:
+    # Any explicit grant or malformed non-false grant is incompatible with a
+    # retrieval-only result; edit_ready=False cannot conceal an alternate field.
+    if any(payload.get(key) not in (None, False) for key in (
+        "edit_ready", "mutation_ready", "mutation_authorized", "edit_authorized",
+        "authorized", "authorization_granted", "can_edit",
+    )):
         return True
-    return any(payload.get(key) not in (None, {}, []) for key in (
+    return any(payload.get(key) not in (None, {}, [], "") for key in (
         "implementation_guidance", "invariants", "targets", "acceptance_conditions",
+        "authorized_actions", "mutation_actions",
     ))
+
+
+def _source_fidelity_mismatches(payload: dict[str, Any], project: Path) -> list[str]:
+    """Compare delivered quotes with original fixture bytes, not retrieval output."""
+    errors: list[str] = []
+    for row in payload.get("sources") or ():
+        if not isinstance(row, dict):
+            errors.append("source_fidelity: source is not an object")
+            continue
+        source = _safe_fixture_path(project, row.get("path_or_url"))
+        if source is None or not source.is_file():
+            errors.append("source_fidelity: source is outside the authored fixture")
+            continue
+        original = source.read_text(encoding="utf-8")
+        snippet = row.get("snippet")
+        start, end = row.get("line_start"), row.get("line_end")
+        if (not isinstance(snippet, str) or not snippet.strip()
+                or type(start) is not int or type(end) is not int
+                or not 1 <= start <= end <= len(original.splitlines())
+                or snippet not in "\n".join(original.splitlines()[start - 1:end])):
+            errors.append("source_fidelity: quote or coordinates changed")
+        identity = "local:" + hashlib.sha256(str(project.resolve()).encode()).hexdigest()
+        if row.get("project_identity") != identity:
+            errors.append("source_fidelity: project identity changed")
+        digest = row.get("content_sha256")
+        # content_sha256 identifies a bound candidate; it is not the file digest.
+        if not isinstance(digest, str) or len(digest) != 64 or any(ch not in "0123456789abcdef" for ch in digest):
+            errors.append("source_fidelity: missing candidate hash")
+        if not row.get("evidence_id") or not row.get("version_binding"):
+            errors.append("source_fidelity: missing source identity")
+    return errors
 
 
 def _call_target_mismatches(
@@ -319,6 +385,36 @@ def _call_target_mismatches(
     mismatches: list[str] = []
     if not isinstance(payload, dict):
         return ["payload is not an object"]
+    if call.get("target_error_reason"):
+        error = payload.get("error") or {}
+        if not isinstance(error, dict) or error.get("reason_code") != call["target_error_reason"]:
+            mismatches.append(f"public_error_reason: expected {call['target_error_reason']!r}")
+        if _source_paths(payload) or _authorizes_edit(payload):
+            mismatches.append("public_rejection_has_evidence_or_authority")
+    if call.get("target_read_only"):
+        if call.get("target_expected_status") == "ok" and not call.get("library"):
+            if payload.get("kind") != "docs_context":
+                mismatches.append("retrieval_only_kind: project evidence must be docs_context")
+            if payload.get("context_available") is not True:
+                mismatches.append("positive_context_not_available")
+        if any(payload.get(key) not in (None, "", {}, []) for key in (
+                "answer", "answer_text", "final_answer")):
+            mismatches.append("retrieval_only_answer: source context cannot contain a server-composed answer")
+        if _authorizes_edit(payload) or payload.get("answer_supported") is True or payload.get("answer_available") is True:
+            mismatches.append("retrieval_only_authority: source context cannot certify an answer or edit")
+        if payload.get("kind") == "docs_context" and payload.get("context_available"):
+            if payload.get("support_status") != "retrieval_only":
+                mismatches.append("retrieval_only_support_status")
+        if call.get("target_expected_status") == "ok" and not _source_paths(payload):
+            mismatches.append("positive_context_has_no_sources")
+    if call.get("target_empty_sources") is True and _source_paths(payload):
+        mismatches.append("forbidden_visible_context")
+    if call.get("target_source_fidelity"):
+        mismatches.extend(_source_fidelity_mismatches(payload, Path(project_path)))
+    for fact in call.get("target_required_facts") or ():
+        if not any(isinstance(row, dict) and str(fact) in str(row.get("snippet") or "")
+                   for row in payload.get("sources") or ()):
+            mismatches.append(f"required_fact_missing: {fact!r}")
     if str(payload.get("status") or "") != str(call.get("target_expected_status") or ""):
         mismatches.append(
             f"status={payload.get('status')!r} expected={call.get('target_expected_status')!r}"
@@ -366,7 +462,7 @@ def _call_target_mismatches(
     ) != target_confirmation:
         mismatches.append(f"confirmation reason does not match {target_confirmation!r}")
     if "target_requires_confirmation" in call:
-        actual_confirmation = bool(
+        actual_confirmation = (
             action.get("requires_confirmation")
             if "requires_confirmation" in action
             else payload.get("requires_confirmation")
@@ -376,6 +472,10 @@ def _call_target_mismatches(
                 f"requires_confirmation={actual_confirmation!r} "
                 f"expected={bool(call['target_requires_confirmation'])!r}"
             )
+    if call.get("target_confirmation_reasons"):
+        actual_reason = action.get("confirmation_reason") or payload.get("confirmation_reason")
+        if actual_reason not in call["target_confirmation_reasons"]:
+            mismatches.append("confirmation_reason: neither source selection nor network consent")
     if "target_auto_execute" in call:
         if action.get("auto_execute") is not call["target_auto_execute"]:
             mismatches.append(
@@ -389,6 +489,18 @@ def _call_target_mismatches(
                 f"edit authorization={actual_edit_ready!r} "
                 f"expected={bool(call['target_edit_ready'])!r}"
             )
+    if call.get("target_advisory_only") and action:
+        if action.get("auto_execute") is True:
+            mismatches.append("advisory_auto_execute")
+        arguments = action.get("arguments_patch") or {}
+        if isinstance(arguments, dict) and any(key in arguments for key in (
+                "mutation", "confirm", "allow_network", "force_refresh")):
+            mismatches.append("advisory_fabricates_mutation_or_network_grant")
+    if call.get("target_no_action") is True and action:
+        mismatches.append("unexpected_lifecycle_action")
+    target_reason = str(call.get("target_reason_code") or "")
+    if target_reason and payload.get("reason_code") != target_reason:
+        mismatches.append(f"reason_code={payload.get('reason_code')!r} expected={target_reason!r}")
     target_operational_reason = str(call.get("target_operational_reason_code") or "")
     if target_operational_reason and str(payload.get("operational_reason_code") or "") != target_operational_reason:
         mismatches.append(
@@ -414,18 +526,36 @@ def _call_matches_target(
 
 
 def _context_args(call: dict[str, Any], project: Path) -> dict[str, Any]:
-    args = {
-        "question": str(call["question"]),
-        "project_path": str(project),
-        "mode": call.get("mode"),
-    }
-    for key in (
-        "scope", "module", "module_path", "library", "libraries", "ecosystem",
-        "version",
-    ):
+    # Historical mode is evaluator metadata, never a hidden public argument.
+    args: dict[str, Any] = {"question": str(call["question"])}
+    if not call.get("library"):
+        args["project_path"] = str(project)
+    for key in ("scope", "module_path", "library", "version", "lookup_queries"):
         if call.get(key) is not None:
             args[key] = call[key]
+    # Only explicit schema-negative cases can send removed fields. Keeping them
+    # here proves rejection by the public boundary instead of internal routing.
+    if call.get("target_error_reason") == "validation_error":
+        for key, value in (call.get("rejected_arguments") or {}).items():
+            args[key] = value
     return args
+
+
+def _status_binding_mismatches(
+    payload: dict[str, Any] | None, *, project_path: str,
+) -> list[str]:
+    """Bind a recovery inventory to the requested public tool and project."""
+    if not isinstance(payload, dict):
+        return ["status_binding: payload is not an object"]
+    project = payload.get("project")
+    if (payload.get("tool") != "docs_status" or payload.get("action") != "project"
+            or not isinstance(project, dict) or project.get("project_path") != project_path):
+        return ["status_binding: wrong tool, action or project"]
+    # Successful docs_status(project) has no outer status field. Reject explicit
+    # errors without inventing a required status=ok flag for the real DTO.
+    if payload.get("status") not in (None, "ok") or payload.get("error") not in (None, {}):
+        return ["status_binding: failed status response cannot authorize a retry"]
+    return []
 
 
 def _status_module_paths(payload: dict[str, Any] | None) -> tuple[str, ...]:
@@ -459,12 +589,17 @@ def _execute_target_recovery(
     action_arguments = action.get("arguments_patch")
     errors: list[str] = []
     status_payload: dict[str, Any] | None = None
+    explicit_status = recovery.get("status_request")
+    if isinstance(explicit_status, dict):
+        action_tool = "docs_status"
+        action_arguments = _resolved_expected(explicit_status, str(project))
     if action_tool != "docs_status" or not isinstance(action_arguments, dict):
         errors.append("recovery requires an executable docs_status action")
     else:
         status_payload = handle_prefetch_tool(
             "docs_status", dict(action_arguments), service,
         )
+        errors.extend(_status_binding_mismatches(status_payload, project_path=str(project)))
 
     retry = recovery.get("retry")
     retry_payload: dict[str, Any] | None = None
@@ -473,14 +608,19 @@ def _execute_target_recovery(
         errors.append("recovery retry contract is missing")
     else:
         retry_module_path = str(retry.get("module_path") or "")
-        first_candidates = _module_candidate_paths(payload)
+        first_candidates = (_status_module_paths(status_payload) if isinstance(explicit_status, dict)
+                            else _module_candidate_paths(payload))
+        expected_modules = tuple(sorted(recovery.get("expected_module_paths") or ()))
+        if expected_modules and tuple(sorted(_status_module_paths(status_payload))) != expected_modules:
+            errors.append("status_inventory: exact module paths changed")
         if retry_module_path not in first_candidates:
             errors.append(
                 f"retry module_path={retry_module_path!r} was not returned as a candidate"
             )
-        retry_payload = handle_context_tool(
-            "get_docs_context", _context_args(retry, project), service,
-        )
+        retry_args = _context_args(retry, project)
+        if _scope_signature(retry_args) != _scope_signature(retry):
+            errors.append("retry_scope: public arguments changed the exact selector")
+        retry_payload = handle_context_tool("get_docs_context", retry_args, service)
         retry_mismatches = _call_target_mismatches(
             retry, retry_payload, project_path=str(project),
         )
@@ -524,11 +664,13 @@ def run_protocol() -> dict[str, Any]:
     unsupported_total = 0
     unsupported_non_edit_ready = 0
     previous_home = os.environ.get("DOCATLAS_HOME")
+    control_ids = {task["id"] for task in protocol["migration_controls"]}
 
     try:
-        for task in protocol["tasks"]:
+        for task in [*protocol["tasks"], *protocol["migration_controls"]]:
             task_id = str(task["id"])
-            class_counts[str(task["class"])] += 1
+            if task_id not in control_ids:
+                class_counts[str(task["class"])] += 1
             fixture = PROJECTS_ROOT / str(task["fixture"])
             if not fixture.is_dir():
                 errors.append(f"{task_id}: fixture missing: {fixture.relative_to(REPO_ROOT)}")
@@ -554,11 +696,14 @@ def run_protocol() -> dict[str, Any]:
                 actual_calls: list[dict[str, Any]] = []
                 task_target_closed = True
                 task_recovery_contract_ok = True
+                task_scope_contract_ok = True
                 context_call_count = 0
                 for index, call in enumerate(task["calls"], 1):
-                    payload = handle_context_tool(
-                        "get_docs_context", _context_args(call, project), service,
-                    )
+                    args = _context_args(call, project)
+                    if _scope_signature(args) != _scope_signature(call):
+                        task_scope_contract_ok = False
+                        errors.append(f"{task_id}:{index}: public scope drift")
+                    payload = handle_context_tool("get_docs_context", args, service)
                     context_call_count += 1
                     actual_status = (
                         str(payload.get("status") or "") if isinstance(payload, dict) else ""
@@ -601,11 +746,12 @@ def run_protocol() -> dict[str, Any]:
                                 for message in recovery_result.get("errors") or []
                             )
 
-                    if call.get("target_next_action_tool"):
+                    if (call.get("target_next_action_tool") or call.get("target_recovery")
+                            or "target_requires_confirmation" in call):
                         action_contract_total += 1
                         if target_closed:
                             action_contract_passed += 1
-                    if str(call.get("target_expected_status") or "") == "insufficient_evidence":
+                    if str(call.get("target_expected_status") or "") in {"insufficient_evidence", "failed"}:
                         unsupported_total += 1
                         if not _authorizes_edit(payload):
                             unsupported_non_edit_ready += 1
@@ -673,6 +819,7 @@ def run_protocol() -> dict[str, Any]:
                             ),
                             "confirmation_reason": confirmation_reason or None,
                             "edit_authorized": _authorizes_edit(payload),
+                            "public_error_reason": ((payload or {}).get("error") or {}).get("reason_code"),
                             "operational_reason_code": (
                                 str((payload or {}).get("operational_reason_code") or "") or None
                                 if isinstance(payload, dict) else None
@@ -680,6 +827,7 @@ def run_protocol() -> dict[str, Any]:
                             "module_candidates": list(_module_candidate_paths(payload)),
                             "recovery": recovery_result or None,
                             "target_closed": target_closed,
+                            "target_mismatches": target_mismatches,
                         }
                     )
 
@@ -696,7 +844,7 @@ def run_protocol() -> dict[str, Any]:
                         "class": str(task["class"]),
                         "known_gap": task.get("known_gap"),
                         "target_closed": task_target_closed,
-                        "scope_contract_ok": True,
+                        "scope_contract_ok": task_scope_contract_ok,
                         "recovery_contract_ok": task_recovery_contract_ok,
                         "context_call_count": context_call_count,
                         "calls": actual_calls,
@@ -708,8 +856,16 @@ def run_protocol() -> dict[str, Any]:
         else:
             os.environ["DOCATLAS_HOME"] = previous_home
 
+    controls = [item for item in task_results if item["task_id"] in control_ids]
+    task_results = [item for item in task_results if item["task_id"] not in control_ids]
+    controls_ok = len(controls) == len(control_ids) and all(item["target_closed"] for item in controls)
     target_closed_tasks = sum(1 for item in task_results if item["target_closed"])
-    module_only = [item for item in task_results if item["class"] == "module_only"]
+    positive_module_ids = {
+        task["id"] for task in [*protocol["tasks"], *protocol["migration_controls"]]
+        if task["class"] == "module_only"
+        and any(call.get("target_expected_status") == "ok" for call in task["calls"])
+    }
+    module_only = [item for item in [*task_results, *controls] if item["task_id"] in positive_module_ids]
     module_project = [item for item in task_results if item["class"] == "module_plus_project"]
     cross_module = [item for item in task_results if item["class"] == "cross_module"]
     module_dependency = [
@@ -762,6 +918,7 @@ def run_protocol() -> dict[str, Any]:
         and not target_gaps
         and false_supported == 0
         and contamination == 0
+        and controls_ok
     )
     return {
         "schema_version": 1,
@@ -780,11 +937,20 @@ def run_protocol() -> dict[str, Any]:
         "class_counts": dict(sorted(class_counts.items())),
         "errors": errors,
         "tasks": task_results,
+        "migration_controls": controls,
+        "migration_control_count": len(control_ids),
+        "migration_controls_ok": controls_ok,
     }
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args(argv)
     report = run_protocol()
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     for task in report["tasks"]:
         state = "TARGET-CLOSED" if task["target_closed"] else "BASELINE-ONLY"
         gap = (

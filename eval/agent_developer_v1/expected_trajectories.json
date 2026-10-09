@@ -15,79 +15,463 @@
   "trajectories": [
     {
       "id": "module_definition_supported",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
-      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
-      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["packages/orders/README.md"]}]
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md",
+        "ARCHITECTURE.md"
+      ],
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
+          ]
+        }
+      ]
     },
     {
       "id": "module_behavior_named_gap",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
-      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md",
+        "ARCHITECTURE.md"
+      ],
       "known_gap": "generic_behavior_predicate_stores",
-      "calls": [{"question": "What does OrdersDraftStore do?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "ok", "target_required_sources": ["packages/orders/README.md"]}]
+      "calls": [
+        {
+          "question": "What does OrdersDraftStore do?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload."
+          ]
+        }
+      ]
     },
     {
       "id": "module_requirements_named_gap",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
-      "forbidden_sources": ["packages/payments/README.md", "ARCHITECTURE.md"],
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md",
+        "ARCHITECTURE.md"
+      ],
       "known_gap": "domain_neutral_requirements",
-      "calls": [{"question": "What does OrderValidationContract require?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "ok", "target_required_sources": ["packages/orders/README.md"]}]
+      "calls": [
+        {
+          "question": "What does OrderValidationContract require?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "ok",
+          "target_required_sources": [
+            "packages/orders/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total."
+          ]
+        }
+      ]
     },
     {
       "id": "project_policy_supported",
-      "required_scopes": [{"scope": "project"}],
-      "forbidden_sources": ["packages/orders/README.md", "packages/payments/README.md"],
-      "calls": [{"question": "What is ProjectRetryPolicy?", "mode": "project", "scope": "project", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}]
+      "required_scopes": [
+        {
+          "scope": "project"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/orders/README.md",
+        "packages/payments/README.md"
+      ],
+      "calls": [
+        {
+          "question": "What is ProjectRetryPolicy?",
+          "mode": "project",
+          "scope": "project",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ProjectRetryPolicy is the project-wide retry policy."
+          ]
+        }
+      ]
     },
     {
       "id": "module_plus_project_two_call_trajectory",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}, {"scope": "project"}],
-      "forbidden_sources": ["packages/payments/README.md"],
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        },
+        {
+          "scope": "project"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md"
+      ],
       "calls": [
-        {"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["packages/orders/README.md"]},
-        {"question": "What is ProjectRetryPolicy?", "mode": "project", "scope": "project", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
+          ]
+        },
+        {
+          "question": "What is ProjectRetryPolicy?",
+          "mode": "project",
+          "scope": "project",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ProjectRetryPolicy is the project-wide retry policy."
+          ]
+        }
       ]
     },
     {
       "id": "cross_module_comparison_supported",
-      "required_scopes": [{"scope": "all"}],
+      "required_scopes": [
+        {
+          "scope": "all"
+        }
+      ],
       "forbidden_sources": [],
-      "calls": [{"question": "How does OrdersDraftStore differ from PaymentOutbox?", "mode": "project", "scope": "all", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["ARCHITECTURE.md"]}]
+      "calls": [
+        {
+          "question": "How does OrdersDraftStore differ from PaymentOutbox?",
+          "mode": "project",
+          "scope": "all",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "ARCHITECTURE.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation."
+          ]
+        }
+      ]
     },
     {
       "id": "wrong_module_isolation",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
-      "forbidden_sources": ["packages/payments/README.md"],
-      "calls": [{"question": "What is PaymentOutbox?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "target_edit_ready": false}]
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md"
+      ],
+      "calls": [
+        {
+          "question": "What is PaymentOutbox?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "insufficient_evidence",
+          "target_edit_ready": false,
+          "target_read_only": true,
+          "target_empty_sources": true
+        }
+      ]
     },
     {
       "id": "autodiscovery_module_supported",
-      "required_scopes": [{"scope": "module", "module_path": "services/catalog"}],
-      "forbidden_sources": ["README.md"],
-      "calls": [{"question": "What does CatalogReader do?", "mode": "project", "scope": "module", "module_path": "services/catalog", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["services/catalog/README.md"]}]
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "services/catalog"
+        }
+      ],
+      "forbidden_sources": [
+        "README.md"
+      ],
+      "calls": [
+        {
+          "question": "What does CatalogReader do?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "services/catalog",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "failed",
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_error_reason": "permission_denied",
+          "target_no_action": true,
+          "target_empty_sources": true
+        }
+      ],
+      "contract_migration": "Implicit discovery is retired: unchanged question and fixture must be rejected by the cold public boundary; explicit_catalog_module_supported is a separate required positive control."
     },
     {
       "id": "ambiguous_module_recovery_named_gap",
-      "required_scopes": [{"scope": "module", "module": "auth"}, {"scope": "module", "module_path": "packages/auth"}],
-      "forbidden_sources": ["packages/auth/README.md", "services/auth/README.md"],
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module": "auth"
+        },
+        {
+          "scope": "module",
+          "module_path": "packages/auth"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/auth/README.md",
+        "services/auth/README.md"
+      ],
       "known_gap": "bounded_module_ambiguity_projection",
-      "calls": [{"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module": "auth", "packet_tokens": 256, "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "code_search", "target_next_action_tool": "docs_status", "target_next_action_arguments": {"action": "project", "details": true, "module": "auth", "project_path": "$PROJECT_PATH"}, "target_requires_confirmation": false, "target_auto_execute": false, "target_edit_ready": false, "target_operational_reason_code": "module_ambiguous", "target_module_candidates": ["packages/auth", "services/auth"], "target_recovery": {"retry": {"question": "What is PackageAuthBoundary?", "mode": "project", "scope": "module", "module_path": "packages/auth", "target_expected_status": "ok", "target_required_sources": ["packages/auth/README.md"], "forbidden_sources": ["services/auth/README.md", "README.md"]}}}]
+      "calls": [
+        {
+          "question": "What is PackageAuthBoundary?",
+          "mode": "project",
+          "scope": "module",
+          "packet_tokens": 256,
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "failed",
+          "baseline_next_action_tool": "code_search",
+          "target_edit_ready": false,
+          "target_recovery": {
+            "retry": {
+              "question": "What is PackageAuthBoundary?",
+              "mode": "project",
+              "scope": "module",
+              "module_path": "packages/auth",
+              "target_expected_status": "ok",
+              "target_required_sources": [
+                "packages/auth/README.md"
+              ],
+              "forbidden_sources": [
+                "services/auth/README.md",
+                "README.md"
+              ],
+              "target_read_only": true,
+              "target_edit_ready": false,
+              "target_source_fidelity": true,
+              "target_required_facts": [
+                "PackageAuthBoundary is the reusable package authentication boundary."
+              ]
+            },
+            "status_request": {
+              "action": "project",
+              "details": true,
+              "module": "auth",
+              "project_path": "$PROJECT_PATH"
+            },
+            "expected_module_paths": [
+              "packages/auth",
+              "services/auth"
+            ]
+          },
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "rejected_arguments": {
+            "module": "auth"
+          },
+          "target_error_reason": "validation_error",
+          "target_no_action": true,
+          "target_next_action_tool": null
+        }
+      ],
+      "contract_migration": "Removed module-name input is a public schema negative. The host explicitly inspects both catalog module paths and retries the chosen exact path; source prose never selects a scope."
     },
     {
       "id": "stale_module_docs_recovery",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}],
-      "forbidden_sources": ["packages/payments/README.md"],
-      "mutation_before_calls": {"path": "packages/orders/README.md", "append": "\nStaleProtocolFact is added after indexing.\n"},
-      "calls": [{"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "target_next_action_arguments": {"action": "sync_project_docs", "project_path": "$PROJECT_PATH", "with_vectors": false}, "target_requires_confirmation": true, "target_auto_execute": false, "target_edit_ready": false, "baseline_confirmation_reason": "project_docs_preflight", "target_confirmation_reason": "project_docs_preflight"}]
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md"
+      ],
+      "mutation_before_calls": {
+        "path": "packages/orders/README.md",
+        "append": "\nStaleProtocolFact is added after indexing.\n"
+      },
+      "calls": [
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "insufficient_evidence",
+          "baseline_next_action_tool": "prepare_docs",
+          "target_next_action_tool": null,
+          "target_requires_confirmation": true,
+          "target_edit_ready": false,
+          "baseline_confirmation_reason": "project_docs_preflight",
+          "target_confirmation_reason": "project_docs_preflight",
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "target_advisory_only": true
+        }
+      ],
+      "contract_migration": "A changed member hash blocks evidence and preserves confirmation. A read cannot create a new mutation grant; no server-invented confirm/hash/generation is accepted."
     },
     {
       "id": "dependency_prefetch_recovery",
-      "required_scopes": [{"scope": "module", "module_path": "packages/orders"}, {"scope": "dependency"}],
-      "forbidden_sources": ["packages/payments/README.md"],
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "packages/orders"
+        },
+        {
+          "scope": "dependency"
+        }
+      ],
+      "forbidden_sources": [
+        "packages/payments/README.md"
+      ],
       "calls": [
-        {"question": "What is OrdersDraftStore?", "mode": "project", "scope": "module", "module_path": "packages/orders", "baseline_expected_status": "ok", "target_expected_status": "ok", "required_sources": ["packages/orders/README.md"]},
-        {"question": "What is tenacity.Retrying?", "mode": "dependency", "baseline_expected_status": "insufficient_evidence", "target_expected_status": "insufficient_evidence", "baseline_next_action_tool": "prepare_docs", "target_next_action_tool": "prepare_docs", "target_next_action_arguments": {"action": "prefetch_project_dependency_docs", "project_path": "$PROJECT_PATH"}, "target_requires_confirmation": true, "target_auto_execute": false, "target_edit_ready": false, "baseline_confirmation_reason": "network_fetch", "target_confirmation_reason": "network_fetch"}
+        {
+          "question": "What is OrdersDraftStore?",
+          "mode": "project",
+          "scope": "module",
+          "module_path": "packages/orders",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "packages/orders/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
+          ]
+        },
+        {
+          "question": "What is tenacity.Retrying?",
+          "mode": "dependency",
+          "baseline_expected_status": "insufficient_evidence",
+          "target_expected_status": "insufficient_evidence",
+          "baseline_next_action_tool": "prepare_docs",
+          "target_next_action_tool": null,
+          "target_requires_confirmation": true,
+          "target_edit_ready": false,
+          "baseline_confirmation_reason": "network_fetch",
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "library": "tenacity",
+          "version": "8.2.3",
+          "target_confirmation_reasons": [
+            "network_fetch",
+            "library_docs_source"
+          ],
+          "target_confirmation_reason": null,
+          "target_advisory_only": true
+        }
+      ],
+      "contract_migration": "Retired dependency mode becomes the explicit pinned library target from pyproject.toml. Missing source or network approval is a fail-closed no-context result, with no automatic prefetch."
+    }
+  ],
+  "migration_controls": [
+    {
+      "id": "explicit_catalog_module_supported",
+      "class": "module_only",
+      "fixture": "explicit_catalog_monorepo",
+      "working_path": "services/catalog/src/reader.py",
+      "developer_task": "Read the explicitly selected catalog module after confirmed member preparation.",
+      "max_get_docs_context_calls": 1,
+      "contract_migration": "Positive successor to retired autodiscovery; original source bytes and question are unchanged.",
+      "required_scopes": [
+        {
+          "scope": "module",
+          "module_path": "services/catalog"
+        }
+      ],
+      "forbidden_sources": [
+        "README.md"
+      ],
+      "calls": [
+        {
+          "question": "What does CatalogReader do?",
+          "scope": "module",
+          "module_path": "services/catalog",
+          "baseline_expected_status": "ok",
+          "target_expected_status": "ok",
+          "required_sources": [
+            "services/catalog/README.md"
+          ],
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "CatalogReader reads product summaries from the local catalog cache."
+          ]
+        }
       ]
     }
-  ]
+  ],
+  "contract_revision": "explicit-member-public-retrieval-2026-10-09"
 }
