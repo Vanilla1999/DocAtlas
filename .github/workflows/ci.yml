@@ -226,7 +226,7 @@ jobs:
 
       - name: Run recoverable documentation failure gate
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
-        run: python scripts/run_recovery_contract_gate.py
+        run: python scripts/run_recovery_contract_gate.py --report "$RUNNER_TEMP/recovery-contract.json"
 
       - name: Run recoverable documentation failure mutation gate
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' }}
@@ -279,14 +279,16 @@ jobs:
         if: ${{ !cancelled() && steps.advanced_dependencies.outcome == 'success' && steps.agent_adversarial.outcome == 'success' }}
         run: python scripts/run_agent_developer_adversarial_mutation_gate.py
 
-      - name: Upload critical mutation gate artifacts
-        if: failure()
+      - name: Upload mutation gate evidence
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: critical-mutation-gate-${{ github.run_id }}
           path: |
             ${{ runner.temp }}/docmancer-mutation-*
             ${{ runner.temp }}/docatlas-agent-v2-mutant-*
+            ${{ runner.temp }}/docatlas-recovery-evidence-*
+            ${{ runner.temp }}/recovery-contract.json
           if-no-files-found: warn
           retention-days: 14
 

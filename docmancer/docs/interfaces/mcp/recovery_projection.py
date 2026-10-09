@@ -188,6 +188,11 @@ def _attach_recovery_diagnosis(
     # A concrete lifecycle/status/user-confirmation action describes a known
     # operational state and is more precise than changing the wording. Preserve
     # it unless canonical evidence reports an authoritative hard stop.
+    if bool(diagnosis.get("hard_stop")):
+        updated["next_action"] = None
+        updated["next_actions"] = []
+        updated.pop("recommended_next_action", None)
+        return updated
     operational = _first_operational_action(updated)
     if operational is not None and not bool(diagnosis.get("hard_stop")):
         updated.update({

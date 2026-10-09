@@ -1,5 +1,27 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Исполнение плана: первый contract slice
+
+2026-10-09 владелец поручил оценить, скорректировать и выполнить план.
+Реализация предусмотренного этапа retrieval теперь разрешена; новое решение
+записано в current decisions. Первым подготовлен
+[question/recovery slice](pr211-execution/SLICE_01_CONTRACTS_RU.md): текущий
+literal request contract, реальные member-backed positives/negatives,
+source-removal transformation, приоритет authoritative conflict и отсутствие
+next action при hard stop, строгие mutation reports и миграция семи span failures.
+Исходные 288/399 parametrized cases пока сохраняются до сравнения силы проверок.
+
+Baseline перед реализацией подтверждён raw artifacts `1148923`: core Python 3.12
+8513 = 6506 PASS / 1936 FAIL / 61 ERROR / 10 SKIP; advanced 622 = 524 PASS / 98 FAIL.
+Состав core и outcomes совпадают с `fe48e7b`; остальные Python matrices этим
+сравнением заново не сертифицируются. Все FAIL/ERROR включены в
+`pr211-execution/BASELINE_FAILURES.json.gz`, неизвестные причины остаются открытыми.
+
+Статические проверки и независимое review первого slice завершены перед
+публикацией; новый runtime и mutation outcomes ожидаются из обычного PR CI.
+Готовность к merge не заявляется. Следом идут Agent/adversarial fixtures и
+docs/catalog/quality, затем retrieval и оставшиеся семьи падений.
+
 ## Текущий план и проверенный результат e4f0ae0
 
 Обновление: 2026-10-09. По запросу владельца составлен

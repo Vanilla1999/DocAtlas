@@ -139,6 +139,19 @@ def build_recovery_diagnosis(
         "hard_stop": False,
     }
 
+    # A concrete authoritative conflict also blocks an otherwise valid
+    # operational recovery. Fetch/preparation is not permission to choose
+    # between contradictory source statements.
+    if proof_origin == "source_documentation" and "conflicting_authoritative_evidence" in proof_reasons:
+        result.update({
+            "origin": "conflict",
+            "reason_code": "authoritative_evidence_conflict",
+            "disposition": "resolve_authoritative_conflict",
+            "hard_stop": True,
+            "detail_reasons": proof_reasons,
+        })
+        return result
+
     if operational_reason in _OPERATIONAL_RECOVERY_REASONS:
         result.update({
             "origin": "operational",
@@ -188,18 +201,6 @@ def build_recovery_diagnosis(
         reason_code = "evidence_ineligible"
         detail_reasons = proof_reasons
     elif proof_origin == "source_documentation":
-        if "conflicting_authoritative_evidence" in proof_reasons:
-            origin = "conflict"
-            reason_code = "authoritative_evidence_conflict"
-            detail_reasons = proof_reasons
-            result.update({
-                "origin": origin,
-                "reason_code": reason_code,
-                "disposition": "resolve_authoritative_conflict",
-                "hard_stop": True,
-                "detail_reasons": detail_reasons,
-            })
-            return result
         if "fragmented_support_exceeds_bound" in proof_reasons:
             origin = "selection"
             reason_code = "bounded_selection_too_broad"
