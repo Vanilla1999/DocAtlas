@@ -44,6 +44,9 @@ def failure_diagnostics(row: dict) -> dict:
             "differences": differences,
         },
         "output_cost": assessment["output_cost"],
+        "pipeline_diagnostics": observation.get("pipeline_diagnostics"),
+        "service_requests": observation.get("service_requests"),
+        "preparation": observation.get("preparation"),
         "runtime_error": observation.get("error"),
     }
 
@@ -67,9 +70,16 @@ def main(argv: list[str] | None = None) -> int:
           f"complete_fact={summary['required_complete_fact_passed']}/{summary['required_complete_fact']}; "
           f"errors={summary['runtime_error_count']}; report={args.output}")
     for row in report["cases"]:
+        diagnostics = failure_diagnostics(row)
+        print("READ_STATE " + json.dumps({
+            "id": row["id"],
+            "read_only_check": row["assessment"]["checks"]["read_only"],
+            "state_equal": diagnostics["read_only"]["state_equal"],
+            "changed_fields": [item["field"] for item in diagnostics["read_only"]["differences"]],
+        }, sort_keys=True))
         if not row["assessment"]["passed"]:
             print(f"FAIL {row['id']}: {','.join(row['assessment']['failed_checks'])}")
-            print("DIAGNOSTICS " + json.dumps(failure_diagnostics(row), ensure_ascii=False, sort_keys=True))
+            print("DIAGNOSTICS " + json.dumps(diagnostics, ensure_ascii=False, sort_keys=True))
     if report["source_identities"]["runtime_error"]:
         print(f"FAIL runtime identity: {report['source_identities']['runtime_error']}")
     return 0 if report["passed"] else 1
