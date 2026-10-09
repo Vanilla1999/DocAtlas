@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import subprocess
 
 from eval.agent_developer_v1.current_retrieval_runtime import (
     build_runtime_manifest, verify_runtime_manifest,
@@ -76,6 +77,16 @@ def load_json(path: Path) -> dict:
 def git_blob_sha(path: Path, *, repo_root: Path | None = None) -> str:
     payload = path.read_bytes()
     return hashlib.sha1(f"blob {len(payload)}\0".encode("ascii") + payload).hexdigest()
+
+
+def current_code_commit(repo_root: Path) -> str:
+    """Read the same checkout identity used by the current P1.4/P1.5 reports."""
+    value = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo_root, text=True,
+    ).strip()
+    if re.fullmatch(r"[0-9a-f]{40}", value) is None:
+        raise ValueError("current checkout has no valid Git commit identity")
+    return value
 
 
 def _frozen(repo_root: Path) -> tuple[dict, dict]:
@@ -426,6 +437,7 @@ def derive_from_paths(*, repo_root: Path, protocol_path: Path, recovery_path: Pa
         rows.append(report_case(case, contract, capture, error=error))
     return {
         "schema_version": SCHEMA_VERSION, "protocol": PROTOCOL,
+        "code_commit": current_code_commit(repo_root),
         "claim_boundary": deepcopy(BOUNDARY),
         "source_identities": source_identities(
             repo_root, protocol_path=protocol_path, recovery_path=recovery_path,
@@ -444,11 +456,13 @@ def verify_report(report: dict, *, repo_root: Path = ROOT, require_quality: bool
         raise ValueError("P1.6 report persisted hostile content marker")
     if ABSOLUTE_PATH_RE.search(serialized):
         raise ValueError("P1.6 report contains an absolute local path")
-    if set(report) != {"schema_version", "protocol", "claim_boundary", "source_identities",
+    if set(report) != {"schema_version", "protocol", "code_commit", "claim_boundary", "source_identities",
                        "cases", "summary", "production_gate_dependencies"}:
         raise ValueError("P1.6 report omitted or invented fields")
     if report.get("schema_version") != SCHEMA_VERSION or report.get("protocol") != PROTOCOL:
         raise ValueError("P1.6 current report identity mismatch")
+    if report.get("code_commit") != current_code_commit(repo_root):
+        raise ValueError("P1.6 commit identity differs from current checkout")
     if report.get("claim_boundary") != BOUNDARY:
         raise ValueError("P1.6 report overclaims execution boundary")
     protocol, migration = _frozen(repo_root)
