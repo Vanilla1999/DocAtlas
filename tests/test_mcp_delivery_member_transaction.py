@@ -770,7 +770,7 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     from docmancer.mcp._docs_server_part01 import LocalMemberService
     root, store, _app = local
     command = "doc-atlas mcp docs-serve"
-    original = f"# Docs MCP server\n\nThe command that starts the Docs MCP server is `{command}`.\n".encode()
+    original = f"# Docs MCP server Ω e\u0301\n\nThe command that starts the Docs MCP server is `{command}`.\n".encode()
     (root / "README.md").write_bytes(original)
     programs = []
     for index in range(12):
@@ -841,17 +841,54 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
     assert not agent.query(command, budget=8000, filters={
         "project_path": str(root), "project_identity": "git:invalid.example/fixture", "source_class": "project_file",
     })
-    if git_kind == "none":
-        from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
-        payload = handle_context_tool("get_docs_context", {
+    from copy import deepcopy
+    from docmancer.docs.interfaces.mcp import context_tools
+    snapshots = []
+    validator = context_tools.validate_model_visible_projection
+    def observe_validation(payload, *, snapshot, **kwargs):
+        errors = validator(payload, snapshot=snapshot, **kwargs)
+        snapshots.append(deepcopy(snapshot))
+        return errors
+    with monkeypatch.context() as observed:
+        observed.setattr(context_tools, "validate_model_visible_projection", observe_validation)
+        payload = context_tools.handle_context_tool("get_docs_context", {
             "question": "Which command starts the Docs MCP server?", "project_path": str(root),
         }, service)
-        assert payload["sources"]
-        assert any(command in row["snippet"] for row in payload["sources"])
-        assert payload["status"] == "ok"
-        public_bytes = sum(len(row["snippet"].encode()) for row in payload["sources"])
-    else:
-        public_bytes = None
+    assert payload["sources"]
+    assert any(command in row["snippet"] for row in payload["sources"])
+    assert payload["status"] == "ok" and len(snapshots) == 1
+    public_bytes = sum(len(row["snippet"].encode()) for row in payload["sources"])
+    # An actual delivered source must retain its committed child identity. The
+    # index class and retrieval DTO class belong to different representations.
+    with closing(agent.store._connect()) as conn:
+        for public in payload["sources"]:
+            bound = snapshots[0][public["evidence_id"]]
+            source = bound["source"]
+            rows = list(conn.execute(
+                "SELECT c.*, p.source_content_hash AS committed_source_content_hash "
+                "FROM retrieval_children c JOIN retrieval_parents p "
+                "ON p.generation_id = c.generation_id AND p.logical_id = c.parent_logical_id "
+                "WHERE c.generation_id = ? AND c.stable_chunk_id = ? AND c.source_path = ?",
+                (outcome["generation_id"], source["stable_chunk_id"], public["path_or_url"]),
+            ))
+            assert len(rows) == 1, "member_context_unique_committed_child"
+            child = dict(rows[0])
+            assert source["source_class"] == "project_doc" and child["source_class"] == "project_file"
+            assert source["project_identity"] == child["project_identity"] == identity
+            assert source["generation_id"] == child["generation_id"] == outcome["generation_id"]
+            assert bound["projected_source"] == public
+            for field in ("parent_logical_id", "source_identity", "display_content_hash",
+                          "char_start", "char_end", "byte_start", "byte_end", "line_start", "line_end"):
+                assert source.get(field) == child[field], ("member_context_committed_lineage", field)
+            raw = originals[public["path_or_url"]]
+            text = raw.decode("utf-8")
+            assert source.get("source_content_hash") == child["committed_source_content_hash"] == hashlib.sha256(raw).hexdigest()
+            assert source["display_text"] == child["display_text"]
+            assert text[source["char_start"]:source["char_end"]] == source["display_text"]
+            assert raw[source["byte_start"]:source["byte_end"]] == source["display_text"].encode()
+            assert public["snippet"] in source["display_text"]
+            if public["path_or_url"] == "README.md":
+                assert source["byte_end"] > source["char_end"], "member_context_unicode_byte_coordinates"
     assert store.active_generation_id() == outcome["generation_id"]
     assert _member_storage_files(policy) == before_read
     assert not store.extracted_dir.exists()
