@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_project_retrieval_alias_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_project_retrieval_alias_contract.py": "7ae433f3e026f13b67f5a6f9683def90a046b08f59204a1688a75df148b4799a"
+  }
+}

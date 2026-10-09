@@ -21,10 +21,13 @@ TARGET_TESTS = (
     "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
     "tests/task_level/test_actionability.py::test_active_task33_protocol_has_public_actionability_contract",
     "tests/task_level/test_github_models_adapter.py::test_github_models_runner_stops_at_host_owned_turn_limit",
+    "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
 )
-TARGET_CASE_COUNTS = (26, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
+    "docmancer.docs.domain.project_retrieval_intent",
+    "docmancer.docs.domain.documentation_query_plan",
     "docmancer.docs.application.action_packet",
     "docmancer.docs.application._action_packet_shared",
     "docmancer.docs.application._action_packet_part01",
@@ -107,6 +110,17 @@ MUTANTS = (
         "for turn in range(1, request.max_turns + 1):",
         "for turn in range(1, request.max_turns + 2):",
         TARGET_TESTS[2],
+    ),
+    Mutant(
+        "project_retrieval_no_generated_aliases",
+        "docmancer/docs/domain/project_retrieval_intent.py",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n"
+        "    return ()",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n"
+        '    return (ProjectRetrievalAlias("inferred_query", "invented lookup", True, "en"),)',
+        TARGET_TESTS[3],
+        1,
+        "critical_alias_no_generated_queries",
     ),
 )
 
@@ -262,7 +276,7 @@ def _validate_baseline(report: dict[str, Any]) -> None:
     actual = tuple(len(_target_cases(report, target)) for target in TARGET_TESTS)
     if (actual != TARGET_CASE_COUNTS or report["tests"] != sum(TARGET_CASE_COUNTS)
             or any(report[key] != 0 for key in ("failures", "errors", "skipped"))):
-        raise RuntimeError(f"invalid baseline: expected 26+1+1 passing cases, got {actual}; {report}")
+        raise RuntimeError(f"invalid baseline: expected {TARGET_CASE_COUNTS} passing cases, got {actual}; {report}")
 
 
 def _validate_kill(report: dict[str, Any], baseline: dict[str, Any], mutant: Mutant) -> None:
