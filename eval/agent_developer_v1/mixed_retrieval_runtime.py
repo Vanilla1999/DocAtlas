@@ -35,6 +35,41 @@ LINEAGE_FIELDS = (
 )
 
 
+def _observed_fields(value, fields) -> dict:
+    """Copy explicit DTO fields without serializing bodies or invoking producers."""
+    data = value if isinstance(value, dict) else getattr(value, "__dict__", {})
+    return {key: deepcopy(data[key]) for key in fields if key in data}
+
+
+def _observed_result(result) -> dict:
+    data = _observed_fields(result, (
+        "status", "reason_code", "mode_selected", "mode_requested", "context_available",
+        "answer_available", "answer_supported", "support_status", "source_search_status",
+        "requires_confirmation", "confirmation_reason", "library_id", "resolved_version",
+        "docs_snapshot_exact", "stale_before_refresh", "refreshed",
+    ))
+    data["delivery_decision"] = _observed_fields(getattr(result, "delivery_decision", None),
+                                                 ("deliverable", "reason_code"))
+    data["routing"] = _observed_fields(getattr(result, "routing", None),
+                                      ("reason_code", "delegated_mode", "project_path_used", "libraries_requested"))
+    data["lanes"] = {key: _observed_fields(value, ("status", "source_count", "reason_code", "canonical_ids"))
+                     for key, value in (getattr(result, "lanes", None) or {}).items()}
+    identity_fields = tuple(key for key in LINEAGE_FIELDS if key != "display_text")
+    data["context_sources"] = [_observed_fields(item, ("source", "path", "url", *identity_fields))
+                               for item in (getattr(result, "context_pack", None) or ())]
+    data["library_chunks"] = [{
+        **_observed_fields(chunk, ("source", "url")),
+        "metadata": _observed_fields(getattr(chunk, "metadata", None), identity_fields),
+    } for chunk in (getattr(result, "results", None) or ())]
+    diagnostics = getattr(result, "diagnostics", None) or {}
+    data["diagnostic_fields"] = sorted(diagnostics)
+    data["library_retrieval"] = _observed_fields(diagnostics.get("retrieval"),
+                                                ("requested", "used", "post_guard"))
+    data["library_index_witness"] = _observed_fields((diagnostics.get("retrieval") or {}).get("index_witness"),
+                                                    ("status", "reason_code"))
+    return data
+
+
 def project_documents(case: dict) -> dict[str, str]:
     local = {row["source"]: row["text"] for row in case["candidates"]
              if row["source_class"] == "project_file"}
@@ -86,8 +121,11 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
             external = prepare_external_sources(actual, project, targets, workspace)
             before = index_state(actual, project, documents, external)
             calls, validations = [], []
+            unified_returns, library_returns, resolution_returns = [], [], []
             app = actual.unified_context
             retrieve = app.get_docs_context
+            resolve = actual.resolve_library
+            read_library = actual.get_docs
             validate = context_tools.validate_model_visible_projection
 
             @wraps(retrieve)
@@ -102,7 +140,25 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
                     "allow_network": kwargs.get("allow_network"),
                     "force_refresh": kwargs.get("force_refresh"),
                 })
-                return retrieve(question_arg, **kwargs)
+                result = retrieve(question_arg, **kwargs)
+                unified_returns.append(_observed_result(result))
+                return result
+
+            @wraps(resolve)
+            def observe_resolution(*args, **kwargs):
+                result = resolve(*args, **kwargs)
+                resolution_returns.append(_observed_fields(result, (
+                    "library", "library_id", "canonical_id", "ecosystem", "version",
+                    "source_type", "docs_url", "requested_version", "resolved_version",
+                    "docs_snapshot_exact", "status", "reason_code", "local", "stale",
+                )))
+                return result
+
+            @wraps(read_library)
+            def observe_library(*args, **kwargs):
+                result = read_library(*args, **kwargs)
+                library_returns.append(_observed_result(result))
+                return result
 
             def observe_validation(payload, **kwargs):
                 validations.append(True)
@@ -111,6 +167,8 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
             network.phase = "read"
             with (
                 patch.object(app, "get_docs_context", observe),
+                patch.object(actual, "resolve_library", observe_resolution),
+                patch.object(actual, "get_docs", observe_library),
                 patch.object(context_tools, "validate_model_visible_projection", observe_validation),
             ):
                 payload, snapshot = _call_with_snapshot(arguments, actual)
@@ -133,6 +191,8 @@ def capture_mixed_source_read(case: dict, workspace: Path) -> dict:
         "execution": "public_fixture_runtime", "error": None, "project_identity": identity,
         "request": expected_request(case, identity), "service_requests": calls,
         "observer_counts": {"retrieval_calls": len(calls), "validation_calls": len(validations)},
+        "service_returns": {"unified": unified_returns, "library": library_returns,
+                            "resolution": resolution_returns},
         "preparation": {
             "project": {key: project_preparation[key] for key in (
                 "expected_paths", "indexed_paths", "excluded_or_failed_paths", "unexpected_paths")},

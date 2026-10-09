@@ -125,6 +125,11 @@ def main(argv: list[str] | None = None) -> int:
                 "output_cost": assessment["output_cost"],
                 "request": observation.get("request"),
                 "service_requests": observation.get("service_requests"),
+                "service_returns": _body_free(observation.get("service_returns") or {}),
+                "public_result": {key: value for key, value in _mapping(observation.get("public_payload")).items()
+                                  if key in {"kind", "status", "reason_code", "operational_reason_code",
+                                             "context_available", "answer_available", "answer_supported",
+                                             "source_search_status", "disposition"}},
                 "observer_counts": observation.get("observer_counts"),
                 "project_identity": observation.get("project_identity"),
                 "source_bindings": _source_binding_diagnostics(observation),
