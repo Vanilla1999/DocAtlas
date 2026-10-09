@@ -50,12 +50,16 @@ def _control(case: dict, *, source_paths: list[str] | None = None) -> dict:
             "target_id": frozen["id"], "library_id": library_id, "name": name, "ecosystem": ecosystem,
             "version": version, "resolved_version": version, "source_type": "reference",
             "docs_url": frozen["source"], "docs_snapshot_exact": version == "8.2.3", "status": "available",
-            "stored_children": [_child(frozen["source"], frozen["text"], identity=identity,
-                                       library_id=library_id, version=version)],
+            "stored_children": [
+                _child(frozen["source"], frozen["text"], identity=identity, library_id=library_id, version=version),
+                _child(f"https://{urlsplit(frozen['source']).hostname}/robots.txt", "User-agent: *\nDisallow:\n",
+                       identity=identity, library_id=library_id, version=version),
+            ],
         })
         events += [
             {"phase": "preparation", "kind": "dns", "host": urlsplit(frozen["source"]).hostname},
             {"phase": "preparation", "kind": "http", "url": frozen["source"]},
+            {"phase": "preparation", "kind": "http", "url": f"https://{urlsplit(frozen['source']).hostname}/robots.txt"},
         ]
     sources, bindings = [], {}
     selected = case["expected_assignment_sources"] if source_paths is None else source_paths
@@ -105,6 +109,10 @@ def _control(case: dict, *, source_paths: list[str] | None = None) -> dict:
         "network_input": {
             "execution": "frozen_dns_http_input",
             "document_sha256": {row["source"]: hashlib.sha256(row["text"].encode()).hexdigest() for row in remote},
+            "infrastructure_sha256": {
+                f"https://{urlsplit(row['source']).hostname}/robots.txt":
+                hashlib.sha256(b"User-agent: *\nDisallow:\n").hexdigest() for row in remote
+            },
             "events": events,
         },
         "state_before": state, "state_after": deepcopy(state),
@@ -259,6 +267,65 @@ def test_claim_and_path_leak_fail_closed() -> None:
         changed = deepcopy(baseline)
         changed["network_input"]["events"].append(event)
         assert not _score(case, changed)["checks"]["finite_public_preparation"]
+
+    remote = next(row for row in case["candidates"] if row["source_class"] != "project_file")
+    url = remote["source"]
+    robots = f"https://{urlsplit(url).hostname}/robots.txt"
+    for key, value in (
+        ("seed_urls", [url]), ("seed_urls", [url, robots + "?unselected=1"]),
+        ("seed_urls", [url, robots, "https://unexpected.example/robots.txt"]),
+        ("path_prefixes", [urlsplit(url).path]), ("max_pages", 1),
+        ("allowed_domains", [urlsplit(url).hostname, "unexpected.example"]),
+    ):
+        changed = deepcopy(baseline)
+        changed["preparation"]["external"]["manifest"]["targets"][0]["scope"][key] = value
+        assert "remote_target_binding" in _score(case, changed)["preparation_errors"], (key, value)
+    changed = deepcopy(baseline)
+    changed["network_input"]["infrastructure_sha256"][robots] = "0" * 64
+    assert "frozen_network_input_identity" in _score(case, changed)["preparation_errors"]
+    changed = deepcopy(baseline)
+    changed["network_input"]["events"] = [
+        event for event in changed["network_input"]["events"] if event.get("url") != robots
+    ]
+    assert "missing_frozen_http_read" in _score(case, changed)["preparation_errors"]
+    for fault in ("missing", "body", "library"):
+        changed = deepcopy(baseline)
+        record = changed["preparation"]["external"]["records"][0]
+        child = next(row for row in record["stored_children"] if row["path"] == robots)
+        if fault == "missing":
+            record["stored_children"].remove(child)
+            expected = "stored_member_roster"
+        elif fault == "body":
+            replacement = "User-agent: x\nDisallow:\n"
+            child.update(_child(robots, replacement, identity=baseline["project_identity"],
+                                library_id=record["library_id"], version=record["version"]))
+            expected = "stored_child_bytes"
+        else:
+            child["library_id"] = "web:unrelated@latest:reference"
+            expected = "prepared_member_library_identity"
+        assert expected in _score(case, changed)["preparation_errors"], fault
+
+    # Even a correctly stored/hash-bound library protocol member is not a frozen
+    # question candidate and must never receive citation or fact credit.
+    library_case = _case("dependency_fact_prefers_dependency_docs")
+    quoted = _control(library_case)
+    record = quoted["preparation"]["external"]["records"][0]
+    child = next(row for row in record["stored_children"] if row["path"].endswith("/robots.txt"))
+    material = {"path": child["path"], "section": "unit-fixture", "content": child["display_text"],
+                "snippet": child["display_text"], "version": "8.2.3"}
+    source = {"evidence_id": "ev-protocol-control", "path_or_url": child["path"],
+              "section": "unit-fixture", "snippet": child["display_text"],
+              "version_binding": "8.2.3", "content_sha256": sha256_json(material)}
+    lineage = {key: deepcopy(value) for key, value in child.items() if key != "path"}
+    lineage["canonical_id"] = record["library_id"]
+    quoted["public_payload"]["sources"].append(source)
+    quoted["bindings"][source["evidence_id"]] = {
+        "projected_source": deepcopy(source), "candidate_hash_material": material, "lineage": lineage,
+    }
+    assessed = _score(library_case, quoted)
+    assert assessed["checks"]["finite_public_preparation"] and assessed["checks"]["required_full_facts"]
+    assert "source_outside_frozen_facts" in assessed["source_errors"]
+    assert not assessed["checks"]["source_integrity"] and not assessed["passed"]
 
 
 def test_proof_runtime_shard_identity_fails_closed() -> None:

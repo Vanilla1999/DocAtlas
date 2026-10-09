@@ -20,6 +20,7 @@ from eval.agent_developer_v1.current_retrieval_runtime import bytes_sha256, sha2
 
 PUBLIC_FIXTURE_IP = "93.184.216.34"
 PREPARATION_TIMEOUT_SECONDS = 30
+FROZEN_ROBOTS_TEXT = "User-agent: *\nDisallow:\n"
 
 
 class FrozenHttpInput:
@@ -27,10 +28,10 @@ class FrozenHttpInput:
         self.documents = dict(documents)
         self.hosts = {urlsplit(url).hostname for url in documents}
         self.responses = {url: text.encode("utf-8") for url, text in documents.items()}
-        self.responses.update({
-            f"https://{host}/robots.txt": b"User-agent: *\nDisallow:\n"
-            for host in self.hosts
-        })
+        self.protocol_controls = {
+            f"https://{host}/robots.txt": FROZEN_ROBOTS_TEXT for host in self.hosts
+        }
+        self.responses.update({url: text.encode("utf-8") for url, text in self.protocol_controls.items()})
         self.events = []
         self.phase = "preparation"
 
@@ -71,6 +72,10 @@ class FrozenHttpInput:
             "execution": "frozen_dns_http_input",
             "document_sha256": {url: hashlib.sha256(text.encode("utf-8")).hexdigest()
                                 for url, text in sorted(self.documents.items())},
+            "infrastructure_sha256": {
+                url: hashlib.sha256(text.encode("utf-8")).hexdigest()
+                for url, text in sorted(self.protocol_controls.items())
+            },
             "events": deepcopy(self.events),
         }
 
@@ -92,8 +97,9 @@ def finite_target(row: dict) -> dict:
             "authority": "official_project" if official else "community",
             "version_binding": "exact" if official else "unversioned",
         },
-        "scope": {"coverage": "bounded", "seed_urls": [url],
-                  "allowed_domains": [host], "path_prefixes": [path], "max_pages": 1},
+        "scope": {"coverage": "bounded", "seed_urls": [url, f"https://{host}/robots.txt"],
+                  "allowed_domains": [host],
+                  "path_prefixes": list(dict.fromkeys([path, "/robots.txt"])), "max_pages": 2},
     }
 
 
@@ -148,8 +154,9 @@ def prepare_external_sources(service, project: Path, targets: list[dict], worksp
             raise RuntimeError("public preparation omitted a requested library record")
         path = Path(service.agent_gateway.index_config_for(record).index.db_path)
         stored = read_stored_children(path)
-        if sorted({row["path"] for row in stored}) != [target["source"]["url"]]:
-            raise RuntimeError("public fixture library index differs from its exact finite member")
+        declared = {target["source"]["url"], *target["scope"]["seed_urls"]}
+        if {row["path"] for row in stored} != declared:
+            raise RuntimeError("public fixture library index differs from its exact finite members")
         records.append({
             "target_id": target["id"], "library_id": record.library_id,
             "name": record.name, "ecosystem": record.ecosystem, "version": record.version,

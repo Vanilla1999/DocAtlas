@@ -52,6 +52,13 @@
           "current_lane": "separate_library_record",
           "may_satisfy_original_fact": false
         }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-advisory",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
       ]
     },
     {
@@ -78,6 +85,13 @@
           "source_text_sha256": "536a93e5c365d8d5acbdc11a3dff3c11fb86a4dc1f95288ddeb3ac0fb1196df3",
           "current_lane": "separate_library_record",
           "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-advisory-only",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
         }
       ]
     },
@@ -115,6 +129,13 @@
           "source_text_sha256": "0d873a169c7c45078529f274bc64a4a0240b6fb51be10b7d0cdeff63cbe6fe22",
           "current_lane": "separate_library_record",
           "may_satisfy_original_fact": false
+        }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "external-implementation-claim",
+          "path_or_url": "https://blog.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
         }
       ]
     },
@@ -154,6 +175,13 @@
           "current_lane": "project",
           "may_satisfy_original_fact": false
         }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "dependency-docs",
+          "path_or_url": "https://tenacity.readthedocs.io/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
       ]
     },
     {
@@ -182,7 +210,8 @@
           "current_lane": "project",
           "may_satisfy_original_fact": false
         }
-      ]
+      ],
+      "protocol_control_members": []
     },
     {
       "id": "document_statement_binds_exact_path",
@@ -221,7 +250,8 @@
           "current_lane": "project",
           "may_satisfy_original_fact": false
         }
-      ]
+      ],
+      "protocol_control_members": []
     },
     {
       "id": "two_claims_require_two_allowed_roles",
@@ -273,7 +303,26 @@
           "current_lane": "separate_library_record",
           "may_satisfy_original_fact": false
         }
+      ],
+      "protocol_control_members": [
+        {
+          "target_id": "dependency-api",
+          "path_or_url": "https://tenacity.readthedocs.io/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        },
+        {
+          "target_id": "advisory-conflict",
+          "path_or_url": "https://advisory.example/robots.txt",
+          "source_text_sha256": "e5c4b84484ee4216e9373be99380320c25dd94805f99f0a805846f087636553f"
+        }
       ]
     }
-  ]
+  ],
+  "protocol_control_member": {
+    "text": "User-agent: *\nDisallow:\n",
+    "purpose": "explicit_finite_http_prerequisite_not_question_evidence",
+    "indexing_contract": "all_explicit_members_are_indexed",
+    "may_satisfy_original_fact": false,
+    "may_be_model_visible": false
+  }
 }

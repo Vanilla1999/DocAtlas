@@ -26,6 +26,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
 PROTECTED_PROOF_ROLES = frozenset({"project_rule", "implementation_fact", "dependency_fact", "document_statement"})
 HEX64 = re.compile(r"[0-9a-f]{64}")
+# Independent frozen oracle input; do not import the transport fixture constant.
+PROTOCOL_CONTROL_TEXT = "User-agent: *\nDisallow:\n"
 P15_RUNTIME_PATHS = (RUNTIME_REQUIRED_PATHS - {"eval/agent_developer_v1/paraphrase_robustness.py"}) | {
     "eval/agent_developer_v1/mixed_provenance.py",
     "eval/agent_developer_v1/mixed_retrieval_runtime.py",
@@ -78,6 +80,13 @@ def expected_migration(protocol: dict) -> dict:
             "only_when": "no_authored_project_document",
             "purpose": "explicit_cold_member_store_grant_not_question_evidence",
         },
+        "protocol_control_member": {
+            "text": PROTOCOL_CONTROL_TEXT,
+            "purpose": "explicit_finite_http_prerequisite_not_question_evidence",
+            "indexing_contract": "all_explicit_members_are_indexed",
+            "may_satisfy_original_fact": False,
+            "may_be_model_visible": False,
+        },
         "crosswalk": [{
             "id": case["id"], "question": case["question"],
             "historical_expected_supported": case["expected_supported"],
@@ -85,6 +94,11 @@ def expected_migration(protocol: dict) -> dict:
             "historical_required_evidence_paths": case.get("required_evidence_paths") or [],
             "host_request_binding": REQUEST_BINDINGS[case["id"]],
             "required_full_fact_sources": case["expected_assignment_sources"],
+            "protocol_control_members": [{
+                "target_id": row["id"],
+                "path_or_url": f"https://{urlsplit(row['source']).hostname}/robots.txt",
+                "source_text_sha256": hashlib.sha256(PROTOCOL_CONTROL_TEXT.encode()).hexdigest(),
+            } for row in case["candidates"] if row["source_class"] != "project_file"],
             "current_obligation": (
                 "all_original_allowed_source_facts_visible_and_bound"
                 if case["expected_supported"] else "no_wrong_role_source_credited_and_no_authority"
@@ -198,9 +212,11 @@ def preparation_errors(case: dict, observation: dict) -> list[str]:
                 or source != {"type": "reference", "url": url, "format": "direct-text",
                               "authority": "official_project" if official else "community",
                               "version_binding": "exact" if official else "unversioned"}
-                or scope != {"coverage": "bounded", "seed_urls": [url],
+                or scope != {"coverage": "bounded",
+                             "seed_urls": [url, f"https://{urlsplit(url).hostname}/robots.txt"],
                              "allowed_domains": [urlsplit(url).hostname],
-                             "path_prefixes": [urlsplit(url).path or "/"], "max_pages": 1}):
+                             "path_prefixes": list(dict.fromkeys([urlsplit(url).path or "/", "/robots.txt"])),
+                             "max_pages": 2}):
             errors.append("remote_target_binding")
         if (record.get("name") != name or record.get("ecosystem") != ecosystem
                 or record.get("version") != version or record.get("library_id") != library_id
@@ -209,15 +225,28 @@ def preparation_errors(case: dict, observation: dict) -> list[str]:
             errors.append("prepared_registry_identity")
         if official and (record.get("resolved_version") != "8.2.3" or record.get("docs_snapshot_exact") is not True):
             errors.append("prepared_exact_version_binding")
-        errors.extend(_stored_errors(record.get("stored_children"), {url: frozen["text"]}))
+        stored_children = record.get("stored_children")
+        errors.extend(_stored_errors(stored_children, {
+            url: frozen["text"],
+            f"https://{urlsplit(url).hostname}/robots.txt": PROTOCOL_CONTROL_TEXT,
+        }))
+        if isinstance(stored_children, list) and any(
+            isinstance(child, dict) and child.get("library_id") != library_id for child in stored_children
+        ):
+            errors.append("prepared_member_library_identity")
     network = observation.get("network_input") or {}
     urls = {row["source"]: row["text"] for row in remote}
     hosts = {urlsplit(url).hostname for url in urls}
     allowed = set(urls) | {f"https://{host}/robots.txt" for host in hosts}
     expected_hashes = {url: hashlib.sha256(text.encode()).hexdigest() for url, text in urls.items()}
+    expected_controls = {
+        f"https://{host}/robots.txt": hashlib.sha256(PROTOCOL_CONTROL_TEXT.encode()).hexdigest()
+        for host in hosts
+    }
     events = network.get("events")
     if (network.get("execution") != "frozen_dns_http_input"
-            or network.get("document_sha256") != expected_hashes or not isinstance(events, list)):
+            or network.get("document_sha256") != expected_hashes
+            or network.get("infrastructure_sha256") != expected_controls or not isinstance(events, list)):
         errors.append("frozen_network_input_identity")
     else:
         fetched = set()
@@ -233,7 +262,7 @@ def preparation_errors(case: dict, observation: dict) -> list[str]:
                 fetched.add(event.get("url"))
             else:
                 errors.append("unknown_network_event")
-        if not set(urls) <= fetched:
+        if not allowed <= fetched:
             errors.append("missing_frozen_http_read")
     return sorted(set(errors))
 
