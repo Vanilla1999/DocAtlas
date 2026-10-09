@@ -69,13 +69,60 @@ def test_normal_is_not_a_synonym_for_synchronous_outside_callable_syntax():
 
 @pytest.mark.parametrize('index', range(5))
 def test_replaying_old_approval_recomputes_relation_after_crop(index):
+    from copy import deepcopy
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+    from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
+
     q, _, body, *_ = CASES[index]
-    old = qualify(q, body)
-    fake = {**old.trace, '_admission_demands': [{'matched': True}], 'need_local_witness': True}
+    # A deliberately explicit literal lookup isolates current-byte attribution.
+    # The unchanged original-only native quality cases receive no credit from it.
+    plan = build_documentation_query_plan(q, lookup_queries=(body,))
+    original, lookup = plan.queries
+    assert (original.query_id, original.text, original.origin, original.public_parent_query_id) == (
+        'query-original', q, 'original', None,
+    )
+    assert (lookup.query_id, lookup.text, lookup.origin, lookup.relation, lookup.public_parent_query_id) == (
+        'query-lookup-1', body, 'host_lookup', 'host_lookup', None,
+    )
+    roles = query_constraint_roles(lookup.text)
+    data = {
+        **asdict(lookup), 'query_text': lookup.text, 'query_origin': lookup.origin,
+        'query_terms': list(documentation_query_terms(lookup.text)),
+        'exact_terms': list(roles.hard_exact), 'bound_subjects': list(roles.bound_subjects),
+    }
+    authoritative = asdict(lookup)
+    old = qualify_evidence(
+        data, query_id=lookup.query_id, visible_text=body, evidence_text=body,
+        authoritative_query=authoritative,
+    )
+    assert old.qualified and old.reason == 'visible_fields', 'critical_relation_crop_healthy'
+    assert old.covered_query_ids == ('query-lookup-1',) and old.coverage_kind == 'direct'
+    assert old.trace['context_only'] is True and not old.trace.get('public_parent_query_id')
+    anonymous = qualify_evidence(data, query_id=lookup.query_id, visible_text=body, evidence_text=body)
+    assert anonymous.qualified and anonymous.trace['context_only'] is True
+    assert (anonymous.covered_query_ids == () and anonymous.coverage_kind is None
+            and anonymous.trace.get('admission_only') is True), 'critical_relation_lookup_no_borrowed_credit'
+
+    inherited = {
+        'need_local_witness': True, 'admission_route': 'typed_local',
+        'matched_need_ids': ['query-need-1'], 'need_witness_spans': [[0, len(body)]],
+        'need_witness_source_key': 'previous-source', '_admission_demands': [{'matched': True}],
+        'context_eligible': True, 'context_need_ids': ['query-need-1'],
+        '_need_context': {'qualified': True},
+    }
+    fake = {**old.trace, **inherited}
+    before = deepcopy((data, authoritative, fake))
     crop = 'The source contains a glossary only.'
-    current = qualify_evidence(fake, query_id='query-need-1', visible_text=crop, evidence_text=crop)
-    assert not current.qualified and not current.trace.get('need_local_witness')
-    assert not current.trace.get('matched_need_ids')
+    current = qualify_evidence(
+        fake, query_id=lookup.query_id, visible_text=crop, evidence_text=crop,
+        authoritative_query=authoritative,
+    )
+    assert (current.qualified is False and current.reason == 'insufficient_visible_match'
+            and current.covered_query_ids == () and current.coverage_kind is None), 'critical_relation_current_crop'
+    assert all(key not in current.trace for key in inherited), 'critical_relation_crop_no_inherited_credit'
+    assert current.trace['query_text'] == body and current.trace['query_origin'] == 'host_lookup'
+    assert not current.trace.get('public_parent_query_id')
+    assert (data, authoritative, fake) == before
 
 
 def test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto(tmp_path):
@@ -88,12 +135,40 @@ def test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto(tmp_p
 def test_compiled_queries_and_relations_are_pure_without_source_io(monkeypatch):
     from pathlib import Path
     import socket
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+    from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
+
     q, _, body, *_ = CASES[0]
-    assert qualify(q, body).qualified
+    lookup, = build_documentation_query_plan(q).queries
+    roles = query_constraint_roles(lookup.text)
+    data = {
+        **asdict(lookup), 'query_text': lookup.text, 'query_origin': lookup.origin,
+        'query_terms': list(documentation_query_terms(lookup.text)),
+        'exact_terms': list(roles.hard_exact), 'bound_subjects': list(roles.bound_subjects),
+    }
+    healthy = qualify_evidence(
+        data, query_id=lookup.query_id, visible_text=body, evidence_text=body,
+        authoritative_query=asdict(lookup),
+    )
+    assert healthy.qualified and healthy.covered_query_ids == ('query-original',), 'critical_relation_pure_healthy'
+    assert healthy.trace['context_only'] is True
     def forbidden(*args, **kwargs):
-        raise AssertionError('relation proof or query compiler performed I/O')
-    monkeypatch.setattr('builtins.open', forbidden)
-    monkeypatch.setattr(Path, 'read_text', forbidden)
-    monkeypatch.setattr(Path, 'read_bytes', forbidden)
-    monkeypatch.setattr(socket, 'socket', forbidden)
-    assert qualify(q, body).qualified
+        raise AssertionError('critical_relation_qualification_no_io')
+    with monkeypatch.context() as blocked:
+        blocked.setattr('builtins.open', forbidden)
+        blocked.setattr(Path, 'read_text', forbidden)
+        blocked.setattr(Path, 'read_bytes', forbidden)
+        blocked.setattr(socket, 'socket', forbidden)
+        current_lookup, = build_documentation_query_plan(q).queries
+        current_roles = query_constraint_roles(current_lookup.text)
+        current_data = {
+            **asdict(current_lookup), 'query_text': current_lookup.text, 'query_origin': current_lookup.origin,
+            'query_terms': list(documentation_query_terms(current_lookup.text)),
+            'exact_terms': list(current_roles.hard_exact), 'bound_subjects': list(current_roles.bound_subjects),
+        }
+        assert current_data == data
+        current = qualify_evidence(
+            current_data, query_id=current_lookup.query_id, visible_text=body, evidence_text=body,
+            authoritative_query=asdict(current_lookup),
+        )
+    assert current == healthy, 'critical_relation_qualification_no_io'

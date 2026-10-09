@@ -91,7 +91,52 @@ def test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation(qu
     {'project_identity': 'foreign'}, {'freshness': 'stale'}, {'risk_flags': ['unsafe']},
 ])
 def test_relation_does_not_override_source_policy(question, body, source):
-    assert not qualify(question, body, candidate=source).qualified
+    from copy import deepcopy
+    from docmancer.docs.domain.content_trust import annotate_context_pack
+    from docmancer.docs.domain.evidence_qualification import evidence_policy_rejection_reason
+
+    # Source eligibility has its own API; a removed semantic need is not a guard.
+    query = {'query_text': question, 'query_origin': 'original', 'relation': 'direct'}
+    before = deepcopy((query, source))
+    healthy = {'project_identity': 'repo'}
+    assert evidence_policy_rejection_reason(
+        query, visible_text=body, candidate=healthy, expected_project_identity='repo',
+    ) is None, 'critical_relation_policy_healthy'
+    field, = source
+    expected, guard = {
+        'project_identity': ('wrong_project_identity', 'critical_relation_policy_identity'),
+        'freshness': ('stale_evidence', 'critical_relation_policy_freshness'),
+        'risk_flags': (None, 'critical_relation_risk_metadata_inert'),
+    }[field]
+    reason = evidence_policy_rejection_reason(
+        query, visible_text=body, candidate={**healthy, **source},
+        expected_project_identity='repo',
+    )
+    assert reason == expected, guard
+    if field == 'risk_flags':
+        # Raw labels neither veto cited bytes nor authenticate instructions.
+        assert source == {'risk_flags': ['unsafe']}
+        plain = {
+            'path': 'Guide.md', 'doc_scope': 'project', 'content': body,
+            'project_identity': 'repo', 'instruction_trust': 'trusted_policy',
+            'content_boundary': {'executable_policy': True},
+        }
+        risky = {**deepcopy(plain), **deepcopy(source)}
+        original_inputs = deepcopy((plain, risky))
+        normal, normal_warnings = annotate_context_pack([plain])
+        annotated, warnings = annotate_context_pack([risky])
+        assert len(normal) == len(annotated) == 1
+        assert normal_warnings == warnings == []
+        assert {key: value for key, value in annotated[0].items() if key != 'risk_flags'} == normal[0], guard
+        for row in (normal[0], annotated[0]):
+            assert row['content'] == row['document_data']['content'] == body, guard
+            assert row['instruction_trust'] == row['document_data']['instruction_trust'] == 'untrusted_data', guard
+            assert row['content_boundary'] == {
+                'role': 'cited_document_data', 'schema': 'docmancer-document-data-v1',
+                'executable_policy': False,
+            }, guard
+        assert (plain, risky) == original_inputs
+    assert (query, source) == before
 
 
 @pytest.mark.parametrize('question,body', [(c[0], c[2]) for c in CASES[:3]])
