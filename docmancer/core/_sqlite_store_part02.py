@@ -394,6 +394,7 @@ class _SQLiteStorePart02:
                 name: row[name]
                 for name in normalized_filter_metadata(metadata)
             })
+            metadata["generation_id"] = generation_id
             values.append(json.dumps(metadata, ensure_ascii=False))
         cursor = conn.execute(
             f"INSERT INTO retrieval_children (generation_id, {', '.join(columns)}) "
