@@ -19,7 +19,7 @@ def _v2_report():
             metrics[metric] = {"numerator": numerator, "denominator": threshold["denominator"]}
         lanes[lane] = {"metrics": metrics}
     return {
-        "schema_version": "project-context-quality-v2-result-3",
+        "schema_version": "project-context-quality-v2-result-4",
         "run_mode": "live_self_host",
         "output_cost_policy": deepcopy(lock["output_cost_policy"]),
         "validation": {"case_count": 25},
@@ -34,7 +34,7 @@ def test_v2_acceptance_requires_semantics_safety_sources_cost_observations_and_z
         ("natural", "semantic_usefulness"),
         ("exposed_paraphrases", "semantic_usefulness"),
         ("natural", "safety"),
-        ("exposed_paraphrases", "source_limit_compliance"),
+        ("exposed_paraphrases", "evaluator_verified_full_semantic_component_coverage"),
         ("natural", "cost_observation_completeness"),
     ):
         broken = deepcopy(report)

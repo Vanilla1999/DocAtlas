@@ -70,10 +70,19 @@ false-full coverage, and frozen lookup-attribution non-regression floors.
 The previous v1/Legacy live corpus is retained as an explicit compatibility
 report. Its path-specific relevance verdict no longer decides release quality,
 but `scripts/check_legacy_project_context_lineage.py` still enforces the frozen
-`query-original >= 12/15` floor and zero-tolerance safety/source-count
+`query-original >= 12/15` floor and zero-tolerance safety
 metrics. Lookup hits do not close the original-query floor. The full-DTO 800-token
 ceiling is explicitly retired; bytes and tokens remain measured and minimized. Run
 `pytest -q tests/test_project_context_quality_v2_protocol.py tests/test_project_context_quality_acceptance.py`.
+
+## 2.6 output count policy in PR #211
+
+The three-source final DTO ceiling is also retired under the owner’s output-cost
+minimization decision. Source count, UTF-8 bytes and the serialized token estimate
+remain measurements; source identity, citation uniqueness, all obligations, original
+coverage and negative controls remain gates. Acquisition/read/call bounds are
+unchanged. Corpus 5, result 4, acceptance v3 and the reviewed crosswalk bind this
+policy explicitly. Removing a size-only failure does not improve retrieval.
 
 ## 2.5 current-contract migration in PR #211
 
@@ -90,10 +99,10 @@ The one retired generated `query-anchor-1` inventory entry is removed while its
 literal remains in the original question. Current planning creates only the
 original and explicit host lookups. Hermetic planning PASS is not retrieval PASS.
 
-`project-context-quality-v2-result-3` and acceptance lock v2 distinguish the
+Historically, `project-context-quality-v2-result-3` and acceptance lock v2 distinguished the
 retained existing three-source control from cost-observation completeness.
 The former is not newly introduced or described as a proven safety necessity;
-it remains pending separate source-count/selection review. Full public DTO cost
+it remained pending separate source-count/selection review until the 2.6 decision above. Full public DTO cost
 is a minimization measurement without a fixed 800-token ceiling. Independent
 quality, authorization, source identity, and negative controls remain enforced.
 A nonempty server `answer` in retrieval-only context is rejected on meaning,

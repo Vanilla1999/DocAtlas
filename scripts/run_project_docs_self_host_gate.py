@@ -187,8 +187,6 @@ def _query_coverage(payload: dict[str, object]) -> float:
 
 def _validate_context_result(payload: dict[str, object]) -> str | None:
     payload = {key: value for key, value in payload.items() if key != "diagnostics"}
-    if len(payload.get("sources") or ()) > 3:
-        return "result exceeds the three-source budget"
     kind = str(payload.get("kind") or "")
     if kind == "docs_answer":
         if (
@@ -277,7 +275,6 @@ def _threshold_failures(metrics: dict[str, object], case_count: int) -> list[str
     for name in (
         "metadata_only_evidence_count", "packs_contamination_count",
         "docs_analysis_contamination_count", "false_docs_answer_count",
-        "source_budget_violation_count",
     ):
         if int(metrics[name]):
             failures.append(f"{name} must be zero")
@@ -784,7 +781,6 @@ def run(
             "max_source_count": max((len(row.get("payload", {}).get("sources") or ()) for row in positives), default=0),
             "max_public_utf8_bytes": max((row.get("observed", {}).get("public_utf8_bytes", 0) for row in positives), default=0),
             "max_estimated_tokens": max((row.get("observed", {}).get("actual_estimated_tokens", 0) for row in positives), default=0),
-            "source_budget_violation_count": sum(len(row.get("payload", {}).get("sources") or ()) > 3 for row in positives),
             "false_abstention_count": sum(
                 row.get("expected", {}).get("kind") != "insufficient_evidence"
                 and not bool(row.get("checks", {}).get("status_ok"))
@@ -796,8 +792,8 @@ def run(
             "mean_score": sum(scores) / max(len(scores), 1),
         },
         "output_cost_policy": {
-            "objective": "minimize_full_public_dto_without_fixed_token_ceiling",
-            "measurement": "canonical_utf8_bytes_and_existing_serialized_token_estimate",
+            "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
+            "measurement": "source_count_canonical_utf8_bytes_and_existing_serialized_token_estimate",
             "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
         },
         "verdict": "FAIL" if errors else "PASS",

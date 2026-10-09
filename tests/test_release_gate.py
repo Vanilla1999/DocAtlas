@@ -111,7 +111,7 @@ def self_host_payload_runner(monkeypatch, tmp_path):
             ) if real_projection else value
             if real_projection:
                 snapshot["e1"]["projected_source"] = copy.deepcopy(projected["sources"][0])
-            context_tools.validate_model_visible_projection(projected, snapshot=snapshot, max_tokens=800)
+            context_tools.validate_model_visible_projection(projected, snapshot=snapshot, max_tokens=None)
             return payload_transform(copy.deepcopy(projected))
 
         monkeypatch.setattr(gate, "call_docs_tool_payload", dispatch)
@@ -138,7 +138,7 @@ def _assert_self_host_payload_baseline(self_host_payload_runner):
 
 _SELF_HOST_BAD_PAYLOADS = [
     (lambda p: p["sources"][0].update(snippet="Docs provide context.", title="grounded project documentation"), "required_facts"),
-    (lambda p: p.update(sources=p["sources"] * 4), "context_contract"),
+    (lambda p: p.update(sources=p["sources"] * 4), "citation_integrity"),
     (lambda p: p.update(answer="x" * 4000), "context_contract"),
     (lambda p: p.update(edit_ready=True), "context_contract"),
     (lambda p: p.update(answer_available=True), "context_contract"),
@@ -172,10 +172,14 @@ def _assert_self_host_metadata_is_not_top1_fact(self_host_payload_runner):
     assert report["metrics"]["top1_fact_bearing_count"] == 0
 
 
-def _assert_self_host_measures_cost_and_retained_source_limit(self_host_payload_runner):
+def _assert_self_host_measures_cost_without_fixed_ceilings(self_host_payload_runner):
     report, _ = self_host_payload_runner(lambda p: p.update(sources=p["sources"] * 4, answer="x" * 4000))
     assert report["metrics"]["max_source_count"] == 4
-    assert report["metrics"]["source_budget_violation_count"] == 15
+    assert "source_budget_violation_count" not in report["metrics"]
+    # Duplicate evidence IDs and nonempty answer remain independently invalid.
+    assert report["verdict"] == "FAIL"
+    assert report["results"][0]["checks"]["citation_integrity"] is False
+    assert report["results"][0]["checks"]["context_contract"] is False
     assert report["metrics"]["max_estimated_tokens"] > 800
     assert "token_budget_violation_count" not in report["metrics"]
     assert report["metrics"]["max_public_utf8_bytes"] > 3200
@@ -477,7 +481,7 @@ def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes(tmp_path) 
     *[(check, ()) for check in (
         _assert_self_host_payload_baseline,
         _assert_self_host_metadata_is_not_top1_fact,
-        _assert_self_host_measures_cost_and_retained_source_limit,
+        _assert_self_host_measures_cost_without_fixed_ceilings,
         _assert_self_host_missing_payload_preserves_case_partitions,
         _assert_self_host_attribution_rejects_same_path_different_identity,
         _assert_self_host_cost_has_no_fixed_token_ceiling,
@@ -568,7 +572,8 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         "packs_contamination_count": 0,
         "docs_analysis_contamination_count": 0,
         "false_docs_answer_count": 0,
-        "source_budget_violation_count": 0,
+        "max_source_count": 99,
+        "max_estimated_tokens": 4000,
     }
     assert _threshold_failures(passing_metrics, 20) == []
     for key, value in (
@@ -582,7 +587,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         ("packs_contamination_count", 1),
         ("docs_analysis_contamination_count", 1),
         ("false_docs_answer_count", 1),
-        ("source_budget_violation_count", 1),
     ):
         assert _threshold_failures({**passing_metrics, key: value}, 20)
 

@@ -288,18 +288,26 @@ def test_same_call_observer_preserves_public_result_and_binds_visible_components
 def test_full_visible_cost_is_measured_without_excusing_missing_facts():
     case = next(row for row in protocol.load_cases() if row["id"] == "v2-natural-install-verify")
     snippet = (protocol.ROOT / "README.md").read_text(encoding="utf-8")
-    response = {"kind": "docs_context", "estimated_tokens": 4000, "sources": [{
-        "path_or_url": "README.md", "evidence_id": "full-readme", "snippet": snippet,
-    }]}
+    # Four distinct contiguous windows preserve the full authored document.
+    # Source count, like byte cost, is measured without an arbitrary ceiling.
+    lines = snippet.splitlines(keepends=True)
+    width = (len(lines) + 3) // 4
+    response = {"kind": "docs_context", "estimated_tokens": 4000, "sources": [
+        {"path_or_url": "README.md", "evidence_id": f"readme-window-{start}",
+         "snippet": "".join(lines[start:start + width])}
+        for start in range(0, len(lines), width)
+    ]}
     result = protocol.evaluate_case(case, response)
     assert result["semantic_useful"]
     assert result["output_cost"]["serialized_estimated_tokens"] > 800
+    assert result["output_cost"]["source_count"] == 4
     assert result["hard_gates"]["cost_observation_valid"]
     # Same large response and identity, but the independently required installer
     # witness is gone: size-policy relaxation cannot excuse loss of the fact.
-    response["sources"][0]["snippet"] = snippet.replace(
-        "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh", "installer omitted",
-    )
+    for source in response["sources"]:
+        source["snippet"] = source["snippet"].replace(
+            "curl -LsSf https://raw.githubusercontent.com/Vanilla1999/DocAtlas/main/scripts/install.sh | sh", "installer omitted",
+        )
     assert not protocol.evaluate_case(case, response)["semantic_useful"]
     response.pop("estimated_tokens")
     assert protocol.evaluate_case(case, response)["root_cause"] == "cost_measurement_missing"

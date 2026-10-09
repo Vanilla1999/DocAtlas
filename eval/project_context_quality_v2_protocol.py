@@ -259,13 +259,11 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     identity_ok = (isinstance(response.get("sources", []), list) and len(source_rows) == len(sources) and all(path and authority and scope and evidence_id and str(source.get("snippet") or "").strip() and not _heading_only(str(source.get("snippet", "")))
                        for (path, authority, scope, source), evidence_id in zip(source_rows, evidence_ids))
                    and len(returned_evidence_ids) == len(source_rows))
-    limits = _payload()["limits"]
     token_value = response.get("estimated_tokens")
     token_known = isinstance(token_value, int) and not isinstance(token_value, bool) and token_value >= 0
     public_payload = {key: value for key, value in response.items() if key != "diagnostics"}
     public_bytes = len(json.dumps(public_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
     actual_tokens = max(1, (public_bytes + 3) // 4)
-    source_limit_ok = len(sources) <= limits["maximum_sources"]
     cost_observation_valid = token_known
     obligation_results = []
     for obligation in case["obligations"]:
@@ -284,7 +282,7 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     expected_negative = case_type == "strict_negative"
     unsupported_control = case_type == "unsupported_answer_control"
     all_components = bool(obligation_results) and all(row["met"] for row in obligation_results)
-    semantic_useful = response.get("kind") == "docs_context" and all_components and safety_ok and identity_ok and source_limit_ok and cost_observation_valid
+    semantic_useful = response.get("kind") == "docs_context" and all_components and safety_ok and identity_ok and cost_observation_valid
     required_lookups = set(case["lookup_query_ids"])
     runtime_covered = {str(value) for value in response.get("covered_query_ids") or []}
     covered_lookups = required_lookups & runtime_covered
@@ -300,8 +298,8 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     unsupported_payload_kind = response.get("kind") == "insufficient_evidence" or (
         response.get("kind") in {None, "docs_context"} and response.get("status") == "insufficient_evidence"
     )
-    negative_correct = expected_negative and unsupported_payload_kind and safety_ok and identity_ok and source_limit_ok and cost_observation_valid and authorization_denied
-    unsupported_answer_control_correct = unsupported_control and safety_ok and identity_ok and source_limit_ok and cost_observation_valid and authorization_denied and (
+    negative_correct = expected_negative and unsupported_payload_kind and safety_ok and identity_ok and cost_observation_valid and authorization_denied
+    unsupported_answer_control_correct = unsupported_control and safety_ok and identity_ok and cost_observation_valid and authorization_denied and (
         unsupported_payload_kind or (
             response.get("kind") == "docs_context"
             and response.get("answer_supported") is False
@@ -318,8 +316,6 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
         root_cause = "safety_failure"
     elif not identity_ok:
         root_cause = "source_identity_failure"
-    elif not source_limit_ok:
-        root_cause = "source_limit_failure"
     elif not cost_observation_valid:
         root_cause = "cost_measurement_missing"
     elif runtime_component_claim["available"] and not runtime_component_claim["valid"]:
@@ -360,8 +356,8 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
         "unadjudicated_relevance": bool(extra_paths),
         "adjudicated_source_count": adjudicated_count, "returned_source_count": len(source_rows),
         "obligations": obligation_results,
-        "hard_gates": {"safety": safety_ok, "source_identity": identity_ok, "source_limit": source_limit_ok, "cost_observation_valid": cost_observation_valid, "estimated_tokens_present": token_known, "authorization_denied": authorization_denied},
-        "output_cost": {"public_utf8_bytes": public_bytes, "serialized_estimated_tokens": actual_tokens,
+        "hard_gates": {"safety": safety_ok, "source_identity": identity_ok, "cost_observation_valid": cost_observation_valid, "estimated_tokens_present": token_known, "authorization_denied": authorization_denied},
+        "output_cost": {"source_count": len(sources), "public_utf8_bytes": public_bytes, "serialized_estimated_tokens": actual_tokens,
                         "reported_estimated_tokens": token_value if token_known else None},
         "root_cause": root_cause,
         "diagnostics": response.get("diagnostics") or {},
@@ -391,7 +387,6 @@ def evaluate(responses: dict[str, dict[str, Any]]) -> dict[str, Any]:
                 "lookup_attribution": _fraction(sum(r["lookup_covered"] for r in positives), sum(r["lookup_required"] for r in positives)),
                 "source_precision": _fraction(sum(r["adjudicated_source_count"] for r in positives), sum(r["returned_source_count"] for r in positives)),
                 "safety": _fraction(sum(r["hard_gates"]["safety"] for _, r in pairs), len(pairs)),
-                "source_limit_compliance": _fraction(sum(r["hard_gates"]["source_limit"] for _, r in pairs), len(pairs)),
                 "cost_observation_completeness": _fraction(sum(r["hard_gates"]["cost_observation_valid"] for _, r in pairs), len(pairs)),
                 "negative_correctness": _fraction(sum(r["negative_correct"] for r in negatives), len(negatives)),
                 "unsupported_answer_control_correctness": _fraction(sum(r["unsupported_answer_control_correct"] for r in unsupported_controls), len(unsupported_controls)),
@@ -400,12 +395,14 @@ def evaluate(responses: dict[str, dict[str, Any]]) -> dict[str, Any]:
                 "false_full_coverage": _fraction(sum(r["false_full_coverage"] for r in positives), len(positives)),
             },
             "output_cost": {
+                "total_source_count": sum(r["output_cost"]["source_count"] for _, r in pairs),
+                "max_source_count": max((r["output_cost"]["source_count"] for _, r in pairs), default=0),
                 "max_public_utf8_bytes": max((r["output_cost"]["public_utf8_bytes"] for _, r in pairs), default=0),
                 "max_serialized_estimated_tokens": max((r["output_cost"]["serialized_estimated_tokens"] for _, r in pairs), default=0),
             },
             "root_cause_counts": dict(sorted(Counter(r["root_cause"] for _, r in pairs).items())),
         }
-    return {"schema_version": "project-context-quality-v2-result-3", "report_only": True,
+    return {"schema_version": "project-context-quality-v2-result-4", "report_only": True,
             "verdict": "REPORT_ONLY", "thresholds": None, "validation": validation,
             "output_cost_policy": _payload()["output_cost_policy"],
             "lanes": lane_reports, "results": results}

@@ -1,11 +1,11 @@
 {
-  "schema_version": "project-context-quality-v2-lock-5",
-  "evaluator_version": "2.5.0",
+  "schema_version": "project-context-quality-v2-lock-6",
+  "evaluator_version": "2.6.0",
   "mode": "report_only_baseline",
   "thresholds": null,
   "files": {
-    "cases": "3e8cdd1c102d119e5e2a075f987f65d2034af5b89afd47b532ec34d36a44ce88",
-    "migration_crosswalk": "230a1fdc09b9729003598ca0d366cd8fef61c313c03f8b6c29a482dbd29f8721",
+    "cases": "cc1f6a4f561e658b21dabc7f1f23601b4762332ed0aa8309b2193ffcbc62cfb3",
+    "migration_crosswalk": "f711e0250e2d2c31491add7ec9ce488728ad95cb6e86dd439fe9f1011b562c7a",
     "diagnostic": "6dd895c8e635bc959291a353569b5326b07dfa9042d50a7674574ce50cea7f5d",
     "catalog": "e06ca717d17a76a536d3918e6085424250651dedccfe3ce20bd0bc514b17b77f"
   },

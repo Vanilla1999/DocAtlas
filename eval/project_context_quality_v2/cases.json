@@ -1,9 +1,6 @@
 {
-  "schema_version": "project-context-quality-v2-corpus-4",
-  "evaluator_version": "2.5.0",
-  "limits": {
-    "maximum_sources": 3
-  },
+  "schema_version": "project-context-quality-v2-corpus-5",
+  "evaluator_version": "2.6.0",
   "obligations": {
     "install": {
       "id": "install",
@@ -1552,9 +1549,12 @@
     }
   ],
   "output_cost_policy": {
-    "objective": "minimize_full_public_dto_without_fixed_token_ceiling",
-    "measurement": "canonical_utf8_bytes_and_serialized_token_estimate",
+    "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
+    "measurement": "source_count_canonical_utf8_bytes_and_serialized_token_estimate",
     "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
     "tokenizer_claim": "serialized_utf8_estimate_not_actual_client_tokens"
+  },
+  "historical_output_limits": {
+    "maximum_sources": 3
   }
 }

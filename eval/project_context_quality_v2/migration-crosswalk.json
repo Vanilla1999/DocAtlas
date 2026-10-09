@@ -305,5 +305,14 @@
       }
     ],
     "runtime_evidence": "Not established by this migration. Full live V2 and Legacy reports are required after publication; corpus validation alone does not show retrieval quality."
+  },
+  "pr211_output_count_policy": {
+    "evaluator_version": "2.6.0",
+    "basis": "Owner requested minimization rather than arbitrary output ceilings; reviewed plan applies the same rule to equivalent downstream output-cost gates.",
+    "classification": "Three-source ceiling was a final DTO output-cost check, not an acquisition/read/scope/security bound.",
+    "change": "Remove final source-count pass/fail ceiling. Preserve count, byte and token measurements, independent source identity, citation uniqueness, all facts and obligations, source precision, negative controls, authorization and original/lookup coverage floors.",
+    "preserved_inputs": "All 25 cases, original questions, explicit lookups, scopes, types, 41 obligation IDs and accepted source witnesses are unchanged from 2.5.",
+    "operational_bounds": "Acquisition/read/call/time and parser bounds are unchanged.",
+    "result_claim": "Policy migration does not fix retrieval or authorize context. Runtime quality must be assessed independently."
   }
 }

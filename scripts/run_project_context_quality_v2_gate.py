@@ -35,7 +35,7 @@ def _fraction(value: Any, *, name: str) -> tuple[int, int]:
 
 def load_acceptance_lock(path: Path = LOCK_PATH) -> dict[str, Any]:
     lock = json.loads(path.read_text(encoding="utf-8"))
-    if lock.get("schema_version") != "project-context-quality-v2-acceptance-v2":
+    if lock.get("schema_version") != "project-context-quality-v2-acceptance-v3":
         raise ValueError("unsupported V2 acceptance lock")
     expected = {
         "v2_protocol_lock_sha256": _sha256(V2_PROTOCOL_LOCK),
@@ -50,7 +50,7 @@ def load_acceptance_lock(path: Path = LOCK_PATH) -> dict[str, Any]:
 def verify_v2_acceptance(report: dict[str, Any], lock: dict[str, Any] | None = None) -> list[str]:
     lock = lock or load_acceptance_lock()
     failures: list[str] = []
-    if report.get("schema_version") != "project-context-quality-v2-result-3":
+    if report.get("schema_version") != "project-context-quality-v2-result-4":
         return ["unexpected V2 report schema"]
     if report.get("output_cost_policy") != lock["output_cost_policy"]:
         failures.append("V2 output cost policy does not match the reviewed acceptance policy")
@@ -110,7 +110,7 @@ def main(argv: list[str] | None = None) -> int:
         "V2 project-context acceptance: PASS; "
         f"natural={natural['semantic_usefulness']['numerator']}/15; "
         f"paraphrases={exposed['semantic_usefulness']['numerator']}/5; "
-        "false_full=0; safety/source limits/cost observations=25/25; output cost is measured without a fixed token ceiling"
+        "false_full=0; safety/cost observations=25/25; source count and output cost are measured without fixed ceilings"
     )
     return 0
 
