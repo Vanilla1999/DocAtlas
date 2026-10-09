@@ -198,8 +198,9 @@ RUNTIME_REQUIRED_PATHS = {
 }
 
 
-def build_runtime_manifest(repo_root: Path) -> dict:
+def build_runtime_manifest(repo_root: Path, *, required_paths: set[str] | None = None) -> dict:
     """Hash repository sources actually imported in this fixture process."""
+    required_paths = RUNTIME_REQUIRED_PATHS if required_paths is None else required_paths
     repo_root = repo_root.resolve()
     loaded = {}
     prefixes = ("docmancer", "eval.agent_developer_v1", "eval.evidence_quality_v2",
@@ -211,14 +212,15 @@ def build_runtime_manifest(repo_root: Path) -> dict:
         if not path.is_relative_to(repo_root) or path.suffix != ".py":
             raise ValueError(f"unreviewed downstream module import: {name}")
         loaded.setdefault(path.relative_to(repo_root).as_posix(), []).append(name)
-    if not RUNTIME_REQUIRED_PATHS <= set(loaded):
+    if not required_paths <= set(loaded):
         raise ValueError("downstream runtime import inventory is incomplete")
     rows = [{"path": path, "sha256": bytes_sha256(repo_root / path), "imported_as": sorted(names)}
             for path, names in sorted(loaded.items())]
     return {"algorithm": "same-process-source-sha256-v1", "files": rows, "sha256": sha256_json(rows)}
 
 
-def verify_runtime_manifest(manifest: dict, repo_root: Path) -> None:
+def verify_runtime_manifest(manifest: dict, repo_root: Path, *, required_paths: set[str] | None = None) -> None:
+    required_paths = RUNTIME_REQUIRED_PATHS if required_paths is None else required_paths
     if not isinstance(manifest, dict) or set(manifest) != {"algorithm", "files", "sha256"}:
         raise ValueError("P1.4 runtime manifest shape is invalid")
     if manifest["algorithm"] != "same-process-source-sha256-v1":
@@ -238,5 +240,5 @@ def verify_runtime_manifest(manifest: dict, repo_root: Path) -> None:
         if not (repo_root / path).is_file() or bytes_sha256(repo_root / path) != row["sha256"]:
             raise ValueError("P1.4 runtime manifest differs from current checkout")
         paths.append(path)
-    if paths != sorted(set(paths)) or not RUNTIME_REQUIRED_PATHS <= set(paths):
+    if paths != sorted(set(paths)) or not required_paths <= set(paths):
         raise ValueError("P1.4 runtime manifest inventory is incomplete")

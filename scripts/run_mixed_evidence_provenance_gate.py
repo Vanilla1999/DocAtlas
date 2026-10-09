@@ -1,74 +1,56 @@
 #!/usr/bin/env python3
+"""Measure current P1.5 facts and source provenance without resealing history."""
 from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
+import tempfile
 
-from eval.agent_developer_v1.mixed_provenance import (
-    canonical_json,
-    derive_from_paths,
-    load_json,
-    sha256_json,
-    verify_report,
-)
-
+from eval.agent_developer_v1.mixed_provenance import derive_from_paths, verify_report
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 ROOT = REPO_ROOT / "eval" / "agent_developer_v1"
-DEFAULT_OUTPUT = ROOT / "results" / "mixed-evidence-provenance.json"
-
-
-def _production_evidence_model_path() -> Path:
-    candidates = (
-        REPO_ROOT / "docmancer" / "docs" / "application" / "evidence_models.py",
-        REPO_ROOT / "docmancer" / "docs" / "domain" / "answer_completeness.py",
-    )
-    existing = [path for path in candidates if path.is_file()]
-    if not existing:
-        raise RuntimeError("no reviewed production evidence-model module exists")
-    return existing[0]
+DEFAULT_OUTPUT = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())) / "p1.5-current-provenance.json"
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Verify P1.5 mixed-evidence provenance")
+    parser = argparse.ArgumentParser(description="Measure P1.5 original-question facts and explicit source provenance")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--write", action="store_true")
     args = parser.parse_args(argv)
-
-    derived = derive_from_paths(
-        repo_root=REPO_ROOT,
-        protocol_path=ROOT / "mixed_provenance_protocol.json",
-        model_path=_production_evidence_model_path(),
-    )
-    verify_report(derived)
-    if derived["decision"]["claim_local_provenance"] != "accepted":
-        raise SystemExit(
-            "P1.5 claim-local provenance is not accepted: "
-            f"mismatches={derived['summary']['mismatches']!r}; "
-            f"advisory_assignments={derived['summary']['advisory_assignments']!r}"
-        )
-    if args.write:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(
-            json.dumps(derived, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-    else:
-        committed = load_json(args.output)
-        verify_report(committed)
-        if canonical_json(committed) != canonical_json(derived):
-            raise SystemExit(
-                "committed P1.5 report differs from the frozen mixed-evidence derivation; "
-                "run with --write and review the provenance change"
-            )
-    print(
-        "P1.5 mixed-evidence provenance: PASS; "
-        f"cases={derived['summary']['case_count']}; "
-        f"matched={derived['summary']['matched_cases']}; "
-        f"sha256={sha256_json(derived)}"
-    )
-    return 0
+    historical = (ROOT / "results" / "mixed-evidence-provenance.json").resolve()
+    if args.output.resolve() == historical:
+        parser.error("current fixture evidence must not overwrite the historical P1.5 report")
+    report = derive_from_paths(repo_root=REPO_ROOT, protocol_path=ROOT / "mixed_provenance_protocol.json")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    verify_report(report)
+    summary = report["summary"]
+    print(f"P1.5 current provenance: {'PASS' if report['passed'] else 'FAIL'}; "
+          f"cases={summary['passed_count']}/{summary['case_count']}; "
+          f"complete_facts={summary['verified_full_fact_count']}/{summary['required_full_fact_count']}; "
+          f"errors={summary['runtime_error_count']}; report={args.output}")
+    for row in report["cases"]:
+        assessment, observation = row["assessment"], row["observation"]
+        if not assessment["passed"]:
+            print(f"FAIL {row['id']}: {','.join(assessment['failed_checks'])}")
+            before, after = observation.get("state_before") or {}, observation.get("state_after") or {}
+            details = {
+                "id": row["id"], "source_errors": assessment["source_errors"],
+                "preparation_errors": assessment["preparation_errors"],
+                "authority_errors": assessment["authority_errors"],
+                "missing_full_fact_sources": sorted(set(assessment["required_full_fact_sources"])
+                                                    - set(assessment["visible_full_fact_sources"])),
+                "state_differences": [{"field": key, "before": before.get(key), "after": after.get(key)}
+                                      for key in sorted(set(before) | set(after)) if before.get(key) != after.get(key)],
+                "generation_before": before.get("generation"), "runtime_error": observation.get("error"),
+                "output_cost": assessment["output_cost"],
+            }
+            print("DIAGNOSTICS " + json.dumps(details, ensure_ascii=False, sort_keys=True))
+    if report["source_identities"]["runtime_error"]:
+        print(f"FAIL runtime identity: {report['source_identities']['runtime_error']}")
+    return 0 if report["passed"] else 1
 
 
 if __name__ == "__main__":
