@@ -558,6 +558,25 @@ def main() -> int:
         )
         if baseline.returncode != 0:
             retained.append(baseline_root)
+            # Read the existing JUnit only. No rerun and no traceback/body dump.
+            try:
+                failed_report = _junit_report(baseline_report)
+            except (OSError, ValueError, RuntimeError, ET.ParseError) as exc:
+                diagnostic = {"junit_status": "unreadable", "error_type": type(exc).__name__}
+            else:
+                failed_cases = [case for case in failed_report["cases"]
+                                if case["outcome"] != "passed"]
+                diagnostic = {
+                    "junit_status": "readable", "returncode": baseline.returncode,
+                    **{key: failed_report[key] for key in ("tests", "failures", "errors", "skipped")},
+                    "first_failures": [{
+                        "classname": case["classname"][:240], "name": case["name"][:240],
+                        "outcome": case["outcome"],
+                        "message": case["message"].split("\n", 1)[0][:320],
+                    } for case in failed_cases[:3]],
+                    "omitted_failures": max(0, len(failed_cases) - 3),
+                }
+            print("BASELINE_DIAGNOSTIC: " + json.dumps(diagnostic, sort_keys=True), file=sys.stderr)
             print(f"BASELINE FAILED; artifacts retained at {baseline_root}", file=sys.stderr)
             return 1
         baseline_evidence = _junit_report(baseline_report)

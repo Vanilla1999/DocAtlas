@@ -148,12 +148,19 @@ def test_current_admission_meaning_preserves_literals_without_inferred_equivalen
         assert question[row.need.query_span_start:row.need.query_span_end] == question
         assert canonical_phrase(question) == question
         if quoted is not None:
-            ref, = [ref for ref in references.references if ref.mention.text == quoted]
-            assert ref.mention.start == len("Can a handler for ") + 1
-            assert ref.mention.end == ref.mention.start + len(quoted)
-            assert question[ref.mention.start:ref.mention.end] == quoted
+            # The quoted occurrence and an equal unquoted connective are distinct.
+            start = len("Can a handler for ") + 1
+            end = start + len(quoted)
+            ref, = [ref for ref in references.references
+                    if (ref.mention.start, ref.mention.end) == (start, end)]
+            assert ref.mention.text == question[start:end] == quoted
             assert ref.role == "symbol_identity" and ref.mention.explicit is True
             assert canonical_phrase(quoted) == quoted
+            if quoted == "for":
+                connective, = [ref for ref in references.references
+                               if (ref.mention.start, ref.mention.end) == (14, 17)]
+                assert (connective.mention.text, connective.role, connective.state,
+                        connective.mention.explicit) == ("for", "unresolved", "unresolved", False)
         plan = build_documentation_query_plan(question)
         assert plan.original_question == question
         assert [(query.query_id, query.text, query.origin, query.relation,
