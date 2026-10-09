@@ -29,6 +29,13 @@ PILOT = {
     "docs/mcp-docs-server.md": "api_contract", "docs/testing.md": "runbook",
     "docs/project-docs-mcp-workflow.md": "runbook",
     "wiki/Supported-Sources.md": "api_contract",
+    "wiki/Commands.md": "api_contract", "docs/index-cleanup.md": "runbook",
+    "docs/modules/project-context-retrieval.md": "module_architecture",
+    "docs/modules/evidence-selection.md": "module_architecture",
+}
+MODULE_MEMBERS = {
+    "docs/modules/project-context-retrieval.md": "docmancer/docs",
+    "docs/modules/evidence-selection.md": "docmancer/docs",
 }
 
 
@@ -42,9 +49,12 @@ def write(root, path, text="literal bytes\n"):
 def catalog(root, paths=("README.md",), **extra):
     documents = []
     for path in paths:
+        if path in MODULE_MEMBERS:
+            (root / MODULE_MEMBERS[path]).mkdir(parents=True, exist_ok=True)
         write(root, path)
         documents.append(dict(path=path, role=PILOT.get(path, "development"),
-                              scope="project", module_path=None, description="Literal fixture.",
+                              scope="module" if path in MODULE_MEMBERS else "project",
+                              module_path=MODULE_MEMBERS.get(path), description="Literal fixture.",
                               authority="source_of_truth", status="active", impact="track"))
     data = dict(schema_version=1, documents=documents, code_files=[])
     data.update(extra)
@@ -67,15 +77,16 @@ def test_committed_pilot_exact_roles_hashes_and_no_discovery(monkeypatch):
     assert {item.path: item.reason for item in metadata.docs_candidates} == PILOT
     assert metadata.code_files == ()
     assert metadata.dependencies == [] and metadata.dependency_source_roots == {}
-    assert len(metadata.docs_candidates) == 10
+    assert len(metadata.docs_candidates) == 14
     for item in metadata.docs_candidates:
-        assert item.doc_scope == "project" and item.module_path is None
+        assert item.doc_scope == ("module" if item.path in MODULE_MEMBERS else "project")
+        assert item.module_path == MODULE_MEMBERS.get(item.path)
         assert item.lifecycle_status == "active" and item.impact_policy == "track"
         assert item.content_hash == "sha256:" + hashlib.sha256((root / item.path).read_bytes()).hexdigest()
         assert item.catalog_entry_hash.startswith("sha256:")
 
 
-def test_actual_inspect_and_patch_constraints_read_only_ten_members(tmp_path, monkeypatch):
+def test_actual_inspect_and_patch_constraints_read_only_reviewed_members(tmp_path, monkeypatch):
     catalog(tmp_path, PILOT)
     write(tmp_path, "docs/unselected.md", "Must edit everything\n")
     write(tmp_path, "src/unselected.py", "class InvisibleThing: pass\n")
@@ -89,7 +100,7 @@ def test_actual_inspect_and_patch_constraints_read_only_ten_members(tmp_path, mo
     assert inspection.dependency_sources["manifests_found"] == []
     packet = PatchConstraintsService(facade).get_patch_constraints(
         "Inspect `InvisibleThing`", project_path=str(tmp_path), changed_files=["src/unselected.py"])
-    assert packet.index_state["visible_source_count"] == 10
+    assert packet.index_state["visible_source_count"] == 14
     assert set(packet.index_state["source_paths"]) == set(PILOT)
     assert packet.source_evidence == [] and packet.repo_map == [] and packet.symbol_candidates == []
     assert packet.source_of_truth_rules == []

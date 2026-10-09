@@ -331,16 +331,22 @@ def test_direct_contract_rejects_legacy_flags(local):
         app.ingest_project_docs(str(root), mutation=request(local, operation="ingest_project_docs"), skip_known=False)
 
 
-def test_d1_catalog_is_frozen_exact_ten():
+def test_d1_catalog_is_frozen_exact_reviewed_members():
     root = Path(__file__).resolve().parents[1]
     raw = yaml.safe_load((root / "docatlas.project-docs.yaml").read_text())
     assert raw["code_files"] == []
-    assert len(raw["documents"]) == 10
+    assert len(raw["documents"]) == 14
     assert {item["path"] for item in raw["documents"]} == {
         "README.md", "CONTRIBUTING.md", "docs/INDEX.md", "docs/PROJECT_MAP.md",
         "wiki/Architecture.md", "docs/adr/0003-context-first-project-reads.md",
         "docs/mcp-docs-server.md", "docs/testing.md", "docs/project-docs-mcp-workflow.md",
-        "wiki/Supported-Sources.md",
+        "wiki/Supported-Sources.md", "wiki/Commands.md", "docs/index-cleanup.md",
+        "docs/modules/project-context-retrieval.md", "docs/modules/evidence-selection.md",
+    }
+    assert {item["path"]: item["module_path"] for item in raw["documents"]
+            if item["scope"] == "module"} == {
+        "docs/modules/project-context-retrieval.md": "docmancer/docs",
+        "docs/modules/evidence-selection.md": "docmancer/docs",
     }
 
 

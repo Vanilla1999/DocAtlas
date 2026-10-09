@@ -10,7 +10,7 @@ coverage; uncertainty must not become a fabricated complete answer.
 
 `ContextSelectionDecision` records selected evidence IDs and covered or missing
 query IDs. Original-query coverage and explicit lookup coverage remain separate.
-The compatibility `ProjectAnswerRequirementContract` does not compile a
+The compatibility `ProjectAnswerContract` does not compile a
 free-form documentation question into inferred proof obligations.
 
 ## Contract with question planning
@@ -21,7 +21,7 @@ expected answers. A lexical match and an exact quote do not establish entailment
 
 Project-only reads bypass answer certification. The host may use returned
 sources to explain supported facts while identifying missing information.
-Neither selection nor a `docs_context` flag authorizes an edit.
+Selection and `docs_context` flags cannot authorize an edit.
 
 ## Invariants
 

@@ -1,6 +1,6 @@
 {
   "schema_version": "project-context-quality-v2-acceptance-v3",
-  "v2_protocol_lock_sha256": "32da99cde420293679117c2710a76c6e5c8c65282bc34e8c57e8d6b7549365d0",
+  "v2_protocol_lock_sha256": "616c9d02bf3b15051618755fcbc48b84d66d9fcee84f8384dbf9b77b3558f5e9",
   "legacy_protocol_lock_sha256": "58322c3af9cea3ebb74b76f7438d0abf677a4f98e94bd483550086bf4ac83516",
   "lanes": {
     "natural": {

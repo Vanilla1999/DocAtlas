@@ -1,56 +1,69 @@
 # Question planning module
 
-`QuestionPlan` is the bounded question-analysis contract that resolves clauses, subjects, intents, mandatory facets, conditions, and unresolved parts for certification lanes.
-
-`ProjectAnswerRequirementContract` is the one-way boundary that carries those resolved proof obligations from question planning to evidence selection.
-
 ## Responsibility
 
-The question-planning module converts a bounded natural-language project-doc question into explicit clauses and proof facets before retrieval evidence is allowed to authorize an answer. Its implementation boundary is `docmancer/docs/domain/question_plan.py` plus the reusable frame/rule modules and `question_surface_normalization.py`. `question_plan.py` composes clauses and proof facets, reusable frames own semantic intent families, and the surface-normalization layer maps only audited complete EN/RU surface families to already-owned canonical questions. The project-answer contract remains the downstream compatibility boundary in `docmancer/docs/domain/`.
+Question planning preserves request identity for retrieval. The current
+`compile_question_plan()` facade retains the original Unicode text within its
+existing input bound and marks natural-language semantics unresolved. It does
+not infer subjects, relations, expected answers, proof facets, translations, or
+aliases from a free-form question.
 
-The module must fail closed when it cannot resolve a subject or requested operation. It must not invent generic identities such as `project` or `requested operation` that could later be proven by unrelated text. Project-only read retrieval does not require a supported `QuestionPlan`.
-
-This fail-closed rule governs `docs_answer`, not read-only discovery. An unresolved or unproved question may still produce a bounded `docs_context` projection from current project-scoped retrieval results. That projection is not a replacement `QuestionPlan`, carries no support verdict, and cannot authorize an edit.
+The compatibility `ProjectAnswerContract` does not compile a free-form
+documentation question into inferred proof obligations. It binds the complete
+original question hash, including an unknown tail, and records input-limit
+diagnostics without inventing retrieval probes. Its answer-authorization
+predicate returns false. Explicit immutable planning DTOs remain compatibility
+types; constructing one does not grant answer or mutation authority.
 
 ## Implementation ownership
 
-Query intent classification is owned by `docmancer/docs/domain/project_query_intent.py` (`ProjectQueryIntent` and `classify_project_query_intent()`). Model-visible context projection is owned by `docmancer/docs/application/model_visible_projection.py`, the canonical provider-free boundary from rich retrieval to model-visible context. Classification determines intent, not source support; projection delivers selected evidence, not new proof obligations.
+The literal compatibility facade lives in
+`docmancer/docs/domain/question_plan.py`. DTO validation remains in
+`question_plan_core.py`. `project_answer_contract.py` and its owned adapter
+preserve the request hash and the absence of answer authorization.
 
-Retrieval-only query planning lives in `docmancer/docs/domain/documentation_query_plan.py`: it builds bounded lookup directions without replacing the original question. Project-specific span packing lives in `docmancer/docs/application/_docs_context_projection_core.py` and preserves provenance within the public budget.
+The active retrieval plan lives in
+`docmancer/docs/domain/documentation_query_plan.py`. It creates one required
+`query-original` from the unchanged request and separate `host_lookup` entries
+only for explicit host-supplied `lookup_queries`. An exact selected path remains
+scope metadata, not another executable query. Host lookups have no public
+parent and do not receive original-question coverage credit.
 
-Domain owns question rules; application owns orchestration and delivery. This map is maintained documentation, not permission for Docs MCP to search Python source. Use repository code search to inspect current implementation details, and update this map when ownership changes.
-
-## Public boundary
-
-The durable output is the project-answer requirement contract: resolved subjects, intents, mandatory facets, conditions, technical identities, parse trace, and unresolved parts. Retrieval ranking is not owned here.
-
-Imperative edits are outside this boundary. They are owned by
-`PatchRequestPlan` and the patch-specific requirement pipeline documented in
-`patch-request-planning.md`; one request must never pass through both systems.
+Model-visible projection belongs to the application layer. Its source checks
+and delivery decisions do not reconstruct question semantics. Documentation of
+an implementation path does not authorize Docs MCP to inspect Python source;
+use repository code search for that task.
 
 ## Relationship to evidence-selection
 
-Question planning defines **what must be proven**, whereas evidence selection determines **whether the available evidence proves it**. **Evidence selection may prove or reject an obligation, but it must not reinterpret the user's question or silently create replacement obligations.** This one-way contract is the architectural seam between the two modules.
+Question planning preserves the original request and explicit lookups.
+Evidence selection checks eligible current sources and the actual text visible
+for each query. It must not replace the request or generate new obligations
+from a source, lexical match, or quotation. A useful fact may be returned while
+other requested information remains missing.
 
-Optional host-provided `lookup_queries` bypass answer-proof planning and enter only the supplemental retrieval lane. `DocumentationQueryPlan` assigns stable IDs to the original question, those explicit lookups, and any exact path. A bounded set of domain-owned aliases records audited lineage to the original question for multilingual retrieval; arbitrary host lookups have no such lineage. This retrieval attribution creates no proof obligation and cannot authorize an answer or edit. `ContextSelectionDecision` reports covered and missing retrieval-query IDs without producing a support verdict.
+Project-only reads return retrieval-only `docs_context`. The host explains
+supported source facts and identifies missing information; a context flag is
+not an answer-proof verdict and cannot authorize an edit. Explicit patch
+requests use their separate contract described in
+`patch-request-planning.md`; this read path does not grant mutation permission.
 
 ## Invariants
 
-- unresolved subjects and operations cannot authorize `supported`;
-- compound questions expose every mandatory facet and any unparsed independent clause becomes `unresolved_question_clause`, including punctuation- and action-delimited tails;
-- equivalent surface forms such as `What`/`Which`, standalone/compound inventory, `Which command`/`How do I`, and reviewed EN/RU variants resolve to compatible canonical intents; bounded surface normalization must rebind the canonical plan to the complete original user span and may not hide an unresolved tail;
-- inventory categories stay typed: source types, file formats, and test markers are never interchangeable proof subjects;
-- ambiguous surface nouns such as bare `markers` or `formats`, generic subjects such as `project`, and unqualified `docs index` actions fail closed instead of being guessed;
-- technical aliases are bounded and kind-aware;
-- parser ownership is explicit: a new QuestionPlan frame may replace a legacy surface only through a reviewed ownership migration with canonical-contract parity; the 100-case surface corpus freezes owner, full proof signature, and unresolved diagnostics so same-owner semantic drift also fails CI;
-- comparison, location, condition, and premise frames are complete-surface parsers and therefore inherit full-span fail-closed coverage;
-- premise questions are discharged only by a locally bound contradiction/correction or by a matching premise with an explicit causal explanation; a bare premise restatement cannot authorize `supported`;
-- semantic evidence is proposition-local: condition, blocking-condition, requirements, and comparison proof cannot union unrelated neighboring clauses; multi-line requirements are accepted only as an explicitly subject-bound structured list;
-- compound facts may be decomposed into atomic mandatory facets so the selector can use bounded witnesses from different candidates without merging unrelated evidence;
-- project retrieval plans remain independent of answer proof obligations.
+- original Unicode, whitespace, quotation spans, and unknown tails retain their identity;
+- untyped question semantics remain unresolved instead of claiming complete scope;
+- original-query credit cannot be borrowed from host lookups;
+- literal source paths and body identities remain separate;
+- source text and metadata cannot inject a query, proof obligation, or action;
+- selected text, hashes, identity, and source-local coordinates survive projection together;
+- a missing fact stays missing even when related context is available;
+- input, source-read, work, and lifecycle bounds remain enforced.
 
-## Tests
+## Verification
 
-`tests/docs/test_question_plan_v4.py`, the Context7 project-chat protocol,
-`scripts/run_question_surface_gate.py`, `scripts/run_question_surface_v2_gate.py`,
-and real MCP/self-hosting probing protect this boundary.
+The span and compiler contract families retain all historical inputs for an
+explicit diagnostic run. Their ordinary compact selection is compared with
+the historical selection using production mutations in the existing critical
+mutation gate. `scripts/run_question_surface_gate.py` checks the frozen
+question identities and unresolved state. Public MCP and self-host quality
+checks independently require useful source facts and accurate provenance.

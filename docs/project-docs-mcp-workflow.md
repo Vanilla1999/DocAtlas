@@ -107,6 +107,20 @@ name filter. If multiple modules could match, preserve the returned candidates
 and ask which exact module is intended. Do not select one silently or fall back
 to another scope. Missing module documentation stays missing.
 
+For the explicit `packages/auth` member in the catalog above:
+
+```python
+get_docs_context(
+    project_path="/absolute/path/to/project",
+    question="How does the authentication module handle token lifecycle?",
+    scope="module",
+    module_path="packages/auth",
+)
+```
+
+This read stays inside that selected module. It does not synchronize documents
+or grant permission to edit them.
+
 ## Documentation changes and verification
 
 DocAtlas does not generate or commit official repository documentation. When the
