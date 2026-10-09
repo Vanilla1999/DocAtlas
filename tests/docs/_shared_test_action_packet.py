@@ -19,25 +19,22 @@ from docmancer.docs.application.action_packet import (
 )
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 from docmancer.docs.application.unified_context_service import UnifiedDocsContextService
 from docmancer.docs.domain.content_trust import annotate_context_pack
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
 from docmancer.docs.models import ProjectContextResult
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer
 from docmancer.mcp.docs_server import MCP_RESOURCES, TOOLS, _json_text, _mcp_tool_result, call_docs_tool_payload
+
+
+def _assert_citation_only_answer(payload, expected_sources):
+    assert payload["status"] == "ok" and payload["context_available"] is True
+    assert payload["kind"] == "docs_answer" and payload["retrieval_only"] is True
+    assert payload["answer_policy"] == "cite_only"
+    assert payload["answer_available"] is False and payload["answer_supported"] is False
+    assert payload["edit_ready"] is False
+    assert [(row["path_or_url"], row["snippet"]) for row in payload["sources"]] == expected_sources
+    assert not {"mutation_intent", "context_pack", "target_surface", "validation"}.intersection(payload)
 
 
 def _assert_untrusted_whole_windows(packet, evidence, *, module_path=None):

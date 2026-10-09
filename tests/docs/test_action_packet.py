@@ -395,7 +395,9 @@ def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
     }
 
     class Facade:
-        def get_docs_context(self, question, **kwargs):
+        @_found_window_retention_producer
+        def get_docs_context(self, question, *, retain_found_windows=False,
+                             _retention_ack=None, **kwargs):
             return ProjectContextResult(
                 project_path="/repo",
                 question=question,
@@ -441,7 +443,8 @@ def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
         Facade(),
     )
     # An explicit SDK presentation retains both authored windows; it grants no edit.
-    assert explicit["kind"] == "patch_context" and explicit["result"] == "data"
+    assert explicit["schema_version"] == 4 and explicit["result"] == "data"
+    _assert_untrusted_whole_windows(explicit, [guidance, target])
     assert {row["text"] for row in explicit["sources"]} == {guidance_text, target_text}
     assert {row["path"] for row in explicit["sources"]} == {guidance["path"], target["path"]}
     assert explicit["edit_ready"] is False and "mutation_intent" not in explicit
@@ -459,9 +462,12 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
         "authority": "official",
         "symbols": ["PermissionService"],
     }
+    document["display_content_hash"] = hashlib.sha256(document["display_text"].encode()).hexdigest()
 
     class Facade:
-        def get_docs_context(self, question, **kwargs):
+        @_found_window_retention_producer
+        def get_docs_context(self, question, *, retain_found_windows=False,
+                             _retention_ack=None, **kwargs):
             return ProjectContextResult(
                 project_path="/repo",
                 question=question,
@@ -482,9 +488,7 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
         Facade(),
     )
 
-    assert result["status"] == "insufficient_evidence"
-    assert result["edit_ready"] is False
-    assert "mutation_intent" not in result
+    _assert_citation_only_answer(result, [(document["path"], document["display_text"])])
     explicit = handle_context_tool(
         "get_docs_context",
         {
@@ -496,7 +500,8 @@ def test_untargeted_patch_recovery_includes_safe_document_navigation():
     )
     # The retained source itself is usable document navigation. Prose does not
     # manufacture a code-search target or an automatic retry.
-    assert explicit["result"] == "data" and explicit["kind"] == "patch_context"
+    assert explicit["schema_version"] == 4 and explicit["result"] == "data"
+    _assert_untrusted_whole_windows(explicit, [document])
     assert [(row["path"], row["text"]) for row in explicit["sources"]] == [
         ("docs/permission-policy.md", "PermissionService owns shared permission policy.")
     ]
@@ -849,10 +854,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
         "question": "Change navigation", "project_path": "/repo",
         "delivery_strategy": "bounded_direct",
     }, PartialFacade())
-    assert partial["status"] == "insufficient_evidence"
-    assert partial["kind"] == "docs_answer"
-    assert partial["answer_supported"] is False and partial["edit_ready"] is False
-    assert "mutation_intent" not in partial and "context_pack" not in partial
+    _assert_citation_only_answer(partial, [("src/navigation.py", "navigation only")])
 
     class LegacyProjectFacade:
         def get_docs_context(self, question, **kwargs):
@@ -869,10 +871,7 @@ def test_bounded_direct_is_one_existing_tool_call_and_returns_only_action_packet
     legacy = handle_context_tool("get_docs_context", {
         "question": "Change legacy", "project_path": "/repo", "delivery_strategy": "bounded_direct",
     }, LegacyProjectFacade())
-    assert legacy["status"] == "insufficient_evidence"
-    assert legacy["kind"] == "docs_answer"
-    assert legacy["answer_supported"] is False and legacy["edit_ready"] is False
-    assert "mutation_intent" not in legacy
+    _assert_citation_only_answer(legacy, [("src/legacy.py", "code")])
 
     class MultiChunkBackend:
         def get_project_context(self, project_path, question, **kwargs):
