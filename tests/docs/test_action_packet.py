@@ -55,6 +55,7 @@ def test_mutation_readiness_does_not_infer_constraints_from_user_wording():
 def test_patch_request_plan_separates_mutation_and_preserve_targets():
     from pathlib import Path
     from docmancer.docs.domain.source_map import build_project_source_evidence
+    from docmancer.docs.domain.source_boundary import SourceBoundary
 
     question = (
         "Fix partial permission handling in BrowserPermissionGate, ScanPermissionGate, "
@@ -87,7 +88,22 @@ def test_patch_request_plan_separates_mutation_and_preserve_targets():
                for item in (*plan.mutation_targets, *plan.preserve_targets))
 
     root = Path("eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001")
-    evidence = build_project_source_evidence(root, question=question, max_items=12, token_budget=1400)
+    declared_paths = (
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+        "lib/modules/permission/domain/permission_result.freezed.dart",
+    )
+    # The SDK host supplies these exact fixture members. A question alone
+    # cannot authorize source enumeration, including generated preserve files.
+    assert build_project_source_evidence(root, question=question) == []
+    evidence = build_project_source_evidence(
+        root, question=question, requirements=[*mutate, preserve],
+        source_boundary=SourceBoundary(code_files=declared_paths),
+        include_generated=True, max_items=12, token_budget=1400,
+    )
+    assert {row["path"] for row in evidence if row.get("matched") is True} == set(declared_paths)
     evidence.append({
         "path": "docs/permission-architecture.md", "source_class": "project_doc",
         "authority": "canonical", "content": "Partial permission handling spans all permission gates.",
