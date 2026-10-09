@@ -24,8 +24,9 @@ TARGET_TESTS = (
     "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
     "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
     "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+    "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.project_retrieval_intent",
@@ -33,6 +34,8 @@ TARGET_MODULES = (
     "docmancer.docs.domain.project_doc_ranking",
     "docmancer.docs.domain.query_terms",
     "docmancer.docs.domain.admission_meaning",
+    "docmancer.docs.domain.admission_local_binding",
+    "docmancer.docs.application.retrieval_need_support",
     "docmancer.docs.domain.admission_grammar",
     "docmancer.docs.domain.question_retrieval_needs",
     "docmancer.docs.domain.query_reference_binding",
@@ -154,6 +157,54 @@ MUTANTS = (
         TARGET_TESTS[5],
         1,
         "critical_admission_meaning_no_inferred_equivalence",
+    ),
+    Mutant(
+        "default_binding_unknown_not_true",
+        "docmancer/docs/domain/admission_local_binding.py",
+        "def default_local_witness(query: Mapping[str, Any], text: str\n"
+        "                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n"
+        "    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n"
+        "    return None, ()",
+        "def default_local_witness(query: Mapping[str, Any], text: str\n"
+        "                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n"
+        "    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n"
+        "    return True, ()",
+        TARGET_TESTS[6],
+        1,
+        "critical_default_binding_unknown_abi",
+    ),
+    Mutant(
+        "default_binding_unknown_not_false",
+        "docmancer/docs/domain/admission_local_binding.py",
+        "def default_local_witness(query: Mapping[str, Any], text: str\n"
+        "                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n"
+        "    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n"
+        "    return None, ()",
+        "def default_local_witness(query: Mapping[str, Any], text: str\n"
+        "                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n"
+        "    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n"
+        "    return False, ()",
+        TARGET_TESTS[6],
+        1,
+        "critical_default_binding_unknown_abi",
+    ),
+    Mutant(
+        "default_binding_unknown_cannot_qualify",
+        "docmancer/docs/application/retrieval_need_support.py",
+        "        result.update(qualified=False, qualification_reason=\"missing_need_local_witness\")",
+        "        result.update(qualified=True, qualification_reason=\"missing_need_local_witness\")",
+        TARGET_TESTS[6],
+        1,
+        "critical_default_binding_unknown_veto",
+    ),
+    Mutant(
+        "default_binding_nonneeds_not_erased",
+        "docmancer/docs/application/retrieval_need_support.py",
+        "    result = dict(trace)",
+        "    result = {}",
+        TARGET_TESTS[6],
+        1,
+        "critical_default_binding_nonneeds_preserved",
     ),
 )
 

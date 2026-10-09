@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "contract": "default-local-binding-unknown-and-trace-boundary-v1",
+  "migration_status": "precheck-original-tests-still-collected",
+  "base_commit": "38da10d347ae2227eee6d1624db58dbf30938674",
+  "runner_base_blob": "769c961ebebc40c31b49d7fa6fb15d13c15df5b3",
+  "source": {
+    "original_path": "tests/docs/test_admission_local_binding.py",
+    "archive_path": "eval/task_level/contract_history/admission_local_binding.py.txt",
+    "git_blob_sha": "f0d3676dc20f9b4785715405f4f6ced401c1df6f",
+    "sha256": "e3eec4a7f10584855352228cca65972f2747bb81e7d3693ec3253ac24ebcc676",
+    "encoding": "utf-8"
+  },
+  "frozen_roster_sha256": "13fd8cc50b80d3811f842d5cffe4315f823844615786bcf4bd3d5aa7d81ca286",
+  "frozen_input_roster_sha256": "2a1fd29dd230996a3621651b0829bf067d961f3919fa50a8e68b17372759dac3",
+  "historical_baseline": {
+    "pr_head_sha": "0855fb491ec388100cce92e57fe64b889c4cd3e0",
+    "run_id": 37996655986,
+    "reader_job_id": 114047940486,
+    "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37996655986/job/114047940486",
+    "module_counts": {
+      "test_functions": 16,
+      "collected_cases": 43,
+      "passed": 1,
+      "failed": 42,
+      "errors": 0,
+      "skipped": 0
+    },
+    "first_node": "tests/docs/test_admission_local_binding.py::test_direct_default_statement_is_a_witness[RelayClient-7]",
+    "first_failure": "AssertionError: assert None is True",
+    "classification": {
+      "selected_definitions": 15,
+      "selected_cases": 42,
+      "retained_live_definitions": 1,
+      "retained_live_cases": 1
+    },
+    "note": "The compact JUnit module record was read directly. The split into retired-compiler expectations and the live unsupported-tail guard is static contract review; no new runtime or final-SHA acceptance is claimed."
+  },
+  "current_contract": {
+    "domain_source": {
+      "path": "docmancer/docs/domain/admission_local_binding.py",
+      "git_blob_sha": "86c67187b049e69ea30ff5fd4f3bc490fe641e68"
+    },
+    "wrapper_source": {
+      "path": "docmancer/docs/application/retrieval_need_support.py",
+      "git_blob_sha": "c08744ccd1b20f3c2acd10b6b8f2681840a0396a"
+    },
+    "unknown_abi": "default_property and bound_default_units return None; default_local_witness returns (None, ()). Unknown is distinct from both a proven default and a semantic refutation. Caller-supplied legacy subject/relation/title/authority metadata cannot nominate a property, owner, condition, or anaphoric value.",
+    "literal_inputs": "All 43 archived query/body/source records and their original is/is-not assertion forms are retained in one frozen input digest. The local AST reader interprets only the frozen fixture's literal, parameter, f-string, concatenation, dictionary, fixture-query and assignment forms. It never imports or executes old tests, assertions, or the old helper.",
+    "input_schema": {
+      "fields": [
+        "original_nodeid",
+        "case_index",
+        "query",
+        "body",
+        "source",
+        "historical_assertion"
+      ],
+      "historical_assertion_fields": [
+        "operator",
+        "value"
+      ],
+      "case_count": 43
+    },
+    "need_trace_boundary": "A previously qualified legacy retrieval_need with unknown proof becomes unqualified with missing_need_local_witness. All inherited need witness/context/assignment credit is removed, while unrelated diagnostic and source-hash values remain intact.",
+    "unchanged_trace_boundary": "The adapter returns original/host_lookup trace values unchanged and does not mutate inputs. This positive control precedes need vetoes and catches an always-empty adapter; it is not proof of retrieval quality or source authority.",
+    "structural_boundaries": "An already rejected need remains rejected with its original reason. Empty/non-string text or a non-mapping source cannot qualify and retains the distinct invalid-input reason.",
+    "live_guard_rule": "The complete source ASTs of default_need and test_recognized_condition_does_not_hide_unsupported_constraint_tail remain identical to the archive and stay independently collected.",
+    "control": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+    "critical_gate_delta": {
+      "before_cases": 31,
+      "after_cases": 32,
+      "before_mutants": 9,
+      "after_mutants": 13
+    },
+    "retirement_rule": "No original test is removed in this precheck. Only the 15 marked functions may be considered for later retirement after a reviewed published source tree has a green normal baseline and all four intended named mutant kills, with expected counts and no errors/skips. Record PR-head/checkout/tree identity explicitly. The live tail function/helper remain collected.",
+    "scope_limit": "No production, retrieval, corpus, source-binding, finite-membership, quality, installed/client or output-budget changes. Existing literal/alias/intent/admission-meaning evidence does not substitute for this API's own mutation proof."
+  },
+  "expected_mutations": [
+    {
+      "name": "default_binding_unknown_not_true",
+      "path": "docmancer/docs/domain/admission_local_binding.py",
+      "old": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return None, ()",
+      "new": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return True, ()",
+      "source_before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+      "source_after_sha256": "40b8e2bc3830862461a7381e78b67675c7b6d2a1952315d182c1b9507560a598",
+      "anchor_count": 1,
+      "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+      "expected_failures": 1,
+      "failure_guard": "critical_default_binding_unknown_abi"
+    },
+    {
+      "name": "default_binding_unknown_not_false",
+      "path": "docmancer/docs/domain/admission_local_binding.py",
+      "old": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return None, ()",
+      "new": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return False, ()",
+      "source_before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+      "source_after_sha256": "a650d443b0f6a2264b796f47c410dfa50c0b0132ce92b0d717406070c49397e4",
+      "anchor_count": 1,
+      "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+      "expected_failures": 1,
+      "failure_guard": "critical_default_binding_unknown_abi"
+    },
+    {
+      "name": "default_binding_unknown_cannot_qualify",
+      "path": "docmancer/docs/application/retrieval_need_support.py",
+      "old": "        result.update(qualified=False, qualification_reason=\"missing_need_local_witness\")",
+      "new": "        result.update(qualified=True, qualification_reason=\"missing_need_local_witness\")",
+      "source_before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+      "source_after_sha256": "ba4ec7a256cfb58c5affa52e9530e8364cd54e5ab36f7a52466fd0af24c67f8f",
+      "anchor_count": 1,
+      "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+      "expected_failures": 1,
+      "failure_guard": "critical_default_binding_unknown_veto"
+    },
+    {
+      "name": "default_binding_nonneeds_not_erased",
+      "path": "docmancer/docs/application/retrieval_need_support.py",
+      "old": "    result = dict(trace)",
+      "new": "    result = {}",
+      "source_before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+      "source_after_sha256": "1a4c853e642727d4cf6af2298f24558a787a4c08b5772d060d406ff3d7698adb",
+      "anchor_count": 1,
+      "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+      "expected_failures": 1,
+      "failure_guard": "critical_default_binding_nonneeds_preserved"
+    }
+  ],
+  "roster": [
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_direct_default_statement_is_a_witness",
+      "definition_line": 14,
+      "source_lines": [
+        13,
+        16
+      ],
+      "collected_cases": 2,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Two direct subject/value examples require inferred positive default binding.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_default_does_not_borrow_subject_property_or_value",
+      "definition_line": 25,
+      "source_lines": [
+        19,
+        26
+      ],
+      "collected_cases": 4,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Four negative examples require semantic subject/property/value refutation rather than unknown.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_compound_property_cannot_be_replaced_by_partial_word_match",
+      "definition_line": 33,
+      "source_lines": [
+        29,
+        34
+      ],
+      "collected_cases": 2,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Two partial compound properties require semantic negative classification.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_compound_property_is_supported_when_fully_present",
+      "definition_line": 37,
+      "source_lines": [
+        37,
+        39
+      ],
+      "collected_cases": 1,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "A complete compound property requires inferred positive binding.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_unrelated_source_title_cannot_lend_subject_to_another_api",
+      "definition_line": 42,
+      "source_lines": [
+        42,
+        45
+      ],
+      "collected_cases": 1,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "An unrelated source title must not supply a semantic owner; original title/authority inputs remain frozen.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_whole_page_membership_is_not_a_local_subject_binding",
+      "definition_line": 48,
+      "source_lines": [
+        48,
+        51
+      ],
+      "collected_cases": 1,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Whole-page heading membership must not supply an inferred local owner; all body/title bytes remain frozen.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_default_requires_an_assignment_for_the_same_local_subject",
+      "definition_line": 62,
+      "source_lines": [
+        54,
+        63
+      ],
+      "collected_cases": 6,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Six assignment/owner examples require semantic negative classification from prose.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_default_local_layout_controls",
+      "definition_line": 72,
+      "source_lines": [
+        66,
+        73
+      ],
+      "collected_cases": 4,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Four layouts require inferred positive local ownership and value.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_default_value_does_not_borrow_another_predicate_or_condition",
+      "definition_line": 82,
+      "source_lines": [
+        76,
+        83
+      ],
+      "collected_cases": 4,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Four predicates/conditions require semantic negative classification from prose.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_conditional_default_requires_the_requested_state",
+      "definition_line": 87,
+      "source_lines": [
+        86,
+        91
+      ],
+      "collected_cases": 3,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Three conditional-state paraphrases require inferred supported/refuted meanings.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_compound_property_with_behavior_suffix_is_not_silently_shortened",
+      "definition_line": 94,
+      "source_lines": [
+        94,
+        96
+      ],
+      "collected_cases": 1,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "A behavior suffix requires semantic property classification.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_explicit_anaphora_handles_infinitive_stance_and_soft_wrapping",
+      "definition_line": 100,
+      "source_lines": [
+        99,
+        104
+      ],
+      "collected_cases": 3,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Three discourse/soft-wrap examples require inferred positive anaphoric binding.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_anaphoric_default_cannot_change_polarity_owner_or_property",
+      "definition_line": 112,
+      "source_lines": [
+        107,
+        114
+      ],
+      "collected_cases": 3,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Three polarity/owner/property examples require semantic negative anaphora classification.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_anaphoric_default_cannot_borrow_another_answer_subject_property_or_condition",
+      "definition_line": 124,
+      "source_lines": [
+        117,
+        126
+      ],
+      "collected_cases": 5,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Five answer/owner/property/condition examples require semantic negative anaphora classification.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_recognized_condition_does_not_hide_unsupported_constraint_tail",
+      "definition_line": 129,
+      "source_lines": [
+        129,
+        133
+      ],
+      "collected_cases": 1,
+      "action": "retain-live-unsupported-tail-guard",
+      "historical_expectation": "The complete unsupported constraint tail must never obtain positive support; retain this live assertion and helper.",
+      "current_guard": "tests/docs/test_admission_local_binding.py::test_recognized_condition_does_not_hide_unsupported_constraint_tail"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_local_binding.py::test_anaphoric_timeout_action_preserves_indefinite_article",
+      "definition_line": 137,
+      "source_lines": [
+        136,
+        140
+      ],
+      "collected_cases": 2,
+      "action": "replace-inferred-default-expectations",
+      "historical_expectation": "Two indefinite-article action examples require inferred positive timeout meaning.",
+      "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
+    }
+  ]
+}

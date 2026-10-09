@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_admission_local_binding_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_admission_local_binding_contract.py": "7ef9e89d4840e644631e9e4bc77811b280a9e374f6de4309cfdc28e3ce8b94b4"
+  }
+}
