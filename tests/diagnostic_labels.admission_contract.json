@@ -13,7 +13,7 @@
   },
   "module_node_hashes": {
     "tests/docs/test_admission_guard_composition.py": "aa115ae6d23e72493e6cf861ec5875367566ec337a8a63ccf70582f2cbc1e1bb",
-    "tests/docs/test_admission_local_binding.py": "3ba94d12fe9ebfcae5c86d5041dcb96979116aa6eeef2d57afd5b25d07e08382",
+    "tests/docs/test_admission_local_binding.py": "bd27a14da5fb3e380f9fc87e802e34ad9053f69c18e0b463155b2550444e9560",
     "tests/docs/test_admission_mapping_assignments.py": "fffd94be622e2d7c08ac6ef378ab558d524b6f1329c60e9c49d8e0772a78c6c7",
     "tests/docs/test_admission_meaning.py": "964abdbdef8f5e41b0107bdb9fd757842d8296ebbbb986a2473d520fa434af1b",
     "tests/docs/test_admission_pipeline_invariants.py": "7e1e06a5673d11ff85e74a957429d119a6b96667fa752a149c39b0bd843da8ed",

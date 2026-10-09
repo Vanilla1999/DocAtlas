@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "default-local-binding-unknown-and-trace-boundary-v1",
-  "migration_status": "precheck-original-tests-still-collected",
+  "migration_status": "retired-selected-default-inference-tests-after-own-runtime-proof",
   "base_commit": "38da10d347ae2227eee6d1624db58dbf30938674",
   "runner_base_blob": "769c961ebebc40c31b49d7fa6fb15d13c15df5b3",
   "source": {
@@ -73,7 +73,7 @@
       "before_mutants": 9,
       "after_mutants": 13
     },
-    "retirement_rule": "No original test is removed in this precheck. Only the 15 marked functions may be considered for later retirement after a reviewed published source tree has a green normal baseline and all four intended named mutant kills, with expected counts and no errors/skips. Record PR-head/checkout/tree identity explicitly. The live tail function/helper remain collected.",
+    "retirement_rule": "The 15 marked legacy inference functions (42 expanded cases) are retired only after the recorded green normal 32-case baseline and all 13 intended mutant kills, including the four default-binding faults. The exact original archive and frozen 43-input roster remain. The live unsupported-tail test, default_need helper, all imports and every other non-test source line remain in the working module. No other family or production implementation is changed.",
     "scope_limit": "No production, retrieval, corpus, source-binding, finite-membership, quality, installed/client or output-budget changes. Existing literal/alias/intent/admission-meaning evidence does not substitute for this API's own mutation proof."
   },
   "expected_mutations": [
@@ -319,5 +319,341 @@
       "historical_expectation": "Two indefinite-article action examples require inferred positive timeout meaning.",
       "current_guard": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit"
     }
-  ]
+  ],
+  "runtime_proof": {
+    "run_id": 38003248365,
+    "run_attempt": 1,
+    "job_id": 114066061733,
+    "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38003248365/job/114066061733",
+    "pr_head_sha": "1c6c2c8454cdd6fe797fe80e85f3b651aef01a0a",
+    "checkout_commit_sha": "64caa3caf213a6a67d44c92546660ef1ced23d87",
+    "checkout_parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "1c6c2c8454cdd6fe797fe80e85f3b651aef01a0a"
+    ],
+    "checkout_tree_sha": "8a544267409f0dbf3ab498dfa864c07b13cdfb73",
+    "pr_head_tree_sha": "8a544267409f0dbf3ab498dfa864c07b13cdfb73",
+    "same_tree_as_pr_head": true,
+    "evidence_mode": "normal EVIDENCE records only; historical/compact literal case_mode records excluded",
+    "baseline": {
+      "errors": 0,
+      "failures": 0,
+      "mutation": null,
+      "returncode": 0,
+      "roster_sha256": "cd00681fc050a2f1e9fba4c08557d257e4cbce6aafdb5e59236c5c454f17d200",
+      "run": "baseline",
+      "skipped": 0,
+      "testcase_seconds": 0.081,
+      "tests": 32
+    },
+    "intended_mutants_killed": 13,
+    "killed_mutant_names": [
+      "normative_python_declaration_recognition",
+      "normative_no_implicit_authority",
+      "normative_whole_source_delivery",
+      "normative_bound_source_fidelity",
+      "active_task33_actionability_contract",
+      "github_models_host_turn_limit",
+      "project_retrieval_no_generated_aliases",
+      "project_query_intent_no_inferred_roles",
+      "admission_meaning_no_inferred_equivalence",
+      "default_binding_unknown_not_true",
+      "default_binding_unknown_not_false",
+      "default_binding_unknown_cannot_qualify",
+      "default_binding_nonneeds_not_erased"
+    ],
+    "default_mutants": [
+      {
+        "errors": 0,
+        "failures": 1,
+        "mutation": {
+          "after_sha256": "40b8e2bc3830862461a7381e78b67675c7b6d2a1952315d182c1b9507560a598",
+          "anchor_count": 1,
+          "before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_abi",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "name": "default_binding_unknown_not_true",
+          "new": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return True, ()",
+          "old": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return None, ()",
+          "path": "docmancer/docs/domain/admission_local_binding.py"
+        },
+        "returncode": 1,
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb",
+        "run": "default_binding_unknown_not_true",
+        "skipped": 0,
+        "testcase_seconds": 0.004,
+        "tests": 1
+      },
+      {
+        "errors": 0,
+        "failures": 1,
+        "mutation": {
+          "after_sha256": "a650d443b0f6a2264b796f47c410dfa50c0b0132ce92b0d717406070c49397e4",
+          "anchor_count": 1,
+          "before_sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_abi",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "name": "default_binding_unknown_not_false",
+          "new": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return False, ()",
+          "old": "def default_local_witness(query: Mapping[str, Any], text: str\n                          ) -> tuple[bool | None, tuple[tuple[int, int], ...]]:\n    \"\"\"Preserve the tri-state ABI; no supported default relation is inferred.\"\"\"\n    return None, ()",
+          "path": "docmancer/docs/domain/admission_local_binding.py"
+        },
+        "returncode": 1,
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb",
+        "run": "default_binding_unknown_not_false",
+        "skipped": 0,
+        "testcase_seconds": 0.004,
+        "tests": 1
+      },
+      {
+        "errors": 0,
+        "failures": 1,
+        "mutation": {
+          "after_sha256": "ba4ec7a256cfb58c5affa52e9530e8364cd54e5ab36f7a52466fd0af24c67f8f",
+          "anchor_count": 1,
+          "before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_unknown_veto",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "name": "default_binding_unknown_cannot_qualify",
+          "new": "        result.update(qualified=True, qualification_reason=\"missing_need_local_witness\")",
+          "old": "        result.update(qualified=False, qualification_reason=\"missing_need_local_witness\")",
+          "path": "docmancer/docs/application/retrieval_need_support.py"
+        },
+        "returncode": 1,
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb",
+        "run": "default_binding_unknown_cannot_qualify",
+        "skipped": 0,
+        "testcase_seconds": 0.004,
+        "tests": 1
+      },
+      {
+        "errors": 0,
+        "failures": 1,
+        "mutation": {
+          "after_sha256": "1a4c853e642727d4cf6af2298f24558a787a4c08b5772d060d406ff3d7698adb",
+          "anchor_count": 1,
+          "before_sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef",
+          "expected_failures": 1,
+          "failure_guard": "critical_default_binding_nonneeds_preserved",
+          "killer": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+          "name": "default_binding_nonneeds_not_erased",
+          "new": "    result = {}",
+          "old": "    result = dict(trace)",
+          "path": "docmancer/docs/application/retrieval_need_support.py"
+        },
+        "returncode": 1,
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb",
+        "run": "default_binding_nonneeds_not_erased",
+        "skipped": 0,
+        "testcase_seconds": 0.004,
+        "tests": 1
+      }
+    ],
+    "final_receipt": "PASS: baseline green; 13 critical mutants killed",
+    "proof_source_blobs": [
+      {
+        "path": "tests/docs/test_admission_local_binding.py",
+        "git_blob_sha": "f0d3676dc20f9b4785715405f4f6ced401c1df6f"
+      },
+      {
+        "path": "tests/docs/test_admission_local_binding_contract.py",
+        "git_blob_sha": "e9fe37b22014e57e9998667dbc5aacf573d19b15"
+      },
+      {
+        "path": "eval/task_level/contract_history/admission_local_binding.py.txt",
+        "git_blob_sha": "f0d3676dc20f9b4785715405f4f6ced401c1df6f"
+      },
+      {
+        "path": "eval/task_level/contract_history/admission_local_binding.json",
+        "git_blob_sha": "f6df59efd8704264a9c223e57a172f45806c0702"
+      },
+      {
+        "path": "docmancer/docs/domain/admission_local_binding.py",
+        "git_blob_sha": "86c67187b049e69ea30ff5fd4f3bc490fe641e68"
+      },
+      {
+        "path": "docmancer/docs/application/retrieval_need_support.py",
+        "git_blob_sha": "c08744ccd1b20f3c2acd10b6b8f2681840a0396a"
+      },
+      {
+        "path": "scripts/run_critical_mutation_gate.py",
+        "git_blob_sha": "c0a3b41ef9f52a8104d5c2fe24e44642ce33134b"
+      }
+    ],
+    "limitation": "This receipt proves the pre-retirement source tree, not full CI or the later base79 tree. Base79 has a newer relation-gate runner; its 53-case/19-mutant suite and final-SHA acceptance remain pending."
+  },
+  "retirement": {
+    "base_commit": "08b5d27cc4b919cfde52df84a8c25e8c6df30a2d",
+    "base_tree": "b857adec62508099722670dc7c515ec57c0b2ebe",
+    "base_working_module_blob": "f0d3676dc20f9b4785715405f4f6ced401c1df6f",
+    "working_module_sha256": "a9462c8e5a190af1e4117d40fd27f2758731ea00d7645a8cd8c362fca7a754b5",
+    "diagnostic_module_node_hash_before": "3ba94d12fe9ebfcae5c86d5041dcb96979116aa6eeef2d57afd5b25d07e08382",
+    "diagnostic_module_node_hash_after": "bd27a14da5fb3e380f9fc87e802e34ad9053f69c18e0b463155b2550444e9560",
+    "removed_definitions": 15,
+    "removed_expanded_cases": 42,
+    "retained_live_definitions": 1,
+    "retained_live_expanded_cases": 1,
+    "current_independent_control_cases": 1,
+    "family_collected_cases_before": 44,
+    "family_collected_cases_after": 2,
+    "removed_original_nodeids": [
+      "tests/docs/test_admission_local_binding.py::test_direct_default_statement_is_a_witness",
+      "tests/docs/test_admission_local_binding.py::test_default_does_not_borrow_subject_property_or_value",
+      "tests/docs/test_admission_local_binding.py::test_compound_property_cannot_be_replaced_by_partial_word_match",
+      "tests/docs/test_admission_local_binding.py::test_compound_property_is_supported_when_fully_present",
+      "tests/docs/test_admission_local_binding.py::test_unrelated_source_title_cannot_lend_subject_to_another_api",
+      "tests/docs/test_admission_local_binding.py::test_whole_page_membership_is_not_a_local_subject_binding",
+      "tests/docs/test_admission_local_binding.py::test_default_requires_an_assignment_for_the_same_local_subject",
+      "tests/docs/test_admission_local_binding.py::test_default_local_layout_controls",
+      "tests/docs/test_admission_local_binding.py::test_default_value_does_not_borrow_another_predicate_or_condition",
+      "tests/docs/test_admission_local_binding.py::test_conditional_default_requires_the_requested_state",
+      "tests/docs/test_admission_local_binding.py::test_compound_property_with_behavior_suffix_is_not_silently_shortened",
+      "tests/docs/test_admission_local_binding.py::test_explicit_anaphora_handles_infinitive_stance_and_soft_wrapping",
+      "tests/docs/test_admission_local_binding.py::test_anaphoric_default_cannot_change_polarity_owner_or_property",
+      "tests/docs/test_admission_local_binding.py::test_anaphoric_default_cannot_borrow_another_answer_subject_property_or_condition",
+      "tests/docs/test_admission_local_binding.py::test_anaphoric_timeout_action_preserves_indefinite_article"
+    ],
+    "retained_test": "tests/docs/test_admission_local_binding.py::test_recognized_condition_does_not_hide_unsupported_constraint_tail",
+    "retained_helpers": [
+      "default_need"
+    ],
+    "source_preservation": "Only the exact source_lines spans of the 15 selected frozen functions, including decorators, are removed. Every remaining source line is kept byte-for-byte, including the live tail, all helpers, imports, module docstring and whitespace.",
+    "frozen_metadata_preserved": [
+      "source",
+      "frozen_roster_sha256",
+      "frozen_input_roster_sha256",
+      "historical_baseline",
+      "expected_mutations",
+      "roster"
+    ],
+    "unchanged_proof_inputs_at_base79": [
+      {
+        "path": "tests/docs/test_admission_local_binding.py",
+        "git_blob_sha": "f0d3676dc20f9b4785715405f4f6ced401c1df6f"
+      },
+      {
+        "path": "tests/docs/test_admission_local_binding_contract.py",
+        "git_blob_sha": "e9fe37b22014e57e9998667dbc5aacf573d19b15"
+      },
+      {
+        "path": "eval/task_level/contract_history/admission_local_binding.py.txt",
+        "git_blob_sha": "f0d3676dc20f9b4785715405f4f6ced401c1df6f"
+      },
+      {
+        "path": "eval/task_level/contract_history/admission_local_binding.json",
+        "git_blob_sha": "f6df59efd8704264a9c223e57a172f45806c0702"
+      },
+      {
+        "path": "docmancer/docs/domain/admission_local_binding.py",
+        "git_blob_sha": "86c67187b049e69ea30ff5fd4f3bc490fe641e68"
+      },
+      {
+        "path": "docmancer/docs/application/retrieval_need_support.py",
+        "git_blob_sha": "c08744ccd1b20f3c2acd10b6b8f2681840a0396a"
+      }
+    ],
+    "unchanged_control_blob": "e9fe37b22014e57e9998667dbc5aacf573d19b15",
+    "unchanged_critical_runner_blob": "7331b5a85b99887ec64334388a7b23c8eed687e5",
+    "external_consumer_and_selector_audit": {
+      "base_commit": "08b5d27cc4b919cfde52df84a8c25e8c6df30a2d",
+      "tree_sha": "b857adec62508099722670dc7c515ec57c0b2ebe",
+      "source_and_config_files": 1363,
+      "python_files": 1273,
+      "workflow_files": 39,
+      "json_config_and_diagnostic_files": 184,
+      "total_files": 1547,
+      "exact_path_blob_roster_sha256": "c0fda2ec7dd61e4a5b5b7769b5f4a9e812f7b785ab37cebbc504b34858a9e092",
+      "scope": "All tracked .py; all .github/workflows entries; .sh/.bash/.yml/.yaml/.toml/.ini/.cfg; Makefile/Justfile/justfile; root, .github, scripts JSON and every tests/diagnostic_labels JSON. Markdown/history/corpus result links are not claimed as executable selector coverage.",
+      "searched_symbols": [
+        "test_admission_local_binding",
+        "default_need",
+        "test_direct_default_statement_is_a_witness",
+        "test_default_does_not_borrow_subject_property_or_value",
+        "test_compound_property_cannot_be_replaced_by_partial_word_match",
+        "test_compound_property_is_supported_when_fully_present",
+        "test_unrelated_source_title_cannot_lend_subject_to_another_api",
+        "test_whole_page_membership_is_not_a_local_subject_binding",
+        "test_default_requires_an_assignment_for_the_same_local_subject",
+        "test_default_local_layout_controls",
+        "test_default_value_does_not_borrow_another_predicate_or_condition",
+        "test_conditional_default_requires_the_requested_state",
+        "test_compound_property_with_behavior_suffix_is_not_silently_shortened",
+        "test_explicit_anaphora_handles_infinitive_stance_and_soft_wrapping",
+        "test_anaphoric_default_cannot_change_polarity_owner_or_property",
+        "test_anaphoric_default_cannot_borrow_another_answer_subject_property_or_condition",
+        "test_anaphoric_timeout_action_preserves_indefinite_article"
+      ],
+      "removed_function_external_references": [],
+      "shared_helper_external_imports": [],
+      "surviving_module_selector": {
+        "path": "experiments/language_aware_context/packing_regressions.py",
+        "git_blob_sha": "e7d35ca9b7905df638f79a598c8de4b82481dfde",
+        "behavior": "Selects the existing module path; that path and its live tail remain."
+      },
+      "surviving_control_selector": {
+        "path": "scripts/run_critical_mutation_gate.py",
+        "git_blob_sha": "7331b5a85b99887ec64334388a7b23c8eed687e5",
+        "behavior": "Selects the unchanged independent contract test."
+      },
+      "diagnostic_change": "Only the old working module's node hash changes; its behavioral label and all other registrations remain."
+    },
+    "full_core_before_retirement": {
+      "run_id": 38003248365,
+      "reader_job_id": 114068441329,
+      "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38003248365/job/114068441329",
+      "python_junit_records": [
+        {
+          "artifact_file": "pytest-core-3.11-38003248365-1/core-tests-3.11.xml",
+          "xml_sha256": "5bdc3055863aab02c2717eaf47efc9fdb29b308377c23d7587f8c623421e0d6a",
+          "counts": {
+            "PASS": 6031,
+            "FAIL": 1748,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        },
+        {
+          "artifact_file": "pytest-core-3.12-38003248365-1/core-tests-3.12.xml",
+          "xml_sha256": "029b4916b92443138805214da1f8f005639f4a24659fdab75814dea304215307",
+          "counts": {
+            "PASS": 6031,
+            "FAIL": 1748,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        },
+        {
+          "artifact_file": "pytest-core-3.13-38003248365-1/core-tests-3.13.xml",
+          "xml_sha256": "9bd80acd9b653d77ad73084b1639aa6926f1b3cf5f53c4ee27217b0164be2298",
+          "counts": {
+            "PASS": 6031,
+            "FAIL": 1748,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        }
+      ],
+      "module_record": {
+        "module": "tests/docs/test_admission_local_binding.py",
+        "counts": {
+          "FAIL": 42,
+          "PASS": 1
+        },
+        "first_node": "tests/docs/test_admission_local_binding.py::test_direct_default_statement_is_a_witness[RelayClient-7]",
+        "first_message": "AssertionError: assert None is True\n +  where None = retrieval_need_local_witness({'query_id': 'need-default', 'query_origin': 'retrieval_need', 'text': 'What is the default timeout of RelayClient?', 'need_subject': 'RelayClient', ...}, 'RelayClient default timeout is 7 seconds.')\n +    where {'query_id': 'need-default', 'query_origin': 'retrieval_need', 'text': 'What is the default timeout of RelayClient?', 'need_subject': 'RelayClient', ...} = default_need('RelayClient')"
+      },
+      "console": {
+        "omitted_rows": 0,
+        "complete_cases_in_artifact": true
+      },
+      "conclusion": "Each Python 3.11/3.12/3.13 has 6031 PASS, 1748 FAIL, 0 ERROR and 10 SKIP. The selected module has 42 FAIL and 1 PASS. This is not a green full core run; no expected post-retirement counts are presented as actual."
+    },
+    "final_sha_runtime_status": "pending"
+  }
 }
