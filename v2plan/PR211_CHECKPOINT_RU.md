@@ -1,5 +1,39 @@
 # PR #211: checkpoint продолжения merge-readiness
 
+## Продолжение после 0049c6d: recovery подтверждён, остальные gates открыты
+
+[Main CI 37971052890](https://github.com/Vanilla1999/DocAtlas/actions/runs/37971052890)
+на `0049c6dd3643a8c214c7c899a08201495ab61d51` завершился FAILURE:
+все три core jobs и required-ci красные. Нового полного JUnit подсчёта этой версии
+здесь нет; числа 118e5d1 ниже не приписываются 0049c6d.
+
+- [Advanced log](https://github.com/Vanilla1999/DocAtlas/actions/runs/37971052890/job/113957463606)
+  подтверждает **11 recovery baseline PASS / 14 intended guard kills**.
+  Original discovery не теряется при добавлении lookup; metadata и чужой source
+  window не создают original credit. Это не полный retrieval quality PASS.
+- Retrieval evidence, docs contract, installed MCP, installer и три platform
+  smoke jobs SUCCESS. Реальные application/client sessions остаются **NOT RUN**.
+- Static и federated выявили новый regression: part03 имеет 1011 строк при
+  пределе1000. Slice19 механически вынес diagnostics в соседний57-line module,
+  сохранив тела функций. Размер не повышался.
+- Slice21 сохраняет существующий same-call diagnostics в no-results return.
+  Truly-empty test не ослабляется. Slice22 исправляет реальную потерю late
+  declaration после восьми ранних references; конечный source grant сохраняется.
+- Slices20/23 мигрируют десять existing ActionPacket cases на явные SDK contracts
+  и whole-window fidelity. Все20function names сохранены. Source replacement,
+  missing requirement, missing create collision receipt и forged filename alias
+  должны отклоняться своими guards; editing permission не выводится из prose.
+
+Все эти новые slices прошли независимый source review. После потери local exec
+transport изменения подготовлены через exact-file GitHub API и опубликованы
+обычным fast-forward. Local AST/compile/runtime после outage **NOT RUN**;
+результаты будущего CI здесь не предрешены. Нет force-push, merge или release.
+
+Следующие blockers: read_next, оставшиеся current public ActionPacket/Task33
+contracts, P1.4/1.5/1.6 fixtures/evaluators и подтверждённые потери original-only
+retrieval. Полный quality/downstream acceptance ещё не выполнен.
+**PR пока не готов к merge.**
+
 ## Подтверждённый результат 118e5d1; compact активирован
 
 [Main CI 37968005070](https://github.com/Vanilla1999/DocAtlas/actions/runs/37968005070)

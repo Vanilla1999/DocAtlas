@@ -194,42 +194,59 @@ def test_patch_request_plan_keeps_implicit_targets_fail_closed(question):
 
 def test_named_permission_patch_resolves_all_decisive_fixture_targets_without_formatter_loss():
     from pathlib import Path
+    from docmancer.docs.domain.source_boundary import SourceBoundary
     from docmancer.docs.domain.source_map import build_project_source_evidence
+    from docmancer.docs.application.action_packet import evidence_identity_for_item
 
+    names = ("BrowserPermissionGate", "ScanPermissionGate", "OfflineSyncGate", "PermissionService")
+    paths = (
+        "lib/modules/browser/application/browser_permission_gate.dart",
+        "lib/modules/scan/application/scan_permission_gate.dart",
+        "lib/modules/sync/application/offline_sync_gate.dart",
+        "lib/modules/permission/application/permission_service.dart",
+    )
     root = Path("eval/task_level/fixtures/templates/decisive_nbo_cross_module_gate_large_001")
+    assert build_project_source_evidence(root, question=PERMISSION_PATCH_QUERY) == []
     evidence = build_project_source_evidence(
-        root, question=PERMISSION_PATCH_QUERY, max_items=12, token_budget=1400,
+        root, question=PERMISSION_PATCH_QUERY, requirements=names,
+        source_boundary=SourceBoundary(code_files=paths), max_items=12, token_budget=1400,
     )
+    contract = MutationIntentContract("modify", "source", tuple(
+        RequestedTarget(name, "symbol", PERMISSION_PATCH_QUERY.index(name),
+                        PERMISSION_PATCH_QUERY.index(name) + len(name), provenance="user_request")
+        for name in names
+    ))
+    resolved = resolve_mutation_targets(
+        contract, evidence, evidence_id_for_item=lambda row: evidence_identity_for_item(row)[0],
+    )
+    assert evaluate_mutation_readiness(resolved).ready is True
+    assert {row.requested_value: row.path for row in resolved.resolved_targets} == dict(zip(names, paths))
     packet = build_action_packet(
-        question=PERMISSION_PATCH_QUERY, context_pack=evidence, max_tokens=2000,
+        question=PERMISSION_PATCH_QUERY, context_pack=evidence, mutation_intent_contract=resolved,
     )
-
-    resolved = {
-        target["requested_value"]: target["path"]
-        for target in packet["mutation_intent"]["resolved_targets"]
-    }
-    assert packet["mutation_intent"]["ready"] is True
-    assert resolved["OfflineSyncGate"].endswith("offline_sync_gate.dart")
-    assert not any("OfflineSyncGate" in message for message in packet["missing_evidence"])
-    assert not any("selected evidence was not preserved" in message for message in packet["missing_evidence"])
-
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert {row["path"] for row in packet["sources"]}.issuperset(paths)
+    assert not any(reason.startswith("invalid_display_span:") for reason in packet.get("missing", []))
+    assert validate_action_packet(packet, evidence_items=evidence, mutation_intent_contract=resolved) == []
 
 def test_selector_missing_requirement_does_not_report_formatter_loss():
+    text = "class OtherGate {}"
+    item = _current_packet_source({
+        "stable_id": "other-gate", "source": "lib/other_gate.dart",
+        "source_class": "source_evidence", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(), "symbols": ["OtherGate"],
+    })
     packet = build_action_packet(
-        question="Fix MissingPermissionGate",
-        context_pack=[{
-            "stable_id": "other-gate",
-            "source": "lib/other_gate.dart",
-            "source_class": "source_evidence",
-            "content": "class OtherGate {}",
-            "symbols": ["OtherGate"],
-        }],
-        max_tokens=1500,
+        question="Fix MissingPermissionGate", context_pack=[item],
+        public_requirements=[{"kind": "target_declaration", "value": "MissingPermissionGate",
+                              "proof_role": "target_identity"}],
     )
-
-    assert any(message.startswith("Missing required evidence:") for message in packet["missing_evidence"])
-    assert not any("selected evidence was not preserved" in message for message in packet["missing_evidence"])
-
+    missing_ids = {row["requirement_id"] for row in packet["requirements"]
+                   if row["kind"] == "target_declaration" and row["value"] == "MissingPermissionGate"}
+    assert missing_ids and missing_ids.issubset(packet["missing"])
+    assert packet["completeness"] != "complete" and packet["edit_ready"] is False
+    assert not any(reason.startswith("invalid_display_span:") for reason in packet["missing"])
+    assert validate_action_packet(packet, evidence_items=[item]) == []
 
 def test_unique_source_path_alias_resolves_but_ambiguous_alias_does_not():
     question = "Fix OfflineSyncGate"
@@ -293,62 +310,61 @@ def test_selected_document_terms_survive_action_packet_formatting():
         "NativeVoiceCapturePlugin.kt receives PCM samples from the SDK and "
         "forwards them to the native capture pipeline."
     )
-    item = {
-        "stable_chunk_id": "native-voice-capture",
-        "parent_logical_id": "parent:native-voice-capture",
-        "source": "docs/native-audio.md",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "authority": "official",
-    }
+    item = _current_packet_source({
+        "stable_chunk_id": "native-voice-capture", "parent_logical_id": "parent:native-voice-capture",
+        "source": "docs/native-audio.md", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(), "authority": "official",
+    })
     target_text = "class NativeVoiceCapturePlugin"
-    target = {
-        "stable_chunk_id": "native-voice-target",
-        "parent_logical_id": "parent:native-voice-target",
-        "source": "src/NativeVoiceCapturePlugin.kt",
-        "display_text": target_text,
-        "display_content_hash": hashlib.sha256(target_text.encode("utf-8")).hexdigest(),
-        "authority": "official",
-        "source_class": "code_graph",
-        "symbols": ["NativeVoiceCapturePlugin"],
-    }
-
+    path = "src/NativeVoiceCapturePlugin.kt"
+    target = _current_packet_source({
+        "stable_chunk_id": "native-voice-target", "parent_logical_id": "parent:native-voice-target",
+        "source": path, "display_text": target_text,
+        "display_content_hash": hashlib.sha256(target_text.encode()).hexdigest(),
+        "authority": "official", "source_class": "code_graph", "symbols": ["NativeVoiceCapturePlugin"],
+    })
+    contract = MutationIntentContract("modify", "source", (
+        RequestedTarget(path, "path", -1, -1, provenance="explicit_task_contract"),
+    ))
+    from docmancer.docs.application.action_packet import evidence_identity_for_item
+    resolved = resolve_mutation_targets(
+        contract, [item, target], evidence_id_for_item=lambda row: evidence_identity_for_item(row)[0],
+    )
+    assert evaluate_mutation_readiness(resolved).ready is True
     packet = build_action_packet(
         question="Update src/NativeVoiceCapturePlugin.kt for SDK PCM capture",
-        context_pack=[item, target],
-        max_tokens=1500,
+        context_pack=[item, target], public_requirements=[text], mutation_intent_contract=resolved,
     )
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert {row["text"] for row in packet["sources"]} == {text, target_text}
+    assert validate_action_packet(packet, evidence_items=[item, target], mutation_intent_contract=resolved) == []
 
-    assert packet["status"] == "ok"
-    assert packet["mutation_intent"]["ready"] is True
-    assert any(row["text"] == text for row in packet["implementation_guidance"])
-    assert validate_action_packet(packet, evidence_items=[item, target], max_tokens=1500) == []
-
-    create = build_mutation_intent(
-        "Create src/NewCaptureAdapter.py in src/existing_capture.py "
-        "so that capture remains bounded."
+    question = "Create src/NewCaptureAdapter.py in src/existing_capture.py so that capture remains bounded."
+    assert build_mutation_intent(question).operation == "none"
+    destination = "src/NewCaptureAdapter.py"
+    parent_path = "src/existing_capture.py"
+    plan = PatchRequestPlan(
+        "create", (), destination=PatchTarget(destination, "path", -1, -1, "mutate", "destination",
+                                              provenance="explicit_task_contract"),
+        parent_context=PatchTarget(parent_path, "path", -1, -1, "mutate", "parent",
+                                   provenance="explicit_task_contract"),
+        surface_id="explicit_task_contract",
     )
-    unresolved = resolve_mutation_targets(
-        create, [], evidence_id_for_item=lambda row: row.get("stable_chunk_id", "")
-    )
+    create = MutationIntentContract("create", "source", (), destination=destination, request_plan=plan)
+    unresolved = resolve_mutation_targets(create, [], evidence_id_for_item=lambda row: row.get("stable_chunk_id", ""))
     assert evaluate_mutation_readiness(unresolved).missing == (
-        "create_destination_not_verified",
-        "create_parent_or_module_not_resolved",
+        "create_destination_not_verified", "create_parent_or_module_not_resolved",
     )
-    parent = {
-        "stable_chunk_id": "capture-parent",
-        "source": "src/existing_capture.py",
-        "source_class": "code_graph",
-        "collision_free_targets": ["src/NewCaptureAdapter.py"],
-    }
-    resolved_create = resolve_mutation_targets(
-        create, [parent], evidence_id_for_item=lambda row: row["stable_chunk_id"]
-    )
-    create_readiness = evaluate_mutation_readiness(resolved_create)
-    assert create_readiness.ready is True
-    assert resolved_create.resolved_targets[0].binding_kind == "parent_context"
-    assert resolved_create.resolved_targets[0].exists is False
-
+    parent = {"stable_chunk_id": "capture-parent", "source": parent_path,
+              "source_class": "code_graph", "collision_free_targets": [destination]}
+    resolved_create = resolve_mutation_targets(create, [parent], evidence_id_for_item=lambda row: row["stable_chunk_id"])
+    assert evaluate_mutation_readiness(resolved_create).ready is True
+    assert any(row.binding_kind == "parent_context" and row.exists is False for row in resolved_create.resolved_targets)
+    # A parent alone cannot certify that the destination is free.
+    no_collision_receipt = {key: value for key, value in parent.items() if key != "collision_free_targets"}
+    collision_unknown = resolve_mutation_targets(create, [no_collision_receipt],
+                                                 evidence_id_for_item=lambda row: row["stable_chunk_id"])
+    assert evaluate_mutation_readiness(collision_unknown).missing == ("create_destination_not_verified",)
 
 def test_patch_handler_uses_action_packet_completeness_for_explicit_target():
     guidance_text = "PermissionService keeps browser and scan preflight policy shared."
@@ -462,53 +478,54 @@ def test_selected_exact_terms_keep_protected_witness_during_budget_fitting():
         "Required: MCP ingestion must preserve fetch/index checkpoints. "
         "Supporting implementation details may be omitted from a bounded packet."
     )
-    item = {
-        "stable_chunk_id": "resumable-ingestion",
-        "parent_logical_id": "parent:resumable-ingestion",
-        "source": "docs/resumable-ingestion.md",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "authority": "canonical",
-    }
-
+    item = _current_packet_source({
+        "stable_chunk_id": "resumable-ingestion", "parent_logical_id": "parent:resumable-ingestion",
+        "source": "docs/resumable-ingestion.md", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(), "authority": "canonical",
+    })
     packet = build_action_packet(
         question="Implement `MCP` resumable `fetch/index` ingestion",
-        context_pack=[item],
-        max_tokens=750,
+        context_pack=[item], public_requirements=["MCP", "fetch/index"],
     )
-
-    visible = json.dumps(packet, ensure_ascii=False).casefold()
-    assert "mcp" in visible
-    assert "fetch/index" in visible
-    assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
-    assert not any(
-        "Mandatory selected evidence was not preserved" in message
-        for message in packet["missing_evidence"]
-    )
-    assert validate_action_packet(packet, evidence_items=[item], max_tokens=750) == []
-
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text and packet["edit_ready"] is False
+    assert validate_action_packet(packet, evidence_items=[item]) == []
+    _assert_replacement_of_bound_source_is_rejected(packet, [item], text.replace("fetch/index", "fetch"))
 
 def test_post_format_sufficiency_accepts_camel_case_symbol_in_snake_case_source_path():
     text = "Build bounded patch context from selected project evidence."
-    item = {
-        "stable_chunk_id": "action-packet-source",
-        "parent_logical_id": "parent:action-packet-source",
-        "source": "docmancer/docs/application/action_packet.py",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "authority": "official",
-        "source_class": "source_evidence",
-    }
-
+    path = "docmancer/docs/application/action_packet.py"
+    item = _current_packet_source({
+        "stable_chunk_id": "action-packet-source", "parent_logical_id": "parent:action-packet-source",
+        "source": path, "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
+        "authority": "official", "source_class": "source_evidence",
+    })
+    contract = MutationIntentContract("modify", "source", (
+        RequestedTarget("ActionPacket", "symbol", -1, -1, provenance="explicit_task_contract"),
+    ))
+    from docmancer.docs.application.action_packet import evidence_identity_for_item
+    resolved = resolve_mutation_targets(contract, [item],
+                                        evidence_id_for_item=lambda row: evidence_identity_for_item(row)[0])
+    assert resolved.resolved_targets[0].path == path
     packet = build_action_packet(
-        question="Harden ActionPacket formatting",
-        context_pack=[item],
-        max_tokens=1500,
+        question="Harden ActionPacket formatting", context_pack=[item],
+        public_requirements=[text], mutation_intent_contract=contract,
     )
-
-    assert packet["status"] == "ok"
-    assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
-
+    assert packet["result"] == "data" and packet["sources"][0]["text"] == text
+    assert packet["sources"][0]["path"] == path and packet["edit_ready"] is False
+    # A unique filename alias locates a source; it cannot invent a declaration.
+    declaration_ids = {row["requirement_id"] for row in packet["requirements"]
+                       if row["kind"] == "target_declaration" and row["value"] == "ActionPacket"}
+    assert declaration_ids and declaration_ids.issubset(packet.get("missing", []))
+    assert validate_action_packet(packet, evidence_items=[item], mutation_intent_contract=contract) == []
+    forged_resolution = build_action_packet(
+        question="Harden ActionPacket formatting", context_pack=[item],
+        public_requirements=[text], mutation_intent_contract=resolved,
+    )
+    assert "mutation resolution assertion is not bound to canonical local evidence" in validate_action_packet(
+        forged_resolution, evidence_items=[item], mutation_intent_contract=resolved,
+    )
 
 def test_validator_rejects_truncated_packets_with_unclosed_required_evidence():
     text = "Required: preserve the source-backed permission contract."
@@ -542,37 +559,30 @@ def test_validator_rejects_truncated_packets_with_unclosed_required_evidence():
 
 def test_display_only_canonical_child_is_rendered_and_hash_bound():
     text = "The formatter must preserve stable child citations."
-    item = {
-        "stable_chunk_id": "display-child",
-        "parent_logical_id": "parent:display-child",
-        "source": "AGENTS.md",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "authority": "canonical",
-        "doc_scope": "project",
-    }
-
+    item = _current_packet_source({
+        "stable_chunk_id": "display-child", "parent_logical_id": "parent:display-child",
+        "source": "AGENTS.md", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
+        "authority": "canonical", "doc_scope": "project",
+    })
     target_text = "def format_packet(): pass"
-    target = {
-        "stable_chunk_id": "formatter-target",
-        "parent_logical_id": "parent:formatter-target",
-        "source": "src/formatter.py",
-        "display_text": target_text,
-        "display_content_hash": hashlib.sha256(target_text.encode("utf-8")).hexdigest(),
-        "authority": "official",
-        "source_class": "code_graph",
-        "symbols": ["format_packet"],
-    }
+    target = _current_packet_source({
+        "stable_chunk_id": "formatter-target", "parent_logical_id": "parent:formatter-target",
+        "source": "src/formatter.py", "display_text": target_text,
+        "display_content_hash": hashlib.sha256(target_text.encode()).hexdigest(),
+        "authority": "official", "source_class": "code_graph", "symbols": ["format_packet"],
+    })
     packet = build_action_packet(
-        question="Update src/formatter.py",
-        context_pack=[item, target],
+        question="Update src/formatter.py", context_pack=[item, target],
+        public_requirements=[text, "format_packet"],
     )
-
-    assert packet["status"] == "ok"
-    assert packet["mutation_intent"]["ready"] is True
-    assert packet["required_invariants"][0]["text"] == text
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert {row["text"] for row in packet["sources"]} == {text, target_text}
+    assert all(row["instruction_trust"] == "untrusted_data" for row in packet["sources"])
+    assert packet["edit_ready"] is False and "mutation_intent" not in packet
     assert validate_action_packet(packet, evidence_items=[item, target]) == []
-
+    source = next(row for row in packet["sources"] if row["path"] == "AGENTS.md")
+    assert source["content_sha256"] == hashlib.sha256(text.encode()).hexdigest()
 
 def test_python_imports_do_not_create_normative_facts_but_prose_does():
     text = """from . import required
@@ -582,30 +592,22 @@ from pkg import (
     forbidden,
 )
 From configuration, retries are required."""
-    item = {
-        "stable_chunk_id": "python-import-boundary",
-        "parent_logical_id": "parent:python-import-boundary",
-        "source": "docs/python-policy.md",
-        "display_text": text,
-        "display_content_hash": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "authority": "canonical",
-    }
-
+    item = _current_packet_source({
+        "stable_chunk_id": "python-import-boundary", "parent_logical_id": "parent:python-import-boundary",
+        "source": "docs/python-policy.md", "display_text": text,
+        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(), "authority": "canonical",
+    })
     packet = build_action_packet(
-        question="Configure retries",
-        context_pack=[item],
-        max_tokens=1500,
+        question="Configure retries", context_pack=[item],
+        public_requirements=["From configuration, retries are required."],
     )
-
-    required = [fact["text"] for fact in packet["required_invariants"]]
-    forbidden = [fact["text"] for fact in packet["forbidden_changes"]]
-    assert required == ["From configuration, retries are required."]
-    assert forbidden == []
-    assert packet["status"] == "ok"
-    assert packet["omitted_counts"].get("mandatory_requirements", 0) == 0
-    assert not any("Mandatory selected evidence" in value for value in packet["missing_evidence"])
-    assert validate_action_packet(packet, evidence_items=[item], max_tokens=1500) == []
-
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert packet["sources"][0]["text"] == text
+    assert packet["sources"][0]["instruction_trust"] == "untrusted_data"
+    assert packet["edit_ready"] is False and "mutation_intent" not in packet
+    assert validate_action_packet(packet, evidence_items=[item]) == []
+    # Neither Python import names nor repository prose can grant instruction authority.
+    assert all(row["value"] != "forbidden" for row in packet["requirements"])
 
 def test_public_mcp_errors_are_bounded_and_match_the_advertised_schema():
     class FailingFacade:
