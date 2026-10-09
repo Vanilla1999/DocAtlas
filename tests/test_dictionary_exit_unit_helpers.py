@@ -125,8 +125,20 @@ def test_segmentation_helpers_trim_bounds_and_immutable_validation_unchanged():
         replace(unit, content_sha256="0" * 64)
     with pytest.raises(ValueError, match="offsets"):
         replace(unit, char_start=-1)
-    with pytest.raises(ValueError, match="exceeds bound"):
-        replace(unit, text="x" * (api.MAX_ANSWER_UNIT_CHARS + 1))
+    # A long admitted unit is valid only with its own complete bytes and binding.
+    long_text = "Ω context. " * 160 + "Only on expiry; never on cancellation."
+    with pytest.raises(ValueError, match="hash mismatch"):
+        replace(unit, text=long_text)
+    long_unit = helpers._make_unit(
+        "sentence", long_text, 0, len(long_text), proposition=False,
+        representation_bounded=False,
+    )
+    assert (long_unit.text, long_unit.char_start, long_unit.char_end) == (long_text, 0, len(long_text))
+    assert long_unit.content_sha256 == hashlib.sha256(long_text.encode()).hexdigest()
+    identity = hashlib.sha256(f"sentence\0{0}\0{len(long_text)}\0{long_text}".encode()).hexdigest()
+    assert long_unit.unit_id == "unit-" + identity[:20]
+    assert api.materialize_answer_units(long_text, (long_unit,)) == long_text
+    assert long_unit.proposition is False
     assert len(api.extract_answer_units("\n".join(f"line {i}" for i in range(100)))) == api.MAX_ANSWER_UNITS
     assert api.extract_answer_units("") == ()
     assert helpers._make_source_field_unit("path", "") is None

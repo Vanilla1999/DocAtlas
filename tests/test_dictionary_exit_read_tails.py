@@ -69,7 +69,7 @@ def test_recovery_keeps_original_fragment_without_question_synthesis(monkeypatch
     selection = SimpleNamespace(support_decision=SimpleNamespace(answer_supported=False))
     diagnosis = recovery.build_recovery_diagnosis(question, selection)
     assert diagnosis['disposition'] == 'search_local_source'
-    assert diagnosis['problem_spans'] == [question.strip()[:220]]
+    assert diagnosis['problem_spans'] == [question.strip()]
     assert 'suggested_questions' not in diagnosis
     assert recovery._suggested_questions(question, (), evidence_path='Guide.md') == []
     assert 'rephrase_exhausted' not in diagnosis
@@ -79,8 +79,7 @@ def test_recovery_keeps_original_fragment_without_question_synthesis(monkeypatch
     assert action['type'] == 'search_local_source'
     assert action['auto_execute'] is action['repeat_docs_context'] is False
     assert 'arguments_patch' not in action and 'decision_options' not in action
-    assert len(action['query_terms']) <= 8
-    assert all(len(term) <= 160 for term in action['query_terms'])
+    assert action['query_terms'] == [question.strip()]
 
 
 def test_legacy_supplied_rephrase_cannot_emit_retry_or_equivalence():
