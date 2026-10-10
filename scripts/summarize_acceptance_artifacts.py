@@ -278,6 +278,101 @@ def _recovery_operand_summary(record: dict) -> dict:
     }
 
 
+def _critical_baseline_console(record: dict) -> dict:
+    """Show at most three retained traceback tails, without the generic 512 cut."""
+    failures = record["failures"]
+    return {
+        **{key: _focused_bound(value) for key, value in record.items() if key != "failures"},
+        "failures": {
+            "items": [
+                {**{key: _focused_bound(value) for key, value in row.items() if key != "trace"},
+                 "trace": row["trace"][-6000:]}
+                for row in failures[:3]
+            ],
+            "report_count": len(failures), "log_omitted": max(0, len(failures) - 3),
+        },
+    }
+
+
+_LITERAL_PRIORITY_MUTATIONS = (
+    "literal_inferred_facets", "literal_missing_unresolved_state", "literal_complete_scope",
+    "literal_legacy_delegation", "literal_unknown_tail_hash_loss", "literal_answer_authority",
+    "literal_original_query_credit_lost", "literal_lookup_required_credit", "literal_lookup_parent_promotion",
+    "literal_path_as_body_identity", "literal_reference_offset_shift", "literal_punctuation_as_semantics",
+    "literal_whitespace_preservation", "literal_unicode_normalization", "literal_input_bound",
+)
+
+
+def _literal_child_summary(
+    provenance: dict, report: dict, junit: dict, cases: list[dict],
+    import_provenance: dict, imported: dict, comparison: dict,
+) -> dict:
+    """Observe existing same-process receipts; do not rerun their evaluator."""
+    outcomes: dict[str, int] = {}
+    classes: dict[str, int] = {}
+    failures: dict[tuple[str, str], int] = {}
+    for case in cases:
+        outcome = case.get("outcome")
+        outcome = outcome if isinstance(outcome, str) else "<invalid outcome>"
+        classname = case.get("classname")
+        classname = classname if isinstance(classname, str) else "<invalid classname>"
+        outcomes[outcome] = outcomes.get(outcome, 0) + 1
+        classes[classname] = classes.get(classname, 0) + 1
+        if outcome != "passed":
+            message = case.get("message")
+            first = message.split("\n", 1)[0] if isinstance(message, str) else "<invalid message>"
+            failures[(outcome, first)] = failures.get((outcome, first), 0) + 1
+    identity = imported.get("source_identity")
+    identity = identity if isinstance(identity, dict) else {}
+    source_rows = [
+        {"source_path": relative, **_focused_fields(value, (
+            "expected_path", "imported_as", "imported_from_checkout", "sha256",
+        ))} for relative, value in sorted(identity.items()) if isinstance(value, dict)
+    ]
+    mutation = report.get("mutation")
+    mutation = (_focused_fields(mutation, (
+        "name", "path", "anchor_count", "before_sha256", "after_sha256",
+        "killer", "expected_failures", "failure_guard",
+    )) if isinstance(mutation, dict) else mutation)
+    mode = junit.get("case_mode")
+    modes = comparison.get("modes")
+    mode_summary = modes.get(mode) if isinstance(modes, dict) and isinstance(mode, str) else None
+    return {
+        "record_type": "LITERAL_CHILD_OPERANDS", **provenance,
+        **{key: _focused_bound(value) for key, value in _focused_fields(
+            report, ("run", "validated", "returncode")).items()},
+        "junit": {key: _focused_bound(value) for key, value in _focused_fields(junit, (
+            "tests", "failures", "errors", "skipped", "roster_sha256",
+            "case_mode", "input_roster_sha256", "wall_seconds", "testcase_seconds",
+        )).items()},
+        "observed_case_count": len(cases), "observed_outcomes": outcomes,
+        "observed_class_counts": classes,
+        "nonpassing_guard_groups": _focused_bound([
+            {"outcome": outcome, "message": first, "case_count": count}
+            for (outcome, first), count in sorted(failures.items())
+        ]),
+        "mutation": _focused_bound(mutation),
+        "comparison": _focused_bound({
+            **_focused_fields(comparison, ("name", "guard")),
+            "observed_mode_summary": mode_summary,
+        }),
+        "source_receipt": {
+            **import_provenance, **{key: _focused_bound(value) for key, value in _focused_fields(
+                imported, ("schema_version", "mode", "exitstatus")).items()},
+            "observed_source_count": len(identity),
+            "source_identity": _focused_bound(source_rows),
+        },
+        "expected_failure_count_boundary": (
+            "mutation.expected_failures is the stored historical count; the producer uses "
+            "a separate compact expectation. Actual mode counts are junit and comparison fields."
+        ),
+        "claim_boundary": (
+            "stored_same_pytest_process_receipt_not_reexecuted_or_source_rehashed; "
+            "grouped failure messages retain counts; full cases remain in the original artifact"
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--quality-dir", type=Path, required=True)
@@ -286,6 +381,9 @@ def main() -> int:
     args = parser.parse_args()
     records: list[dict] = []
     critical_operands: list[dict] = []
+    literal_headers: list[dict] = []
+    literal_operands: list[dict] = []
+    literal_comparisons: list[tuple[Path, dict, dict]] = []
     issues: list[dict] = []
 
     def record(kind: str, value: dict) -> None:
@@ -445,6 +543,8 @@ def main() -> int:
         if loaded is None:
             continue
         provenance, report = loaded
+        if path.name == "comparison.json" and "literal-contract-comparison" in path.relative_to(args.contract_dir).parts:
+            literal_comparisons.append((path.parent, provenance, report))
         if report.get("schema_version") == "recovery-contract-v2":
             record("RECOVERY_ARTIFACT", {
                 **provenance, **_focused_fields(report, (
@@ -486,6 +586,117 @@ def main() -> int:
                 )),
             })
 
+    # The comparison producer already saved both case selections and every
+    # validated child. Read only those JSON files, never its stdout or code.
+    if not literal_comparisons:
+        issues.append({"expected_file": "literal-contract-comparison/comparison.json", "status": "missing"})
+    for directory, provenance, summary in literal_comparisons:
+        if (summary.get("schema_version") != 1
+                or summary.get("protocol") != "literal-contract-reduction-comparison-v1"):
+            issues.append({**provenance, "status": "unknown_literal_comparison_schema"})
+        pairs = rows(summary.get("mutations", []), "literal.mutations", provenance)
+        if type(summary.get("passed")) is not bool or (summary.get("passed") is True and not pairs):
+            issues.append({**provenance, "status": "incomplete_literal_comparison_summary"})
+        named_pairs = {}
+        for pair in pairs:
+            name = pair.get("name")
+            if not isinstance(name, str) or not name or name in named_pairs:
+                issues.append({**provenance, "status": "missing_or_duplicate_literal_mutation"})
+                continue
+            named_pairs[name] = pair
+        expected = {"baseline-historical", "baseline-compact"}
+        expected.update(name + "-" + mode for name in named_pairs for mode in ("historical", "compact"))
+        observed = []
+        priority = {name: index for index, name in enumerate(_LITERAL_PRIORITY_MUTATIONS)}
+        paths = list(directory.glob("*/evidence.json"))
+
+        def literal_order(path: Path) -> tuple[int, str, int]:
+            name = path.parent.name
+            if name in {"baseline-historical", "baseline-compact"}:
+                return (0, "", 0 if name == "baseline-historical" else 1)
+            base, _, mode = name.rpartition("-")
+            return (1 + priority.get(base, len(priority)), base, 0 if mode == "historical" else 1)
+
+        for child_path in sorted(paths, key=literal_order):
+            loaded = read(child_path, args.contract_dir)
+            if loaded is None:
+                continue
+            child_provenance, report = loaded
+            run = child_path.parent.name
+            observed.append(run)
+            missing = [key for key in ("run", "validated", "returncode", "junit", "mutation")
+                       if key not in report]
+            if missing:
+                issues.append({**child_provenance, "status": "incomplete_literal_child", "missing_fields": missing})
+            junit = report.get("junit")
+            if not isinstance(junit, dict):
+                issues.append({**child_provenance, "field": "junit", "status": "unavailable_object"})
+                junit = {}
+            cases = rows(junit.get("cases"), "literal.junit.cases", child_provenance)
+            mode = junit.get("case_mode")
+            mutation = report.get("mutation")
+            name = mutation.get("name") if isinstance(mutation, dict) else None
+            identity_ok = (
+                report.get("run") == run and report.get("validated") is True
+                and type(report.get("returncode")) is int and mode in ("historical", "compact")
+                and ((mutation is None and run == "baseline-" + mode and report["returncode"] == 0)
+                     or (isinstance(name, str) and run == name + "-" + mode and report["returncode"] == 1))
+            )
+            if not identity_ok:
+                issues.append({**child_provenance, "status": "literal_child_identity_mismatch"})
+            imports_path = child_path.parent / (run + ".imports.json")
+            imported_file = read(imports_path, args.contract_dir)
+            import_provenance, imported = imported_file if imported_file is not None else (
+                {"artifact_file": imports_path.relative_to(args.contract_dir).as_posix()}, {})
+            identity = imported.get("source_identity")
+            if (imported.get("schema_version") != 1 or imported.get("mode") != mode
+                    or type(imported.get("exitstatus")) is not int
+                    or imported.get("exitstatus") != report.get("returncode")
+                    or not isinstance(identity, dict) or not identity
+                    or json.dumps(identity, sort_keys=True) != json.dumps(junit.get("source_identity"), sort_keys=True)):
+                issues.append({**import_provenance, "status": "literal_same_process_receipt_mismatch"})
+            if isinstance(identity, dict):
+                for relative, value in identity.items():
+                    if (not isinstance(value, dict)
+                            or not isinstance(value.get("expected_path"), str)
+                            or not value.get("expected_path")
+                            or value.get("imported_from_checkout") is not True
+                            or not isinstance(value.get("imported_as"), list) or not value.get("imported_as")
+                            or not all(isinstance(item, str) and item for item in value["imported_as"])
+                            or not isinstance(value.get("sha256"), str) or len(value["sha256"]) != 64
+                            or any(char not in "0123456789abcdef" for char in value["sha256"])):
+                        issues.append({**import_provenance, "status": "malformed_literal_source_identity",
+                                       "source_path": relative})
+            comparison = named_pairs.get(name, {}) if isinstance(name, str) else {}
+            literal_operands.append(_literal_child_summary(
+                child_provenance, report, junit, cases, import_provenance, imported, comparison,
+            ))
+        missing, unexpected = sorted(expected - set(observed)), sorted(set(observed) - expected)
+        if summary.get("passed") is True and (missing or unexpected):
+            issues.append({**provenance, "status": "literal_declared_child_inventory_mismatch",
+                           "missing": missing, "unexpected": unexpected})
+        literal_headers.append({
+            "record_type": "LITERAL_COMPARISON", **provenance,
+            **_focused_fields(summary, (
+                "schema_version", "protocol", "passed", "activated_compact_default",
+            )),
+            "error": _focused_bound(summary.get("error")),
+            "historical_baseline": _focused_bound(summary.get("historical_baseline")),
+            "baselines": _focused_bound(summary.get("baselines")),
+            "evaluator_controls": _focused_bound(summary.get("evaluator_controls")),
+            "declared_mutation_count": len(named_pairs),
+            "declared_mutation_names": [_focused_bound(name) for name in named_pairs],
+            "observed_child_count": len(observed),
+            "declared_child_count": len(expected),
+            "missing_declared_children": [_focused_bound(name) for name in missing],
+            "unexpected_children": [_focused_bound(name) for name in unexpected],
+            "child_print_priority": "two_baselines_then_15_question_plan_related_pairs_then_remaining_pairs",
+            "claim_boundary": (
+                "observed_comparison_summary_and_declared_inventory_not_new_retirement_authorization; "
+                "producer_pass_and_individual_child_receipts_are_separate_fields"
+            ),
+        })
+
     # A rejected mutation baseline has no validated evidence.json. Read its
     # already retained JUnit directly, and never infer kills from these failures.
     baseline_xml = [
@@ -505,7 +716,10 @@ def main() -> int:
                 for reason in (*case.findall("failure"), *case.findall("error")):
                     failed.append({"classname": case.get("classname"), "name": case.get("name"),
                                    "kind": reason.tag, "message": reason.get("message", ""),
-                                   "trace": (reason.text or "")[-6000:]})
+                                   "trace": (reason.text or "")[-6000:],
+                                   "trace_characters": len(reason.text or ""),
+                                   "trace_omitted_characters": max(0, len(reason.text or "") - 6000),
+                                   "trace_fragment": "tail"})
             record("CRITICAL_BASELINE", {
                 "artifact_file": path.relative_to(args.contract_dir).as_posix(),
                 "sha256": hashlib.sha256(raw).hexdigest(), "observed_case_count": len(cases),
@@ -543,11 +757,14 @@ def main() -> int:
     # Full original records remain unchanged below and in the saved artifact.
     records = [
         *critical_operands,
+        *[row for row in records if row["record_type"] == "CRITICAL_BASELINE"],
         *[_recovery_operand_summary(row) for row in records
           if row["record_type"] == "RECOVERY_ARTIFACT"],
+        *literal_headers,
+        *literal_operands,
         *[_delivery_operand_summary(row) for row in records
           if row["record_type"] == "V2_FOCUSED_STAGE"],
-        *records,
+        *[row for row in records if row["record_type"] != "CRITICAL_BASELINE"],
     ]
     result = {
         "schema_version": 1, "purpose": "existing_artifacts_only_not_gate_acceptance",
@@ -557,10 +774,13 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     remaining, omitted = 384_000, 0
-    priority_omitted = {"CRITICAL_OPERANDS": 0, "RECOVERY_OPERANDS": 0}
+    priority_omitted = {"CRITICAL_OPERANDS": 0, "CRITICAL_BASELINE": 0, "RECOVERY_OPERANDS": 0,
+                        "LITERAL_COMPARISON": 0, "LITERAL_CHILD_OPERANDS": 0}
 
     def emit(kind: str, value: dict, *, already_bounded: bool = False) -> None:
         nonlocal remaining, omitted
+        if kind == "CRITICAL_BASELINE":
+            value, already_bounded = _critical_baseline_console(value), True
         line = kind + " " + json.dumps(value if already_bounded else _focused_bound(value), ensure_ascii=False)
         size = len(line.encode("utf-8")) + 1
         if size > remaining - 512:  # Retain space for the fixed console receipt below.
@@ -578,6 +798,7 @@ def main() -> int:
         emit(row["record_type"], {key: value for key, value in row.items() if key != "record_type"},
              already_bounded=row["record_type"] in {
                  "V2_FOCUSED_STAGE", "V2_DELIVERY_OPERANDS", "CRITICAL_OPERANDS", "RECOVERY_OPERANDS",
+                 "LITERAL_COMPARISON", "LITERAL_CHILD_OPERANDS",
              })
     print("ARTIFACT_CONSOLE " + json.dumps({"omitted_rows": omitted, "record_count": len(records),
                                            "complete_selected_records_in_artifact": True,
