@@ -1,31 +1,30 @@
 # PR #211: checkpoint продолжения
 
-Обновлено: 2026-10-10 01:47 UTC.
+Обновлено: 2026-10-10 02:28 UTC.
 
-**PR пока не готов к merge.** Последний полностью завершённый фактический CI:
-PR HEAD `eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a`,
-tree `6d75a3b5f019e94c11810364a7214b442b5829fa`.
+**PR пока не готов к merge.** Последний завершённый фактический CI:
+PR HEAD `321f36577577cb90a0422cee0de0b525b9cd658e`,
+merge checkout `217d21017008240cf252e6b99e5c6e810a858a2a`,
+общий tree `9ea02d6b3dd7912b46000dc8174939ec0981e5d8`.
 
-Следующий reviewed пакет сохранён до
-`b1c6586a2f1b25dccf0b0a56232e91c02a4fa8f6` (slices96–106).
-Его совместный runtime **PENDING**. Новые целевые числа не считаются PASS.
+После него подготовлен reviewed пакет 108–112. Его совместный runtime **PENDING**.
+Ни исправление source carrier, ни добавление diagnostic reader ещё не означают PASS.
 
 ## Действующие решения
 
 - Потолки **6144 bytes / 800 tokens / 3 sources** отменены. Измеряем и сокращаем
-  объём с сохранением полных полезных фактов, source identity, scope/version/hash и consent.
+  полный полезный output с сохранением фактов, source identity, scope/version/hash и consent.
 - Операционные input/read/work/call/time ограничения остаются.
-- Retrieval включён в позднее утверждённый план; прежний blanket deferral снят.
+- Retrieval включён в утверждённый план; прежний blanket deferral снят.
 - Retirement — после независимого oracle, собственного зелёного baseline,
   intended mutation proof и сохранности helpers/imports/selectors/archive.
-- Legacy acceptance явно мигрирует по принятому ADR 0003: полный frozen fact
-  coverage исходных cases с floor **12/15**. Raw original-query coverage остаётся
-  отдельной метрикой без lookup/parent credit. Это смена проверяемого контракта;
-  отмена output-cost ceilings не отменяет quality floor.
+- Legacy acceptance применяет принятый ADR 0003: полный frozen fact coverage
+  исходных cases с floor **12/15**. Raw original-query coverage остаётся отдельной
+  метрикой без lookup/parent credit. Изменение метрики явно версионировано.
 - Реальные Claude Code/Codex/OpenCode sessions **NOT RUN**. Installed SDK/stdio
   подтверждает CI transport, но не эти клиентские sessions.
-- Локальные runtime/import/pytest/AST/install не выполняются. Проверки идут в
-  существующих авторизованных PR workflows. Новые providers/models не подключаются.
+- Локальные runtime/import/pytest/AST/install не выполняются. Проверки идут
+  в существующих авторизованных PR workflows, без новых providers/models.
 - Обычные commits и fast-forward двух refs разрешены. Merge/release, force-push
   и внешние comments/messages не выполняются.
 
@@ -33,163 +32,146 @@ tree `6d75a3b5f019e94c11810364a7214b442b5829fa`.
 Решения: [CURRENT_WAVE_DECISIONS_RU.md](CURRENT_WAVE_DECISIONS_RU.md).
 Старый local checkout не является актуальной базой.
 
-## Полный фактический CI: eb2c4f3b (95)
+## Фактический CI: 107
 
-Actual merge checkout: `abc3819438a1e2fea452a750f99e01edb3a41438`.
-Проверены родители: main `d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c`
-и PR head95. Checkout tree совпадает с PR tree.
-Main и P1-stack metadata указывают этот PR HEAD.
+[Main run 38014539455](https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455).
+[P1-stack 38014539441](https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441).
+[JUnit reader 114103727373](https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114103727373).
+[Полный runtime receipt107](pr211-execution/RUNTIME_EVIDENCE_321f3657.json).
+[Downstream receipt107](pr211-execution/PR211_107_DOWNSTREAM_RECEIPT.json).
 
-[Main run38010627863](https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863).
-[P1-stack38010627919](https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919).
-[JUnit reader114091874403](https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114091874403).
-[Полный receipt95](pr211-execution/RUNTIME_EVIDENCE_eb2c4f3b.json).
-[Отдельный downstream receipt95](pr211-execution/PR211_95_DOWNSTREAM_RECEIPT.json).
-
-На **каждом** Python3.11/3.12/3.13:
-**7726 = 6063 PASS / 1653 FAIL / 0 ERROR / 10 SKIP**.
-Integrity issues пусты; omitted_rows=0. Матрица не суммируется в один baseline.
+На **каждом** Python 3.11/3.12/3.13:
+**7727 = 6024 PASS / 1693 FAIL / 0 ERROR / 10 SKIP**.
+Integrity issues пусты, 279 reader records разобраны без ошибок, omitted_rows=0.
+Матрица не суммируется в один baseline.
 
 | Python | SHA256 JUnit |
 | --- | --- |
-|3.11|`3502ad3ae96a45d9dd809784332983a3245e3eb28ad37559f7186333035c4a8b`|
-|3.12|`1810198a915152fed0fd1e57b4ffbe59bd770571c1ac7299c1f36d03139a6cff`|
-|3.13|`9d8e715c7467bd07038daa78048383da8f5f2720221006f66cccb60fe587739b`|
+|3.11|`d1e748582f38dfb857c333e2958354cf4208f965bcee69c9748cf8ea47716c61`|
+|3.12|`48715a50a83576a10e40dfad78c82e06a72ecdc98fe5067836217f782921f89f`|
+|3.13|`1ac2185fc2322e032258344ad84d86b63867da738ff3401d57e2c92dcf2513c5`|
 
-Root сопоставил все215 module records с f7. Counts изменились только у трёх:
-Context7 **12P/45F → 12P/24F** (21 reviewed retirement),
-projection boundaries **14P/6F → 16P/4F**,
-docs_service_part03 **6P/18F → 10P/14F**.
-Это сравнение module counts. Оно не доказывает PASS каждого из пяти migrated
-read fixtures: следующий JUnit reader выводит их отдельные nodes.
+Сравнение с предыдущим полным 95: **6063P/1653F → 6024P/1693F**,
+коллекция +1. В пакете 96–107 тесты не удалялись.
 
-Context7: 36 остальных cases собраны; 21 retired input сохранён в exact archive
-и проверяется current control вместе с прежними тремя входами.
-Удалённые FAIL не объявляются новыми PASS.
-Прежняя карта и её история:
-[CORE_FAILURE_MAP_80c8fbbb.jsonl](pr211-execution/CORE_FAILURE_MAP_80c8fbbb.jsonl).
-Оставшиеся1653 FAIL не объявлены все устаревшими.
-
-Docs-contract, docs-impact, static-contract, retrieval-evidence, installer,
-installed MCP и три platform smoke jobs SUCCESS. Core/advanced/required-ci FAIL.
-P1-stack FAIL; platform/build/wheel3.11–3.13/sdist/installer SUCCESS.
-
-## Critical, recovery и downstream: фактические результаты95
-
-[Advanced114089537662](https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537662).
-
-| Gate | Фактический результат95 | Ограничение вывода |
+| Изменившееся семейство | Actual107 | Что доказано |
 | --- | --- | --- |
-|Normal critical|53 PASS;20 intended mutations killed|18 named guards и2 сохранённых legacy targets.|
-|Literal historical/compact|Baseline702/82 и51 парная mutation PASS|Отдельный comparison; не прибавляется к normal53/20.|
-|Recovery baseline|11 PASS /1 FAIL /0 ERROR|Closed literal positive13/read52 не дошёл до projection.|
-|Recovery mutations|Baseline rejected|23 mutants не исполнялись; kills не заявлены.|
-|Advanced pytest|528 PASS /94 FAIL|Обязательный набор остаётся красным.|
-|Question surface|100 исходных входов и positive/absent-fact/source-removal controls PASS|Нет права объявить остальные quality gates PASS.|
-|P1.4|12/14; discovery8/10; полные факты5/5; oracle5/5|Два alias cases FAIL.|
-|P1.5|5/7; полные факты4/6; oracle6/6|Два source-role cases FAIL.|
-|P1.6 current public delivery|6/6; полный факт1/1; oracle6/6|Workflow FAIL из-за retained adversarial24/28.|
-|Legacy/V2/Agent Developer/adversarial|FAIL|Новый Legacy oracle ещё не проверен runtime.|
-|Installed CI|1/1; controls7/7; реальный stdio|Actual пользовательские clients NOT RUN.|
+|Projection boundaries|17P/3F вместо16P/4F|Один прежний failure устранён; три V2-позитива остаются.|
+|Новый mixed contract|1F|После успешной scope-producer проверки public packet содержит только library source.|
+|V2 protocol|48P/2F|Оба focused traces падают на optional observer `app.service`.|
+|Release gate|14P/38F|Первая причина — тот же observer setup; 38 cases используют общий минимальный fixture. Полные38 traces reader не публикует.|
 
-Closure имеет четыре failing gates:
-p14_quality, p15_quality, adversarial, adversarial_mutation.
-Его собственные controls4/4 PASS. P1 downstream steps после advanced skipped;
-отсутствующие proof inputs сохраняют FAIL. Retrieval gate SUCCESS, но измерения
-стоимости и сохранённые frozen groups не доказывают новый прирост recall.
+Legacy acceptance controls **5/5 PASS** на всех трёх Python lanes.
+Это не означает, что live Legacy report достиг 12/15 или прошёл downstream.
 
-Остались P1.4: `alias_order_drafts`, `alias_project_retry_rule`.
-P1.5: `document_statement_binds_exact_path`,
-`two_claims_require_two_allowed_roles`.
+## Downstream107
 
-## Reviewed пакет96–106: совместный runtime PENDING
+| Gate | Наблюдение | Ограничение |
+| --- | --- | --- |
+|P1.4|12/14; discovery8/10; полные факты5/5; oracle5/5|`alias_order_drafts` и `alias_project_retry_rule` FAIL.|
+|P1.5|**6/7**, полные факты5/6; oracle6/6|Filename-reference case теперь PASS; остался mixed source case.|
+|P1.6 current delivery|6/6; oracle6/6|Retained adversarial24/28 и его mutation gate остаются FAIL.|
+|Current closure|Integrity всех трёх current reports подтверждена; controls4/4|Quality и required outcomes FAIL.|
+|Installed MCP|1/1; verifier PASS; controls7/7|Reviewed wheel + scripted planner + настоящий stdio; actual clients NOT RUN.|
+|Retrieval evidence|SUCCESS; 31 sufficient в прежней группе48, operational/integrity errors0|Пять causal cells дают31; bounded pool/holdout не показали улучшения.|
+|Required CI / P1-stack exact|FAIL|Core и advanced FAIL; platform/build/wheel/sdist успешны.|
+
+P1.5: project return содержит **ARCHITECTURE.md, 37 символов**, а Unified
+сохраняет его вместе с exact Tenacity 8.2.3 source, **65 символов**.
+Обе стадии разрешают delivery. Финальный public/snapshot packet содержит
+только библиотеку. В actual library snapshot class находится в metadata.
+Новый независимый mixed fixture воспроизводит тот же loss на других исходных
+вопросе, фактах и finite sources.
+
+Main advanced завершён с FAIL. Полный job log трижды вернул `Transport closed`;
+повторы прекращены. Quality artifact существует, но его ZIP-содержимое
+в этом receipt не прочитано. Поэтому **текущие counts/kills recovery и critical,
+а также полные Legacy/V2 результаты NOT OBSERVED**. Их нельзя подменять95.
+Отдельный P1-stack advanced сообщает528P/94F; это не измерение main advanced.
+
+Последние успешно прочитанные normal critical результаты относятся к95:
+53P/20 intended kills. Отдельный literal comparison95: baselines702/82 и51
+парная mutation. Recovery95:11P/1F; baseline отвергнут, mutations не запускались.
+[Receipt95](pr211-execution/RUNTIME_EVIDENCE_eb2c4f3b.json) сохраняет историю.
+
+## Reviewed пакет после107: runtime pending
 
 | Slice | Commit | Изменение |
 | --- | --- | --- |
-|96|`3064eb635058af44609ee35181c39154da7d3224`|Producer-owned request_scope и project lane contract для mixed; поля добавлены в конец dataclass.|
-|97|`85224cda69355c1a9bd64c148e45452955bc86ae`|Whole filename label из полного allowed catalog до evidence_path; independent scope/collision/body controls и8 mutations.|
-|98|`cf973994c0085a991f59d5e20542aeb1b119666a`|Кавычки для всех литеральных FTS operands в primary/fallback; AND/OR/NOT не становятся операторами запроса.|
-|99|`3a96a5c0d8a7787023beaf2d0a34cbf9668f98a6`|Negative projection fixture допускает корректный early veto; исходные вопросы/факты/guards сохранены.|
-|100|`3b9b155b734778bcca91af9796174d469be409c0`|Pure mixed composition внутри authoritative project_docs_answer; current request/root/module и обе source lanes независимо валидируются.|
-|101|`42a481c66dde69d7f3103cd10bfb50c2dd7035c4`|Существующий JUnit reader выводит текущие focused nodes, без нового запуска или изменения exit policy.|
-|102|`fe1f3d75bf89276fa355425e152cbe4d73bfe38e`|Полные фактические runtime/downstream receipts95.|
-|103|`91275e9f26ed3df3be9e8f747d6cc37e9835ebee`|Один independent mixed public contract test,4 real calls/28 replays/1 collision и5 targeted mutations.|
-|104|`34913345f8f6f491fc707a9028c58d7d68319cd5`|Версионированный Legacy source-fact oracle с provenance/body/scope/span counterfactuals в прежних test functions.|
-|105|`e7f33e6e121eee81364f2e0ee50cdacd34f7ca47`|Исправлен найденный review collection blocker: exact one-node diagnostic shard mixed-теста.|
-|106|`b1c6586a2f1b25dccf0b0a56232e91c02a4fa8f6`|Body-free same-call eligibility observations на member/project/Unified returns; один printer field, без новых reads или изменения результата.|
+|108|`016070138835bf908d83cfe6e6e98420025e4778`|DQP3 precheck: независимые explicit lookup slots и два directed mutants, без retirement.|
+|109|`24423beb1c4d4822b3f578586040a7064c36dba5`|Optional observer capabilities: отсутствие внутренних facade methods не ломает основной read/observer contract.|
+|110|`8bd34947893fecb02b841ca0c3ad16b374c8a646`|Mixed class carrier: верхнее поле или metadata, все присутствующие значения согласованы; guards сохраняются.|
+|111|`17e0b573aeda133671e211cf5f2abd8ae3464ec2`|Полные actual107 runtime/downstream receipts.|
+|112|`dbd957356d14dbd081fd5ad89e1c4999fa23291f`|Чтение уже созданных quality/recovery/critical artifacts в существующем CI diagnostic job; без нового выполнения сценариев.|
 
-Code slices прошли root и independent review; exact parent/tree/file/blob
-verification выполнена, executable modes runners сохранены.
-**Целевые critical54/25 и recovery12/33 PENDING**.
-Исходные critical53/20 и recovery12 cases/23 mutants сохранены; новые mutants
-получают credit только после собственного зелёного baseline и intended guard failure.
+### DQP3
 
-Mixed helper не выполняет новый retrieval/IO. Library contract и global
-delivery/consent/conflict gates сохраняются, project source проходит собственный
-current request/scope/raw hash check. Canonical absolute request root поддержан;
-relative, tilde и symlink aliases пока сохраняют прежний library packet без нового
-mixed-PASS claim. Source-root проверка не подменяется новым filesystem resolve.
+Все70 старых expanded cases из29 definitions остаются.
+Три выбранных input-contract nodes имеют exact archive и независимые expected
+rows внутри существующего alias contract control. Проверяются original question,
+порядок/повторы lookup slots, независимые public IDs, пятый слот и отсутствие
+скрытых semantic aliases/parent credit. Новых test functions нет.
+После собственного healthy baseline и двух intended kills можно отдельно
+рассматривать удаление ровно этих3 nodes; остальные67 не объявлены устаревшими.
 
-Legacy: `verified_original_case_fact_count >=12/15` — явно новый versioned metric
-по ADR0003; raw `original_query_covered_count` не переназывается и не получает lookup credit.
-Исходные16 вопросов, lookups, gold, protocol lock, V2 settings и6 hard-zero gates
-сохранены. Source fact в metadata-only heading/link/table header не принимается.
-Owner выводится из captured host root, а не candidate source. Проверяются exact
-current file spans и actual same-call snapshot. Сохранились5 acceptance definitions
-и14 protocol definitions/21 expanded cases. Новые counterfactuals внутри прежнего
-теста не объявлены production mutation kills.
+[Crosswalk и review](pr211-execution/EXPLICIT_LOOKUP_SLOT_PRECHECK_RU.md).
 
-Предыдущее полное Legacy fact coverage на f7: **8/15 <12/15**.
-Это всё ещё FAIL. Старый report без новых persisted validator receipts не доказывает
-работу нового oracle.
+### Optional observer
 
-Подробности:
-[Structural filename](PR211_STRUCTURAL_FILENAME_CONTEXT_RU.md),
-[FTS operands](PR211_FTS_LITERAL_OPERANDS_RU.md),
-[Early-veto fixture](PR211_EARLY_VETO_FIXTURE_RU.md),
-[Mixed producer](PR211_MIXED_PROJECT_SCOPE_PRODUCER_RU.md),
-[Mixed projection](PR211_MIXED_PROJECT_CONTEXT_PROJECTION_RU.md),
-[Mixed control](PR211_MIXED_CONTEXT_CONTRACT_RU.md),
-[Legacy oracle](pr211-execution/LEGACY_SOURCE_FACT_ACCEPTANCE_RU.md).
+Диагностика оборачивает только существующие callable project/member methods.
+При отсутствии используется stdlib nullcontext; fake stages и extra reads
+не создаются. Обязательные unified/selection/validation/coverage observers,
+один actual dispatch, snapshot checks, counters и cleanup сохранены.
+Ожидается фактическое восстановление2+38 controls, а не их ослабление.
 
-## Следующая проверяемая граница retrieval
+[Review](pr211-execution/OPTIONAL_DELIVERY_OBSERVER_CAPABILITIES_RU.md).
 
-Три actual V2 focused records95 сохранены в полном receipt.
-Cache/reset отдаёт0/2 полных фактов; architecture3/4; request-flow0/4.
-У cache/reset полезное intro window rejected по qualification; порог не снижен
-под этот corpus. У architecture недостающий infrastructure witness не доказан.
+### Mixed carrier
 
-У request-flow имеются qualified lookup windows, но MCP возвращает ранний
-delivery veto до project_docs_context. `required_evidence_missing` — скопированная
-support reason, она сама не доказывает, какой read eligibility operand был false.
-Project-reader ranking мог уже исполняться: projection trace `not_reached`
-не означает отсутствие всякого раннего ranking. Без этих operands менять
-retention/ranker/gates или обещать найденную product-причину нельзя.
+Producer явно хранит library class/scope в metadata canonical candidate.
+Helper теперь требует exact literal class из объявленных carriers и их согласия;
+None, конфликт, отсутствие обоих и malformed metadata запрещают project addition.
+Raw source/hash/version и current project/root/module/consent guards не меняются.
 
-В106 сохранена [диагностика delivery operands](PR211_V2_DELIVERY_OPERANDS_RU.md).
-Она читает только выбранные поля уже возвращённых объектов, включая реальные
-identity/span metadata у RetrievedChunk, и явно отмечает unknown/omitted.
-Новый runtime остаётся PENDING.
+В том же independent test исправлены два предположения о расположении class/scope;
+literal expected values и full-body/SQL/hash/span checks сохраняются.
+Прежние4 native calls,28 request/source replays и collision control остаются;
+добавлено15 detached carrier iterations. Это дополнительная работа внутри function,
+а не сокращение числа исполнений.
+
+[Review](PR211_MIXED_LIBRARY_CLASS_CARRIER_RU.md).
+
+### Artifact diagnostics
+
+Existing diagnostic job читает уже загруженные artifacts текущего run,
+стандартной библиотекой Python, без импорта production/evaluator и без rerun.
+Shared V2 focused serializer переносится без изменения acceptance wrapper.
+Сохраняются source report hashes, provenance, missing/unreadable records,
+независимость reader status от gate acceptance и original complete artifacts.
+Console transport ограничен отдельно от product output; сокращённые записи
+не объявляются полным evidence.
 
 ## Следующие конкретные действия
 
-1. На совместном новом SHA проверить collection, отдельные migrated read nodes,
-   mixed baseline/mutations54/25, recovery12/33 и существующие Legacy controls.
-2. Получить actual P1.4/P1.5/adversarial, полный Legacy source-fact report и
-   три V2 focused observations. Сначала устранить первый доказанный дефект.
-3. Прочитать добавленные в106 body-free eligibility operands из тех же
-   реальных calls и локализовать потерю member read → project context → Unified.
-   Исходный вопрос, facts, read guards и честная original coverage сохраняются.
-4. Продолжать narrow contract audits остальных семей, начиная с query-plan IDs,
-   explicit lookup lineage и retired alias expectations. Сокращение только после
-   независимого successor и фактического mutation proof.
-5. Затем полный required CI/P1/downstream и необходимые installed/client checks
-   на одном конечном опубликованном SHA. Merge пока не выполнять.
+1. Опубликовать пакет обычным fast-forward обеих refs, проверить actual merge
+   parents/tree и собрать полный совместный CI на этом SHA.
+2. Проверить восстановление observer cases, mixed positive/negative/full-fact
+   controls, P1.5 и **critical54/27**. Recovery target **12/33** остаётся pending.
+3. Через новый artifact reader получить actual recovery failure/summary,
+   Legacy source-fact report и три V2 focused delivery observations.
+   Сначала исправлять первый доказанный operand, сохраняя исходные задачи/guards.
+4. Закрыть2 P1.4 discovery failures и4 retained adversarial failures по действующему
+   контракту. Имя alias или old tiny_budget само по себе не основание retirement.
+5. После своего proof выполнить narrow DQP3 retirement; затем продолжить audit
+   остальных семейств с сохранением исходных примеров и независимых successor controls.
+6. Закрыть все required CI/P1/downstream на конечном SHA и необходимые installed/client
+   проверки. SDK/stdio не заменяет реальные клиентские sessions. Merge не выполнять.
 
-## Продолжение работы
+## Как продолжать без потери состояния
 
 Оба authorized refs: `implementation/pr211-merge-readiness` и
 `integration/stage3-v2-identity-pr1`; обновлять fast-forward с expected SHA.
-Root создаёт commits/обновляет refs, агенты готовят blobs и independent reviews.
-При потере временного состояния читать этот checkpoint и точный Git HEAD;
-не возвращаться к старому checkout и не повторять завершённые slices.
+Root создаёт commits и refs, агенты готовят blobs и независимые reviews.
+Читать точный Git HEAD и этот checkpoint, не возвращаться к старому checkout.
+Продолжать конкретное выполнение, давать короткие updates не реже минуты;
+не завершать работу ещё одним предложением продолжить.

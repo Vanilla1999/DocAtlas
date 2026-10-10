@@ -8,24 +8,37 @@
 ## Состояние исполнения на 2026-10-10
 
 Последний полный фактический прогон — PR HEAD
-`eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a`: на каждом Python 3.11/3.12/3.13
-**6063 PASS / 1653 FAIL / 0 ERROR / 10 SKIP**. Required CI/P1 остаются FAIL.
-Normal critical: **53 PASS / 20 intended mutation kills**; отдельные historical
-и compact literal baselines **702 / 82** и **51 парная mutation** подтверждены
-в собственном сравнении. По собственному proof f7 до этого прогона удалён21
-obsolete Context7 alias case;36 остальных cases сохранились и собраны CI95.
-Question surface проверил все 100 исходных входов и отрицательные controls;
-recovery пока **11 PASS / 1 FAIL**, его mutations не запускались после отказа baseline.
+`321f36577577cb90a0422cee0de0b525b9cd658e` (107), merge checkout
+`217d21017008240cf252e6b99e5c6e810a858a2a` с тем же tree.
+На каждом Python3.11/3.12/3.13:
+**6024 PASS /1693 FAIL /0 ERROR /10 SKIP**, всего7727.
+279 JUnit records прочитаны без ошибок, integrity issues пусты, console omitted=0.
+Required CI/P1 остаются FAIL.
 
-Reviewed пакет до `b1c6586a2f1b25dccf0b0a56232e91c02a4fa8f6` добавляет исправления
-структурных filename references, литеральных FTS operands, mixed project/library
-projection, отрицательной fixture и независимого Legacy source-fact oracle,
-а также body-free observations тех же member/project/Unified calls.
-Его **совместный runtime PENDING**; целевые critical **54/25** и recovery **12/33**
-ещё не являются результатами. Реальные пользовательские clients **NOT RUN**.
-Подробные receipts и следующие шаги — в
-[checkpoint](PR211_CHECKPOINT_RU.md). Исторические исходные числа ниже сохранены
-с указанием их SHA; они не заменяют текущее состояние.
+P1.5 улучшился **5/7→6/7**: filename-reference case прошёл, mixed case остаётся.
+Projection boundaries **16P/4F→17P/3F**. Добавленный независимый mixed control
+воспроизвёл потерю проектного источника. Optional diagnostics106 вызвала40 новых
+failures:2 V2 protocol и38 release gate; причина связана с отсутствующим
+`app.service` у минимального observer fixture. Legacy acceptance controls5/5
+уже проходят, но это не full live Legacy acceptance.
+
+Reviewed corrections108–112 сохраняют explicit-slot crosswalk, исправляют
+optional observer и mixed library class carrier, фиксируют actual107 receipts
+и делают существующие quality/recovery/critical artifacts доступными в кратком
+diagnostic job. Совместный runtime **PENDING**: critical **54/27**,
+recovery **12/33** — целевые составы, не результаты.
+Старые3 DQP nodes и остальные67 cases пока остаются; retirement требует собственного proof.
+
+Main advanced log недоступен через connector после Transport closed, поэтому
+текущие normal critical/recovery counts и полные Legacy/V2 детали не заявляются.
+Последний прочитанный успешный critical proof остаётся95:53P/20 intended kills;
+literal comparison702/82+51 парная mutation — отдельный результат.
+На95 recovery11P/1F и baseline rejection. Эти исторические результаты
+не подставляются вместо107. Реальные пользовательские clients **NOT RUN**.
+
+Подробные receipts, подтверждённые дефекты и следующие действия:
+[checkpoint](PR211_CHECKPOINT_RU.md).
+Исходные числа плана ниже остаются привязаны к своим историческим SHA.
 
 ## Поправки после оценки перед исполнением
 
