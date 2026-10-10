@@ -176,6 +176,8 @@ def main() -> int:
         "tests/test_project_context_quality_v2_protocol.py",
         "tests/docs/test_discovery_independent_qualification.py",
         "tests/docs/test_source_map.py",
+        "tests/test_action_packet_v4_found_window_retention.py",
+        "tests/test_mcp_delivery_member_transaction.py",
     }
     for row in preferred["cases"]:
         if row["outcome"] not in {"FAIL", "ERROR"}:

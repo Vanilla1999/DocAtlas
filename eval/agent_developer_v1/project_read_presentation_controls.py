@@ -166,7 +166,7 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
             expected_id = "query-lookup-1" if "/alpha-" in row.path else "query-lookup-2"
             traces = row.metadata["retrieval_query_matches"]
             require(row.path in documents and row.content == documents[row.path]
-                    and row.content_hash == digest(documents[row.path])
+                    and row.content_hash == "sha256:" + digest(documents[row.path])
                     and {key for key, trace in traces.items() if trace.get("qualified") is True} == {expected_id}
                     and traces[expected_id]["query_text"] == lookups[int(expected_id[-1]) - 1]
                     and traces["query-original"]["query_text"] == question
@@ -196,7 +196,7 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
                 require(row["content"] == row["display_text"] == documents[row["path"]]
                         and row["project_identity"] == identity and row["doc_scope"] == "project"
                         and row["source_class"] == "project_doc" and row["generation_id"] == generation
-                        and row["_source_snapshot_sha256"] == child["committed_source_content_hash"]
+                        and row["_source_snapshot_sha256"] == "sha256:" + child["committed_source_content_hash"]
                         and all(row.get(field) == child[field] for field in (
                             "stable_chunk_id", "parent_logical_id", "source_identity", "display_content_hash",
                             "char_start", "char_end", "byte_start", "byte_end", "line_start", "line_end"))

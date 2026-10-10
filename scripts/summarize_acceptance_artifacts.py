@@ -504,7 +504,8 @@ def main() -> int:
             for case in cases:
                 for reason in (*case.findall("failure"), *case.findall("error")):
                     failed.append({"classname": case.get("classname"), "name": case.get("name"),
-                                   "kind": reason.tag, "message": reason.get("message", "")})
+                                   "kind": reason.tag, "message": reason.get("message", ""),
+                                   "trace": (reason.text or "")[-6000:]})
             record("CRITICAL_BASELINE", {
                 "artifact_file": path.relative_to(args.contract_dir).as_posix(),
                 "sha256": hashlib.sha256(raw).hexdigest(), "observed_case_count": len(cases),
