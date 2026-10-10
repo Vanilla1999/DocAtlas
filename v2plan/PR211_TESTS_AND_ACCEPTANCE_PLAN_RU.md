@@ -8,36 +8,44 @@
 ## Состояние исполнения на 2026-10-10
 
 Последний полный фактический прогон — PR HEAD
-`321f36577577cb90a0422cee0de0b525b9cd658e` (107), merge checkout
-`217d21017008240cf252e6b99e5c6e810a858a2a` с тем же tree.
+`441cdefd2b251d63f716bfa75b053413bbe09c76` (113), merge checkout
+`ceea2571e9847a71515feda4e1e1441fafdede44` с тем же tree.
 На каждом Python3.11/3.12/3.13:
-**6024 PASS /1693 FAIL /0 ERROR /10 SKIP**, всего7727.
-279 JUnit records прочитаны без ошибок, integrity issues пусты, console omitted=0.
-Required CI/P1 остаются FAIL.
+**6064 PASS /1653 FAIL /0 ERROR /10 SKIP**, всего7727.
+С107 исправлены40 observer failures (2 V2 protocol +38 release);
+collection не менялась. Required CI/P1 остаются FAIL.
 
-P1.5 улучшился **5/7→6/7**: filename-reference case прошёл, mixed case остаётся.
-Projection boundaries **16P/4F→17P/3F**. Добавленный независимый mixed control
-воспроизвёл потерю проектного источника. Optional diagnostics106 вызвала40 новых
-failures:2 V2 protocol и38 release gate; причина связана с отсутствующим
-`app.service` у минимального observer fixture. Legacy acceptance controls5/5
-уже проходят, но это не full live Legacy acceptance.
+P1.5 теперь **7/7**, полный fact coverage6/6, oracle6/6.
+P1.4 остаётся12/14 с двумя original-only discovery failures;
+P1.6 current6/6, retained adversarial24/28.
+Legacy live source-fact acceptance8/15 при принятом floor12/15,
+raw original coverage0. V2 report впервые доступен reader: natural facts6/15,
+paraphrase1/5; production runnerFAIL. REPORT_ONLY не является acceptance.
 
-Reviewed corrections108–112 сохраняют explicit-slot crosswalk, исправляют
-optional observer и mixed library class carrier, фиксируют actual107 receipts
-и делают существующие quality/recovery/critical artifacts доступными в кратком
-diagnostic job. Совместный runtime **PENDING**: critical **54/27**,
-recovery **12/33** — целевые составы, не результаты.
-Старые3 DQP nodes и остальные67 cases пока остаются; retirement требует собственного proof.
+Critical baseline113:53P/1F из54; mixed detached control падает на
+`critical_mixed_class_control_healthy`/`metadata_only`.
+Recovery11P/1F: fixture требовала оба acquisition candidates, хотя storage
+вправе дедуплицировать одинаковые title/body. Own mutation credit отсутствует.
+Reviewed corrections114–117 исправляют эти две fixtures, добавляют DQP30
+precheck и дают приоритет всем3 compact V2 delivery operands.
+Новый совместный runtime **PENDING**: target critical54/29 и recovery12/33.
 
-Main advanced log недоступен через connector после Transport closed, поэтому
-текущие normal critical/recovery counts и полные Legacy/V2 детали не заявляются.
-Последний прочитанный успешный critical proof остаётся95:53P/20 intended kills;
-literal comparison702/82+51 парная mutation — отдельный результат.
-На95 recovery11P/1F и baseline rejection. Эти исторические результаты
-не подставляются вместо107. Реальные пользовательские clients **NOT RUN**.
+Все70 старых DQP cases пока collected (actual25P/45F). После собственного
+healthy baseline и четырёх intended kills двух precheck families возможен
+точный retirement33cases:29→16 definitions,70→37 cases.
+Независимые source/body/condition/scope negatives сохраняются; более широкий
+retirement не объявлен обоснованным только по красному CI.
+
+Reader113 дал305 разобранных records без parse errors. JUnit console omitted0;
+artifact console29selected/28printed/1omitted. Полный V2 request-flow не получен
+из доступного console; прежний SHA его не подменяет. Оба доступных cases
+показывают20 member windows и3/1 project/unified windows с delivery eligible.
+Новый reader117 должен дать actual operands всех трёх cases.
+Реальные пользовательские client sessions **NOT RUN**.
 
 Подробные receipts, подтверждённые дефекты и следующие действия:
-[checkpoint](PR211_CHECKPOINT_RU.md).
+[checkpoint](PR211_CHECKPOINT_RU.md),
+[actual113](pr211-execution/RUNTIME_EVIDENCE_441cdefd.json).
 Исходные числа плана ниже остаются привязаны к своим историческим SHA.
 
 ## Поправки после оценки перед исполнением
