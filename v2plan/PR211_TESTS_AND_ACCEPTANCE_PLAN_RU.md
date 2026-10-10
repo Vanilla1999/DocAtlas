@@ -8,48 +8,47 @@
 ## Состояние исполнения на 2026-10-10
 
 Последний полный фактический прогон — PR HEAD
-`cadeef515ea78c78338821f38b15fed3bde7c993` (118), merge checkout
-`9f25f147c522d84f61a57abb1d731d2b6e792c9a`, tree
-`62d727c3ffbb35e77f0301d0e961e6f60ed4ebe2`.
-На каждом Python 3.11/3.12/3.13:
-**6065 PASS /1652 FAIL /0 ERROR /10 SKIP**, всего7727.
-С113 исправлен mixed fixture control; collection прежняя.
-Required CI/P1-stack exact остаются FAIL.
+`c2a6682d2438c9217c3bf26938dcd003391dbc75` (121), merge
+`642a14289fddd06408400b4ee6cc5480945e7d1a`, общий tree
+`89106f59cf181510a25ee8b667a9ff4966a82fd6`.
+На каждом Python3.11/3.12/3.13: **6065 PASS /1652 FAIL /0 ERROR /10 SKIP**, всего7727.
+Required CI/P1-stack exact FAIL. Это counts до нового retirement.
 
-Critical теперь **54/54 healthy**, прямой producer step SUCCESS подтверждает
-aggregate 29 intended kills. Recovery **12/12 и 33 kills** по stored summary.
-Installed reviewed-wheel MCP **1/1**, self-test 7/7 и report verification PASS;
-false-supported 0, contamination 0. Реальные client sessions **NOT RUN**.
+Critical: **54/54 healthy и все30 intended kills**, individual receipts доступны
+без priority omissions. DQP4+relation1 named guards/source/import hashes
+независимо проверены; baseline42 imports — отдельные probe processes.
+Recovery baseline12PASS, mutation gateFAIL: first-winner filename fault попал
+на другой guard. Полного33-kill результата на121 нет.
+Lossless module32/32 в каждой версии, четыре будущих cap killers отдельноPASS.
 
-P1.5 — **7/7**, facts 6/6, oracle 6/6. P1.4 — 12/14, discovery 8/10, facts 5/5.
-P1.6 current 6/6; retained adversarial 24/28 и его mutation baseline FAIL.
-Legacy source-fact acceptance 8/15 при floor 12/15, raw original coverage 0.
-V2 natural facts 6/15 и paraphrase 1/5; REPORT_ONLY с production runner FAIL.
+Legacy source-fact acceptance8/15 при floor12/15; raw original coverage0.
+V2 natural facts6/15, paraphrase1/5; productionFAIL.
+Installed MCP, retrieval evidence, platforms/build/wheel/sdist jobs121 SUCCESS.
+P1.5 SUCCESS; P1.4/P1.6/closureFAIL. Реальные client sessions **NOT RUN**.
 
-Reader 118 разобрал 326 records без ошибок, JUnit console omitted 0.
-Artifact console: 128 selected / 51 printed / 77 omitted; все три compact V2 headers получены,
-но все 29 individual critical mutant receipts отсутствуют в доступном console.
-Retirement 33 DQP cases требует четырёх собственных named/source/import operands;
-aggregate SUCCESS не заменяет их. Все 70 old DQP cases пока collected.
+Выполнен reviewed пакет122–125, его собственный общий runtime ещё **PENDING**:
 
-Reviewed119 добавляет relation25 precheck: 2 original plan calls и 1 directed
-generation mutant,0 новых ordinary functions. Все 25 old cases остаются.
-Reviewed120 приоритизирует actual critical/recovery operands и отмечает outcomes
-четырёх существующих lossless cases. Own target: 54 healthy / 30 kills **PENDING**.
-После proof возможны отдельные точные retirements 33 DQP и 25 relation cases;
-unselected body/scope/condition/safety obligations сохраняются.
+- **122**: read presentation сохраняет уже acquired/admitted windows; bounded control
+и operational/consent/current guards остаются. Native24-window proof+1mutant.
+- **123**: после собственного precheck удалены **58 ordinary cases /15definitions**:
+DQP70→37 и relation72→47. Frozen archives, helpers/imports/selectors,
+negative/source-policy/condition/native/safety obligations сохранены.
+- **124**: filename collision проверяется по actual complete naming plan, вычисленному до retrieval;
+assertion выполняется перед public veto check. Production,12cases/33mutants/expected guards прежние.
+- **125**:4cap faults используют4existing lossless cases;0new ordinary cases.
+Joint critical target **59healthy/35kills**; expected core collection7669.
 
-V2 source audit113 показал: все 3/1 qualified windows доходят до public, missing
-cleanup/infrastructure facts отсеяны на qualification. Actual118 request-flow
-даёт другой blocker: 27 готовых items сокращаются до 20 в control view, затем
-budget_exceeded запрещает delivery. Product fix должен отделить эту границу
-от реальных read/work/call/time bounds и сохранить consent/stale/current guards.
+Один старый DQP default3/800 test пока сохраняется до собственного cap proof и
+отдельного versioned AST/crosswalk retirement. Новый ordinary partial-body admission
+для original-only P1.4 разрабатывается отдельно, ещё не входит в пакет122–125.
+Остальные quality gaps и remaining relation47 требуют собственного решения.
 
-Подробные результаты и следующие действия:
-[checkpoint](PR211_CHECKPOINT_RU.md),
-[actual118](pr211-execution/RUNTIME_EVIDENCE_cadeef51.json),
-[V2 source audit113](pr211-execution/V2_QUALIFIED_WINDOW_AUDIT_113_RU.md).
-Исходные числа плана ниже остаются привязаны к своим историческим SHA.
+Подробности: [checkpoint](PR211_CHECKPOINT_RU.md),
+[actual121](pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json),
+[retirement58](pr211-execution/COMPILER_RETIREMENT_58_RU.md),
+[delivery](pr211-execution/PROJECT_READ_PRESENTATION_RU.md),
+[cap precheck](pr211-execution/OUTPUT_CAP_MUTATION_PRECHECK_RU.md).
+Исходные числа плана ниже сохраняются как история, привязанная к своим SHA.
 
 ## Поправки после оценки перед исполнением
 

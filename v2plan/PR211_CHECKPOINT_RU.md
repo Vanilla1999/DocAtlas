@@ -1,12 +1,12 @@
 # PR #211: checkpoint продолжения
 
-Обновлено: 2026-10-10 03:30 UTC.
+Обновлено: 2026-10-10 04:06 UTC.
 
 **PR пока не готов к merge.** Последний завершённый фактический CI:
-PR HEAD `cadeef515ea78c78338821f38b15fed3bde7c993` (118),
-merge checkout `9f25f147c522d84f61a57abb1d731d2b6e792c9a`,
-общий tree `62d727c3ffbb35e77f0301d0e961e6f60ed4ebe2`.
-Reviewed slices119–120 описаны ниже; их собственный runtime **PENDING**.
+PR HEAD `c2a6682d2438c9217c3bf26938dcd003391dbc75` (121),
+merge checkout `642a14289fddd06408400b4ee6cc5480945e7d1a`,
+общий tree `89106f59cf181510a25ee8b667a9ff4966a82fd6`.
+Reviewed пакет122–125 описан ниже; его собственный runtime **PENDING**.
 
 ## Действующие решения
 
@@ -30,122 +30,130 @@ Reviewed slices119–120 описаны ниже; их собственный ru
 Решения: [CURRENT_WAVE_DECISIONS_RU.md](CURRENT_WAVE_DECISIONS_RU.md).
 Старый local checkout не является актуальной базой.
 
-## Фактический CI: 118
+## Фактический CI: 121
 
-[Main run](https://github.com/Vanilla1999/DocAtlas/actions/runs/38019193867).
-[P1-stack](https://github.com/Vanilla1999/DocAtlas/actions/runs/38019193889).
-[Acceptance reader](https://github.com/Vanilla1999/DocAtlas/actions/runs/38019193867/job/114118025694).
-[Выбранные точные runtime records118](pr211-execution/RUNTIME_EVIDENCE_cadeef51.json).
+[Main run](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993).
+[P1-stack](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021213074).
+[Acceptance reader](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950).
+[Точные selected runtime records121](pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json).
 
-На **каждом** Python 3.11/3.12/3.13:
-**7727 = 6065 PASS / 1652 FAIL / 0 ERROR / 10 SKIP**.
-Матрица не складывается в один baseline. JUnit integrity issues пусты.
-По сравнению с113: один исправленный mixed control, collection прежняя.
-С107 устранено 41 падение: 40 в optional observers и одно в mixed fixture.
-Старые cases в114–118 не удалялись.
+На **каждом** Python3.11/3.12/3.13:
+**7727 = 6065 PASS /1652 FAIL /0 ERROR /10 SKIP**.
+Матрица не складывается в один baseline; JUnit integrity issues пусты.
+Это те же counts, что на118. Удаление58 cases выполнено позже, в123.
 
 | Python | SHA-256 JUnit |
 | --- | --- |
-|3.11|`7aaa2b1d076691f16ecf3e144f904aa5c8547bfb5725afb19cb0f956d7eb58b3`|
-|3.12|`91c369fe9b2f47bc5f1f1acd6434a884bdac99a76bade2384c2c7661f432f813`|
-|3.13|`221cb1d1db49ed879b8c44732315c4f79d2877c66f86c7bf997248f9bdf1caa7`|
+|3.11|`184cd15117d6f42b743c4c56d32ac9111bc949ac5e9560ee6fdc0b855d47d93d`|
+|3.12|`db291c4e5eecd8828995ff6a192a1e0039769eea18c0464c0a65112455237663`|
+|3.13|`4c026aee08d93073b0df18c87f76b5b60fcd1f40b93ace99e139cdf0324474bd`|
 
-| Gate | Actual118 | Практическая граница |
+| Gate | Actual121 | Граница доказательства |
 | --- | --- | --- |
-|Critical|**54P/0F/0E/0S; step SUCCESS**|29 intended kills подтверждены строгим producer целиком; individual hashes ещё не получены из console.|
-|Recovery|**12P/0F/0E; 33 mutants killed**|Stored summary status=passed; baseline healthy. Не все individual records включены в receipt.|
-|Literal historical/compact comparison|SUCCESS|Отдельный existing comparison step; не подменяет DQP33 proof.|
-|P1.4|12/14; discovery8/10; facts5/5; oracle5/5|Два original-only discovery failures.|
-|P1.5|**7/7; facts6/6; oracle6/6**|Current provenance PASS.|
-|P1.6 current|**6/6; facts1/1; oracle6/6**|Retained adversarial24/28 и его mutation baseline FAIL.|
+|Critical|**54P/0F/0E/0S;30 intended kills**|Все individual priority records доступны; нужные DQP4+relation1 guards/source/import hashes независимо проверены.|
+|Recovery baseline|**12P/0F/0E**|Свой baseline здоров.|
+|Recovery mutations|**FAIL**|filename-collision-first-winner пойман другим guard; полного33-kill summary на121 нет.|
+|Literal historical/compact comparison|SUCCESS|Собственный existing producer step16 на том же checkout.|
+|Lossless core projection|**32/32** на каждом Python|Все четыре будущих cap killer cases отдельно напечатаны как PASS; новые cap faults ещё не выполнялись.|
 |Legacy live|Source-fact acceptance **8/15**, raw original coverage0|Floor12/15 не достигнут; report FAIL.|
-|V2 live|Natural facts6/15; paraphrase facts1/5|Report сформирован, REPORT_ONLY; production runner FAIL.|
-|Current closure|Reports integrity PASS; oracle4/4|Current quality и required outcomes FAIL.|
-|Installed MCP|**1/1; self-test7/7; report verification PASS**|Reviewed wheel, deterministic SDK/stdio; false-supported0, contamination0.|
-|Retrieval evidence / platforms / build / wheel / sdist|SUCCESS|Это отдельные завершённые jobs.|
+|V2 live|Natural facts6/15; paraphrase1/5|REPORT_ONLY; production runner FAIL.|
+|Agent Developer|v1:8target-closed/11;4target gaps. Adversarial24/28|false_supported0, contamination0; полезный context для части исходных задач отсутствует.|
+|Installed MCP / retrieval evidence / platforms|SUCCESS|Завершённые jobs121; это не реальные Claude/Codex/OpenCode sessions.|
+|Build / exact wheel / sdist installer|SUCCESS в P1-stack|Это отдельные packaging/installed jobs.|
+|P1.4 / P1.6 / closure|FAIL|P1.5 SUCCESS. Подробные numbers предыдущего118 не выдаются за новые individual121 receipts.|
 |Required CI / P1-stack exact|**FAIL**|Core и advanced остаются красными.|
 
-Hermetic quality16/16 проверяет literal query identity без retrieval.
+Hermetic16/16 проверяет literal query identity без retrieval.
 Legacy raw report8/16 и positive7/15 отличаются от принятого source-fact oracle8/15.
-Agent Developer v1:11tasks executed,4target gaps; false_supported=0,
-forbidden_source_contamination=0. Ошибки получения полезного контекста сохраняются.
+Agent Developer v1 полностью исполнил11tasks; проблемы setup не подменяются текущими quality gaps.
 
-Reader log: 586750 UTF-8 bytes, SHA-256
-`c531b3800493f54970adadb724b84a49ccbb12535d86aebc254bc5612f3bb7c2`.
-Разобраны 326 JSON records без ошибок. JUnit console omitted=0.
-Artifact console: 128 selected / 51 printed / 77 omitted.
-Все три compact V2 headers получены. **Все 29 individual critical mutant records
-не попали в console118**; для DQP33 нужны четыре конкретных own receipts.
-Aggregate SUCCESS не заменяет их before/after/import hashes.
+Reader:591931 UTF-8 bytes, SHA-256
+`f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397`.
+Разобраны407 JSON records без ошибок. JUnit console omitted0.
+Critical priority31 records (baseline+30), recovery priority27, пропущено0.
+Остальных artifact rows не напечатано41 из170 selected.
+Все три V2 compact headers получены.
 
-Receipt сохраняет 27 выбранных parsed records целиком, metadata jobs и точные
-короткие downstream/installed console lines. Это не полный diagnostic ledger.
-SHA-256 receipt: `ea98324651792ea224aca6aac6988ef396593f698a888109c0e58e293ee47f8a`;
-333370 UTF-8 bytes. Остальные observed rows остаются в CI artifacts.
+Receipt сохраняет все31 critical records,27 recovery,3 JUnit counts и provenance/omissions.
+SHA-256 `d672705adec2e132a91dc894af261a688405addf9cbc06e7fc0051fd33a52d57`;
+144504 UTF-8 bytes. Это selected parsed records, не полный diagnostic ledger.
+Все42 baseline import rows получены отдельным probe subprocess, **не same-pytest-process attestation**.
 
-## Установленные причины retrieval failures
+## Применённый reviewed пакет122–125
 
-### 1. Cache reset / architecture: failed qualification
-
-[Аудит exact113](pr211-execution/V2_QUALIFIED_WINDOW_AUDIT_113_RU.md)
-сопоставляет полные current source bytes, шесть raw/public window hashes и
-frozen facts. Все qualified member windows **3/1** дошли до public.
-Числа20→3/1 сами по себе не означают потерю после квалификации.
-Нужные cleanup/infrastructure paragraphs были найдены, но имели пустые
-`qualified_query_ids`. Этот source finding относится к113; actual118 quality
-counts приведены отдельно выше.
-
-Для полезного partial context требуется отдельный admission contract с
-relevance/body/identity/scope/current/hash guards. Нельзя просто понизить ratio
-под эти cases, пропустить любой body hit либо изменить gold/host lookups.
-Unknown-modifier/lunar-policy negative controls сохраняются.
-
-### 2. Request flow: post-acquisition view truncation блокирует delivery
-
-Actual118 `v2-natural-request-flow`: member 31 windows, 15 qualified;
-project и Unified 20 windows, 9 qualified. Наблюдённый `project_docs` stage:
-observed 27 items / 18457 bytes → retained 20 items / 12016 bytes,
-item_limit 20, byte_limit 65536, `budget_exceeded=true`, status=insufficient.
-Остальные routing stages не превышены. Project/Unified result status=success,
-consent не требуется, но delivery=false; public sources 0.
-
-Срез отдельно разбирает post-acquisition control view и реальные acquisition
-bounds. Он ещё не исправлен. Нельзя повысить20 до другого magic number,
-безусловно игнорировать budget flag или обходить ACK/consent/stale/work guards.
-
-## Reviewed пакет после118: собственный runtime pending
-
-| Slice | Commit | Изменение |
+| Slice | Commit | Изменение и состояние |
 | --- | --- | --- |
-|119|`93bc8d82ec7ec3f0618f9b12624030026566c48e`|Relation25 precheck:2 original representatives/2plan calls,1 directed generation mutant;0new ordinary functions,25oldcases пока collected.|
-|120|`9d1ea6a0bc1a789aee36ec52eb6a5a5260f94c4c`|Priority critical/recovery operands с actual import stdout;4existing lossless-case outcomes в JUnit reader.|
+|122|`85fdb5166e24e071b8a9b616895043819ac526ea`|Сохранение admitted acquired project windows после bounded control; native24-window control и1fault. Own runtime pending.|
+|123|`4bc25f9b543ef8ac6c0f508aaf339c9ddad8cf54`|Удалены58 superseded compiler cases после собственного54/30 proof: DQP33 и relation25; архивы/helpers/guards сохранены. Post-removal runtime pending.|
+|124|`d5811c8fc703073b21c2a2dd623c36f5f3b5307f`|Детерминированный filename collision guard по actual full naming plan, без смены expected guard/production/33mutants. Runtime pending.|
+|125|`8552d125be7eef93c880592f71106b810c96dc48`|4направленных cap faults и2existing selectors (1+3cases);0new ordinary cases. Joint target59healthy/35kills pending.|
 
-[Relation precheck](pr211-execution/RELATION_COMPILER_PRECHECK_RU.md).
-[Priority reader](pr211-execution/ACCEPTANCE_OPERANDS_PRIORITY_RU.md).
-Code slices имеют root и независимый peer source review.
-Новый target — critical 54 healthy / 30 intended kills; это не runtime PASS.
-Import probe — **отдельный subprocess до pytest**, не same-process attestation.
+Каждый code slice имеет root и независимый peer review; локальных запусков нет.
 
-## Следующие конкретные действия
+- [Project window delivery](pr211-execution/PROJECT_READ_PRESENTATION_RU.md).
+- [Retirement58 и audit118 файлов](pr211-execution/COMPILER_RETIREMENT_58_RU.md).
+- [Filename guard](pr211-execution/FILENAME_COLLISION_PLAN_GUARD_RU.md).
+- [Output cap precheck](pr211-execution/OUTPUT_CAP_MUTATION_PRECHECK_RU.md).
 
-1. Опубликовать reviewed119–120 и этот checkpoint обычным fast-forward
+DQP теперь16definitions/37cases; relation4definitions/47cases.
+Все5 DQP negative rows, relation helpers `CASES/probe/qualify`, source-policy15,
+conditional3/native5 и safety26 сохраняются.
+Ожидаемое новое core collection:7727−58=7669; фактического post-removal результата ещё нет.
+Статическое уменьшение roster не является измерением ускорения.
+
+## Оставшиеся причины и границы
+
+### Request flow
+
+Actual118: member31 windows/15qualified → Project и Unified20/9.
+Control stage27items/18457bytes →20/12016, budget_exceeded=True.
+Этот post-acquisition view overflow блокировал delivery при status=success и отсутствии consent.
+Slice122 сохраняет отдельный admitted presentation pack, оставляя bounded control,
+source hashes/catalog membership, consent/stale/dependency и реальные work bounds.
+Нативный fixture требует24→control20→Project/Unified24 и полные байты каждого
+реально выбранного public source. **24 публичных источника не обещаются**:
+отдельное downstream правило no_new_direction ещё может сокращать presentation.
+
+### Cache reset / architecture и original-only P1.4
+
+[Аудит exact113](pr211-execution/V2_QUALIFIED_WINDOW_AUDIT_113_RU.md):
+все3/1 qualified windows дошли до public. Нужные cleanup/infrastructure paragraphs
+были найдены, но не qualified. Их нельзя объявить исправленными retention patch.
+
+Разрабатывается отдельный versioned ordinary partial-body admission для двух
+original-only P1.4 случаев: order drafts before upload и project network retries.
+Дизайн требует actual same-call native discovery, finite current catalog/source,
+exact body/hash/span/scope и двух последовательных content words исходного вопроса
+в одной substantive source clause. Generated queries, synonyms, stemming и
+original/answer/edit grants не добавляются. Весь исходный вопрос остаётся missing.
+Технические/literal/path вопросы сохраняют старые строгие lanes.
+Этот draft ещё не входит в reviewed122–125 и требует native controls/ADR/review.
+Обычный modifier вне доказанного span не получает answer credit; frozen literal/lunar
+negative controls и single-hit/metadata/split-clause запреты сохраняются.
+
+### Recovery
+
+В121 first-winner mutant встретил `recovery_filename_path_selection_not_naming_scope`
+вместо `recovery_filename_catalog_ambiguity`. По source сортировка opaque source IDs
+и удаление одинаковых title/body могли выбрать разных members; actual winner неизвестен.
+Slice124 проверяет уже вычисленный полный naming plan до public no-source assertion.
+Все12case names,33mutants и их intended guards сохранены. Нужен собственный новый12/33 PASS.
+
+## Следующие действия
+
+1. Опубликовать reviewed122–125 и этот checkpoint обычным fast-forward обоих
    implementation/pr211-merge-readiness и integration/stage3-v2-identity-pr1.
-   Получить own critical operands на новом joint SHA.
-2. После четырёх DQP named guards+source/import receipts применить reviewed
-   retirement 33: 29→16 functions, 70→37 cases. После собственного нового relation
-   kill — отдельный retirement 25: 6→4 functions, 72→47 cases.
-   Helpers/imports/unselected safety/body/condition cases и diagnostic hashes сохранить.
-3. Старый один test с default3/800 пока отдельно pending: реальные четыре
-   lossless successors уже есть, но dedicated cap mutants ещё не выполнены.
-   Не объявлять их runtime из агрегата всего module.
-4. Довести narrow request-flow read-presentation fix с operational guards.
-   Параллельно определить безопасный partial-context критерий для original-only
-   P1.4/Agent Developer и оставшихся V2 facts; исходные вопросы/facts не менять.
-5. Продолжить remaining relation47 и другие failure families по первой причине;
-   не удалять их только потому, что CI красный. Завершить required/downstream
-   и необходимые installed/client acceptance на конечном SHA.
+   Проверить новый CI merge SHA/tree и фактические required/downstream jobs.
+2. Проверить own59healthy/35intended critical kills, recovery12/33, lossless
+   controls, exact58 removal и native24-window delivery; сохранить individual receipts.
+3. Только после четырёх новых cap kills отдельным slice удалить старый
+   `test_context_budget_is_a_product_invariant`, обновив precise AST state,
+   crosswalk и owning node hash. Этот один старый3/800 test пока collected.
+4. Довести ordinary partial-body slice с независимыми native positives/negatives
+   и scoped receipt; не менять frozen questions/facts/host lookups.
+5. Продолжить remaining relation47 и другие failing families через независимые
+   original-task/source controls, не удалять их только из-за красного CI.
+   Завершить quality/required/downstream и необходимые installed/client acceptance.
 
-Исторический actual113 сохранён в
-[RUNTIME_EVIDENCE_441cdefd.json](pr211-execution/RUNTIME_EVIDENCE_441cdefd.json).
-Не принимать прежние статические APPROVE или aggregate job SUCCESS за
-доказательство отсутствующих individual runtime operands или полного merge acceptance.
+Исторические actual118 и113 сохранены в соответствующих receipts. Статический
+APPROVE, старый SHA или aggregate SUCCESS не заменяют отсутствующий собственный runtime.

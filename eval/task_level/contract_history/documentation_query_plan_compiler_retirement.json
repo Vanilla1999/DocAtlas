@@ -789,7 +789,7 @@
       "eval/task_level/contract_history/documentation_query_plan_compiler_retirement.json",
       "v2plan/pr211-execution/DQP_COMPILER_CONTRACT_PRECHECK_RU.md"
     ],
-    "commits_or_refs_changed": false,
+    "commits_or_refs_changed": true,
     "actual": {
       "selected_cases_removed": 30,
       "selected_definitions_removed": 10,

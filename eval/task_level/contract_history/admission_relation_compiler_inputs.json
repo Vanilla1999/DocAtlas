@@ -621,8 +621,8 @@
     ],
     "safety_module": "tests/docs/test_admission_relation_safety.py remains unchanged; imports CASES/qualify/probe survive.",
     "diagnostic_registration": "tests/diagnostic_labels.admission_contract.json",
-    "original_module_and_registration_changed": false,
-    "diagnostic_registration_base_blob": "5714aa323a983c9f070559088a0499fa863a7d4e"
+    "diagnostic_registration_base_blob": "5714aa323a983c9f070559088a0499fa863a7d4e",
+    "precheck_original_module_and_registration_changed": false
   },
   "existing_independent_properties": [
     {
@@ -861,7 +861,7 @@
       "eval/task_level/contract_history/admission_relation_compiler_inputs.json",
       "v2plan/pr211-execution/RELATION_COMPILER_PRECHECK_RU.md"
     ],
-    "commits_or_refs_changed": false,
+    "commits_or_refs_changed": true,
     "actual": {
       "selected_cases_removed": 25,
       "selected_definitions_removed": 2,
@@ -872,7 +872,8 @@
       "source_sha256": "05891fce3e921626e4185fc58f2a4e007e767ec1926526d29674030d6e6e9f49",
       "node_roster_sha256": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d",
       "after_removal_runtime": "pending_existing_PR_CI",
-      "note": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md"
+      "note": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md",
+      "original_module_and_registration_changed": true
     }
   }
 }
