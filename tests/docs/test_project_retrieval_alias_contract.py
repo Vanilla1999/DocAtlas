@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -35,6 +36,10 @@ _PLAN_INPUT_FUNCTIONS = (
 _PLAN_INPUT_SOURCE_SHA256 = "bb96a79c3005efd943b4f5bb11b4b8fdaf17c5d5cfcae871968870b55e0b9109"
 _PLAN_INPUT_ROSTER_SHA256 = "7577838d21c2121b60804f1e1c798cd5f87303477bb96ca5b0f801a5f12e23d1"
 _PLAN_INPUT_RECORDS_SHA256 = "ee96d2abc69481735513a82a70a7db2d6b3729fb5612db2b6e7247292591d3c5"
+
+_COMPILER_CROSSWALK = "eval/task_level/contract_history/documentation_query_plan_compiler_retirement.json"
+_COMPILER_ROSTER_SHA256 = "b910fa3dd979b133e630c45aa35c4b71fd66d5c62f95094422120c993d057b60"
+_COMPILER_RECORDS_SHA256 = "4c28bcbe98ec8fbb338555a7a45536139c60ace5dcfd2643b1cd12ae4bec6047"
 
 
 def _input_digest(value):
@@ -99,6 +104,111 @@ def _context7_questions(prior_questions):
     return questions
 
 
+def _compiler_precheck_inputs(archived_nodes, working_nodes, selected_node, archived_source):
+    crosswalk = json.loads((_ROOT / _COMPILER_CROSSWALK).read_text(encoding="utf-8"))
+    assert crosswalk["protocol"] == "documentation-query-compiler-retirement-v1"
+    assert crosswalk["source"] == {
+        "original_path": _PLAN_INPUT_ORIGINAL, "archive_path": _PLAN_INPUT_ARCHIVE,
+        "git_blob_sha": "25de8f3898ba60a33a08425d3e045353fa8014f9",
+        "sha256": _PLAN_INPUT_SOURCE_SHA256,
+    }
+    roster = crosswalk["roster"]
+    assert _input_digest(roster) == crosswalk["frozen_roster_sha256"] == _COMPILER_ROSTER_SHA256
+    assert len(roster) == 12
+    assert sum(row["collected_cases"] for row in roster) == 35
+    assert sum(row["retired_cases"] for row in roster) == 30
+    assert sum(row["retained_cases"] for row in roster) == 5
+    functions = {node.name: node for node in archived_nodes if isinstance(node, ast.FunctionDef)}
+    retired_names, partial = set(), {}
+    source_lines = archived_source.splitlines()
+    for row in roster:
+        function = functions[row["function"]]
+        assert row["original_nodeid"] == _PLAN_INPUT_ORIGINAL + "::" + function.name
+        start = min([function.lineno, *(node.lineno for node in function.decorator_list)])
+        assert row["definition_line"] == function.lineno
+        assert row["source_lines"] == [start, function.end_lineno]
+        frozen_function = "\n".join(source_lines[start - 1:function.end_lineno])
+        assert hashlib.sha256(frozen_function.encode("utf-8")).hexdigest() == row["source_sha256"]
+        count = 1
+        for decorator in function.decorator_list:
+            assert isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute)
+            assert decorator.func.attr == "parametrize"
+            assert len(decorator.args) == 2 and not decorator.keywords
+            count *= len(ast.literal_eval(decorator.args[1]))
+        assert count == row["collected_cases"]
+        removed, kept = row["retired_case_indices"], row["retained_case_indices"]
+        assert sorted(removed + kept) == list(range(count)) and not set(removed).intersection(kept)
+        assert len(removed) == row["retired_cases"] and len(kept) == row["retained_cases"]
+        if kept:
+            assert row["action"] == "retain_exact_negative_parameter_rows"
+            decorator, = function.decorator_list
+            assert isinstance(decorator.args[1], ast.List)
+            partial[function.name] = kept
+        else:
+            assert row["action"] == "retire_obsolete_compiler_function"
+            retired_names.add(function.name)
+    assert len(retired_names) == 10
+    assert partial == {
+        "test_exact_project_facets_and_negative_neighbors": [6, 8],
+        "test_audited_installation_equivalence_is_complete_and_bounded": [1, 2, 3],
+    }
+    exact = functions["test_exact_project_facets_and_negative_neighbors"]
+    values = ast.literal_eval(exact.decorator_list[0].args[1])
+    assert [values[index] for index in partial[exact.name]] == [
+        ("Где находятся модули?", set()), ("Какие инструменты нужны для ремонта?", set()),
+    ]
+    installation = functions["test_audited_installation_equivalence_is_complete_and_bounded"]
+    values = ast.literal_eval(installation.decorator_list[0].args[1])
+    assert [values[index] for index in partial[installation.name]] == [
+        (" и объяснить архитектуру?", False),
+        (" и проверить неизвестный контракт?", False),
+        (" с UnknownLedger?", False),
+    ]
+
+    # DQP3 is checked separately. Every other node must match one complete state;
+    # partial retirements, changed bodies, decorators, helpers or imports do not match.
+    frozen_other = [node for node in archived_nodes if not selected_node(node)]
+    retired_other = []
+    for node in frozen_other:
+        if isinstance(node, ast.FunctionDef) and node.name in retired_names:
+            continue
+        if isinstance(node, ast.FunctionDef) and node.name in partial:
+            node = copy.deepcopy(node)
+            rows = node.decorator_list[0].args[1]
+            rows.elts = [rows.elts[index] for index in partial[node.name]]
+        retired_other.append(node)
+    actual = [ast.dump(node, include_attributes=False)
+              for node in working_nodes if not selected_node(node)]
+    precheck = [ast.dump(node, include_attributes=False) for node in frozen_other]
+    retirement = [ast.dump(node, include_attributes=False) for node in retired_other]
+    assert actual == precheck or actual == retirement, "critical_compiler_retirement_exact_scope"
+
+    records = crosswalk["representative_inputs"]
+    assert len(records) == 2
+    assert _input_digest(records) == crosswalk["representative_inputs_sha256"] == _COMPILER_RECORDS_SHA256
+    compound = functions["test_alias_budget_is_fair_across_requested_facets"]
+    calls = sorted([
+        node for node in ast.walk(compound) if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name) and node.func.id == "build_project_retrieval_aliases"
+    ], key=lambda node: (node.lineno, node.col_offset))
+    assert len(calls) == 2
+    equivalent = functions["test_only_audited_complete_equivalence_derives_original"]
+    assignment, = [
+        node for node in equivalent.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "question" for target in node.targets)
+    ]
+    originals = (ast.literal_eval(calls[0].args[0]), ast.literal_eval(assignment.value))
+    for index, record in enumerate(records):
+        assert record["case_index"] == index and record["archive_question_index"] == 0
+        function = (compound, equivalent)[index]
+        assert record["original_nodeid"] == _PLAN_INPUT_ORIGINAL + "::" + function.name
+        assert record["question"] == originals[index]
+        assert record["question_sha256"] == hashlib.sha256(originals[index].encode("utf-8")).hexdigest()
+    assert records[0]["lookup_queries"] == []
+    assert records[1]["lookup_queries"] == [originals[1]]
+    return records
+
+
 def _explicit_plan_inputs():
     crosswalk = json.loads((_ROOT / _PLAN_INPUT_CROSSWALK).read_text(encoding="utf-8"))
     assert crosswalk["source"]["original_path"] == _PLAN_INPUT_ORIGINAL
@@ -158,16 +268,16 @@ def _explicit_plan_inputs():
     working_nodes = ast.parse((_ROOT / _PLAN_INPUT_ORIGINAL).read_text(encoding="utf-8")).body
     def selected_node(node):
         return isinstance(node, ast.FunctionDef) and node.name in _PLAN_INPUT_FUNCTIONS
-    assert [ast.dump(node, include_attributes=False) for node in working_nodes if not selected_node(node)] == [
-        ast.dump(node, include_attributes=False) for node in archived_nodes if not selected_node(node)
-    ]
+    compiler_inputs = _compiler_precheck_inputs(
+        archived_nodes, working_nodes, selected_node, frozen.decode("utf-8"),
+    )
     working_selected = [node for node in working_nodes if selected_node(node)]
     assert len(working_selected) in (0, 3)
     if working_selected:
         assert [ast.dump(node, include_attributes=False) for node in working_selected] == [
             ast.dump(node, include_attributes=False) for node in selected
         ]
-    return records
+    return records, compiler_inputs
 
 
 def test_current_alias_boundary_preserves_explicit_queries_without_inference():
@@ -248,7 +358,8 @@ def test_current_alias_boundary_preserves_explicit_queries_without_inference():
 
     # These three unchanged request fixtures add five-slot and duplicate-slot coverage.
     # Expected rows are frozen literal records, not an instance using producer defaults.
-    for record in _explicit_plan_inputs():
+    plan_inputs, compiler_inputs = _explicit_plan_inputs()
+    for record in plan_inputs:
         plan = build_documentation_query_plan(
             record["question"], lookup_queries=tuple(record["lookup_queries"]),
         )
@@ -279,3 +390,31 @@ def test_current_alias_boundary_preserves_explicit_queries_without_inference():
     # All 24 original/explicit-lookup positive controls have already passed.
     for question in context7_questions:
         assert build_project_retrieval_aliases(question) == (), "critical_context7_no_topic_router_aliases"
+
+    # Two independent representatives, not a replay of the 35 historical cases.
+    # Earlier alias/intent/lookup controls keep their own first-failure markers.
+    for record in compiler_inputs:
+        question, guard = record["question"], record["guard"]
+        original_only = build_documentation_query_plan(question)
+        assert [[row.query_id, row.text, row.origin, row.relation, row.coverage_required]
+                for row in original_only.queries] == record["expected_original_rows"], guard
+        plan = (build_documentation_query_plan(question, lookup_queries=tuple(record["lookup_queries"]))
+                if record["lookup_queries"] else original_only)
+        assert [[row.query_id, row.text, row.origin, row.relation, row.coverage_required]
+                for row in plan.queries] == record["expected_rows"], guard
+        for current in (original_only, plan):
+            assert current.original_question == question, guard
+            assert current.component_contract == () and current.component_scope_complete is False, guard
+            for row in current.queries:
+                assert row.public_parent_query_id is None, guard
+                assert row.preferred_catalog_roles == row.forbidden_catalog_roles == (), guard
+                assert row.forbidden_evidence_terms == row.parent_exact_terms == (), guard
+                assert row.need_subject is row.need_relation is row.need_context is None, guard
+        payload = plan.as_payload()
+        assert payload["original_question"] == question, guard
+        assert [[row["query_id"], row["text"], row["origin"], row["relation"], row["coverage_required"]]
+                for row in payload["queries"]] == record["expected_rows"], guard
+        assert payload["query_ids"] == payload["public_query_ids"] == record["expected_public_query_ids"], guard
+        assert payload["required_query_ids"] == record["expected_required_query_ids"], guard
+        assert all(row["public_parent_query_id"] is None for row in payload["queries"]), guard
+        assert build_project_retrieval_aliases(question) == (), guard

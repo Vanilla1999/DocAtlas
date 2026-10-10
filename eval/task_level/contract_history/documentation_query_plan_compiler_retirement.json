@@ -1,0 +1,611 @@
+{
+  "schema_version": 1,
+  "protocol": "documentation-query-compiler-retirement-v1",
+  "phase": "precheck_old_thirty_cases_remain_collected",
+  "source": {
+    "original_path": "tests/docs/test_documentation_query_plan.py",
+    "archive_path": "eval/task_level/contract_history/documentation_query_plan_explicit_inputs.py.txt",
+    "git_blob_sha": "25de8f3898ba60a33a08425d3e045353fa8014f9",
+    "sha256": "bb96a79c3005efd943b4f5bb11b4b8fdaf17c5d5cfcae871968870b55e0b9109"
+  },
+  "decision": {
+    "kind": "versioned_retirement_of_superseded_compiler_expectations_not_execution_equivalence",
+    "adr_path": "docs/adr/0003-context-first-project-reads.md",
+    "adr_blob_sha": "9ec7ca998294b171ea3e0e52972ffbdd673116dc",
+    "contract": "Preserve original and explicit host requests; no inferred topics, generated aliases/source policies, audited equivalence or inherited original credit.",
+    "not_covered": "This control does not establish source facts, original-query retrieval quality, qualification, source identity, scope, hash binding, MCP delivery or the actual runtime of all archived inputs."
+  },
+  "roster": [
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_exact_project_facets_and_negative_neighbors",
+      "function": "test_exact_project_facets_and_negative_neighbors",
+      "definition_line": 160,
+      "source_lines": [
+        148,
+        162
+      ],
+      "source_sha256": "fb1dc0c0befdace47d7f0c026f99bc93f259c87a51e2d07727e19da7b7f5199e",
+      "collected_cases": 10,
+      "action": "retain_exact_negative_parameter_rows",
+      "retired_case_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        7,
+        9
+      ],
+      "retained_case_indices": [
+        6,
+        8
+      ],
+      "retired_cases": 8,
+      "retained_cases": 2,
+      "successor_properties": [
+        "no_generated_aliases",
+        "no_inferred_roles"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_alias_budget_is_fair_across_requested_facets",
+      "function": "test_alias_budget_is_fair_across_requested_facets",
+      "definition_line": 165,
+      "source_lines": [
+        165,
+        172
+      ],
+      "source_sha256": "3dda72924bbe00f3411a88900dd504437db7225bf534d6ddf4d0768887a412fa",
+      "collected_cases": 1,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 1,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_aliases",
+        "compound_original_bytes"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_partial_canonical_facets_cannot_cover_original",
+      "function": "test_partial_canonical_facets_cannot_cover_original",
+      "definition_line": 180,
+      "source_lines": [
+        175,
+        184
+      ],
+      "source_sha256": "af0b986e1ecb7a3d5d2846e534a69e150ebbc3f8ccc04698af5305c1e05948da",
+      "collected_cases": 3,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1,
+        2
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 3,
+      "retained_cases": 0,
+      "successor_properties": [
+        "full_original_bytes",
+        "no_generated_queries",
+        "no_lookup_parent_credit"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_only_audited_complete_equivalence_derives_original",
+      "function": "test_only_audited_complete_equivalence_derives_original",
+      "definition_line": 187,
+      "source_lines": [
+        187,
+        193
+      ],
+      "source_sha256": "e6c1ecc7d2e22db866ab69815a95d647a4312a97eb9a0df249c4f1090fb71155",
+      "collected_cases": 1,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 1,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_queries",
+        "no_lookup_parent_credit",
+        "same_text_keeps_independent_query_id"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_operational_facets_have_role_policies",
+      "function": "test_operational_facets_have_role_policies",
+      "definition_line": 219,
+      "source_lines": [
+        218,
+        223
+      ],
+      "source_sha256": "2258bb7f6dbf84466affc5c989c121344d23ae15a3f5ce85ac07ea53f60f0dcd",
+      "collected_cases": 4,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 4,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_aliases",
+        "no_inferred_roles"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_output_budget_wording_gets_requested_facet",
+      "function": "test_output_budget_wording_gets_requested_facet",
+      "definition_line": 230,
+      "source_lines": [
+        226,
+        232
+      ],
+      "source_sha256": "777b65178e836f73dc2bd9f767afd869b607981c64c69326d6871673fe8423a4",
+      "collected_cases": 2,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 2,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_aliases"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_audited_installation_equivalence_is_complete_and_bounded",
+      "function": "test_audited_installation_equivalence_is_complete_and_bounded",
+      "definition_line": 241,
+      "source_lines": [
+        235,
+        249
+      ],
+      "source_sha256": "6358102a011c2e81e32c92b07a2a63d668be94282af9891275a66bdc00c34b55",
+      "collected_cases": 4,
+      "action": "retain_exact_negative_parameter_rows",
+      "retired_case_indices": [
+        0
+      ],
+      "retained_case_indices": [
+        1,
+        2,
+        3
+      ],
+      "retired_cases": 1,
+      "retained_cases": 3,
+      "successor_properties": [
+        "no_generated_queries",
+        "no_lookup_parent_credit"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_narrow_operational_probes_have_policies",
+      "function": "test_narrow_operational_probes_have_policies",
+      "definition_line": 257,
+      "source_lines": [
+        252,
+        261
+      ],
+      "source_sha256": "085731a803677c62d84cd9ffa695a2e8ddce8760a181839f3999f5ee01d6719c",
+      "collected_cases": 3,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1,
+        2
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 3,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_aliases",
+        "no_inferred_roles"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_project_query_routing_distinguishes_purpose_from_failure",
+      "function": "test_project_query_routing_distinguishes_purpose_from_failure",
+      "definition_line": 269,
+      "source_lines": [
+        264,
+        271
+      ],
+      "source_sha256": "c2988dc367303304e9c630afb4a2f710b077c436e7b59db43fb013259595f7d2",
+      "collected_cases": 3,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1,
+        2
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 3,
+      "retained_cases": 0,
+      "successor_properties": [
+        "general_intent_dto_without_inferred_flags"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_failure_neighbors_do_not_become_product_purpose",
+      "function": "test_failure_neighbors_do_not_become_product_purpose",
+      "definition_line": 301,
+      "source_lines": [
+        297,
+        305
+      ],
+      "source_sha256": "6c25616137a6fd8a62f978d30861e70a0a397b4af433d7dad8ec5078a4de7ed0",
+      "collected_cases": 2,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0,
+        1
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 2,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_generated_aliases",
+        "general_intent_dto_without_inferred_flags"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_product_definition_host_lookup_without_product_name_can_derive_original",
+      "function": "test_product_definition_host_lookup_without_product_name_can_derive_original",
+      "definition_line": 415,
+      "source_lines": [
+        415,
+        422
+      ],
+      "source_sha256": "0c56bd63e274e7073ae991f2b9fe509e24a6da41cd7ef49cbc46111894483752",
+      "collected_cases": 1,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 1,
+      "retained_cases": 0,
+      "successor_properties": [
+        "no_lookup_parent_credit",
+        "same_text_keeps_independent_query_id"
+      ]
+    },
+    {
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_conservative_ru_fallback_cannot_authorize_original_lineage",
+      "function": "test_conservative_ru_fallback_cannot_authorize_original_lineage",
+      "definition_line": 440,
+      "source_lines": [
+        440,
+        445
+      ],
+      "source_sha256": "1936735a8d3a76f38811d35916a2af868af10a05599433d2bf337a7d546b0ed4",
+      "collected_cases": 1,
+      "action": "retire_obsolete_compiler_function",
+      "retired_case_indices": [
+        0
+      ],
+      "retained_case_indices": [],
+      "retired_cases": 1,
+      "retained_cases": 0,
+      "successor_properties": [
+        "full_original_bytes",
+        "no_generated_queries",
+        "no_lookup_parent_credit"
+      ]
+    }
+  ],
+  "frozen_roster_sha256": "b910fa3dd979b133e630c45aa35c4b71fd66d5c62f95094422120c993d057b60",
+  "representative_inputs": [
+    {
+      "case_index": 0,
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_alias_budget_is_fair_across_requested_facets",
+      "archive_question_index": 0,
+      "question": "Explain project purpose, architecture, offline mode and context token budget",
+      "question_sha256": "c6d724f2d337ba4f1096920bc41140e4a91703069477746e31c59341dd57dc6f",
+      "lookup_queries": [],
+      "lookup_provenance": "no_lookup_in_original_fixture",
+      "expected_original_rows": [
+        [
+          "query-original",
+          "Explain project purpose, architecture, offline mode and context token budget",
+          "original",
+          "direct",
+          true
+        ]
+      ],
+      "expected_rows": [
+        [
+          "query-original",
+          "Explain project purpose, architecture, offline mode and context token budget",
+          "original",
+          "direct",
+          true
+        ]
+      ],
+      "expected_public_query_ids": [
+        "query-original"
+      ],
+      "expected_required_query_ids": [
+        "query-original"
+      ],
+      "guard": "critical_compound_request_has_no_generated_aliases"
+    },
+    {
+      "case_index": 1,
+      "original_nodeid": "tests/docs/test_documentation_query_plan.py::test_only_audited_complete_equivalence_derives_original",
+      "archive_question_index": 0,
+      "question": "project architecture overview components indexing retrieval storage",
+      "question_sha256": "b38c0db008c9c2f560c25732ac963f6b98e9844607312474a573bce78e8f52fa",
+      "lookup_queries": [
+        "project architecture overview components indexing retrieval storage"
+      ],
+      "lookup_provenance": "new_explicit_host_counterexample_equal_to_unchanged_archived_original",
+      "expected_original_rows": [
+        [
+          "query-original",
+          "project architecture overview components indexing retrieval storage",
+          "original",
+          "direct",
+          true
+        ]
+      ],
+      "expected_rows": [
+        [
+          "query-original",
+          "project architecture overview components indexing retrieval storage",
+          "original",
+          "direct",
+          true
+        ],
+        [
+          "query-lookup-1",
+          "project architecture overview components indexing retrieval storage",
+          "host_lookup",
+          "host_lookup",
+          false
+        ]
+      ],
+      "expected_public_query_ids": [
+        "query-original",
+        "query-lookup-1"
+      ],
+      "expected_required_query_ids": [
+        "query-original"
+      ],
+      "guard": "critical_equal_lookup_has_no_original_credit"
+    }
+  ],
+  "representative_inputs_sha256": "4c28bcbe98ec8fbb338555a7a45536139c60ace5dcfd2643b1cd12ae4bec6047",
+  "execution_accounting": {
+    "ordinary_test_nodes_added": 0,
+    "representative_input_records_added": 2,
+    "production_plan_calls_added": 3,
+    "production_alias_calls_added": 2,
+    "archived_selected_cases": 35,
+    "archived_cases_replayed_as_production_calls": 0,
+    "legacy_cases_removed_by_this_precheck": 0,
+    "planned_later_case_reduction": 30,
+    "planned_later_definition_reduction": 10,
+    "performance_claim": "Collected cases and source calls are static counts. No measured full-CI speedup is claimed; two mutation children are added."
+  },
+  "preservation": {
+    "earlier_dqp3_crosswalk": "eval/task_level/contract_history/documentation_query_plan_explicit_inputs.json",
+    "earlier_dqp3_archive_and_input_roster": "unchanged; its own exactly-three-or-zero AST check remains separate",
+    "compiler_family_allowed_states": [
+      {
+        "name": "precheck",
+        "definitions": 12,
+        "cases": 35
+      },
+      {
+        "name": "retired30",
+        "definitions": 2,
+        "cases": 5
+      }
+    ],
+    "whole_module_states": [
+      {
+        "dqp3": "present",
+        "compiler_family": "precheck",
+        "definitions": 29,
+        "cases": 70,
+        "node_roster_sha256": "2fa96401eaed3a8a68e5993a07485bfe2bac6886fead9892214482ea73f3ac95"
+      },
+      {
+        "dqp3": "retired_after_separate_proof",
+        "compiler_family": "precheck",
+        "definitions": 26,
+        "cases": 67,
+        "node_roster_sha256": "8662d4c3549155598e1d084dfa7664a2cfd1ce8b9a7a50fec4bfc71fe2b728f2"
+      },
+      {
+        "dqp3": "present",
+        "compiler_family": "retired30",
+        "definitions": 19,
+        "cases": 40,
+        "node_roster_sha256": "cb9b114c9c4f43872e9f906c7f94bea4ab49b1ae718b6a48ae14607e8000922a"
+      },
+      {
+        "dqp3": "retired_after_separate_proof",
+        "compiler_family": "retired30",
+        "definitions": 16,
+        "cases": 37,
+        "node_roster_sha256": "3e87a5d20558573e7eb7e70b3a64a22b8528843879fc13a4965aa3578da0533b"
+      }
+    ],
+    "exact_retained_negative_rows": {
+      "test_exact_project_facets_and_negative_neighbors": [
+        {
+          "archive_case_index": 6,
+          "question": "Где находятся модули?",
+          "expected_intent_ids": []
+        },
+        {
+          "archive_case_index": 8,
+          "question": "Какие инструменты нужны для ремонта?",
+          "expected_intent_ids": []
+        }
+      ],
+      "test_audited_installation_equivalence_is_complete_and_bounded": [
+        {
+          "archive_case_index": 1,
+          "suffix": " и объяснить архитектуру?",
+          "equivalent": false
+        },
+        {
+          "archive_case_index": 2,
+          "suffix": " и проверить неизвестный контракт?",
+          "equivalent": false
+        },
+        {
+          "archive_case_index": 3,
+          "suffix": " с UnknownLedger?",
+          "equivalent": false
+        }
+      ]
+    },
+    "all_other_nodes": "Exact archived AST sequence required, including all bodies, decorators, imports and non-test statements; no generic ignore list.",
+    "diagnostic_registration": "tests/diagnostic_labels.compound_context.json",
+    "precheck_changes_original_module_or_registration": false
+  },
+  "existing_independent_properties": [
+    {
+      "property": "no_generated_aliases",
+      "control": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "mutants": [
+        "project_retrieval_no_generated_aliases",
+        "context7_russian_topic_router_cannot_generate_aliases"
+      ],
+      "independent_assertion": "Actual alias tuple empty after healthy original and explicit lookup plans."
+    },
+    {
+      "property": "general_intent_dto_without_inferred_flags",
+      "control": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+      "mutants": [
+        "project_query_intent_no_inferred_roles"
+      ],
+      "independent_assertion": "Literal name/general and all boolean fields; separate API, not credit from the alias control."
+    },
+    {
+      "property": "full_original_bytes",
+      "control": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+      "mutants": [
+        "literal_original_query_credit_lost"
+      ],
+      "independent_assertion": "Full original retained separately from explicit prefix lookup."
+    },
+    {
+      "property": "no_lookup_parent_credit",
+      "control": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+      "mutants": [
+        "literal_lookup_required_credit",
+        "literal_lookup_parent_promotion"
+      ],
+      "independent_assertion": "Original required, host optional, every parent empty; these faults belong to the separate literal comparison."
+    },
+    {
+      "property": "no_inferred_roles",
+      "control": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "mutants": [
+        "project_retrieval_no_generated_aliases"
+      ],
+      "independent_assertion": "Original/host policy arrays empty. The alias fault is not a standalone dedicated role-only mutation."
+    },
+    {
+      "property": "no_generated_queries",
+      "control": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "mutants": [
+        "documentation_plan_keeps_duplicate_lookup_slots",
+        "documentation_plan_keeps_fifth_lookup_slot"
+      ],
+      "independent_assertion": "Independent literal plan rows, direct original and explicit host slots only. Slot faults do not claim standalone generated-query branch proof."
+    }
+  ],
+  "directed_mutations": [
+    {
+      "name": "documentation_compound_topic_does_not_generate_aliases",
+      "path": "docmancer/docs/domain/project_retrieval_intent.py",
+      "old": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+      "new": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    if \"architecture\" in question.casefold() and \"token budget\" in question.casefold():\n        return (ProjectRetrievalAlias(\"project_architecture\", \"invented compound lookup\", True, \"en\"),)\n    return ()",
+      "failure_guard": "critical_compound_request_has_no_generated_aliases",
+      "decisive_record_index": 0,
+      "base_blob_sha": "989e317c45a18fc19d0074a832095ed6a7e7d097",
+      "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+      "anchor_matches": 1,
+      "after_sha256": "3c8c7608e6ab82142ecf4f7f65a01edc0c57da79263152caa21de97a205b0c2a",
+      "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "expected_failures": 1,
+      "expected_errors": 0,
+      "expected_skips": 0
+    },
+    {
+      "name": "documentation_equal_lookup_does_not_inherit_original",
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "old": "            f\"query-lookup-{index}\", text, \"host_lookup\", False, relation=\"host_lookup\",",
+      "new": "            f\"query-lookup-{index}\", text, \"host_lookup\", False,\n            relation=\"exact_anchor\" if text == question else \"host_lookup\",\n            public_parent_query_id=\"query-original\" if text == question else None,",
+      "failure_guard": "critical_equal_lookup_has_no_original_credit",
+      "decisive_record_index": 1,
+      "base_blob_sha": "0cd20b1138f1a3a2740729677d9588414f2dcf32",
+      "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+      "anchor_matches": 1,
+      "after_sha256": "a9e9b31df66e1a7d3c56c324893853f8efea41435c4d8f61524e12ec3ada7823",
+      "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "expected_failures": 1,
+      "expected_errors": 0,
+      "expected_skips": 0
+    }
+  ],
+  "runtime_gate": {
+    "status": "pending_not_accepted",
+    "required_normal_baseline": {
+      "tests": 54,
+      "pass": 54,
+      "fail": 0,
+      "error": 0,
+      "skip": 0
+    },
+    "required_normal_mutants": 29,
+    "new_mutants_each": {
+      "tests": 1,
+      "expected_assertion_failures": 1,
+      "errors": 0,
+      "skips": 0,
+      "named_guard_required": true,
+      "source_import_hash_identity_required": true
+    },
+    "earlier_dqp3_own_proof_required": true,
+    "literal_comparison_requires_own_green_same_source_evidence": true,
+    "current_113_critical_step": "Parent observed FAIL; individual first failure not available at precheck authoring. No healthy113 proof is claimed.",
+    "runtime_proof": null
+  },
+  "retirement_phase": {
+    "status": "not_performed",
+    "required_actions": [
+      "Resolve current critical baseline failure and run actual precheck with both new named kills.",
+      "Retain both original negative parameter groups and all unselected source semantics.",
+      "Read current external consumers/selectors; remove only ten listed functions and nine listed parameter rows.",
+      "Update only the owning module node hash, new crosswalk runtime receipt and retirement note.",
+      "Bind actual PR head, checkout commit, checkout tree and same-tree proof without conflating merge SHA with PR SHA."
+    ],
+    "paths": [
+      "tests/docs/test_documentation_query_plan.py",
+      "tests/diagnostic_labels.compound_context.json",
+      "eval/task_level/contract_history/documentation_query_plan_compiler_retirement.json",
+      "v2plan/pr211-execution/DQP_COMPILER_CONTRACT_PRECHECK_RU.md"
+    ],
+    "commits_or_refs_changed": false
+  }
+}

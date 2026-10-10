@@ -353,6 +353,24 @@ MUTANTS = (
         1,
         "critical_explicit_lookup_fifth_slot",
     ),
+    Mutant(
+        "documentation_compound_topic_does_not_generate_aliases",
+        "docmancer/docs/domain/project_retrieval_intent.py",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    if \"architecture\" in question.casefold() and \"token budget\" in question.casefold():\n        return (ProjectRetrievalAlias(\"project_architecture\", \"invented compound lookup\", True, \"en\"),)\n    return ()",
+        TARGET_TESTS[3],
+        1,
+        "critical_compound_request_has_no_generated_aliases",
+    ),
+    Mutant(
+        "documentation_equal_lookup_does_not_inherit_original",
+        "docmancer/docs/domain/documentation_query_plan.py",
+        "            f\"query-lookup-{index}\", text, \"host_lookup\", False, relation=\"host_lookup\",",
+        "            f\"query-lookup-{index}\", text, \"host_lookup\", False,\n            relation=\"exact_anchor\" if text == question else \"host_lookup\",\n            public_parent_query_id=\"query-original\" if text == question else None,",
+        TARGET_TESTS[3],
+        1,
+        "critical_equal_lookup_has_no_original_credit",
+    ),
 )
 
 
