@@ -79,9 +79,7 @@ def test_literal_mentions_keep_sha_unicode_offsets_and_occurrences():
                        for m in current)
         guard = ("critical_reference_nl_context_keeps_quoted_symbol" if record["expected_explicit"]
                  else "critical_reference_nl_context_keeps_bare_unresolved")
-        assert (actual == expected if record["occurrence_required"] else actual in ((), expected)), (
-            guard, record["input_index"], actual,
-        )
+        assert (actual == expected if record["occurrence_required"] else actual in ((), expected)), guard
         if record["expected_explicit"]:
             # Catalog nomination belongs to resolve_references. An explicit
             # backtick symbol remains a symbol even on an exact stem collision.
