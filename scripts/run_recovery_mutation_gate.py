@@ -228,6 +228,18 @@ MUTANTS = (
            "if False and witnesses and body_window is None:\n        return None",
            "closed_literal_context", "recovery_literal_explicit_raw_window_span_replay"),
 
+    Mutant("pair-context-admits-one-body-name", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "        if len(paired) != 2 or not re.search(r\"[^\\W_]\", remaining):",
+           "        if not paired or not re.search(r\"[^\\W_]\", remaining):",
+           "closed_literal_context", "recovery_pair_requires_both_body_literals"),
+    Mutant("pair-context-accepts-unconsumed-tail", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "        or re.fullmatch(r\"\\?\\s*\", question[right.end:]) is None):",
+           "        or re.search(r\"\\?\\s*\", question[right.end:]) is None):",
+           "closed_literal_context", "recovery_pair_frame_requires_full_query"),
+    Mutant("pair-context-joins-separate-paragraphs", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "    return []\n\n\ndef _closed_explain_literals",
+           "    flattened = evidence_text.replace(\"\\r\\n\\r\\n\", \" \").replace(\"\\n\\n\", \" \")\n    return (_pair_context_witnesses(flattened, window_start, mentions)\n            if flattened != evidence_text else [])\n\n\ndef _closed_explain_literals",
+           "closed_literal_context", "recovery_pair_keeps_paragraph_boundary"),
 
 )
 

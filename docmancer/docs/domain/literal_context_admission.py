@@ -42,6 +42,60 @@ def _closed_context_literal(question: str) -> QueryMention | None:
     return None
 
 
+def _closed_pair_context(question: str) -> tuple[QueryMention, ...]:
+    """Consume one context request for two unresolved, distinct raw names."""
+    mentions = query_mentions(question)
+    if (len(mentions) != 2 or any(
+        mention.explicit or mention.syntax_role != "unresolved" or not mention.text.isidentifier()
+        for mention in mentions
+    ) or mentions[0].text == mentions[1].text):
+        return ()
+    left, right = mentions
+    if (re.fullmatch(r"\s*how[ \t]+does[ \t]+", question[:left.start], re.I) is None
+        or re.fullmatch(r"[ \t]+differ[ \t]+from[ \t]+", question[left.end:right.start], re.I) is None
+        or re.fullmatch(r"\?\s*", question[right.end:]) is None):
+        return ()
+    return mentions
+
+
+def _pair_context_witnesses(
+    evidence_text: str, window_start: int, mentions: tuple[QueryMention, ...],
+) -> list[dict[str, Any]]:
+    """Bind both complete identifiers inside one unchanged plain paragraph."""
+    if len(mentions) != 2 or mentions[0].text == mentions[1].text:
+        return []
+    # Qualified spellings cannot lend their identifier segment to a bare name.
+    patterns = [r"(?<![\w.:/\\-])" + re.escape(mention.text) + r"(?![\w/\\-]|\.\w|::)"
+                for mention in mentions]
+    paragraph_start = 0
+    for boundary in re.finditer(r"(?:\r?\n)[ \t]*(?:\r?\n)|\Z", evidence_text):
+        unit_start = paragraph_start
+        unit_text = evidence_text[unit_start:boundary.start()]
+        paragraph_start = boundary.end()
+        normalized = " ".join(unit_text.split())
+        if (not normalized or _relation_units(unit_text) != (normalized,)
+            or any(re.match(r"^(?:[ \t]*>| {4}|\t)", line) for line in unit_text.splitlines())):
+            continue
+        paired = []
+        remaining = unit_text
+        for mention, pattern in zip(mentions, patterns):
+            matches = list(re.finditer(pattern, unit_text))
+            if matches:
+                paired.append((mention, matches[0]))
+            remaining = re.sub(pattern, "", remaining)
+        if len(paired) != 2 or not re.search(r"[^\W_]", remaining):
+            continue
+        offset = window_start + unit_start
+        return [{
+            "mention_id": mention.mention_id, "text": mention.text,
+            "char_start": offset + match.start(), "char_end": offset + match.end(),
+            "query_char_start": mention.start, "query_char_end": mention.end,
+            "kind": "literal_pair_context",
+            "paragraph_char_start": offset, "paragraph_char_end": offset + len(unit_text),
+        } for mention, match in paired]
+    return []
+
+
 def _closed_explain_literals(question: str) -> tuple[QueryMention, ...]:
     """Consume the entire explicit identifier list before admitting any body."""
     frame = re.match(r"\s*explain[ \t]+", question, re.I)
@@ -283,6 +337,9 @@ def admit_original_literal_context(
         count_witness = _count_context_witness(evidence_text, body_window["char_start"], count_context)
         if count_witness is not None:
             witnesses.append(count_witness)
+    pair_context = _closed_pair_context(question)
+    if pair_context and body_window is not None:
+        witnesses.extend(_pair_context_witnesses(evidence_text, body_window["char_start"], pair_context))
     statement_context = document_statement_mentions(question)
     if statement_context is not None and body_window is not None:
         locator, target = statement_context
