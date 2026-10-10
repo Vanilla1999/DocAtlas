@@ -371,26 +371,56 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
             path_scope_checks += 1
 
             real_run = RetrievalDispatcher.run
-            withheld, retained = [], []
+            acquisitions, retained = [], []
+            retained_path = None
             def one_visible_path(dispatcher, query, *args, **kwargs):
+                nonlocal retained_path
                 result = real_run(dispatcher, query, *args, **kwargs)
-                selected = []
-                for chunk in result.chunks:
-                    metadata = chunk.metadata or {}
-                    current_path = metadata.get("project_doc_path") or metadata.get("source_path")
-                    (selected if current_path == path else withheld).append(chunk)
+                rows = [(chunk, (chunk.metadata or {}).get("project_doc_path")
+                         or (chunk.metadata or {}).get("source_path")) for chunk in result.chunks]
+                require(all(current_path in documents for _, current_path in rows),
+                        "recovery_filename_acquisition_member_binding",
+                        {"paths": [current_path for _, current_path in rows]})
+                # The native store may already deduplicate identical title/body
+                # rows. Keep a real survivor; do not demand both collision paths.
+                if retained_path is None and rows:
+                    retained_path = rows[0][1]
+                selected = [chunk for chunk, current_path in rows if current_path == retained_path][:1]
+                acquisitions.append({
+                    "query": query, "returned_paths": [current_path for _, current_path in rows],
+                    "retained_paths": [retained_path for _ in selected],
+                })
                 retained.extend(selected)
                 return replace(result, chunks=selected)
             with patch.object(RetrievalDispatcher, "run", one_visible_path):
-                rejected(question, "unreturned_collision", "recovery_filename_catalog_ambiguity")
-            require(withheld and retained
-                    and any((chunk.metadata or {}).get("project_doc_path") == "archive/queue-window.md"
-                            for chunk in withheld)
-                    and all((chunk.metadata or {}).get("project_doc_path") == path for chunk in retained),
-                    "recovery_filename_withheld_real_candidates")
-            require(any(sorted(row["canonical_path"] for row in record["reference"]["naming_catalog"]["sources"])
-                        == sorted(documents) for record in prepared),
-                    "recovery_filename_inventory_precedes_acquisition")
+                capture = rejected(question, "unreturned_collision", "recovery_filename_catalog_ambiguity")
+            single_candidate_observation = {
+                "dispatch_calls": len(acquisitions), "acquisitions": acquisitions,
+                "retained_path": retained_path, "retained_chunks": len(retained),
+                "single_candidate_observed": bool(retained), "full_catalog_paths": sorted(documents),
+                "naming_state": source_ref["state"], "naming_source_ids": source_ref["source_ids"],
+            }
+            # The preceding independent path-filter probe always checks one
+            # selected source against both catalog names. A correct public veto
+            # may precede acquisition; it must not be forced to perform a read.
+            if retained:
+                require(retained_path in documents and prepared
+                        and all(record["path"] == retained_path for record in prepared)
+                        and all(len(item["retained_paths"]) <= 1
+                                and set(item["retained_paths"]) <= {retained_path} for item in acquisitions),
+                        "recovery_filename_single_real_candidate",
+                        {"fixture": single_candidate_observation, "capture": capture})
+                require(all(
+                    sorted(row["canonical_path"] for row in record["reference"]["naming_catalog"]["sources"])
+                        == sorted(documents)
+                    and record["reference"]["raw_document"] == documents[retained_path]
+                    and record["reference"]["source"]["content_sha256"] == _digest(documents[retained_path])
+                    and any(row["role"] == "source_locator" and row["state"] == "ambiguous"
+                            and set(row["source_ids"]) == set(source_ref["source_ids"])
+                            for row in record["plan"]["references"])
+                    for record in prepared),
+                    "recovery_filename_inventory_precedes_acquisition",
+                    {"fixture": single_candidate_observation, "capture": capture})
             for collision in ("manual/queue-window.rst", "manual/queue_window.md", "manual/queue window.md"):
                 install({path: body, collision: body})
                 rejected(question, collision, "recovery_filename_catalog_ambiguity")
@@ -398,4 +428,5 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
         "positive_reads": positives, "negative_controls": negatives, "replay_controls": replays,
         "read_only_checks": read_checks, "path_scope_read_only_checks": path_scope_checks,
         "immutable_replay_controls": 13, "preparations": preparations,
+        "single_candidate_acquisition": single_candidate_observation,
     }
