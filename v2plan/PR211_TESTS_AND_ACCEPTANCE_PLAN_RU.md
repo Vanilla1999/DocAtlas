@@ -8,44 +8,47 @@
 ## Состояние исполнения на 2026-10-10
 
 Последний полный фактический прогон — PR HEAD
-`441cdefd2b251d63f716bfa75b053413bbe09c76` (113), merge checkout
-`ceea2571e9847a71515feda4e1e1441fafdede44` с тем же tree.
-На каждом Python3.11/3.12/3.13:
-**6064 PASS /1653 FAIL /0 ERROR /10 SKIP**, всего7727.
-С107 исправлены40 observer failures (2 V2 protocol +38 release);
-collection не менялась. Required CI/P1 остаются FAIL.
+`cadeef515ea78c78338821f38b15fed3bde7c993` (118), merge checkout
+`9f25f147c522d84f61a57abb1d731d2b6e792c9a`, tree
+`62d727c3ffbb35e77f0301d0e961e6f60ed4ebe2`.
+На каждом Python 3.11/3.12/3.13:
+**6065 PASS /1652 FAIL /0 ERROR /10 SKIP**, всего7727.
+С113 исправлен mixed fixture control; collection прежняя.
+Required CI/P1-stack exact остаются FAIL.
 
-P1.5 теперь **7/7**, полный fact coverage6/6, oracle6/6.
-P1.4 остаётся12/14 с двумя original-only discovery failures;
-P1.6 current6/6, retained adversarial24/28.
-Legacy live source-fact acceptance8/15 при принятом floor12/15,
-raw original coverage0. V2 report впервые доступен reader: natural facts6/15,
-paraphrase1/5; production runnerFAIL. REPORT_ONLY не является acceptance.
+Critical теперь **54/54 healthy**, прямой producer step SUCCESS подтверждает
+aggregate 29 intended kills. Recovery **12/12 и 33 kills** по stored summary.
+Installed reviewed-wheel MCP **1/1**, self-test 7/7 и report verification PASS;
+false-supported 0, contamination 0. Реальные client sessions **NOT RUN**.
 
-Critical baseline113:53P/1F из54; mixed detached control падает на
-`critical_mixed_class_control_healthy`/`metadata_only`.
-Recovery11P/1F: fixture требовала оба acquisition candidates, хотя storage
-вправе дедуплицировать одинаковые title/body. Own mutation credit отсутствует.
-Reviewed corrections114–117 исправляют эти две fixtures, добавляют DQP30
-precheck и дают приоритет всем3 compact V2 delivery operands.
-Новый совместный runtime **PENDING**: target critical54/29 и recovery12/33.
+P1.5 — **7/7**, facts 6/6, oracle 6/6. P1.4 — 12/14, discovery 8/10, facts 5/5.
+P1.6 current 6/6; retained adversarial 24/28 и его mutation baseline FAIL.
+Legacy source-fact acceptance 8/15 при floor 12/15, raw original coverage 0.
+V2 natural facts 6/15 и paraphrase 1/5; REPORT_ONLY с production runner FAIL.
 
-Все70 старых DQP cases пока collected (actual25P/45F). После собственного
-healthy baseline и четырёх intended kills двух precheck families возможен
-точный retirement33cases:29→16 definitions,70→37 cases.
-Независимые source/body/condition/scope negatives сохраняются; более широкий
-retirement не объявлен обоснованным только по красному CI.
+Reader 118 разобрал 326 records без ошибок, JUnit console omitted 0.
+Artifact console: 128 selected / 51 printed / 77 omitted; все три compact V2 headers получены,
+но все 29 individual critical mutant receipts отсутствуют в доступном console.
+Retirement 33 DQP cases требует четырёх собственных named/source/import operands;
+aggregate SUCCESS не заменяет их. Все 70 old DQP cases пока collected.
 
-Reader113 дал305 разобранных records без parse errors. JUnit console omitted0;
-artifact console29selected/28printed/1omitted. Полный V2 request-flow не получен
-из доступного console; прежний SHA его не подменяет. Оба доступных cases
-показывают20 member windows и3/1 project/unified windows с delivery eligible.
-Новый reader117 должен дать actual operands всех трёх cases.
-Реальные пользовательские client sessions **NOT RUN**.
+Reviewed119 добавляет relation25 precheck: 2 original plan calls и 1 directed
+generation mutant,0 новых ordinary functions. Все 25 old cases остаются.
+Reviewed120 приоритизирует actual critical/recovery operands и отмечает outcomes
+четырёх существующих lossless cases. Own target: 54 healthy / 30 kills **PENDING**.
+После proof возможны отдельные точные retirements 33 DQP и 25 relation cases;
+unselected body/scope/condition/safety obligations сохраняются.
 
-Подробные receipts, подтверждённые дефекты и следующие действия:
+V2 source audit113 показал: все 3/1 qualified windows доходят до public, missing
+cleanup/infrastructure facts отсеяны на qualification. Actual118 request-flow
+даёт другой blocker: 27 готовых items сокращаются до 20 в control view, затем
+budget_exceeded запрещает delivery. Product fix должен отделить эту границу
+от реальных read/work/call/time bounds и сохранить consent/stale/current guards.
+
+Подробные результаты и следующие действия:
 [checkpoint](PR211_CHECKPOINT_RU.md),
-[actual113](pr211-execution/RUNTIME_EVIDENCE_441cdefd.json).
+[actual118](pr211-execution/RUNTIME_EVIDENCE_cadeef51.json),
+[V2 source audit113](pr211-execution/V2_QUALIFIED_WINDOW_AUDIT_113_RU.md).
 Исходные числа плана ниже остаются привязаны к своим историческим SHA.
 
 ## Поправки после оценки перед исполнением
