@@ -48,6 +48,53 @@ def test_literal_mentions_keep_sha_unicode_offsets_and_occurrences():
     assert all(question[m.start:m.end] == m.text and m.mention_id == f"{digest}:{m.start}:{m.end}" for m in mentions)
     assert next(m for m in mentions if m.text == "docs/Памятка.md").syntax_role == "source_locator"
 
+    # Replay every selected original question; this is 19 pure calls, not a
+    # representative sample. Frozen source files are data, never imported.
+    import json
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    frozen = json.loads((root / "eval/task_level/contract_history/reference_role_inputs.json").read_text(encoding="utf-8"))
+    assert frozen["protocol"] == "reference-role-original-inputs-v1"
+    inputs = frozen["replay_inputs"]
+    assert len(inputs) == 19
+    encoded = json.dumps(inputs, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    assert hashlib.sha256(encoded.encode("utf-8")).hexdigest() == "deef6debbad224f9f3bf0d146654f3b703c3748fc82345058697bd0f91373cf8"
+    for archive_path, source_hash in (
+        ("eval/task_level/contract_history/query_reference_roles.py.txt", "8109bda521861fcc4be5c3be57c42b9a4b63dc38eafbb088247fe60525082aa6"),
+        ("eval/task_level/contract_history/reference_behavior_matrix.py.txt", "1c760ae7be2dffeab5b71a1ccdb30163fc2bb465045048bf235a6b2f227bebcf"),
+    ):
+        assert hashlib.sha256((root / archive_path).read_bytes()).hexdigest() == source_hash
+    for record in inputs:
+        raw_question = record["question"]
+        raw_hash = hashlib.sha256(raw_question.encode("utf-8")).hexdigest()
+        start, end = record["literal_span"]
+        assert raw_hash == record["question_sha256"]
+        assert raw_question[start:end] == record["literal"]
+        current = query_mentions(raw_question)
+        assert all(type(m.start) is int and type(m.end) is int
+                   and type(m.explicit) is bool for m in current)
+        expected = ((record["literal"], start, end, record["expected_role"],
+                     record["expected_explicit"], f"{raw_hash}:{start}:{end}"),)
+        actual = tuple((m.text, m.start, m.end, m.syntax_role, m.explicit, m.mention_id)
+                       for m in current)
+        guard = ("critical_reference_nl_context_keeps_quoted_symbol" if record["expected_explicit"]
+                 else "critical_reference_nl_context_keeps_bare_unresolved")
+        assert (actual == expected if record["occurrence_required"] else actual in ((), expected)), (
+            guard, record["input_index"], actual,
+        )
+        if record["expected_explicit"]:
+            # Catalog nomination belongs to resolve_references. An explicit
+            # backtick symbol remains a symbol even on an exact stem collision.
+            plan = resolve_references(raw_question,
+                catalog=[catalog("docs/ArgonGuide.md", "argon-guide")], scope=SCOPE)
+            ref, = plan.references
+            assert plan.question == raw_question and plan.scope == SCOPE
+            assert ref.mention == current[0]
+            if record["source_parameters"]["quote"] == "`":
+                assert (ref.role, ref.state, ref.source_ids) == ("symbol_identity", "resolved", ())
+            else:
+                assert (ref.role, ref.state, ref.source_ids) == ("source_locator", "resolved", ("argon-guide",))
+
 
 @pytest.mark.parametrize("literal", ["docs/Guide.md", r"docs\Guide.md", "./docs/Guide.md", "Guide.md", "GUIDE.MD", '"Guide"', '"GUIDE"'])
 def test_catalog_path_basename_stem_casefold_are_literal_resolution(literal):

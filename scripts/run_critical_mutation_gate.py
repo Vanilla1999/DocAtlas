@@ -34,8 +34,9 @@ TARGET_TESTS = (
     "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
     "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
     "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+    "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -492,6 +493,24 @@ MUTANTS = (
         TARGET_TESTS[11],
         1,
         "critical_project_read_distinct_lookup_units",
+    ),
+    Mutant(
+        "reference_nl_context_cannot_promote_bare_locator",
+        "docmancer/docs/domain/query_reference_binding.py",
+        "            role = \"symbol_identity\" if any(c in value for c in \"._/:+-\") else \"unresolved\"",
+        "            role = \"symbol_identity\" if any(c in value for c in \"._/:+-\") else \"unresolved\"\n            if role == \"unresolved\" and \"in the file\" in question:\n                role = \"source_locator\"",
+        TARGET_TESTS[16],
+        1,
+        "critical_reference_nl_context_keeps_bare_unresolved",
+    ),
+    Mutant(
+        "reference_nl_context_cannot_promote_quoted_stem",
+        "docmancer/docs/domain/query_reference_binding.py",
+        "        path = suffix in DOCUMENT_SUFFIXES",
+        "        path = suffix in DOCUMENT_SUFFIXES or \"in the file\" in question[:start]",
+        TARGET_TESTS[16],
+        1,
+        "critical_reference_nl_context_keeps_quoted_symbol",
     ),
 )
 
