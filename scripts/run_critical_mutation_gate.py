@@ -28,8 +28,9 @@ TARGET_TESTS = (
     "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
     "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
     "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
+    "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -58,6 +59,21 @@ TARGET_MODULES = (
     "eval.task_level.evaluators.actionability",
     "eval.task_level.github_models",
     "eval.task_level._github_models_part02",
+    "docmancer.docs.application.mixed_context_projection",
+    "docmancer.docs.application.model_visible_projection",
+    "docmancer.docs.application._docs_context_projection_core",
+    "docmancer.docs.interfaces.mcp.context_tools",
+    "docmancer.docs.application._project_docs_service_part03",
+    "docmancer.docs.application._unified_context_service_part01",
+    "docmancer.docs.models",
+    "docmancer.docs.domain.literal_context_admission",
+    "docmancer.core.member_read_store",
+    "docmancer.core.sqlite_store",
+    "docmancer.mcp._docs_server_part01",
+    "docmancer.retrieval.dispatch",
+    "eval.agent_developer_v1.finite_http_fixture",
+    "eval.agent_developer_v1.current_retrieval_runtime",
+    "eval.evidence_quality_v2.runtime",
 )
 
 
@@ -273,6 +289,51 @@ MUTANTS = (
         TARGET_TESTS[3],
         1,
         "critical_context7_no_topic_router_aliases",
+    ),
+    Mutant(
+        "mixed_project_context_hook",
+        "docmancer/docs/application/model_visible_projection.py",
+        "    payload, snapshot = retain_mixed_project_context(\n        question=question, retrieval=retrieval, payload=payload, snapshot=snapshot,\n    )",
+        "    payload, snapshot = payload, snapshot  # mutation: omit admitted mixed project context",
+        TARGET_TESTS[10],
+        1,
+        "critical_mixed_both_lanes",
+    ),
+    Mutant(
+        "mixed_current_request_root",
+        "docmancer/docs/application/mixed_context_projection.py",
+        "    if not requested_root.is_absolute() or \"..\" in requested_root.parts or str(requested_root) != root:\n        return None",
+        "    if False:  # mutation: ignore the current request root\n        return None",
+        TARGET_TESTS[10],
+        1,
+        "critical_mixed_request_root",
+    ),
+    Mutant(
+        "mixed_resolved_module_filter",
+        "docmancer/docs/application/mixed_context_projection.py",
+        "        or scope[\"module_path\"] is not None and item.get(\"module_path\") != scope[\"module_path\"]",
+        "        or False  # mutation: ignore the producer-resolved module",
+        TARGET_TESTS[10],
+        1,
+        "critical_mixed_resolved_module",
+    ),
+    Mutant(
+        "mixed_project_full_quote",
+        "docmancer/docs/application/mixed_context_projection.py",
+        "            projected = {key: source[key] for key in sorted(DOCS_SOURCE_FIELDS)}",
+        "            projected = {key: source[key] for key in sorted(DOCS_SOURCE_FIELDS)}\n            projected[\"snippet\"] = projected[\"snippet\"][:-1]",
+        TARGET_TESTS[10],
+        1,
+        "critical_mixed_full_fact",
+    ),
+    Mutant(
+        "mixed_scope_original_query",
+        "docmancer/docs/application/_project_docs_service_part03.py",
+        "            \"schema_version\": 1,\n            \"query\": query,\n            \"project_path\": str(root),",
+        "            \"schema_version\": 1,\n            \"query\": query + \" ignored\",\n            \"project_path\": str(root),",
+        TARGET_TESTS[10],
+        1,
+        "critical_mixed_scope_producer",
     ),
 )
 
