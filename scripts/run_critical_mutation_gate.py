@@ -335,6 +335,24 @@ MUTANTS = (
         1,
         "critical_mixed_scope_producer",
     ),
+    Mutant(
+        "documentation_plan_keeps_duplicate_lookup_slots",
+        "docmancer/docs/domain/documentation_query_plan.py",
+        "    for index, text in enumerate(lookup_queries[:5], 1):",
+        "    for index, text in enumerate(tuple(dict.fromkeys(lookup_queries))[:5], 1):",
+        TARGET_TESTS[3],
+        1,
+        "critical_explicit_lookup_duplicate_slots",
+    ),
+    Mutant(
+        "documentation_plan_keeps_fifth_lookup_slot",
+        "docmancer/docs/domain/documentation_query_plan.py",
+        "    for index, text in enumerate(lookup_queries[:5], 1):",
+        "    for index, text in enumerate(lookup_queries[:4], 1):",
+        TARGET_TESTS[3],
+        1,
+        "critical_explicit_lookup_fifth_slot",
+    ),
 )
 
 

@@ -6,7 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan, technical_anchors
 from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +23,18 @@ _CONTEXT7_ROSTER_SHA256 = "39591084bef65604349d5f6237066b9a2492c1d83c4f38dbf033b
 _CONTEXT7_INPUT_SHA256 = "eb8a4ac593d8659f59a8081d5140109dd2684b5a23c3abd9c66c198fcd9820c6"
 _PRIOR_QUESTIONS_SHA256 = "fad4c95805cf51cd3257f244b00c81d3be13a6b116efa962904dd555d1aaa186"
 _ALL_QUESTIONS_SHA256 = "77a8c8ff1372debd437a24fe1ca43ffeff6c9453907dfd534cd71714205ed7e1"
+
+_PLAN_INPUT_CROSSWALK = "eval/task_level/contract_history/documentation_query_plan_explicit_inputs.json"
+_PLAN_INPUT_ARCHIVE = "eval/task_level/contract_history/documentation_query_plan_explicit_inputs.py.txt"
+_PLAN_INPUT_ORIGINAL = "tests/docs/test_documentation_query_plan.py"
+_PLAN_INPUT_FUNCTIONS = (
+    "test_documentation_query_plan_owns_public_retrieval_query_ids",
+    "test_documentation_query_plan_owns_retrieval_only_alias_lineage",
+    "test_same_text_lookups_retain_independent_public_and_canonical_ids",
+)
+_PLAN_INPUT_SOURCE_SHA256 = "bb96a79c3005efd943b4f5bb11b4b8fdaf17c5d5cfcae871968870b55e0b9109"
+_PLAN_INPUT_ROSTER_SHA256 = "7577838d21c2121b60804f1e1c798cd5f87303477bb96ca5b0f801a5f12e23d1"
+_PLAN_INPUT_RECORDS_SHA256 = "ee96d2abc69481735513a82a70a7db2d6b3729fb5612db2b6e7247292591d3c5"
 
 
 def _input_digest(value):
@@ -85,6 +97,77 @@ def _context7_questions(prior_questions):
         assert ast.dump(working_selected[0], include_attributes=False) == ast.dump(
             function, include_attributes=False)
     return questions
+
+
+def _explicit_plan_inputs():
+    crosswalk = json.loads((_ROOT / _PLAN_INPUT_CROSSWALK).read_text(encoding="utf-8"))
+    assert crosswalk["source"]["original_path"] == _PLAN_INPUT_ORIGINAL
+    assert crosswalk["source"]["archive_path"] == _PLAN_INPUT_ARCHIVE
+    frozen = (_ROOT / _PLAN_INPUT_ARCHIVE).read_bytes()
+    assert hashlib.sha256(frozen).hexdigest() == crosswalk["source"]["sha256"] == _PLAN_INPUT_SOURCE_SHA256
+    archived_nodes = ast.parse(frozen.decode("utf-8")).body
+    functions = [node for node in archived_nodes
+                 if isinstance(node, ast.FunctionDef) and node.name.startswith("test_")]
+    counts = []
+    for function in functions:
+        count = 1
+        for decorator in function.decorator_list:
+            assert isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute)
+            assert decorator.func.attr == "parametrize"
+            count *= len(ast.literal_eval(decorator.args[1]))
+        counts.append(count)
+    assert len(functions) == 29 and sum(counts) == 70
+    selected = [node for node in functions if node.name in _PLAN_INPUT_FUNCTIONS]
+    assert [node.name for node in selected] == list(_PLAN_INPUT_FUNCTIONS)
+    actual = [{
+        "original_nodeid": _PLAN_INPUT_ORIGINAL + "::" + function.name,
+        "definition_line": function.lineno,
+        "source_lines": [function.lineno, function.end_lineno],
+        "collected_cases": 1,
+    } for function in selected]
+    assert actual == crosswalk["selected_functions"]
+    identity = "\n".join(
+        f'{row["original_nodeid"]}:{row["source_lines"][0]}-'
+        f'{row["source_lines"][1]}:{row["collected_cases"]}' for row in actual
+    )
+    assert hashlib.sha256(identity.encode("utf-8")).hexdigest() == (
+        crosswalk["frozen_selected_roster_sha256"]) == _PLAN_INPUT_ROSTER_SHA256
+    records = crosswalk["inputs"]
+    assert len(records) == 3
+    assert _input_digest(records) == crosswalk["frozen_input_roster_sha256"] == _PLAN_INPUT_RECORDS_SHA256
+    for index, (function, record) in enumerate(zip(selected, records, strict=True)):
+        assert not function.decorator_list
+        call, = [
+            node for node in ast.walk(function) if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name) and node.func.id == "build_documentation_query_plan"
+        ]
+        assert len(call.args) == 1
+        keyword, = call.keywords
+        assert keyword.arg == "lookup_queries"
+        question, lookups = ast.literal_eval(call.args[0]), ast.literal_eval(keyword.value)
+        assert isinstance(question, str) and isinstance(lookups, tuple)
+        assert all(isinstance(value, str) for value in lookups)
+        assert len(lookups) == (5, 1, 3)[index]
+        assert record["case_index"] == index and record["original_nodeid"] == actual[index]["original_nodeid"]
+        assert record["question"] == question and record["lookup_queries"] == list(lookups)
+        assert record["question_sha256"] == hashlib.sha256(question.encode("utf-8")).hexdigest()
+        assert record["lookup_sha256s"] == [hashlib.sha256(value.encode("utf-8")).hexdigest() for value in lookups]
+
+    # Preserve every unselected test/import/helper; do not execute the archive.
+    # Selected tests remain live for precheck and may leave only in a later reviewed slice.
+    working_nodes = ast.parse((_ROOT / _PLAN_INPUT_ORIGINAL).read_text(encoding="utf-8")).body
+    def selected_node(node):
+        return isinstance(node, ast.FunctionDef) and node.name in _PLAN_INPUT_FUNCTIONS
+    assert [ast.dump(node, include_attributes=False) for node in working_nodes if not selected_node(node)] == [
+        ast.dump(node, include_attributes=False) for node in archived_nodes if not selected_node(node)
+    ]
+    working_selected = [node for node in working_nodes if selected_node(node)]
+    assert len(working_selected) in (0, 3)
+    if working_selected:
+        assert [ast.dump(node, include_attributes=False) for node in working_selected] == [
+            ast.dump(node, include_attributes=False) for node in selected
+        ]
+    return records
 
 
 def test_current_alias_boundary_preserves_explicit_queries_without_inference():
@@ -162,6 +245,30 @@ def test_current_alias_boundary_preserves_explicit_queries_without_inference():
             assert row.need_subject is row.need_relation is row.need_context is None
         assert explicit.component_contract == () and explicit.component_scope_complete is False
         assert explicit.as_payload()["required_query_ids"] == ["query-original"]
+
+    # These three unchanged request fixtures add five-slot and duplicate-slot coverage.
+    # Expected rows are frozen literal records, not an instance using producer defaults.
+    for record in _explicit_plan_inputs():
+        plan = build_documentation_query_plan(
+            record["question"], lookup_queries=tuple(record["lookup_queries"]),
+        )
+        rows = [[row.query_id, row.text, row.origin, row.relation, row.coverage_required]
+                for row in plan.queries]
+        assert rows == record["expected_rows"], record["guard"]
+        payload = plan.as_payload()
+        assert plan.original_question == payload["original_question"] == record["question"], record["guard"]
+        assert [[row["query_id"], row["text"], row["origin"], row["relation"], row["coverage_required"]]
+                for row in payload["queries"]] == record["expected_rows"], record["guard"]
+        assert payload["query_ids"] == payload["public_query_ids"] == record["expected_public_query_ids"], record["guard"]
+        assert payload["required_query_ids"] == record["expected_required_query_ids"], record["guard"]
+        assert not plan.explicit_paths and not plan.component_contract and plan.component_scope_complete is False
+        for row in plan.queries:
+            assert row.public_parent_query_id is None
+            assert row.preferred_catalog_roles == row.forbidden_catalog_roles == ()
+            assert row.forbidden_evidence_terms == row.parent_exact_terms == ()
+            assert row.need_subject is row.need_relation is row.need_context is None
+        for literal in record["required_literal_identifiers"]:
+            assert literal in technical_anchors(record["question"]), "critical_explicit_query_literal_identity"
 
     # A real nonempty alias DTO produced by the directed production mutant must
     # fail here. Blanketing the query plan with an empty result fails above.
