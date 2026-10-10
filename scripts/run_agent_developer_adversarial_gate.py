@@ -109,11 +109,26 @@ def self_test() -> dict[str, Any]:
                           "project": {"project_path": str(root), "project_docs": {"modules": [
                               {"module_path": "packages/auth"}, {"module_path": "services/auth"},
                           ]}}}
+        raw_fidelity_checks = []
+        for path, ending, changed_ending in (
+            ("raw-lf.md", "\n", "\r\n"), ("raw-crlf.md", "\r\n", "\n"),
+        ):
+            text = "Raw λ source fact."
+            (root / path).write_bytes(("# Raw source" + ending + ending + text + ending).encode("utf-8"))
+            row = {**good["sources"][0], "path_or_url": path, "snippet": text + ending}
+            raw_fidelity_checks.append(not base._source_fidelity_mismatches({"sources": [row]}, root))
+            for changes in (
+                {"line_start": 1, "line_end": 1},
+                {"line_end": 4},
+                {"snippet": text + changed_ending},
+            ):
+                raw_fidelity_checks.append(bool(base._source_fidelity_mismatches(
+                    {"sources": [{**row, **changes}]}, root)))
         checks = [
             ("serialized_cost_measured", _projection_tokens({"estimated_tokens": 0, "sources": ["x" * 1000]}, "") > 250
              and _projection_tokens({"estimated_tokens": 1}, "") > 1),
             ("source_quote_fidelity", not base._source_fidelity_mismatches(good, root)
-             and bool(base._source_fidelity_mismatches(bad, root))),
+             and bool(base._source_fidelity_mismatches(bad, root)) and all(raw_fidelity_checks)),
             ("forbidden_source", _contaminated_sources(("docs/a.md", "docs/b.md"), ("docs/b.md",)) == ("docs/b.md",)
              and not _contaminated_sources(("docs/a.md",), ("docs/b.md",))),
             ("exact_scope", not _scope_matches({"scope": "module", "module_path": "packages/orders"}, {"scope": "project"})

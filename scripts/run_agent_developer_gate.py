@@ -356,13 +356,14 @@ def _source_fidelity_mismatches(payload: dict[str, Any], project: Path) -> list[
         if source is None or not source.is_file():
             errors.append("source_fidelity: source is outside the authored fixture")
             continue
-        original = source.read_text(encoding="utf-8")
+        original = source.read_bytes().decode("utf-8")
+        lines = original.splitlines(keepends=True)
         snippet = row.get("snippet")
         start, end = row.get("line_start"), row.get("line_end")
         if (not isinstance(snippet, str) or not snippet.strip()
                 or type(start) is not int or type(end) is not int
-                or not 1 <= start <= end <= len(original.splitlines())
-                or snippet not in "\n".join(original.splitlines()[start - 1:end])):
+                or not 1 <= start <= end <= len(lines)
+                or snippet not in "".join(lines[start - 1:end])):
             errors.append("source_fidelity: quote or coordinates changed")
         identity = "local:" + hashlib.sha256(str(project.resolve()).encode()).hexdigest()
         if row.get("project_identity") != identity:
