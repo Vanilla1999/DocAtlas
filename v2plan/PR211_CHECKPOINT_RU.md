@@ -1,12 +1,12 @@
 # PR #211: checkpoint продолжения
 
-Обновлено: 2026-10-10 04:06 UTC.
+Обновлено: 2026-10-10 04:38 UTC.
 
 **PR пока не готов к merge.** Последний завершённый фактический CI:
-PR HEAD `c2a6682d2438c9217c3bf26938dcd003391dbc75` (121),
-merge checkout `642a14289fddd06408400b4ee6cc5480945e7d1a`,
-общий tree `89106f59cf181510a25ee8b667a9ff4966a82fd6`.
-Reviewed пакет122–125 описан ниже; его собственный runtime **PENDING**.
+PR HEAD `d76f6ab85e12f482ad6bec1d43040899f4b0a532` (126),
+merge checkout `8120a80bbb0309a3ec0bf4add71f568666c76772`,
+общий tree `63bff21aadbfb131082db075ed95ea7e89310e44`.
+Reviewed пакет127–129 ниже; его собственный runtime **PENDING**.
 
 ## Действующие решения
 
@@ -18,7 +18,7 @@ Reviewed пакет122–125 описан ниже; его собственны�
   intended mutation proof и сохранности helpers/imports/selectors/archive.
 - Legacy acceptance по ADR0003: полный frozen fact coverage исходных cases
   с floor **12/15**. Raw original-query coverage — отдельная метрика;
-  lookup/parent credit не повышает её. Миграция явно версионирована.
+  lookup/parent credit не повышает её.
 - Реальные Claude Code/Codex/OpenCode sessions **NOT RUN**. Installed SDK/stdio
   подтверждает CI transport, но не эти клиентские sessions.
 - Локальные runtime/import/pytest/AST/install не выполняются. Используются
@@ -30,130 +30,138 @@ Reviewed пакет122–125 описан ниже; его собственны�
 Решения: [CURRENT_WAVE_DECISIONS_RU.md](CURRENT_WAVE_DECISIONS_RU.md).
 Старый local checkout не является актуальной базой.
 
-## Фактический CI: 121
+## Фактический CI: 126
 
-[Main run](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993).
-[P1-stack](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021213074).
-[Acceptance reader](https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950).
-[Точные selected runtime records121](pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json).
+[Main run](https://github.com/Vanilla1999/DocAtlas/actions/runs/38023053227).
+[Acceptance reader](https://github.com/Vanilla1999/DocAtlas/actions/runs/38023053227/job/114129755653).
+[Selected runtime records126](pr211-execution/RUNTIME_EVIDENCE_d76f6ab8.json).
 
 На **каждом** Python3.11/3.12/3.13:
-**7727 = 6065 PASS /1652 FAIL /0 ERROR /10 SKIP**.
+**7669 = 6062 PASS /1597 FAIL /0 ERROR /10 SKIP**.
 Матрица не складывается в один baseline; JUnit integrity issues пусты.
-Это те же counts, что на118. Удаление58 cases выполнено позже, в123.
 
 | Python | SHA-256 JUnit |
 | --- | --- |
-|3.11|`184cd15117d6f42b743c4c56d32ac9111bc949ac5e9560ee6fdc0b855d47d93d`|
-|3.12|`db291c4e5eecd8828995ff6a192a1e0039769eea18c0464c0a65112455237663`|
-|3.13|`4c026aee08d93073b0df18c87f76b5b60fcd1f40b93ace99e139cdf0324474bd`|
+|3.11|`12808a98f9ef5984147f608dbaba49797e2da3783c2e4b6d2f718a1b43cd6a01`|
+|3.12|`572802584bf65241d32bcaea66ddab45d9f8124c11282c923fc2a52d1aa0ab9a`|
+|3.13|`44843fefc212d45ec252da461bc67a4b601a21709fcc3eb66910bad0891bf0b4`|
 
-| Gate | Actual121 | Граница доказательства |
+Collection уменьшился ровно на58 после retirement123: DQP70→37,
+relation72→47. Их PASS counts сохранились25 и23. Относительно121 появились
+ещё три FAIL: native24-window fixture и два retention cases. Имена двух новых
+retention failures в старом compact reader не напечатаны; они не объявлены
+миграциями ожиданий без traceback. Slice127 расширяет только диагностику.
+
+| Gate | Actual126 | Граница доказательства |
 | --- | --- | --- |
-|Critical|**54P/0F/0E/0S;30 intended kills**|Все individual priority records доступны; нужные DQP4+relation1 guards/source/import hashes независимо проверены.|
-|Recovery baseline|**12P/0F/0E**|Свой baseline здоров.|
-|Recovery mutations|**FAIL**|filename-collision-first-winner пойман другим guard; полного33-kill summary на121 нет.|
-|Literal historical/compact comparison|SUCCESS|Собственный existing producer step16 на том же checkout.|
-|Lossless core projection|**32/32** на каждом Python|Все четыре будущих cap killer cases отдельно напечатаны как PASS; новые cap faults ещё не выполнялись.|
-|Legacy live|Source-fact acceptance **8/15**, raw original coverage0|Floor12/15 не достигнут; report FAIL.|
-|V2 live|Natural facts6/15; paraphrase1/5|REPORT_ONLY; production runner FAIL.|
-|Agent Developer|v1:8target-closed/11;4target gaps. Adversarial24/28|false_supported0, contamination0; полезный context для части исходных задач отсутствует.|
-|Installed MCP / retrieval evidence / platforms|SUCCESS|Завершённые jobs121; это не реальные Claude/Codex/OpenCode sessions.|
-|Build / exact wheel / sdist installer|SUCCESS в P1-stack|Это отдельные packaging/installed jobs.|
-|P1.4 / P1.6 / closure|FAIL|P1.5 SUCCESS. Подробные numbers предыдущего118 не выдаются за новые individual121 receipts.|
-|Required CI / P1-stack exact|**FAIL**|Core и advanced остаются красными.|
+|Critical baseline|59 entries,58P/1F|Native fixture: `critical_project_read_acquired_qualified`. Guard повторяется на нескольких operands; точный первый operand в126 console отсутствует.|
+|Critical mutations|**не выполнены**|Baseline блокирует цикл; нового35-kill proof нет.|
+|Recovery|**12P и33 intended kills**|Все33 per-mutant outcomes сверены с собственными case/guard:0P/1F/0E; priority omissions0.|
+|Literal historical/compact comparison|SUCCESS|Existing step16. Individual51-fault receipts ещё не доступны в console; aggregate не разрешает новое retirement.|
+|Lossless core projection|**32/32** на каждом Python|Все4 cap killer cases PASS; их4 новые faults не выполнены из-за critical baseline.|
+|Legacy live|Source-fact acceptance **8/15**, raw original coverage0|Floor12/15 не достигнут; reportFAIL.|
+|V2 live|Natural facts6/15; paraphrase1/5|REPORT_ONLY; production runnerFAIL. Request flow2/4facts; есть precision/contamination failure.|
+|Agent Developer|v1:8target-closed/11,4gaps; adversarial24/28|false_supported0, contamination0 в этих agent fixtures; baseline не target-green.|
+|P1.4|12/14cases,8/10discovery,5/5complete facts; execution errors0|Два ordinary original-only cases FAIL;5/5oracle selftests.|
+|P1.5|SUCCESS|Отдельный текущий run38023053171.|
+|P1.6|Public delivery6/6,complete facts1/1,oracle6/6|Общий jobFAIL: Agent Developer gaps и adversarial baseline.|
+|Installed MCP / retrieval evidence / platforms|SUCCESS|Installed selftests7/7,deterministic scripted task1/1; реальные client sessions NOT RUN.|
+|Required CI / P1-stack exact / closure|**FAIL**|Core, advanced и quality остаются красными.|
 
-Hermetic16/16 проверяет literal query identity без retrieval.
-Legacy raw report8/16 и positive7/15 отличаются от принятого source-fact oracle8/15.
-Agent Developer v1 полностью исполнил11tasks; проблемы setup не подменяются текущими quality gaps.
+Hermetic16/16 проверяет literal query identity без retrieval. P1.6 public delivery
+и installed transport не подменяют полное quality acceptance.
 
-Reader:591931 UTF-8 bytes, SHA-256
-`f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397`.
-Разобраны407 JSON records без ошибок. JUnit console omitted0.
-Critical priority31 records (baseline+30), recovery priority27, пропущено0.
-Остальных artifact rows не напечатано41 из170 selected.
-Все три V2 compact headers получены.
+Reader:592758 UTF-8 bytes, SHA-256
+`5ba00eacb3e432d650c6ef6d5f396db286397487189436fbdeec90940e5042a1`.
+Разобраны357 JSON records без ошибок. JUnit console omitted0.
+Recovery priority35 records (два baseline reports и33 mutants), пропущено0.
+Critical baseline доступен; individual critical mutant records отсутствуют.
+Остальных artifact rows не напечатано55 из133 selected.
+Новый receipt содержит59 selected records, все33 intended outcomes, jobs и short-log hashes:
+122030 bytes, SHA-256 `02105cf8680d81e65be9ed073e6ee3fd0e68ca50a3ea2dea00c35448b96a6990`.
 
-Receipt сохраняет все31 critical records,27 recovery,3 JUnit counts и provenance/omissions.
-SHA-256 `d672705adec2e132a91dc894af261a688405addf9cbc06e7fc0051fd33a52d57`;
-144504 UTF-8 bytes. Это selected parsed records, не полный diagnostic ledger.
-Все42 baseline import rows получены отдельным probe subprocess, **не same-pytest-process attestation**.
+Полная независимая пересверка всех source/import operands33 recovery mutants
+этим receipt не заявляется: console сохраняет все outcomes, но только часть
+подробных module records. Проверки самого CI writer и read-only review receipt
+различаются. Separate import probe не является same-pytest-process attestation.
 
-## Применённый reviewed пакет122–125
+## Применённый reviewed пакет127–129
 
-| Slice | Commit | Изменение и состояние |
+| Slice | Commit | Изменение |
 | --- | --- | --- |
-|122|`85fdb5166e24e071b8a9b616895043819ac526ea`|Сохранение admitted acquired project windows после bounded control; native24-window control и1fault. Own runtime pending.|
-|123|`4bc25f9b543ef8ac6c0f508aaf339c9ddad8cf54`|Удалены58 superseded compiler cases после собственного54/30 proof: DQP33 и relation25; архивы/helpers/guards сохранены. Post-removal runtime pending.|
-|124|`d5811c8fc703073b21c2a2dd623c36f5f3b5307f`|Детерминированный filename collision guard по actual full naming plan, без смены expected guard/production/33mutants. Runtime pending.|
-|125|`8552d125be7eef93c880592f71106b810c96dc48`|4направленных cap faults и2existing selectors (1+3cases);0new ordinary cases. Joint target59healthy/35kills pending.|
+|127|`e6babced683c005303af597a79878ecd13e54c90`|Два source-proven fixture hash-domain fixes: public project hash и snapshot hash имеют prefix `sha256:`, SQL/display hashes — raw. Добавлены failure traces и два focused modules в existing reader.|
+|128|`23af9fc5b5934bc651e40f510ec90c88e1642dcc`|Original-only project partial-body context с current native receipt, без answer/original-coverage grant. Independent native controls и6 directed recovery faults.|
+|129|`e8929ae6d3bf0bc571aafffa52d29366d4c00da8`|Четыре frozen relation source-context reads внутри existing privacy test;+1existing critical selector/+2faults. Оставшиеся47 witness cases не удалены.|
 
-Каждый code slice имеет root и независимый peer review; локальных запусков нет.
+Joint targets: **critical60healthy/37intended kills; recovery12healthy/39intended kills**.
+Это targets следующего запуска, не фактический PASS.
+Новых pytest test names пакет127–129 не добавляет; внутренние native calls
+учтены в соответствующих notes и не выдаются за бесплатную проверку.
 
-- [Project window delivery](pr211-execution/PROJECT_READ_PRESENTATION_RU.md).
-- [Retirement58 и audit118 файлов](pr211-execution/COMPILER_RETIREMENT_58_RU.md).
-- [Filename guard](pr211-execution/FILENAME_COLLISION_PLAN_GUARD_RU.md).
-- [Output cap precheck](pr211-execution/OUTPUT_CAP_MUTATION_PRECHECK_RU.md).
+- [Hash domains и диагностика](pr211-execution/PROJECT_READ_HASH_DOMAINS_RU.md).
+- [Ordinary body contract](PR211_ORDINARY_PARTIAL_BODY_ADMISSION_RU.md).
+- [Relation source-context precheck](pr211-execution/RELATION_SOURCE_CONTEXT_PRECHECK_RU.md).
+- [Retirement58 с собственным121 proof](pr211-execution/COMPILER_RETIREMENT_58_RU.md).
+- [Четыре cap faults](pr211-execution/OUTPUT_CAP_MUTATION_PRECHECK_RU.md).
 
-DQP теперь16definitions/37cases; relation4definitions/47cases.
-Все5 DQP negative rows, relation helpers `CASES/probe/qualify`, source-policy15,
-conditional3/native5 и safety26 сохраняются.
-Ожидаемое новое core collection:7727−58=7669; фактического post-removal результата ещё нет.
-Статическое уменьшение roster не является измерением ускорения.
+## Оставшиеся причины
 
-## Оставшиеся причины и границы
+### Качество и объём выдачи
 
-### Request flow
+В126 V2 natural выдаёт41source суммарно,max18; max16744public UTF-8bytes,
+max4186estimated tokens. Это наблюдения, не ceilings. Full facts остаются6/15.
+Request-flow теперь доставляет MCP/gateway facts, но application/selection facts
+не доставлены; verdict2/4. Production runner также сообщает
+`no_packs_contamination` и `only_allowed_sources` failures.
+Результат нельзя считать безрегрессионным по качеству только потому, что он
+сохраняет больше admitted windows. Нужны current source/body/ownership причины
+и исправление полезности/precision; caps и weakened oracle не возвращаются.
 
-Actual118: member31 windows/15qualified → Project и Unified20/9.
-Control stage27items/18457bytes →20/12016, budget_exceeded=True.
-Этот post-acquisition view overflow блокировал delivery при status=success и отсутствии consent.
-Slice122 сохраняет отдельный admitted presentation pack, оставляя bounded control,
-source hashes/catalog membership, consent/stale/dependency и реальные work bounds.
-Нативный fixture требует24→control20→Project/Unified24 и полные байты каждого
-реально выбранного public source. **24 публичных источника не обещаются**:
-отдельное downstream правило no_new_direction ещё может сокращать presentation.
+Legacy8/15, V2 architecture/cache-reset и четыре Agent Developer target gaps
+остаются открытыми. В source обнаружено возможное несовпадение span domains:
+reference probe использует `evidence_text.strip()`, а closed-literal admission
+сравнивает span с длиной raw native chunk. Завершающий LF может блокировать
+полезный body; ведущие whitespace требуют правильного raw offset.
+Это source-level finding, не доказанный runtime first operand и не готовый fix.
+Comparison task требует отдельного анализа.
 
-### Cache reset / architecture и original-only P1.4
+### Ordinary partial-body admission
 
-[Аудит exact113](pr211-execution/V2_QUALIFIED_WINDOW_AUDIT_113_RU.md):
-все3/1 qualified windows дошли до public. Нужные cleanup/infrastructure paragraphs
-были найдены, но не qualified. Их нельзя объявить исправленными retention patch.
+Slice128 разрешает только ordinary original project read, полученный этим
+синхронным MCP handler из подготовленного current member store. В одной
+substantive source clause нужен contiguous span исходного вопроса с двумя
+различными content words; нельзя перескакивать через другие content words
+или соединять независимые clauses. Полный acquired window сохраняется.
+Технические/literal/path/numeric/operator вопросы остаются в строгих lanes.
+Private request context связывает root/member/generation/source/hash/window
+и закрывается при нормальном и аварийном выходе.
+Весь original остаётся missing; answer/edit false. Modifier вне span не доказан.
+Scoped, replay, metadata, split-clause, single-hit и hostile controls не снимаются.
+Нужны собственные P1.4 и12/39 runtime results.
 
-Разрабатывается отдельный versioned ordinary partial-body admission для двух
-original-only P1.4 случаев: order drafts before upload и project network retries.
-Дизайн требует actual same-call native discovery, finite current catalog/source,
-exact body/hash/span/scope и двух последовательных content words исходного вопроса
-в одной substantive source clause. Generated queries, synonyms, stemming и
-original/answer/edit grants не добавляются. Весь исходный вопрос остаётся missing.
-Технические/literal/path вопросы сохраняют старые строгие lanes.
-Этот draft ещё не входит в reviewed122–125 и требует native controls/ADR/review.
-Обычный modifier вне доказанного span не получает answer credit; frozen literal/lunar
-negative controls и single-hit/metadata/split-clause запреты сохраняются.
+### Сокращение тестов
 
-### Recovery
-
-В121 first-winner mutant встретил `recovery_filename_path_selection_not_naming_scope`
-вместо `recovery_filename_catalog_ambiguity`. По source сортировка opaque source IDs
-и удаление одинаковых title/body могли выбрать разных members; actual winner неизвестен.
-Slice124 проверяет уже вычисленный полный naming plan до public no-source assertion.
-Все12case names,33mutants и их intended guards сохранены. Нужен собственный новый12/33 PASS.
+DQP16definitions/37cases, relation4definitions/47cases.
+Один старый DQP default3/800 test остаётся collected до четырёх собственных cap kills.
+Оставшиеся47 relation нельзя удалить по этому precheck: source-policy15,
+condition3/native5 и исторические negative obligations требуют точного crosswalk.
+Question-plan v4: рассматривается reuse существующих literal/span/dictionary
+successors для26 obsolete semantic cases; два literal/code-span cases сохраняются.
+Own evidence, archive обоих файлов и import/selector audit ещё нужны.
+Причина FAIL сама по себе не разрешает удаление.
 
 ## Следующие действия
 
-1. Опубликовать reviewed122–125 и этот checkpoint обычным fast-forward обоих
-   implementation/pr211-merge-readiness и integration/stage3-v2-identity-pr1.
-   Проверить новый CI merge SHA/tree и фактические required/downstream jobs.
-2. Проверить own59healthy/35intended critical kills, recovery12/33, lossless
-   controls, exact58 removal и native24-window delivery; сохранить individual receipts.
-3. Только после четырёх новых cap kills отдельным slice удалить старый
-   `test_context_budget_is_a_product_invariant`, обновив precise AST state,
-   crosswalk и owning node hash. Этот один старый3/800 test пока collected.
-4. Довести ordinary partial-body slice с независимыми native positives/negatives
-   и scoped receipt; не менять frozen questions/facts/host lookups.
-5. Продолжить remaining relation47 и другие failing families через независимые
-   original-task/source controls, не удалять их только из-за красного CI.
-   Завершить quality/required/downstream и необходимые installed/client acceptance.
+1. Fast-forward обоих refs с reviewed127–129 и этим checkpoint; проверить
+   merge SHA/tree нового existing PR CI.
+2. Проверить60/37critical,12/39recovery,P1.4,retention traces и required/downstream;
+   сохранить individual receipts. Исправить действительные first failures.
+3. После четырёх cap kills отдельным узким slice убрать default3/800 test,
+   обновить precise AST preservation, crosswalk и owning node hash.
+4. Довести raw source-span correction и Agent/V2 gaps на неизменных questions/facts;
+   не добавлять implicit queries, source-policy исключения или output ceilings.
+5. Продолжить retirement remaining relation/question-plan через reused own proof;
+   завершить quality,required CI и необходимые installed/client acceptance.
 
-Исторические actual118 и113 сохранены в соответствующих receipts. Статический
-APPROVE, старый SHA или aggregate SUCCESS не заменяют отсутствующий собственный runtime.
+Исторические121/118/113 receipts сохраняются. Static APPROVE, прошлый SHA,
+aggregate SUCCESS и целевой roster не заменяют собственного runtime.

@@ -7,47 +7,54 @@
 
 ## Состояние исполнения на 2026-10-10
 
-Последний полный фактический прогон — PR HEAD
-`c2a6682d2438c9217c3bf26938dcd003391dbc75` (121), merge
-`642a14289fddd06408400b4ee6cc5480945e7d1a`, общий tree
-`89106f59cf181510a25ee8b667a9ff4966a82fd6`.
-На каждом Python3.11/3.12/3.13: **6065 PASS /1652 FAIL /0 ERROR /10 SKIP**, всего7727.
-Required CI/P1-stack exact FAIL. Это counts до нового retirement.
+Последний фактический CI — PR HEAD
+`d76f6ab85e12f482ad6bec1d43040899f4b0a532` (126), merge
+`8120a80bbb0309a3ec0bf4add71f568666c76772`, общий tree
+`63bff21aadbfb131082db075ed95ea7e89310e44`.
+На каждом Python3.11/3.12/3.13: **6062 PASS /1597 FAIL /0 ERROR /10 SKIP**, всего7669.
+Required CI/P1-stack/closure FAIL. Удаление58cases подтверждено collection
+(DQP70→37,relation72→47); дополнительно выявлены3live failures, их не скрываем.
 
-Critical: **54/54 healthy и все30 intended kills**, individual receipts доступны
-без priority omissions. DQP4+relation1 named guards/source/import hashes
-независимо проверены; baseline42 imports — отдельные probe processes.
-Recovery baseline12PASS, mutation gateFAIL: first-winner filename fault попал
-на другой guard. Полного33-kill результата на121 нет.
-Lossless module32/32 в каждой версии, четыре будущих cap killers отдельноPASS.
+Critical baseline58P/1F из59: native24-window fixture,
+`critical_project_read_acquired_qualified`. Guard не раскрывает точный operand;
+новые35mutants не выполнялись. Recovery: собственные12PASS и33intended kills;
+все33individual outcomes сверены, полный source/import rehash всех33 не заявляется.
+Lossless32/32 и4existing cap killer cases PASS на всех трёх Python.
+Literal historical/compact step16 SUCCESS, individual51-fault console evidence ещё нужно.
 
-Legacy source-fact acceptance8/15 при floor12/15; raw original coverage0.
-V2 natural facts6/15, paraphrase1/5; productionFAIL.
-Installed MCP, retrieval evidence, platforms/build/wheel/sdist jobs121 SUCCESS.
-P1.5 SUCCESS; P1.4/P1.6/closureFAIL. Реальные client sessions **NOT RUN**.
+Legacy source-fact8/15 при floor12/15; raw original coverage0.
+V2 natural6/15,paraphrase1/5; productionFAIL. Request flow2/4facts,
+max18sources/16744public bytes/4186estimated tokens и reported Packs contamination.
+Это данные для улучшения precision и пользы; потолки не возвращаются.
+AgentV1 8target-closed/11,4gaps; adversarial24/28.
+P1.4 12/14cases и8/10discovery,5/5completefacts; два original-only gaps.
+P1.6 public delivery6/6,completefacts1/1; общий jobFAIL.
+Installed MCP/selftests7/7/scriptedtask1/1, retrieval evidence/platforms/P1.5 SUCCESS.
+Реальные client sessions **NOT RUN**.
 
-Выполнен reviewed пакет122–125, его собственный общий runtime ещё **PENDING**:
+Reviewed пакет127–129 применён; собственный новый runtime **PENDING**:
 
-- **122**: read presentation сохраняет уже acquired/admitted windows; bounded control
-и operational/consent/current guards остаются. Native24-window proof+1mutant.
-- **123**: после собственного precheck удалены **58 ordinary cases /15definitions**:
-DQP70→37 и relation72→47. Frozen archives, helpers/imports/selectors,
-negative/source-policy/condition/native/safety obligations сохранены.
-- **124**: filename collision проверяется по actual complete naming plan, вычисленному до retrieval;
-assertion выполняется перед public veto check. Production,12cases/33mutants/expected guards прежние.
-- **125**:4cap faults используют4existing lossless cases;0new ordinary cases.
-Joint critical target **59healthy/35kills**; expected core collection7669.
+- **127**: два fixture hash-domain исправления и узкое расширение existing diagnostics;
+  source/display raw hashes не смешиваются с prefixed project/snapshot hashes.
+- **128**: ordinary original project partial-body context, current request-scoped
+  native receipt и6recovery faults. Полный body, original missing,answer/edit false.
+- **129**:4real frozen relation reads в existing privacy test,+1critical selector/+2faults;
+  остальные47witness cases не удалены.
+- Следующий joint target **critical60healthy/37kills,recovery12healthy/39kills**.
+  Ноль новых pytest names не означает ноль дополнительной native работы.
 
-Один старый DQP default3/800 test пока сохраняется до собственного cap proof и
-отдельного versioned AST/crosswalk retirement. Новый ordinary partial-body admission
-для original-only P1.4 разрабатывается отдельно, ещё не входит в пакет122–125.
-Остальные quality gaps и remaining relation47 требуют собственного решения.
+Один старый DQP default3/800 test сохраняется до собственного cap proof и
+versioned AST/crosswalk retirement. Вопросы/raw source/facts не меняются.
+Raw-versus-trimmed span mismatch исследуется отдельно; runtime first operand
+для module gaps пока не известен. Question-plan26 рассматривается для reuse
+существующих literal/span/dictionary successors, с сохранением2literal/code cases;
+нужны independent receipts,archive и current import/selector audit.
 
 Подробности: [checkpoint](PR211_CHECKPOINT_RU.md),
-[actual121](pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json),
+[actual126](pr211-execution/RUNTIME_EVIDENCE_d76f6ab8.json),
 [retirement58](pr211-execution/COMPILER_RETIREMENT_58_RU.md),
-[delivery](pr211-execution/PROJECT_READ_PRESENTATION_RU.md),
-[cap precheck](pr211-execution/OUTPUT_CAP_MUTATION_PRECHECK_RU.md).
+[ordinary contract](PR211_ORDINARY_PARTIAL_BODY_ADMISSION_RU.md),
+[relation precheck](pr211-execution/RELATION_SOURCE_CONTEXT_PRECHECK_RU.md).
 Исходные числа плана ниже сохраняются как история, привязанная к своим SHA.
 
 ## Поправки после оценки перед исполнением
