@@ -226,7 +226,7 @@ class _ProjectDocsServicePart03:
             prepared = reference_context.prepare(_retrieve(text, **kwargs), text)
             for lookup in documentation_query_plan.queries:
                 if lookup.text == text and lookup.origin in {"original", "host_lookup"}:
-                    _record_query_discovery(discovery_records, prepared, lookup)
+                    _record_query_discovery(discovery_records, prepared, lookup, reference_context=reference_context)
             return prepared
 
         chunks = _run(

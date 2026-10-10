@@ -8,6 +8,7 @@ from dataclasses import asdict
 from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
 from docmancer.docs.domain.evidence_qualification import qualify_evidence
 from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
+from docmancer.docs.domain.original_body_discovery import record_original_body_discovery
 from .context_query_probes import literal_query_probe
 
 
@@ -34,7 +35,7 @@ def _discovery_window_key(chunk: Any) -> str:
 
 def _record_query_discovery(
     records: dict[str, dict[str, dict[str, Any]]], chunks: Any,
-    lookup: DocumentationLookup,
+    lookup: DocumentationLookup, *, reference_context: Any = None,
 ) -> None:
     """Record a completed application-owned acquisition; metadata is not a receipt.
 
@@ -45,9 +46,26 @@ def _record_query_discovery(
     for chunk in chunks:
         matches = records.setdefault(_discovery_window_key(chunk), {})
         receipt = {"query": asdict(lookup), "lexical_score": float(chunk.score)}
+        _record_current_body_discovery(reference_context, chunk, receipt["query"])
         previous = matches.get(lookup.query_id)
         if previous is None or receipt["lexical_score"] > previous["lexical_score"]:
             matches[lookup.query_id] = deepcopy(receipt)
+
+
+def _record_current_body_discovery(context: Any, chunk: Any, query: dict[str, Any]) -> None:
+    """Bind the receipt to the owning finite context, not chunk-supplied flags."""
+    if context is None or context.complete is not True or context.question != query.get("text"):
+        return
+    source = str(chunk.source)
+    identity = context.sources.get(source)
+    metadata = chunk.metadata or {}
+    reference = metadata.get("_reference_evidence")
+    if (identity is None or not isinstance(reference, dict)
+        or reference.get("source") != asdict(identity)
+        or reference.get("member_binding") != context.source_member_bindings.get(source)
+        or reference.get("project_doc_content_hash") != context.source_file_hashes.get(source)):
+        return
+    record_original_body_discovery(query=query, body=chunk.text, candidate=metadata)
 
 
 def _tag_retrieval_query(

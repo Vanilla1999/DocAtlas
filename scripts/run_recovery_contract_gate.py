@@ -42,21 +42,20 @@ from eval.evidence_quality_v2.runtime import index_project, isolated_service, wr
 from eval.project_context_quality.capture_public_context import capture_public_call
 from eval.agent_developer_v1.structural_filename_controls import run_structural_filename_controls
 from eval.agent_developer_v1.fts_literal_controls import run_fts_literal_controls
+from eval.agent_developer_v1.ordinary_body_controls import run_ordinary_body_controls
 
 REPORT_SCHEMA = "recovery-contract-v2"
 TARGET_MODULES = (
-    "docmancer.docs.application.recovery",
-    "docmancer.docs.application.proofability",
-    "docmancer.docs.interfaces.mcp.recovery_projection",
-    "docmancer.docs.application._project_docs_service_part03",
-    "docmancer.docs.application.source_reference_evidence",
-    "docmancer.docs.application.reference_query_tagging",
-    "docmancer.docs.application._docs_context_projection_core",
-    "docmancer.docs.domain.project_doc_ranking",
+    "docmancer.docs.application.recovery", "docmancer.docs.application.proofability",
+    "docmancer.docs.interfaces.mcp.recovery_projection", "docmancer.docs.application._project_docs_service_part03",
+    "docmancer.docs.application.source_reference_evidence", "docmancer.docs.application.reference_query_tagging",
+    "docmancer.docs.application._docs_context_projection_core", "docmancer.docs.domain.project_doc_ranking",
     "docmancer.docs.domain.literal_context_admission",
     "docmancer.docs.domain.query_reference_binding",
     "eval.agent_developer_v1.structural_filename_controls",
     "docmancer.core._sqlite_store_part03", "eval.agent_developer_v1.fts_literal_controls",
+    "docmancer.docs.domain.original_body_discovery", "docmancer.docs.domain.ordinary_body_context",
+    "docmancer.docs.interfaces.mcp.context_tools", "eval.agent_developer_v1.ordinary_body_controls",
 )
 TREASURE = (
     "What is the documented contract for adaptive treasure gem trip sampling across positions 1,2,3, "
@@ -921,8 +920,9 @@ def closed_literal_context() -> dict[str, Any]:
             rejected("Explain DeliveryEpoch and CommitLatch and VacuumProbe.",
                      "explain_pair_only", "recovery_explain_exact_body")
     filename = run_structural_filename_controls(_require, _observed_public_call, _literal_context_replay_controls)
+    ordinary = run_ordinary_body_controls(_require, _observed_public_call)
     return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks,
-            "structural_filename": filename, "fts_literal": fts}
+            "structural_filename": filename, "fts_literal": fts, "ordinary_body": ordinary}
 
 
 CASES = (

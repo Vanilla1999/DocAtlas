@@ -9,6 +9,7 @@ from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
+from docmancer.docs.domain.original_body_discovery import original_body_read_scope
 import math
 from typing import Any
 from ._context_recovery_actions import (
@@ -281,6 +282,7 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
     return updated
 
 
+@original_body_read_scope
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None

@@ -302,7 +302,7 @@ def project_docs_context(
                     "_lifecycle_intent": request_lifecycle_intent,
                 })
                 literal_context_candidates.append((original, normalized, admission))
-                decision_trace.record('candidate', 'prepared', 'literal_symbol_body_context', original, normalized)
+                decision_trace.record('candidate', 'prepared', admission['reason'], original, normalized)
                 continue
             decision_trace.record('candidate', 'rejected', 'no_visible_qualification', original)
             continue
@@ -697,7 +697,7 @@ def project_docs_context(
         snapshot[evidence_id] = _snapshot_entry(original, normalized)
         seen_ids[evidence_id] = len(sources) - 1
         projection_diagnostics.setdefault("literal_context_admissions", []).append(admission)
-        decision_trace.record('selection', 'accepted', 'literal_symbol_body_context', original, normalized)
+        decision_trace.record('selection', 'accepted', admission['reason'], original, normalized)
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO

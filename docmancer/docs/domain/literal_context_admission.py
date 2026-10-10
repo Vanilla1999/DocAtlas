@@ -14,6 +14,7 @@ from .evidence_qualification import _relation_units, qualify_evidence
 from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
 from .query_terms import documentation_query_terms, query_constraint_roles
 from .technical_tokens import technical_term_pattern
+from .ordinary_body_context import ordinary_body_context_witness
 
 
 def _closed_context_literal(question: str) -> QueryMention | None:
@@ -271,10 +272,17 @@ def admit_original_literal_context(
                     "source_mention_id": locator.mention_id,
                     "source_query_char_start": locator.start, "source_query_char_end": locator.end,
                 })
+    reason = "literal_symbol_body_context"
     if not witnesses:
-        return None
+        ordinary = ordinary_body_context_witness(
+            question=question, evidence_text=evidence_text, candidate=candidate,
+        )
+        if ordinary is None:
+            return None
+        witnesses = [ordinary]
+        reason = "ordinary_body_clause_context_v1"
     return {
-        "reason": "literal_symbol_body_context", "query_id": "query-original",
+        "reason": reason, "query_id": "query-original",
         "qualification_reason": qualification.reason, "coverage_credit": False,
         "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
         "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),

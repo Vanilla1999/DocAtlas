@@ -36,6 +36,10 @@ MODULE_PATHS = {
     "eval.agent_developer_v1.structural_filename_controls": "eval/agent_developer_v1/structural_filename_controls.py",
     "docmancer.core._sqlite_store_part03": "docmancer/core/_sqlite_store_part03.py",
     "eval.agent_developer_v1.fts_literal_controls": "eval/agent_developer_v1/fts_literal_controls.py",
+    "docmancer.docs.domain.original_body_discovery": "docmancer/docs/domain/original_body_discovery.py",
+    "docmancer.docs.domain.ordinary_body_context": "docmancer/docs/domain/ordinary_body_context.py",
+    "docmancer.docs.interfaces.mcp.context_tools": "docmancer/docs/interfaces/mcp/context_tools.py",
+    "eval.agent_developer_v1.ordinary_body_controls": "eval/agent_developer_v1/ordinary_body_controls.py",
 }
 FROZEN_QUESTION_SHA256 = "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b"
 FROZEN_SOURCE_SHA256 = "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
@@ -182,6 +186,31 @@ MUTANTS = (
            'fallback_query = " OR ".join(literal_terms)',
            'fallback_query = " OR ".join(terms)',
            "closed_literal_context", "recovery_fts_literal_fallback"),
+    Mutant("ordinary-partial-context-disabled", MODULE_PATHS["docmancer.docs.domain.ordinary_body_context"],
+           "    if binding is None:\n        return None",
+           "    if True:\n        return None",
+           "closed_literal_context", "recovery_ordinary_full_source_fact"),
+    Mutant("ordinary-native-receipt-not-required", MODULE_PATHS["docmancer.docs.domain.original_body_discovery"],
+           "key in state.receipts",
+           "True",
+           "closed_literal_context", "recovery_ordinary_native_receipt_required"),
+    Mutant("ordinary-request-owner-not-bound", MODULE_PATHS["docmancer.docs.domain.original_body_discovery"],
+           "scope[\"project_id\"] != state.project_identity",
+           "False",
+           "closed_literal_context", "recovery_ordinary_request_owner_binding"),
+    Mutant("ordinary-independent-clauses-joined", MODULE_PATHS["docmancer.docs.domain.ordinary_body_context"],
+           "_BOUNDARY.finditer(text)",
+           "re.finditer(r\"(?!)\", text)",
+           "closed_literal_context", "recovery_ordinary_body_clause_safety"),
+    Mutant("ordinary-query-content-word-skipped", MODULE_PATHS["docmancer.docs.domain.ordinary_body_context"],
+           "                for source_word in source_words:\n                    if source_word[0].casefold() == query_words[cursor][0].casefold():",
+           "                for source_word in source_words:\n                    if (matched and cursor + 1 < len(query_words)\n                        and source_word[0].casefold() == query_words[cursor + 1][0].casefold()):\n                        cursor += 1\n                    if source_word[0].casefold() == query_words[cursor][0].casefold():",
+           "closed_literal_context", "recovery_ordinary_original_span_boundary"),
+    Mutant("ordinary-literal-surface-discarded", MODULE_PATHS["docmancer.docs.domain.ordinary_body_context"],
+           "    if (any(not (char.isalpha() or char.isspace() or char in \".?!,;:-–—\") for char in question)\n        or re.search(r\"(?<![^\\W\\d_])-|-(?![^\\W\\d_])\", question)\n        or query_mentions(question)",
+           "    if (query_mentions(question)",
+           "closed_literal_context", "recovery_ordinary_original_span_boundary"),
+
 )
 
 

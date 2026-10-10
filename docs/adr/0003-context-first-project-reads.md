@@ -34,6 +34,53 @@ names. Public lookup credit never transfers to the original question.
 - Deleted, stale, and no-longer-admitted members cannot supply current evidence;
   confirmed sync does not promise physical deletion of unselected stored rows.
 
+## Ordinary partial body context v1
+
+`ordinary_body_clause_context_v1` is a deliberately limited additional context
+admission, not whole-question qualification. It applies to ordinary, original
+project reads through `get_docs_context`; module/library requests, explicit
+literal or technical references, quoted/path syntax, and numeric/operator
+syntax continue through their existing lanes. The ordinary fallback declines
+unsupported syntax instead of silently deleting it.
+
+A witness is one contiguous raw span of the original question containing at
+least two distinct content words. Its content words must appear in order inside
+one substantive prose clause of the current source. Source insertions are
+allowed; query content words between the endpoints cannot be skipped, and
+separate sentences or coordinating clauses cannot be joined. Heading, link,
+table/list, code-fence and repeated-label text cannot supply this prose witness.
+Whitespace wrapping and inline emphasis preserve raw coordinates.
+
+A documented, general English function-word set covers question words,
+auxiliaries, determiners, personal pronouns and basic connectors/prepositions.
+It is not a topic dictionary. Temporal, conditional and negative words such as
+`before`, `after`, `unless` and `not` remain content words. There is no stemming,
+synonym expansion, generated lookup, threshold fitted to a fixture, or new
+provider/dependency. Stored queries and canonical hard-exact extraction do not
+change.
+
+Every ordinary witness requires a private receipt from this exact original
+query's actual native body discovery. The receipt binds the host-requested
+local project identity independently of the candidate, the finite current
+catalog member, generation, source/file hashes and complete returned window
+span/hash. Fresh source preparation by the owning native context is required;
+serialized metadata and lookup-only discovery cannot mint that receipt. The
+receipt exists only for the synchronous public handler, including final
+projection. Nested calls receive fresh state; normal and exceptional exits
+deactivate it, including copied contexts. This process-local ledger guards
+normal consumer replay; it is not a capability against arbitrary Python code.
+
+Admission retains the whole acquired source window and its provenance.
+Qualification remains false, original-query coverage remains missing, and
+answer/edit authority remains false. The selected lexical span does not prove
+every unmatched ordinary modifier or semantic relation in the whole question:
+a question mentioning an unknown ordinary modifier may still receive useful
+network context when a real network phrase matches. Existing explicit-literal
+and unrelated-empty controls remain required. The initial evidence obligation
+is native MCP delivery for the unchanged two P14 questions, independent prose
+and formatting, and causal source/relevance/replay counterfactuals; it does not
+establish V2 or whole-PR acceptance.
+
 ## Consequences
 
 Independent quality evaluators preserve the original questions and required
