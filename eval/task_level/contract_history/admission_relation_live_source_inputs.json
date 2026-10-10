@@ -1,0 +1,226 @@
+{
+  "schema_version": "docatlas-relation-source-context-v1",
+  "status": "precheck_prepared_runtime_pending",
+  "repository": "Vanilla1999/DocAtlas",
+  "source_checkout": {
+    "head": "d76f6ab85e12f482ad6bec1d43040899f4b0a532",
+    "tree": "63bff21aadbfb131082db075ed95ea7e89310e44",
+    "interpretation": "Original published precheck source snapshot, not the later integration commit."
+  },
+  "historical_archive": {
+    "path": "eval/task_level/contract_history/admission_relation_compiler_inputs.py.txt",
+    "blob": "f230beaa41ebb0b999f97493007fe253c629ef78",
+    "sha256": "34620c11c83e58dad640b4ee56711830de9ab3ba18ca0c64e88e6f26ffea2809",
+    "bytes": 9679,
+    "executed_as_test": false
+  },
+  "input_digest": {
+    "algorithm": "SHA256 UTF-8 JSON array-of-arrays, ensure_ascii=false, separators=(',',':')",
+    "fields": [
+      "id",
+      "family",
+      "question",
+      "body",
+      "current_outcome"
+    ],
+    "sha256": "391e69055fb006e82ac1109a0d1ce1e89c1cbce02651bc37cd4cb756a224477c"
+  },
+  "frozen_inputs": [
+    {
+      "id": "callable_positive",
+      "family": "callable_form",
+      "question": "Can a handler for QueueHub be synchronous?",
+      "body": "A handler for QueueHub can be synchronous.",
+      "historical_source": {
+        "questions": {
+          "case_index": 2,
+          "tuple_item": 0
+        },
+        "body": {
+          "case_index": 2,
+          "tuple_item": 2
+        }
+      },
+      "current_outcome": "context_only",
+      "question_sha256": "52a7d687d30c43a89647af273600e5edc5ec0cb0128400ba807429a0f7595632",
+      "body_sha256": "dee4e840cd1db278c750cf208fdba93672b2e4b5c05ad694df5c0e8e6485438d",
+      "body_utf8_bytes": 42
+    },
+    {
+      "id": "callable_wrong_role",
+      "family": "callable_form",
+      "question": "Can a handler for QueueHub be synchronous?",
+      "body": "A handler for OtherHub can be synchronous. QueueHub is also documented.",
+      "historical_source": {
+        "questions": {
+          "case_index": 2,
+          "tuple_item": 0
+        },
+        "body": {
+          "function": "test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation",
+          "parameter_row": 4
+        }
+      },
+      "current_outcome": "context_only",
+      "question_sha256": "52a7d687d30c43a89647af273600e5edc5ec0cb0128400ba807429a0f7595632",
+      "body_sha256": "a7dd68b26561ae003d76ae31e135df305f7b3652aaaa33e2462fb3fe476c373e",
+      "body_utf8_bytes": 71
+    },
+    {
+      "id": "strict_positive",
+      "family": "enumeration",
+      "question": "Which ways enable strict mode?",
+      "body": "Strict mode can be enabled in these ways:\n\n- Use a per-call option.\n- Set a model configuration.",
+      "historical_source": {
+        "questions": {
+          "case_index": 3,
+          "tuple_item": 0
+        },
+        "body": {
+          "case_index": 3,
+          "tuple_item": 2
+        }
+      },
+      "current_outcome": "context_only",
+      "question_sha256": "35936adbdb3a2287e4f12e54533ef2a259fa5e0a2fcd50f24d5fc406e2e9954a",
+      "body_sha256": "29ecf7c8272e156f6ad7ebd1746dff993e009d7eecd32697f9635ac927bbe79e",
+      "body_utf8_bytes": 96
+    },
+    {
+      "id": "strict_metadata_only",
+      "family": "enumeration",
+      "question": "Which ways enable strict mode?",
+      "body": "# Strict mode ways\n\n- [Options](options.md)\n- [Methods](methods.md)",
+      "historical_source": {
+        "questions": {
+          "case_index": 3,
+          "tuple_item": 0
+        },
+        "body": {
+          "function": "test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation",
+          "parameter_row": 8
+        }
+      },
+      "current_outcome": "metadata_only_rejected",
+      "question_sha256": "35936adbdb3a2287e4f12e54533ef2a259fa5e0a2fcd50f24d5fc406e2e9954a",
+      "body_sha256": "ac8f8e18fdeb1d2a6a397dc1559a842659aef6c35ef606984cc1ebfa2afad98b",
+      "body_utf8_bytes": 67
+    }
+  ],
+  "historical_expectations": {
+    "callable_positive": {
+      "native_context": true,
+      "generated_need_admission": "typed_local",
+      "answer_supported": false
+    },
+    "callable_wrong_role": {
+      "qualified": false,
+      "origins": [
+        "original",
+        "retrieval_need"
+      ]
+    },
+    "strict_positive": {
+      "native_context": true,
+      "generated_need_admission": "typed_local",
+      "answer_supported": false
+    },
+    "strict_metadata_only": {
+      "qualified": false,
+      "origins": [
+        "original",
+        "retrieval_need"
+      ]
+    }
+  },
+  "current_contract": {
+    "version": "current-source-context-v1",
+    "query_input": "The unchanged original question only; no generated lane, explicit lookup, gold fact, path hint or requirement injection.",
+    "source_input": "Exactly Guide.md with the archived body, separate finite host-owned store per case; no header prepended to new reads.",
+    "lexical_attribution": "An independently requalified original query may be attributed to source context. This is not relation entailment or answer support.",
+    "callable_wrong_role": "The complete OtherHub statement and QueueHub mention may be quoted as context. The positive QueueHub synchronous fact must not be synthesized or credited.",
+    "strict_metadata_only": "A real current acquired child must reach native qualification and be rejected as metadata_only_evidence; no sources or original coverage may be delivered.",
+    "positive_fidelity": "One exact committed child and the complete original body on wire, with independent file/body hashes, public/snapshot binding, owner, scope, generation and char/byte/line coordinates.",
+    "authority": "Actual projected and public payloads cannot authorize answers or edits; source content remains untrusted_data and nonexecutable.",
+    "execution": "Four actual call_docs_tool_payload/get_docs_context invocations through capture_public_call; synchronous in-process MCP handler, not client/stdio proof. Observers call their original once and return the same result.",
+    "state": "Compare all fixture app-storage files/directories, generation, catalog and body before first read versus after its public return.",
+    "optional_source_uri": "Compare every public/snapshot source field except source_uri. If public source_uri is present, require a nonempty string equal to both captured locator fields and registered in the actual source_reader. Late removal of the optional locator is permitted."
+  },
+  "selected_test": {
+    "path": "tests/docs/test_admission_relation_safety.py",
+    "function": "test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+    "selector": "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+    "base_blob": "f3374394afce41c21659a9fc582f73e78b5ecc35",
+    "base_sha256": "d3f62614310486c92248cb71cd3d13179cc6c062d6b4c24f46baaffb249e127c",
+    "change": "Only two lines after the original function body: import and call the four-read helper.",
+    "new_pytest_functions": 0,
+    "added_native_public_reads": 4,
+    "original_privacy_read_preserved": true
+  },
+  "preservation": {
+    "remaining_witness_path": "tests/docs/test_admission_relation_witnesses.py",
+    "remaining_witness_blob": "6132b5b1e970e309b7ebe583ebf39d0444744097",
+    "remaining_witness_sha256": "05891fce3e921626e4185fc58f2a4e007e767ec1926526d29674030d6e6e9f49",
+    "remaining_witness_expanded_cases": 47,
+    "live_source_policy_cases": 15,
+    "source_condition_cases": 3,
+    "native_witness_cases": 5,
+    "historical_negative_origin_cases": 24,
+    "other_safety_expanded_cases_unchanged": 25,
+    "helpers_imports_CASES_unchanged": true,
+    "existing_relation25_archive_and_AST_gate_unchanged": true,
+    "old_cases_deleted": 0,
+    "production_modified": false,
+    "critical_runner_modified": false
+  },
+  "critical_integration": {
+    "status": "PENDING_ROOT_RUNNER_INTEGRATION_AND_RUNTIME",
+    "selector": "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+    "additional_baseline_pytest_cases": 1,
+    "additional_mutants": 2,
+    "required_import_origin_module": "eval.agent_developer_v1.relation_source_context_controls",
+    "current_baseline_failure_blocks_mutation_credit": true,
+    "expected_mutations": [
+      {
+        "name": "relation-visible-metadata-as-body",
+        "path": "docmancer/docs/domain/evidence_qualification.py",
+        "base_blob": "498a3941ce965443ee2508d4f88525966d3d581c",
+        "before": "    if reference_reason is not None:\n        return _rejected(result, reference_reason)\n    lines = body.splitlines()",
+        "after": "    if reference_reason is not None:\n        return _rejected(result, reference_reason)\n    lines = visible_text.splitlines()",
+        "failure_guard": "critical_relation_metadata_cannot_supply_body",
+        "expected_anchor_occurrences": 1,
+        "expected_before_sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554",
+        "expected_after_sha256": "964c24af8bee801b12f6fc6fd53d2bc9f3706911fd0a58b39602d38fd45aead1",
+        "expected_failed_cases": 1,
+        "expected_errors": 0,
+        "expected_skipped": 0
+      },
+      {
+        "name": "relation-callable-context-as-answer",
+        "path": "docmancer/docs/application/_docs_context_projection_core.py",
+        "base_blob": "ec87e90b8ef40faab65e514a3e417ee9d6bf0b0c",
+        "before": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
+        "after": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if original_question.startswith(\"Can \"):\n        payload.update(answer_supported=True, answer_available=True)\n        _refresh_estimate(payload)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
+        "failure_guard": "critical_relation_public_no_answer_authority",
+        "expected_anchor_occurrences": 1,
+        "expected_before_sha256": "c31a8d8bb27e6b4ff6badb8348a60365befb4b2a3fa59db060d63c484d569acf",
+        "expected_after_sha256": "76f4397c0fe261ace66ad6f638528b08980a76e497ef703c56ed42c1efa99765",
+        "expected_failed_cases": 1,
+        "expected_errors": 0,
+        "expected_skipped": 0
+      }
+    ],
+    "ordered_fault_rationale": [
+      "The preserved old precedence/privacy call remains first. Metadata-as-body keeps its substantive source healthy and changes the fourth new native row only.",
+      "Callable promotion is a generic Can-question fault without fixture IDs. The preserved first privacy question does not match; the first new actual projected payload reaches the named no-answer guard before a late validator can mask it.",
+      "No success is inferred from an empty fixture, missing capture, exception, a different failed guard, or a failing unmutated baseline."
+    ]
+  },
+  "runtime": {
+    "status": "NOT_RUN",
+    "baseline": null,
+    "mutation_receipts": [],
+    "retirement_authorized_by_this_file": false
+  },
+  "integration_base_commit": "23af9fc5b5934bc651e40f510ec90c88e1642dcc"
+}

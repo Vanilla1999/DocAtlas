@@ -130,6 +130,8 @@ def test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto(tmp_p
     cap = capture_reference_case(tmp_path, {'Guide.md':'# Rules\n\n'+body}, q)
     wire = json.dumps(cap['public_payload'])
     assert all(term not in wire for term in ('raw_document', '_admission_demands', 'need_witness_spans', '_reference_evidence'))
+    from eval.agent_developer_v1.relation_source_context_controls import run_relation_source_context_controls
+    run_relation_source_context_controls(tmp_path / 'current-source-context')
 
 
 def test_compiled_queries_and_relations_are_pure_without_source_io(monkeypatch):

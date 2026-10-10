@@ -32,8 +32,9 @@ TARGET_TESTS = (
     "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
     "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
     "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
+    "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -80,6 +81,7 @@ TARGET_MODULES = (
     "docmancer.docs.application._project_context_service_part01",
     "eval.agent_developer_v1.project_read_presentation_controls",
     "docmancer.docs.domain.context_budget",
+    "eval.agent_developer_v1.relation_source_context_controls",
 )
 
 
@@ -430,6 +432,24 @@ MUTANTS = (
         TARGET_TESTS[13],
         3,
         "critical_context_full_source_set",
+    ),
+    Mutant(
+        "relation-visible-metadata-as-body",
+        "docmancer/docs/domain/evidence_qualification.py",
+        "    if reference_reason is not None:\n        return _rejected(result, reference_reason)\n    lines = body.splitlines()",
+        "    if reference_reason is not None:\n        return _rejected(result, reference_reason)\n    lines = visible_text.splitlines()",
+        TARGET_TESTS[14],
+        1,
+        "critical_relation_metadata_cannot_supply_body",
+    ),
+    Mutant(
+        "relation-callable-context-as-answer",
+        "docmancer/docs/application/_docs_context_projection_core.py",
+        "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
+        "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if original_question.startswith(\"Can \"):\n        payload.update(answer_supported=True, answer_available=True)\n        _refresh_estimate(payload)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
+        TARGET_TESTS[14],
+        1,
+        "critical_relation_public_no_answer_authority",
     ),
 )
 
