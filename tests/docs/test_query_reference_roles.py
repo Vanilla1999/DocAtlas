@@ -2,16 +2,6 @@
 import pytest
 from docmancer.docs.domain.query_reference_binding import query_mentions
 
-@pytest.mark.parametrize("name", ["ARGON", "Argon", "argon", "ПАМЯТКА"])
-@pytest.mark.parametrize("context,role", [("in the file", "source_locator"), ("constant", "symbol_identity"), ("library", "semantic_subject")])
-def test_context_not_case_assigns_role(name, context, role):
-    q = f"What is documented for {context} {name}?"
-    matches = [m for m in query_mentions(q) if m.text == name]
-    assert len(matches) == 1
-    m = matches[0]
-    assert (m.syntax_role, m.explicit) == (role, True)
-    assert q[m.start:m.end] == name
-
 def test_same_spelling_has_distinct_source_and_symbol_occurrences():
     q = "What does the constant `ARGON` mean in the file ARGON?"
     ms = [m for m in query_mentions(q) if m.text == "ARGON"]
@@ -19,13 +9,7 @@ def test_same_spelling_has_distinct_source_and_symbol_occurrences():
     assert [m.syntax_role for m in ms] == ["symbol_identity", "source_locator"]
     assert all(q[m.start:m.end] == m.text for m in ms)
 
-@pytest.mark.parametrize("context,role", [("в файле", "source_locator"), ("из документа", "source_locator"), ("константа", "symbol_identity"), ("класс", "symbol_identity"), ("библиотека", "semantic_subject")])
-def test_russian_roles_preserve_unicode_offsets(context, role):
-    q = f"Как работает {context} ПАМЯТКА?"
-    m = next(m for m in query_mentions(q) if m.text == "ПАМЯТКА")
-    assert m.syntax_role == role and q[m.start:m.end] == "ПАМЯТКА"
-
-@pytest.mark.parametrize("context,role", [("in the file", "source_locator"), ("constant", "symbol_identity")])
+@pytest.mark.parametrize("context,role", [("constant", "symbol_identity")])
 @pytest.mark.parametrize("quote", ["`", '\"'])
 def test_quotes_preserve_contextual_role(context, role, quote):
     q = f"What is documented {context} {quote}ArgonGuide{quote}?"

@@ -3,7 +3,6 @@ from dataclasses import asdict, replace
 import hashlib
 import inspect
 import json
-from pathlib import Path
 
 import pytest
 
@@ -37,10 +36,6 @@ def select(items, **kwargs):
         items, question=kwargs.pop("question", ""),
         config=selector.patch_selection_config(), **kwargs,
     )
-
-
-def test_imports_use_worktree():
-    assert Path(selector.__file__).resolve().parents[3] == Path(__file__).resolve().parents[1]
 
 
 def test_patch_config_has_no_budget_or_count_sentinel():

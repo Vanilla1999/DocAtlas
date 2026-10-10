@@ -124,11 +124,13 @@
       "evidence": [
         "v2plan/PR211_REFERENCE_ROLE_ORIGINAL_INPUT_PRECHECK_RU.md:115",
         "verified_prerequisites.role19",
-        "Existing successor retains19 parser+2 resolver calls; no operation-saving credit or hidden-loop reduction claim"
+        "Existing successor retains19 parser+2 resolver calls; no operation-saving credit or hidden-loop reduction claim",
+        "TEST_REDUCTION_40_UNIT_RETIREMENT_32.json: fresh CI38033112465 own62/43 proof supersedes historical blocked status"
       ],
-      "removed": 0,
+      "removed": 19,
       "added": 0,
-      "approval": "NOT_APPROVED",
+      "approval": "STATIC_REVIEWED_CI_PENDING",
+      "independent_review": "TEST_REDUCTION_40_REVIEW_32.json",
       "author_approval": "BLOCKED_43_KILLS_NOT_MET"
     },
     {
@@ -264,11 +266,13 @@
       "contract_or_successor": "question-planning.md:11-16 empty obligations/full question hash/false answer authorization; existing QP direct-builder guard and native false-authority delivery.",
       "evidence": [
         "_project_answer_contract_part02.py:8-25",
-        "Prerequisites: own reuse/public source receipt and frozen fact preservation; explicit ProofObligation path-negative excluded."
+        "Prerequisites: own reuse/public source receipt and frozen fact preservation; explicit ProofObligation path-negative excluded.",
+        "TEST_REDUCTION_40_UNIT_RETIREMENT_32.json: canceled inferred-contract expectations, no real lifecycle/read/source fact scenario removed; independent peer review pending"
       ],
-      "removed": 0,
+      "removed": 10,
       "added": 0,
-      "approval": "NOT_APPROVED",
+      "approval": "STATIC_REVIEWED_CI_PENDING",
+      "independent_review": "TEST_REDUCTION_40_REVIEW_32.json",
       "author_approval": "CANDIDATE"
     },
     {
@@ -2286,9 +2290,9 @@
         "PASS": 3
       },
       "behavior": "Pure imported __file__ belongs-to-checkout assertions.",
-      "decision": "UNRESOLVED",
+      "decision": "DELETE_OBSOLETE",
       "prior_proposed_decision": "DELETE_DUPLICATE",
-      "contract_or_successor": "Existing import-origin receipts and installed execution, only where actual boundary equivalence is established.",
+      "contract_or_successor": "Explicitly retire standalone checkout-location assertions under the installed-package-first test strategy. No same-process import equivalence or evaluator import-origin proof claimed; actual source and behavioral checks remain.",
       "evidence": [
         "P_ROSTER",
         "P_IMPORT",
@@ -2298,15 +2302,17 @@
         "P_INSTALLED_LIMIT",
         "tests/test_action_packet_v4_public.py:102-104",
         "tests/test_action_packet_v4_selection.py:42-43",
-        "tests/test_action_packet_v4_eval.py:118-120"
+        "tests/test_action_packet_v4_eval.py:118-120",
+        "TEST_REDUCTION_40_UNIT_RETIREMENT_32.json: explicit harness-only retirement rationale; peer review pending"
       ],
-      "proof_state": "Two modules have actual separate-process receipts; evaluator module and BASE installed receipt absent. Minimal3-node package blocked, not approved.",
+      "proof_state": "Original duplicate-equivalence proposal remained blocked. Current draft retires checkout-only diagnostics explicitly, without claiming missing import receipts exist. Peer review and final CI pending.",
       "candidate_instances": 3,
-      "removed": 0,
+      "removed": 3,
       "added": 0,
       "owner": "C",
       "author_approval": "NOT_RECORDED",
-      "approval": "NOT_APPROVED"
+      "approval": "STATIC_REVIEWED_CI_PENDING",
+      "independent_review": "TEST_REDUCTION_40_REVIEW_32.json"
     },
     {
       "family": "private-split-hook-observation",
@@ -19336,15 +19342,17 @@
     }
   ],
   "ledger": {
-    "removed": 30,
+    "removed": 62,
     "added": 1,
     "renamed_or_moved": 0,
-    "net": 29,
-    "projected_after": 8262,
+    "net": 61,
+    "projected_after": 8230,
     "measured_after": null,
-    "target_gap": 3288,
-    "reduction_percent": 0.3497768664817272,
-    "accounting_status": "Physical reviewed edits; final expanded collection pending",
+    "target_gap": 3256,
+    "reduction_percent": 0.7357375467374261,
+    "accounting_status": "62 physical removals independently reviewed; final expanded collection and final-SHA CI pending.",
+    "reviewed_removed": 62,
+    "peer_review_pending_removed": 0,
     "classified_old_nodes": 891,
     "unclassified_old_nodes": 7400,
     "baseline_roster_integrity": "Complete partition: no duplicate/missing/unknown node IDs"

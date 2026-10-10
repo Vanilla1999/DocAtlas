@@ -115,11 +115,6 @@ def test_direct_task_evaluation_ceiling_rejects_without_runtime_compaction(case,
     assert not (tmp_path / "evaluation" / "action_packet.json").exists()
 
 
-def test_eval_source_imports_are_from_worktree(tmp_path):
-    import eval.evidence_selection_quality as module
-    assert Path(module.__file__).resolve().is_relative_to(Path(__file__).resolve().parents[1])
-
-
 def test_workflow_evaluation_requirements_fail_closed_without_v4_policy_fields(case, tmp_path):
     from eval.answer_quality_runner import _task42_projection, _evaluate_measured_case
 

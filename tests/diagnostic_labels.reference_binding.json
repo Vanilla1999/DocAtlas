@@ -9,7 +9,7 @@
     "tests/docs/test_reference_transfer_regressions.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_query_reference_roles.py": "84a2969b0b6c5c44f0ce40416f4e5fcce80f5a920d0057f00e5b43fc5e8b96f2",
+    "tests/docs/test_query_reference_roles.py": "59da9b8eb7e1094d8f3ff14e97f548b4c79da4a5d5e658b95af94257d72138aa",
     "tests/docs/test_source_locator_resolution.py": "5304c9c1ab89da22d4729cfcbfaccd0123fc592eabbc3f6d3c668758c835fc7c",
     "tests/docs/test_typed_reference_evidence.py": "7ae1280572d57f92f8b97dc265ce7cd42967b3e7951776853b42c00976f9a38a",
     "tests/docs/test_reference_projection_retention.py": "4f3cbdc6c170b229501cf3ec47ddad6698ce270991c2f1108e82dfdb6fb492dd",

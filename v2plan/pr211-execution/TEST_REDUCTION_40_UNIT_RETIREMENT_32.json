@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+  "proof_sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+  "proof_run": "38033112465",
+  "removed": 32,
+  "added": 0,
+  "baseline_outcomes": {"FAIL": 29, "PASS": 3},
+  "scope": {
+    "reference-role19": {
+      "removed": 19,
+      "author": "A; scoped deletion and report existed before cancellation",
+      "author_report_sha256": "51a3eaefcca1b9154828179ec3d1494e389cab6ab829b3961cbc54bfee36fb2a",
+      "reviewer": "coordinator, independently reviewing another author's deletion without spawning an agent",
+      "verdict": "APPROVE_STATIC_CI_PENDING",
+      "proof": "Independently read44 saved evidence JSON and43 mutation JUnit files: healthy62/62, all43 validated intended assertion failures, exact healthy target identities, no errors/skips. Reconstructed each unique mutation from proof-SHA Git source text; before/after hashes and single anchors match.41 named guard first lines match exactly; two historical unguarded assertions remain explicitly unguarded. Own bare/quoted faults have the correct guards and1F/0E/0S each.",
+      "preservation": "Current source equals proof-SHA source after only two exact definition removals and one decorator tuple removal.21 role cases and all24 native public cases remain; broader92 PASS result and current native23FAIL/1PASS preserved, not represented as improved source facts.",
+      "operation_accounting": "Existing19 frozen-input replays and resolver calls remain. No new loop, test or mutation added, no parser-call or measured speedup credit."
+    },
+    "answer-contract-v2-v3-inference": {
+      "removed": 10,
+      "author": "coordinator",
+      "verdict": "PHYSICAL_DRAFT_PEER_REVIEW_AND_CI_PENDING",
+      "rationale": "All ten bodies assert the canceled inference of subjects/obligations/aliases, historical V2/V3 schema/hash or Pascal-name answer authority. docs/modules/question-planning.md:11-16 explicitly specifies empty inferred obligations and false answer authority. These bodies invoke only in-memory builders/provers; they do not exercise actual CLI/MCP reads, storage, source facts or lifecycle outcomes. Removal is semantic contract retirement, not FAIL-based deletion.",
+      "preservation": "Keep test_filesystem_path_tokens_cannot_supply_behavior_subject_predicate_or_value and its _unit helper byte-identical. Remove unused imports and _obligations helper only. Existing raw-question/hash/literal/no-authority/native source scenarios, frozen quality inputs/gold and actual cleanup/read flows are untouched.",
+      "evidence": "Existing own question_contract_does_not_infer_obligations intended kill and current62 healthy critical baseline corroborate the canceled inference boundary; they are not substituted for independent source-fact or client acceptance. A originally audited this ten-node family; that candidate audit is not peer approval of this new diff."
+    },
+    "worktree-import-receipt-duplicates": {
+      "removed": 3,
+      "author": "coordinator",
+      "verdict": "PHYSICAL_DRAFT_PEER_REVIEW_AND_CI_PENDING",
+      "rationale": "Explicit retirement of three standalone unit assertions that imported modules reside inside the checkout. This checkout-only harness expectation is not a product/source contract and is inappropriate as acceptance of an installed package. Every actual packet/selection/evaluator behavior test remains unchanged; only these three definitions and two unused pathlib imports are removed.",
+      "proof_boundary": "Earlier C duplicate-equivalence proposal was blocked by missing same-process/evaluator import receipts. Those receipts are still not claimed. This draft changes the standalone harness-check policy explicitly, rather than claiming missing equivalence evidence exists. Separate-process probes, actual source provenance checks and installed harness execution are retained; none is mislabelled same-process evidence for the deleted nodes."
+    }
+  },
+  "final_source_sha256": {
+    "tests/docs/test_query_reference_roles.py": "c9e1ddc1c2279b7d1e21376b2d2b832d70ba35ba76b30ad314376d243d09cf8a",
+    "tests/docs/test_project_answer_contract_v3.py": "665923ba0923c776fdb8b8e43c1ad0318ac9986748b245ae8982e640470912f1",
+    "tests/test_action_packet_v4_eval.py": "a0aacd7aa5b072e52d2d1d3dc8b4b96dbe1ef0886381071f5660d23906b0145d",
+    "tests/test_action_packet_v4_public.py": "301e1300fe9fc565e694f648bce640cd4ecb8dcbf85aadc0b813d8544a588041",
+    "tests/test_action_packet_v4_selection.py": "324cf8c0b4a1bd35b63c410baf8a719ed669339ca3127a57b81d25e7235eef92"
+  },
+  "deleted_file": "tests/docs/test_project_answer_contract_v2.py",
+  "shared_controls": "Update only the affected normalized survivor node hashes; remove deleted V2 module's label/hash entry. No skip, marker change, collection filter or hidden replay.",
+  "boundary": "No agents spawned after owner cancellation. No local project runtime/import/AST/pytest/install. Final collection and CI NOT_RUN;13 coordinator-authored deletions await independent peer review and are not integrated/published. All62 physical deletions including prior30 are provisional until final collection.40percent and20percent-green goals NOT_ACHIEVED."
+}

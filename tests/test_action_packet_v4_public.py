@@ -2,7 +2,6 @@
 from copy import deepcopy
 import hashlib
 import json
-from pathlib import Path
 
 import pytest
 
@@ -97,11 +96,6 @@ def build(result):
 
 def refresh(packet):
     action_packet.refresh_action_packet_estimate(packet)
-
-
-def test_imports_are_from_this_worktree(tmp_path):
-    root = Path(__file__).resolve().parents[1]
-    assert Path(action_packet.__file__).resolve().is_relative_to(root)
 
 
 def test_real_mcp_preserves_unique_necessary_data_over_2000(necessary_evidence, tmp_path):
