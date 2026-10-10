@@ -11,7 +11,7 @@ The user-facing CLI is `doc-atlas`; the Python import namespace remains
 | CLI | `docmancer/cli/` | Installation, ingest, query, lifecycle and MCP commands |
 | Documentation application | `docmancer/docs/application/` | Project, library and unified context workflows |
 | Documentation domain | `docmancer/docs/domain/` | Ranking, trust, source identity and policy rules |
-| Question planning | `docmancer/docs/domain/question_plan.py` | Fail-closed documentation questions and proof obligations |
+| Question planning | `docmancer/docs/domain/question_plan.py` | Original request identity and conservative retrieval-only planning |
 | Patch planning | `docmancer/docs/domain/patch_request_plan.py` | Reviewed imperative grammar, target polarity and mutation authorization inputs |
 | MCP Docs server | `docmancer/mcp/docs_server.py` | Public documentation tools, resources and transport boundary |
 | MCP Packs gateway | `docmancer/mcp/serve.py` | Advanced installed API-pack search and dispatch |

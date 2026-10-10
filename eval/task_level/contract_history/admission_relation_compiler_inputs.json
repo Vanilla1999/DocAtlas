@@ -1,0 +1,879 @@
+{
+  "schema_version": 1,
+  "protocol": "admission-relation-compiler-precheck-v1",
+  "phase": "retired25_after_own_ci",
+  "source": {
+    "original_path": "tests/docs/test_admission_relation_witnesses.py",
+    "archive_path": "eval/task_level/contract_history/admission_relation_compiler_inputs.py.txt",
+    "git_blob_sha": "f230beaa41ebb0b999f97493007fe253c629ef78",
+    "sha256": "34620c11c83e58dad640b4ee56711830de9ab3ba18ca0c64e88e6f26ffea2809"
+  },
+  "decision": {
+    "kind": "versioned_retirement_of_removed_generation_expectations_not_execution_equivalence",
+    "adr_path": "docs/adr/0003-context-first-project-reads.md",
+    "adr_blob_sha": "9ec7ca998294b171ea3e0e52972ffbdd673116dc",
+    "contract": "Preserve exact original and explicit host queries; do not generate typed retrieval_need lanes or infer source relation proof from natural language.",
+    "not_covered": "This precheck does not execute the 25 archived qualification cases, establish source facts or entailment, certify discovery or answers, or replace native/safety/source-policy tests."
+  },
+  "selected_functions": [
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "function": "test_local_relation_not_question_word_overlap",
+      "definition_line": 50,
+      "source_lines": [
+        47,
+        55
+      ],
+      "collected_cases": 20,
+      "action": "future_retire_generated_typed_relation_expectation",
+      "source_sha256": "89fb9a0f942c148b576747fabc67c5411210b75aab015475e2a8ac02b1b3ad47"
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "function": "test_new_lexical_family_and_markdown_layout",
+      "definition_line": 65,
+      "source_lines": [
+        58,
+        67
+      ],
+      "collected_cases": 5,
+      "action": "future_retire_generated_typed_relation_expectation",
+      "source_sha256": "b6bc90a2cf4dc011c34d9d2099118107804fe4686acb1ad3a997dc1b7e397f47"
+    }
+  ],
+  "frozen_roster_sha256": "8f70e346a0c0cb4ba2e4580d715637895d10ebe1b11ccd4e6ebafdd7fc9ffbae",
+  "archived_inputs": [
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 0,
+      "case_family_index": 0,
+      "language": "en",
+      "answer": "first",
+      "question": "Which takes precedence: nav title or page title?",
+      "body": "The nav title takes precedence over the page title.",
+      "operator": "precedence",
+      "question_sha256": "c81503eb639a49bc94522e267044b12ad45a240d8ff05557cf8eec3aec20d645",
+      "body_sha256": "a07586923b8820b782b05e5e1635f6ed38f005a13878272a90f091b6277fc98f",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 1,
+      "case_family_index": 1,
+      "language": "en",
+      "answer": "first",
+      "question": "When do QueueTasks run relative to response delivery?",
+      "body": "QueueTasks execute after response delivery.",
+      "operator": "temporal_order",
+      "question_sha256": "81abaf6d49bd5d9e20f2c3448a9394721af879926878b64bd2f2705b5211eea8",
+      "body_sha256": "ace2d2b6bb884e598985c70ae2ce6c698f096245b7171b6b1b34e85dc28777ca",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 2,
+      "case_family_index": 2,
+      "language": "en",
+      "answer": "first",
+      "question": "Can a handler for QueueHub be synchronous?",
+      "body": "A handler for QueueHub can be synchronous.",
+      "operator": "callable_form",
+      "question_sha256": "52a7d687d30c43a89647af273600e5edc5ec0cb0128400ba807429a0f7595632",
+      "body_sha256": "dee4e840cd1db278c750cf208fdba93672b2e4b5c05ad694df5c0e8e6485438d",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 3,
+      "case_family_index": 3,
+      "language": "en",
+      "answer": "first",
+      "question": "Which ways enable strict mode?",
+      "body": "Strict mode can be enabled in these ways:\n\n- Use a per-call option.\n- Set a model configuration.",
+      "operator": "enumeration",
+      "question_sha256": "35936adbdb3a2287e4f12e54533ef2a259fa5e0a2fcd50f24d5fc406e2e9954a",
+      "body_sha256": "29ecf7c8272e156f6ad7ebd1746dff993e009d7eecd32697f9635ac927bbe79e",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 4,
+      "case_family_index": 4,
+      "language": "en",
+      "answer": "first",
+      "question": "How do transport keys map to protocols?",
+      "body": "| Transport key | Protocol |\n|---|---|\n| `ALPHA_KEY` | scheme-a |\n| `BETA_KEY` | scheme-b |",
+      "operator": "mapping",
+      "question_sha256": "e91183ffeb53980ab74d46262fafd411a262dab206cfa9c4e29c0ebe7427f74f",
+      "body_sha256": "e7c90a29f27310835e5cc12d3d761c146c68266330dee22cfd4ce92a74fa55ff",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 5,
+      "case_family_index": 0,
+      "language": "ru",
+      "answer": "first",
+      "question": "Что имеет приоритет: nav title или page title?",
+      "body": "The nav title takes precedence over the page title.",
+      "operator": "precedence",
+      "question_sha256": "2ea98879838ee64bc56cdcc4ddd33d7f775a6ca0746fa245120a15f754415af8",
+      "body_sha256": "a07586923b8820b782b05e5e1635f6ed38f005a13878272a90f091b6277fc98f",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 6,
+      "case_family_index": 1,
+      "language": "ru",
+      "answer": "first",
+      "question": "Когда выполняется QueueTasks относительно response delivery?",
+      "body": "QueueTasks execute after response delivery.",
+      "operator": "temporal_order",
+      "question_sha256": "f782e41a20675f019a2bfd6b1fde9936cdcac30ffbbca6344b6accad0d68776e",
+      "body_sha256": "ace2d2b6bb884e598985c70ae2ce6c698f096245b7171b6b1b34e85dc28777ca",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 7,
+      "case_family_index": 2,
+      "language": "ru",
+      "answer": "first",
+      "question": "Может ли handler для QueueHub быть синхронной?",
+      "body": "A handler for QueueHub can be synchronous.",
+      "operator": "callable_form",
+      "question_sha256": "f98f8db5308332744edccb3630ec3eb79c066098b24a349646d976c37145c20f",
+      "body_sha256": "dee4e840cd1db278c750cf208fdba93672b2e4b5c05ad694df5c0e8e6485438d",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 8,
+      "case_family_index": 3,
+      "language": "ru",
+      "answer": "first",
+      "question": "Какие способы включают strict mode?",
+      "body": "Strict mode can be enabled in these ways:\n\n- Use a per-call option.\n- Set a model configuration.",
+      "operator": "enumeration",
+      "question_sha256": "38ab90466d814393fa5256083a108a68c9bfb2fd3a8c4a85edf4b47e5be73873",
+      "body_sha256": "29ecf7c8272e156f6ad7ebd1746dff993e009d7eecd32697f9635ac927bbe79e",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 9,
+      "case_family_index": 4,
+      "language": "ru",
+      "answer": "first",
+      "question": "Как transport keys сопоставляются с protocols?",
+      "body": "| Transport key | Protocol |\n|---|---|\n| `ALPHA_KEY` | scheme-a |\n| `BETA_KEY` | scheme-b |",
+      "operator": "mapping",
+      "question_sha256": "251369c3656c789093eca1d022249a2b69d619eea47a7828274d7a6fee932e03",
+      "body_sha256": "e7c90a29f27310835e5cc12d3d761c146c68266330dee22cfd4ce92a74fa55ff",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 10,
+      "case_family_index": 0,
+      "language": "en",
+      "answer": "other",
+      "question": "Which takes precedence: nav title or page title?",
+      "body": "The page title overrides the nav title.",
+      "operator": "precedence",
+      "question_sha256": "c81503eb639a49bc94522e267044b12ad45a240d8ff05557cf8eec3aec20d645",
+      "body_sha256": "58cd15a7eed0a0b6f1177028783ba0e88937a7d5444394ffa9e7c3b4a98a293f",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 11,
+      "case_family_index": 1,
+      "language": "en",
+      "answer": "other",
+      "question": "When do QueueTasks run relative to response delivery?",
+      "body": "QueueTasks run before response delivery.",
+      "operator": "temporal_order",
+      "question_sha256": "81abaf6d49bd5d9e20f2c3448a9394721af879926878b64bd2f2705b5211eea8",
+      "body_sha256": "c6f4a6cf4c2f2ecda10c489f347c2b35e5dcc9d8f557cd7f5d1188f315292bf4",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 12,
+      "case_family_index": 2,
+      "language": "en",
+      "answer": "other",
+      "question": "Can a handler for QueueHub be synchronous?",
+      "body": "A handler for QueueHub must be asynchronous.",
+      "operator": "callable_form",
+      "question_sha256": "52a7d687d30c43a89647af273600e5edc5ec0cb0128400ba807429a0f7595632",
+      "body_sha256": "879ddf95bc6277ae8f61620b2d47a603fe571cfaa3e4ec558aeb8c1ff7fce4e6",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 13,
+      "case_family_index": 3,
+      "language": "en",
+      "answer": "other",
+      "question": "Which ways enable strict mode?",
+      "body": "To enable strict mode, use these methods:\n\n1. Apply a field setting.\n2. Select a validation option.",
+      "operator": "enumeration",
+      "question_sha256": "35936adbdb3a2287e4f12e54533ef2a259fa5e0a2fcd50f24d5fc406e2e9954a",
+      "body_sha256": "bc73ad88c86efff3f794e8632c1e39d8bf8d932a638fa943a9fefa9206a9ec2c",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 14,
+      "case_family_index": 4,
+      "language": "en",
+      "answer": "other",
+      "question": "How do transport keys map to protocols?",
+      "body": "Transport keys map to protocols as follows:\n\n- `FIRST_KEY` -> scheme-x\n- `LAST_KEY` -> scheme-y",
+      "operator": "mapping",
+      "question_sha256": "e91183ffeb53980ab74d46262fafd411a262dab206cfa9c4e29c0ebe7427f74f",
+      "body_sha256": "5d1e04f934a787d338ccf761257c2db5d69a4b6756de61f55eafeef9c06fcbe2",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 15,
+      "case_family_index": 0,
+      "language": "ru",
+      "answer": "other",
+      "question": "Что имеет приоритет: nav title или page title?",
+      "body": "The page title overrides the nav title.",
+      "operator": "precedence",
+      "question_sha256": "2ea98879838ee64bc56cdcc4ddd33d7f775a6ca0746fa245120a15f754415af8",
+      "body_sha256": "58cd15a7eed0a0b6f1177028783ba0e88937a7d5444394ffa9e7c3b4a98a293f",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 16,
+      "case_family_index": 1,
+      "language": "ru",
+      "answer": "other",
+      "question": "Когда выполняется QueueTasks относительно response delivery?",
+      "body": "QueueTasks run before response delivery.",
+      "operator": "temporal_order",
+      "question_sha256": "f782e41a20675f019a2bfd6b1fde9936cdcac30ffbbca6344b6accad0d68776e",
+      "body_sha256": "c6f4a6cf4c2f2ecda10c489f347c2b35e5dcc9d8f557cd7f5d1188f315292bf4",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 17,
+      "case_family_index": 2,
+      "language": "ru",
+      "answer": "other",
+      "question": "Может ли handler для QueueHub быть синхронной?",
+      "body": "A handler for QueueHub must be asynchronous.",
+      "operator": "callable_form",
+      "question_sha256": "f98f8db5308332744edccb3630ec3eb79c066098b24a349646d976c37145c20f",
+      "body_sha256": "879ddf95bc6277ae8f61620b2d47a603fe571cfaa3e4ec558aeb8c1ff7fce4e6",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 18,
+      "case_family_index": 3,
+      "language": "ru",
+      "answer": "other",
+      "question": "Какие способы включают strict mode?",
+      "body": "To enable strict mode, use these methods:\n\n1. Apply a field setting.\n2. Select a validation option.",
+      "operator": "enumeration",
+      "question_sha256": "38ab90466d814393fa5256083a108a68c9bfb2fd3a8c4a85edf4b47e5be73873",
+      "body_sha256": "bc73ad88c86efff3f794e8632c1e39d8bf8d932a638fa943a9fefa9206a9ec2c",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "case_index": 19,
+      "case_family_index": 4,
+      "language": "ru",
+      "answer": "other",
+      "question": "Как transport keys сопоставляются с protocols?",
+      "body": "Transport keys map to protocols as follows:\n\n- `FIRST_KEY` -> scheme-x\n- `LAST_KEY` -> scheme-y",
+      "operator": "mapping",
+      "question_sha256": "251369c3656c789093eca1d022249a2b69d619eea47a7828274d7a6fee932e03",
+      "body_sha256": "5d1e04f934a787d338ccf761257c2db5d69a4b6756de61f55eafeef9c06fcbe2",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local",
+        "nonempty_source_witness_spans": true
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "case_index": 0,
+      "question": "Which has priority: command option or config file?",
+      "body": "A config file takes precedence over a command option.",
+      "question_sha256": "4d7fa001206f1aa2c7379a662cc266be6a8b458bc66f2e7f198a479aa02770fe",
+      "body_sha256": "a6a47797aee36761ca59015b796b72eedc9f0242f7bca6fc5cb14decdf0b62c4",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local"
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "case_index": 1,
+      "question": "When does Cleanup run relative to transaction commit?",
+      "body": "- Cleanup executes before transaction commit.",
+      "question_sha256": "d7760397f84cf07e9d733cf3a9547657d8d6f9f90f016cbb6141eee1fd19c82e",
+      "body_sha256": "133e93147d2979975495e5bccd87fecc50130eb921ae74f706e11cefc8e34d59",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local"
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "case_index": 2,
+      "question": "Is a normal handler allowed?",
+      "body": "A normal handler is not allowed; an async handler is required.",
+      "question_sha256": "73e9d6f792ac4c71b4d78e89f8c1186712b879ff90ff90c151c64cbc354843bb",
+      "body_sha256": "1db173ad5f82c29f4daa05c14313786cad5b3ec4d9acf74229950f7841c96bef",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local"
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "case_index": 3,
+      "question": "Which options configure retry policy?",
+      "body": "Retry policy is configured using these options:\n\n- Select an interval.\n- Choose a limit.",
+      "question_sha256": "69e3178af26ae1348ba337243ef494aa1ca9399dbc328c9b28ec29749561601e",
+      "body_sha256": "2f76e9e7bc773f62121b60646fa51df5803570583b5d4e70ad94cafeb627aeeb",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local"
+      }
+    },
+    {
+      "original_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "case_index": 4,
+      "question": "How do input fields correspond to output fields?",
+      "body": "| Input fields | Output fields |\n|---|---|\n| old_name | new_name |",
+      "question_sha256": "9008ba7f226d199aeac90bff4eb689bf59d7f75ca7d7ac635cb091f412720363",
+      "body_sha256": "0e8ce5f29118a98494f6dc5c942892d31b1ccb2c7ab5fb1558598a0fae75c81b",
+      "historical_assertion": {
+        "qualified": true,
+        "admission_route": "typed_local"
+      }
+    }
+  ],
+  "frozen_input_roster_sha256": "c75cba6725098b2ca036a47634091f015a5917c3c5b10bed88a001f57b1b474b",
+  "data_expansion_order": {
+    "first_function": [
+      "answer",
+      "language",
+      "case_family_index"
+    ],
+    "second_function": "literal decorator row order",
+    "execution": "Only frozen literal data is expanded; neither old helper nor old assertion executes."
+  },
+  "representative_inputs": [
+    {
+      "case_index": 0,
+      "archive_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap",
+      "archive_case_index": 6,
+      "question": "Когда выполняется QueueTasks относительно response delivery?",
+      "question_sha256": "f782e41a20675f019a2bfd6b1fde9936cdcac30ffbbca6344b6accad0d68776e",
+      "lookup_queries": [],
+      "expected_rows": [
+        [
+          "query-original",
+          "Когда выполняется QueueTasks относительно response delivery?",
+          "original",
+          "direct",
+          true
+        ]
+      ],
+      "expected_payload": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "Когда выполняется QueueTasks относительно response delivery?",
+        "query_ids": [
+          "query-original"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "Когда выполняется QueueTasks относительно response delivery?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [],
+        "component_scope_complete": false
+      },
+      "guard": "critical_relation_original_does_not_generate_need_queries"
+    },
+    {
+      "case_index": 1,
+      "archive_nodeid": "tests/docs/test_admission_relation_witnesses.py::test_new_lexical_family_and_markdown_layout",
+      "archive_case_index": 4,
+      "question": "How do input fields correspond to output fields?",
+      "question_sha256": "9008ba7f226d199aeac90bff4eb689bf59d7f75ca7d7ac635cb091f412720363",
+      "lookup_queries": [],
+      "expected_rows": [
+        [
+          "query-original",
+          "How do input fields correspond to output fields?",
+          "original",
+          "direct",
+          true
+        ]
+      ],
+      "expected_payload": {
+        "schema_version": "documentation-query-plan-v2",
+        "original_question": "How do input fields correspond to output fields?",
+        "query_ids": [
+          "query-original"
+        ],
+        "required_query_ids": [
+          "query-original"
+        ],
+        "public_query_ids": [
+          "query-original"
+        ],
+        "queries": [
+          {
+            "query_id": "query-original",
+            "text": "How do input fields correspond to output fields?",
+            "origin": "original",
+            "coverage_required": true,
+            "facet_id": null,
+            "requirement_id": null,
+            "relation": "direct",
+            "public_parent_query_id": null,
+            "preferred_catalog_roles": [],
+            "forbidden_catalog_roles": [],
+            "forbidden_evidence_terms": [],
+            "parent_exact_terms": [],
+            "need_subject": null,
+            "need_relation": null,
+            "need_context": null
+          }
+        ],
+        "explicit_paths": [],
+        "unresolved_parts": [],
+        "_component_contract": [],
+        "component_scope_complete": false
+      },
+      "guard": "critical_relation_original_does_not_generate_need_queries"
+    }
+  ],
+  "representative_inputs_sha256": "5943d52139a599c91cebfe3eddb1eab73fde67287d509fc3af9524c359ef57b7",
+  "execution_accounting": {
+    "ordinary_test_functions_added": 0,
+    "representative_records_added": 2,
+    "production_plan_calls_added": 2,
+    "production_alias_calls_added": 0,
+    "archived_cases_replayed_as_production_calls": 0,
+    "old_cases_removed_by_precheck": 0,
+    "planned_later_case_reduction": 25,
+    "planned_later_definition_reduction": 2,
+    "performance_claim": "No measured runtime or full-CI speedup is claimed; one mutation child is added."
+  },
+  "preservation": {
+    "whole_module_states": [
+      {
+        "state": "precheck",
+        "test_definitions": 6,
+        "collected_cases": 72,
+        "node_roster_sha256": "a005ffa9039aa28ec770ad4fac6aa32c1f6e1ed0e7502b42b4dd20557794fe7f"
+      },
+      {
+        "state": "future_retirement_after_own_proof",
+        "test_definitions": 4,
+        "collected_cases": 47,
+        "node_roster_sha256": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d"
+      }
+    ],
+    "all_other_nodes": "Whole AST sequence must equal frozen source or removal of exactly the two selected functions; no generic helper/import/CASES ignore.",
+    "unchanged_helpers": [
+      "CASES",
+      "probe",
+      "qualify"
+    ],
+    "unchanged_case_groups": [
+      {
+        "function": "test_keyword_salad_wrong_role_and_unrelated_sentence_never_prove_relation",
+        "cases": 24,
+        "note": "Keep all 12 original-body and 12 legacy retrieval_need-origin rows; the latter remain a separate migration task."
+      },
+      {
+        "function": "test_relation_does_not_override_source_policy",
+        "cases": 15,
+        "note": "Existing healthy independent policy controls remain unchanged."
+      },
+      {
+        "function": "test_missing_or_opposite_condition_does_not_answer_conditional_question",
+        "cases": 3,
+        "note": "Keep all original condition bodies and questions for separate contract migration."
+      },
+      {
+        "function": "test_native_pipeline_keeps_real_need_and_false_answer_flags",
+        "cases": 5,
+        "note": "Original public discovery and false-authority obligations remain collected."
+      }
+    ],
+    "safety_module": "tests/docs/test_admission_relation_safety.py remains unchanged; imports CASES/qualify/probe survive.",
+    "diagnostic_registration": "tests/diagnostic_labels.admission_contract.json",
+    "diagnostic_registration_base_blob": "5714aa323a983c9f070559088a0499fa863a7d4e",
+    "precheck_original_module_and_registration_changed": false
+  },
+  "existing_independent_properties": [
+    {
+      "property": "original_and_host_independence",
+      "control": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+      "note": "Earlier literal rows/IDs/parent/required flags and all29 mutant definitions remain unchanged."
+    },
+    {
+      "property": "source_policy",
+      "control": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+      "note": "15 cases cover foreign/stale policy and inert raw risk metadata; no removal."
+    },
+    {
+      "property": "crop_identity_and_no_io",
+      "controls": [
+        "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
+        "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io"
+      ],
+      "note": "Existing six relation-policy/crop/no-I/O faults remain in the critical runner."
+    },
+    {
+      "property": "native_source_discovery",
+      "control": "tests/docs/test_admission_relation_witnesses.py::test_native_pipeline_keeps_real_need_and_false_answer_flags",
+      "note": "Five still-collected cases remain independent quality obligations; the new generation precheck gives them no PASS credit."
+    }
+  ],
+  "directed_mutation": {
+    "name": "relation_question_does_not_generate_typed_retrieval_need",
+    "path": "docmancer/docs/domain/documentation_query_plan.py",
+    "old": "    queries = [DocumentationLookup(\"query-original\", question, \"original\")]",
+    "new": "    queries = [DocumentationLookup(\"query-original\", question, \"original\")]\n    if \" relative to \" in question or \" относительно \" in question:\n        queries.append(DocumentationLookup(\n            \"query-need-1\", question, \"retrieval_need\", relation=\"direct\",\n            need_relation=\"temporal_order\",\n        ))",
+    "failure_guard": "critical_relation_original_does_not_generate_need_queries",
+    "decisive_record_index": 0,
+    "base_blob_sha": "0cd20b1138f1a3a2740729677d9588414f2dcf32",
+    "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+    "expected_failures": 1,
+    "expected_errors": 0,
+    "expected_skips": 0,
+    "anchor_matches": 1,
+    "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+    "after_sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225"
+  },
+  "observed_predecessor": {
+    "pr_head": "441cdefd2b251d63f716bfa75b053413bbe09c76",
+    "checkout_commit": "ceea2571e9847a71515feda4e1e1441fafdede44",
+    "run_id": 38017123447,
+    "reader_job_id": 114111640263,
+    "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38017123447/job/114111640263",
+    "decoded_log_sha256": "ad44754505bf41a660a8312924380d8989915f6cf776a0579ae84f45edbf0f59",
+    "decoded_log_utf8_bytes": 569005,
+    "module_records": [
+      {
+        "reader_line": 325,
+        "module": "tests/docs/test_admission_relation_safety.py",
+        "counts": {
+          "FAIL": 18,
+          "PASS": 8
+        },
+        "first_node": "tests/docs/test_admission_relation_safety.py::test_same_supported_demand_cannot_escape_its_witness_in_another_lane[original]",
+        "first_message": "StopIteration"
+      },
+      {
+        "reader_line": 326,
+        "module": "tests/docs/test_admission_relation_witnesses.py",
+        "counts": {
+          "FAIL": 49,
+          "PASS": 23
+        },
+        "first_node": "tests/docs/test_admission_relation_witnesses.py::test_local_relation_not_question_word_overlap[first-en-Which takes precedence: nav title or page title?-\\u0427\\u0442\\u043e \\u0438\\u043c\\u0435\\u0435\\u0442 \\u043f\\u0440\\u0438\\u043e\\u0440\\u0438\\u0442\\u0435\\u0442: nav title \\u0438\\u043b\\u0438 page title?-The nav title takes precedence over the page title.-The page title overrides the nav title.-precedence]",
+        "first_message": "StopIteration"
+      }
+    ],
+    "scope": "Module summaries and each first failure only; unprinted individual case outcomes are not claimed."
+  },
+  "runtime_gate": {
+    "status": "own_precheck_passed_c2a6682d",
+    "required_baseline": {
+      "tests": 54,
+      "pass": 54,
+      "fail": 0,
+      "error": 0,
+      "skip": 0
+    },
+    "required_directed_kills": 30,
+    "new_mutant_requires": {
+      "tests": 1,
+      "fail": 1,
+      "error": 0,
+      "skip": 0,
+      "intended_guard": true,
+      "exact_source_import_identity": true
+    },
+    "previous_dqp30_own_runtime_still_required": true,
+    "runtime_proof": {
+      "repository": "Vanilla1999/DocAtlas",
+      "pr": 211,
+      "pr_head": "c2a6682d2438c9217c3bf26938dcd003391dbc75",
+      "checkout_commit": "642a14289fddd06408400b4ee6cc5480945e7d1a",
+      "checkout_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "checkout_parents": [
+        "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+        "c2a6682d2438c9217c3bf26938dcd003391dbc75"
+      ],
+      "pr_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "same_tree_verified": true,
+      "main_run_id": 38021212993,
+      "reader_job_id": 114124354950,
+      "advanced_job_id": 114122398660,
+      "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950",
+      "evidence_path": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json",
+      "evidence_blob": "5a4a03197ed8ad93e40157ec37ecb3cb5247ea3d",
+      "evidence_sha256": "d672705adec2e132a91dc894af261a688405addf9cbc06e7fc0051fd33a52d57",
+      "decoded_log_sha256": "f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397",
+      "decoded_log_utf8_bytes": 591931,
+      "critical_baseline": {
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/evidence.json",
+        "sha256": "9191908ea3a417236cbcb6da83de474222280518fe3e1b6758211c83ff08f493",
+        "bytes": 16066,
+        "run": "baseline",
+        "validated": true,
+        "returncode": 0,
+        "junit": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "489d07c1f0d9641cef201b4bfbbbba08ce08979c721f504cb87a3e3dce94595c"
+        },
+        "observed_case_count": 54,
+        "observed_nonpassing_count": 0,
+        "failed_cases": [],
+        "stored_import_probe": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/import-origin.stdout.log",
+          "sha256": "3d48454cfecf4e547e4ad6b75797d0f40d7cb10ddb3ff6d0f27fdc8115b2a899",
+          "bytes": 10361,
+          "recorded_module_count": 42,
+          "complete_rows_in_receipt": 42,
+          "matched_modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+            },
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+            }
+          ],
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process"
+        },
+        "complete_record_in": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json"
+      },
+      "critical_mutants_total": 30,
+      "priority_rows_omitted": 0,
+      "import_claim_boundary": "Import rows are actual stored separate-process import probes, not pytest same-process observations. Producer validation and individual stored failure/source hashes are recorded without rerunning.",
+      "literal_comparison": {
+        "step": {
+          "name": "Compare historical and compact literal contract tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        "claim_boundary": "Same-checkout producer step success. No omitted individual literal mutant rows are reconstructed."
+      },
+      "scope": "Own compiler-boundary evidence; no source-quality, archived-input execution-equivalence or full-PR PASS claim.",
+      "directed_mutants": [
+        {
+          "record_type": "CRITICAL_OPERANDS",
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/evidence.json",
+          "sha256": "8ca2d26392d94eaeaa0a3f09c9abde856652517603abeb04f4f5bf9503d1a44c",
+          "bytes": 2480,
+          "run": "relation_question_does_not_generate_typed_retrieval_need",
+          "validated": true,
+          "returncode": 1,
+          "junit": {
+            "tests": 1,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+          },
+          "observed_case_count": 1,
+          "observed_nonpassing_count": 1,
+          "failed_cases": [
+            {
+              "classname": "tests.docs.test_project_retrieval_alias_contract",
+              "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+              "outcome": "failure",
+              "message": "AssertionError: critical_relation_original_does_not_generate_need_queries"
+            }
+          ],
+          "mutation": {
+            "name": "relation_question_does_not_generate_typed_retrieval_need",
+            "path": "docmancer/docs/domain/documentation_query_plan.py",
+            "anchor_count": 1,
+            "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+            "after_sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225",
+            "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "expected_failures": 1,
+            "failure_guard": "critical_relation_original_does_not_generate_need_queries"
+          },
+          "import_origin": {
+            "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/import-origin.stdout.log",
+            "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+            "sha256": "2c7cdad24ecd7c9447851bfcf4f77fbd4a9d1ca362c040d2d1cf898d32fb9dd2",
+            "bytes": 10361,
+            "selection": "mutated_module",
+            "row_count": 42,
+            "selected_row_count": 1,
+            "unselected_row_count": 41,
+            "modules": [
+              {
+                "module": "docmancer.docs.domain.documentation_query_plan",
+                "path": "/home/runner/work/_temp/docmancer-mutation-jjbdw1pj/docmancer/docs/domain/documentation_query_plan.py",
+                "sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225"
+              }
+            ]
+          },
+          "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+        }
+      ]
+    }
+  },
+  "retirement_phase": {
+    "status": "performed_in_reviewed_retirement_slice",
+    "conditions": [
+      "Healthy own current baseline and intended generation mutant on bound checkout/source identity.",
+      "Keep all47 unselected cases, CASES/probe/qualify and all other AST nodes intact.",
+      "Audit current external selectors/imports before removing only the two selected functions.",
+      "Separate reviewed source removal, owning diagnostic hash, actual crosswalk receipt and note."
+    ],
+    "paths": [
+      "tests/docs/test_admission_relation_witnesses.py",
+      "tests/diagnostic_labels.admission_contract.json",
+      "eval/task_level/contract_history/admission_relation_compiler_inputs.json",
+      "v2plan/pr211-execution/RELATION_COMPILER_PRECHECK_RU.md"
+    ],
+    "commits_or_refs_changed": true,
+    "actual": {
+      "selected_cases_removed": 25,
+      "selected_definitions_removed": 2,
+      "combined_source_cases_removed": 25,
+      "remaining_definitions": 4,
+      "remaining_cases": 47,
+      "source_blob": "6132b5b1e970e309b7ebe583ebf39d0444744097",
+      "source_sha256": "05891fce3e921626e4185fc58f2a4e007e767ec1926526d29674030d6e6e9f49",
+      "node_roster_sha256": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d",
+      "after_removal_runtime": "pending_existing_PR_CI",
+      "note": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md",
+      "original_module_and_registration_changed": true
+    }
+  }
+}

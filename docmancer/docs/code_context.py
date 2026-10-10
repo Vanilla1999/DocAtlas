@@ -10,11 +10,6 @@ CODE_CONTEXT_SCHEMA_VERSION = "code-context-1"
 CODE_CONTEXT_TOOL = "get_code_context"
 _SOURCE_SUFFIXES = {".dart", ".py", ".js", ".jsx", ".ts", ".tsx", ".java", ".kt", ".swift", ".go", ".rs"}
 _WORD_RE = re.compile(r"[A-Za-zА-Яа-яЁё_][A-Za-zА-Яа-яЁё0-9_]{2,}")
-_LOW_SIGNAL_TERMS = {
-    "and", "does", "how", "the", "this", "that", "where", "work", "used",
-    "как", "где", "для", "или", "что", "это", "работает", "используется",
-}
-_GENERIC_SOURCE_TERMS = {"tab", "tabs", "key", "build", "file", "files", "download", "downloaded", "browser"}
 _IMPORT_EXTENSIONS = (".dart", ".ts", ".tsx", ".js", ".jsx", ".py")
 
 
@@ -158,7 +153,7 @@ def _query_terms(question: str, *, entry_symbols: list[str] | None, changed_file
         _append_unique(terms, quoted.strip())
     for word in _WORD_RE.findall(question or ""):
         normalized = _normalize(word)
-        if len(normalized) < 3 or normalized in _LOW_SIGNAL_TERMS:
+        if len(normalized) < 3:
             continue
         _append_unique(terms, word)
     return terms[:24]
@@ -226,16 +221,15 @@ def _connection_reason(item: dict[str, Any], frontier: set[str], *, hop: int, se
     exact_symbols = {term for term in frontier if term in symbol_names}
     exact_refs = {term for term in frontier if term in references}
     path_matches = {term for term in frontier if term and term in normalized_path}
-    generic_only = bool(path_matches) and not exact_symbols and not exact_refs and all(term in _GENERIC_SOURCE_TERMS for term in path_matches)
     if exact_symbols:
         return "defines entry/central symbol"
     if exact_refs:
         return "references central symbol from source chain"
     if selected and _connected_to_selected(item, selected):
         return "import/reference-connected to source chain"
-    if path_matches and not generic_only and (not module_terms or any(term in normalized_path for term in module_terms)):
+    if path_matches and (not module_terms or any(term in normalized_path for term in module_terms)):
         return "path/module coherent query match"
-    if hop == 0 and _fact_matches_any(item, frontier) and not generic_only and not imports:
+    if hop == 0 and _fact_matches_any(item, frontier) and not imports:
         return "query symbol/path match"
     return None
 
@@ -263,14 +257,8 @@ def _source_context_score(item: dict[str, Any], *, module_terms: set[str]) -> fl
 
 
 def _module_coherence_terms(query_terms: list[str]) -> set[str]:
-    normalized = set(_normalized_terms(query_terms))
-    terms: set[str] = set()
-    for term in normalized:
-        if term in {"tsd browser", "tsd_browser", "browser"} or "tsd" in term:
-            terms.update({"tsd browser", "tsd_browser"})
-        elif term not in _GENERIC_SOURCE_TERMS and len(term) >= 4:
-            terms.add(term)
-    return terms
+    """Use literal request terms, without product aliases or topic exclusions."""
+    return {term for term in _normalized_terms(query_terms) if len(term) >= 4}
 
 
 def _is_noise_path(path: str) -> bool:

@@ -13,6 +13,20 @@ from docmancer.cli.__main__ import cli
 from docmancer.cli.ui import display_path
 
 
+def _declare_docs(root, *paths):
+    """Fixtures use literal membership, never implicit README discovery."""
+    (root / "docatlas.project-docs.yaml").write_text(yaml.safe_dump({
+        "schema_version": 1, "code_files": [],
+        "documents": [{"path": path,
+            "role": "module_architecture" if path.startswith("packages/") else "overview",
+            "scope": "module" if path.startswith("packages/") else "project",
+            "module_path": "packages/auth" if path.startswith("packages/auth/") else None,
+            "description": "Explicit fixture documentation membership.",
+            "authority": "source_of_truth", "status": "active", "impact": "track"}
+            for path in paths],
+    }), encoding="utf-8")
+
+
 class FakeDocmancerConfig:
     def __init__(self, data=None):
         defaults = {
@@ -107,6 +121,7 @@ def test_docs_impact_cli_returns_machine_readable_report(tmp_path):
     module = tmp_path / "packages" / "auth"
     module.mkdir(parents=True)
     (module / "README.md").write_text("# Auth\n", encoding="utf-8")
+    _declare_docs(tmp_path, "README.md", "packages/auth/README.md")
 
     result = CliRunner().invoke(
         cli,
@@ -145,6 +160,7 @@ def test_docs_impact_cli_accepts_changed_symbols_for_section_hints(tmp_path):
     (tmp_path / "README.md").write_text(
         "# Project\n\n## Authentication\nUse `issue_token`.\n", encoding="utf-8"
     )
+    _declare_docs(tmp_path, "README.md")
 
     result = CliRunner().invoke(
         cli,
@@ -217,16 +233,14 @@ def test_docs_impact_cli_incrementally_syncs_exact_committed_doc_diff(tmp_path):
     first = CliRunner().invoke(cli, arguments)
     second = CliRunner().invoke(cli, arguments)
 
-    assert first.exit_code == 0, first.output
-    assert second.exit_code == 0, second.output
-    first_sync = json.loads(first.output)["sync"]
-    second_sync = json.loads(second.output)["sync"]
-    assert first_sync["status"] == "success"
-    assert first_sync["metrics"]["files_reprocessed"] == 1
-    assert first_sync["metrics"]["derived_writes"] == 1
-    assert second_sync["metrics"]["files_reprocessed"] == 0
-    assert second_sync["metrics"]["derived_writes"] == 0
-    assert len(first.output.encode("utf-8")) <= 32 * 1024
+    # Exact committed changes describe the diff, not an explicit member grant.
+    # The legacy CLI flag cannot bypass the authorized prepare_docs lane.
+    for result in (first, second):
+        assert result.exit_code != 0
+        assert isinstance(result.exception, PermissionError)
+    assert not (tmp_path / "index.db").exists()
+    assert not (tmp_path / "extracted").exists()
+    assert readme.read_text(encoding="utf-8") == "# Project\n\nNew accepted docs.\n"
 
 
 def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_path):
@@ -234,6 +248,7 @@ def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_pat
     module = tmp_path / "packages" / "auth"
     module.mkdir(parents=True)
     (module / "README.md").write_text("# Auth\n", encoding="utf-8")
+    _declare_docs(tmp_path, "README.md", "packages/auth/README.md")
     (tmp_path / "package.json").write_text('{"dependencies": {"react": "18.3.1"}}', encoding="utf-8")
 
     result = CliRunner().invoke(cli, ["agent-contract", "--project-path", str(tmp_path), "--format", "json"])
@@ -244,11 +259,15 @@ def test_agent_contract_cli_describes_project_sources_and_tool_selection(tmp_pat
     assert contract["tool_selection"]["default_tool"] == "get_docs_context"
     assert "docs_status for an explicit health" in contract["tool_selection"]["decision_rule"]
     assert {item["path"] for item in contract["project"]["documentation"]} == {"README.md", "packages/auth/README.md"}
-    assert any(item["name"] == "react" for item in contract["project"]["dependencies"])
+    assert contract["project"]["dependencies"] == []
+    assert any("Dependency/source metadata unresolved" in warning
+        for warning in contract["warnings"])
+    assert 'context_format="patch_context"' in contract["tool_selection"]["decision_rule"]
 
 
 def test_agent_contract_cli_can_render_markdown(tmp_path):
     (tmp_path / "README.md").write_text("# Project\n", encoding="utf-8")
+    _declare_docs(tmp_path, "README.md")
 
     result = CliRunner().invoke(cli, ["agent-contract", "--project-path", str(tmp_path), "--format", "markdown"])
 

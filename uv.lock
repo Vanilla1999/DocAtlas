@@ -628,7 +628,7 @@ requires-dist = [
     { name = "click", specifier = ">=8.0.0" },
     { name = "cohere", marker = "extra == 'embeddings-cohere'", specifier = ">=5.0.0" },
     { name = "crawl4ai", marker = "extra == 'crawl4ai'", specifier = ">=0.4.0" },
-    { name = "fastembed", specifier = ">=0.4.0" },
+    { name = "fastembed", specifier = "==0.8.0" },
     { name = "filelock", specifier = ">=3.0.0" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "jsonschema", specifier = ">=4.0.0" },

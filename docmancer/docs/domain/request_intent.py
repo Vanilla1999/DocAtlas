@@ -1,4 +1,4 @@
-"""Shared deterministic request-intent predicates for routing and patch planning."""
+"""Conservative request-intent ABI; free-form prose grants no mutation authority."""
 
 from __future__ import annotations
 
@@ -9,25 +9,7 @@ import re
 MAX_INTENT_SCAN_CHARS = 4_000
 MAX_INTENT_CLAUSES = 12
 
-_ACTION_HEAD = re.compile(
-    r"\s*(?:[-*]\s+)?(?:(?:please|пожалуйста)\s+)?(?P<verb>"
-    r"implement|create|build|write|develop|introduce|replace|add|change|edit|modify|fix|"
-    r"refactor|delete|remove|rename|update|patch|migrate|code|make|"
-    r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
-    r"исправ\w*|(?:от)?рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b",
-    re.IGNORECASE,
-)
 _FENCE_LINE = re.compile(r"(?m)^[ \t]*(?P<fence>```|~~~)[^\n]*(?:\n|$)")
-_RUSSIAN_ACTION_QUESTION = re.compile(r"[А-Яа-яЁё]+[^\S\r\n]+ли\b", re.IGNORECASE)
-_RUSSIAN_INFINITIVE_ACTION = re.compile(r"[А-Яа-яЁё]+(?:ть|ться)$", re.IGNORECASE)
-_RUSSIAN_NARRATIVE_PREDICATE = re.compile(
-    r"^[^,;:]{1,120}\b(?:"
-    r"открывает|показывает|отправляет|возвращает|переводит|перемещает|"
-    r"запускает|вызывает|использует|ведет|ведёт|создает|создаёт|"
-    r"обновляет|удаляет|сохраняет|закрывает|переоткрывает|проверяет"
-    r")\b",
-    re.IGNORECASE,
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,64 +106,21 @@ def _looks_like_narrative_action_label(
     verb_end: int,
     clause_end: int,
 ) -> bool:
-    """Reject Russian use-case labels that look imperative only at the first word.
+    """Legacy semantic hook, disabled; syntax helpers remain available."""
 
-    Product stories commonly use an infinitive as a UI/action label, e.g.
-    ``Создать новый запрос открывает экран ...``.  The later third-person
-    predicate makes the clause descriptive rather than an instruction to edit
-    the repository.  Restricting this check to Russian infinitives avoids
-    weakening real imperative forms such as ``Создай`` / ``Исправь``.
-    """
-
-    verb = source[verb_start:verb_end]
-    if _RUSSIAN_INFINITIVE_ACTION.fullmatch(verb) is None:
-        return False
-    tail = source[verb_end:clause_end].strip()
-    return bool(_RUSSIAN_NARRATIVE_PREDICATE.search(tail))
+    return False
 
 
 def find_change_clause(question: str) -> ChangeIntentClause | None:
-    """Find a real top-level change imperative, including after a short preamble.
+    """Return no inferred change clause; explicit SDK contracts are separate."""
 
-    The scanner is deliberately clause-aware instead of searching arbitrary
-    substrings: a request may describe a defect in sentence one and say
-    ``Fix ...`` in sentence two, while quoted/code examples and narrative
-    use-case labels must never create mutation authority.
-    """
-
-    source = str(question or "")[:MAX_INTENT_SCAN_CHARS]
-    if not source.strip():
-        return None
-    masked = _mask_non_top_level_text(source)
-    for start, end in _top_level_clause_spans(masked):
-        match = _ACTION_HEAD.match(masked, start, end)
-        if match is None:
-            continue
-        verb_start, verb_end = match.span("verb")
-        # "Удаляет ли ...?" describes behavior, not an instruction to edit.
-        # Test original text so masked code cannot bring a later "ли" next
-        # to the verb. Continue scanning for a subsequent real imperative.
-        if _RUSSIAN_ACTION_QUESTION.match(source, verb_start, end):
-            continue
-        if _looks_like_narrative_action_label(
-            source,
-            verb_start=verb_start,
-            verb_end=verb_end,
-            clause_end=end,
-        ):
-            continue
-        return ChangeIntentClause(
-            start=match.start(),
-            end=end,
-            verb=source[verb_start:verb_end],
-            verb_start=verb_start,
-            verb_end=verb_end,
-        )
+    # Free-form text is data, not an explicit mutation contract. Preserve the
+    # syntax/masking helpers for callers without synthesizing an operation.
     return None
 
 
 def is_change_request(question: str) -> bool:
-    """Return true only for an explicit top-level change imperative."""
+    """Text alone is never an explicit mutation contract."""
 
     return find_change_clause(question) is not None
 

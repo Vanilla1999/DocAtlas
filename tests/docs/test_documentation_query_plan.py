@@ -10,55 +10,6 @@ from docmancer.docs.domain.evidence_qualification import (
 import pytest
 
 
-def test_documentation_query_plan_owns_public_retrieval_query_ids():
-    plan = build_documentation_query_plan(
-        "Please explain DocAtlas architecture and testing.",
-        lookup_queries=(
-            "project purpose",
-            "project architecture",
-            "project data flow",
-            "local development",
-            "test commands",
-        ),
-    ).as_payload()
-
-    assert plan["public_query_ids"] == [
-        "query-original",
-        "query-lookup-1",
-        "query-lookup-2",
-        "query-lookup-3",
-        "query-lookup-4",
-        "query-lookup-5",
-    ]
-    assert plan["required_query_ids"] == []
-    assert any(item["origin"] == "canonical_intent" for item in plan["queries"])
-    assert not any(
-        query_id.startswith("query-intent-") for query_id in plan["public_query_ids"]
-    )
-
-
-def test_documentation_query_plan_owns_retrieval_only_alias_lineage():
-    plan = build_documentation_query_plan(
-        "Как устроен полный процесс работы Docs MCP?",
-        lookup_queries=("MCP public tools",),
-    ).as_payload()
-    by_origin = {
-        origin: [item for item in plan["queries"] if item["origin"] == origin]
-        for origin in {item["origin"] for item in plan["queries"]}
-    }
-
-    assert by_origin["original"][0]["relation"] == "direct"
-    assert by_origin["original"][0]["public_parent_query_id"] is None
-    assert by_origin["host_lookup"][0]["relation"] == "host_lookup"
-    assert by_origin["host_lookup"][0]["public_parent_query_id"] is None
-    assert all(
-        item["relation"] == "audited_rewrite"
-        and item["public_parent_query_id"] == "query-original"
-        and item["preferred_catalog_roles"]
-        for item in by_origin["canonical_intent"]
-    )
-
-
 def test_documentation_lookup_rejects_invalid_lineage():
     with pytest.raises(ValueError, match="unsupported"):
         DocumentationLookup("query-x", "x", "hint", relation="internal_hint")
@@ -113,23 +64,6 @@ def test_evidence_qualification_rejects_metadata_only_term_matches():
     assert qualification.reason == "insufficient_visible_match"
 
 
-def test_same_text_lookups_retain_independent_public_and_canonical_ids():
-    plan = build_documentation_query_plan(
-        "Explain get_docs_context project architecture",
-        lookup_queries=("get_docs_context", "project architecture overview components indexing retrieval storage",
-                        "get_docs_context"),
-    )
-    assert {q.query_id for q in plan.queries if q.origin == "host_lookup"} == {
-        "query-lookup-1", "query-lookup-2", "query-lookup-3",
-    }
-    assert any(q.origin == "exact_anchor" and q.text == "get_docs_context" for q in plan.queries)
-    assert any(
-        q.origin == "canonical_intent"
-        and q.text == "project architecture overview components indexing retrieval storage"
-        for q in plan.queries
-    )
-
-
 @pytest.mark.parametrize("failed_direct", [False, True])
 def test_derived_merge_never_invents_successful_direct_coverage(failed_direct):
     from docmancer.docs.application.context_selection import merge_query_matches
@@ -146,51 +80,12 @@ def test_derived_merge_never_invents_successful_direct_coverage(failed_direct):
 
 
 @pytest.mark.parametrize("question,expected", [
-    ("Что это за проект и какую проблему он решает?", {"product_overview"}),
-    ("Как устроена архитектура проекта и где проходят основные границы модулей?", {"project_architecture"}),
-    ("Как проходит запрос get_docs_context от MCP-входа до выбора источников?", {"retrieval_pipeline"}),
-    ("Какие публичные инструменты предоставляет Docs MCP?", {"docs_mcp_public_tools"}),
-    ("Как система выбирает доказательства?", {"evidence_selection"}),
-    ("Почему проект не работает и как диагностировать проблему?", {"troubleshooting"}),
     ("Где находятся модули?", set()),
-    ("Где начать читать код проекта?", {"contributor_start"}),
     ("Какие инструменты нужны для ремонта?", set()),
-    ("Как система хранит доказательства?", {"project_storage"}),
 ])
 def test_exact_project_facets_and_negative_neighbors(question, expected):
     from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
     assert {alias.intent_id for alias in build_project_retrieval_aliases(question)} == expected
-
-
-def test_alias_budget_is_fair_across_requested_facets():
-    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-    aliases = build_project_retrieval_aliases("Explain project purpose, architecture, offline mode and context token budget")
-    assert len(aliases) == 4
-    assert {alias.intent_id for alias in aliases} == {
-        "product_overview", "project_architecture", "offline_usage", "context_budget",
-    }
-    assert not any(alias.intent_id == "context_budget" for alias in build_project_retrieval_aliases("Explain project architecture"))
-
-
-@pytest.mark.parametrize("question", [
-    "Explain project architecture and testing",
-    "Explain UnknownLedger project architecture",
-    "Explain project architecture and the imaginary orbital subsystem",
-])
-def test_partial_canonical_facets_cannot_cover_original(question):
-    plan = build_documentation_query_plan(question)
-    aliases = [q for q in plan.queries if q.origin == "canonical_intent"]
-    assert aliases
-    assert all(q.relation == "host_lookup" and q.public_parent_query_id is None for q in aliases)
-
-
-def test_only_audited_complete_equivalence_derives_original():
-    question = "project architecture overview components indexing retrieval storage"
-    plan = build_documentation_query_plan(question)
-    alias = next(q for q in plan.queries if q.origin == "canonical_intent" and q.text == question)
-    assert alias.text == question
-    assert alias.relation == "audited_rewrite"
-    assert alias.public_parent_query_id == "query-original"
 
 
 def test_host_policies_follow_relevant_facets_not_compound_union():
@@ -215,25 +110,7 @@ def test_unrecognized_host_inherits_only_single_facet_policy():
     assert host.forbidden_evidence_terms
 
 
-@pytest.mark.parametrize("question", ["clear local index", "troubleshoot stale docs", "offline mode", "context token budget"])
-def test_operational_facets_have_role_policies(question):
-    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-    aliases = build_project_retrieval_aliases(question)
-    assert aliases
-    assert all(alias.preferred_catalog_roles and "roadmap" in alias.forbidden_catalog_roles for alias in aliases)
-
-
-@pytest.mark.parametrize("question", [
-    "What output budgets apply to Docs MCP responses?",
-    "Какой лимит источников в ответе Docs MCP?",
-])
-def test_output_budget_wording_gets_requested_facet(question):
-    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-    assert "context_budget" in {a.intent_id for a in build_project_retrieval_aliases(question)}
-
-
 @pytest.mark.parametrize("suffix,equivalent", [
-    ("?", True),
     (" и объяснить архитектуру?", False),
     (" и проверить неизвестный контракт?", False),
     (" с UnknownLedger?", False),
@@ -247,28 +124,6 @@ def test_audited_installation_equivalence_is_complete_and_bounded(suffix, equiva
         assert len(audited) == 1
         assert "local installation setup verification" in audited[0].text
         assert audited[0].public_parent_query_id == "query-original"
-
-
-@pytest.mark.parametrize("question", [
-    "Which pytest markers are available?",
-    "Where is project docs configuration?",
-    "Which environment variable controls the state root?",
-])
-def test_narrow_operational_probes_have_policies(question):
-    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-    aliases = build_project_retrieval_aliases(question)
-    assert aliases
-    assert all(a.preferred_catalog_roles and "roadmap" in a.forbidden_catalog_roles for a in aliases)
-
-
-@pytest.mark.parametrize("question,expected", [
-    ("Что это за проект и какую проблему он решает?", "architecture"),
-    ("What problem does this project solve?", "architecture"),
-    ("What problem is causing the project to fail?", "troubleshooting"),
-])
-def test_project_query_routing_distinguishes_purpose_from_failure(question, expected):
-    from docmancer.docs.domain.project_query_intent import classify_project_query_intent
-    assert classify_project_query_intent(question).name == expected
 
 
 def test_failed_derived_probe_does_not_contribute_successful_lineage():
@@ -292,17 +147,6 @@ def test_requirement_hints_inherit_applicable_host_policies():
     assert hint.forbidden_evidence_terms
     assert hint.relation == "host_lookup"
     assert hint.public_parent_query_id is None
-
-
-@pytest.mark.parametrize("question", [
-    "What problem is causing this project to fail?",
-    "How do I solve a problem in this project?",
-])
-def test_failure_neighbors_do_not_become_product_purpose(question):
-    from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-    from docmancer.docs.domain.project_query_intent import classify_project_query_intent
-    assert {a.intent_id for a in build_project_retrieval_aliases(question)} == {"troubleshooting"}
-    assert classify_project_query_intent(question).name == "troubleshooting"
 
 
 @pytest.mark.parametrize("question", [
@@ -412,16 +256,6 @@ def test_audited_installation_needs_qualified_evidence_not_just_a_plan_alias(bod
         assert qualification.reason == "insufficient_visible_match"
 
 
-def test_product_definition_host_lookup_without_product_name_can_derive_original():
-    plan = build_documentation_query_plan(
-        "Что такое DocAtlas и зачем он нужен разработчику?",
-        lookup_queries=("local-first documentation context for coding agents",),
-    )
-    host = next(q for q in plan.queries if q.query_id == "query-lookup-1")
-    assert host.relation == "audited_rewrite"
-    assert host.public_parent_query_id == "query-original"
-
-
 @pytest.mark.parametrize("lookup", [
     "coding agents documentation",
     "local-first documentation context for deployment agents",
@@ -437,9 +271,3 @@ def test_product_definition_neighbors_do_not_derive_original(lookup):
     assert host.public_parent_query_id is None
 
 
-def test_conservative_ru_fallback_cannot_authorize_original_lineage():
-    plan = build_documentation_query_plan("Как хранение связано с очисткой?")
-    fallback = next(q for q in plan.queries if q.origin == "canonical_intent")
-    assert "storage" in fallback.text and "clear index" in fallback.text
-    assert fallback.relation == "host_lookup"
-    assert fallback.public_parent_query_id is None

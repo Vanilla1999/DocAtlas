@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_docs_lossless_selection.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_docs_lossless_selection.py": "2a654da5872d56a516bbc82f5fe91fe958c349122aad0bfb4bccc4e937103881"
+  }
+}

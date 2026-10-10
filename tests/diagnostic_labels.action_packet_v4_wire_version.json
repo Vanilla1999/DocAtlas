@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_action_packet_v4_wire_version.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_action_packet_v4_wire_version.py": "c58aa260256229c0b9a7fb3fc1d5e1e53a19860b9a427da99c6fac42f93a2536"
+  }
+}

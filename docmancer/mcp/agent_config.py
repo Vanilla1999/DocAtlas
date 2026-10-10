@@ -91,6 +91,11 @@ def register_server(target: AgentTarget) -> tuple[bool, str]:
 
     target.config_path.parent.mkdir(parents=True, exist_ok=True)
     config = _load_config(target.config_path)
+    if target.style == "json_opencode_mcp":
+        changed = _update_opencode_config(config)
+        if changed:
+            _backup_and_write(target.config_path, config)
+        return changed, f"{'registered' if changed else 'already registered'} in {target.config_path}"
     servers = _json_server_mapping(config, target.style, create=True)
     desired = _desired_server_entry(target.style)
 
@@ -133,6 +138,13 @@ def unregister_server(target: AgentTarget) -> bool:
     desired = _desired_server_entry(target.style)
 
     existing = servers.get(SERVER_KEY)
+    if target.style == "json_opencode_mcp":
+        owned = [(name, entry) for name, entry in servers.items() if entry == desired]
+        if len(owned) == 1:
+            del servers[owned[0][0]]
+            _backup_and_write(target.config_path, config)
+            return True
+        return False
     if existing == desired:
         del servers[SERVER_KEY]
         _backup_and_write(target.config_path, config)
@@ -145,7 +157,6 @@ def _desired_server_entry(style: str) -> dict[str, Any]:
         return {
             "type": "local",
             "command": [COMMAND, *ARGS],
-            "enabled": True,
             "environment": dict(OPENCODE_MCP_ENVIRONMENT),
         }
     if style == "json_vscode_servers":
@@ -159,6 +170,16 @@ def _json_server_mapping(
     *,
     create: bool,
 ) -> dict[str, Any] | None:
+    if style == "json_opencode_mcp":
+        mcp = config.setdefault("mcp", {}) if create else config.get("mcp")
+        if mcp is None:
+            return None
+        if not isinstance(mcp, dict):
+            raise ValueError("Existing 'mcp' in agent config must be an object")
+        servers = mcp.setdefault("servers", {}) if create else mcp.get("servers")
+        if servers is not None and not isinstance(servers, dict):
+            raise ValueError("Existing 'mcp.servers' in agent config must be an object")
+        return servers
     key = {
         "json_mcpServers": "mcpServers",
         "json_mcp_servers": "mcp_servers",
@@ -176,6 +197,45 @@ def _json_server_mapping(
     if not isinstance(servers, dict):
         raise ValueError(f"Existing {key!r} in agent config must be an object")
     return servers
+
+
+def _update_opencode_config(config: dict[str, Any]) -> bool:
+    """Migrate a unique owned registration without changing its identity or state."""
+    before = json.dumps(config, sort_keys=True)
+    mcp = config.setdefault("mcp", {})
+    if not isinstance(mcp, dict):
+        raise ValueError("Existing 'mcp' in agent config must be an object")
+    servers = _json_server_mapping(config, "json_opencode_mcp", create=True)
+    desired = _desired_server_entry("json_opencode_mcp")
+    owned = [(mapping, name, entry) for mapping in (mcp, servers)
+             for name, entry in mapping.items()
+             if not (mapping is mcp and name == "servers") and _has_same_command(entry, desired)]
+    if len(owned) > 1:
+        raise ValueError("Ambiguous DocAtlas MCP registrations; refusing to overwrite them")
+    for mapping in (mcp, servers):
+        for name in (SERVER_KEY, "docmancer"):
+            if name in mapping and not _has_same_command(mapping[name], desired):
+                raise ValueError("Existing DocAtlas MCP server has a different command; refusing to overwrite it")
+    mapping, name, existing = owned[0] if owned else (servers, SERVER_KEY, {})
+    if mapping is mcp and name in servers:
+        raise ValueError("Conflicting MCP server name; refusing to overwrite it")
+    environment = {} if "environment" not in existing else existing["environment"]
+    if not isinstance(environment, dict):
+        raise ValueError("Existing DocAtlas MCP server has a non-object environment; refusing to overwrite it")
+    merged = {**existing, **desired, "environment": {**environment, **OPENCODE_MCP_ENVIRONMENT}}
+    if "enabled" in merged:
+        enabled = merged.pop("enabled")
+        if not isinstance(enabled, bool):
+            raise ValueError("Existing enabled state must be boolean")
+        if "disabled" in merged and merged["disabled"] != (not enabled):
+            raise ValueError("Conflicting MCP enabled/disabled state")
+        merged["disabled"] = not enabled
+    if "disabled" in merged and not isinstance(merged["disabled"], bool):
+        raise ValueError("Existing disabled state must be boolean")
+    if mapping is mcp:
+        del mcp[name]
+    servers[name] = merged
+    return json.dumps(config, sort_keys=True) != before
 
 
 def _load_config(path: Path) -> dict[str, Any]:
@@ -225,6 +285,8 @@ def has_current_server_entry(config: dict[str, Any], target: AgentTarget) -> boo
     if servers is None:
         return False
     desired = _desired_server_entry(target.style)
+    if target.style == "json_opencode_mcp":
+        return sum(_matches_command(entry, desired) for entry in servers.values()) == 1
     return _matches_command(servers.get(SERVER_KEY), desired)
 
 

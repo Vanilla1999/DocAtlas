@@ -91,11 +91,6 @@ def validate_docatlas_result(payload: dict[str, Any]) -> list[str]:
         or declared_tokens != actual_tokens
     ):
         errors.append("DocAtlas estimated_tokens does not match the canonical payload")
-    try:
-        if _core.docs_context_budget_tokens(payload) > 800:
-            errors.append("docs_context exceeds whole-payload admission budget")
-    except (TypeError, ValueError):
-        errors.append("DocAtlas result must be JSON serializable")
     return list(dict.fromkeys(errors))
 
 

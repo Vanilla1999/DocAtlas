@@ -1,0 +1,28 @@
+{
+  "baseline": "6e94d6ab926f23c39c2bdbb7b926f6a1593ec68f",
+  "scope": "new actual-consumer contract tests only",
+  "modules": {
+    "tests/test_nl_dictionary_removal_packet_contract.py": 12,
+    "tests/test_nl_dictionary_removal_consumer_contract.py": 8,
+    "tests/test_nl_dictionary_removal_literal_contract.py": 25
+  },
+  "combined": {"passed": 45, "failed": 0},
+  "independent_combined": {"passed": 45, "failed": 0},
+  "payload_pins_verified": 39,
+  "preexisting_files_preserved": 1487,
+  "frozen_pins_verified": 13,
+  "legacy_compatibility_suites_run": false,
+  "legacy_results": "historical, fresh compatibility UNKNOWN",
+  "quality_release_full_security": "NOT CHECKED",
+  "installed_parity": "UNKNOWN",
+  "bounded_source_exit": true,
+  "known_structural_debt": {
+    "packet_requested_tokens": 128,
+    "packet_estimated_tokens": 231,
+    "validator_rejects_overflow": true,
+    "formatter_fixed": false
+  },
+  "network": false,
+  "reinstall": false,
+  "runtime_index_mutation": false
+}

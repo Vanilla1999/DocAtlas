@@ -62,7 +62,6 @@ def test_public_context_keeps_audited_host_coverage_after_trace_permutation(reve
     assert child not in payload["covered_query_ids"]
     assert "query-original" not in payload["covered_query_ids"]
     assert payload["answer_supported"] is False and payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3 and payload["estimated_tokens"] <= 800
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
 

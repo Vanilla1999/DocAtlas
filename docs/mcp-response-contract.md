@@ -4,7 +4,7 @@ This note clarifies the runtime response fields and the conditional context-firs
 
 ## Response fields
 
-The `get_docs_context` response has three `kind` values: `docs_answer` for a narrow typed question whose mandatory relation-specific proof obligations are complete, `docs_context` for safe retrieval-only project context when completeness or the requested relation remains uncertain, and `patch_context` for explicit change tasks. Project reads return `docs_context`, never `docs_answer`; certification belongs to library, dependency, or mixed evidence lanes. The separate `status` is `ok`, `truncated`, or `insufficient_evidence` when no safe context is available, not a fourth kind.
+Project reads return source-attributed `docs_context` with `answer_supported=false`, `answer_available=false`, and `edit_ready=false`. The advertised compatibility schema also names `docs_answer`; it does not grant free-form answer certification. Advanced `patch_context` is available only when explicitly enabled and advertised and carries no edit permission. The separate `status` includes `ok`, `truncated`, `insufficient_evidence`, and `failed`; it is not another result kind.
 
 
 ## Omitted material
@@ -15,7 +15,7 @@ when interpreting the bounded packet. This status describes omission of
 non-critical material. It does not certify that a project-context answer is
 complete or replace `status="insufficient_evidence"`.
 
-For bounded client handling, inspect `status`, `kind`, `sources`,
+For client handling, inspect `status`, `kind`, `sources`,
 `missing`, and `omitted_counts`. A response with
 `status="insufficient_evidence"` means no safe context is available for the
 requested documentary claim; do not present it as documentation support.
@@ -40,4 +40,4 @@ A returned preparation action is not mandatory when the context is already suffi
 
 ## Implementation authority
 
-The bounded field enums are validated in `docmancer/docs/application/model_visible_projection.py`; project reads are projected by `docmancer/docs/interfaces/mcp/context_tools.py`. The project-read boundary is defined in [ADR 0003](./adr/0003-context-first-project-reads.md).
+The response fields and source fidelity are validated in `docmancer/docs/application/model_visible_projection.py`; project reads are projected by `docmancer/docs/interfaces/mcp/context_tools.py`. The project-read boundary is defined in [ADR 0003](./adr/0003-context-first-project-reads.md).

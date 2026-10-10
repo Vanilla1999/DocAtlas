@@ -16,7 +16,12 @@ class _WebFetcherPart02:
         redirect_lock: threading.Lock,
     ) -> _FetchedPage | None:
         started = time.monotonic()
-        url = normalize_url(disc.url)
+        self._raise_if_cancelled()
+        url = exact_url(disc.url)
+        if not contains(self._fetch_policy.exact_urls or (), url):
+            raise ValueError("url_not_selected")
+        if self._respect_robots and robots is None:
+            raise ValueError("explicit_robots_control_required")
         self._emit_progress({"phase": "fetching", "message": f"Fetching {url}", "url": url})
         is_seed_url = disc.strategy == DiscoveryStrategy.SEED_URLS
         if robots and not robots.can_fetch(url):
@@ -37,20 +42,11 @@ class _WebFetcherPart02:
             )
             return None
 
-        with redirect_lock:
-            predicted_url = redirect_tracker.predict_final_url(url)
-        github_raw_url = self._github_blob_raw_url(url)
-        fetch_url = github_raw_url or predicted_url or url
+        predicted_url = None  # No inferred transport destination.
+        github_raw_url = None  # Immutable files use only the hashed manifest lane.
+        fetch_url = url
 
         request_policy = self._fetch_policy
-        if github_raw_url:
-            allowed = set(request_policy.allowed_hosts)
-            allowed.update({"github.com", "raw.githubusercontent.com"})
-            request_policy = replace(
-                request_policy,
-                allowed_hosts=tuple(sorted(allowed)),
-                path_prefixes=(urlparse(github_raw_url).path,),
-            )
         with self._new_client(request_policy) as client:
             rate_limiter.wait(fetch_url)
             try:
@@ -107,13 +103,19 @@ class _WebFetcherPart02:
             rate_limiter.reset_backoff(fetch_url)
             resp_url = getattr(resp, "url", None)
             if isinstance(resp_url, (str, httpx.URL)):
-                final_url = normalize_url(str(resp_url))
+                final_url = exact_url(str(resp_url))
             else:
-                final_url = normalize_url(fetch_url)
+                final_url = exact_url(fetch_url)
+            if not contains(self._fetch_policy.exact_urls or (), final_url):
+                raise ValueError("redirect_url_not_selected")
             if final_url != normalize_url(fetch_url):
                 with redirect_lock:
                     redirect_tracker.record_redirect(url, final_url)
             raw_html = resp.text
+            self._raise_if_cancelled()
+            self._finite_total_bytes = getattr(self, "_finite_total_bytes", 0) + len(resp.content)
+            if self._finite_total_bytes > self._max_fetched_document_bytes:
+                raise DocsFetchSecurityError("max_fetched_document_bytes", redact_url(url))
 
         if looks_like_html(raw_html):
             doc_format = (
@@ -147,9 +149,11 @@ class _WebFetcherPart02:
                 content = browser_content
 
         content_hash = ContentDeduplicator.content_hash(content)
-        canonical = normalize_url(resolve_url(str(meta.get("canonical_url")), final_url)) if meta.get("canonical_url") else url
-        source_url = canonical if (is_seed_url or is_docs_url(canonical, base_url)) else url
-        docset_root = _source_docset_root(final_url, base_url)
+        canonical = exact_url(resolve_url(str(meta.get("canonical_url")), final_url)) if meta.get("canonical_url") else url
+        if not contains(self._fetch_policy.exact_urls or (), canonical):
+            raise ValueError("canonical_url_not_selected")
+        source_url = canonical
+        docset_root = url
         doc = Document(
             source=source_url,
             content=content,

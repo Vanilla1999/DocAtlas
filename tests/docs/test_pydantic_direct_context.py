@@ -4,7 +4,6 @@ from pathlib import Path
 from eval.evidence_quality_v2.run import load_protocol, documents_for
 from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
 from docmancer.mcp.docs_server import call_docs_tool_payload
-from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
 
 QUESTION = "Перечисли способы включить strict mode, включая field, annotation, config и validation call."
 
@@ -29,5 +28,3 @@ def test_original_direct_question_delivers_all_four_strict_mode_controls(tmp_pat
     }
     assert result['answer_supported'] is False
     assert result['edit_ready'] is False
-    assert len(result['sources']) <= 3
-    assert docs_context_budget_tokens(result) <= 800

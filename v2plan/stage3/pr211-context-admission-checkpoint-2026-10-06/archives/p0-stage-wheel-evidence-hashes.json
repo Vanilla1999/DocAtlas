@@ -1,0 +1,120 @@
+{
+  "artifacts": [
+    {
+      "path": "p0_config_boundary_probe.py",
+      "sha256": "5253d4b31b3083e9f5a01fcf5e68b8bc30d1e42caf5b4f1f6f5d139bf120a4e6",
+      "bytes": 3625
+    },
+    {
+      "path": "p0_dictionary_audit.py",
+      "sha256": "03bb9446b472712aa25cc82b558a354f0d8afaa057317937147fed8d194ef992",
+      "bytes": 4801
+    },
+    {
+      "path": "p0_frame_classification.py",
+      "sha256": "b0d4d1877cc4192c7c05d99e6c1cce300a388a795da719a89ff81e6595e1bba6",
+      "bytes": 5087
+    },
+    {
+      "path": "p0_neighbor_probes.py",
+      "sha256": "bc2dcc7d3787562046cb4b860666593012bcd782311b370e8b07eeb640632fe3",
+      "bytes": 2271
+    },
+    {
+      "path": "p0_policy_probes.py",
+      "sha256": "2e817278f456910e90f2cd3dad9e36de320535bf88ba4de8b20989178482bf54",
+      "bytes": 3581
+    },
+    {
+      "path": "p0_stage_baseline.py",
+      "sha256": "2f0fcd3b6d647febd414f8c8e510bfd3411ae8a3ce8f8fe62f9524ad33e004df",
+      "bytes": 13345
+    },
+    {
+      "path": "p0_trace_integrity.py",
+      "sha256": "d843d232f04d25378dafeecacc582feead96e675c7febfc3255fa0e16f98b092",
+      "bytes": 6356
+    },
+    {
+      "path": "p0_transition_manifest.py",
+      "sha256": "3e014b735007edd630f90f4f91ad0bd0a09e72275b5d74e82295887717ea222b",
+      "bytes": 3927
+    },
+    {
+      "path": "p0_wheel_probe.py",
+      "sha256": "191bc008c5ede0f170ff3fa164adcc21f109215f7ff741562cc9016f629af0a4",
+      "bytes": 2105
+    },
+    {
+      "path": "archives/p0-stages-en-direct15.json.gz",
+      "sha256": "f8ad795a1a1ab0043c888c746dd4f73a68007bc6d00546edf923eef6b35b7806",
+      "bytes": 14100090
+    },
+    {
+      "path": "archives/p0-stages-en-direct15.log",
+      "sha256": "988b2e1584f8deb80c443e4adf90f4f2edd2f7a7174fad5d676b72621821081a",
+      "bytes": 1189
+    },
+    {
+      "path": "archives/p0-stages-ru-lookups.json.gz",
+      "sha256": "62a362852462e2ded4e53d2c54d02d5e209239e79beb80da573be5cfaf817efe",
+      "bytes": 13671431
+    },
+    {
+      "path": "archives/p0-stages-ru-lookups.log",
+      "sha256": "9a04ae87be784599b9ce2fb6a306ee3ac2e398f65eeb32098bc5251f72154f6c",
+      "bytes": 1190
+    },
+    {
+      "path": "archives/p0-stages-ru-original.json.gz",
+      "sha256": "a1595d5c7051d3e0d16f959ee68a974c4c41235713c33da8223349932a7ca85a",
+      "bytes": 12618083
+    },
+    {
+      "path": "archives/p0-stages-ru-original.log",
+      "sha256": "faa6cdf612b677b444a85c9e23b4395c585caea7b488b52b4c9c8b0472195dc1",
+      "bytes": 1186
+    },
+    {
+      "path": "archives/p0-stages-trust.json.gz",
+      "sha256": "c2fda56d8d3f46adeb60ca49810ebc337b3c8a58a4d9c39b4b0b1b671fee0cbe",
+      "bytes": 12137617
+    },
+    {
+      "path": "archives/p0-stages-trust.log",
+      "sha256": "1db5b82034f7c9fe7cc95328745088e4be28cca85d54ed1ae8d625432e2af212",
+      "bytes": 1113
+    },
+    {
+      "path": "archives/p0-config-baseline-pytest.log",
+      "sha256": "afce95472c348fc7db5f9b1ac9c923e05497173bfcbfd6c27d874c8f7d249b6f",
+      "bytes": 99
+    },
+    {
+      "path": "archives/p0-config-boundaries.json",
+      "sha256": "5b7fc6fd313b846225890f1902548bda339925b8fe9d9e14b7ca222c283982c9",
+      "bytes": 209322
+    },
+    {
+      "path": "archives/p0-trace-integrity.json",
+      "sha256": "197aec83eee7e2b0f81b15b2149d21088ab744b113e3ece9d612a8fb816456db",
+      "bytes": 210827
+    },
+    {
+      "path": "archives/p0-clean-wheel-probe.json",
+      "sha256": "5d05340ba8fe5a9b1ef835209f1134a7c415bd76d85d279c86becb11c51b3e70",
+      "bytes": 22568
+    },
+    {
+      "path": "archives/p0-frame-symbol-decisions.json",
+      "sha256": "51b76c2125096643b64cc9cf760dea5a9e1c91c8bc011c19962422f68ec87f24",
+      "bytes": 195545
+    },
+    {
+      "path": "archives/p0-wheel-build.log",
+      "sha256": "baa324130e4c4bea365a49b5f82158a4adfd0acbce33006c8bfee6c3ccf70a25",
+      "bytes": 99
+    }
+  ],
+  "scope": "Current wheel/frame/config/stage evidence; supersedes earlier hashes of rerun traces"
+}

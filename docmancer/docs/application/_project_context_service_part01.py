@@ -8,12 +8,14 @@ from docmancer.docs.application.evidence_selection import requirement_probe_quer
 from docmancer.docs.application._project_docs_service_part03 import _tag_retrieval_query
 from docmancer.docs.application.project_docs_service import ProjectDocsService
 from docmancer.docs.domain.source_map import ProjectSourceFacts
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 
 
 class _ProjectContextServicePart01:
     def __init__(self, facade: Any):
         self.facade = facade
 
+    @_found_window_retention_producer
     def get_project_context(
         self,
         project_path: str,
@@ -34,10 +36,15 @@ class _ProjectContextServicePart01:
         allow_network: bool = False,
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
+        retain_found_windows: bool = False,
+        _retention_ack: Any = None,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
-        mutation_intent = mutation_intent or build_mutation_intent(question)
+        # This is a read boundary. Only a caller-supplied contract can request
+        # mutation guidance; unknown prose never constructs mutation authority.
+        mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
         routing_budget_issues: list[str] = []
+        routing_budget_stages: set[str] = set()
         routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
         if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
@@ -52,7 +59,7 @@ class _ProjectContextServicePart01:
             and mutation_intent.operation in {"modify", "delete", "rename"}
             and target.value.casefold() != str(mutation_intent.destination or "").casefold()
         )
-        patch_request = is_change_request(question)
+        patch_request = mutation_intent.operation != "none"
         canonical_requirements = (
             build_patch_evidence_requirements(mutation_intent.request_plan)
             if patch_request and mutation_intent.request_plan is not None
@@ -72,8 +79,11 @@ class _ProjectContextServicePart01:
         from .need_query_schedule import scheduled_plan, requirement_search_probes
         documentation_query_plan, _ = scheduled_plan(documentation_query_plan,
             supplemental_queries=requirement_search_probes(canonical_requirements))
-        metadata = self.facade.read_project_metadata(str(root))
+        from docmancer.docs.project import ProjectMetadataReader
+        metadata = ProjectMetadataReader().read(root)
         project_docs = None
+        retained_results: list[Any] = []
+        read_presentation_results: list[Any] = []
         if mode in {"auto", "project-only"}:
             candidate_limit = min(20, max(12, (limit or 4) * 3))
             project_docs_kwargs = {
@@ -86,7 +96,24 @@ class _ProjectContextServicePart01:
                 project_docs_kwargs["lookup_queries"] = lookup_queries
             if evidence_path:
                 project_docs_kwargs["evidence_path"] = evidence_path
-            project_docs = self.facade.get_project_docs(str(root), question, **project_docs_kwargs)
+            if retain_found_windows:
+                project_docs_kwargs.update(retain_found_windows=True, _retained_results=retained_results,
+                                           _retention_ack=_retention_ack)
+            project_docs = _invoke_found_window_retention(self.facade.get_project_docs, str(root), question, **project_docs_kwargs)
+            if project_docs and project_docs.results:
+                members = {candidate.path: candidate for candidate in metadata.docs_candidates}
+                project_docs = replace(project_docs, results=[
+                    chunk for chunk in project_docs.results
+                    if chunk.path in members and members[chunk.path].content_hash
+                    and chunk.content_hash == members[chunk.path].content_hash
+                    and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash
+                ])
+            if retain_found_windows:
+                members = {candidate.path: candidate for candidate in metadata.docs_candidates}
+                retained_results = [chunk for chunk in retained_results
+                    if chunk.path in members and members[chunk.path].content_hash
+                    and chunk.content_hash == members[chunk.path].content_hash
+                    and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash]
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
             if project_docs and project_docs.results:
@@ -101,17 +128,39 @@ class _ProjectContextServicePart01:
                         ],
                     )
                 from .need_context_projection import set_context_variants
+                from docmancer.docs.domain.context_hint_policy import preserves_unresolved_context_candidate
+                prefit_candidates = project_context_pack(
+                    question=question, project_docs=project_docs, dependency_docs=None)
                 checked_sets = {
                     original.get('stable_chunk_id')
                     for original, _, _ in set_context_variants(
-                        project_context_pack(question=question, project_docs=project_docs, dependency_docs=None),
+                        prefit_candidates,
                         query_plan=documentation_query_plan.as_payload(),
                         expected_project_identity=project_docs.results[0].project_identity,
                         max_tokens=800, diagnostics={},
                     )
                 }
+                # Keep topical retrieval-only candidates until public admission;
+                # lack of answer proof alone must not erase useful source text.
+                if not checked_sets and not any(
+                    original.get('retrieval_query_ids') for original in prefit_candidates
+                ):
+                    checked_sets.update(original.get('stable_chunk_id')
+                        for original in prefit_candidates
+                        if preserves_unresolved_context_candidate(original,
+                            query_plan=documentation_query_plan.as_payload(),
+                            expected_project_identity=project_docs.results[0].project_identity,
+                            lifecycle_intent=canonical_requirements.lifecycle_intent))
                 context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
                                                  if chunk.stable_chunk_id in checked_sets)
+                if not retain_found_windows and not patch_request:
+                    # Preserve only existing public-query qualifications or strict
+                    # literal body admission, without another acquisition call.
+                    read_presentation_results = rerank_project_doc_chunks(
+                        project_docs.results, question=question, intent=intent,
+                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                        finite_member_paths=frozenset(members), retain_found_windows=True,
+                    )
                 project_docs = replace(
                     project_docs,
                     results=rerank_project_doc_chunks(
@@ -122,6 +171,7 @@ class _ProjectContextServicePart01:
                         broad_max_per_source=4 if evidence_path else 2,
                         lifecycle_intent_value=canonical_requirements.lifecycle_intent,
                         context_candidate_ids=context_candidate_ids,
+                        finite_member_paths=frozenset(members),
                     ),
                 )
                 routing_stage_observed["project_docs"] = list(project_docs.results)
@@ -129,10 +179,11 @@ class _ProjectContextServicePart01:
                 project_docs = replace(project_docs, results=bounded_results)
                 if budget_issue:
                     routing_budget_issues.append(f"project_docs: {budget_issue}")
+                    routing_budget_stages.add("project_docs")
 
         explicit_dependency = library or (libraries[0] if libraries else None)
-        inferred_dependency = self.dependency_mentioned_in_question(metadata, question)
-        selected_dependency = explicit_dependency or inferred_dependency
+        literal_dependency = self.dependency_mentioned_in_question(metadata, question)
+        selected_dependency = explicit_dependency or literal_dependency
         explicit_dependency_requested = bool(explicit_dependency or mode in {"deps-only", "public-docs"})
         dependency_docs: DocsResult | None = None
         dependency_confirmation: dict[str, Any] | None = None
@@ -166,6 +217,7 @@ class _ProjectContextServicePart01:
                 if budget_issue:
                     dependency_docs = replace(dependency_docs, results=bounded_results)
                     routing_budget_issues.append(f"dependency_docs: {budget_issue}")
+                    routing_budget_stages.add("dependency_docs")
 
         warnings = [*(project_docs.warnings if project_docs else [])]
         if dependency_docs:
@@ -213,7 +265,7 @@ class _ProjectContextServicePart01:
                 *mutation_intent.request_plan.scope_terms,
             ]
             if patch_request and mutation_intent.request_plan is not None
-            else extract_project_answer_requirements(question)
+            else list(documentation_query_terms(question))
         )
         retrieval_route = route_initial_stages(
             question=question,
@@ -254,6 +306,7 @@ class _ProjectContextServicePart01:
             source_evidence_items, budget_issue = fit_stage_items("source_evidence", observed_source_evidence)
             if budget_issue:
                 routing_budget_issues.append(f"source_evidence: {budget_issue}")
+                routing_budget_stages.add("source_evidence")
             context_pack.extend(source_evidence_items)
             record_stage(
                 routing_record, "source_evidence",
@@ -279,6 +332,7 @@ class _ProjectContextServicePart01:
             repo_map_items, budget_issue = fit_stage_items("repo_map", observed_repo_map)
             if budget_issue:
                 routing_budget_issues.append(f"repo_map: {budget_issue}")
+                routing_budget_stages.add("repo_map")
             context_pack.extend(repo_map_items)
             record_stage(
                 routing_record, "repo_map",
@@ -313,6 +367,7 @@ class _ProjectContextServicePart01:
                 code_graph_items, budget_issue = fit_stage_items("code_graph", observed_code_graph_items)
                 if budget_issue:
                     routing_budget_issues.append(f"code_graph: {budget_issue}")
+                    routing_budget_stages.add("code_graph")
                 context_pack.extend(code_graph_items)
                 record_stage(
                     routing_record, "code_graph",
@@ -348,6 +403,7 @@ class _ProjectContextServicePart01:
                 _, gap_repo_budget_issue = fit_stage_items("repo_map", gap_repo_map)
                 if gap_repo_budget_issue:
                     routing_budget_issues.append(f"repo_map: {gap_repo_budget_issue}")
+                    routing_budget_stages.add("repo_map")
                 record_stage(
                     routing_record, "repo_map", status="used" if gap_repo_map else "insufficient",
                     reason=gap_route.repo_map_reason,
@@ -364,6 +420,7 @@ class _ProjectContextServicePart01:
                 _, gap_graph_budget_issue = fit_stage_items("code_graph", observed_gap_graph_items)
                 if gap_graph_budget_issue:
                     routing_budget_issues.append(f"code_graph: {gap_graph_budget_issue}")
+                    routing_budget_stages.add("code_graph")
                 record_stage(
                     routing_record, "code_graph", status="used" if observed_gap_graph_items else "insufficient",
                     reason=gap_route.code_graph_reason,
@@ -371,11 +428,36 @@ class _ProjectContextServicePart01:
                 )
         gap_actions = _documentation_gap_actions(next_actions)
         if gap_actions:
-            requires_confirmation = True
-            confirmation_reason = "repo_write"
-            next_action = gap_actions[0]
-            arguments_patch = {"project_path": str(root)}
-        context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=root)
+            # Creating missing docs is a proposed mutation, not the current
+            # read. Keep its consent on the action; never replace an actual
+            # acquisition/network consent decision with advisory write consent.
+            for action in gap_actions:
+                action["requires_confirmation"] = True
+                action["confirmation_reason"] = "repo_write"
+            if not requires_confirmation:
+                next_action = gap_actions[0]
+                arguments_patch = {"project_path": str(root)}
+                if patch_request:
+                    requires_confirmation = True
+                    confirmation_reason = "repo_write"
+        def read_window_key(item):
+            return (item.get("path"), item.get("stable_chunk_id"), item.get("char_start"), item.get("char_end"))
+        read_presentation_pack = project_context_pack(
+            question=question, dependency_docs=None,
+            project_docs=replace(project_docs, results=read_presentation_results)
+            if project_docs is not None and read_presentation_results else None,
+        )
+        read_window_keys = {read_window_key(item) for item in read_presentation_pack}
+        control_window_keys = {read_window_key(item) for item in context_pack}
+        control_item_count = len(context_pack)
+        annotated_pack, content_trust_warnings = annotate_context_pack(
+            [*context_pack, *(item for item in read_presentation_pack
+                             if read_window_key(item) not in control_window_keys)],
+            repository_root=root,
+        )
+        context_pack = annotated_pack[:control_item_count]
+        read_presentation_pack = [item for item in annotated_pack
+                                  if read_window_key(item) in read_window_keys]
         warnings.extend(warning["code"] for warning in content_trust_warnings)
         if evidence_path:
             normalized_evidence_path = normalize_doc_path(evidence_path)
@@ -400,17 +482,10 @@ class _ProjectContextServicePart01:
             trust_contract=trust_contract,
             requirements=canonical_requirements,
         )
-        assigned_ids = {
-            assignment.requirement_id for assignment in selection_decision.assignments
-        }
-        missing_component_queries = [
-            (requirement.requirement_id, probe)
-            for requirement in canonical_requirements
-            if requirement.mandatory
-            and requirement.as_proof_obligation() is not None
-            and requirement.requirement_id not in assigned_ids
-            and (probe := requirement_probe_query(requirement))
-        ][:4]
+        # Component proof obligations are not executable request lookups. Keep
+        # the guarded legacy rescue interface inert rather than manufacturing
+        # another query schedule from inferred proof targets/expected values.
+        missing_component_queries = ()
         observed_project_identity = (
             ProjectDocsService._repository_identity(root)
             if missing_component_queries and project_docs else ""
@@ -421,8 +496,6 @@ class _ProjectContextServicePart01:
             and item.get("project_identity") == observed_project_identity
             and item.get("freshness") == "current"
             and item.get("index_freshness") == "synchronized"
-            and not item.get("risk_flags")
-            and not item.get("instruction_risk_flags")
         }
         observed_documents = {}
         for chunk in (project_docs.results if project_docs else ()):
@@ -430,8 +503,7 @@ class _ProjectContextServicePart01:
             if (
                 path not in admissible_paths or not chunk.content_hash
                 or not str(chunk.content_hash).strip() or chunk.stale
-                or chunk.metadata.get("stale") or chunk.metadata.get("risk_flags")
-                or chunk.metadata.get("instruction_risk_flags")
+                or chunk.metadata.get("stale")
                 or chunk.metadata.get("freshness", "current") != "current"
                 or chunk.metadata.get("index_freshness", "synchronized") != "synchronized"
                 or chunk.source_class != "project_file"
@@ -490,8 +562,6 @@ class _ProjectContextServicePart01:
                     or candidate_metadata.get("stale")
                     or candidate_metadata.get("freshness", "current") != "current"
                     or candidate_metadata.get("index_freshness", "synchronized") != "synchronized"
-                    or candidate_metadata.get("risk_flags")
-                    or candidate_metadata.get("instruction_risk_flags")
                     or candidate.stable_identity != stable_id
                     or not isinstance(stable_id, str) or not stable_id.strip()
                     or (path, stable_id) in seen_rescue_ids
@@ -549,8 +619,6 @@ class _ProjectContextServicePart01:
                     question=question, project_docs=replace(project_docs, results=[rescued_chunk]),
                     dependency_docs=None,
                 ), repository_root=root)
-                if any(item.get("instruction_risk_flags") or item.get("risk_flags") for item in candidate_pack):
-                    continue
                 candidate_decision = select_evidence(
                     candidate_pack, question=question,
                     config=project_docs_selection_config(tokens or 4000),
@@ -653,7 +721,7 @@ class _ProjectContextServicePart01:
                     "preferred_for": ["API calls", "agent actions", "installed packs"],
                 },
             ]
-        relevance_terms = [] if requirements else extract_query_relevance_terms(question, intent=intent)
+        relevance_terms = list(documentation_query_terms(question))
         source_evidence_answer_available = any(
             item.get("evidence_class") == "source_snippet"
             and _context_has_query_evidence([item], relevance_terms)
@@ -733,6 +801,8 @@ class _ProjectContextServicePart01:
         )
         answer_type = completeness_result["answer_type"]
         answer_completeness = completeness_result["answer_completeness"]
+        if not patch_request:
+            answer_completeness = {**answer_completeness, "edit_ready": False}
         recommended_next_actions = completeness_result["recommended_next_actions"]
         if recommended_next_actions:
             next_actions.extend(recommended_next_actions)
@@ -806,10 +876,66 @@ class _ProjectContextServicePart01:
             message = "Returned partial/navigational project context; search project source for missing story-specific terms."
         if dependency_confirmation_blocks_answer and not answer_available:
             message = f"Dependency docs for {selected_dependency} require network access; retry with allow_network=true after user confirmation."
-        delivery_decision = DeliveryDecision(
-            deliverable=bool(answer_available),
-            reason_code=None if answer_available else str(reason or "operational_delivery_blocked"),
+        read_context_eligible = bool(
+            context_pack and not project_docs_blocked and not requires_confirmation
+            and not dependency_confirmation_blocks_answer and not routing_budget_issues
+            and status != "stale"
+            and (project_docs is None or project_docs.status in {"success", "partial_success"})
+            and (dependency_docs is None or dependency_docs.status in {"success", "partial_success"})
         )
+        delivery_decision = DeliveryDecision(
+            # Missing answer proof is not a reason to suppress an otherwise
+            # eligible read packet. Public admission still checks every source.
+            deliverable=bool(answer_available or read_context_eligible),
+            reason_code=None if answer_available or read_context_eligible else str(reason or "operational_delivery_blocked"),
+        )
+        # Selection, support and routing above keep their bounded control view.
+        # Its project-doc presentation quota does not invalidate already acquired
+        # source windows. Other stage budgets and all operating vetoes still apply.
+        if read_presentation_pack and not project_docs_blocked and not requires_confirmation \
+                and not dependency_confirmation_blocks_answer \
+                and not (routing_budget_stages - {"project_docs"}) \
+                and status in {"success", "partial_success"} \
+                and project_docs.status in {"success", "partial_success"} \
+                and (dependency_docs is None or (dependency_docs.status in {"success", "partial_success"}
+                    and not dependency_docs.requires_confirmation and not dependency_docs.stale_before_refresh)):
+            seen_windows = {read_window_key(item) for item in context_pack}
+            context_pack = [*context_pack, *(item for item in read_presentation_pack
+                if read_window_key(item) not in seen_windows)]
+            trust_contract = build_project_context_trust_contract(
+                project_docs=project_docs, dependency_docs=dependency_docs,
+                requested_library=selected_dependency, mode=mode, context_pack=context_pack,
+            )
+            delivery_decision = DeliveryDecision(deliverable=True, reason_code=None)
+        # Explicit patch retention still uses its existing completion protocol.
+        if retain_found_windows and project_docs is not None:
+            retained_results = rerank_project_doc_chunks(
+                retained_results, question=question, intent=intent,
+                lifecycle_intent_value=canonical_requirements.lifecycle_intent,
+                finite_member_paths=frozenset(members), retain_found_windows=True,
+            )
+            if evidence_path:
+                retained_results = [chunk for chunk in retained_results
+                                    if normalize_doc_path(chunk.path) == normalize_doc_path(evidence_path)]
+            retained_docs = replace(project_docs, results=retained_results)
+            retained_pack, retained_warnings = annotate_context_pack(
+                project_context_pack(question=question, project_docs=retained_docs, dependency_docs=None),
+                repository_root=root,
+            )
+            def window_key(item):
+                return (item.get("path"), item.get("stable_chunk_id"), item.get("char_start"), item.get("char_end"))
+            seen_windows = {window_key(item) for item in context_pack}
+            context_pack = [*context_pack, *(item for item in retained_pack
+                if window_key(item) not in seen_windows)]
+            warnings.extend(warning["code"] for warning in retained_warnings)
+            trust_contract = build_project_context_trust_contract(
+                project_docs=retained_docs, dependency_docs=dependency_docs,
+                requested_library=selected_dependency, mode=mode, context_pack=context_pack,
+            )
+            if retained_pack and not project_docs_blocked and not requires_confirmation \
+                    and not dependency_confirmation_blocks_answer and status != "stale" \
+                    and project_docs.status in {"success", "partial_success", "no_results"}:
+                delivery_decision = DeliveryDecision(deliverable=True, reason_code=None)
         return ProjectContextResult(
             project_path=str(root),
             question=question,
@@ -852,32 +978,12 @@ class _ProjectContextServicePart01:
 
     @staticmethod
     def dependency_mentioned_in_question(metadata: ProjectMetadata, question: str) -> str | None:
-        query = str(question or "")
-        dependency_context = bool(_DEPENDENCY_REFERENCE_CUE_RE.search(query))
-        for dependency in metadata.dependencies:
-            name = dependency.package_name
-            aliases = {name.casefold()}
-            if name.casefold().startswith("flutter_"):
-                aliases.add(name[8:].casefold())
-            for alias in aliases:
-                tokens = re.findall(r"[a-z0-9]+", alias)
-                if not tokens:
-                    continue
-                pattern = r"(?<![a-z0-9])" + r"[\s._-]*".join(
-                    re.escape(token) for token in tokens
-                ) + r"(?![a-z0-9])"
-                match = re.search(pattern, query, re.IGNORECASE)
-                if match is None:
-                    continue
-                compact_alias = "".join(tokens)
-                explicitly_quoted = bool(re.search(
-                    rf"[`\"']\s*{pattern}\s*[`\"']",
-                    query,
-                    re.IGNORECASE,
-                ))
-                if compact_alias in _AMBIGUOUS_DEPENDENCY_NAMES and not (
-                    dependency_context or explicitly_quoted
-                ):
-                    continue
-                return name
-        return None
+        """Bind one explicitly quoted, exact current dependency identifier.
+
+        Bare package-name overlap, prefixes and topic cues cannot select a
+        dependency lane. Ambiguous exact selections require the library input.
+        """
+        literals = {match[1] for match in re.finditer(r"[`\"']([^`\"'\n]+)[`\"']", str(question or ""))}
+        matches = {dependency.package_name for dependency in metadata.dependencies
+                   if dependency.package_name in literals}
+        return next(iter(matches)) if len(matches) == 1 else None

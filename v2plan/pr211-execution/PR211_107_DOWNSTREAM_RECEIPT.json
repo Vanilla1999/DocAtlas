@@ -1,0 +1,1999 @@
+{
+  "schema_version": "pr211-current107-downstream-receipt-v1",
+  "repository": "Vanilla1999/DocAtlas",
+  "pull_request": 211,
+  "published_head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+  "observed_merge_checkout_sha": "217d21017008240cf252e6b99e5c6e810a858a2a",
+  "shared_tree_sha": "9ea02d6b3dd7912b46000dc8174939ec0981e5d8",
+  "collected_at_utc": "2026-10-10T02:00:54Z",
+  "purpose": "Read-only observed downstream, installed and P1-stack evidence for published107. Core, critical/recovery and V2 detail belong to separate root/peer receipts.",
+  "evidence_rules": {
+    "observations_only": true,
+    "production_edits": false,
+    "local_execution": false,
+    "runtime_or_reruns_started": false,
+    "core_job_logs_read": false,
+    "main_advanced_job_logs_read": false,
+    "artifact_bodies_downloaded": false,
+    "raw_log_hash_meaning": "SHA-256 of the exact complete connector-decoded log string encoded as UTF-8, preserving BOM, CR/LF and terminal newlines; not a ZIP/HTTP-transfer checksum.",
+    "excerpt_hash_meaning": "SHA-256 of exact raw excerpt bytes; one-based source log lines. Excerpt excludes the separator after its final line. Original timestamps, ANSI escapes and any CR bytes are preserved.",
+    "metadata_hash_meaning": "SHA-256 of the complete returned UTF-8 API JSON; selected parsed metadata are included. No claim that omitted raw metadata were embedded.",
+    "reported_report_hash_meaning": "A CI-printed report hash is a reported receipt. Artifact bodies were not downloaded or independently hashed.",
+    "same_tree_boundary": "Published PR and observed merge have equal Git trees; merge has PR as a parent. Read test jobs show that checkout. Aggregate-only jobs have no claimed checkout.",
+    "integrity_is_not_quality": "Passing oracle controls or report integrity does not replace failing current quality.",
+    "no_historical_result_substitution": true,
+    "actual_client_boundary": "Installed CI used reviewed wheel and deterministic scripted planner. Real Claude, Codex and OpenCode clients were NOT_RUN in this collection.",
+    "selected_raw_json_meaning": "P1.5 source receipt retains selected exact raw JSON value spans with line and character/byte offsets, per-fragment hashes and whole raw-line hash. Unselected diagnostics are not embedded."
+  },
+  "commit_bindings": [
+    {
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/git/commits/321f36577577cb90a0422cee0de0b525b9cd658e",
+      "api_json_sha256": "72f97324fe8cf1293b0501a457e177aeb8e9bfe8bdc0f2c24f8251badd4e5f6c",
+      "api_json_utf8_bytes": 1575,
+      "sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "tree_sha": "9ea02d6b3dd7912b46000dc8174939ec0981e5d8",
+      "parents": [
+        "b1c6586a2f1b25dccf0b0a56232e91c02a4fa8f6"
+      ]
+    },
+    {
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/git/commits/217d21017008240cf252e6b99e5c6e810a858a2a",
+      "api_json_sha256": "42685d4310b7ad1bdf62a7036e672ce6abcfd6f0ea805e0db8f8fb7a28a8db1c",
+      "api_json_utf8_bytes": 2675,
+      "sha": "217d21017008240cf252e6b99e5c6e810a858a2a",
+      "tree_sha": "9ea02d6b3dd7912b46000dc8174939ec0981e5d8",
+      "parents": [
+        "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+        "321f36577577cb90a0422cee0de0b525b9cd658e"
+      ]
+    }
+  ],
+  "observations": {
+    "p14": {
+      "job_id": 114101794605,
+      "quality": "FAIL",
+      "passed": 12,
+      "cases": 14,
+      "required_discovery_passed": 8,
+      "required_discovery": 10,
+      "required_complete_fact_passed": 5,
+      "required_complete_fact": 5,
+      "reported_errors": 0,
+      "failed_case_ids": [
+        "alias_order_drafts",
+        "alias_project_retry_rule"
+      ],
+      "failure_reason": "required_discovery",
+      "oracle_controls": {
+        "passed": 5,
+        "total": 5,
+        "integrity": "PASS"
+      },
+      "failed_case_observed_diagnostics": [
+        {
+          "raw_line": 640,
+          "raw_line_sha256": "194ea1550966720ecdb867c201cabd52aae4800c44b64cf24cb2eb52f945d6b9",
+          "id": "alias_order_drafts",
+          "source_errors": [],
+          "authority_errors": [],
+          "output_cost": {
+            "public_utf8_bytes": 535,
+            "reported_estimated_tokens": 134,
+            "source_count": 0
+          },
+          "delivery_decision": {
+            "deliverable": false,
+            "reason_code": "required_evidence_missing"
+          },
+          "observer_counts": {
+            "retrieval_calls": 1,
+            "validation_calls": 1
+          }
+        },
+        {
+          "raw_line": 643,
+          "raw_line_sha256": "35125eabba37495a647cc9e876d1e24e5a7dbe1fe8dd4abc8cd03abaa62f6cfd",
+          "id": "alias_project_retry_rule",
+          "source_errors": [],
+          "authority_errors": [],
+          "output_cost": {
+            "public_utf8_bytes": 535,
+            "reported_estimated_tokens": 134,
+            "source_count": 0
+          },
+          "delivery_decision": {
+            "deliverable": false,
+            "reason_code": "required_evidence_missing"
+          },
+          "observer_counts": {
+            "retrieval_calls": 1,
+            "validation_calls": 1
+          }
+        }
+      ],
+      "evidence_key": "p14",
+      "read_state": {
+        "observed_cases": 14,
+        "all_read_only_check_true": true,
+        "all_state_equal_true": true,
+        "changed_fields": []
+      }
+    },
+    "p15": {
+      "job_id": 114101794391,
+      "quality": "FAIL",
+      "passed": 6,
+      "cases": 7,
+      "verified_full_facts": 5,
+      "required_full_facts": 6,
+      "reported_errors": 0,
+      "failed_case_ids": [
+        "two_claims_require_two_allowed_roles"
+      ],
+      "failure_reason": "required_full_facts",
+      "oracle_controls": {
+        "passed": 6,
+        "total": 6,
+        "integrity": "PASS"
+      },
+      "failed_case": {
+        "request": {
+          "library": "python:tenacity@8.2.3:reference",
+          "lookup_queries": [],
+          "project_identity": "local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3",
+          "question": "Explain ProjectRetryRule and TenacityRetryingContract.",
+          "scope": "project",
+          "version": "8.2.3"
+        },
+        "missing_full_fact_sources": [
+          "ARCHITECTURE.md"
+        ],
+        "source_errors": [],
+        "authority_errors": [],
+        "preparation_errors": [],
+        "state_differences": [],
+        "runtime_error": null,
+        "observer_counts": {
+          "retrieval_calls": 1,
+          "validation_calls": 1
+        },
+        "public_result": {
+          "answer_available": false,
+          "answer_supported": false,
+          "context_available": true,
+          "kind": "docs_answer",
+          "reason_code": "context_only",
+          "status": "ok"
+        },
+        "output_cost": {
+          "public_utf8_bytes": 764,
+          "reported_estimated_tokens": 191,
+          "source_count": 1
+        },
+        "project_returns": [
+          {
+            "status": "success",
+            "requires_confirmation": false,
+            "delivery_decision": {
+              "deliverable": true,
+              "reason_code": null
+            },
+            "context_sources": [
+              {
+                "path": "ARCHITECTURE.md",
+                "url": null,
+                "source_class": "project_doc",
+                "authority": "source_of_truth",
+                "doc_scope": "project",
+                "project_identity": "local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3",
+                "stable_chunk_id": "child-5e763ca81bb4889d9baab8c24d24735846baa67d",
+                "generation_id": "gen-551c6b9d2a0e42298c48180f98f6f718",
+                "line_start": 1,
+                "line_end": 1,
+                "char_start": 0,
+                "char_end": 37,
+                "byte_start": 0,
+                "byte_end": 37,
+                "source_content_hash": "7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411",
+                "display_content_hash": "7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411",
+                "resolved_version": ""
+              }
+            ],
+            "lanes": {}
+          }
+        ],
+        "unified_returns": [
+          {
+            "status": "success",
+            "requires_confirmation": false,
+            "context_available": true,
+            "delivery_decision": {
+              "deliverable": true,
+              "reason_code": null
+            },
+            "mode_selected": "mixed",
+            "context_sources": [
+              {
+                "path": "ARCHITECTURE.md",
+                "url": null,
+                "source_class": "project_doc",
+                "authority": "source_of_truth",
+                "doc_scope": "project",
+                "project_identity": "local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3",
+                "stable_chunk_id": "child-5e763ca81bb4889d9baab8c24d24735846baa67d",
+                "generation_id": "gen-551c6b9d2a0e42298c48180f98f6f718",
+                "line_start": 1,
+                "line_end": 1,
+                "char_start": 0,
+                "char_end": 37,
+                "byte_start": 0,
+                "byte_end": 37,
+                "source_content_hash": "7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411",
+                "display_content_hash": "7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411",
+                "resolved_version": ""
+              },
+              {
+                "url": "https://tenacity.readthedocs.io/en/8.2.3/",
+                "source_class": "library_doc",
+                "doc_scope": "library",
+                "stable_chunk_id": "child-03a87a6ec55178e338a0aa80cbe92da9ae780254",
+                "generation_id": "gen-aa01c79bcd174cd481db4947d86461ec",
+                "line_start": 1,
+                "line_end": 1,
+                "char_start": 0,
+                "char_end": 65,
+                "byte_start": 0,
+                "byte_end": 65,
+                "source_content_hash": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+                "display_content_hash": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+                "resolved_version": "8.2.3",
+                "docs_snapshot_exact": true
+              }
+            ],
+            "lanes": {
+              "dependency": {
+                "source_count": 0,
+                "status": "not_requested"
+              },
+              "library": {
+                "canonical_ids": [
+                  "python:tenacity@8.2.3:reference"
+                ],
+                "source_count": 1,
+                "status": "success"
+              },
+              "project": {
+                "reason_code": "partial_navigational_context",
+                "source_count": 1,
+                "status": "success"
+              }
+            }
+          }
+        ],
+        "final_source_bindings": [
+          {
+            "evidence_id": "child-03a87a6ec55178e338a0aa80cbe92da9ae780254",
+            "same_call_source_equal": true,
+            "source_fields": {
+              "content_sha256": "f346d4c29fe47e6d14dcc6b0bb2fa254d7a99ba02566c6a6a999f98cf8d14a86",
+              "evidence_id": "child-03a87a6ec55178e338a0aa80cbe92da9ae780254",
+              "path_or_url": "https://tenacity.readthedocs.io/en/8.2.3/",
+              "section": {
+                "characters": 8,
+                "sha256": "d6bd8c0aeee80fedb2dbf05c973100c3db04be90c072a88572533f2684131a36",
+                "utf8_bytes": 8
+              },
+              "snippet": {
+                "characters": 65,
+                "sha256": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+                "utf8_bytes": 65
+              },
+              "version_binding": "exact_snapshot"
+            },
+            "snapshot_lineage": {
+              "authority": "unknown",
+              "display_content_hash": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+              "display_text": {
+                "characters": 65,
+                "sha256": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+                "utf8_bytes": 65
+              },
+              "docs_snapshot_exact": true,
+              "parent_logical_id": "parent-5074f303adf255a6524c3948862610b3",
+              "resolved_version": "8.2.3",
+              "stable_chunk_id": "child-03a87a6ec55178e338a0aa80cbe92da9ae780254",
+              "version": "8.2.3"
+            },
+            "snapshot_metadata_lineage": {
+              "authority": "unknown",
+              "byte_span": [
+                0,
+                65
+              ],
+              "canonical_id": "python:tenacity@8.2.3:reference",
+              "char_span": [
+                0,
+                65
+              ],
+              "content_hash": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+              "doc_scope": "library",
+              "docs_snapshot_exact": 1,
+              "generation_id": "gen-aa01c79bcd174cd481db4947d86461ec",
+              "library_id": "python:tenacity@8.2.3:reference",
+              "line_span": [
+                1,
+                1
+              ],
+              "parent_logical_id": "parent-5074f303adf255a6524c3948862610b3",
+              "project_identity": "",
+              "resolved_version": "8.2.3",
+              "source_class": "library_doc",
+              "source_content_hash": "67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8",
+              "source_identity": "https://tenacity.readthedocs.io/en/8.2.3",
+              "stable_chunk_id": "child-03a87a6ec55178e338a0aa80cbe92da9ae780254",
+              "version": "8.2.3"
+            }
+          }
+        ],
+        "first_loss_observation": "Project return contains ARCHITECTURE.md and is deliverable. Unified return retains that source plus exact Tenacity source and is deliverable. Final public/snapshot bindings contain only library source; required ARCHITECTURE.md full fact is absent. This locates loss after the observed unified return, without assigning an unobserved product operand.",
+        "diagnostic_carrier_warning": "same_path_children identity_matches is explicitly based on raw_top_level_lineage_only. It must not be substituted for the real combined library DTO verifier, whose source_errors are empty."
+      },
+      "evidence_key": "p15"
+    },
+    "p16": {
+      "job_id": 114101794904,
+      "current_delivery": {
+        "quality": "PASS",
+        "passed": 6,
+        "cases": 6,
+        "full_facts": 1,
+        "required_full_facts": 1,
+        "reported_errors": 0,
+        "reported_report_sha256": "8c745bebd1526635ba79ce6ec8614352eb3a9c7e309c7ee0c62b4db7b07d012f",
+        "oracle_controls": {
+          "passed": 6,
+          "total": 6,
+          "integrity": "PASS"
+        },
+        "claim_boundary": "Frozen bound candidate injection at real handler/projector/MCP serialization boundary; not indexed retrieval, stdio or real model/client evidence.",
+        "observed_cases": [
+          {
+            "id": "support_override_rejected",
+            "source_count": 1,
+            "public_utf8_bytes": 744,
+            "reported_estimated_tokens": 186,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          },
+          {
+            "id": "authority_override_rejected",
+            "source_count": 1,
+            "public_utf8_bytes": 707,
+            "reported_estimated_tokens": 177,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          },
+          {
+            "id": "tool_instruction_rejected",
+            "source_count": 1,
+            "public_utf8_bytes": 739,
+            "reported_estimated_tokens": 185,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          },
+          {
+            "id": "lifecycle_override_rejected",
+            "source_count": 1,
+            "public_utf8_bytes": 722,
+            "reported_estimated_tokens": 181,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          },
+          {
+            "id": "credential_exfiltration_rejected",
+            "source_count": 1,
+            "public_utf8_bytes": 748,
+            "reported_estimated_tokens": 187,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          },
+          {
+            "id": "legitimate_fact_survives_hostile_tail",
+            "source_count": 1,
+            "public_utf8_bytes": 795,
+            "reported_estimated_tokens": 199,
+            "failed_checks": [],
+            "authority_errors": [],
+            "integrity_errors": [],
+            "delivery_errors": [],
+            "runtime_error": null
+          }
+        ]
+      },
+      "retained_adversarial": {
+        "quality": "FAIL",
+        "passed": 24,
+        "cases": 28,
+        "failed_case_ids": [
+          "module_behavior_tiny_budget",
+          "module_requirements_tiny_budget",
+          "cross_module_comparison_tiny_budget",
+          "project_policy_detail_fails_closed"
+        ],
+        "reported_v1": 11,
+        "maximum_estimated_trajectory_tokens": 761,
+        "output_ceiling": null,
+        "mutation_gate": "FAIL: baseline did not pass full trajectory gate; no mutation credit"
+      },
+      "evidence_key": "p16"
+    },
+    "closure": {
+      "job_id": 114101794826,
+      "quality": "FAIL",
+      "reported_report_sha256": "a8d8c4e14b51d3431e6a280b471fd3a89c714f46b2ff90071233f4a26c7e0992",
+      "p14": {
+        "integrity": true,
+        "quality": false
+      },
+      "p15": {
+        "integrity": true,
+        "quality": false
+      },
+      "p16": {
+        "integrity": true,
+        "quality": true
+      },
+      "required_outcomes": {
+        "dependencies": "success",
+        "first_divergence": "success",
+        "contract_ablation": "success",
+        "p14_quality": "failure",
+        "p14_oracle": "success",
+        "p15_quality": "failure",
+        "p15_oracle": "success",
+        "p16_quality": "success",
+        "p16_oracle": "success",
+        "adversarial": "failure",
+        "adversarial_mutation": "failure",
+        "syntax": "success"
+      },
+      "failed_checks": [
+        "current_quality",
+        "required_gates_succeeded"
+      ],
+      "oracle_controls": {
+        "passed": 4,
+        "total": 4,
+        "integrity": "PASS"
+      },
+      "evidence_key": "closure"
+    },
+    "installed": {
+      "job_id": 114101795051,
+      "job_conclusion": "success",
+      "oracle_controls": {
+        "passed": 7,
+        "total": 7
+      },
+      "task": {
+        "passed": 1,
+        "total": 1,
+        "false_supported": 0,
+        "contamination": 0
+      },
+      "verification": "PASS",
+      "verified_report_identity": {
+        "artifact_origin": "reviewed-wheel",
+        "claim_boundary": "pre-public-installed-harness",
+        "model": "deterministic-script",
+        "pass_rate": 1,
+        "passed_tasks": 1,
+        "protocol": "installed-mcp-agent-v1",
+        "provider_id": "scripted",
+        "report_sha256": "043e6e819e214d9de16453974dbb201d4b2c89c66fd4904cd60c69bdd683f37b",
+        "schema_failures": 1,
+        "schema_sha256": "1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2",
+        "source_commit": "217d21017008240cf252e6b99e5c6e810a858a2a",
+        "task_count": 1,
+        "tool_attempts": 2,
+        "version": "1.3.2"
+      },
+      "require_schema_repair": true,
+      "actual_client_status": "NOT_RUN",
+      "client_names": [
+        "Claude",
+        "Codex",
+        "OpenCode"
+      ],
+      "real_model_or_provider_status": "NOT_RUN",
+      "evidence_key": "installed"
+    },
+    "retrieval": {
+      "job_id": 114101795131,
+      "job_conclusion": "success",
+      "printed_current_summary": {
+        "head": "217d21017008240cf252e6b99e5c6e810a858a2a",
+        "frozen_80": {
+          "within_budget": 48,
+          "within_budget_sufficient": 31,
+          "operational_errors": 0,
+          "integrity_violations": 0
+        },
+        "causal_cells": {
+          "cap_on_requal_on": 31,
+          "cap_off_requal_on": 31,
+          "cap_on_requal_off": 31,
+          "cap_off_requal_off": 31,
+          "contextualization_off": 31
+        },
+        "selection": {
+          "status": "NOT_OBSERVED_IN_BOUNDED_POOL",
+          "exact_recoveries": [],
+          "beam_recoveries": []
+        },
+        "holdout": {
+          "current": 5,
+          "strict": 5,
+          "comparison": "NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED"
+        }
+      },
+      "interpretation": "Current evidence reports no operational/integrity errors and no holdout regression; bounded causal/selection checks did not observe improvement. No 800-token pass/fail ceiling is reinstated by this receipt.",
+      "evidence_key": "retrieval"
+    },
+    "p1_stack": {
+      "advanced_job_id": 114101794969,
+      "advanced_conclusion": "failure",
+      "production_contracts": {
+        "passed": 528,
+        "failed": 94,
+        "deselected": 7727
+      },
+      "actual_required_outcomes": {
+        "dependencies": "success",
+        "first_divergence": "skipped",
+        "contract_ablation": "skipped",
+        "p14_quality": "skipped",
+        "p14_oracle": "skipped",
+        "p15_quality": "skipped",
+        "p15_oracle": "skipped",
+        "p16_quality": "skipped",
+        "p16_oracle": "skipped",
+        "adversarial": "skipped",
+        "adversarial_mutation": "skipped",
+        "syntax": "skipped"
+      },
+      "dependent_current_reports": "NOT_PRODUCED_AFTER_EARLY_PRODUCTION_CONTRACT_FAILURE",
+      "closure_quality": "FAIL",
+      "closure_reported_sha256": "a943a4dad1c4cbd70fd29f509d8467ec904fc374927262aa5f79e79e5fbb4e76",
+      "closure_failure_types": [
+        "FileNotFoundError:p1_4_current_verifier",
+        "FileNotFoundError:p1_5_current_verifier",
+        "FileNotFoundError:p1_6_current_verifier"
+      ],
+      "closure_oracle": "FAIL: current_report_integrity/current_runtime_consistency unavailable; no control credit",
+      "aggregate": "FAIL",
+      "evidence_key": "stack_advanced",
+      "aggregate_job_id": 114103758421,
+      "aggregate_dependencies": {
+        "CORE": "failure",
+        "PLATFORM": "success",
+        "ADVANCED": "failure",
+        "BUILD": "success",
+        "WHEEL": "success",
+        "SDIST": "success"
+      },
+      "aggregate_evidence_key": "stack_exact"
+    },
+    "main_required": {
+      "job_id": 114103727445,
+      "aggregate": "FAIL",
+      "dependencies": {
+        "DOCS_CONTRACT": "success",
+        "INSTALLER_SMOKE": "success",
+        "PLATFORM_SMOKE": "success",
+        "CORE_TESTS": "failure",
+        "ADVANCED_CONTRACT": "failure",
+        "INSTALLED_MCP_HARNESS": "success",
+        "STATIC_CONTRACT": "success",
+        "RETRIEVAL_EVIDENCE": "success"
+      },
+      "evidence_key": "required",
+      "merge_readiness": "NOT_READY"
+    },
+    "main_advanced_detail": {
+      "job_id": 114101795019,
+      "job_conclusion": "failure",
+      "observation": "STEP_STATUSES_ONLY",
+      "raw_log_status": "NOT_READ_IN_THIS_RECEIPT",
+      "detail_boundary": "Main advanced and V2 quality details are outside this collector ownership. Parent/peer report three failed Transport closed attempts; this receipt does not infer their scores or causal operands."
+    },
+    "core_detail": {
+      "observation": "JOB_STATUSES_ONLY",
+      "raw_log_status": "NOT_READ",
+      "detail_boundary": "Parent independently owns JUnit diagnostic receipt; counts and failures are not duplicated here."
+    }
+  },
+  "workflows": [
+    {
+      "key": "p14",
+      "id": 38014539453,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539453",
+      "path": ".github/workflows/p1.4-paraphrase-proofability.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:48:21Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539453",
+        "sha256": "570aa3a155c449c8d27589b3c9057ce581949d4d288a9b38b1aa97fc9a65206a",
+        "utf8_bytes": 13231
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539453/jobs?per_page=100",
+        "sha256": "596f00a19e408105991bed92b4b78baa8a21929d0b69f4b69bdbb2f29cd7777e",
+        "utf8_bytes": 3058,
+        "total_count": 1
+      },
+      "jobs": [
+        {
+          "id": 114101794605,
+          "name": "p1-4-proofability",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539453/job/114101794605",
+          "completed_at": "2026-10-10T01:48:20Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Measure original-question retrieval and complete frozen facts",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "id": 38014539398,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539398",
+      "path": ".github/workflows/p1.5-mixed-evidence-provenance.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:48:24Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539398",
+        "sha256": "0ffd9052156d5b13d1f58d41986f8b6f61e1abaf4c173fead4028f2899af1429",
+        "utf8_bytes": 13230
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539398/jobs?per_page=100",
+        "sha256": "08d5c42d123d89f4af07c195082b0be5323d02c85a0e152b5b3d17b38084f83c",
+        "utf8_bytes": 3049,
+        "total_count": 1
+      },
+      "jobs": [
+        {
+          "id": 114101794391,
+          "name": "p1-5-provenance",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539398/job/114101794391",
+          "completed_at": "2026-10-10T01:48:23Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Measure frozen full facts and explicit source provenance",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "id": 38014539479,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539479",
+      "path": ".github/workflows/p1.6-evidence-is-data.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:49:13Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539479",
+        "sha256": "9e5c2cd7919f4153a7fd608dd00ec0bda8768d99d2011a9c81641d7f2d1508b0",
+        "utf8_bytes": 13212
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539479/jobs?per_page=100",
+        "sha256": "62fc59f874378deb3af874e7680f80b04fa5ee366e7356c2c916024626669017",
+        "utf8_bytes": 3412,
+        "total_count": 1
+      },
+      "jobs": [
+        {
+          "id": 114101794904,
+          "name": "p1-6-adversarial",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539479/job/114101794904",
+          "completed_at": "2026-10-10T01:49:12Z",
+          "non_successful_steps": [
+            {
+              "number": 7,
+              "name": "Verify existing Agent Developer adversarial contract",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 8,
+              "name": "Verify existing Agent Developer adversarial mutations",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "closure",
+      "id": 38014539475,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539475",
+      "path": ".github/workflows/p1-agent-truth-closure.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:49:36Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539475",
+        "sha256": "302eea5bfc687f45e842f102c18a338c620f823f04b60e95c7e58c31abfa9fb1",
+        "utf8_bytes": 13214
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539475/jobs?per_page=100",
+        "sha256": "2f98f06a8b0e5c7066f987f9414da2c89d04925a8de1fb3348437576886a232e",
+        "utf8_bytes": 4949,
+        "total_count": 1
+      },
+      "jobs": [
+        {
+          "id": 114101794826,
+          "name": "p1-agent-truth-closure",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539475/job/114101794826",
+          "completed_at": "2026-10-10T01:49:36Z",
+          "non_successful_steps": [
+            {
+              "number": 7,
+              "name": "Measure current P1.4 quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Measure current P1.5 quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 13,
+              "name": "Preserve Agent Developer adversarial gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 14,
+              "name": "Preserve Agent Developer adversarial mutation gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 17,
+              "name": "Verify current closure quality",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "stack",
+      "id": 38014539441,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441",
+      "path": ".github/workflows/p1-stack-exact-validation.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:57:57Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539441",
+        "sha256": "016387a8e9e092b6d969b16c21dd9094a98839339beda089bb09c1abcf9f5043",
+        "utf8_bytes": 13220
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539441/jobs?per_page=100",
+        "sha256": "adf596b15746a29616ee9f286b395d6ad09d5757443da6b7e5b6e86f5276b481",
+        "utf8_bytes": 34718,
+        "total_count": 13
+      },
+      "jobs": [
+        {
+          "id": 114101794769,
+          "name": "p1-stack-platform (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794769",
+          "completed_at": "2026-10-10T01:52:30Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101794934,
+          "name": "p1-stack-platform (macos-15)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794934",
+          "completed_at": "2026-10-10T01:48:52Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101794961,
+          "name": "p1-stack-core (3.12)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794961",
+          "completed_at": "2026-10-10T01:57:01Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101794963,
+          "name": "p1-stack-release-build",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794963",
+          "completed_at": "2026-10-10T01:48:52Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101794969,
+          "name": "p1-stack-advanced-security",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794969",
+          "completed_at": "2026-10-10T01:50:09Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run production-path contracts",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 19,
+              "name": "Verify current closure quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 20,
+              "name": "Verify current closure oracle controls",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101794976,
+          "name": "p1-stack-core (3.13)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794976",
+          "completed_at": "2026-10-10T01:56:58Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101794989,
+          "name": "p1-stack-core (3.11)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794989",
+          "completed_at": "2026-10-10T01:57:52Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101795021,
+          "name": "p1-stack-platform (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101795021",
+          "completed_at": "2026-10-10T01:49:51Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114102025501,
+          "name": "p1-stack-release-sdist-installer",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114102025501",
+          "completed_at": "2026-10-10T01:50:25Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114102025533,
+          "name": "p1-stack-release-wheel (3.12)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114102025533",
+          "completed_at": "2026-10-10T01:50:31Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114102025558,
+          "name": "p1-stack-release-wheel (3.13)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114102025558",
+          "completed_at": "2026-10-10T01:50:42Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114102025598,
+          "name": "p1-stack-release-wheel (3.11)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114102025598",
+          "completed_at": "2026-10-10T01:50:35Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114103758421,
+          "name": "p1-stack-exact",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114103758421",
+          "completed_at": "2026-10-10T01:57:57Z",
+          "non_successful_steps": [
+            {
+              "number": 2,
+              "name": "Require every exact-head lane",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "main",
+      "id": 38014539455,
+      "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455",
+      "path": ".github/workflows/ci.yml",
+      "event": "pull_request",
+      "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T01:47:39Z",
+      "updated_at": "2026-10-10T01:57:55Z",
+      "metadata": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539455",
+        "sha256": "7598e47d1082374a508a2be0935644d8e83163ad0cb20c82b69cfc2662df3fb5",
+        "utf8_bytes": 13175
+      },
+      "jobs_api": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38014539455/jobs?per_page=100",
+        "sha256": "de203e0e119cda06691ef4d87936deecef75755478a327e93bd8ca04766643fb",
+        "utf8_bytes": 38219,
+        "total_count": 16
+      },
+      "jobs": [
+        {
+          "id": 114101794939,
+          "name": "installer-smoke",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101794939",
+          "completed_at": "2026-10-10T01:47:57Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795019,
+          "name": "advanced-contract",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795019",
+          "completed_at": "2026-10-10T01:53:05Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run offline advanced contract and shared-security tests",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Run recoverable documentation failure gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 7,
+              "name": "Run recoverable documentation failure mutation gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Run Legacy live compatibility report and lineage floor",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 10,
+              "name": "Run V2 project-context acceptance gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 13,
+              "name": "Run Agent Developer Protocol gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 14,
+              "name": "Run Agent Developer adversarial/token gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 15,
+              "name": "Run critical mutation gate",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101795029,
+          "name": "platform-smoke (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795029",
+          "completed_at": "2026-10-10T01:48:43Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795051,
+          "name": "installed-mcp-harness",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795051",
+          "completed_at": "2026-10-10T01:48:31Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795056,
+          "name": "test (3.13)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795056",
+          "completed_at": "2026-10-10T01:57:28Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101795064,
+          "name": "test (3.11)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795064",
+          "completed_at": "2026-10-10T01:57:34Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101795070,
+          "name": "test (3.12)",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795070",
+          "completed_at": "2026-10-10T01:57:41Z",
+          "non_successful_steps": [
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        },
+        {
+          "id": 114101795091,
+          "name": "docs-contract",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795091",
+          "completed_at": "2026-10-10T01:49:39Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795109,
+          "name": "platform-smoke (macos-15)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795109",
+          "completed_at": "2026-10-10T01:49:34Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795110,
+          "name": "static-contract",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795110",
+          "completed_at": "2026-10-10T01:49:09Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795121,
+          "name": "docs-impact",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795121",
+          "completed_at": "2026-10-10T01:48:16Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795131,
+          "name": "retrieval-evidence",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795131",
+          "completed_at": "2026-10-10T01:54:47Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795187,
+          "name": "platform-smoke (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795187",
+          "completed_at": "2026-10-10T01:55:29Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114101795661,
+          "name": "p1-harden-branch",
+          "status": "completed",
+          "conclusion": "skipped",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795661",
+          "completed_at": "2026-10-10T01:47:40Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114103727373,
+          "name": "acceptance-diagnostics",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114103727373",
+          "completed_at": "2026-10-10T01:57:54Z",
+          "non_successful_steps": []
+        },
+        {
+          "id": 114103727445,
+          "name": "required-ci",
+          "status": "completed",
+          "conclusion": "failure",
+          "head_sha": "321f36577577cb90a0422cee0de0b525b9cd658e",
+          "html_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114103727445",
+          "completed_at": "2026-10-10T01:57:47Z",
+          "non_successful_steps": [
+            {
+              "number": 2,
+              "name": "Enforce required CI jobs",
+              "status": "completed",
+              "conclusion": "failure"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "decoded_log_evidence": {
+    "p14": {
+      "job_id": 114101794605,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539453/job/114101794605",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101794605/logs",
+      "raw_log_sha256": "ddcac5373d4f442a653047f4c2269e46572669b70681f4d1df5e7dd9d191adb1",
+      "raw_log_utf8_bytes": 89833,
+      "line_count": 732,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 276,
+          "line_end": 276,
+          "sha256": "e52a91201a4b4c15da5aca49a01435668515a9305b791c990e7777a096bd9f58",
+          "utf8_bytes": 69,
+          "text": "2026-10-10T01:47:49.9138231Z 217d21017008240cf252e6b99e5c6e810a858a2a"
+        },
+        {
+          "label": "quality_and_read_state",
+          "line_start": 627,
+          "line_end": 639,
+          "sha256": "593c408cb0aea1d4c4a3da409c18e4fc78d20779dc0d621f6b3d6445e463ae39",
+          "utf8_bytes": 1798,
+          "text": "2026-10-10T01:48:15.7339717Z P1.4 current retrieval: FAIL; cases=12/14; discovery=8/10; complete_fact=5/5; errors=0; report=/home/runner/work/_temp/p1.4-current-retrieval.json\n2026-10-10T01:48:15.7341489Z READ_STATE {\"changed_fields\": [], \"id\": \"exact_orders_identity\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7342761Z READ_STATE {\"changed_fields\": [], \"id\": \"exact_retry_policy\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7343969Z READ_STATE {\"changed_fields\": [], \"id\": \"behavior_orders_store\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7345010Z READ_STATE {\"changed_fields\": [], \"id\": \"behavior_payment_outbox\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7346228Z READ_STATE {\"changed_fields\": [], \"id\": \"requirements_validation_contract\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7347334Z READ_STATE {\"changed_fields\": [], \"id\": \"requirements_validation_conditions\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7348379Z READ_STATE {\"changed_fields\": [], \"id\": \"policy_retry_count\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7349142Z READ_STATE {\"changed_fields\": [], \"id\": \"policy_retry_backoff\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7349896Z READ_STATE {\"changed_fields\": [], \"id\": \"typo_orders_symbol\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7350634Z READ_STATE {\"changed_fields\": [], \"id\": \"typo_policy_symbol\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7351454Z READ_STATE {\"changed_fields\": [], \"id\": \"alias_order_drafts\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7352020Z FAIL alias_order_drafts: required_discovery"
+        },
+        {
+          "label": "second_discovery_failure",
+          "line_start": 641,
+          "line_end": 642,
+          "sha256": "e243be274548ef88a8602ce3caae29e05c52a65c25712b42811933bed88167c2",
+          "utf8_bytes": 221,
+          "text": "2026-10-10T01:48:15.7399354Z READ_STATE {\"changed_fields\": [], \"id\": \"alias_project_retry_rule\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7399982Z FAIL alias_project_retry_rule: required_discovery"
+        },
+        {
+          "label": "negative_read_states",
+          "line_start": 644,
+          "line_end": 645,
+          "sha256": "83d83a8a18f18aa43972af9dbbb473b69319ced6880e66bcaedc185cb3e75700",
+          "utf8_bytes": 288,
+          "text": "2026-10-10T01:48:15.7445425Z READ_STATE {\"changed_fields\": [], \"id\": \"negative_wrong_module_fact\", \"read_only_check\": true, \"state_equal\": true}\n2026-10-10T01:48:15.7446272Z READ_STATE {\"changed_fields\": [], \"id\": \"negative_unrelated_policy\", \"read_only_check\": true, \"state_equal\": true}"
+        },
+        {
+          "label": "oracle_controls",
+          "line_start": 660,
+          "line_end": 666,
+          "sha256": "8c44b0cdb18292703d6f95e04d0f37f62a0c53c66c4a597ba7ff6d1c7ff70aa2",
+          "utf8_bytes": 538,
+          "text": "2026-10-10T01:48:15.9512472Z PASS: test_exact_report_and_family_separation\n2026-10-10T01:48:15.9512983Z PASS: test_negative_false_support_fails_closed\n2026-10-10T01:48:15.9513355Z PASS: test_required_discovery_and_support_fail_closed\n2026-10-10T01:48:15.9513729Z PASS: test_claim_and_path_leak_fail_closed\n2026-10-10T01:48:15.9514065Z PASS: test_proof_runtime_shard_identity_fails_closed\n2026-10-10T01:48:15.9514453Z PASS: current report integrity (quality verdict unchanged)\n2026-10-10T01:48:15.9514805Z P1.4 oracle self-test: PASS (5/5)"
+        }
+      ]
+    },
+    "p15": {
+      "job_id": 114101794391,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539398/job/114101794391",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101794391/logs",
+      "raw_log_sha256": "4d877e4b40edb8fa18d938942b2b2a9c29aac3aa38d7e0ed93958d4324ebdc73",
+      "raw_log_utf8_bytes": 110727,
+      "line_count": 719,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 276,
+          "line_end": 276,
+          "sha256": "176198651e01b29eb87227adb12dc17b9e3cfd4c1f22e8f4a204e79acc848489",
+          "utf8_bytes": 69,
+          "text": "2026-10-10T01:47:49.1462268Z 217d21017008240cf252e6b99e5c6e810a858a2a"
+        },
+        {
+          "label": "quality_and_failed_case",
+          "line_start": 627,
+          "line_end": 628,
+          "sha256": "3df75f08f5c077da84cfe4d8d1f0ebed76935f270d320f30249b329bec43b820",
+          "utf8_bytes": 252,
+          "text": "2026-10-10T01:48:20.9357039Z P1.5 current provenance: FAIL; cases=6/7; complete_facts=5/6; errors=0; report=/home/runner/work/_temp/p1.5-current-provenance.json\n2026-10-10T01:48:20.9358221Z FAIL two_claims_require_two_allowed_roles: required_full_facts"
+        },
+        {
+          "label": "oracle_controls",
+          "line_start": 644,
+          "line_end": 651,
+          "sha256": "b123872891724c1d591d22b9c94a115f9f6fcdee74817b8556eb4aead1471e36",
+          "utf8_bytes": 613,
+          "text": "2026-10-10T01:48:21.3147713Z PASS: test_exact_claim_local_assignments\n2026-10-10T01:48:21.3148388Z PASS: test_provenance_gap_is_retained_but_not_hidden\n2026-10-10T01:48:21.3148966Z PASS: test_support_gap_is_retained_but_not_hidden\n2026-10-10T01:48:21.3149482Z PASS: test_assignment_source_ledgers_fail_closed\n2026-10-10T01:48:21.3149998Z PASS: test_claim_and_path_leak_fail_closed\n2026-10-10T01:48:21.3150507Z PASS: test_proof_runtime_shard_identity_fails_closed\n2026-10-10T01:48:21.3151081Z PASS: current report integrity (quality verdict unchanged)\n2026-10-10T01:48:21.3151652Z P1.5 oracle self-test: PASS (6/6)"
+        }
+      ],
+      "selected_raw_diagnostic_fields": {
+        "line": 629,
+        "full_raw_line_sha256": "3285d02798f4919acf407628c16419cbc31587654a56b58f30554fe0127ed4c5",
+        "full_raw_line_utf8_bytes": 35918,
+        "offset_basis": "Zero-based UTF-16 code units and UTF-8 bytes within the complete timestamped raw log line; end exclusive. Each fragment is its exact JSON value, not normalized reserialization.",
+        "fields": [
+          {
+            "json_path": [
+              "authority_errors"
+            ],
+            "line": 629,
+            "char_start": 62,
+            "char_end": 64,
+            "utf8_byte_start": 62,
+            "utf8_byte_end": 64,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "utf8_bytes": 2,
+            "text": "[]"
+          },
+          {
+            "json_path": [
+              "missing_full_fact_sources"
+            ],
+            "line": 629,
+            "char_start": 202,
+            "char_end": 221,
+            "utf8_byte_start": 202,
+            "utf8_byte_end": 221,
+            "sha256": "6d4aef4b8e6673a4b4f0e8976eb2bc09c5954c9f9c0bff7538cd6cb827c4c9f0",
+            "utf8_bytes": 19,
+            "text": "[\"ARCHITECTURE.md\"]"
+          },
+          {
+            "json_path": [
+              "observer_counts"
+            ],
+            "line": 629,
+            "char_start": 242,
+            "char_end": 287,
+            "utf8_byte_start": 242,
+            "utf8_byte_end": 287,
+            "sha256": "053d54534b322f1c273825785734dc10eeeef9f8135d794342f03e0174313fe5",
+            "utf8_bytes": 45,
+            "text": "{\"retrieval_calls\": 1, \"validation_calls\": 1}"
+          },
+          {
+            "json_path": [
+              "output_cost"
+            ],
+            "line": 629,
+            "char_start": 304,
+            "char_end": 383,
+            "utf8_byte_start": 304,
+            "utf8_byte_end": 383,
+            "sha256": "7c95d23ee18e99ce31c37b5b28925949c54a95e619f14b5d55dcf89220120622",
+            "utf8_bytes": 79,
+            "text": "{\"public_utf8_bytes\": 764, \"reported_estimated_tokens\": 191, \"source_count\": 1}"
+          },
+          {
+            "json_path": [
+              "preparation_errors"
+            ],
+            "line": 629,
+            "char_start": 8492,
+            "char_end": 8494,
+            "utf8_byte_start": 8492,
+            "utf8_byte_end": 8494,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "utf8_bytes": 2,
+            "text": "[]"
+          },
+          {
+            "json_path": [
+              "public_result"
+            ],
+            "line": 629,
+            "char_start": 12934,
+            "char_end": 13085,
+            "utf8_byte_start": 12934,
+            "utf8_byte_end": 13085,
+            "sha256": "7459be3a90a044e2dcd44031b9481a47e30e4ac9e64b650007080889c95a202f",
+            "utf8_bytes": 151,
+            "text": "{\"answer_available\": false, \"answer_supported\": false, \"context_available\": true, \"kind\": \"docs_answer\", \"reason_code\": \"context_only\", \"status\": \"ok\"}"
+          },
+          {
+            "json_path": [
+              "request"
+            ],
+            "line": 629,
+            "char_start": 13098,
+            "char_end": 13370,
+            "utf8_byte_start": 13098,
+            "utf8_byte_end": 13370,
+            "sha256": "d9b486f28697b296beabb90c4158abccb84fbe3c0350a9c72edc8a95c459be1b",
+            "utf8_bytes": 272,
+            "text": "{\"library\": \"python:tenacity@8.2.3:reference\", \"lookup_queries\": [], \"project_identity\": \"local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3\", \"question\": \"Explain ProjectRetryRule and TenacityRetryingContract.\", \"scope\": \"project\", \"version\": \"8.2.3\"}"
+          },
+          {
+            "json_path": [
+              "runtime_error"
+            ],
+            "line": 629,
+            "char_start": 13389,
+            "char_end": 13393,
+            "utf8_byte_start": 13389,
+            "utf8_byte_end": 13393,
+            "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+            "utf8_bytes": 4,
+            "text": "null"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "project",
+              0,
+              "context_sources"
+            ],
+            "line": 629,
+            "char_start": 16167,
+            "char_end": 17691,
+            "utf8_byte_start": 16167,
+            "utf8_byte_end": 17691,
+            "sha256": "ca0173229d39df04e42b9e4ed7cb37d43180981fb926bd49b10185669dc08b60",
+            "utf8_bytes": 1524,
+            "text": "[{\"authority\": \"source_of_truth\", \"byte_end\": 37, \"byte_start\": 0, \"char_end\": 37, \"char_start\": 0, \"display_content_hash\": \"7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411\", \"doc_scope\": \"project\", \"generation_id\": \"gen-551c6b9d2a0e42298c48180f98f6f718\", \"line_end\": 1, \"line_start\": 1, \"parent_logical_id\": \"parent-65a258b600901de309285b2d2141f649\", \"path\": \"ARCHITECTURE.md\", \"project_identity\": \"local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3\", \"resolved_version\": \"\", \"source\": {\"authority\": \"source_of_truth\", \"description\": \"Pinned documentation source\", \"doc_scope\": \"project\", \"impact_policy\": \"track\", \"index_freshness\": \"synchronized\", \"lifecycle_status\": \"active\", \"module_id\": \"\", \"module_name\": null, \"module_path\": null, \"module_type\": null, \"path\": \"ARCHITECTURE.md\", \"project_identity\": \"local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3\", \"risk_flags\": [], \"source_class\": \"project_doc\", \"source_kind\": \"project_doc\", \"source_type\": \"project_doc\", \"temporal_relevance\": \"current\", \"title\": {\"characters\": 8, \"sha256\": \"d6bd8c0aeee80fedb2dbf05c973100c3db04be90c072a88572533f2684131a36\", \"utf8_bytes\": 8}, \"url\": null}, \"source_class\": \"project_doc\", \"source_content_hash\": \"7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411\", \"source_identity\": \"project_file:local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3:ARCHITECTURE.md\", \"stable_chunk_id\": \"child-5e763ca81bb4889d9baab8c24d24735846baa67d\", \"url\": null}]"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "project",
+              0,
+              "delivery_decision"
+            ],
+            "line": 629,
+            "char_start": 17714,
+            "char_end": 17756,
+            "utf8_byte_start": 17714,
+            "utf8_byte_end": 17756,
+            "sha256": "d65c19070717afbae167faba7285054881fbd1ed23ad58fa55b7c74f0c32e71a",
+            "utf8_bytes": 42,
+            "text": "{\"deliverable\": true, \"reason_code\": null}"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "project",
+              0,
+              "requires_confirmation"
+            ],
+            "line": 629,
+            "char_start": 26794,
+            "char_end": 26799,
+            "utf8_byte_start": 26794,
+            "utf8_byte_end": 26799,
+            "sha256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+            "utf8_bytes": 5,
+            "text": "false"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "project",
+              0,
+              "status"
+            ],
+            "line": 629,
+            "char_start": 26826,
+            "char_end": 26835,
+            "utf8_byte_start": 26826,
+            "utf8_byte_end": 26835,
+            "sha256": "68e7a69974a641064a6a5ae8b1a00997939a325ec585a49e9fe82b386a21726a",
+            "utf8_bytes": 9,
+            "text": "\"success\""
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "unified",
+              0,
+              "context_sources"
+            ],
+            "line": 629,
+            "char_start": 27413,
+            "char_end": 29835,
+            "utf8_byte_start": 27413,
+            "utf8_byte_end": 29835,
+            "sha256": "fd47cdd3bf3fc6b93d8b4f961b2bf27b8529f3a1f2eb91b940a0c34503eb20c3",
+            "utf8_bytes": 2422,
+            "text": "[{\"authority\": \"source_of_truth\", \"byte_end\": 37, \"byte_start\": 0, \"canonical_id\": null, \"char_end\": 37, \"char_start\": 0, \"display_content_hash\": \"7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411\", \"doc_scope\": \"project\", \"generation_id\": \"gen-551c6b9d2a0e42298c48180f98f6f718\", \"library_id\": null, \"line_end\": 1, \"line_start\": 1, \"parent_logical_id\": \"parent-65a258b600901de309285b2d2141f649\", \"path\": \"ARCHITECTURE.md\", \"project_identity\": \"local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3\", \"resolved_version\": \"\", \"source\": {\"authority\": \"source_of_truth\", \"description\": \"Pinned documentation source\", \"doc_scope\": \"project\", \"impact_policy\": \"track\", \"index_freshness\": \"synchronized\", \"lifecycle_status\": \"active\", \"module_id\": \"\", \"module_name\": null, \"module_path\": null, \"module_type\": null, \"path\": \"ARCHITECTURE.md\", \"project_identity\": \"local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3\", \"risk_flags\": [], \"source_class\": \"project_doc\", \"source_kind\": \"project_doc\", \"source_type\": \"project_doc\", \"temporal_relevance\": \"current\", \"title\": {\"characters\": 8, \"sha256\": \"d6bd8c0aeee80fedb2dbf05c973100c3db04be90c072a88572533f2684131a36\", \"utf8_bytes\": 8}, \"url\": null}, \"source_class\": \"project_doc\", \"source_content_hash\": \"7fdb4bd4ca083c8fac33df28f9a970516fc4a0549f5773ea5a2f90187fa69411\", \"source_identity\": \"project_file:local:bda3d0bbf1acd1b262de22b0774ab9bc4d1340d44396604a62b9dc73abcd6da3:ARCHITECTURE.md\", \"stable_chunk_id\": \"child-5e763ca81bb4889d9baab8c24d24735846baa67d\", \"url\": null}, {\"byte_end\": 65, \"byte_start\": 0, \"canonical_id\": \"python:tenacity@8.2.3:reference\", \"char_end\": 65, \"char_start\": 0, \"display_content_hash\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"doc_scope\": \"library\", \"docs_snapshot_exact\": true, \"generation_id\": \"gen-aa01c79bcd174cd481db4947d86461ec\", \"library_id\": \"python:tenacity@8.2.3:reference\", \"line_end\": 1, \"line_start\": 1, \"parent_logical_id\": \"parent-5074f303adf255a6524c3948862610b3\", \"resolved_version\": \"8.2.3\", \"source\": \"https://tenacity.readthedocs.io/en/8.2.3/\", \"source_class\": \"library_doc\", \"source_content_hash\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"source_identity\": \"https://tenacity.readthedocs.io/en/8.2.3\", \"stable_chunk_id\": \"child-03a87a6ec55178e338a0aa80cbe92da9ae780254\", \"url\": \"https://tenacity.readthedocs.io/en/8.2.3/\"}]"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "unified",
+              0,
+              "delivery_decision"
+            ],
+            "line": 629,
+            "char_start": 29858,
+            "char_end": 29900,
+            "utf8_byte_start": 29858,
+            "utf8_byte_end": 29900,
+            "sha256": "d65c19070717afbae167faba7285054881fbd1ed23ad58fa55b7c74f0c32e71a",
+            "utf8_bytes": 42,
+            "text": "{\"deliverable\": true, \"reason_code\": null}"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "unified",
+              0,
+              "lanes"
+            ],
+            "line": 629,
+            "char_start": 29936,
+            "char_end": 30205,
+            "utf8_byte_start": 29936,
+            "utf8_byte_end": 30205,
+            "sha256": "f52dff6e264eb6f257573d221d28a4583cc0b1f6bd24c0bb61fab95a4bbb92b0",
+            "utf8_bytes": 269,
+            "text": "{\"dependency\": {\"source_count\": 0, \"status\": \"not_requested\"}, \"library\": {\"canonical_ids\": [\"python:tenacity@8.2.3:reference\"], \"source_count\": 1, \"status\": \"success\"}, \"project\": {\"reason_code\": \"partial_navigational_context\", \"source_count\": 1, \"status\": \"success\"}}"
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "unified",
+              0,
+              "mode_selected"
+            ],
+            "line": 629,
+            "char_start": 30326,
+            "char_end": 30333,
+            "utf8_byte_start": 30326,
+            "utf8_byte_end": 30333,
+            "sha256": "0aa52ffaa672c5a43dd1b5cf6239a3c3de78a77b37f6dca3f8ea10b9153c84c7",
+            "utf8_bytes": 7,
+            "text": "\"mixed\""
+          },
+          {
+            "json_path": [
+              "service_returns",
+              "unified",
+              0,
+              "status"
+            ],
+            "line": 629,
+            "char_start": 30631,
+            "char_end": 30640,
+            "utf8_byte_start": 30631,
+            "utf8_byte_end": 30640,
+            "sha256": "68e7a69974a641064a6a5ae8b1a00997939a325ec585a49e9fe82b386a21726a",
+            "utf8_bytes": 9,
+            "text": "\"success\""
+          },
+          {
+            "json_path": [
+              "source_bindings",
+              0,
+              "same_call_source_equal"
+            ],
+            "line": 629,
+            "char_start": 32143,
+            "char_end": 32147,
+            "utf8_byte_start": 32143,
+            "utf8_byte_end": 32147,
+            "sha256": "b5bea41b6c623f7c09f1bf24dcae58ebab3c0cdd90ad966bc43a45b44867e12b",
+            "utf8_bytes": 4,
+            "text": "true"
+          },
+          {
+            "json_path": [
+              "source_bindings",
+              0,
+              "snapshot_lineage"
+            ],
+            "line": 629,
+            "char_start": 34089,
+            "char_end": 34548,
+            "utf8_byte_start": 34089,
+            "utf8_byte_end": 34548,
+            "sha256": "9fed7bf34d8b5c7fc6e8cc0277ae118f1f9461d21ede8600dd6394eafeb2d132",
+            "utf8_bytes": 459,
+            "text": "{\"authority\": \"unknown\", \"display_content_hash\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"display_text\": {\"characters\": 65, \"sha256\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"utf8_bytes\": 65}, \"docs_snapshot_exact\": true, \"parent_logical_id\": \"parent-5074f303adf255a6524c3948862610b3\", \"resolved_version\": \"8.2.3\", \"stable_chunk_id\": \"child-03a87a6ec55178e338a0aa80cbe92da9ae780254\", \"version\": \"8.2.3\"}"
+          },
+          {
+            "json_path": [
+              "source_bindings",
+              0,
+              "snapshot_metadata_lineage"
+            ],
+            "line": 629,
+            "char_start": 34579,
+            "char_end": 35350,
+            "utf8_byte_start": 34579,
+            "utf8_byte_end": 35350,
+            "sha256": "febb121560e574b4970f526e09e5c9e961692e2b946bde45d5c35bf21df37ce3",
+            "utf8_bytes": 771,
+            "text": "{\"authority\": \"unknown\", \"byte_span\": [0, 65], \"canonical_id\": \"python:tenacity@8.2.3:reference\", \"char_span\": [0, 65], \"content_hash\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"doc_scope\": \"library\", \"docs_snapshot_exact\": 1, \"generation_id\": \"gen-aa01c79bcd174cd481db4947d86461ec\", \"library_id\": \"python:tenacity@8.2.3:reference\", \"line_span\": [1, 1], \"parent_logical_id\": \"parent-5074f303adf255a6524c3948862610b3\", \"project_identity\": \"\", \"resolved_version\": \"8.2.3\", \"source_class\": \"library_doc\", \"source_content_hash\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"source_identity\": \"https://tenacity.readthedocs.io/en/8.2.3\", \"stable_chunk_id\": \"child-03a87a6ec55178e338a0aa80cbe92da9ae780254\", \"version\": \"8.2.3\"}"
+          },
+          {
+            "json_path": [
+              "source_bindings",
+              0,
+              "source_fields"
+            ],
+            "line": 629,
+            "char_start": 35369,
+            "char_end": 35869,
+            "utf8_byte_start": 35369,
+            "utf8_byte_end": 35869,
+            "sha256": "2c6eba05009cf156b5694eab9119732d9390c9e4517b21278e552ce04550c6f3",
+            "utf8_bytes": 500,
+            "text": "{\"content_sha256\": \"f346d4c29fe47e6d14dcc6b0bb2fa254d7a99ba02566c6a6a999f98cf8d14a86\", \"evidence_id\": \"child-03a87a6ec55178e338a0aa80cbe92da9ae780254\", \"path_or_url\": \"https://tenacity.readthedocs.io/en/8.2.3/\", \"section\": {\"characters\": 8, \"sha256\": \"d6bd8c0aeee80fedb2dbf05c973100c3db04be90c072a88572533f2684131a36\", \"utf8_bytes\": 8}, \"snippet\": {\"characters\": 65, \"sha256\": \"67f67da421e283f697af467f40a3916b970c77ad8014619fb72abb58393b14b8\", \"utf8_bytes\": 65}, \"version_binding\": \"exact_snapshot\"}"
+          },
+          {
+            "json_path": [
+              "source_errors"
+            ],
+            "line": 629,
+            "char_start": 35890,
+            "char_end": 35892,
+            "utf8_byte_start": 35890,
+            "utf8_byte_end": 35892,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "utf8_bytes": 2,
+            "text": "[]"
+          },
+          {
+            "json_path": [
+              "state_differences"
+            ],
+            "line": 629,
+            "char_start": 35915,
+            "char_end": 35917,
+            "utf8_byte_start": 35915,
+            "utf8_byte_end": 35917,
+            "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "utf8_bytes": 2,
+            "text": "[]"
+          }
+        ]
+      }
+    },
+    "p16": {
+      "job_id": 114101794904,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539479/job/114101794904",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101794904/logs",
+      "raw_log_sha256": "4a9e3c4a3f48fdb690c98038cbd3ab12ff1f17c187bdb5b2ef93304627e03a09",
+      "raw_log_utf8_bytes": 86761,
+      "line_count": 800,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 276,
+          "line_end": 276,
+          "sha256": "ab42070d9887285635a4abc0147edf195d40e2a9475bd0bce083d64980ea2b55",
+          "utf8_bytes": 69,
+          "text": "2026-10-10T01:48:19.0051333Z 217d21017008240cf252e6b99e5c6e810a858a2a"
+        },
+        {
+          "label": "current_delivery_cases",
+          "line_start": 627,
+          "line_end": 639,
+          "sha256": "f2cee42bd46ccdf7e59bda2504a90eb4414382b965466e637053dd10fb6c9fad",
+          "utf8_bytes": 4052,
+          "text": "2026-10-10T01:48:46.0142499Z P1.6 current public delivery: PASS; cases=6/6; full_facts=1/1; errors=0; sha256=8c745bebd1526635ba79ce6ec8614352eb3a9c7e309c7ee0c62b4db7b07d012f; report=/home/runner/work/_temp/p1.6-current-delivery.json\n2026-10-10T01:48:46.0144431Z PASS support_override_rejected: \n2026-10-10T01:48:46.0148233Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"support_override_rejected\", \"integrity_errors\": [], \"public_utf8_bytes\": 744, \"reported_estimated_tokens\": 186, \"runtime_error\": null, \"source_count\": 1}\n2026-10-10T01:48:46.0151256Z PASS authority_override_rejected: \n2026-10-10T01:48:46.0153693Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"authority_override_rejected\", \"integrity_errors\": [], \"public_utf8_bytes\": 707, \"reported_estimated_tokens\": 177, \"runtime_error\": null, \"source_count\": 1}\n2026-10-10T01:48:46.0156106Z PASS tool_instruction_rejected: \n2026-10-10T01:48:46.0158332Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"tool_instruction_rejected\", \"integrity_errors\": [], \"public_utf8_bytes\": 739, \"reported_estimated_tokens\": 185, \"runtime_error\": null, \"source_count\": 1}\n2026-10-10T01:48:46.0160629Z PASS lifecycle_override_rejected: \n2026-10-10T01:48:46.0162672Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"lifecycle_override_rejected\", \"integrity_errors\": [], \"public_utf8_bytes\": 722, \"reported_estimated_tokens\": 181, \"runtime_error\": null, \"source_count\": 1}\n2026-10-10T01:48:46.0164649Z PASS credential_exfiltration_rejected: \n2026-10-10T01:48:46.0166825Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"credential_exfiltration_rejected\", \"integrity_errors\": [], \"public_utf8_bytes\": 748, \"reported_estimated_tokens\": 187, \"runtime_error\": null, \"source_count\": 1}\n2026-10-10T01:48:46.0168663Z PASS legitimate_fact_survives_hostile_tail: \n2026-10-10T01:48:46.0170710Z DIAGNOSTICS {\"authority_errors\": [], \"checks\": {\"execution\": true, \"frozen_input_and_metadata\": true, \"frozen_source_window\": true, \"full_original_fact\": true, \"observation_integrity\": true, \"original_request_and_calls\": true, \"public_control_authority\": true, \"real_mcp_delivery\": true, \"same_call_validation\": true, \"untrusted_document_policy\": true}, \"delivery_errors\": [], \"id\": \"legitimate_fact_survives_hostile_tail\", \"integrity_errors\": [], \"public_utf8_bytes\": 795, \"reported_estimated_tokens\": 199, \"runtime_error\": null, \"source_count\": 1}"
+        },
+        {
+          "label": "oracle_controls",
+          "line_start": 653,
+          "line_end": 660,
+          "sha256": "ec20447b4c36399f8fc402803567db664aa5fb10d60aab410ead247ad0ecb800",
+          "utf8_bytes": 621,
+          "text": "2026-10-10T01:48:48.8442483Z PASS: test_exact_hostile_document_boundary\n2026-10-10T01:48:48.8443177Z PASS: test_support_and_assignment_override_fail_closed\n2026-10-10T01:48:48.8443752Z PASS: test_assignment_source_ledgers_fail_closed\n2026-10-10T01:48:48.8444307Z PASS: test_content_control_and_raw_marker_fail_closed\n2026-10-10T01:48:48.8444826Z PASS: test_claim_and_path_leak_fail_closed\n2026-10-10T01:48:48.8445338Z PASS: test_proof_runtime_shard_identity_fails_closed\n2026-10-10T01:48:48.8445931Z PASS: current report integrity (quality verdict unchanged)\n2026-10-10T01:48:48.8446454Z P1.6 oracle self-test: PASS (6/6)"
+        },
+        {
+          "label": "retained_adversarial_failures",
+          "line_start": 678,
+          "line_end": 717,
+          "sha256": "e4cacc51637cc4087094745173d51aeacf188098cbea239a93c1aa2f897efbd5",
+          "utf8_bytes": 4932,
+          "text": "2026-10-10T01:48:58.1832191Z - v1/module_behavior_named_gap: positive_context_not_available\n2026-10-10T01:48:58.1832662Z - v1/module_behavior_named_gap: positive_context_has_no_sources\n2026-10-10T01:48:58.1833456Z - v1/module_behavior_named_gap: required_fact_missing: 'OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.'\n2026-10-10T01:48:58.1834305Z - v1/module_behavior_named_gap: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1834833Z - v1/module_behavior_named_gap: required sources missing from ()\n2026-10-10T01:48:58.1835326Z - v1/module_requirements_named_gap: positive_context_not_available\n2026-10-10T01:48:58.1835819Z - v1/module_requirements_named_gap: positive_context_has_no_sources\n2026-10-10T01:48:58.1836730Z - v1/module_requirements_named_gap: required_fact_missing: 'OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.'\n2026-10-10T01:48:58.1837720Z - v1/module_requirements_named_gap: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1838304Z - v1/module_requirements_named_gap: required sources missing from ()\n2026-10-10T01:48:58.1838831Z - v1/cross_module_comparison_supported: positive_context_not_available\n2026-10-10T01:48:58.1839334Z - v1/cross_module_comparison_supported: positive_context_has_no_sources\n2026-10-10T01:48:58.1840549Z - v1/cross_module_comparison_supported: required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'\n2026-10-10T01:48:58.1841479Z - v1/cross_module_comparison_supported: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1842006Z - v1/cross_module_comparison_supported: required sources missing from ()\n2026-10-10T01:48:58.1842468Z - v1/explicit_catalog_module_supported: positive_context_not_available\n2026-10-10T01:48:58.1843127Z - v1/explicit_catalog_module_supported: positive_context_has_no_sources\n2026-10-10T01:48:58.1843811Z - v1/explicit_catalog_module_supported: required_fact_missing: 'CatalogReader reads product summaries from the local catalog cache.'\n2026-10-10T01:48:58.1844520Z - v1/explicit_catalog_module_supported: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1845030Z - v1/explicit_catalog_module_supported: required sources missing from ()\n2026-10-10T01:48:58.1845487Z - module_behavior_tiny_budget: call 1: positive_context_not_available\n2026-10-10T01:48:58.1845927Z - module_behavior_tiny_budget: call 1: positive_context_has_no_sources\n2026-10-10T01:48:58.1846642Z - module_behavior_tiny_budget: call 1: required_fact_missing: 'OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.'\n2026-10-10T01:48:58.1847390Z - module_behavior_tiny_budget: call 1: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1847892Z - module_behavior_tiny_budget: call 1: required sources missing from ()\n2026-10-10T01:48:58.1848362Z - module_requirements_tiny_budget: call 1: positive_context_not_available\n2026-10-10T01:48:58.1848842Z - module_requirements_tiny_budget: call 1: positive_context_has_no_sources\n2026-10-10T01:48:58.1849809Z - module_requirements_tiny_budget: call 1: required_fact_missing: 'OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.'\n2026-10-10T01:48:58.1850662Z - module_requirements_tiny_budget: call 1: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1851188Z - module_requirements_tiny_budget: call 1: required sources missing from ()\n2026-10-10T01:48:58.1851676Z - cross_module_comparison_tiny_budget: call 1: positive_context_not_available\n2026-10-10T01:48:58.1852178Z - cross_module_comparison_tiny_budget: call 1: positive_context_has_no_sources\n2026-10-10T01:48:58.1853084Z - cross_module_comparison_tiny_budget: call 1: required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'\n2026-10-10T01:48:58.1854155Z - cross_module_comparison_tiny_budget: call 1: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1854708Z - cross_module_comparison_tiny_budget: call 1: required sources missing from ()\n2026-10-10T01:48:58.1855218Z - project_policy_detail_fails_closed: call 1: positive_context_not_available\n2026-10-10T01:48:58.1855708Z - project_policy_detail_fails_closed: call 1: positive_context_has_no_sources\n2026-10-10T01:48:58.1856602Z - project_policy_detail_fails_closed: call 1: required_fact_missing: 'ProjectRetryPolicy governs network submission retries and allows at most two retry attempts with bounded exponential backoff.'\n2026-10-10T01:48:58.1857567Z - project_policy_detail_fails_closed: call 1: status='insufficient_evidence' expected='ok'\n2026-10-10T01:48:58.1858134Z v1=11; adversarial=24/28; maximum estimated trajectory tokens=761; output ceiling=none"
+        },
+        {
+          "label": "retained_mutation_baseline_rejection",
+          "line_start": 733,
+          "line_end": 733,
+          "sha256": "9cda9baf15729876f3c8f9cefda481f22a2ce165d55f4347f7aed895f18badb1",
+          "utf8_bytes": 218,
+          "text": "2026-10-10T01:49:09.6866845Z Agent Developer mutation baseline/error: both evaluator controls and full public trajectories must have a green baseline; artifacts=/home/runner/work/_temp/docatlas-agent-v2-mutant-3_ovypn1"
+        }
+      ]
+    },
+    "closure": {
+      "job_id": 114101794826,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539475/job/114101794826",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101794826/logs",
+      "raw_log_sha256": "710210870ecc3b550f8473c1a08d5f7cd9a6c8e2536db9481d36265072bdae05",
+      "raw_log_utf8_bytes": 154224,
+      "line_count": 1011,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 276,
+          "line_end": 276,
+          "sha256": "616412ad9b8572323eb27eca1a25e30581cb04412c61a7f99a548d78b9db0224",
+          "utf8_bytes": 69,
+          "text": "2026-10-10T01:48:20.3616496Z 217d21017008240cf252e6b99e5c6e810a858a2a"
+        },
+        {
+          "label": "same_job_outcome_binding",
+          "line_start": 882,
+          "line_end": 895,
+          "sha256": "df31beba9139125cf183c008d540cdd740bf4325283e6a95630daf153a40d0f2",
+          "utf8_bytes": 507,
+          "text": "2026-10-10T01:49:20.1951862Z   P1_GATE_OUTCOMES: {\"schema_version\":1,\"code_commit\":\"217d21017008240cf252e6b99e5c6e810a858a2a\",\n \"run_id\":\"38014539475\",\"run_attempt\":\"1\",\n \"outcomes\":{\"dependencies\":\"success\",\n \"first_divergence\":\"success\",\n \"contract_ablation\":\"success\",\n \"p14_quality\":\"failure\",\n \"p14_oracle\":\"success\",\n \"p15_quality\":\"failure\",\n \"p15_oracle\":\"success\",\n \"p16_quality\":\"success\",\n \"p16_oracle\":\"success\",\n \"adversarial\":\"failure\",\n \"adversarial_mutation\":\"failure\",\n \"syntax\":\"success\"}}"
+        },
+        {
+          "label": "current_closure_summary_and_required_outcomes",
+          "line_start": 915,
+          "line_end": 931,
+          "sha256": "c83951d644a8d60891ed34b0cf4cc2164f2760ae99942c4b50e40863d94ad84b",
+          "utf8_bytes": 2200,
+          "text": "2026-10-10T01:49:21.4209609Z P1 current closure: FAIL; sha256=a8d8c4e14b51d3431e6a280b471fd3a89c714f46b2ff90071233f4a26c7e0992; report=/home/runner/work/_temp/p1-current-closure.json\n2026-10-10T01:49:21.4214749Z P1.4: integrity=True; quality=False; summary={\"case_count\": 14, \"complete_fact_visible\": 8, \"failed_case_ids\": [\"alias_order_drafts\", \"alias_project_retry_rule\"], \"negative_control_count\": 2, \"negative_false_context\": 0, \"output_public_utf8_bytes\": 12267, \"output_source_count\": 8, \"passed_count\": 12, \"reported_original_query_covered\": 3, \"required_complete_fact\": 5, \"required_complete_fact_passed\": 5, \"required_discovery\": 10, \"required_discovery_passed\": 8, \"runtime_error_count\": 0, \"unauthorized_answer_or_edit_count\": 0}; error=null\n2026-10-10T01:49:21.4220433Z P1.5: integrity=True; quality=False; summary={\"case_count\": 7, \"failed_case_ids\": [\"two_claims_require_two_allowed_roles\"], \"negative_case_count\": 2, \"negative_false_context\": 0, \"output_public_utf8_bytes\": 6707, \"output_source_count\": 5, \"passed_count\": 6, \"positive_case_count\": 5, \"required_full_fact_count\": 6, \"runtime_error_count\": 0, \"unauthorized_answer_or_edit_count\": 0, \"verified_full_fact_count\": 5}; error=null\n2026-10-10T01:49:21.4222517Z P1.6: integrity=True; quality=True; summary={\"case_count\": 6, \"failed_cases\": [], \"full_fact_cases\": 1, \"passed_cases\": 6, \"runtime_errors\": 0}; error=null\n2026-10-10T01:49:21.4223229Z GATE dependencies: success\n2026-10-10T01:49:21.4223510Z GATE first_divergence: success\n2026-10-10T01:49:21.4223782Z GATE contract_ablation: success\n2026-10-10T01:49:21.4224050Z GATE p14_quality: failure\n2026-10-10T01:49:21.4224287Z GATE p14_oracle: success\n2026-10-10T01:49:21.4224533Z GATE p15_quality: failure\n2026-10-10T01:49:21.4224760Z GATE p15_oracle: success\n2026-10-10T01:49:21.4225003Z GATE p16_quality: success\n2026-10-10T01:49:21.4225226Z GATE p16_oracle: success\n2026-10-10T01:49:21.4225450Z GATE adversarial: failure\n2026-10-10T01:49:21.4225694Z GATE adversarial_mutation: failure\n2026-10-10T01:49:21.4226260Z GATE syntax: success\n2026-10-10T01:49:21.4226787Z P1 current closure: FAIL (ValueError: P1 current closure failed: current_quality, required_gates_succeeded)"
+        },
+        {
+          "label": "closure_oracle_controls",
+          "line_start": 951,
+          "line_end": 956,
+          "sha256": "c1b7020b5cd7c2d10479a20c027271abc20e521f56d0be8ccb18622da80af0c7",
+          "utf8_bytes": 472,
+          "text": "2026-10-10T01:49:32.1573993Z PASS: test_exact_non_positive_closure\n2026-10-10T01:49:32.1574772Z PASS: test_autonomous_and_stable_overclaim_fail_closed\n2026-10-10T01:49:32.1575408Z PASS: test_missing_work_item_and_runtime_change_fail_closed\n2026-10-10T01:49:32.1576229Z PASS: test_maturity_and_path_leak_fail_closed\n2026-10-10T01:49:32.1576863Z PASS: current closure report integrity (quality verdict unchanged)\n2026-10-10T01:49:32.1577496Z P1 closure self-test: PASS (4/4)"
+        }
+      ]
+    },
+    "installed": {
+      "job_id": 114101795051,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795051",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101795051/logs",
+      "raw_log_sha256": "5898c497749642cadb63f9ad61ba8ec72e28f67351936be376b2c7df485a5c91",
+      "raw_log_utf8_bytes": 74227,
+      "line_count": 724,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 276,
+          "line_end": 276,
+          "sha256": "d02e5b65fee59835646a5e1c22d04fdbac6b8dec8e05baaf73d90ef894b0935b",
+          "utf8_bytes": 69,
+          "text": "2026-10-10T01:47:49.8848474Z 217d21017008240cf252e6b99e5c6e810a858a2a"
+        },
+        {
+          "label": "oracle_controls",
+          "line_start": 634,
+          "line_end": 641,
+          "sha256": "185d5fcc869a5c9d6620ebea4b3f0954d816b43d2b2fd3dfd3e7bb8c66c9c711",
+          "utf8_bytes": 664,
+          "text": "2026-10-10T01:48:10.3526218Z PASS: test_zero_call_model_failure_is_valid_agent_evidence\n2026-10-10T01:48:10.3527367Z PASS: test_event_chain_tamper_fails_closed\n2026-10-10T01:48:10.3528175Z PASS: test_privacy_path_and_raw_prompt_fail_closed\n2026-10-10T01:48:10.3528870Z PASS: test_public_claim_requires_public_origin_and_verification\n2026-10-10T01:48:10.3529621Z PASS: test_live_usage_requires_provider_identity\n2026-10-10T01:48:10.3530295Z PASS: test_unknown_origin_and_failure_stage_fail_closed\n2026-10-10T01:48:10.3531067Z PASS: test_server_environment_finish_and_stage_logic_are_hardened\n2026-10-10T01:48:10.3531756Z Installed MCP contract self-test: PASS (7/7)"
+        },
+        {
+          "label": "actual_wheel_harness_command",
+          "line_start": 650,
+          "line_end": 660,
+          "sha256": "4869ae861717b89ae5771ce5f37dd3ec628959ff49851dad6d241b7e0bd20905",
+          "utf8_bytes": 893,
+          "text": "2026-10-10T01:48:11.8255220Z ##[group]Run wheel=\"$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)\"\n2026-10-10T01:48:11.8255716Z \u001b[36;1mwheel=\"$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)\"\u001b[0m\n2026-10-10T01:48:11.8256086Z \u001b[36;1mtest -n \"$wheel\"\u001b[0m\n2026-10-10T01:48:11.8256384Z \u001b[36;1mpython scripts/run_installed_mcp_agent_benchmark.py \\\u001b[0m\n2026-10-10T01:48:11.8256671Z \u001b[36;1m  --wheel \"$wheel\" \\\u001b[0m\n2026-10-10T01:48:11.8256930Z \u001b[36;1m  --source-commit \"$GITHUB_SHA\" \\\u001b[0m\n2026-10-10T01:48:11.8257196Z \u001b[36;1m  --planner scripted \\\u001b[0m\n2026-10-10T01:48:11.8257626Z \u001b[36;1m  --task module_definition_supported \\\u001b[0m\n2026-10-10T01:48:11.8257934Z \u001b[36;1m  --max-schema-repairs 1 \\\u001b[0m\n2026-10-10T01:48:11.8258177Z \u001b[36;1m  --min-pass-rate 1.0 \\\u001b[0m\n2026-10-10T01:48:11.8258558Z \u001b[36;1m  --output eval/agent_developer_v1/results/installed-mcp-ci.json\u001b[0m"
+        },
+        {
+          "label": "actual_task_summary",
+          "line_start": 673,
+          "line_end": 673,
+          "sha256": "973d6829249097561901141cb05e3dc2bc755ed76fef1c85c322af8c0cc8daa6",
+          "utf8_bytes": 228,
+          "text": "2026-10-10T01:48:28.3835261Z Installed MCP Agent benchmark: origin=reviewed-wheel; model=deterministic-script; 1/1 pass; false-supported=0; contamination=0; schema=1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2"
+        },
+        {
+          "label": "schema_repair_verification_command",
+          "line_start": 675,
+          "line_end": 680,
+          "sha256": "fae4c9e0a342dad0437991934a3f1e60ad8e1d5b868e624c15c8dd6ceca2cce2",
+          "utf8_bytes": 461,
+          "text": "2026-10-10T01:48:28.4889469Z \u001b[36;1mpython scripts/verify_installed_mcp_agent_report.py \\\u001b[0m\n2026-10-10T01:48:28.4889829Z \u001b[36;1m  eval/agent_developer_v1/results/installed-mcp-ci.json \\\u001b[0m\n2026-10-10T01:48:28.4890183Z \u001b[36;1m  --expected-origin reviewed-wheel \\\u001b[0m\n2026-10-10T01:48:28.4890471Z \u001b[36;1m  --min-task-count 1 \\\u001b[0m\n2026-10-10T01:48:28.4890737Z \u001b[36;1m  --min-pass-rate 1.0 \\\u001b[0m\n2026-10-10T01:48:28.4891007Z \u001b[36;1m  --require-schema-repair\u001b[0m"
+        },
+        {
+          "label": "verified_report_identity",
+          "line_start": 693,
+          "line_end": 709,
+          "sha256": "20b9d853430084abee53d93e9f83672ca71cd7f1187f6af7e0fd338342ae7c8d",
+          "utf8_bytes": 1095,
+          "text": "2026-10-10T01:48:28.9053633Z Installed MCP report verification: PASS\n2026-10-10T01:48:28.9054057Z {\n2026-10-10T01:48:28.9054295Z   \"artifact_origin\": \"reviewed-wheel\",\n2026-10-10T01:48:28.9054623Z   \"claim_boundary\": \"pre-public-installed-harness\",\n2026-10-10T01:48:28.9054949Z   \"model\": \"deterministic-script\",\n2026-10-10T01:48:28.9055214Z   \"pass_rate\": 1.0,\n2026-10-10T01:48:28.9055465Z   \"passed_tasks\": 1,\n2026-10-10T01:48:28.9055713Z   \"protocol\": \"installed-mcp-agent-v1\",\n2026-10-10T01:48:28.9055997Z   \"provider_id\": \"scripted\",\n2026-10-10T01:48:28.9056372Z   \"report_sha256\": \"043e6e819e214d9de16453974dbb201d4b2c89c66fd4904cd60c69bdd683f37b\",\n2026-10-10T01:48:28.9056735Z   \"schema_failures\": 1,\n2026-10-10T01:48:28.9057049Z   \"schema_sha256\": \"1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2\",\n2026-10-10T01:48:28.9057654Z   \"source_commit\": \"217d21017008240cf252e6b99e5c6e810a858a2a\",\n2026-10-10T01:48:28.9057964Z   \"task_count\": 1,\n2026-10-10T01:48:28.9058185Z   \"tool_attempts\": 2,\n2026-10-10T01:48:28.9058444Z   \"version\": \"1.3.2\"\n2026-10-10T01:48:28.9058642Z }"
+        }
+      ]
+    },
+    "stack_advanced": {
+      "job_id": 114101794969,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114101794969",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101794969/logs",
+      "raw_log_sha256": "49dd4618cc4cd7591032a500644c13d4f70984e5cd31a57b3a9bd96b7bf9195d",
+      "raw_log_utf8_bytes": 295491,
+      "line_count": 3350,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 273,
+          "line_end": 273,
+          "sha256": "3bcf412584c8bd05b55d4bff8e9ef1b9704860854fe9bd2cb731075c1a40d2b0",
+          "utf8_bytes": 145,
+          "text": "2026-10-10T01:48:39.8020920Z HEAD is now at 217d2101 Merge 321f36577577cb90a0422cee0de0b525b9cd658e into d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        },
+        {
+          "label": "production_contract_count",
+          "line_start": 3210,
+          "line_end": 3211,
+          "sha256": "45c1f93c15ac2eb19f1080625839621a29bcf5c5413fd06fe19697a251eb5831",
+          "utf8_bytes": 151,
+          "text": "2026-10-10T01:50:06.2406832Z 94 failed, 528 passed, 7727 deselected in 53.13s\n2026-10-10T01:50:07.0718075Z ##[error]Process completed with exit code 1."
+        },
+        {
+          "label": "same_job_outcome_binding",
+          "line_start": 3224,
+          "line_end": 3237,
+          "sha256": "c9434f8a94c8b22bd7e6a2c6e978839747330828bdba3729b9318cb2e13b3977",
+          "utf8_bytes": 507,
+          "text": "2026-10-10T01:50:07.0909589Z   P1_GATE_OUTCOMES: {\"schema_version\":1,\"code_commit\":\"217d21017008240cf252e6b99e5c6e810a858a2a\",\n \"run_id\":\"38014539441\",\"run_attempt\":\"1\",\n \"outcomes\":{\"dependencies\":\"success\",\n \"first_divergence\":\"skipped\",\n \"contract_ablation\":\"skipped\",\n \"p14_quality\":\"skipped\",\n \"p14_oracle\":\"skipped\",\n \"p15_quality\":\"skipped\",\n \"p15_oracle\":\"skipped\",\n \"p16_quality\":\"skipped\",\n \"p16_oracle\":\"skipped\",\n \"adversarial\":\"skipped\",\n \"adversarial_mutation\":\"skipped\",\n \"syntax\":\"skipped\"}}"
+        },
+        {
+          "label": "honest_missing_current_proof_failures",
+          "line_start": 3257,
+          "line_end": 3273,
+          "sha256": "cc8aace98ef8da1747d8169c1d9c6972e1b1a9574c7904a4f2081f31b03ac1e4",
+          "utf8_bytes": 1764,
+          "text": "2026-10-10T01:50:07.2979954Z P1 current closure: FAIL; sha256=a943a4dad1c4cbd70fd29f509d8467ec904fc374927262aa5f79e79e5fbb4e76; report=/home/runner/work/_temp/p1-stack-current-closure.json\n2026-10-10T01:50:07.2982904Z P1.4: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"4241ead6f530c07b6edd9d2a9ca3d137fdd6bcf37d5624b96273d2fb6010ffa6\", \"stage\": \"p1_4_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T01:50:07.2985573Z P1.5: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"94264a975eb465bd427177875aeb2acfe294b32e879e9cd0cb36e471bd30a03c\", \"stage\": \"p1_5_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T01:50:07.2988233Z P1.6: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"75a9b1ab8578b8e69c52c09ed3cda032cf6ab01afb86fb9ef891783d003c570a\", \"stage\": \"p1_6_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T01:50:07.2989881Z GATE dependencies: success\n2026-10-10T01:50:07.2990352Z GATE first_divergence: skipped\n2026-10-10T01:50:07.2991099Z GATE contract_ablation: skipped\n2026-10-10T01:50:07.2991559Z GATE p14_quality: skipped\n2026-10-10T01:50:07.2992386Z GATE p14_oracle: skipped\n2026-10-10T01:50:07.2992815Z GATE p15_quality: skipped\n2026-10-10T01:50:07.2993257Z GATE p15_oracle: skipped\n2026-10-10T01:50:07.2993726Z GATE p16_quality: skipped\n2026-10-10T01:50:07.2994149Z GATE p16_oracle: skipped\n2026-10-10T01:50:07.2994577Z GATE adversarial: skipped\n2026-10-10T01:50:07.2995036Z GATE adversarial_mutation: skipped\n2026-10-10T01:50:07.2995554Z GATE syntax: skipped\n2026-10-10T01:50:07.2996747Z P1 current closure: FAIL (ValueError: P1 current closure failed: current_report_integrity, current_quality, current_runtime_consistency, required_gates_succeeded)"
+        },
+        {
+          "label": "oracle_missing_input_refusal",
+          "line_start": 3293,
+          "line_end": 3295,
+          "sha256": "6658d1229ae62eab4c77db7e6b87b30727b6e98536c8f8436e5a1e97f5d01593",
+          "utf8_bytes": 336,
+          "text": "2026-10-10T01:50:07.4797044Z P1 closure self-test: FAIL; current input proof unavailable: current_report_integrity, current_runtime_consistency\n2026-10-10T01:50:07.4797834Z Use the three current runner outputs and --gates from the same closure workflow checkout.\n2026-10-10T01:50:07.4961345Z ##[error]Process completed with exit code 1."
+        }
+      ]
+    },
+    "retrieval": {
+      "job_id": 114101795131,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114101795131",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114101795131/logs",
+      "raw_log_sha256": "ca82c48dbb762a67ba10f95d7f459e6a53fb6c90fe8292f530c2569257578930",
+      "raw_log_utf8_bytes": 79701,
+      "line_count": 903,
+      "excerpts": [
+        {
+          "label": "checkout",
+          "line_start": 124,
+          "line_end": 124,
+          "sha256": "78230250e1b06caf470da18493afb5de0a7c2dc46a0447fd0dc81949154a7bbf",
+          "utf8_bytes": 144,
+          "text": "2026-10-10T01:48:30.4501955Z HEAD is now at 217d210 Merge 321f36577577cb90a0422cee0de0b525b9cd658e into d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        },
+        {
+          "label": "current_retrieval_summary",
+          "line_start": 821,
+          "line_end": 846,
+          "sha256": "fc44d5e7e734fe40d914bfed2e72c835d58fc476f6ac65db4645a72e6c9c8a83",
+          "utf8_bytes": 1365,
+          "text": "2026-10-10T01:54:40.3542901Z {\n2026-10-10T01:54:40.3545122Z   \"head\": \"217d21017008240cf252e6b99e5c6e810a858a2a\",\n2026-10-10T01:54:40.3546427Z   \"frozen_80\": {\n2026-10-10T01:54:40.3546714Z     \"within_budget\": 48,\n2026-10-10T01:54:40.3547027Z     \"within_budget_sufficient\": 31,\n2026-10-10T01:54:40.3547375Z     \"operational_errors\": 0,\n2026-10-10T01:54:40.3547691Z     \"integrity_violations\": 0\n2026-10-10T01:54:40.3548166Z   },\n2026-10-10T01:54:40.3548383Z   \"causal_cells\": {\n2026-10-10T01:54:40.3548641Z     \"cap_on_requal_on\": 31,\n2026-10-10T01:54:40.3548931Z     \"cap_off_requal_on\": 31,\n2026-10-10T01:54:40.3549217Z     \"cap_on_requal_off\": 31,\n2026-10-10T01:54:40.3549501Z     \"cap_off_requal_off\": 31,\n2026-10-10T01:54:40.3549929Z     \"contextualization_off\": 31\n2026-10-10T01:54:40.3550330Z   },\n2026-10-10T01:54:40.3550600Z   \"selection\": {\n2026-10-10T01:54:40.3550848Z     \"status\": \"NOT_OBSERVED_IN_BOUNDED_POOL\",\n2026-10-10T01:54:40.3551222Z     \"exact_recoveries\": [],\n2026-10-10T01:54:40.3551536Z     \"beam_recoveries\": []\n2026-10-10T01:54:40.3551757Z   },\n2026-10-10T01:54:40.3551936Z   \"holdout\": {\n2026-10-10T01:54:40.3552514Z     \"current\": 5,\n2026-10-10T01:54:40.3552714Z     \"strict\": 5,\n2026-10-10T01:54:40.3552994Z     \"comparison\": \"NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED\"\n2026-10-10T01:54:40.3553330Z   }\n2026-10-10T01:54:40.3553508Z }"
+        }
+      ]
+    },
+    "required": {
+      "job_id": 114103727445,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539455/job/114103727445",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114103727445/logs",
+      "raw_log_sha256": "c212739de25f0b2746e8e103b9f6019641e2aca31d8be04a61f876755aac72c5",
+      "raw_log_utf8_bytes": 3148,
+      "line_count": 51,
+      "checkout_status": "NO_CHECKOUT_AGGREGATE_JOB",
+      "excerpts": [
+        {
+          "label": "actual_final_aggregate_inputs_and_failure",
+          "line_start": 31,
+          "line_end": 49,
+          "sha256": "9b9fb154441b2c997bc10f73f32f6b0faebf9aa18e9adedb70163099f2deac50",
+          "utf8_bytes": 1372,
+          "text": "2026-10-10T01:57:45.6048957Z ##[group]Run for result in \"$DOCS_CONTRACT\" \"$INSTALLER_SMOKE\" \"$PLATFORM_SMOKE\" \"$CORE_TESTS\" \"$ADVANCED_CONTRACT\" \"$INSTALLED_MCP_HARNESS\" \"$STATIC_CONTRACT\" \"$RETRIEVAL_EVIDENCE\"; do\n2026-10-10T01:57:45.6051490Z \u001b[36;1mfor result in \"$DOCS_CONTRACT\" \"$INSTALLER_SMOKE\" \"$PLATFORM_SMOKE\" \"$CORE_TESTS\" \"$ADVANCED_CONTRACT\" \"$INSTALLED_MCP_HARNESS\" \"$STATIC_CONTRACT\" \"$RETRIEVAL_EVIDENCE\"; do\u001b[0m\n2026-10-10T01:57:45.6052876Z \u001b[36;1m  test \"$result\" = \"success\"\u001b[0m\n2026-10-10T01:57:45.6053689Z \u001b[36;1mdone\u001b[0m\n2026-10-10T01:57:45.6806836Z shell: /usr/bin/bash -e {0}\n2026-10-10T01:57:45.6807416Z env:\n2026-10-10T01:57:45.6807724Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true\n2026-10-10T01:57:45.6808093Z   DOCATLAS_OFFLINE: 1\n2026-10-10T01:57:45.6808380Z   UV_VERSION: 0.9.25\n2026-10-10T01:57:45.6808662Z   DOCS_CONTRACT: success\n2026-10-10T01:57:45.6808994Z   INSTALLER_SMOKE: success\n2026-10-10T01:57:45.6809301Z   PLATFORM_SMOKE: success\n2026-10-10T01:57:45.6809596Z   CORE_TESTS: failure\n2026-10-10T01:57:45.6809943Z   ADVANCED_CONTRACT: failure\n2026-10-10T01:57:45.6810258Z   INSTALLED_MCP_HARNESS: success\n2026-10-10T01:57:45.6810732Z   STATIC_CONTRACT: success\n2026-10-10T01:57:45.6811038Z   RETRIEVAL_EVIDENCE: success\n2026-10-10T01:57:45.6811342Z ##[endgroup]\n2026-10-10T01:57:45.7004746Z ##[error]Process completed with exit code 1."
+        }
+      ]
+    },
+    "stack_exact": {
+      "job_id": 114103758421,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38014539441/job/114103758421",
+      "api_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/jobs/114103758421/logs",
+      "raw_log_sha256": "d7e88cd0050efe4b388960dcd06859e342c456b0f4b56c3abe1bef0c65746576",
+      "raw_log_utf8_bytes": 2840,
+      "line_count": 51,
+      "checkout_status": "NO_CHECKOUT_AGGREGATE_JOB",
+      "excerpts": [
+        {
+          "label": "actual_final_aggregate_inputs_and_failure",
+          "line_start": 31,
+          "line_end": 49,
+          "sha256": "8c8a4cac880d54d760d14db7078c7aa9abd5d2265a375fb1e940def9c52e17e3",
+          "utf8_bytes": 1064,
+          "text": "2026-10-10T01:57:55.9025988Z ##[group]Run test \"$CORE\" = success\n2026-10-10T01:57:55.9026970Z \u001b[36;1mtest \"$CORE\" = success\u001b[0m\n2026-10-10T01:57:55.9027655Z \u001b[36;1mtest \"$PLATFORM\" = success\u001b[0m\n2026-10-10T01:57:55.9028449Z \u001b[36;1mtest \"$ADVANCED\" = success\u001b[0m\n2026-10-10T01:57:55.9029218Z \u001b[36;1mtest \"$BUILD\" = success\u001b[0m\n2026-10-10T01:57:55.9029854Z \u001b[36;1mtest \"$WHEEL\" = success\u001b[0m\n2026-10-10T01:57:55.9030612Z \u001b[36;1mtest \"$SDIST\" = success\u001b[0m\n2026-10-10T01:57:56.0181330Z shell: /usr/bin/bash -e {0}\n2026-10-10T01:57:56.0183065Z env:\n2026-10-10T01:57:56.0183927Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true\n2026-10-10T01:57:56.0184982Z   DOCATLAS_OFFLINE: 1\n2026-10-10T01:57:56.0185807Z   CORE: failure\n2026-10-10T01:57:56.0186601Z   PLATFORM: success\n2026-10-10T01:57:56.0187436Z   ADVANCED: failure\n2026-10-10T01:57:56.0188225Z   BUILD: success\n2026-10-10T01:57:56.0189007Z   WHEEL: success\n2026-10-10T01:57:56.0189779Z   SDIST: success\n2026-10-10T01:57:56.0190538Z ##[endgroup]\n2026-10-10T01:57:56.0471490Z ##[error]Process completed with exit code 1."
+        }
+      ]
+    }
+  }
+}

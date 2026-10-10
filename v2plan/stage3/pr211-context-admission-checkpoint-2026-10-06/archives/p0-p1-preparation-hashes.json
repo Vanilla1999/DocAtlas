@@ -1,0 +1,26 @@
+{
+  "schema": "p0-p1-preparation-artifacts-v1",
+  "status": "proposed-not-approved",
+  "files": [
+    {
+      "path": "archives/p0-transition-manifest.json",
+      "sha256": "375cdda976a6e07cea6ae6c95521ee762424c1bc5dd9626a98b37d9ec6a0f91f"
+    },
+    {
+      "path": "archives/p0-published-question-only-replay.json",
+      "sha256": "84b3ffc1395ccc5cd96fe154829a6182ca50609d54415de94a6d22c1c0a12ec7"
+    },
+    {
+      "path": "archives/p0-published-question-only-replay.log",
+      "sha256": "fd3073bc9f31b9c16a0c0507b9cae24775a4c9c3cabf5be8bc36b68a8ea667c3"
+    },
+    {
+      "path": "archives/p0-isolated-package-import.log",
+      "sha256": "192bd61a3b0fddfd08537cb6ec3b39a4738a5783944250499260ef7cf393422a"
+    },
+    {
+      "path": "archives/p1-ru-en-corpus-proposed.json",
+      "sha256": "4d41ab3fe917cb5be993187eff988daf932f921bfd2ed0e41ed378b6f00be31f"
+    }
+  ]
+}

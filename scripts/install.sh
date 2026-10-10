@@ -77,11 +77,18 @@ fi
 # C. doc-atlas
 # ---------------------------------------------------------------------------
 info "Installing doc-atlas..."
+INSTALL_PYTHON="${DOCATLAS_INSTALL_PYTHON:-3.13}"
+case "$INSTALL_PYTHON" in
+  3.11|3.12|3.13) : ;;
+  *) die "Unsupported DOCATLAS_INSTALL_PYTHON '$INSTALL_PYTHON'; choose 3.11, 3.12 or 3.13." ;;
+esac
 INSTALL_SOURCE="${DOCATLAS_INSTALL_SOURCE:-doc-atlas}"
 if [ -n "${DOCATLAS_INSTALL_VERSION:-}" ] && [ "$INSTALL_SOURCE" = "doc-atlas" ]; then
   INSTALL_SOURCE="doc-atlas==${DOCATLAS_INSTALL_VERSION}"
 fi
-uv tool install --upgrade "$INSTALL_SOURCE"
+# Managed Python is downloaded as needed. Refuse source builds rather than
+# requiring a compiler or falling back to an unreviewed system interpreter.
+uv tool install --upgrade --managed-python --python "$INSTALL_PYTHON" --no-build "$INSTALL_SOURCE"
 ensure_path
 
 if [ -n "${DOCATLAS_EXPECT_VERSION:-${DOCATLAS_INSTALL_VERSION:-}}" ]; then
@@ -275,25 +282,40 @@ if os.path.exists(path):
             except json.JSONDecodeError as exc:
                 print(f"opencode config is not valid JSON/JSONC: {exc}", file=sys.stderr)
                 sys.exit(2)
-    if was_jsonc:
-        print("note: opencode config uses JSONC; comments will be dropped on "
-              "rewrite (a .bak backup is kept)", file=sys.stderr)
     if not isinstance(data, dict):
         print("opencode config must be a JSON object", file=sys.stderr)
         sys.exit(2)
 
-servers = data.setdefault("mcp", {})
-if not isinstance(servers, dict):
+mcp = data.setdefault("mcp", {})
+if not isinstance(mcp, dict):
     print("opencode 'mcp' key must be an object", file=sys.stderr)
+    sys.exit(2)
+servers = mcp.setdefault("servers", {})
+if not isinstance(servers, dict):
+    print("opencode 'mcp.servers' must be an object", file=sys.stderr)
     sys.exit(2)
 
 desired = {
     "type": "local",
     "command": ["doc-atlas", "mcp", "docs-serve"],
-    "enabled": True,
     "environment": {"DOCATLAS_MCP_TEXT_FALLBACK": "1"},
 }
-existing = servers.get(name)
+owned = [(mapping, key, value) for mapping in (mcp, servers)
+         for key, value in mapping.items() if not (mapping is mcp and key == "servers")
+         and isinstance(value, dict) and value.get("command") == desired["command"]]
+if len(owned) > 1:
+    print("ambiguous DocAtlas registrations; refusing to overwrite", file=sys.stderr)
+    sys.exit(2)
+for mapping in (mcp, servers):
+    for key in (name, "docatlas", "docmancer"):
+        if key in mapping and (not isinstance(mapping[key], dict)
+                               or mapping[key].get("command") != desired["command"]):
+            print("conflicting DocAtlas registration; refusing to overwrite", file=sys.stderr)
+            sys.exit(2)
+mapping, name, existing = owned[0] if owned else (servers, name, None)
+if mapping is mcp and name in servers:
+    print("conflicting MCP name; refusing to overwrite", file=sys.stderr)
+    sys.exit(2)
 if existing is not None and not isinstance(existing, dict):
     print(f"opencode MCP server {name!r} must be an object", file=sys.stderr)
     sys.exit(2)
@@ -308,12 +330,26 @@ if not isinstance(environment, dict):
     print(f"opencode MCP server {name!r} has a non-object environment; refusing to overwrite it", file=sys.stderr)
     sys.exit(2)
 merged = {**(existing or {}), **desired, "environment": {**environment, **desired["environment"]}}
-if existing == merged:
+if "enabled" in merged:
+    enabled = merged.pop("enabled")
+    if not isinstance(enabled, bool) or ("disabled" in merged and merged["disabled"] != (not enabled)):
+        print("invalid or conflicting enabled state", file=sys.stderr)
+        sys.exit(2)
+    merged["disabled"] = not enabled
+if "disabled" in merged and not isinstance(merged["disabled"], bool):
+    print("invalid disabled state", file=sys.stderr)
+    sys.exit(2)
+if mapping is servers and existing == merged:
     print("unchanged")
     sys.exit(0)
+if os.path.exists(path) and was_jsonc:
+    print("JSONC update requires manual editing; refusing to drop comments", file=sys.stderr)
+    sys.exit(2)
 
 if os.path.exists(path):
     shutil.copy2(path, path + ".bak")
+if mapping is mcp:
+    del mcp[name]
 servers[name] = merged
 with open(path, "w", encoding="utf-8") as fh:
     fh.write(json.dumps(data, indent=2, sort_keys=True) + "\n")
@@ -323,7 +359,7 @@ PY
     ok "opencode: '$SERVER_NAME' configured in $cfg"
   else
     warn "opencode: could not update $cfg automatically."
-    step "Add manually under the \"mcp\" key: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"enabled\":true,\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\"}}}"
+    step "Add manually under mcp.servers, preserving any existing server name and disabled state: {\"$SERVER_NAME\": {\"type\":\"local\",\"command\":[\"doc-atlas\",\"mcp\",\"docs-serve\"],\"environment\":{\"DOCATLAS_MCP_TEXT_FALLBACK\":\"1\"}}}"
   fi
 }
 

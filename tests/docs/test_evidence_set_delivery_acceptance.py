@@ -1,14 +1,11 @@
 """Native delivery acceptance; no case labels enter product selection."""
 import pytest
 
-from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
 from tests.docs._evidence_set_fixtures import capture_case, old_assessment
 from tests.docs._reference_binding_fixtures import capture_reference_case, visible
 
 
 def assert_bounds(payload):
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload['sources']) <= 3
     assert all(payload[k] is False for k in (
         'answer_supported', 'answer_available', 'edit_ready'))
 

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_source_identity.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_source_identity.py": "fd4ea230e0794aca1c0b3dfdfbcbe2a0151cd07430458504a9daa04474cebf7e"
+  }
+}

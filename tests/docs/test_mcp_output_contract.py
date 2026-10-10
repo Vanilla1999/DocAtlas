@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, paginate_context_items
@@ -108,14 +109,21 @@ def test_module_recovery_omits_an_impossible_exact_path_without_throwing():
         "estimated_tokens": 0,
     }
 
+    before = deepcopy(payload)
     _bound_recoverable_insufficient_projection(payload, max_tokens=256)
 
-    assert payload.get("module_candidates") in (None, [])
-    assert impossible_path not in str(payload)
+    # Historical node name retained: output cost cannot erase an exact locator.
+    assert payload["module_candidates"] == before["module_candidates"]
+    assert payload["recommended_next_action"] == before["recommended_next_action"]
+    assert {key: value for key, value in payload.items() if key != "estimated_tokens"} == {
+        key: value for key, value in before.items() if key != "estimated_tokens"
+    }
     assert payload["status"] == "insufficient_evidence"
     assert payload["answer_supported"] is False
     assert payload["answer_available"] is False
-    assert estimate_projection_tokens(payload) <= 256
+    assert payload["estimated_tokens"] == estimate_projection_tokens(payload)
+    assert payload["recommended_next_action"]["auto_execute"] is False
+    assert payload["recommended_next_action"]["requires_confirmation"] is False
 
 
 def test_module_recovery_status_action_preserves_the_ambiguous_selector():

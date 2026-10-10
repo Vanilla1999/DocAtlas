@@ -113,10 +113,40 @@ def test_cli_writes_json_and_markdown_without_provider_calls(tmp_path):
 
 
 def test_default_public_catalog_meets_task35_hard_and_target_budgets():
-    report = build_footprint_report(current_tools({}), representative_response_fixtures())
+    # Keep the historical node ID for acceptance inventories. On 2026-10-08 the
+    # owner replaced fixed catalog ceilings with measured, contract-preserving
+    # minimization. The independent output-schema budget remains in force.
+    tools = current_tools({})
+    report = build_footprint_report(tools, representative_response_fixtures())
 
+    assert [tool["name"] for tool in tools] == ["get_docs_context", "prepare_docs", "docs_status"]
     assert report["public_tool_count"] == 3
-    assert report["mcp_tools_list_bytes"] <= 6 * 1024
-    assert validate_footprint_report(report, max_tools_list_bytes=10 * 1024) == []
-    get_context = next(row for row in report["tools"] if row["name"] == "get_docs_context")
-    assert get_context["output_schema_bytes"] < 1_000
+    assert report["mcp_tools_list_bytes"] == len(canonical_json_bytes(tools))
+    rows = {row["name"]: row for row in report["tools"]}
+    assert len(rows) == len(report["tools"]) == 3
+    assert set(rows) == {tool["name"] for tool in tools}
+    for tool in tools:
+        row = rows[tool["name"]]
+        assert row["total_bytes"] == len(canonical_json_bytes(tool))
+        assert row["description_bytes"] == len(tool["description"].encode("utf-8"))
+        assert row["input_schema_bytes"] == len(canonical_json_bytes(tool["inputSchema"]))
+        expected_output = len(canonical_json_bytes(tool["outputSchema"])) if "outputSchema" in tool else 0
+        assert row["output_schema_bytes"] == expected_output
+    # A tools/list array adds two brackets and one comma per adjacent pair.
+    # outputSchema is already inside each tool total, never an extra addend.
+    assert report["mcp_tools_list_bytes"] == sum(row["total_bytes"] for row in rows.values()) + len(tools) + 1
+    assert validate_footprint_report(report) == []
+
+    context = tools[0]
+    assert set(context["inputSchema"]["properties"]) == {
+        "question", "lookup_queries", "project_path", "library", "version", "module_path", "scope",
+    }
+    assert context["outputSchema"]["type"] == "object"
+    assert "status" in context["outputSchema"]["required"]
+    assert "oneOf" not in context["outputSchema"]
+    advanced = next(tool for tool in current_tools({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
+                    if tool["name"] == "get_docs_context")
+    assert advanced["inputSchema"]["properties"]["context_format"]["enum"] == ["patch_context", None]
+    assert advanced["outputSchema"]["oneOf"][0] == context["outputSchema"]
+    assert rows["get_docs_context"]["output_schema_bytes"] < len(canonical_json_bytes(advanced["outputSchema"]))
+    assert rows["get_docs_context"]["output_schema_bytes"] < 1_000

@@ -1,76 +1,320 @@
-"""Production-path regressions for budgeted docs-context recovery targets."""
+"""Production-path regressions for source-bound docs-context recovery targets."""
 from __future__ import annotations
 
 from copy import deepcopy
+from contextlib import ExitStack
 import hashlib
 import json
 
-from docmancer.core.config import DocmancerConfig
+import pytest
+
 from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
 from docmancer.docs.interfaces.host_context import SourceReadController
 from docmancer.docs.interfaces.mcp.context_tools import handle_context_tool
-from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
 
 
-def _real_service(tmp_path):
+def _real_service(tmp_path, request, *, content=None):
+    from eval.evidence_quality_v2 import runtime
+
     tmp_path.mkdir(parents=True, exist_ok=True)
     (tmp_path / "docs").mkdir()
     (tmp_path / "pyproject.toml").write_text('[project]\nname="recovery-smoke"\nversion="0.1"\n')
     path = tmp_path / "docs/polling.md"
-    body = ["# Polling", "", "Retry only after a terminal status is observed.", ""]
-    body.extend(f"Polling context line {index}." for index in range(1, 18))
-    body.append("Job polling uses docs_status to inspect progress until terminal status.")
-    body.extend(f"Additional polling context {index}." for index in range(18, 36))
-    path.write_text("\n".join(body) + "\n")
+    if content is None:
+        body = ["# Polling", "", "Retry only after a terminal status is observed.", ""]
+        body.extend(f"Polling context line {index}." for index in range(1, 18))
+        body.append("Job polling uses docs_status to inspect progress until terminal status.")
+        body.extend(f"Additional polling context {index}." for index in range(18, 36))
+        content = "\n".join(body) + "\n"
+    path.write_text(content)
     (tmp_path / "docatlas.project-docs.yaml").write_text(
         "schema_version: 1\ndocuments:\n  - path: docs/polling.md\n    role: runbook\n"
         "    scope: project\n    authority: source_of_truth\n    status: active\n"
         "    description: Polling lifecycle\n"
     )
-    config = DocmancerConfig()
-    config.index.provider = "sqlite"
-    config.index.db_path = str(tmp_path / "state/index.db")
-    config.index.extracted_dir = str(tmp_path / "state/extracted")
-    service = LibraryDocsService(config=config, config_source="explicit")
-    assert service.sync_project_docs(str(tmp_path), with_vectors=False).status == "success"
+    state = (tmp_path / "state").resolve()
+    lifecycle = ExitStack()
+    request.addfinalizer(lifecycle.close)
+
+    def cleanup_home():
+        home = runtime._FIXTURE_HOMES.pop(state, None)
+        if home is not None:
+            home.cleanup()
+
+    # LIFO: restore the fixture environment before removing its private store.
+    lifecycle.callback(cleanup_home)
+    service, config = lifecycle.enter_context(runtime.isolated_service(state))
+    runtime.index_project(service, config, tmp_path)
     return service
 
 
-def test_final_public_handler_preserves_quality_and_usable_reference(tmp_path):
-    service = _real_service(tmp_path)
+def test_final_public_handler_complete_window_preserves_quality_and_quote(tmp_path, request, record_property):
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from eval.project_context_quality.capture_public_context import capture_public_call
+
+    service = _real_service(tmp_path, request)
     args = {
         "question": "How does docs_status polling progress work?",
         "lookup_queries": ["docs_status polling progress"],
         "project_path": str(tmp_path),
         "scope": "all",
     }
-    payload = call_docs_tool_payload("get_docs_context", args, service)
+    # The observer forwards the real projector unchanged and records its bindings.
+    record = capture_public_call(service, args)
+    payload = record["public_payload"]
     assert payload["kind"] == "docs_context"
     assert payload["context_quality"]["status"] in {"unverified", "partial"}
-    assert len(payload["read_next"]) == 1
+    assert payload["read_next"] == []
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert len(payload["sources"]) == 1
+    source = payload["sources"][0]
+    assert source["path_or_url"] == "docs/polling.md"
+    assert (source["line_start"], source["line_end"]) == (5, 40)
+    raw = (tmp_path / source["path_or_url"]).read_bytes()
+    quote = b"\n".join(raw.splitlines()[4:40])
+    assert source["snippet"].encode() == quote
+    snapshot = record["projection_attempts"][0]["snapshot"]
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    bound = snapshot[source["evidence_id"]]["source"]
+    assert bound["content"].rstrip("\n").encode() == quote
+    assert (bound["line_start"], bound["line_end"]) == (5, 40)
+    assert bound["project_identity"] == source["project_identity"]
+    assert bound["_source_snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    assert bound["_reference_evidence"]["raw_document"].encode() == raw
+    reference = bound["_reference_evidence"]["source"]
+    assert reference["content_sha256"] == hashlib.sha256(raw).hexdigest()
+    assert reference["scope"]["snapshot_id"] == bound["generation_id"]
+    assert reference["scope"]["project_id"] == source["project_identity"]
+    assert source["source_uri"].startswith("docatlas://source/")
+
+
+def _continuation_document():
+    # Distinct lifecycle instructions, not repeated padding or oracle requirements.
+    return "# Polling\n\n" + "\n\n".join([
+        "Job polling uses docs_status to inspect progress until a terminal status is observed. "
+        "Start by recording the job identifier returned by preparation. Keep the identifier "
+        "with the project path so that subsequent status requests address the same job.",
+        "For a queued job, wait for the worker to accept the request. Queue position is an "
+        "observation rather than a completion promise. Do not start another preparation "
+        "request while the original job is still queued; overlapping requests make diagnosis harder.",
+        "For a running job, compare the current progress with the previous observation and "
+        "retain any reported error details. A progress counter can remain unchanged while the "
+        "worker processes one document. Lack of a counter change alone does not establish that the job has failed.",
+        "The polling loop stops when the status becomes succeeded, failed, or cancelled. "
+        "A succeeded job can be inspected through the indexed documentation. A failed job "
+        "requires diagnosis before retrying. A cancelled job must not be treated as successfully prepared.",
+        "When docs_status polling reports progress, record the observation time alongside "
+        "the completed and pending counts. These counts describe that job only. Comparing "
+        "counts from different job identifiers does not measure progress of the original preparation request.",
+        "If a status request fails, retain the last successful observation without treating "
+        "it as the current state. Retry the status request for the same job identifier. "
+        "A transport error is not a terminal job state and does not authorize a second preparation request.",
+        "Before retrying a failed preparation job, inspect the reported error and check "
+        "whether its cause has been addressed. Record the new job identifier separately. "
+        "Preserve the failed job observation so that the retry can be distinguished from the original attempt.",
+        "Cancellation requests and cancellation completion are separate events. Continue "
+        "polling the existing job after requesting cancellation until docs_status reports "
+        "a terminal status. A cancellation request may race with successful completion, so retain the observed result.",
+        "After a successful preparation job, inspect the prepared documentation using the "
+        "same project path. If the expected source is absent, investigate that source rather "
+        "than assuming the polling loop verified document coverage. Job completion is not an answer-quality guarantee.",
+        "For polling diagnostics, report the job identifier, observation times, status "
+        "transitions, and the last error message. Do not replace the actual sequence with "
+        "an inferred transition. A queued observation followed by success does not prove that a running observation was received.",
+        "For polling shutdown, stop issuing requests only after preserving the final "
+        "observation or recording that the host stopped waiting. If the host exits before "
+        "a terminal result, mark the investigation as incomplete. Do not label that interrupted observation sequence as success.",
+        "Keep polling records separate from credentials and configuration secrets. Store "
+        "only the status fields needed to identify the job and explain its progress. When "
+        "sharing the diagnostic record, include the source project identity and omit unrelated local environment details.",
+    ]) + "\n"
+
+
+@pytest.mark.parametrize("revoked", [False, True], ids=["authorized", "revoked"])
+@pytest.mark.parametrize("legacy_scope", ["control", "absent", True, False])
+def test_final_public_handler_continuation_preserves_quality_and_usable_reference(
+    tmp_path, request, monkeypatch, revoked, legacy_scope, record_property,
+):
+    from docmancer.docs.application import joint_seed_envelopes
+    from docmancer.docs.application.joint_context_lineage import retained_seed_mapping
+    from docmancer.docs.application.model_visible_projection import (
+        _snapshot_entry, validate_model_visible_projection,
+    )
+    from docmancer.docs.interfaces.mcp import context_tools
+
+    service = _real_service(tmp_path, request, content=_continuation_document())
+    real_project = context_tools.project_docs_context
+    real_envelopes = joint_seed_envelopes.seed_envelopes
+    attempts, envelope_attempts = [], []
+    witness = "Job polling uses docs_status to inspect progress until a terminal status is observed."
+
+    def observe_envelopes(seed_payload, seed_snapshot):
+        result = real_envelopes(seed_payload, seed_snapshot)
+        envelope_attempts.append(deepcopy((seed_payload, seed_snapshot, result)))
+        return result
+
+    def negative_probe(*args, **kwargs):
+        # Inject legacy metadata at a unit boundary, not into acquisition or a
+        # fabricated successful payload. Normal producers do not emit this proof.
+        retrieval = kwargs["retrieval"]
+        if legacy_scope != "control":
+            original = next(row for row in retrieval["context_pack"] if witness in row["content"])
+            start = original["content"].index(witness)
+            plan = retrieval["documentation_query_plan"]
+            plan["_component_contract"] = [{"component_id": "opaque:negative-probe"}]
+            if legacy_scope == "absent":
+                plan.pop("component_scope_complete", None)
+            else:
+                plan["component_scope_complete"] = legacy_scope
+            retrieval["selection_decision"] = {"assignments": [{
+                "requirement_id": "opaque:negative-probe",
+                "evidence_id": original.get("stable_id") or original["stable_chunk_id"],
+                "projected_content_hash": hashlib.sha256(witness.encode()).hexdigest(),
+                "unit_char_start": start, "unit_char_end": start + len(witness),
+            }]}
+        result = real_project(*args, **kwargs)
+        attempts.append(deepcopy((retrieval, result[1])))
+        return result
+
+    monkeypatch.setattr(context_tools, "project_docs_context", negative_probe)
+    monkeypatch.setattr(joint_seed_envelopes, "seed_envelopes", observe_envelopes)
+    payload = call_docs_tool_payload("get_docs_context", {
+        "question": "How does docs_status polling progress work?",
+        "project_path": str(tmp_path),
+        "scope": "all",
+    }, service)
+    assert payload.get("kind") == "docs_context", payload
+    assert payload["context_quality"] == {
+        "status": "unverified", "reasons": ["coverage_unverified"],
+    }, payload["read_next"]
+    assert len(payload["read_next"]) == 1, {
+        "source_count": len(payload.get("sources") or ()),
+        "sources": [{
+            **{key: row.get(key) for key in ("evidence_id", "path_or_url", "line_start", "line_end")},
+            "snippet_sha256": hashlib.sha256(row["snippet"].encode()).hexdigest(),
+        } for row in (payload.get("sources") or ())[:4]],
+        "envelope_attempt_count": len(envelope_attempts),
+        "envelope_option_counts": [len(options) for _, _, options in envelope_attempts[:4]],
+    }
     target = payload["read_next"][0]
     assert target["reason"] in {"inspect_source_context", "requested_part_missing"}
-    assert target["snapshot_sha256"].startswith("sha256:")
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert payload["support_status"] == "retrieval_only"
+    assert payload["answer_policy"] == "cite_only"
+    assert len(attempts) == 1
+    retrieval, snapshot = attempts[0]
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
+    raw = (tmp_path / "docs/polling.md").read_bytes()
+    raw_text = raw.decode("utf-8")
+    assert envelope_attempts
+    for seed_payload, seed_snapshot, options in envelope_attempts:
+        assert len(seed_payload["sources"]) >= 2 and options
+        for _, (row, original, kind) in options:
+            reference = original["_reference_evidence"]
+            start, end = reference["char_start"], reference["char_end"]
+            assert kind == "seed_envelope"
+            assert 0 <= start < end < len(raw_text), "read_next_compact_envelope_range"
+            assert row["snippet"] == original["content"] == raw_text[start:end]
+            assert original["byte_start"] == len(raw_text[:start].encode("utf-8"))
+            assert original["byte_end"] == len(raw_text[:end].encode("utf-8"))
+            assert raw[original["byte_start"]:original["byte_end"]] == row["snippet"].encode("utf-8")
+            assert row["line_start"] == raw_text.count("\n", 0, start) + 1
+            assert row["line_end"] == raw_text.count("\n", 0, end - 1) + 1
+            assert all(old["snippet"] in row["snippet"] for old in seed_payload["sources"]), (
+                "read_next_compact_envelope_keeps_raw_seeds"
+            )
+            mapping = retained_seed_mapping(seed_payload, seed_snapshot, {"sources": [row]}, {
+                row["evidence_id"]: _snapshot_entry(original, row),
+            })
+            assert mapping == {old["evidence_id"]: row["evidence_id"] for old in seed_payload["sources"]}
+    assert target["path"] == "docs/polling.md"
+    assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
+    assert len(payload["sources"]) == 1
+    source = payload["sources"][0]
+    assert source["path_or_url"] == target["path"]
+    assert source["project_identity"] == target["project_identity"]
+    raw_lines = raw.splitlines()
+    # Keep every previously required line when the quote grows. Selection may
+    # retain additional source facts after the output ceiling was removed.
+    assert source["line_start"] == 1
+    assert 11 <= source["line_end"] < len(raw_lines)
+    assert source["snippet"].encode() == b"".join(raw.splitlines(keepends=True)[:source["line_end"]])
+    # Recovery must cover the whole unseen suffix; only blank separator lines
+    # may be skipped between the visible prefix and its continuation.
+    assert source["line_end"] < target["line_start"] <= target["line_end"]
+    assert target["line_end"] == len(raw_lines)
+    assert not any(line.strip() for line in raw_lines[
+        source["line_end"]:target["line_start"] - 1
+    ])
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    bound = snapshot[source["evidence_id"]]["source"]
+    assert bound["_source_snapshot_sha256"] == target["snapshot_sha256"]
+    assert bound["_reference_evidence"]["raw_document"].encode() == raw
+    if legacy_scope != "control":
+        assignment = retrieval["selection_decision"]["assignments"][0]
+        assert witness in source["snippet"]
+        assert hashlib.sha256(witness.encode()).hexdigest() == assignment["projected_content_hash"]
+    plan = retrieval["documentation_query_plan"]
+    assert plan["_component_contract"] == []
+    assert plan["component_scope_complete"] is False
+    assert plan["_component_coverage"]["mandatory_component_ids"] == []
+    assert plan["_component_coverage"]["covered_component_ids"] == []
+    assert plan["_component_coverage"]["unresolved_residue"] == ["unverified_original_component_scope"]
+    reads = []
 
-    read = json.loads(read_docs_resource(target["source_uri"], service)["text"])
-    assert read["line_start"] == target["line_start"]
-    assert read["line_end"] <= target["line_end"]
-    assert read["content_sha256"] == target["snapshot_sha256"]
+    def read_resource(uri):
+        result = json.loads(read_docs_resource(uri, service)["text"])
+        reads.append(result)
+        return result
 
-    service = _real_service(tmp_path / "second")
-    payload = call_docs_tool_payload("get_docs_context", {
-        **args, "project_path": str(tmp_path / "second"),
-    }, service)
-    target = payload["read_next"][0]
     controller = SourceReadController(
         payload,
         requested_facts={"rule": "What rule appears around the polling evidence?"},
-        read_resource=lambda uri: json.loads(read_docs_resource(uri, service)["text"]),
+        read_resource=read_resource,
     )
+    if revoked:
+        from docmancer.docs.project_docs_catalog import read_project_docs_catalog
+
+        catalog = tmp_path / "docatlas.project-docs.yaml"
+        catalog.write_text(catalog.read_text().replace(
+            "authority: source_of_truth", "authority: historical\n    impact: search_only",
+        ))
+        current_catalog = read_project_docs_catalog(tmp_path)
+        assert current_catalog.present and current_catalog.valid
+        assert len(current_catalog.entries) == 1
+        entry = current_catalog.entries[0]
+        assert entry.path == target["path"]
+        assert entry.scope == "project"
+        assert entry.status == "active"
+        assert entry.authority == "historical"
+        assert entry.impact == "search_only"
     accepted = controller.read(target["source_uri"], missing_fact_id="rule")
-    assert accepted["status"] in {"complete", "truncated"}
+    assert len(reads) == 1
+    if revoked:
+        assert reads[0] == {"status": "source_unavailable", "reason_code": "source_policy_or_snapshot_changed"}
+        assert accepted == {"status": "stopped", "reason_code": "source_policy_or_snapshot_changed"}
+        assert controller.results == []
+    else:
+        assert accepted == reads[0]
+        assert accepted["status"] == "complete"
+        assert accepted["line_start"] == target["line_start"]
+        assert accepted["line_end"] == target["line_end"]
+        assert accepted["path"] == target["path"]
+        assert accepted["project_identity"] == target["project_identity"]
+        assert accepted["content_sha256"] == target["snapshot_sha256"]
+        assert accepted["snippet"].encode() == b"\n".join(raw_lines[
+            target["line_start"] - 1:target["line_end"]
+        ])
+        assert docs_context_budget_tokens(accepted) <= 600
+        assert controller.results == [accepted]
 
 
 class _Reader:
@@ -156,26 +400,71 @@ def _raw_recovery_fixture():
     }
 
 
-def test_omitted_candidate_can_supply_read_target_without_becoming_evidence():
+def test_omitted_candidate_can_supply_read_target_without_becoming_evidence(record_property, monkeypatch):
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from docmancer.docs.interfaces.mcp import context_tools
+
+    retrieval = _raw_recovery_fixture()
+    question = retrieval["documentation_query_plan"]["original_question"]
+    lookup_queries = ["complete runnable example"]
+    retrieval["documentation_query_plan"] = build_documentation_query_plan(
+        question, lookup_queries=tuple(lookup_queries),
+    ).as_payload()
+    example = retrieval["context_pack"][1]
+    retrieval["context_pack"][1] = _candidate(
+        "docs/example.md", example["content"].replace(
+            "complete runnable example for export identifiers",
+            "Export operation preserves original identifiers in a complete runnable example.",
+        ), query_id="query-lookup-1", line_start=100, stable_id="example",
+    )
+    expected_example = deepcopy(retrieval["context_pack"][1])
+    real_project = context_tools.project_docs_context
+    snapshots = []
+
+    def capture_projection(*args, **kwargs):
+        result = real_project(*args, **kwargs)
+        snapshots.append(deepcopy(result[1]))
+        return result
+
+    monkeypatch.setattr(context_tools, "project_docs_context", capture_projection)
     reader = _Reader()
-    service = _ContextApp(_raw_recovery_fixture(), reader)
+    service = _ContextApp(retrieval, reader)
     payload = handle_context_tool("get_docs_context", {
-        "question": "How does the export operation preserve original identifiers?",
+        "question": question,
+        "lookup_queries": lookup_queries,
         "project_path": "/repo",
         "scope": "all",
     }, service)
     assert payload["kind"] == "docs_context"
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload["read_next"]) == 1
-    target = payload["read_next"][0]
-    assert target["path"] in {"docs/direct.md", "docs/example.md"}
-    assert all(source["path_or_url"] != target["path"] for source in payload["sources"]) or target["path"] == "docs/direct.md"
-    if target["path"] == "docs/example.md":
-        assert all(source["path_or_url"] != "docs/example.md" for source in payload["sources"])
-    assert reader.ranges
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
+    assert len(snapshots) == 1
+    snapshot = snapshots[0]
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
+    # This historical fixture forced omission under the removed token ceiling.
+    # The complete admitted code block must now survive without a redundant
+    # read capability; an empty or shortened source is not successful delivery.
+    examples = [source for source in payload["sources"]
+                if source["path_or_url"] == expected_example["path"]]
+    assert len(examples) == 1, payload["sources"]
+    source = examples[0]
+    assert source["snippet"] == expected_example["content"]
+    assert (source["line_start"], source["line_end"]) == (
+        expected_example["line_start"], expected_example["line_end"],
+    )
+    assert source["project_identity"] == expected_example["project_identity"]
+    assert source["content_sha256"] == snapshot[source["evidence_id"]]["content_sha256"]
+    assert snapshot[source["evidence_id"]]["source"]["content"] == expected_example["content"]
+    assert payload["read_next"] == []
+    assert reader.ranges == []
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert payload["support_status"] == "retrieval_only"
+    assert payload["answer_policy"] == "cite_only"
 
 
-def test_binding_failure_removes_dead_read_next_and_reports_cause():
+def test_binding_failure_removes_dead_read_next_and_reports_cause(record_property):
     reader = _Reader(fail_range=True)
     service = _ContextApp(_raw_recovery_fixture(), reader)
     payload = handle_context_tool("get_docs_context", {
@@ -185,17 +474,42 @@ def test_binding_failure_removes_dead_read_next_and_reports_cause():
     }, service)
     assert payload["read_next"] == []
     assert "source_unavailable" in payload["context_quality"]["reasons"]
-    assert docs_context_budget_tokens(payload) <= 800
+    record_property("public_output_tokens", docs_context_budget_tokens(payload))
 
 
-def test_final_projection_quality_uses_surviving_component_witness():
-    from docmancer.docs.application.docs_context_projection import project_docs_context
+@pytest.mark.parametrize("legacy_scope", ["absent", True, False])
+@pytest.mark.parametrize("component_id", ["project_answer:verify", "opaque:negative-probe", None])
+@pytest.mark.parametrize("with_source", [True, False], ids=["visible", "unavailable"])
+def test_final_projection_quality_uses_surviving_component_witness(
+    monkeypatch, legacy_scope, component_id, with_source,
+):
+    from docmancer.docs.application import docs_context_projection as projection
+    from docmancer.docs.application.model_visible_projection import _source_digest, validate_model_visible_projection
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 
+    real_coverage = projection.component_coverage_decision
+    final_sources = []
+
+    def observe_coverage(contract, assignments, sources, **kwargs):
+        result = real_coverage(contract, assignments, sources, **kwargs)
+        final_sources.append(deepcopy(tuple(sources)))
+        return result
+
+    monkeypatch.setattr(projection, "component_coverage_decision", observe_coverage)
     witness = "Verify the installation with the health check."
     content = "Install locally. " + witness
     witness_start = content.index(witness)
     witness_hash = hashlib.sha256(witness.encode()).hexdigest()
-    payload, _ = project_docs_context(retrieval={
+    # A valid literal plan keeps this negative control on the real projection
+    # path; a source-local byte witness must not certify a component's meaning.
+    plan = build_documentation_query_plan("install verify health check").as_payload()
+    if legacy_scope == "absent":
+        plan.pop("component_scope_complete")
+    else:
+        plan["component_scope_complete"] = legacy_scope
+    if component_id is not None:
+        plan["_component_contract"] = [{"component_id": component_id}]
+    retrieval = {
         "context_pack": [{
             "stable_id": "project:quality-doc", "source_class": "project_doc",
             "path": "docs/install.md", "content": content,
@@ -206,25 +520,63 @@ def test_final_projection_quality_uses_surviving_component_witness():
             }},
         }],
         "selection_decision": {"assignments": [{
-            "requirement_id": "project_answer:verify", "evidence_id": "project:quality-doc",
+            "requirement_id": component_id, "evidence_id": "project:quality-doc",
             "projected_content_hash": witness_hash,
             "unit_char_start": witness_start, "unit_char_end": witness_start + len(witness),
         }]},
-        "documentation_query_plan": {
-            "original_question": "install verify health check",
-            "query_ids": ["query-original"], "public_query_ids": ["query-original"],
-            "queries": [{"query_id": "query-original", "text": "install verify health check", "origin": "original"}],
-            "_component_contract": [{"component_id": "project_answer:verify"}],
-        },
-    })
-    assert payload["context_quality"] == {"status": "checked", "reasons": []}
+        "documentation_query_plan": plan,
+    }
+    if component_id is None:
+        retrieval.pop("selection_decision")
+    if not with_source:
+        retrieval["context_pack"] = []
+        plan["unresolved_parts"] = ["opaque:unresolved"]
+    expected_hash = _source_digest(retrieval["context_pack"][0]) if with_source else None
+    diagnostics = {}
+    payload, snapshot = projection.project_docs_context(retrieval=retrieval, selection_diagnostics=diagnostics)
+    assert payload["context_quality"] == (
+        {"status": "unverified", "reasons": ["coverage_unverified"]} if with_source
+        else {"status": "unavailable", "reasons": ["source_unavailable"]}
+    )
     assert payload["read_next"] == []
+    assert payload["answer_supported"] is False
+    assert payload["answer_available"] is False
+    assert payload["edit_ready"] is False
+    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
+    if with_source:
+        assert payload["support_status"] == "retrieval_only"
+        assert payload["answer_policy"] == "cite_only"
+        assert len(payload["sources"]) == 1
+        source = payload["sources"][0]
+        assert source["snippet"] == content
+        assert source["content_sha256"] == expected_hash
+        assert snapshot[source["evidence_id"]]["content_sha256"] == source["content_sha256"]
+        assert snapshot[source["evidence_id"]]["source"]["content"] == content
+        final = final_sources[-1][0]
+        assert final["snippet"] == source["snippet"]
+        assert final["content_sha256"] == source["content_sha256"]
+        assert final["_visible_assignment_hashes"] == ([witness_hash] if component_id else [])
+        assert final["_assigned_requirement_ids"] == ([component_id] if component_id else [])
+    else:
+        assert payload.get("sources", []) == []
+        assert snapshot == {}
+        assert final_sources[-1] == ()
+    final_plan = retrieval["documentation_query_plan"]
+    assert final_plan["_component_contract"] == []
+    assert final_plan["component_scope_complete"] is False
+    assert final_plan["_projection_omissions"] == []
+    assert final_plan["_component_coverage"] == diagnostics["component_coverage"] == {
+        "mandatory_component_ids": [], "covered_component_ids": [],
+        "missing_component_ids": [], "evidence_ids": [],
+        "unresolved_residue": [*(plan.get("unresolved_parts") or ()), "unverified_original_component_scope"],
+        "status": "unavailable", "recognized_component_status": "unavailable",
+    }
 
 
 def test_public_schema_exposes_quality_and_registered_range_contract():
     from docmancer.mcp._docs_server_schema import PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA
 
-    properties = PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["properties"]
+    properties = PUBLIC_GET_DOCS_CONTEXT_OUTPUT_SCHEMA["oneOf"][0]["properties"]
     assert set(properties["context_quality"]["properties"]["status"]["enum"]) == {
         "checked", "partial", "unverified", "unavailable",
     }
@@ -240,9 +592,15 @@ def test_public_schema_exposes_quality_and_registered_range_contract():
 def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
     from docmancer.docs.application import docs_context_projection as projection
     from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
     from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
 
     retrieval = _host_lookup_context_retrieval()
+    plan = retrieval["documentation_query_plan"]
+    retrieval["documentation_query_plan"] = build_documentation_query_plan(
+        plan["queries"][0]["text"],
+        lookup_queries=tuple(row["text"] for row in plan["queries"] if row["origin"] == "host_lookup"),
+    ).as_payload()
     retrieval["_source_continuation_project_root"] = "/repo"
     retrieval["context_pack"] = retrieval["context_pack"][:2]
     target = {"source_uri": "docatlas://source/range", "path": "docs/extra.md",
@@ -257,12 +615,12 @@ def test_optional_recovery_cannot_evict_accepted_evidence(monkeypatch):
     monkeypatch.setattr(projection, "_run_core", observed)
     monkeypatch.setattr(projection, "prepare_docs_context_read_next", lambda *args, **kwargs: (target, {}))
     monkeypatch.setattr(projection, "docs_context_read_next_cost", lambda *args: 650)
-    # Force the reservation path; the reduced evidence budget cannot retain both.
+    # Refused optional attachment must not trigger budget-driven reprojection.
     monkeypatch.setattr(projection, "attach_docs_context_read_next", lambda *args, **kwargs: False)
     payload, _ = projection.project_docs_context(retrieval=retrieval)
-    assert len(calls) == 2
+    assert len(calls) == 1
+    assert len(calls[0]["sources"]) == 2
     assert {s["evidence_id"] for s in payload["sources"]} == {s["evidence_id"] for s in calls[0]["sources"]}
     assert payload["covered_query_ids"] == calls[0]["covered_query_ids"]
     assert payload["read_next"] == []
-    assert "budget_limited" in payload["context_quality"]["reasons"]
-    assert docs_context_budget_tokens(payload) <= 800
+    assert "budget_limited" not in payload["context_quality"]["reasons"]

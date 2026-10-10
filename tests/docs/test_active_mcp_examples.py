@@ -14,7 +14,7 @@ FILES = ('README.md', 'SKILL.md', 'docs/project-docs-demo.md', 'docs/project-doc
 def test_active_get_docs_context_keywords_match_runtime(path):
     spec = next(s for s in build_docs_surface(DocsServerConfig()).tools if s.name == 'get_docs_context')
     allowed = set(spec.input_schema['properties'])
-    matches = list(re.finditer(r'get_docs_context\(([^()\n]*)\)', (ROOT / path).read_text()))
+    matches = list(re.finditer(r'get_docs_context\(([^()]*)\)', (ROOT / path).read_text()))
     assert matches, f'No examples checked in {path}'
     for match in matches:
         try:
@@ -27,10 +27,14 @@ def test_active_get_docs_context_keywords_match_runtime(path):
 
 def test_module_examples_keep_explicit_module_scope():
     text = (ROOT / 'docs/project-docs-mcp-workflow.md').read_text()
-    calls = [m.group() for m in re.finditer(r'get_docs_context\(([^()\n]*)\)', text) if 'module_path=' in m.group()]
+    calls = [ast.parse(m.group(), mode='eval').body
+             for m in re.finditer(r'get_docs_context\(([^()]*)\)', text)
+             if 'module_path=' in m.group()]
     assert calls
     for call in calls:
-        assert 'scope="module"' in call
+        keywords = {item.arg: ast.literal_eval(item.value) for item in call.keywords}
+        assert keywords['scope'] == 'module'
+        assert keywords['module_path'] == 'packages/auth'
 
 
 def test_multiline_module_example_also_uses_the_public_schema():

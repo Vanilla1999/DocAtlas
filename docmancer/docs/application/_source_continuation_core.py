@@ -216,7 +216,7 @@ def source_continuation_uri(project_root: str, source: dict) -> str | None:
 
 
 def attach_source_continuation_locators(payload: dict, snapshot: dict, *, root: str, max_tokens: int) -> None:
-    """Spend only spare DTO budget; never displace an already selected fact."""
+    """Attach source-local locators and synchronize their snapshot bindings."""
     from .model_visible_projection import _refresh_estimate
     for source in payload.get('sources') or ():
         bound = snapshot[source['evidence_id']]
@@ -225,12 +225,8 @@ def attach_source_continuation_locators(payload: dict, snapshot: dict, *, root: 
             continue
         source['source_uri'] = uri
         _refresh_estimate(payload)
-        if docs_context_budget_tokens(payload) > max_tokens:
-            source.pop('source_uri')
-            _refresh_estimate(payload)
-        else:
-            bound['projected_source']['source_uri'] = uri
-            bound['source_uri'] = uri
+        bound['projected_source']['source_uri'] = uri
+        bound['source_uri'] = uri
 
 
 def bind_project_source_continuations(reader, project_root: str, projection: dict, snapshot: dict) -> None:

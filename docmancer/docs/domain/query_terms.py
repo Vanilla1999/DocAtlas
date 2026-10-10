@@ -8,10 +8,6 @@ from functools import lru_cache
 from pathlib import Path
 
 
-_REQUEST_FRAMING_TERMS = frozenset({
-    "describe", "explain", "how", "please", "show", "tell", "what", "which",
-    "compare", "summarize", "расскажи", "mcp", "and", "or", "the", "и", "или",
-})
 # A shaped command followed by one explicit long-option value is a literal
 # retrieval hypothesis, not a claim about option arity or answer sufficiency.
 # Do not consume natural-language connectors or cross a physical line.
@@ -21,7 +17,7 @@ _COMMAND_OPTION_VALUE_RE = re.compile(
     r"(?P<value>[A-Za-z0-9][A-Za-z0-9_.:/-]{0,79})(?![\w.-])"
 )
 _TECHNICAL_TERM_PATTERNS = (
-    re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]"),
+    re.compile(r"[`\"]([^`\"\n]{1,160})[`\"]"),
     re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}"),
     re.compile(r"\b(?:ERR(?:OR)?[_-]?\d+|[A-Z][A-Z0-9]+[_-]\d+)\b"),
     re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b"),
@@ -32,17 +28,14 @@ _TECHNICAL_TERM_PATTERNS = (
     re.compile(r"\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b"),
 )
 _EXACT_TERM_PATTERNS = (
-    ("quoted", re.compile(r"[`\"]([^`\"\n]{2,160})[`\"]")),
+    ("quoted", re.compile(r"[`\"]([^`\"\n]{1,160})[`\"]")),
     ("flag", re.compile(r"(?<![\w.-])--[A-Za-z][A-Za-z0-9-]{1,118}")),
     ("error_code", re.compile(r"\b(?:ERR(?:OR)?[_-]?\d+|[A-Z][A-Z0-9]+[_-]\d+)\b")),
     ("config_key", re.compile(r"\b[A-Z][A-Z0-9_]{2,119}\b")),
     ("symbol", re.compile(r"\b[A-Za-z_]\w*(?:(?:::|\.)[A-Za-z_]\w*)+\b")),
+    ("symbol", re.compile(r"\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b")),
     ("path", re.compile(r"(?<![\w/])(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+")),
 )
-_PATH_ROOTS = frozenset({
-    "app", "bin", "cmd", "config", "docmancer", "docs", "eval", "lib",
-    "packages", "scripts", "src", "test", "tests", "tools", "wiki",
-})
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,8 +47,6 @@ class DocumentationExactTerm:
 
 def is_exact_technical_token(token: str) -> bool:
     """Classify lexical identity without treating request framing as identity."""
-    if token.casefold() in _REQUEST_FRAMING_TERMS:
-        return False
     return (
         any(char in token for char in "._/:+-")
         or any(char.isupper() for char in token[1:])
@@ -67,8 +58,6 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
     """Extract bounded exact anchors without depending on retrieval infrastructure."""
     values: list[str] = []
     for match in _COMMAND_OPTION_VALUE_RE.finditer(question):
-        if match.group("value").casefold() in _SUPPLEMENTAL_FUNCTION_WORDS:
-            continue
         # Use the existing quoted-exact constraint so a wrong option value,
         # split mentions, or another command cannot qualify this extra probe.
         literal = "`" + " ".join(match.group(0).split()) + "`"
@@ -92,8 +81,6 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
             value = (match.group(1) if match.lastindex else match.group(0)).strip()
             if (
                 value
-                and value.casefold() not in {"docatlas", "docmancer"}
-                and (pattern is _TECHNICAL_TERM_PATTERNS[0] or value.casefold() not in _REQUEST_FRAMING_TERMS)
                 and value not in values
                 and f"`{value}`" not in values
             ):
@@ -105,18 +92,11 @@ def documentation_technical_anchors(question: str, *, limit: int = 12) -> tuple[
 
 @lru_cache(maxsize=512)
 def documentation_query_terms(question: str) -> tuple[str, ...]:
-    """Bounded lexical probe terms, excluding standalone request connectors."""
-    # A leading enumeration imperative describes answer presentation, not a
-    # fact that documentation must repeat. Keep the public question, interior
-    # occurrences, exact identities and all condition words unchanged.
-    lexical_question = re.sub(
-        r"^\s*(?:перечисли(?:те)?|enumerate)\s+(?=\S)", "", question, count=1, flags=re.I,
-    )
+    """Bounded literal lexical terms, retaining connectors and negation."""
     return tuple(dict.fromkeys(
         token.casefold()
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/+-]+", lexical_question)
-        if token.casefold() not in _REQUEST_FRAMING_TERMS
-        and (len(token) >= 4 or is_exact_technical_token(token))
+        for token in re.findall(r"[\w.:/+-]+", question)
+        if token
     ))[:32]
 
 
@@ -165,30 +145,16 @@ class QueryConstraintRoles:
 
 @lru_cache(maxsize=512)
 def query_constraint_roles(question: str) -> QueryConstraintRoles:
-    """Use declared occurrence roles, with the existing strict anchor fallback."""
-    from .query_reference_binding import query_mentions
-    mentions = query_mentions(question)
-    subjects = tuple(dict.fromkeys(m.text.casefold() for m in mentions if m.syntax_role == "semantic_subject"))
-    hard = list(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
-    existing_anchors = {value.casefold() for value in documentation_technical_anchors(question)}
-    for mention in mentions:
-        # Unresolved bare anchors retain BASE's strict fallback, not a new
-        # invented semantic subject. Locators stay hard until source-bound.
-        required = (mention.syntax_role == "symbol_identity"
-            or (mention.syntax_role == "source_locator" and mention.explicit)
-            or (mention.syntax_role != "semantic_subject" and mention.text.casefold() in existing_anchors))
-        if required and mention.text.casefold() not in hard:
-            hard.append(mention.text.casefold())
-    return QueryConstraintRoles(tuple(hard), subjects, tuple(dict.fromkeys(m.text.casefold() for m in mentions)))
+    """Exact syntactic constraints only; no inferred semantic subject roles."""
+    hard = tuple(dict.fromkeys(term.normalized_value for term in documentation_exact_terms(question)))
+    return QueryConstraintRoles(hard, (), documentation_technical_anchors(question))
 
 
 def _looks_like_source_path(value: str) -> bool:
     normalized = value.replace("\\", "/")
-    first = normalized.partition("/")[0]
     leaf = normalized.rsplit("/", 1)[-1]
     return (
         normalized.startswith(("./", "../", "/"))
-        or first.casefold() in _PATH_ROOTS
         or bool(Path(leaf).suffix)
     )
 
@@ -204,27 +170,6 @@ __all__ = [
 ]
 
 
-# Used only to admit an OPTIONAL lookup, never to rewrite the public question
-# or to decide whether its conditions/negation have been semantically covered.
-_SUPPLEMENTAL_FUNCTION_WORDS = frozenset({
-    "i", "a", "an", "the", "in", "on", "at", "so", "to", "of", "for", "from",
-    "by", "as", "and", "or", "do", "does", "did", "we", "it", "its", "is", "are",
-    "was", "were", "be", "been", "this", "that", "these", "those", "with", "about",
-    "what", "which", "how", "when", "where", "why", "who", "should", "would",
-    "happen", "happens", "happened",
-    "can", "could", "will", "shall", "must", "not", "only", "if", "unless", "without",
-    "я", "мы", "он", "она", "оно", "они", "в", "во", "на", "от", "по", "за",
-    "к", "ко", "с", "со", "из", "до", "для", "о", "об", "и", "или", "а", "но",
-    "что", "как", "где", "когда", "кто", "это", "этот", "эти", "так", "же", "бы",
-    "не", "нет", "если", "без", "только", "должен", "нужно", "надо",
-})
-
-
 def supplemental_query_is_useful(text: str) -> bool:
-    """Reject empty/function-word residue without destroying technical identity."""
-    if documentation_technical_anchors(text):
-        return True
-    return any(
-        token.casefold() not in _SUPPLEMENTAL_FUNCTION_WORDS
-        for token in re.findall(r"[\w]+(?:[.:/+-][\w-]+)*", str(text or ""))
-    )
+    """Explicit lookups need no topic/function-word approval."""
+    return bool(str(text or "").strip())

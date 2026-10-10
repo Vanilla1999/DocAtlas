@@ -253,50 +253,9 @@ class _RetrievalDispatcherPart02:
         return [next(queues[str((chunk.metadata or {}).get('canonical_url') or chunk.source)]) for chunk in chunks]
 
     def _rerank_intent_matches(self, query: str, chunks: list[Any], *, expand: str | None = None) -> list[Any]:
-        if not query or len(chunks) < 2:
-            return chunks
-        # Project lanes already carry SQLite ranking; library snippet boosts
-        # must not displace repository prose requirements with code examples.
         if all((getattr(chunk, "metadata", {}) or {}).get("source_class") == "project_file" for chunk in chunks):
             return self._rank_project_bodies_within_source(query, chunks)
-        query_lower = query.lower()
-        query_terms = _query_api_terms(query)
-        intent_terms = _query_intent_terms(query_lower)
-        if not query_terms and not intent_terms:
-            return chunks
-
-        scored: list[tuple[float, int, Any]] = []
-        for index, chunk in enumerate(chunks):
-            metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(metadata.get("canonical_url") or getattr(chunk, "source", "") or "")
-            title = str(metadata.get("title") or metadata.get("section_title") or "")
-            document_title = str(metadata.get("document_title") or "")
-            anchor = str(metadata.get("anchor") or "")
-            haystack = "\n".join([source, title, document_title, anchor]).lower()
-            text = str(getattr(chunk, "text", "") or "").lower()
-
-            boost = 0.0
-            for term in query_terms:
-                term_lower = term.lower()
-                compact = term_lower.replace(".", "")
-                if term_lower in haystack or compact in haystack:
-                    boost += 3.0
-                elif term_lower in text[:1200] or compact in text[:1200]:
-                    boost += 1.0
-
-            if boost and any(part in source for part in ("/docs/", "/guide/", "/tutorial/", "/reference/", "/concepts/", "/concepts2/")):
-                boost += 1.0
-            boost += _intent_source_score(query_lower, intent_terms, source, haystack, text)
-            boost += _snippet_intent_score(query_lower, intent_terms, query_terms, metadata, text)
-            if isinstance(metadata, dict):
-                metadata["_pre_post_rank"] = index + 1
-                metadata["_intent_boost"] = boost
-            scored.append((boost, index, chunk))
-
-        if not any(boost for boost, _index, _chunk in scored):
-            return chunks
-        scored.sort(key=lambda item: (-item[0], item[1]))
-        return [chunk for _boost, _index, chunk in scored]
+        return chunks
 
     def _append_api_term_matches(
         self,
@@ -308,33 +267,8 @@ class _RetrievalDispatcherPart02:
         backend_filters: dict | None = None,
         verification_filters: dict | None = None,
     ) -> list[Any]:
-        query_terms = _query_api_terms(query)
-        if not query_terms:
-            return chunks
-        supplemental: list[Any] = []
-        for term in sorted(query_terms)[:8]:
-            try:
-                supplemental.extend(self.store.query(
-                    term, limit=4, budget=budget,
-                    expand=expand, filters=backend_filters,
-                ))
-            except Exception:
-                continue
-        supplemental = self._filter_chunks(supplemental, verification_filters)
-        for rank, chunk in enumerate(supplemental, start=1):
-            metadata = getattr(chunk, "metadata", None)
-            if isinstance(metadata, dict):
-                metadata["_supplemental_rank"] = rank
-        seen: set[Any] = set()
-        out: list[Any] = []
-        for chunk in [*chunks, *supplemental]:
-            metadata = getattr(chunk, "metadata", {}) or {}
-            key = metadata.get("section_id") or (getattr(chunk, "source", ""), getattr(chunk, "chunk_index", None))
-            if key in seen:
-                continue
-            seen.add(key)
-            out.append(chunk)
-        return out
+        # Literal anchors remain constraints, not extra executable searches.
+        return self._filter_chunks(chunks, verification_filters)
 
     def _degraded_mode_name(self, mode: str, candidate_lists: dict[str, list[Any]], failures: dict[str, str]) -> str:
         if not failures:

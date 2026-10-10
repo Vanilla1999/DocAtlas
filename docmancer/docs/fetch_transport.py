@@ -69,6 +69,21 @@ class DocsHttpClient:
             if deadline is not None and self._clock() >= deadline:
                 raise DocsFetchSecurityError("request_timeout", redact_url(current))
             first = self._policy.validate_url(current)
+            if self._policy.exact_urls is not None:
+                # Check the request URL, not merely the pre-serialization input
+                # or the response URL after an unauthorized request has escaped.
+                try:
+                    request = (
+                        self._client.build_request("GET", current, params=kwargs.get("params"))
+                        if isinstance(self._client, _HTTPX_CLIENT_TYPE)
+                        else httpx.Request("GET", current, params=kwargs.get("params"))
+                    )
+                    outgoing = str(request.url)
+                except (httpx.InvalidURL, ValueError):
+                    raise DocsFetchSecurityError("invalid_url", redact_url(current)) from None
+                from docmancer.docs.finite_membership import contains
+                if not contains(self._policy.exact_urls, outgoing):
+                    raise DocsFetchSecurityError("url_not_selected", redact_url(outgoing))
             second = self._policy.validate_url(current)
             self._validate_stable_resolution(first, second)
             request_kwargs = dict(kwargs)

@@ -1,0 +1,1990 @@
+{
+  "schema_version": "pr211-member-selfhost-acceptance-v1",
+  "title": "Completed actual991638f CI and reviewed subsequent synthetic lookup",
+  "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+  "tree_sha": "955bac94d5ca6b847f558b0e7dbd0dcb8265e9df",
+  "checkout_merge_sha": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+  "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "verified_at_utc": "2026-10-08 20:45:05 UTC",
+  "workflow_counts": {
+    "success": 8,
+    "failure": 8,
+    "skipped": 1
+  },
+  "all_workflows_completed": true,
+  "workflows": [
+    {
+      "id": 37840422775,
+      "name": "P2.2A comparative harness",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422731,
+      "name": "P2 Product Truth protocol",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422931,
+      "name": "P2.2B/C execution gate",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422866,
+      "name": "P1.4 paraphrase and proofability",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422729,
+      "name": "P1 Agent Truth closure",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840423038,
+      "name": "P2.3 Product Truth decision",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422821,
+      "name": "P1.6 evidence is data",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422987,
+      "name": "P2.1C task pack",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422723,
+      "name": "P1.5 mixed-evidence provenance",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422673,
+      "name": "Release artifact gate and publish",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422728,
+      "name": "P2.1B positive controls",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422740,
+      "name": "Task 33C pull-request checks",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422802,
+      "name": "Direct question validation",
+      "status": "completed",
+      "conclusion": "skipped"
+    },
+    {
+      "id": 37840422735,
+      "name": "Language flow investigation",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422829,
+      "name": "P2 federated task-pack reopening",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37840422988,
+      "name": "CI",
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "id": 37840422886,
+      "name": "P1 stack exact validation",
+      "status": "completed",
+      "conclusion": "failure"
+    }
+  ],
+  "main_and_p1_jobs": [
+    {
+      "run_id": 37840422988,
+      "jobs": [
+        {
+          "id": 113528090798,
+          "name": "static-contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528090888,
+          "name": "docs-impact",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528090958,
+          "name": "installer-smoke",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528090987,
+          "name": "installed-mcp-harness",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091167,
+          "name": "retrieval-evidence",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091279,
+          "name": "test (3.11)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091353,
+          "name": "platform-smoke (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091403,
+          "name": "platform-smoke (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091438,
+          "name": "docs-contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091475,
+          "name": "advanced-contract",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091546,
+          "name": "test (3.13)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091595,
+          "name": "test (3.12)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091606,
+          "name": "platform-smoke (macos-15)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528092919,
+          "name": "p1-harden-branch",
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        {
+          "id": 113532153123,
+          "name": "required-ci",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    },
+    {
+      "run_id": 37840422886,
+      "jobs": [
+        {
+          "id": 113528091114,
+          "name": "p1-stack-release-build",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091366,
+          "name": "p1-stack-platform (ubuntu-latest)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091388,
+          "name": "p1-stack-core (3.13)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091413,
+          "name": "p1-stack-advanced-security",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091433,
+          "name": "p1-stack-core (3.11)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091445,
+          "name": "p1-stack-platform (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528091512,
+          "name": "p1-stack-core (3.12)",
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        {
+          "id": 113528091614,
+          "name": "p1-stack-platform (macos-15)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528341656,
+          "name": "p1-stack-release-wheel (3.11)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528341689,
+          "name": "p1-stack-release-wheel (3.12)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528341703,
+          "name": "p1-stack-release-sdist-installer",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113528341745,
+          "name": "p1-stack-release-wheel (3.13)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 113532324954,
+          "name": "p1-stack-exact",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    }
+  ],
+  "core": {
+    "actual_total": 8513,
+    "actual_states": {
+      "failure": 1946,
+      "passed": 6496,
+      "error": 61,
+      "skipped": 10
+    },
+    "python": [
+      "3.11",
+      "3.12",
+      "3.13"
+    ],
+    "node_roster_sha256": "baf2bb6e4e4e943b07365cc5bcee4ff89f08b1c6fe30d9359e43e1ac43e3be15",
+    "node_outcomes_sha256": "cdd5643f64f3998c5cc01974a14c2c92663702229e73012e7aed93ca15819703",
+    "transitions": [
+      {
+        "nodeid": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_foreign_project_same_path_never_enters_owned_context",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_does_not_mark_mtime_only_change_stale",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_reports_indexed_and_stale_sources",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service_part03.py::test_get_project_docs_returns_scoped_docs_result",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service_part04.py::test_get_project_context_requires_preflight_for_stale_project_docs",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_docs_service_part04.py::test_get_project_docs_reports_stale_project_docs",
+        "before": "failure",
+        "after": "passed"
+      }
+    ],
+    "added": [
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+        "state": "failure"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_fixture_restores_environment_and_preserves_original_repository",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_preserves_all_catalog_bytes_and_source_boundaries",
+        "state": "passed"
+      }
+    ],
+    "removed": [],
+    "pass_regressions": {
+      "3.11": [],
+      "3.12": [],
+      "3.13": []
+    },
+    "unexpected_transitions": {
+      "3.11": [],
+      "3.12": [],
+      "3.13": []
+    },
+    "target_states": {
+      "failure": 1,
+      "passed": 7
+    },
+    "target_outcomes": [
+      {
+        "nodeid": "tests/docs/test_module_docs_manifest_e2e.py::test_two_module_docs_manifest_sync_filter_and_public_mcp",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "failure",
+        "message": "AssertionError: {'status': 'insufficient_evidence', 'kind': 'docs_context', 'missing': ['required_evidence_missing'], 'estimated_tokens': 134, ...}\nassert 'insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence"
+      },
+      {
+        "nodeid": "tests/evidence_quality_v2/test_readme_neutral_context.py::test_foreign_project_same_path_never_enters_owned_context",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_reports_indexed_and_stale_sources",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service.py::test_inspect_project_docs_does_not_mark_mtime_only_change_stale",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service_part03.py::test_get_project_docs_returns_scoped_docs_result",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service_part04.py::test_get_project_docs_reports_stale_project_docs",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_docs_service_part04.py::test_get_project_context_requires_preflight_for_stale_project_docs",
+        "group": "member_fixture_or_descriptor_mtime",
+        "before": "failure",
+        "after": "passed",
+        "message": ""
+      }
+    ],
+    "new_test_states": {
+      "passed": 5,
+      "failure": 1
+    },
+    "new_cases": [
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_cold_read_does_not_create_or_authorize_storage",
+        "state": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+        "state": "failure",
+        "message": "AssertionError: assert ('insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence)"
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+        "state": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_fixture_restores_environment_and_preserves_original_repository",
+        "state": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+        "state": "passed",
+        "message": ""
+      },
+      {
+        "nodeid": "tests/test_project_docs_self_host_fixture.py::test_self_host_snapshot_preserves_all_catalog_bytes_and_source_boundaries",
+        "state": "passed",
+        "message": ""
+      }
+    ],
+    "security_controls": {
+      "3.11": {
+        "count": 141,
+        "states": {
+          "passed": 141
+        },
+        "nonpassing": []
+      },
+      "3.12": {
+        "count": 141,
+        "states": {
+          "passed": 141
+        },
+        "nonpassing": []
+      },
+      "3.13": {
+        "count": 141,
+        "states": {
+          "passed": 141
+        },
+        "nonpassing": []
+      }
+    },
+    "diagnostic_47": {
+      "3.11": {
+        "count": 47,
+        "states": {
+          "error": 47
+        },
+        "message_identical_to_04ff": true,
+        "first_barrier_changes": 0
+      },
+      "3.12": {
+        "count": 47,
+        "states": {
+          "error": 47
+        },
+        "message_identical_to_04ff": true,
+        "first_barrier_changes": 0
+      },
+      "3.13": {
+        "count": 47,
+        "states": {
+          "error": 47
+        },
+        "message_identical_to_04ff": true,
+        "first_barrier_changes": 0
+      }
+    },
+    "first_barrier_comparison": {
+      "3.11": {
+        "same_state_failure_error_count": 2006,
+        "stable_barrier_change_count": 10,
+        "stable_barrier_unchanged_count": 1996,
+        "no_marked_statement_count": 0,
+        "no_marked_statement_nodes": []
+      },
+      "3.12": {
+        "same_state_failure_error_count": 2006,
+        "stable_barrier_change_count": 10,
+        "stable_barrier_unchanged_count": 1996,
+        "no_marked_statement_count": 0,
+        "no_marked_statement_nodes": []
+      },
+      "3.13": {
+        "same_state_failure_error_count": 2006,
+        "stable_barrier_change_count": 10,
+        "stable_barrier_unchanged_count": 1996,
+        "no_marked_statement_count": 0,
+        "no_marked_statement_nodes": []
+      }
+    },
+    "message_variation_unexplained_changes": {
+      "3.11": [],
+      "3.12": [],
+      "3.13": []
+    },
+    "file": "PR211_991638F_CORE_ACCEPTANCE.json",
+    "sha256": "487a53de8ddaf11b2bcc6b638fd9e9660df355d24fb904dc2142b0e26f81f701",
+    "baseline_head_sha": "04ff1dda57efb5236d7b3577d4e2736b2820df5b",
+    "published_reconstruction_chain": [
+      "PR211_CONTINUATION_OUTCOMES.json.gz",
+      "PR211_FOLLOWUP_CORE_ACCEPTANCE.json",
+      "PR211_RUNTIME_FOLLOWUP_CORE_ACCEPTANCE.json",
+      "PR211_CONTRACT_FIXTURE_CORE_ACCEPTANCE.json",
+      "PR211_04FF_CORE_ACCEPTANCE.json",
+      "PR211_991638F_CORE_ACCEPTANCE.json"
+    ]
+  },
+  "advanced": {
+    "job_id": 113528091475,
+    "job_status": "completed",
+    "job_conclusion": "failure",
+    "artifact_id": 11577267665,
+    "artifact_sha256": "b4b1cce18d615110b5efa24c1304a524217a8990afeb253772ccbfe5dc68444f",
+    "xml_sha256": "8528cd3f6ac5c331cf8c49845e4dba6a4f5f6e80a4499d8d49833837154c0d3a",
+    "counts": {
+      "passed": 524,
+      "failure": 98
+    },
+    "case_count": 622,
+    "unique_case_count": 622,
+    "roster_sha256_canonical_json": "4bc61bdb43d28a1b4b23abf14ff15a6e0d6c9b5ff9d8b21dfc7021946901cdf2",
+    "roster_state_sha256_canonical_json": "e09c2a03509fd82bfdcc0b33446d7371c29255baf2ce1e4472d77a6fa44c07fc",
+    "baseline_roster_equal": true,
+    "removed": [],
+    "added": [],
+    "state_transitions": [],
+    "previous_pass_regressions": [],
+    "pytest_log_summary": "98 failed,524 passed,8513 deselected in47.12s",
+    "downstream_executed_failures": [
+      {
+        "step_number": 6,
+        "key": "recovery",
+        "name": "Run recoverable documentation failure gate",
+        "conclusion": "failure",
+        "first_cause": "Origin assertion before fixture preparation: expected parsing, actual retrieval/retrieval_miss/no_candidate_evidence.",
+        "location": "scripts/run_recovery_contract_gate.py:128",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 7,
+        "key": "recovery_mutation",
+        "name": "Run recoverable documentation failure mutation gate",
+        "conclusion": "failure",
+        "first_cause": "Recovery baseline is red; mutants do not start.",
+        "location": "FAIL: recovery mutation baseline is red",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 8,
+        "key": "hermetic_chat",
+        "name": "Run hermetic Context7-style project chat gate",
+        "conclusion": "failure",
+        "first_cause": "Alias/query-plan report: 1/16 PASS, 15 FAIL, retrieval_executed=false.",
+        "location": "project-context-quality-hermetic.json",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 9,
+        "key": "legacy_live_and_lineage",
+        "name": "Run Legacy live compatibility report and lineage floor",
+        "conclusion": "failure",
+        "first_cause": "Actual self-host setup passes and report has10/16PASS; lineage now rejects original query coverage0<12 and packs_contamination_count1.",
+        "location": "check_legacy_project_context_lineage.py",
+        "same_first_cause_as_04ff": false
+      },
+      {
+        "step_number": 10,
+        "key": "project_context_v2",
+        "name": "Run V2 project-context acceptance gate",
+        "conclusion": "failure",
+        "first_cause": "validate_corpus rejects frozen witness wiki/Commands.md absent from active catalog. No V2 JSON; own preparation not certified.",
+        "location": "eval/project_context_quality_v2_protocol.py:164",
+        "same_first_cause_as_04ff": false
+      },
+      {
+        "step_number": 12,
+        "key": "question_surface",
+        "name": "Run question surface regression gate",
+        "conclusion": "failure",
+        "first_cause": "100 cases fail: ten categories0/10, owner silent_empty=100.",
+        "location": "scripts/run_question_surface_gate.py",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 13,
+        "key": "agent_v1",
+        "name": "Run Agent Developer Protocol gate",
+        "conclusion": "failure",
+        "first_cause": "ValueError: fixture requires a nonempty finite docs-only catalog.",
+        "location": "eval/evidence_quality_v2/runtime.py:106",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 14,
+        "key": "agent_adversarial",
+        "name": "Run Agent Developer adversarial/token gate",
+        "conclusion": "failure",
+        "first_cause": "Same finite-catalog error during V1 token baseline _capture_v1_token_contract, before own adversarial cases.",
+        "location": "run_agent_developer_adversarial_gate.py -> runtime.py:106",
+        "same_first_cause_as_04ff": true
+      },
+      {
+        "step_number": 15,
+        "key": "critical_mutation",
+        "name": "Run critical mutation gate",
+        "conclusion": "failure",
+        "first_cause": "Baseline28:19PASS/9FAIL; retired normative expected required/forbidden yieldsNone. Mutants not started.",
+        "location": "tests/docs/test_normative_language.py:44",
+        "same_first_cause_as_04ff": true
+      }
+    ],
+    "dependent_adversarial_mutation": {
+      "step_number": 16,
+      "conclusion": "skipped",
+      "executed": false,
+      "reason": "Actual full adversarial baseline failed; unchanged explicit outcome dependency remains active."
+    },
+    "uploaded_quality_report_members": [
+      "project-context-quality-hermetic.json",
+      "project-context-quality-legacy-live.json"
+    ],
+    "hermetic_quality_report": {
+      "case_count": 16,
+      "passed_count": 1,
+      "retrieval_executed": false,
+      "verdict": "FAIL"
+    },
+    "legacy_live_report_generated": true,
+    "v2_report_generated": false,
+    "critical_baseline": {
+      "case_count": 28,
+      "counts": {
+        "failure": 9,
+        "passed": 19
+      },
+      "failure_nodes": [
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Offline fallback cannot bypass the gate.-forbidden]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The worker may not continue without evidence.-forbidden]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Don't bypass PermissionService.-forbidden]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[PermissionDecision.deferFollowUp is reserved for post-entry review.-required]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[The invariant preserves immediate denial.-required]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration, retries are required.-required]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[from configuration, retries are required.-required]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[From configuration import rules are required.-required]"
+        ],
+        [
+          "tests.docs.test_normative_language",
+          "test_normative_modality_is_deterministic_and_preserves_legacy_cases[Import policy is required.-required]"
+        ]
+      ],
+      "same_roster_states_as_04ff": true,
+      "mutation_execution_started": false
+    },
+    "agent_preparation_boundary": {
+      "directly_observed": "Finite docs-only catalog validation fails in both steps; full adversarial fails inside V1 token baseline before own cases.",
+      "semantic_case_passes_established": false,
+      "adversarial_cases_executed": false,
+      "adversarial_mutations_executed": false
+    }
+  },
+  "self_host": {
+    "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+    "legacy": {
+      "report_generated": true,
+      "case_count": 16,
+      "passed_count": 10,
+      "positive_case_count": 15,
+      "positive_passed_count": 9,
+      "negative_case_count": 1,
+      "verdict": "FAIL",
+      "metrics": {
+        "top1_relevance": 0.6666666666666666,
+        "top3_relevance": 0.6666666666666666,
+        "top3_relevant_count": 10,
+        "mrr": 0.6666666666666666,
+        "distractor_rate": 0.0,
+        "historical_source_rate": 0.0,
+        "mean_query_coverage": 0.43333333333333335,
+        "original_query_covered_count": 0,
+        "direct_coverage_count": 0,
+        "derived_coverage_count": 0,
+        "direct_only_coverage_count": 0,
+        "derived_only_coverage_count": 0,
+        "both_coverage_count": 0,
+        "lookup_coverage_count": 13,
+        "zero_coverage_count": 2,
+        "useful_result_count": 9,
+        "top1_fact_bearing_count": 9,
+        "metadata_only_evidence_count": 0,
+        "packs_contamination_count": 1,
+        "docs_analysis_contamination_count": 0,
+        "false_docs_answer_count": 0,
+        "max_source_count": 1,
+        "max_estimated_tokens": 587,
+        "source_budget_violation_count": 0,
+        "token_budget_violation_count": 0,
+        "false_abstention_count": 2,
+        "false_supported_count": 0,
+        "operational_contamination_count": 0,
+        "cases_scoring_8_plus": 12,
+        "mean_score": 8.977333333333332
+      },
+      "errors": [
+        "01: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Как установить DocAtlas локально и проверить, что он работает?",
+        "03: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Какие первые команды выполнить после установки?",
+        "07: failed positive checks=['required_facts']: Как настроить проектную документацию для репозитория?",
+        "08: failed positive checks=['relevant_source_in_top3', 'required_facts', 'only_allowed_sources']: Как безопасно проверить и очистить локальный индекс?",
+        "12: failed positive checks=['status_ok', 'source_backed', 'context_contract', 'relevant_source_in_top3', 'required_facts', 'public_query_inventory']: Как выбор доказательств определяет подходящие кандидаты?",
+        "15: failed positive checks=['relevant_source_in_top3', 'required_facts', 'no_packs_contamination', 'only_allowed_sources']: Какая команда запускает Docs MCP сервер?",
+        "useful onboarding context is below the frozen minimum",
+        "Top-1 fact-bearing context is below the frozen minimum",
+        "relevant context is missing from Top-3 too often",
+        "direct or audited-derived original coverage is below the frozen minimum",
+        "packs_contamination_count must be zero"
+      ],
+      "failed_cases": [
+        {
+          "case_id": "ru-install",
+          "failed_checks": [
+            "relevant_source_in_top3",
+            "required_facts",
+            "only_allowed_sources"
+          ]
+        },
+        {
+          "case_id": "ru-first-commands",
+          "failed_checks": [
+            "status_ok",
+            "source_backed",
+            "context_contract",
+            "relevant_source_in_top3",
+            "required_facts",
+            "public_query_inventory"
+          ]
+        },
+        {
+          "case_id": "ru-config",
+          "failed_checks": [
+            "required_facts"
+          ]
+        },
+        {
+          "case_id": "ru-clean",
+          "failed_checks": [
+            "relevant_source_in_top3",
+            "required_facts",
+            "only_allowed_sources"
+          ]
+        },
+        {
+          "case_id": "ru-selection",
+          "failed_checks": [
+            "status_ok",
+            "source_backed",
+            "context_contract",
+            "relevant_source_in_top3",
+            "required_facts",
+            "public_query_inventory"
+          ]
+        },
+        {
+          "case_id": "ru-server-command",
+          "failed_checks": [
+            "relevant_source_in_top3",
+            "required_facts",
+            "no_packs_contamination",
+            "only_allowed_sources"
+          ]
+        }
+      ],
+      "setup": {
+        "origin": {
+          "head_sha": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+          "tree_sha": "955bac94d5ca6b847f558b0e7dbd0dcb8265e9df",
+          "object_format": "sha1",
+          "inventory_sha256": "6784f7eec19ab6428ff8b824a24b562a0e091e540d67d35aef65031c11c64324"
+        },
+        "file_count": 2807,
+        "total_source_bytes": 119478143,
+        "all_uploaded_file_rows_match_local_head_paths_modes_blobs_bytes_and_hashes": true,
+        "all_tracked_files_included": true,
+        "copied_hash_equal_original_all": true,
+        "inventory_sha256_recomputed": true,
+        "source_manifest_sha256_recomputed": true,
+        "mirror_manifest_sha256_recomputed": true,
+        "mirror_identity_recomputed": true,
+        "only_mirror_bytes_changed": [
+          "docatlas.yaml"
+        ],
+        "config_delta": {
+          "path": "docatlas.yaml",
+          "field": "index.db_path",
+          "before": ".docatlas/docatlas.db",
+          "after": "/tmp/docatlas-evidence-e0zj13eq/docatlas_home/mcp-members/members.db",
+          "original_sha256": "21dd13643e7c30f0526e78cca1f0d95a968ddf3242e24b9ce1254d830dc5817f",
+          "relocated_sha256": "3c662806b24cbaf12fa5a3730e5dcdd0106bc0dbe6ec9c4890213323349a49e6",
+          "all_other_values_preserved": true
+        },
+        "config_semantic_equality_boundary": "Uploaded helper assertion all_other_values_preserved; relocated YAML bytes not independently included in artifact. Original/relocated hashes and only-config mirror delta independently match manifest.",
+        "import_origins": {
+          "executing_checkout": "/home/runner/work/DocAtlas/DocAtlas",
+          "modules": {
+            "docmancer.mcp._docs_server_part01": {
+              "path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/mcp/_docs_server_part01.py",
+              "sha256": "1ef2a6e3a9f19af1eb8e95c4e5165b1d8217ad34661eb49c45df9cfeaee7da8b"
+            },
+            "docmancer.docs.project": {
+              "path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/project.py",
+              "sha256": "c0f5eb9a3e72342d86f2f824b1e65e65b5aba0cce7c2cbf0fa2974f5db23becf"
+            },
+            "docmancer.docs.application.project_docs_member_transaction": {
+              "path": "/home/runner/work/DocAtlas/DocAtlas/docmancer/docs/application/project_docs_member_transaction.py",
+              "sha256": "e255652379cefb73ce393f2f7e7a1996672e54cda66f608c359ff288c053a2b6"
+            },
+            "eval.evidence_quality_v2.runtime": {
+              "path": "/home/runner/work/DocAtlas/DocAtlas/eval/evidence_quality_v2/runtime.py",
+              "sha256": "4b5cc5471b6b19ec8ed8f453f1caf937f4590f950f90cf302aedaab846ac9565"
+            },
+            "scripts._project_docs_self_host_fixture": {
+              "path": "/home/runner/work/DocAtlas/DocAtlas/scripts/_project_docs_self_host_fixture.py",
+              "sha256": "3a867afe6346bc595c5bf246907c33825f1c9fdcb27fe6982eb2c4f13c0cba85"
+            }
+          },
+          "claim_boundary": "in_process_checkout_imports_not_installed_client"
+        },
+        "all_five_import_hashes_match_local_published_tree": true,
+        "cold_read_verified": true,
+        "preparation": {
+          "storage_path": "/tmp/docatlas-evidence-e0zj13eq/docatlas_home/mcp-members/members.db",
+          "generation_id": "gen-19836c356fa74f57b193ad3d0d427052",
+          "mutation": {
+            "operation": "sync_project_docs",
+            "confirm": true,
+            "storage_path": "/tmp/docatlas-evidence-e0zj13eq/docatlas_home/mcp-members/members.db",
+            "expected_generation_id": null,
+            "catalog_sha256": "4e51d2baee5be889a9828d5f5527e1f937c59c3ba67cba056e59b4e9cf6a86e1",
+            "documents": [
+              {
+                "path": "README.md",
+                "content_sha256": "ea6fbc363cc9917fdcb0daec05cb40f1e09a75234134cfca7b37653846513e56",
+                "catalog_entry_hash": "sha256:0c3960f91b315609989a156bb996d4be507e215f16d4f3f06f2d4f527bf612e6"
+              },
+              {
+                "path": "CONTRIBUTING.md",
+                "content_sha256": "d919d401a3c60ca87eca1e0a596e77e78a5d6d1f4ec38a223a7a49e4a884cc29",
+                "catalog_entry_hash": "sha256:04d2b96ce2a3fb5d3d77399f19cb3b2ca908bdbe7602f45f17efc616d332856b"
+              },
+              {
+                "path": "docs/INDEX.md",
+                "content_sha256": "b4e602fd1ea233ae8ba2b4316a08ce729e50fa8931c96bb1f200224fc71aa5d4",
+                "catalog_entry_hash": "sha256:a7d667fc0cc77246f164070f31866999929b19fb67c9d021cb98ff2b6b8b0a72"
+              },
+              {
+                "path": "docs/PROJECT_MAP.md",
+                "content_sha256": "138a7bdd3159b9ac4edff6460a6defb5a8b7e18114566796e691873d3c7079e8",
+                "catalog_entry_hash": "sha256:0d98049b2b193928fadc3fc6d1b5d2ecba5027ab76987a85e5c4844d57a6b9e5"
+              },
+              {
+                "path": "wiki/Architecture.md",
+                "content_sha256": "52c2f45b10ab9c053d2846d6b6deada9a220495358cce66be75d63ad2ce77074",
+                "catalog_entry_hash": "sha256:8472dab538ea795cc9c6663d9e2ef116d0c39d5fb48ac4ff6d5f1199b35628b8"
+              },
+              {
+                "path": "docs/adr/0003-context-first-project-reads.md",
+                "content_sha256": "83f44d6cf026ba3aab066ede447e4c1aaa3802c58fffe5ac7fca85f7c0874ded",
+                "catalog_entry_hash": "sha256:8e450f3cf8a45b8532435f0aea78a59a5638364723fd2dd0a838fe8a7926078f"
+              },
+              {
+                "path": "docs/mcp-docs-server.md",
+                "content_sha256": "9a719295e395ad27c7c3de67c2286ed7695980e513b8b28dbe0be345045678a6",
+                "catalog_entry_hash": "sha256:c9b59fa8e9da598f4ed422df25109a41c47264c50518c31131f716dd31bc294f"
+              },
+              {
+                "path": "docs/testing.md",
+                "content_sha256": "06af645781e242f8b96e934c58cd91115826c77cec5d02ef8188baab54bf8ae6",
+                "catalog_entry_hash": "sha256:c95e76ce8367ba2ef6753ee0dd1ea07716e5e4b6da473b9634d5e8f43c4b2e32"
+              },
+              {
+                "path": "docs/project-docs-mcp-workflow.md",
+                "content_sha256": "4478411a57217bd30378f232641481a5b8773dadda37f555204f724753c6fafa",
+                "catalog_entry_hash": "sha256:a74fd6669904ac07966bacc5b7f6aefab56eef39423b8aa5ed666840ed517ac3"
+              },
+              {
+                "path": "wiki/Supported-Sources.md",
+                "content_sha256": "d3759a0f3bc9b1b336c0a966a43e6058cae210e8a1eca703204716467f6be57e",
+                "catalog_entry_hash": "sha256:0e53674f1b1d9347eb30abc59279b9bbdff5e10fc81291c70459ede4af2896a7"
+              }
+            ]
+          },
+          "indexed_paths": [
+            "CONTRIBUTING.md",
+            "README.md",
+            "docs/INDEX.md",
+            "docs/PROJECT_MAP.md",
+            "docs/adr/0003-context-first-project-reads.md",
+            "docs/mcp-docs-server.md",
+            "docs/project-docs-mcp-workflow.md",
+            "docs/testing.md",
+            "wiki/Architecture.md",
+            "wiki/Supported-Sources.md"
+          ],
+          "transaction_metrics": {
+            "transaction": "committed",
+            "generation_id": "gen-19836c356fa74f57b193ad3d0d427052",
+            "members": 10,
+            "new_count": 10,
+            "changed_count": 0,
+            "unchanged_files": 0,
+            "derived_writes": 98,
+            "derived_deletes": 0,
+            "sources_deleted": 0,
+            "sections_indexed": 98
+          }
+        },
+        "all_ten_catalog_entry_and_content_hashes_recomputed": true,
+        "origin_unchanged_after_calls": true,
+        "origin_metadata_recheck_boundary": "Remote helper performed pre/post metadata and Git inventory checks; local audit verifies uploaded source bytes against published tree, cannot replay remote transient metadata.",
+        "git_witness": "not_git",
+        "claim_boundary": "tracked_repository_mirror_not_original_storage_or_git_impact"
+      }
+    },
+    "v2": {
+      "report_generated": false,
+      "first_actual_error": "ValueError: witness is not an active catalog document: wiki/Commands.md",
+      "location": "eval/project_context_quality_v2_protocol.py:164 during validate_corpus, called by evaluate after runner returns",
+      "first_frozen_binding_conflict": {
+        "case_id": "v2-natural-install-verify",
+        "obligation_id": "verify",
+        "witness": {
+          "path": "wiki/Commands.md",
+          "text": "doc-atlas doctor"
+        }
+      },
+      "commands_witness_case_ids": [
+        "v2-natural-first-session",
+        "v2-natural-install-verify",
+        "v2-natural-offline",
+        "v2-paraphrase-local-trial"
+      ],
+      "active_catalog_paths": [
+        "README.md",
+        "CONTRIBUTING.md",
+        "docs/INDEX.md",
+        "docs/PROJECT_MAP.md",
+        "wiki/Architecture.md",
+        "docs/adr/0003-context-first-project-reads.md",
+        "docs/mcp-docs-server.md",
+        "docs/testing.md",
+        "docs/project-docs-mcp-workflow.md",
+        "wiki/Supported-Sources.md"
+      ],
+      "catalog_sha256": "4e51d2baee5be889a9828d5f5527e1f937c59c3ba67cba056e59b4e9cf6a86e1",
+      "commands_document_tracked_and_copied": true,
+      "commands_document_in_active_catalog": false,
+      "commands_document_sha256": "8d889ac9ad8a29cb17d0101ff7722bebf9115da3055a8295c8ebf23c95e9699b",
+      "corpus_sha256": "80a663d5e560fb039f6f1a30b2b1d634da7684af8b8c7d0976c7b60813370963",
+      "own_setup_and_provenance_independently_certified": false,
+      "boundary": "No V2 JSON was uploaded. Return ordering is not proof that its cold/read/preparation guards passed. Active catalog/corpus conflict requires owner decision; no automatic catalog membership or gold repair."
+    },
+    "local_repository_runtime_import_or_provider_executed": false
+  },
+  "self_host_unit_cross_check": {
+    "tests.test_release_gate": {
+      "concrete_cases": 52,
+      "states": {
+        "passed": 52
+      },
+      "states_same_as_04ff": true,
+      "pass_regressions": []
+    },
+    "tests.test_project_context_quality_protocol": {
+      "concrete_cases": 20,
+      "states": {
+        "passed": 17,
+        "failure": 3
+      },
+      "states_same_as_04ff": true,
+      "pass_regressions": []
+    },
+    "new_fixture_cases": [
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_snapshot_preserves_all_catalog_bytes_and_source_boundaries",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_snapshot_does_not_select_members_from_questions_or_unselected_files",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_cold_read_does_not_create_or_authorize_storage",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_confirmed_prepare_binds_one_host_store_and_copied_project",
+        "state": "failure",
+        "message": "AssertionError: assert ('insufficient_evidence' == 'ok'\n  \n  - ok\n  + insufficient_evidence)"
+      },
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_conflicting_config_and_changed_hashes_fail_before_initialization",
+        "state": "passed"
+      },
+      {
+        "nodeid": "tests.test_project_docs_self_host_fixture::test_self_host_fixture_restores_environment_and_preserves_original_repository",
+        "state": "passed"
+      }
+    ],
+    "source": "991638f-core-3.12-cases.json",
+    "advanced_selection_has_no_self_host_unit_cases": true,
+    "failure_boundary": "confirmed_prepare binding test reaches final public payload assertion insufficient_evidence vs ok after cold/prepare/generation/store checks. No full public payload in JUnit. Root core audit owns full matrix."
+  },
+  "retrieval_evidence": {
+    "job_id": 113528091167,
+    "job_status": "completed",
+    "conclusion": "failure",
+    "exact_gate_failure": "within-budget full model-visible DTO exceeded the 800-token ceiling",
+    "artifact_id": 11578095362,
+    "artifact_sha256": "70eb9327bd485eb9f5a99fdd296ce0d8475d4b84154e164b4ca4d2a7a829fc3f",
+    "artifact_downloaded": true,
+    "report_generated_from_head": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+    "printed_metrics": {
+      "head": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+      "frozen_80": {
+        "within_budget": 48,
+        "within_budget_sufficient": 30,
+        "operational_errors": 0,
+        "integrity_violations": 0
+      },
+      "causal_cells": {
+        "cap_on_requal_on": 30,
+        "cap_off_requal_on": 30,
+        "cap_on_requal_off": 30,
+        "cap_off_requal_off": 30,
+        "contextualization_off": 30
+      },
+      "selection": {
+        "status": "NOT_OBSERVED_IN_BOUNDED_POOL",
+        "exact_recoveries": [],
+        "beam_recoveries": []
+      },
+      "holdout": {
+        "current": 5,
+        "strict": 5,
+        "comparison": "NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED"
+      }
+    },
+    "printed_metrics_same_as_04ff_excluding_head": true,
+    "unchanged_numeric_limit": 800,
+    "actual_full_dto_budget": false,
+    "case_count": 80,
+    "roster_equal": true,
+    "within_budget_case_count": 48,
+    "within_budget_max_actual_model_visible_tokens": 1451,
+    "over_800_within_budget_count": 24,
+    "over_800_within_budget_cases": [
+      {
+        "id": "fastapi-01",
+        "project": "fastapi",
+        "utf8_bytes": 3690,
+        "actual_tokens": 1059,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "fastapi-04",
+        "project": "fastapi",
+        "utf8_bytes": 4468,
+        "actual_tokens": 1296,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "httpx-02",
+        "project": "httpx",
+        "utf8_bytes": 4273,
+        "actual_tokens": 1293,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "httpx-04",
+        "project": "httpx",
+        "utf8_bytes": 3444,
+        "actual_tokens": 937,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "httpx-05",
+        "project": "httpx",
+        "utf8_bytes": 3394,
+        "actual_tokens": 1014,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "mkdocs-01",
+        "project": "mkdocs",
+        "utf8_bytes": 4204,
+        "actual_tokens": 1210,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "pydantic-01",
+        "project": "pydantic",
+        "utf8_bytes": 3815,
+        "actual_tokens": 1055,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "pydantic-02",
+        "project": "pydantic",
+        "utf8_bytes": 4944,
+        "actual_tokens": 1451,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "pydantic-04",
+        "project": "pydantic",
+        "utf8_bytes": 4233,
+        "actual_tokens": 1304,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "pydantic-06",
+        "project": "pydantic",
+        "utf8_bytes": 3033,
+        "actual_tokens": 948,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "ruff-01",
+        "project": "ruff",
+        "utf8_bytes": 3562,
+        "actual_tokens": 1120,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "ruff-03",
+        "project": "ruff",
+        "utf8_bytes": 4158,
+        "actual_tokens": 1266,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "ruff-04",
+        "project": "ruff",
+        "utf8_bytes": 3296,
+        "actual_tokens": 999,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "ruff-05",
+        "project": "ruff",
+        "utf8_bytes": 3618,
+        "actual_tokens": 1065,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "ruff-06",
+        "project": "ruff",
+        "utf8_bytes": 3424,
+        "actual_tokens": 1004,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "starlette-03",
+        "project": "starlette",
+        "utf8_bytes": 3089,
+        "actual_tokens": 879,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "starlette-04",
+        "project": "starlette",
+        "utf8_bytes": 3098,
+        "actual_tokens": 886,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "typer-01",
+        "project": "typer",
+        "utf8_bytes": 3902,
+        "actual_tokens": 1197,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "typer-04",
+        "project": "typer",
+        "utf8_bytes": 3103,
+        "actual_tokens": 971,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "typer-06",
+        "project": "typer",
+        "utf8_bytes": 3804,
+        "actual_tokens": 1198,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "uv-01",
+        "project": "uv",
+        "utf8_bytes": 3125,
+        "actual_tokens": 902,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "uv-03",
+        "project": "uv",
+        "utf8_bytes": 3441,
+        "actual_tokens": 1033,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "uv-04",
+        "project": "uv",
+        "utf8_bytes": 4092,
+        "actual_tokens": 1046,
+        "tokenizer": "docatlas-offline:o200k_base"
+      },
+      {
+        "id": "uv-05",
+        "project": "uv",
+        "utf8_bytes": 3740,
+        "actual_tokens": 1113,
+        "tokenizer": "docatlas-offline:o200k_base"
+      }
+    ],
+    "all_80_sizes_and_token_counts_same_as_04ff": true,
+    "size_token_deltas": [],
+    "canonical_utf8_reserialization_matches": 80,
+    "canonical_utf8_mismatches": [],
+    "local_bpe_or_repo_execution": false,
+    "deferred_retrieval_changed": false,
+    "measurement_boundary": {
+      "wire_mode": "structured",
+      "counted_text": "One whole structuredContent DTO canonically serialized with ensure_ascii=False, sort_keys=True, separators=(comma,colon). Diagnostics are prohibited.",
+      "tokenizer": "docatlas-offline:o200k_base",
+      "vocabulary_uncompressed_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+      "source_vocabulary": "Vendored pinned o200k_base vocabulary and regex from tiktoken 0.11.0; offline implementation, no native tiktoken package/provider call.",
+      "ordinary_text_encoding": "disallowed_special=(); special-looking strings remain literal text.",
+      "not_included": [
+        "conversation history",
+        "input message",
+        "tool catalog",
+        "repeated delivery channels",
+        "provider-reported token usage"
+      ],
+      "engineering_estimate_is_distinct": true,
+      "maximum_case": {
+        "id": "pydantic-02",
+        "utf8_bytes": 4944,
+        "actual_tokens": 1451,
+        "tokenizer": "docatlas-offline:o200k_base",
+        "engineering_estimate": 1236
+      },
+      "canonical_utf8_reserialization_matches": 80,
+      "local_bpe_execution_performed": false,
+      "local_provider_or_model_calls_performed": false,
+      "bundle_pin_validation": "Current pinned bundle independently decompressed with stdlib gzip; SHA256446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d verified. Source and bundle byte-identical to04ff. No local BPE/repo execution."
+    },
+    "claim_boundaries": {
+      "live_agent_end_to_end": "NOT_MEASURED",
+      "market_or_unseen_distribution_generalization": "NOT_CLAIMED",
+      "production_selector": "NOT_JUSTIFIED_BY_THIS_SAMPLE",
+      "total_task_token_savings": "NOT_MEASURED"
+    }
+  },
+  "static_contract": {
+    "id": 113528090798,
+    "name": "static-contract",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "runtime": {
+    "actual_full_sdk_invocations": 15,
+    "actual_log_reads": 19,
+    "boundaries": {
+      "actual_app_clients": {
+        "Claude Code": "NOT RUN",
+        "Codex": "NOT RUN",
+        "OpenCode": "NOT RUN"
+      },
+      "artifact_metadata": "Release artifact identity/digest/size read from GitHub metadata only; binary artifacts were not downloaded or installed locally.",
+      "generation": "Indexed source/library generation rows unchanged; whole database bytes may change through registry/job bookkeeping.",
+      "library": "Authored preloaded local library indexes/registry; not network library lifecycle acceptance.",
+      "local_runtime": "NOT RUN: audit only read GitHub logs/metadata and parsed them with stdlib; no local installations, server subprocesses, providers, or clients.",
+      "main_platform": "Main platform package/CLI and installed SDK steps are checked separately; only completed actual logs listed in this audit support a PASS claim. Pending platform jobs are explicit.",
+      "mtime_repeat": "All SDK restart/repeat lanes exercise the published mtime fix and report derived_writes=0 with unchanged source-generation rows. The SDK script does not perform an mtime-only touch; dedicated touch/control tests are outside this scoped runtime audit.",
+      "publication": "Pull-request event; publish/public-platform/registry jobs skipped. No release was published.",
+      "registration_smoke": "scripts/test-install.sh uses fixture CLI stubs; registration successes are not real app-client sessions.",
+      "runtime": "Actual SDK stdio logs with site-packages origins and prepared structured/text delivery, default/advanced cold observations and restart/CAS.",
+      "sdist_installer": "Release job ran two full SDK invocations with Python3.11 site-packages origin and installer separately succeeded; this does not independently establish SDK origin inside the newly created uv environment.",
+      "source_binding_digest": "SHA256 of canonical sorted path/content hash/span/bytes/basis records; only temporary library fixture prefixes are normalized. It is an audit binding digest, not an uploaded artifact digest.",
+      "wire": "Serialized CallToolResult bytes, excluding JSON-RPC envelope; not model tokens or app visibility."
+    },
+    "claim": "All six platform SDK jobs and every release/installed runtime phase were audited from final actual scoped logs. Main/P1 aggregate failures remain outside this runtime scope; this audit does not assert merge readiness.",
+    "delta_vs_04ff1dd": {
+      "audited_runtime_workflow_guidance_files": "Eight byte-identical runtime/workflow/guidance files; project_docs_member_transaction.py differs by reviewed descriptor-bound mtime preservation.",
+      "cold_controls": "MATCH df9b682 baseline plus cold default read fails with zero sources",
+      "main_package_cli": "77 passed on each of three platforms",
+      "mtime_only_touch": "NOT exercised by SDK smoke; dedicated touch/control outcomes belong to the separate core audit",
+      "prepared_outcomes_and_normalized_source_bindings": "EXACT MATCH in every case across all 30 lanes",
+      "restart_generation_source_binding_cas": "generation and source identity unchanged; stale-null CAS rejected; derived_writes=0 in both transports for all 15 invocations"
+    },
+    "full_audit": {
+      "bytes": 709588,
+      "path": "/workspace/scratch/5ecb5f548321/pr211-acceptance-artifacts/991638f-runtime-release-audit.json",
+      "sha256": "f6d53afca23cd2b159c5932b7c765d5317d7f3675f2e1aecb17840a122d6aca2"
+    },
+    "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+    "installed_scripted_harness": {
+      "claim_boundary": "One scripted task, schema repair/provenance/hash/privacy verifier; not a live model/client benchmark.",
+      "job_id": 113528090987,
+      "report": {
+        "artifact_origin": "reviewed-wheel",
+        "claim_boundary": "pre-public-installed-harness",
+        "model": "deterministic-script",
+        "pass_rate": 1.0,
+        "passed_tasks": 1,
+        "protocol": "installed-mcp-agent-v1",
+        "provider_id": "scripted",
+        "report_sha256": "dc19bad0af2938b9d41a5e684a47ee606311802bd8af3caede515a8338b1ff15",
+        "schema_failures": 1,
+        "schema_sha256": "1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2",
+        "source_commit": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+        "task_count": 1,
+        "tool_attempts": 2,
+        "version": "1.3.2"
+      }
+    },
+    "main_package_cli": [
+      {
+        "job_id": 113528091606,
+        "summary": "77 passed in 1.76s"
+      },
+      {
+        "job_id": 113528091403,
+        "summary": "77 passed in 2.23s"
+      },
+      {
+        "job_id": 113528091353,
+        "summary": "77 passed in 4.85s"
+      }
+    ],
+    "merge_sha": "e499c39704d4923164dc50c1460a2e1c50b81d7f",
+    "phase_jobs": [
+      {
+        "conclusion": "success",
+        "id": 113528090958,
+        "name": "installer-smoke",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528090987,
+        "name": "installed-mcp-harness",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091353,
+        "name": "platform-smoke (macos-15-intel)",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091403,
+        "name": "platform-smoke (ubuntu-latest)",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091438,
+        "name": "docs-contract",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091606,
+        "name": "platform-smoke (macos-15)",
+        "run_id": 37840422988,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528089349,
+        "name": "build",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528252468,
+        "name": "sdist-and-installer",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528252500,
+        "name": "wheel (3.13)",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528252532,
+        "name": "wheel (3.12)",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528252664,
+        "name": "wheel (3.11)",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528879707,
+        "name": "required-release",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "id": 113528920339,
+        "name": "public-platform-smoke (${{ matrix.os }})",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "id": 113528920500,
+        "name": "publish",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "id": 113528922100,
+        "name": "publish-official-mcp-registry",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091114,
+        "name": "p1-stack-release-build",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091366,
+        "name": "p1-stack-platform (ubuntu-latest)",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091445,
+        "name": "p1-stack-platform (macos-15-intel)",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528091614,
+        "name": "p1-stack-platform (macos-15)",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528341656,
+        "name": "p1-stack-release-wheel (3.11)",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528341689,
+        "name": "p1-stack-release-wheel (3.12)",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528341703,
+        "name": "p1-stack-release-sdist-installer",
+        "run_id": 37840422886,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "id": 113528341745,
+        "name": "p1-stack-release-wheel (3.13)",
+        "run_id": 37840422886,
+        "status": "completed"
+      }
+    ],
+    "prepared_case_observations": 420,
+    "prepared_delivery_lanes": 30,
+    "previous_audit": {
+      "head_sha": "04ff1dda57efb5236d7b3577d4e2736b2820df5b",
+      "sha256": "4cee777da1d3c3125bf2fa261345c0b23d562afcb8fb4cbf969adfb2a460ecc6"
+    },
+    "release_artifacts": {
+      "37840422673": {
+        "artifacts": [
+          {
+            "archive_download_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/artifacts/11577187626/zip",
+            "created_at": "2026-10-08T20:34:33Z",
+            "digest": "sha256:c2c2ee3dd338a5c6a6ad536ccc8827f8fde090f22bc7587ec3b4306b500da06c",
+            "expired": false,
+            "expires_at": "2027-01-06T20:34:11Z",
+            "id": 11577187626,
+            "name": "release-dist",
+            "size_in_bytes": 72469334,
+            "updated_at": "2026-10-08T20:34:33Z",
+            "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/artifacts/11577187626",
+            "workflow_run": {
+              "head_branch": "integration/stage3-v2-identity-pr1",
+              "head_repository_id": 1268269743,
+              "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+              "id": 37840422673,
+              "repository_id": 1268269743
+            }
+          }
+        ]
+      },
+      "37840422886": {
+        "artifacts": [
+          {
+            "archive_download_url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/artifacts/11576419980/zip",
+            "created_at": "2026-10-08T20:34:41Z",
+            "digest": "sha256:1cf902f1bc86e064277c0d4d2114ec84abab615299fcd39163027576eb874151",
+            "expired": false,
+            "expires_at": "2027-01-06T20:34:11Z",
+            "id": 11576419980,
+            "name": "p1-stack-release-dist",
+            "size_in_bytes": 72469334,
+            "updated_at": "2026-10-08T20:34:41Z",
+            "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/artifacts/11576419980",
+            "workflow_run": {
+              "head_branch": "integration/stage3-v2-identity-pr1",
+              "head_repository_id": 1268269743,
+              "head_sha": "991638f28ecff659c320b45738edfaa8b9fd375e",
+              "id": 37840422886,
+              "repository_id": 1268269743
+            }
+          }
+        ]
+      }
+    },
+    "representative_matrix": {
+      "all_scope": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "a43bd0ef62a15eee7d042d043525bd6887ecd6e03277be6737be0cbb7c62ef93",
+        "source_count": 2,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 127
+      },
+      "complete": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "4b1c154d0aa3ef7598971821518c38dea9a1c723705010f958dae15670c85518",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 94
+      },
+      "docs_default": {
+        "completeness": null,
+        "gate": null,
+        "missing": null,
+        "result": null,
+        "source_binding_signature_sha256": "cc4b31a991dbc5bf5e0e98cb371d11f9fd0252fd41ddaa248d9df2892a6077e9",
+        "source_count": 1,
+        "status": "ok",
+        "unique_nonoverlap_utf8_bytes": 93
+      },
+      "docs_null": {
+        "completeness": null,
+        "gate": null,
+        "missing": null,
+        "result": null,
+        "source_binding_signature_sha256": "cc4b31a991dbc5bf5e0e98cb371d11f9fd0252fd41ddaa248d9df2892a6077e9",
+        "source_count": 1,
+        "status": "ok",
+        "unique_nonoverlap_utf8_bytes": 93
+      },
+      "large": {
+        "completeness": "complete",
+        "gate": "PASS",
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "ee7d1467f04a734efb56d2b78838014b420ef58bc90985f32a6600bde11f359c",
+        "source_count": 50,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 39372
+      },
+      "library_missing_version": {
+        "completeness": "unavailable",
+        "gate": null,
+        "missing": [
+          "confirmation_required",
+          "delivery_blocked",
+          "exact_version:99.0.0",
+          "no_admitted_evidence",
+          "retrieval_lane:library",
+          "retrieval_status:confirmation_required",
+          "visible_content_assignment_required"
+        ],
+        "result": "failure",
+        "source_binding_signature_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "source_count": 0,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 0
+      },
+      "library_v1": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "14650d5b1252e08b9a7c7d72e5cd0329fef4791980b03960586fb273c307de7f",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 102
+      },
+      "library_v2": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "2b94f08904bafe9040ccc3641d3d4c50d24500639860660490a66bd336463861",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 105
+      },
+      "module_alpha": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "1dd943e9987cf93933f021105930ee0a723d80ad16e084e71c0b8b33aff2e69d",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 65
+      },
+      "module_beta": {
+        "completeness": "complete",
+        "gate": null,
+        "missing": null,
+        "result": "data",
+        "source_binding_signature_sha256": "dcf8b6e814634a35b1e870a23e2e0b2c65a19181765ea8fe56ae51fb95458afe",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 62
+      },
+      "module_mismatch": {
+        "completeness": "unavailable",
+        "gate": null,
+        "missing": [
+          "delivery_blocked",
+          "no_admitted_evidence",
+          "retrieval_lane:project",
+          "retrieval_status:not_found",
+          "visible_content_assignment_required"
+        ],
+        "result": "failure",
+        "source_binding_signature_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "source_count": 0,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 0
+      },
+      "partial": {
+        "completeness": "partial",
+        "gate": null,
+        "missing": [
+          "query_exact:1:absentfixtureconstraint"
+        ],
+        "result": "data",
+        "source_binding_signature_sha256": "4b1c154d0aa3ef7598971821518c38dea9a1c723705010f958dae15670c85518",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 94
+      },
+      "project_scope": {
+        "completeness": "partial",
+        "gate": null,
+        "missing": [
+          "visible_content_assignment_required"
+        ],
+        "result": "data",
+        "source_binding_signature_sha256": "4b1c154d0aa3ef7598971821518c38dea9a1c723705010f958dae15670c85518",
+        "source_count": 1,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 94
+      },
+      "version_mismatch": {
+        "completeness": "unavailable",
+        "gate": null,
+        "missing": [
+          "exact_version:99.0.0",
+          "no_admitted_evidence",
+          "visible_content_assignment_required"
+        ],
+        "result": "failure",
+        "source_binding_signature_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "source_count": 0,
+        "status": null,
+        "unique_nonoverlap_utf8_bytes": 0
+      }
+    },
+    "run_statuses": [
+      {
+        "conclusion": null,
+        "run_id": 37840422988,
+        "status": "in_progress"
+      },
+      {
+        "conclusion": "success",
+        "run_id": 37840422673,
+        "status": "completed"
+      },
+      {
+        "conclusion": null,
+        "run_id": 37840422886,
+        "status": "in_progress"
+      }
+    ],
+    "runtime_scope_complete": true,
+    "schema_version": 1,
+    "source_file_provenance": {
+      ".github/workflows/ci.yml": {
+        "04ff1dd_sha256": "b8812ad66fc739900bcb1de07eda3cebc90567ec07363c5953e4beafeed29f40",
+        "current_sha256": "b8812ad66fc739900bcb1de07eda3cebc90567ec07363c5953e4beafeed29f40",
+        "unchanged": true
+      },
+      ".github/workflows/p1-stack-exact-validation.yml": {
+        "04ff1dd_sha256": "6998bbf05f37757b2a5df2fb27a9729337f65f2f0aad270b48e1cc0489505fe6",
+        "current_sha256": "6998bbf05f37757b2a5df2fb27a9729337f65f2f0aad270b48e1cc0489505fe6",
+        "unchanged": true
+      },
+      ".github/workflows/publish.yml": {
+        "04ff1dd_sha256": "9b213da7ffd5726042c577480ed1fec5c38e2b922cda28c5ae655668599884ce",
+        "current_sha256": "9b213da7ffd5726042c577480ed1fec5c38e2b922cda28c5ae655668599884ce",
+        "unchanged": true
+      },
+      "SKILL.md": {
+        "04ff1dd_sha256": "3ad0fa98a913069c715ead5043f4a3c41c70c3befc34774ca01012ea529d12b0",
+        "current_sha256": "3ad0fa98a913069c715ead5043f4a3c41c70c3befc34774ca01012ea529d12b0",
+        "unchanged": true
+      },
+      "docmancer/docs/application/project_docs_member_transaction.py": {
+        "04ff1dd_sha256": "6d02174f73339874e463c3fbc0f4848e1150c263a3ea35828b880f0c085c9094",
+        "current_sha256": "e255652379cefb73ce393f2f7e7a1996672e54cda66f608c359ff288c053a2b6",
+        "unchanged": false
+      },
+      "docmancer/templates/agent_contract.md": {
+        "04ff1dd_sha256": "dccf35d1f256d76b6cc08d6b8913a586ae4ff5c1abff3bd818520974162c5ae2",
+        "current_sha256": "dccf35d1f256d76b6cc08d6b8913a586ae4ff5c1abff3bd818520974162c5ae2",
+        "unchanged": true
+      },
+      "scripts/docs_mcp_stdio_smoke.py": {
+        "04ff1dd_sha256": "0dc7e73483b3d11f8e4fb1a6390e3807fc92facd9818fd41150f8a9dffed1b92",
+        "current_sha256": "0dc7e73483b3d11f8e4fb1a6390e3807fc92facd9818fd41150f8a9dffed1b92",
+        "unchanged": true
+      },
+      "scripts/release_gate.py": {
+        "04ff1dd_sha256": "8e69109ed16ce21fce3937595185d571214b6e17d4ed9ab16e762723689868cd",
+        "current_sha256": "8e69109ed16ce21fce3937595185d571214b6e17d4ed9ab16e762723689868cd",
+        "unchanged": true
+      },
+      "scripts/test-install.sh": {
+        "04ff1dd_sha256": "b0434c657921438e2a2318a676ca7e985508951f1a755ae64058b4bd13be15ee",
+        "current_sha256": "b0434c657921438e2a2318a676ca7e985508951f1a755ae64058b4bd13be15ee",
+        "unchanged": true
+      }
+    },
+    "title": "PR211 991638f actual runtime/release delta against 04ff1dd",
+    "tree_sha": "955bac94d5ca6b847f558b0e7dbd0dcb8265e9df",
+    "verified_at_utc": "2026-10-08 20:42:54 UTC",
+    "zero_derived_write_repeat_observations": 30
+  },
+  "runtime_final_run_statuses": [
+    {
+      "run_id": 37840422988,
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "run_id": 37840422886,
+      "status": "completed",
+      "conclusion": "failure"
+    },
+    {
+      "run_id": 37840422673,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "runtime_run_status_boundary": "The frozen runtime subreport was written before aggregate workflows ended. runtime_final_run_statuses and final workflow/job rows above supersede its earlier in_progress aggregate metadata; all scoped runtime jobs were completed and verified.",
+  "catalog": {
+    "canonical_utf8_bytes": 6918,
+    "docs_output_schema_bytes": 860,
+    "fixed_catalog_gate": null,
+    "decision": "Owner removed fixed catalog6144/10240 ceilings; minimize justified representation with all semantic/validation/consent guards preserved. Separate output schema<1000 and frozen retrieval criterion800 remain.",
+    "source": "CURRENT_WAVE_DECISIONS_RU.md",
+    "unchanged_since_reviewed_catalog_slice": true,
+    "measurement_boundary": "Previously recorded canonical6918/860 measurements; reviewed991 changes contain no catalog/output-schema production change. Canonical bytes are not app/model token cost."
+  },
+  "source_evidence": [
+    {
+      "file": "991638f-core-validated-delta.json",
+      "bytes": 12960,
+      "sha256": "487a53de8ddaf11b2bcc6b638fd9e9660df355d24fb904dc2142b0e26f81f701"
+    },
+    {
+      "file": "991638f-core-critical-reasons.json",
+      "bytes": 18134,
+      "sha256": "a35c6003e9325b9c086900a262403e60b2ead6e2f196bb3259e1d8fb241acbf0"
+    },
+    {
+      "file": "991638f-core-failure-phase-audit.json",
+      "bytes": 42764,
+      "sha256": "1d53539682cfa012942fdf381cf587278a75426205038583e7addfc839e04911"
+    },
+    {
+      "file": "991638f-core-message-variation-audit.json",
+      "bytes": 10545,
+      "sha256": "b840605c907a4242d21c2053ecd5f59479f5af7d1e01007bdd6d882af2998be4"
+    },
+    {
+      "file": "991638f-core-provenance.json",
+      "bytes": 5735,
+      "sha256": "ecfa6df66698b93a92bdcab0b2cae1d7b57c3e334cf7c2519fe46da4a0fcfe08"
+    },
+    {
+      "file": "991638f-runtime-final-delta.json",
+      "bytes": 18985,
+      "sha256": "fd8e4994ef6c30e339919d7838a307724a883754c0ecbe9e95c2e1758c4b6293"
+    },
+    {
+      "file": "991638f-runtime-release-audit.json",
+      "bytes": 709588,
+      "sha256": "f6d53afca23cd2b159c5932b7c765d5317d7f3675f2e1aecb17840a122d6aca2"
+    },
+    {
+      "file": "991638f-advanced-related-audit.json",
+      "bytes": 42355,
+      "sha256": "3245bca5f62ce8c92edf660659a60ac41d25cecf8e2c7ae93eb3b01a6f1f2e3f"
+    },
+    {
+      "file": "991638f-final-workflows-jobs.json",
+      "bytes": 56222,
+      "sha256": "6bf5d69a294d8ff91b4940dc21cb22bde51dad2310a7a59fcf1fbbb0793da71f"
+    },
+    {
+      "file": "991638f-publication-verification.json",
+      "bytes": 6678,
+      "sha256": "af43ea830428b88eb2f5d686077bb0c5d69251efbae7ace2f9e25fd346d3e3e0"
+    }
+  ],
+  "limits": [
+    "All assigned CI runs completed; completion does not mean passing acceptance or merge/release authorization.",
+    "Core and advanced comparisons use complete concrete-node rosters and actual JUnit. Initial focused791/801 is not the full suite.",
+    "Seven old targets PASS, one old module target remains insufficient_evidence. Six added nodes include one public-positive FAIL after real cold/preparation guards.",
+    "47 earlier fixture errors retain exact diagnostic messages and first barriers. Their hidden abbreviated metadata is not inferred.",
+    "Legacy self-host setup is proven by its uploaded JSON. V2 has no output JSON; its own successful preparation is not certified from source ordering.",
+    "Original21fe472d had failing CI, but exact original per-node roster is unavailable. Remaining failures cannot all be labelled pre-existing relative to21fe472d.",
+    "Owner removed fixed catalog ceilings only. Frozen gold, other gates, retrieval800 criterion and the deferred retrieval prohibition remain.",
+    "Actual Claude Code, Codex and OpenCode application sessions NOT RUN. Installed CLI stubs and SDK do not certify app sessions.",
+    "No local repository imports/runtime/pytest/dependency/model/provider/client operations, force push, merge or release occurred. Actual runtime evidence comes from ordinary PR CI.",
+    "The subsequent explicit lookup changes a new synthetic lifecycle positive only, preserves its question/source bytes, and must not credit query-original. Its runtime is NOT RUN as of this document."
+  ],
+  "readiness": false,
+  "complete_ci_acceptance": false,
+  "required_ci_conclusion": "failure",
+  "required_ci_job_id": 113532153123,
+  "p1_stack_conclusion": "failure",
+  "p1_stack_job_id": 113532324954,
+  "release_validation_conclusion": "success",
+  "release_published": false,
+  "subsequent_work": {
+    "scope": "One NEW synthetic self-host prepared public call adds an explicit host lookup, preserving original question/RULES/CRLF/source/hash/snapshot and all prior guards, while asserting no original-query credit.",
+    "coverage": "This acceptance certifies no runtime outcome for commits after991638f.",
+    "runtime": "NOT RUN",
+    "checkpoint": "PR211_CHECKPOINT_RU.md",
+    "production_retrieval_gold_or_downstream_inputs_changed": false
+  }
+}

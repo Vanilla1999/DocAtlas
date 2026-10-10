@@ -50,8 +50,13 @@ class DocsFetchPolicy:
     allowed_hosts: tuple[str, ...] = ()
     path_prefixes: tuple[str, ...] = ()
     allow_subdomains: bool = True
+    exact_urls: tuple[str, ...] | None = None
 
     def allows_scope(self, url: str) -> bool:
+        if self.exact_urls is not None:
+            from docmancer.docs.finite_membership import contains
+            if not contains(self.exact_urls, url):
+                return False
         try:
             parsed = urlparse(url)
             host = parsed.hostname
@@ -81,6 +86,10 @@ class DocsFetchPolicy:
         except (TypeError, ValueError):
             raise DocsFetchSecurityError("invalid_url", "<invalid-url>") from None
         redacted = _redact_url(parsed)
+        if self.exact_urls is not None:
+            from docmancer.docs.finite_membership import contains
+            if not contains(self.exact_urls, url):
+                raise DocsFetchSecurityError("url_not_selected", redacted)
         if parsed.scheme not in {"https", "http"}:
             raise DocsFetchSecurityError("unsupported_scheme", redacted)
         if username is not None or password is not None:

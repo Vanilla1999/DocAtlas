@@ -1,12 +1,72 @@
 """Pure tagging adapter for prepared source references and retrieval lanes."""
 from __future__ import annotations
+from copy import deepcopy
+import hashlib
+import json
 from typing import Any
+from dataclasses import asdict
 from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
-from docmancer.docs.domain.evidence_qualification import qualify_evidence, derived_parent_trace
-from docmancer.docs.domain.query_terms import documentation_query_terms, query_constraint_roles
-from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
-from .context_selection import merge_query_matches
-from .retrieval_need_support import apply_retrieval_need_witness
+from docmancer.docs.domain.evidence_qualification import qualify_evidence
+from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
+from docmancer.docs.domain.original_body_discovery import record_original_body_discovery
+from .context_query_probes import literal_query_probe
+
+
+def _discovery_window_key(chunk: Any) -> str:
+    """Identify the actual acquired window, independently of claimed query tags."""
+    metadata = chunk.metadata or {}
+    reference = metadata.get("_reference_evidence")
+    if not isinstance(reference, dict):
+        reference = {}
+    binding = {
+        "source": str(chunk.source), "chunk_index": chunk.chunk_index,
+        "content_sha256": hashlib.sha256(chunk.text.encode("utf-8")).hexdigest(),
+        "source_identity": reference.get("source"),
+        "member_binding": reference.get("member_binding"),
+        "reference_span": [reference.get("char_start"), reference.get("char_end")],
+        **{key: metadata.get(key) for key in (
+            "stable_chunk_id", "project_identity", "generation_id", "source_class",
+            "project_doc_path", "doc_scope", "module_path", "char_span",
+        )},
+    }
+    return hashlib.sha256(json.dumps(binding, sort_keys=True, ensure_ascii=False,
+                                     separators=(",", ":")).encode("utf-8")).hexdigest()
+
+
+def _record_query_discovery(
+    records: dict[str, dict[str, dict[str, Any]]], chunks: Any,
+    lookup: DocumentationLookup, *, reference_context: Any = None,
+) -> None:
+    """Record a completed application-owned acquisition; metadata is not a receipt.
+
+    The ledger stays in the current service call and is never read from a source
+    or a public request. A receipt records discovery, not relevance or authority.
+    Every later admission still recomputes the canonical body qualification.
+    """
+    for chunk in chunks:
+        matches = records.setdefault(_discovery_window_key(chunk), {})
+        receipt = {"query": asdict(lookup), "lexical_score": float(chunk.score)}
+        _record_current_body_discovery(reference_context, chunk, receipt["query"])
+        previous = matches.get(lookup.query_id)
+        if previous is None or receipt["lexical_score"] > previous["lexical_score"]:
+            matches[lookup.query_id] = deepcopy(receipt)
+
+
+def _record_current_body_discovery(context: Any, chunk: Any, query: dict[str, Any]) -> None:
+    """Bind the receipt to the owning finite context, not chunk-supplied flags."""
+    if context is None or context.complete is not True or context.question != query.get("text"):
+        return
+    source = str(chunk.source)
+    identity = context.sources.get(source)
+    metadata = chunk.metadata or {}
+    reference = metadata.get("_reference_evidence")
+    if (identity is None or not isinstance(reference, dict)
+        or reference.get("source") != asdict(identity)
+        or reference.get("member_binding") != context.source_member_bindings.get(source)
+        or reference.get("project_doc_content_hash") != context.source_file_hashes.get(source)):
+        return
+    record_original_body_discovery(query=query, body=chunk.text, candidate=metadata)
+
 
 def _tag_retrieval_query(
     chunks: Any, query_id: str | None, query_text: str | None = None,
@@ -19,40 +79,16 @@ def _tag_retrieval_query(
     tagged = []
     for chunk in chunks:
         metadata = dict(chunk.metadata or {})
-        trace = dict(metadata.get("lexical_match") or {})
-        exact_path_match = bool(metadata.get("exact_path_match"))
-        if query_id.startswith("query-path-") and query_text:
-            candidate_path = str(
-                metadata.get("project_doc_path")
-                or metadata.get("path")
-                or chunk.source
-            )
-            exact_path_match = (
-                normalize_doc_path(candidate_path) == normalize_doc_path(query_text)
-            )
-        if exact_path_match and query_id.startswith("query-path-"):
-            trace["mode"] = "exact_path"
-        elif trace.get("mode") == "exact_path":
-            trace.pop("mode")
+        # The lookup DTO is the execution contract; lexical metadata is neither
+        # the query text nor an authority to choose a public origin.
+        authoritative = asdict(lookup) if lookup is not None else None
+        trace = literal_query_probe(authoritative) if authoritative else {
+            "query_text": query_text or "", "admission_only": True,
+        }
+        if authoritative and (query_id != lookup.query_id or (query_text is not None and query_text != lookup.text)):
+            authoritative = None
+            trace = {"query_text": query_text or "", "query_origin": "invalid"}
         trace.setdefault("lexical_score", float(chunk.score))
-        if query_text:
-            if trace.get("query_text") != query_text:
-                trace["query_terms"] = list(documentation_query_terms(query_text))
-                roles = query_constraint_roles(query_text)
-                trace.update(exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects),
-                             retrieval_anchors=list(roles.retrieval_anchors))
-            trace["query_text"] = query_text
-        if lookup is not None:
-            trace.update({
-                "query_origin": lookup.origin,
-                "relation": lookup.relation,
-                "public_parent_query_id": lookup.public_parent_query_id,
-                "preferred_catalog_roles": list(lookup.preferred_catalog_roles),
-                "forbidden_catalog_roles": list(lookup.forbidden_catalog_roles),
-                "forbidden_evidence_terms": list(lookup.forbidden_evidence_terms),
-                "parent_exact_terms": list(lookup.parent_exact_terms),
-                "need_subject": lookup.need_subject, "need_relation": lookup.need_relation, "need_context": lookup.need_context,
-            })
         heading_value = metadata.get("heading_path") or ""
         heading_path = " > ".join(map(str, heading_value)) if isinstance(heading_value, (list, tuple)) else str(heading_value)
         visible_text = "\n".join(str(value or "") for value in (
@@ -66,21 +102,21 @@ def _tag_retrieval_query(
             candidate=metadata,
             expected_project_identity=expected_project_identity,
             lifecycle_intent=lifecycle_intent,
+            authoritative_query=authoritative,
         ).trace)
-        trace = apply_retrieval_need_witness({**trace, "query_id": query_id, "text": query_text or ""}, trace, chunk.text,
-            source={"verified_owner": trace.get("bound_subject_context"), "authority": metadata.get("authority"), "lifecycle_status": metadata.get("lifecycle_status")})
-        matches = dict(metadata.get("retrieval_query_matches") or {})
-        matches[query_id] = trace
-        parent_trace = (
-            derived_parent_trace(
-                trace,
-                source_query_id=query_id,
-                parent_query_id=str(lookup.public_parent_query_id or ""),
+        if authoritative and query_id == "query-original" and trace.get("qualified") is not True:
+            admission = admit_original_literal_context(
+                question=lookup.text, evidence_text=chunk.text, candidate=metadata,
+                expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
             )
-            if lookup is not None else None
-        )
-        if parent_trace is not None:
-            matches = merge_query_matches(matches, {lookup.public_parent_query_id: parent_trace})
+            if admission is not None:
+                trace["literal_context_admission"] = admission
+        matches = {
+            key: {**value, "admission_only": True}
+            for key, value in (metadata.get("retrieval_query_matches") or {}).items()
+            if isinstance(value, dict)
+        }
+        matches[query_id] = trace
         qualified_ids = tuple(key for key, value in matches.items() if value.get("qualified") is True)
         metadata.update({
             "retrieval_query_matches": matches,

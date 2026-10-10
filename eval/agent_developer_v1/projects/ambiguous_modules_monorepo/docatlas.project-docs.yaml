@@ -1,0 +1,26 @@
+schema_version: 1
+code_files: []
+documents:
+  - path: README.md
+    role: overview
+    scope: project
+    description: Auth monorepo overview.
+    authority: supporting
+    status: active
+    impact: track
+  - path: packages/auth/README.md
+    role: module_architecture
+    scope: module
+    module_path: packages/auth
+    description: Reusable package authentication boundary.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: services/auth/README.md
+    role: module_architecture
+    scope: module
+    module_path: services/auth
+    description: Deployed authentication service boundary.
+    authority: source_of_truth
+    status: active
+    impact: track

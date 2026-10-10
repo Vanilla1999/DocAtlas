@@ -4,8 +4,8 @@ from __future__ import annotations
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
 from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
-from ._evidence_selection_part02 import _authority_conflicts, _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
-from docmancer.docs.domain.project_answer_contract import obligations_can_authorize_docs_answer
+from ._evidence_selection_part02 import _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
+from ._evidence_selection_part01 import _proof_role_admitted, _technical_requirement_matches, validate_assignment_binding
 
 
 def _hydrate_cohesive_contract_paragraphs(
@@ -59,6 +59,7 @@ def select_evidence(
             project_identity=project_identity,
             module_id=module_id,
             profile=config.profile,
+            representation_bounded=config.result_kind != "patch_context",
         )
     )
     canonical_project_identity = _scope_requirement_value(requirements, "project_identity")
@@ -92,7 +93,6 @@ def select_evidence(
         include_soft_wrapped_prose=v3_answer_units,
     )
     eligibility_contract_hash = canonical_hash({
-        "trust_contract": _canonical_contract_value(trust_contract or {}),
         "project_identity": project_identity,
         "module_id": module_id,
         "result_kind": config.result_kind,
@@ -108,6 +108,16 @@ def select_evidence(
             candidate.symbols,
             candidate.exact_terms,
         )
+        if config.result_kind == "patch_context":
+            binding += (
+                candidate.evidence_id, candidate.hydration_id, candidate.identity_aliases,
+                candidate.path_or_url, candidate.section, candidate.authority,
+                candidate.source_class, candidate.version_binding, candidate.resolved_version,
+                candidate.docs_snapshot_exact, candidate.project_identity, candidate.module_id,
+                candidate.doc_scope, candidate.char_start, candidate.char_end,
+                candidate.line_start, candidate.line_end, candidate.freshness,
+                canonical_hash(_candidate_source_view(candidate)),
+            )
         previous = identity_bindings.setdefault(candidate.stable_id, binding)
         if previous != binding:
             identity_collisions.add(candidate.stable_id)
@@ -141,7 +151,6 @@ def select_evidence(
             "doc_scope": item.doc_scope,
             "symbols": list(item.symbols),
             "exact_terms": list(item.exact_terms),
-            "instruction_risk_flags": list(item.instruction_risk_flags),
             "freshness": item.freshness,
             "navigation_only": item.navigation_only,
             "token_estimate": item.token_estimate,
@@ -193,6 +202,7 @@ def select_evidence(
                 config.profile == "project_docs_answer"
                 and not any(item.proof_role == "document_statement" for item in requirements)
             ),
+            preserve_window=config.result_kind == "patch_context",
         )
         for candidate in eligible
     ]
@@ -218,16 +228,16 @@ def select_evidence(
                 -len(candidate.covered_requirement_ids & mandatory_ids),
                 -sum(witness.completeness_score for witness in mandatory_witnesses),
             )
-        return (*base, *_candidate_preference(candidate))
+        return (*base, *_candidate_preference(candidate, length_dependent=config.result_kind != "patch_context"))
 
     ordered = sorted(covered, key=ordering_key)
-    if len(ordered) > config.max_candidates:
+    if config.max_candidates is not None and len(ordered) > config.max_candidates:
         for candidate in ordered[config.max_candidates:]:
             omissions.append(Omission(candidate.stable_id, "candidate_cap"))
         ordered = ordered[:config.max_candidates]
     deduped, dedupe_omissions = _deduplicate(ordered, config, requirements)
     omissions.extend(dedupe_omissions)
-    conflicts = _authority_conflicts(deduped)
+    conflicts: set[str] = set()
     mandatory = {item.requirement_id for item in requirements if item.mandatory}
     selected, missing, selection_omissions = _reserve_and_select(
         deduped,
@@ -238,7 +248,8 @@ def select_evidence(
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
     bounded_materialization_failed = config.result_kind == "docs_answer" and (
-        len(selected) > config.max_spans or len(selected_documents) > config.max_documents
+        (config.max_spans is not None and len(selected) > config.max_spans)
+        or (config.max_documents is not None and len(selected_documents) > config.max_documents)
     )
     if bounded_materialization_failed:
         missing.add("bounded_evidence_not_materializable")
@@ -246,14 +257,12 @@ def select_evidence(
     missing.update(f"stable_identity_collision:{value}" for value in identity_collisions)
     if config.result_kind == "docs_answer" and selected and all(item.navigation_only for item in selected):
         missing.add("factual_source_evidence")
-    if config.profile == "project_docs_answer" and not mandatory:
-        missing.add("project_answer_requirement")
     status: Literal["ok", "insufficient_evidence"] = (
         "ok" if selected and not missing and not conflicts else "insufficient_evidence"
     )
     selected = sorted(selected, key=lambda item: (
         0 if item.covered_requirement_ids & mandatory else 1,
-        *_candidate_preference(item),
+        *_candidate_preference(item, length_dependent=config.result_kind != "patch_context"),
     ))
     selected_tokens = sum(item.token_estimate for item in selected)
     selected_fit_tokens = sum(item.fit_token_estimate for item in selected)
@@ -267,11 +276,11 @@ def select_evidence(
         "max_spans": config.max_spans,
         "selected_tokens": selected_tokens,
         "wrapper_reserve_tokens": config.wrapper_reserve_tokens,
-        "projected_total_tokens": selected_tokens + config.wrapper_reserve_tokens,
+        "projected_total_tokens": selected_tokens + (config.wrapper_reserve_tokens or 0),
         "serialized_projected_tokens": (
             selected_fit_tokens + DOCS_SERIALIZATION_RESERVE_TOKENS
             if config.result_kind == "docs_answer"
-            else selected_tokens + config.wrapper_reserve_tokens
+            else selected_tokens
         ),
         "hard_tokens": config.hard_tokens,
         "mandatory_requirements": len(mandatory),
@@ -319,7 +328,9 @@ def select_evidence(
             matching.append((candidate, witness))
         if not matching:
             continue
-        matching.sort(key=lambda pair: _assignment_preference(requirement, pair[0], pair[1]))
+        matching.sort(key=lambda pair: _assignment_preference(
+            requirement, pair[0], pair[1], length_dependent=config.result_kind != "patch_context",
+        ))
         candidate, witness = matching[0]
         if witness is not None:
             if witness.unit_char_start is None or witness.unit_char_end is None:
@@ -345,6 +356,9 @@ def select_evidence(
             absolute_line = candidate.line_start
             projected_hash = hashlib.sha256(candidate.projected_text.encode("utf-8")).hexdigest()
             qualifier_text = candidate.projected_text
+        absolute_line_end = absolute_line
+        if config.result_kind == "patch_context" and absolute_line is not None:
+            absolute_line_end += qualifier_text.count("\n")
         assignment_rows.append(EvidenceAssignment(
             requirement_id=requirement.requirement_id,
             evidence_id=candidate.stable_id,
@@ -352,7 +366,7 @@ def select_evidence(
             char_start=absolute_start,
             char_end=absolute_end,
             line_start=absolute_line,
-            line_end=absolute_line,
+            line_end=absolute_line_end,
             projected_content_hash=projected_hash,
             proof_role=requirement.proof_role,
             qualifiers=requirement.qualifiers or _observed_qualifiers(qualifier_text),
@@ -368,36 +382,15 @@ def select_evidence(
     missing.update(mandatory - assigned_requirement_ids)
     if status == "ok" and mandatory - assigned_requirement_ids:
         status = "insufficient_evidence"
-    if config.profile == "project_docs_answer":
-        proof_obligations = tuple(
-            obligation
-            for requirement in requirements
-            if requirement.mandatory
-            if (obligation := requirement.as_proof_obligation()) is not None
-        )
-        explicit_support_contract = any(
-            requirement.mandatory
-            and requirement.public_provenance in {
-                "public_task_contract", "required_evidence_paths",
-            }
-            for requirement in requirements
-        )
-        context_only_retrieval = bool(
-            "fallback:generic_project_terms" in requirements.parse_trace
-            and "unsupported_query:generic_free_form_relation"
-            in requirements.unresolved_parts
-            and not explicit_support_contract
-        )
-        if context_only_retrieval:
-            missing.add("unsupported_answer_authorization:unresolved_query")
-            status = "insufficient_evidence"
-        elif proof_obligations and not obligations_can_authorize_docs_answer(proof_obligations):
-            missing.add("unsupported_answer_authorization:context_only_relation")
-            missing.update(
-                f"context_only:{obligation.relation or obligation.kind}"
-                for obligation in proof_obligations
-            )
-            status = "insufficient_evidence"
+    if config.result_kind == "docs_answer":
+        # Scope, exact literals, hashes and assignments authorize context
+        # selection only. They do not independently establish a full answer,
+        # including the generic/SDK fallback and supplied requirement paths.
+        missing.add("unsupported_answer_authorization:context_only")
+        status = "insufficient_evidence"
+    elif not any(item.unit_id is not None for item in assignments):
+        missing.add("visible_content_assignment_required")
+        status = "insufficient_evidence"
     assignment_hash = canonical_hash([asdict(item) for item in assignments])
     selection_hash = canonical_hash({
         "schema_version": SELECTOR_SCHEMA_VERSION,
@@ -430,7 +423,6 @@ def select_evidence(
         None if status == "ok" else
         unresolved_reason if unresolved_reason else
         "bounded_evidence_not_materializable" if bounded_materialization_failed else
-        "authority_conflict" if conflicts else
         "required_evidence_missing" if missing else
         "no_eligible_evidence"
     )
@@ -494,45 +486,25 @@ def validate_evidence_sufficiency(
         if candidate is None or requirement is None:
             errors.append("evidence assignment does not resolve to canonical inputs")
             continue
-        if assignment.unit_id is None:
-            if result_kind == "docs_answer" and requirement.kind == "proof_obligation":
-                errors.append("typed docs assignment requires an answer unit")
-            continue
-        unit = next((item for item in candidate.answer_units if item.unit_id == assignment.unit_id), None)
-        if unit is None:
-            errors.append("evidence assignment answer unit is missing")
-            continue
-        if (
-            assignment.unit_kind != unit.kind
-            or assignment.unit_char_start != unit.char_start
-            or assignment.unit_char_end != unit.char_end
-            or assignment.unit_content_hash != unit.content_sha256
-            or assignment.projected_content_hash != unit.content_sha256
-        ):
-            errors.append("evidence assignment answer unit binding is invalid")
-            continue
-        obligation = requirement.as_proof_obligation()
-        if obligation is not None and not local_proof_for_obligation(
-            obligation, unit, source=_candidate_source_view(candidate),
-        ).valid:
-            errors.append("typed evidence assignment no longer proves its obligation")
+        if not validate_assignment_binding(requirement, candidate, assignment, requirements=requirements):
+            errors.append("evidence assignment visible content or scope binding is invalid")
     if decision.status == "ok" and (decision.missing_requirements or decision.unresolved_conflicts):
         errors.append("successful selection cannot contain unresolved requirements or conflicts")
     if len({item.stable_id for item in decision.selected_candidates}) != len(decision.selected_candidates):
         errors.append("selected stable IDs must be unique")
     if len({(item.stable_id, item.content_sha256) for item in decision.selected_candidates}) != len(decision.selected_candidates):
         errors.append("selected stable identity bindings must be unique")
-    if decision.metrics.get("projected_total_tokens", 0) > decision.metrics.get("hard_tokens", 0):
+    hard_tokens = decision.metrics.get("hard_tokens")
+    if hard_tokens is not None and decision.metrics.get("projected_total_tokens", 0) > hard_tokens:
         errors.append("selected whole-item bundle exceeds the hard token budget")
     if result_kind == "docs_answer" and decision.status == "ok" and all(
         item.navigation_only for item in decision.selected_candidates
     ):
         errors.append("successful docs selection requires factual evidence")
     if result_kind == "patch_context" and decision.status == "ok" and not any(
-        item.symbols or _PATCH_FACT_RE.search(item.display_text)
-        for item in decision.selected_candidates
+        assignment.unit_id is not None for assignment in decision.assignments
     ):
-        errors.append("successful patch selection requires actionable cited evidence")
+        errors.append("successful patch selection requires assigned visible content")
     expected = canonical_hash({
         "schema_version": SELECTOR_SCHEMA_VERSION,
         "config_hash": decision.selector_config_hash,
@@ -555,92 +527,22 @@ def _with_coverage(
     requirements: Sequence[EvidenceRequirement],
     *,
     factual_only: bool,
+    preserve_window: bool = False,
 ) -> EvidenceCandidate:
-    # Paths, headings, and symbols aid retrieval but cannot prove a factual
-    # answer. Requirements must match model-visible source text.
-    haystack = candidate.display_text.casefold() if factual_only else "\n".join([
-        candidate.display_text, candidate.path_or_url, candidate.section,
-        " ".join(candidate.symbols), candidate.version_binding, candidate.resolved_version,
-    ]).casefold()
-    stripped_display = candidate.display_text.strip()
-    display_words = re.findall(r"\w+", stripped_display, re.UNICODE)
-    incomplete_span = factual_only and bool(
-        len(stripped_display) <= 80
-        and "\n" not in stripped_display
-        and (
-            re.fullmatch(r"#{1,6}\s+\S.*", stripped_display) is not None
-            or
-            stripped_display.endswith(':')
-            or (len(display_words) <= 2 and not re.search(r"[.!?;]", stripped_display))
-        )
-    )
-    source = _normalized_source(candidate.path_or_url)
+    # Content requirements always need a literal visible unit, in every profile.
     covered: set[str] = set()
     witnesses: list[RequirementWitness] = []
     for requirement in requirements:
         witness: RequirementWitness | None = None
-        value = requirement.value.casefold()
-        if requirement.kind == "proof_obligation":
-            witness = _witness_for_requirement(requirement, candidate)
-            matches = witness is not None
-        elif requirement.kind == "canonical_policy":
-            matches = candidate.stable_id == requirement.value
-        elif requirement.kind in {"evidence_path", "target_path"}:
-            wanted = _normalized_source(requirement.value)
-            matches = source == wanted or source.endswith("/" + wanted) or wanted.endswith("/" + source)
-        elif requirement.kind == "exact_version":
-            matches = candidate.resolved_version.casefold() == value and _version_rank(candidate.version_binding) == 0
-        elif requirement.kind == "exact_snapshot":
-            matches = candidate.docs_snapshot_exact is True
-        elif requirement.kind == "project_identity":
-            matches = candidate.project_identity == requirement.value
-        elif requirement.kind == "module_id":
-            matches = candidate.module_id == requirement.value
-        elif requirement.kind in {
-            "target_declaration", "preserve_declaration",
-            "behavioral_contract", "cross_module_invariant",
-        }:
-            witness = _witness_for_requirement(requirement, candidate)
-            matches = witness is not None
-        elif requirement.kind == "exact_term":
-            matches = requirement_value_visible(requirement.value, haystack)
-        elif requirement.kind == "entity":
-            matches = requirement_value_visible(requirement.value, haystack)
-        elif requirement.kind == "facet":
-            matches = _facet_requirement_matches(requirement.value, haystack)
-        elif requirement.kind == "code_group":
-            matches = _code_group_requirement_matches(requirement.value, candidate)
-        elif requirement.kind == "unsupported_query":
-            matches = False
+        if requirement.kind in {"evidence_path", "target_path", "exact_version", "exact_snapshot", "project_identity", "module_id"}:
+            matches = _technical_requirement_matches(requirement, candidate)
         else:
-            matches = value in haystack
-        if matches and incomplete_span and requirement.kind not in {"evidence_path", "target_path"}:
-            matches = False
-        if matches and requirement.proof_role == "document_statement":
-            scoped_paths = {
-                _normalized_source(item.value)
-                for item in requirements
-                if item.kind == "evidence_path"
-            }
-            matches = bool(scoped_paths) and source in scoped_paths
-        if matches and requirement.proof_role == "implementation_fact":
-            matches = candidate.source_class in {"source_snippet", "test", "project_file"}
-        if matches and requirement.proof_role == "project_rule":
-            matches = candidate.authority == "canonical" and candidate.source_class not in {
-                "repo_map", "code_graph", "absent_in_source",
-            }
-        if matches and requirement.proof_role == "dependency_fact":
-            matches = candidate.source_class not in {
-                "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
-            } and _version_rank(candidate.version_binding) == 0
-        if matches and requirement.qualifiers:
-            matches = all(
-                _QUALIFIER_PATTERNS[qualifier].search(candidate.projected_text)
-                for qualifier in requirement.qualifiers
-            )
-        if matches and (factual_only or requirement.kind == "proof_obligation"):
-            witness = witness or _witness_for_requirement(requirement, candidate)
+            witness = _witness_for_requirement(requirement, candidate)
             matches = witness is not None
+        if matches:
+            matches = _proof_role_admitted(requirement, candidate, requirements)
+        if requirement.qualifiers:
+            matches = False
         if matches:
             covered.add(requirement.requirement_id)
             if witness is not None:
@@ -659,10 +561,10 @@ def _with_coverage(
         for unit in candidate.answer_units
         if unit.unit_id == witness.unit_id
     )
-    material = materialize_answer_units(candidate.display_text, witness_units)
+    material = "" if preserve_window else materialize_answer_units(candidate.display_text, witness_units)
     fit_tokens = candidate.fit_token_estimate
     visible_tokens = candidate.token_estimate
-    if material:
+    if material and not preserve_window:
         visible_tokens = _estimated_tokens(material)
         fit_tokens = _docs_answer_candidate_tokens(
             stable_id=candidate.stable_id,
@@ -680,20 +582,4 @@ def _with_coverage(
     )
 
 
-def _canonical_contract_value(value: Any) -> Any:
-    if isinstance(value, Mapping):
-        return {
-            str(key): _canonical_contract_value(item)
-            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
-        }
-    if isinstance(value, (set, frozenset)):
-        return sorted(
-            (_canonical_contract_value(item) for item in value), key=canonical_hash
-        )
-    if isinstance(value, (list, tuple)):
-        return [_canonical_contract_value(item) for item in value]
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    return str(value)
-
-__all__=['select_evidence', 'validate_evidence_sufficiency', '_with_coverage', '_canonical_contract_value']
+__all__=['select_evidence', 'validate_evidence_sufficiency', '_with_coverage']

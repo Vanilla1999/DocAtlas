@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_finite_callers.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_finite_callers.py": "9666201a2062d53dfae7e21795566be5a41287e38bd3879a27c0a87ad79c7354"
+  }
+}

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import json
+from dataclasses import replace
+from hashlib import sha256
+from pathlib import Path
+
 from docmancer.docs.domain.source_map import (
     _find_symbol_match,
     _split_identifier,
@@ -9,6 +14,30 @@ from docmancer.docs.domain.source_map import (
     source_facts_diagnostics,
 )
 from docmancer.docs.domain.source_boundary import SourceBoundary, iter_bounded_source_files
+
+
+def _declare_code_files(root, *paths):
+    # These are explicit fixture members, not a discovered recursive source grant.
+    (root / "docatlas.project-docs.yaml").write_text(
+        json.dumps({"schema_version": 1, "documents": [], "code_files": list(paths)}),
+        encoding="utf-8",
+    )
+
+
+def _observe_source_reads(monkeypatch, root):
+    original_read_text = Path.read_text
+    observed = {}
+
+    def read_text(path, *args, **kwargs):
+        value = original_read_text(path, *args, **kwargs)
+        if path.is_relative_to(root) and path.suffix in {".py", ".dart", ".java"}:
+            observed.setdefault(path.relative_to(root).as_posix(), []).append(
+                sha256(value.encode("utf-8")).hexdigest()
+            )
+        return value
+
+    monkeypatch.setattr(Path, "read_text", read_text)
+    return observed
 
 
 def _source_facts_fixture(tmp_path):
@@ -61,6 +90,7 @@ class TicketService:
         "class GeneratedScreen {}\n",
         encoding="utf-8",
     )
+    _declare_code_files(tmp_path, "lib/screen.dart", "lib/cubit/help_requests_cubit.dart", "app/service.py")
     return tmp_path
 
 
@@ -97,12 +127,19 @@ def test_find_symbol_match_no_match():
     assert match_type is None
 
 
-def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_path):
+def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_path, monkeypatch):
     lib = tmp_path / "lib"
     lib.mkdir()
     (lib / "permission_service.dart").write_text(
         """class PermissionService implements GrantAuthority {}"""
     )
+    (lib / "unlisted.dart").write_text("class PermissionService {}\n", encoding="utf-8")
+    declared_path = "lib/permission_service.dart"
+    source_bytes = (tmp_path / declared_path).read_bytes()
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+    assert build_project_source_evidence(tmp_path, question="PermissionService grant authority") == []
+    assert observed == {}
+    _declare_code_files(tmp_path, declared_path)
     items = build_project_source_evidence(
         tmp_path,
         question="PermissionService grant authority",
@@ -117,19 +154,80 @@ def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_pa
     assert ev["symbols"] == [
         {"kind": "class", "name": "PermissionService", "line_start": 1, "line_end": 1}
     ]
+    assert observed == {declared_path: [sha256(source_bytes).hexdigest()]}
+    assert ev["path"] == ev["source"]["path"] == declared_path
+    assert ev["line_start"] == ev["line_end"] == 1
+    assert ev["source"]["line_start"] == ev["source"]["line_end"] == 1
+    assert ev["snippet"].encode("utf-8") == source_bytes
+    assert sha256(ev["snippet"].encode("utf-8")).hexdigest() == observed[declared_path][0]
 
 
-def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path):
-    source = tmp_path / "lib/modules/sync/application/offline_sync_gate.dart"
+def test_named_gate_source_evidence_exposes_declaration_metadata(tmp_path, monkeypatch):
+    relative = "lib/modules/sync/application/offline_sync_gate.dart"
+    source = tmp_path / relative
     source.parent.mkdir(parents=True)
-    source.write_text("class OfflineSyncGate {}\n", encoding="utf-8")
+    declaration = "class OfflineSyncGate {}\n"
+    source.write_text(declaration, encoding="utf-8")
+    # An unlisted declaration cannot supply evidence or consume the term pool.
+    unlisted = tmp_path / "lib/unlisted.dart"
+    unlisted.write_text(declaration, encoding="utf-8")
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+    assert build_project_source_evidence(tmp_path, question="OfflineSyncGate") == []
+    assert observed == {}
+    _declare_code_files(tmp_path, relative)
 
     items = build_project_source_evidence(
         tmp_path, question="OfflineSyncGate", max_items=4, token_budget=700,
     )
 
-    match = next(item for item in items if item.get("path") == source.relative_to(tmp_path).as_posix())
+    match = next(item for item in items if item.get("path") == relative)
     assert match["symbols"][0]["name"] == "OfflineSyncGate"
+    assert match["line_start"] == 1
+    assert observed == {relative: [sha256(declaration.encode("utf-8")).hexdigest()]}
+
+    from copy import deepcopy
+    from docmancer.docs.application.action_packet import (
+        build_action_packet, evidence_identity_for_item, validate_action_packet,
+    )
+    variants = build_project_source_evidence(
+        tmp_path, question="OfflineSyncGate", requirements=["OfflineSyncGate", "sync gate"],
+        max_items=4, token_budget=700,
+    )
+    assert {item["match_type"] for item in variants} == {"exact_substring", "symbol"}
+    assert {tuple(item["matched_terms"]) for item in variants} == {("OfflineSyncGate",), ("sync gate",)}
+    assert len({evidence_identity_for_item(item)[0] for item in variants}) == 1
+    packet = build_action_packet(
+        question="OfflineSyncGate", context_pack=variants,
+        public_requirements=[declaration.strip()],
+    )
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert len(packet["sources"]) == 1 and packet["sources"][0]["text"] == declaration.strip()
+    assert validate_action_packet(packet, evidence_items=variants) == []
+    # Reusing the identity while asserting a different window still fails.
+    forged = deepcopy(variants[1])
+    forged["line_start"] = forged["line_end"] = 2
+    errors = validate_action_packet(packet, evidence_items=[variants[0], forged])
+    assert any(error.startswith("stable_identity_collision:") for error in errors)
+
+    # Crossing the former eight-match cutoff must preserve this declaration.
+    # Only its source coordinate changes when earlier uses are prepended.
+    for earlier_uses in (8, 16):
+        prefix = "".join(
+            f"final gate_{index} = OfflineSyncGate();\n"
+            for index in range(earlier_uses)
+        )
+        padded = prefix + declaration
+        source.write_text(padded, encoding="utf-8")
+        observed.clear()
+        items = build_project_source_evidence(
+            tmp_path, question="OfflineSyncGate", max_items=4, token_budget=700,
+        )
+        assert [(item["path"], item["line_start"]) for item in items] == [
+            (relative, earlier_uses + 1), (relative, 1),
+        ]
+        assert items[0]["symbols"][0]["name"] == match["symbols"][0]["name"]
+        assert items[0]["snippet"] == match["snippet"] == declaration.strip()
+        assert observed == {relative: [sha256(padded.encode("utf-8")).hexdigest()]}
 
 
 def test_build_project_source_evidence_finds_camel_case_from_nl(tmp_path):
@@ -138,6 +236,7 @@ def test_build_project_source_evidence_finds_camel_case_from_nl(tmp_path):
     (lib / "ticket_service.dart").write_text(
         """String _sendTicketTitleToChat(String title) { return title; }"""
     )
+    _declare_code_files(tmp_path, "lib/ticket_service.dart")
     items = build_project_source_evidence(
         tmp_path,
         question="send ticket title chat",
@@ -155,6 +254,7 @@ def test_build_project_source_evidence_absent_has_unknown_confidence(tmp_path):
     src = tmp_path / "src"
     src.mkdir()
     (src / "main.py").write_text("x = 1")
+    _declare_code_files(tmp_path, "src/main.py")
     items = build_project_source_evidence(
         tmp_path,
         question="nonexistent_function_name",
@@ -162,11 +262,12 @@ def test_build_project_source_evidence_absent_has_unknown_confidence(tmp_path):
         token_budget=700,
     )
     absent = [item for item in items if item.get("evidence_class") == "absent_in_source"]
+    assert absent
     if absent:
         assert absent[0].get("confidence") == "unknown"
 
 
-def test_source_evidence_skips_generated_plugin_registrant(tmp_path):
+def test_source_evidence_skips_generated_plugin_registrant(tmp_path, monkeypatch):
     android = tmp_path / "android/app/src/main/java/io/flutter/plugins"
     android.mkdir(parents=True)
     (android / "GeneratedPluginRegistrant.java").write_text(
@@ -180,11 +281,22 @@ def test_source_evidence_skips_generated_plugin_registrant(tmp_path):
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "lib/public_api.dart")
+    observed = _observe_source_reads(monkeypatch, tmp_path)
     items = build_project_source_evidence(tmp_path, question="GeneratedPluginRegistrant public API", max_items=8, token_budget=1000)
     paths = {item.get("path") for item in items if item.get("evidence_class") == "source_snippet"}
 
     assert "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java" not in paths
     assert "lib/public_api.dart" in paths
+    assert set(observed) == {"lib/public_api.dart"}
+    observed.clear()
+    _declare_code_files(
+        tmp_path, "lib/public_api.dart",
+        "android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+    )
+    denied = build_project_source_evidence(tmp_path, question="GeneratedPluginRegistrant public API")
+    assert denied == []
+    assert observed == {}
 
 
 def test_project_repo_map_extracts_static_source_facts_and_honors_budget(tmp_path):
@@ -217,6 +329,7 @@ class HelpService:
         encoding="utf-8",
     )
 
+    _declare_code_files(tmp_path, "lib/help_request_details_screen.dart", "lib/help_service.py")
     items = build_project_repo_map(tmp_path, question="Вернуть в работу HelpService", max_files=1, token_budget=180)
 
     assert [item["path"] for item in items] == ["lib/help_request_details_screen.dart"]
@@ -261,11 +374,13 @@ def test_collect_project_source_facts_keeps_repo_map_shape_compatible(tmp_path):
     repo_map = build_project_repo_map(root, question="Вернуть в работу HelpRequestScreen", max_files=2, token_budget=4000)
     facts = collect_project_source_facts(root, question="Вернуть в работу HelpRequestScreen", max_files=2, token_budget=4000)
 
+    assert facts
     assert facts == repo_map
 
 
-def test_collect_project_source_facts_skips_generated_files(tmp_path):
+def test_collect_project_source_facts_skips_generated_files(tmp_path, monkeypatch):
     root = _source_facts_fixture(tmp_path)
+    observed = _observe_source_reads(monkeypatch, root)
 
     items = collect_project_source_facts(root, question="GeneratedPluginRegistrant GeneratedScreen HelpRequestScreen")
 
@@ -273,13 +388,21 @@ def test_collect_project_source_facts_skips_generated_files(tmp_path):
     assert "lib/screen.dart" in paths
     assert "lib/generated/GeneratedPluginRegistrant.dart" not in paths
     assert "lib/generated/screen.g.dart" not in paths
+    assert set(observed) == {"lib/screen.dart", "lib/cubit/help_requests_cubit.dart", "app/service.py"}
+    for generated in ("lib/generated/GeneratedPluginRegistrant.dart", "lib/generated/screen.g.dart"):
+        observed.clear()
+        boundary = replace(SourceBoundary.from_project(root), code_files=("lib/screen.dart", generated))
+        denied = collect_project_source_facts(root, question="HelpRequestScreen", source_boundary=boundary)
+        assert denied == []
+        assert observed == {}
 
 
-def test_collect_project_source_facts_skips_benchmark_runtime_artifacts(tmp_path):
+def test_collect_project_source_facts_skips_benchmark_runtime_artifacts(tmp_path, monkeypatch):
     root = _source_facts_fixture(tmp_path)
     artifact = root / "eval/task_level/results/run/uv-cache/archive-v0/package/source.py"
     artifact.parent.mkdir(parents=True)
     artifact.write_text("class RuntimeArtifact: pass\n", encoding="utf-8")
+    observed = _observe_source_reads(monkeypatch, root)
 
     items = collect_project_source_facts(
         root,
@@ -287,7 +410,19 @@ def test_collect_project_source_facts_skips_benchmark_runtime_artifacts(tmp_path
         include_unmatched=True,
     )
 
+    assert items
     assert all(not item["path"].startswith("eval/task_level/results/") for item in items)
+    assert set(observed) == {"lib/screen.dart", "lib/cubit/help_requests_cubit.dart", "app/service.py"}
+    observed.clear()
+    boundary = replace(
+        SourceBoundary.from_project(root),
+        code_files=("lib/screen.dart", "eval/task_level/results/run/uv-cache/archive-v0/package/source.py"),
+    )
+    denied = collect_project_source_facts(
+        root, question="RuntimeArtifact HelpRequestScreen", include_unmatched=True, source_boundary=boundary,
+    )
+    assert denied == []
+    assert observed == {}
 
 
 def test_source_boundary_loads_project_manifest_and_limits_roots(tmp_path):
@@ -295,6 +430,7 @@ def test_source_boundary_loads_project_manifest_and_limits_roots(tmp_path):
     (tmp_path / "other").mkdir()
     (tmp_path / "app/main.py").write_text("class Included: pass\n", encoding="utf-8")
     (tmp_path / "other/ignored.py").write_text("class OutsideRoot: pass\n", encoding="utf-8")
+    _declare_code_files(tmp_path, "app/main.py")
     (tmp_path / "docatlas.yaml").write_text(
         "project:\n  source_roots: [app]\n  include_extensions: [.py]\n",
         encoding="utf-8",
@@ -305,6 +441,13 @@ def test_source_boundary_loads_project_manifest_and_limits_roots(tmp_path):
     )
 
     assert [item["path"] for item in items] == ["app/main.py"]
+    boundary = SourceBoundary.from_project(tmp_path)
+    assert boundary.source_roots == ("app",)
+    assert boundary.code_files == ("app/main.py",)
+    assert collect_project_source_facts(
+        tmp_path, question="Included OutsideRoot", include_unmatched=True,
+        source_boundary=replace(boundary, code_files=("app/main.py", "other/ignored.py")),
+    ) == []
 
 
 def test_source_boundary_applies_excludes_and_gitignore(tmp_path):
@@ -316,6 +459,7 @@ def test_source_boundary_applies_excludes_and_gitignore(tmp_path):
     boundary = SourceBoundary(
         exclude_paths=("src/excluded/**",),
         gitignore_patterns=("src/ignored.py",),
+        code_files=("src/keep.py",),
     )
 
     paths = [
@@ -326,6 +470,11 @@ def test_source_boundary_applies_excludes_and_gitignore(tmp_path):
     ]
 
     assert paths == ["src/keep.py"]
+    for denied in ("src/excluded/drop.py", "src/ignored.py"):
+        assert list(iter_bounded_source_files(
+            tmp_path, boundary=replace(boundary, code_files=("src/keep.py", denied)),
+            supported_extensions=frozenset({".py"}),
+        )) == []
 
 
 def test_source_boundary_gitignore_anchored_negation_only_reincludes_root_path(tmp_path):
@@ -333,7 +482,7 @@ def test_source_boundary_gitignore_anchored_negation_only_reincludes_root_path(t
         path = tmp_path / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("class BoundaryFact: pass\n", encoding="utf-8")
-    boundary = SourceBoundary(gitignore_patterns=("*.py", "!/keep.py"))
+    boundary = SourceBoundary(gitignore_patterns=("*.py", "!/keep.py"), code_files=("keep.py",))
 
     paths = [
         path.relative_to(tmp_path).as_posix()
@@ -343,6 +492,11 @@ def test_source_boundary_gitignore_anchored_negation_only_reincludes_root_path(t
     ]
 
     assert paths == ["keep.py"]
+    for denied in ("nested/keep.py", "drop.py"):
+        assert list(iter_bounded_source_files(
+            tmp_path, boundary=replace(boundary, code_files=("keep.py", denied)),
+            supported_extensions=frozenset({".py"}),
+        )) == []
 
 
 def test_source_boundary_distinguishes_anchored_and_nonanchored_directories(tmp_path):
@@ -351,8 +505,8 @@ def test_source_boundary_distinguishes_anchored_and_nonanchored_directories(tmp_
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("class BoundaryFact: pass\n", encoding="utf-8")
 
-    anchored = SourceBoundary(gitignore_patterns=("/ignored/",))
-    nonanchored = SourceBoundary(gitignore_patterns=("ignored/",))
+    anchored = SourceBoundary(gitignore_patterns=("/ignored/",), code_files=("nested/ignored/nested.py",))
+    nonanchored = SourceBoundary(gitignore_patterns=("ignored/",), code_files=("nested/ignored/nested.py",))
 
     anchored_paths = [
         path.relative_to(tmp_path).as_posix()
@@ -366,6 +520,10 @@ def test_source_boundary_distinguishes_anchored_and_nonanchored_directories(tmp_
 
     assert anchored_paths == ["nested/ignored/nested.py"]
     assert nonanchored_paths == []
+    assert list(iter_bounded_source_files(
+        tmp_path, boundary=replace(anchored, code_files=("ignored/root.py",)),
+        supported_extensions=frozenset({".py"}),
+    )) == []
 
 
 def test_source_boundary_preserves_legacy_positional_source_roots(tmp_path):
@@ -380,18 +538,23 @@ def test_source_boundary_preserves_legacy_positional_source_roots(tmp_path):
         path.relative_to(tmp_path).as_posix()
         for path in iter_bounded_source_files(
             tmp_path,
-            boundary=SourceBoundary(("src",)),
+            boundary=SourceBoundary(("src",), code_files=("src/main.py",)),
             supported_extensions=frozenset({".py"}),
         )
     ]
 
     assert paths == ["src/main.py"]
+    assert list(iter_bounded_source_files(
+        tmp_path, boundary=SourceBoundary(("src",), code_files=("src/main.py", "other/outside.py")),
+        supported_extensions=frozenset({".py"}),
+    )) == []
 
 
 def test_source_boundary_invalid_project_manifest_fails_closed(tmp_path):
     source = tmp_path / "src/main.py"
     source.parent.mkdir()
     source.write_text("class MustNotLeak: pass\n", encoding="utf-8")
+    _declare_code_files(tmp_path, "src/main.py")
     (tmp_path / "docatlas.yaml").write_text(
         "project:\n  source_roots: [src]\n  max_scanned_files: 0\n",
         encoding="utf-8",
@@ -408,7 +571,7 @@ def test_source_boundary_generated_paths_require_explicit_opt_in(tmp_path):
     generated = tmp_path / "artifacts/output.py"
     generated.parent.mkdir()
     generated.write_text("class GeneratedFact: pass\n", encoding="utf-8")
-    boundary = SourceBoundary(generated_paths=("artifacts/**",))
+    boundary = SourceBoundary(generated_paths=("artifacts/**",), code_files=("artifacts/output.py",))
 
     hidden = list(iter_bounded_source_files(
         tmp_path, boundary=boundary, supported_extensions=frozenset({".py"})
@@ -422,20 +585,52 @@ def test_source_boundary_generated_paths_require_explicit_opt_in(tmp_path):
 
     assert hidden == []
     assert included == [generated]
+    assert list(iter_bounded_source_files(
+        tmp_path, boundary=boundary, supported_extensions=frozenset({".py"}), include_generated="true",
+    )) == []
 
 
-def test_source_map_includes_generated_path_for_explicit_artifact_question(tmp_path):
+def test_source_map_includes_generated_path_for_explicit_artifact_question(tmp_path, monkeypatch):
     generated = tmp_path / "generated/model.py"
     generated.parent.mkdir()
-    generated.write_text("class GeneratedModel: pass\n", encoding="utf-8")
+    content = "class GeneratedModel: pass\n"
+    generated.write_text(content, encoding="utf-8")
+    generated.with_name("other.py").write_text("class HiddenGeneratedModel: pass\n", encoding="utf-8")
+    question = "Inspect the generated file GeneratedModel"
+    observed = _observe_source_reads(monkeypatch, tmp_path)
+
+    # The original prose is unchanged. A generated-file opt-in cannot replace
+    # the caller's finite member grant, and that grant cannot replace opt-in.
+    assert collect_project_source_facts(
+        tmp_path, question=question, include_unmatched=True, include_generated=True,
+    ) == []
+    assert observed == {}
+    _declare_code_files(tmp_path, "generated/model.py")
+    for opt_in in (None, False, "true"):
+        assert collect_project_source_facts(
+            tmp_path, question=question, include_unmatched=True, include_generated=opt_in,
+        ) == []
+    assert observed == {}
 
     items = collect_project_source_facts(
-        tmp_path,
-        question="Inspect the generated file GeneratedModel",
-        include_unmatched=True,
+        tmp_path, question=question, include_unmatched=True, include_generated=True,
     )
 
     assert [item["path"] for item in items] == ["generated/model.py"]
+    assert items[0]["char_count"] == len(content) and items[0]["line_count"] == 1
+    assert items[0]["symbols"] == [
+        {"kind": "class", "name": "GeneratedModel", "line_start": 1, "line_end": 1}
+    ]
+    assert observed == {"generated/model.py": [sha256(content.encode("utf-8")).hexdigest()]}
+
+    # Explicit generated opt-in still cannot override exclusions or read siblings.
+    observed.clear()
+    excluded = replace(SourceBoundary.from_project(tmp_path), exclude_paths=("generated/**",))
+    assert collect_project_source_facts(
+        tmp_path, question=question, include_unmatched=True,
+        source_boundary=excluded, include_generated=True,
+    ) == []
+    assert observed == {}
 
 
 def test_source_boundary_never_follows_symlink_outside_project(tmp_path):
@@ -445,7 +640,7 @@ def test_source_boundary_never_follows_symlink_outside_project(tmp_path):
     (tmp_path / "linked").symlink_to(outside, target_is_directory=True)
 
     paths = list(iter_bounded_source_files(
-        tmp_path, boundary=SourceBoundary(), supported_extensions=frozenset({".py"})
+        tmp_path, boundary=SourceBoundary(code_files=("linked/secret.py",)), supported_extensions=frozenset({".py"})
     ))
 
     assert paths == []
@@ -462,13 +657,13 @@ def test_source_boundary_enforces_file_byte_depth_and_deadline_budgets(tmp_path)
 
     limited = list(iter_bounded_source_files(
         tmp_path,
-        boundary=SourceBoundary(max_scanned_files=1, max_directory_depth=2),
+        boundary=SourceBoundary(max_scanned_files=1, max_directory_depth=2, code_files=("src/file_0.py",)),
         supported_extensions=frozenset({".py"}),
     ))
     ticks = iter((0.0, 1.0, 1.0))
     expired = list(iter_bounded_source_files(
         tmp_path,
-        boundary=SourceBoundary(scan_deadline_seconds=0.5),
+        boundary=SourceBoundary(scan_deadline_seconds=0.5, code_files=("src/file_0.py",)),
         supported_extensions=frozenset({".py"}),
         clock=lambda: next(ticks),
     ))
@@ -476,6 +671,15 @@ def test_source_boundary_enforces_file_byte_depth_and_deadline_budgets(tmp_path)
     assert len(limited) == 1
     assert deep not in limited
     assert expired == []
+    for boundary in (
+        SourceBoundary(max_scanned_files=1, code_files=("src/file_0.py", "src/file_1.py")),
+        SourceBoundary(max_directory_depth=2, code_files=("src/one/two/deep.py",)),
+        SourceBoundary(max_file_bytes=1, code_files=("src/file_0.py",)),
+        SourceBoundary(max_scanned_bytes=1, code_files=("src/file_0.py",)),
+    ):
+        assert list(iter_bounded_source_files(
+            tmp_path, boundary=boundary, supported_extensions=frozenset({".py"}),
+        )) == []
 
 
 def test_collect_project_source_facts_selection_score_favors_exact_question_term(tmp_path):

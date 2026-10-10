@@ -21,7 +21,6 @@ _ELIGIBILITY_REASON_ORDER = (
     "unknown_version",
     "forbidden_source",
     "outside_scope",
-    "instruction_risk",
     "invalid_identity",
     "query_identifier_conflict",
     "query_intent_mismatch",

@@ -3,10 +3,7 @@ from __future__ import annotations
 import pytest
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
-from docmancer.docs.application.model_visible_projection import (
-    docs_context_budget_tokens,
-    validate_model_visible_projection,
-)
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 
 
 def _candidate(path: str, text: str, question: str, *, authority: str = "source_of_truth"):
@@ -37,8 +34,6 @@ def _project(question: str, sources: list[dict]):
         },
     }
     payload, snapshot = project_docs_context(retrieval=retrieval)
-    assert docs_context_budget_tokens(payload) <= 800
-    assert len(payload.get("sources") or []) <= 3
     assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
     return payload
 

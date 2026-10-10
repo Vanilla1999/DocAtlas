@@ -59,6 +59,7 @@ class AgentIndexGateway:
         default_agent: Any | None = None,
         agent_factory: Callable[..., Any] | None = None,
         library_index_root: Path | str | None = None,
+        member_storage_policy: Any | None = None,
     ):
         if agent_factory is None:
             from docmancer.agent import DocmancerAgent
@@ -66,6 +67,8 @@ class AgentIndexGateway:
             agent_factory = DocmancerAgent
         self.config = config
         self._default_agent = default_agent
+        self.member_storage_policy = member_storage_policy
+        self._read_default_agent = None
         self._agents: dict[str, Any] = {}
         self._retrieval_dispatchers: dict[int, tuple[tuple[Any, ...], Any]] = {}
         self._cache_lock = threading.RLock()
@@ -98,6 +101,25 @@ class AgentIndexGateway:
             if self._default_agent is None:
                 self._default_agent = self._agent_factory(config=self.config)
             return self._default_agent
+
+    def read_agent_instance(self) -> Any:
+        """Read the selected owned member store without opening the writer."""
+        policy = self.member_storage_policy
+        if policy is None:
+            return self.agent_instance()
+        from docmancer.core.member_storage_policy import MemberStoragePolicy
+        if not isinstance(policy, MemberStoragePolicy) or not policy.validate(storage_path=self.config.index.db_path):
+            raise PermissionError("member store has not been explicitly initialized")
+        if self.config.index.provider != "sqlite" or effective_retrieval_mode(self.config) != "lexical":
+            raise PermissionError("member reads require the current SQLite lexical configuration")
+        with self._cache_lock:
+            if self._read_default_agent is None:
+                from docmancer.agent import DocmancerAgent
+                from docmancer.core.member_read_store import MemberReadStore
+                agent = DocmancerAgent(config=self.config, _lazy_init=True)
+                agent._store = MemberReadStore(policy, self.config.index.extracted_dir or None)
+                self._read_default_agent = agent
+            return self._read_default_agent
 
     def agent_for_config(self, config: DocmancerConfig) -> Any:
         """Create an uncached agent for an isolated staging index."""
@@ -280,7 +302,7 @@ class AgentIndexGateway:
             return DocumentComponentSearch(status="invalid_request")
 
         try:
-            agent = self.agent_instance()
+            agent = self.read_agent_instance()
             store = getattr(agent, "store", None)
         except Exception:
             return DocumentComponentSearch(status="unavailable", failure_count=1)

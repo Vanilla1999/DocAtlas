@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-import re
 from .admission_grammar import MeaningSlot, parse_admission_frame
+from .question_plan_core import _safe_coverage_gap
 from .question_retrieval_needs import RetrievalNeed, retrieval_needs
 from .query_reference_binding import ReferencePlan
 
@@ -36,24 +36,19 @@ def compile_admission_demands(question: str, references: ReferencePlan) -> tuple
     # equivalence audit may not: retain every uncovered meaningful source range.
     cursor = 0
     for start, end in sorted((n.query_span_start, n.query_span_end) for n in needs):
-        if start > cursor and re.search(r"\w", question[cursor:start]):
+        if start > cursor and not _safe_coverage_gap(question[cursor:start]):
             gap = RetrievalNeed(f"residue-{cursor}", cursor, start, question[cursor:start], "", "requested_part", "", ())
             result.append(AdmissionDemand(gap, "unknown", (), (), ((cursor, start),)))
         cursor = max(cursor, end)
-    if cursor < len(question) and re.search(r"\w", question[cursor:]):
+    if cursor < len(question) and not _safe_coverage_gap(question[cursor:]):
         gap = RetrievalNeed(f"residue-{cursor}", cursor, len(question), question[cursor:], "", "requested_part", "", ())
         result.append(AdmissionDemand(gap, "unknown", (), (), ((cursor, len(question)),)))
     return tuple(sorted(result, key=lambda d: d.need.query_span_start))
 
 
 def same_supported_meaning(left: AdmissionDemand, right: AdmissionDemand) -> bool:
-    """No inferred translation authority from equal literals or lexical overlap."""
-    if left.unsupported_spans or right.unsupported_spans or left.operator == 'unknown':
-        return False
-    signature = lambda value: (value.operator,
-        tuple(sorted((s.role, s.canonical) for s in value.arguments)),
-        tuple(sorted((s.role, s.canonical) for s in value.constraints)))
-    return signature(left) == signature(right)
+    """Equal supplied slots are not a witness of NL meaning equivalence."""
+    return False
 
 
 def questions_have_same_supported_meaning(left: str, right: str) -> bool:

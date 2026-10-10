@@ -1,0 +1,289 @@
+{
+  "schema": "pr211-runtime-followup-core-acceptance-v1",
+  "scope": "Executed core-only evidence; not full acceptance PASS.",
+  "full_acceptance": false,
+  "merge_ready": false,
+  "head_sha": "3be9c34afa49dcf4278d2910ec29ed37c305225c",
+  "tree_sha": "b27a3a70a6e3796e5e76a59395330843c7784656",
+  "checkout_merge_sha": "fc1b4cf20e3e561a03230adcd67dd920e8464bdc",
+  "merge_parents": [
+    "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+    "3be9c34afa49dcf4278d2910ec29ed37c305225c"
+  ],
+  "base_branch_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+  "baseline_head_sha": "40032f7be3c6d0822e8c25a2e2c53acf9a46aeea",
+  "run_id": 37824782946,
+  "run_attempt": 1,
+  "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/37824782946",
+  "run_conclusion": "failure",
+  "required_ci_job": {
+    "id": 113478741723,
+    "name": "required-ci",
+    "status": "completed",
+    "conclusion": "failure"
+  },
+  "checkout_attribution": "Exact PR run head and merge API parents/tree, frozen clean snapshot, pinned default actions/checkout; core giant logs intentionally not downloaded.",
+  "frozen_snapshot_clean": true,
+  "head_merge_tree_equality_verified": true,
+  "ci_workflow_byte_identical_to_400": true,
+  "executed_per_python": 8507,
+  "states_per_python": {
+    "failure": 1980,
+    "passed": 6456,
+    "error": 61,
+    "skipped": 10
+  },
+  "matrix_rosters_identical": true,
+  "matrix_outcomes_identical": true,
+  "roster_ids_sha256": "e6fe4f84c1c5018c63c1f52b972a44a6951aa42e5fe2e834214ecaae389697d0",
+  "roster_outcomes_sha256": "2b56c88f8648561a4a75f223eb987b569b8f38e0b27d6b2846ab5c12643cd01f",
+  "digest_encoding": "SHA256 canonical UTF-8 JSON; ensure_ascii=False, sort_keys=True, separators=(comma,colon); sorted node IDs or sorted [{nodeid,state}] records.",
+  "matrix": [
+    {
+      "python": "3.11",
+      "job_id": 113474696802,
+      "artifact_id": 11571311901,
+      "artifact_name": "pytest-core-3.11-37824782946-1",
+      "artifact_sha256": "238c5bfcaf3b9a463f7c07bd8aabb5a4e9b726b48972acfaeadfada9067abc86",
+      "artifact_bytes": 561671,
+      "xml_sha256": "ac3844e340bfb848ab6316323a4a6aad0a7bbb909afa186809ded04bff6c9740",
+      "xml_bytes": 7758413,
+      "case_json_sha256": "e42c88ef3902f9cb3c16e48ad19ea65578ddbe30f91f1a80f7a6913e3296a18e",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success",
+      "executed": 8507,
+      "states": {
+        "failure": 1980,
+        "passed": 6456,
+        "error": 61,
+        "skipped": 10
+      }
+    },
+    {
+      "python": "3.12",
+      "job_id": 113474697084,
+      "artifact_id": 11571391371,
+      "artifact_name": "pytest-core-3.12-37824782946-1",
+      "artifact_sha256": "5a432090f914db6ca88a2bc2eaf74ce4dd25ffd0d76a1e8fc38fa8daea9756a9",
+      "artifact_bytes": 561581,
+      "xml_sha256": "63e9323990cb231cac187ca63630adbf33ece608089310c0f1909158380d0bef",
+      "xml_bytes": 7758625,
+      "case_json_sha256": "36801491dcb94f05d9728c3bd6030c21ca48294e30a943875df5c064c06a11ac",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success",
+      "executed": 8507,
+      "states": {
+        "failure": 1980,
+        "passed": 6456,
+        "error": 61,
+        "skipped": 10
+      }
+    },
+    {
+      "python": "3.13",
+      "job_id": 113474697060,
+      "artifact_id": 11571590931,
+      "artifact_name": "pytest-core-3.13-37824782946-1",
+      "artifact_sha256": "111dd8ff3e06f5c90e4ed90967e0945cb1c8975628fc9892754927ef568bcd31",
+      "artifact_bytes": 561625,
+      "xml_sha256": "a608fb88eb3b5e8a85de4f9ea34e806ddaf1e8c8d5c41ee4a02905c4d6e2f9e3",
+      "xml_bytes": 7758626,
+      "case_json_sha256": "820616ddd873ce568aec64fb8d92fdcaa7efb7669e6d722c6e7de9c87ba586b6",
+      "job_conclusion": "failure",
+      "junit_upload_conclusion": "success",
+      "executed": 8507,
+      "states": {
+        "failure": 1980,
+        "passed": 6456,
+        "error": 61,
+        "skipped": 10
+      }
+    }
+  ],
+  "baseline": {
+    "executed": 8507,
+    "states": {
+      "failure": 1986,
+      "passed": 6450,
+      "error": 61,
+      "skipped": 10
+    },
+    "durable_delta_path": "v2plan/PR211_FOLLOWUP_CORE_ACCEPTANCE.json",
+    "durable_delta_sha256": "e9a1c5b0db620b7c055d52862f26d5940270b5f97abd22084f453f3a4b0e979a",
+    "core_outcomes_sha256": "9344538d533260a89dc4152767b3d38ef58d64807247ada6542960ce6d366b70"
+  },
+  "delta": {
+    "added": [],
+    "removed": [],
+    "transitions": [
+      {
+        "nodeid": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries0]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_indexed_mcp.py::test_indexed_repo_quote_without_answer_authority_survives_public_mcp[lookup_queries1]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_explicit_lookup_delivers_indexed_context_without_inferred_answer[Compare the Docs MCP server command and its configuration requirements.]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_explicit_lookup_delivers_indexed_context_without_inferred_answer[How does the Docs MCP server start, and why is it required?]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_explicit_lookup_delivers_indexed_context_without_inferred_answer[If configuration changes, which command starts the Docs MCP server? What is the default?]",
+        "before": "failure",
+        "after": "passed"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_explicit_lookup_delivers_indexed_context_without_inferred_answer[\\u041a\\u0430\\u043a \\u0437\\u0430\\u043f\\u0443\\u0441\\u043a\\u0430\\u0435\\u0442\\u0441\\u044f Docs MCP server \\u0438 \\u043f\\u043e\\u0447\\u0435\\u043c\\u0443 \\u043e\\u043d \\u043d\\u0443\\u0436\\u0435\\u043d?]",
+        "before": "failure",
+        "after": "passed"
+      }
+    ],
+    "transition_counts": {
+      "failure->passed": 6
+    },
+    "pass_regressions": [],
+    "policy_transitions": [],
+    "module_transitions": {
+      "tests/test_dictionary_exit_indexed_mcp.py": {
+        "failure->passed": 2
+      },
+      "tests/test_dictionary_exit_literal_needs_mcp.py": {
+        "failure->passed": 4
+      }
+    }
+  },
+  "all_8507_records_reconstructed_from_400_plus_six_transitions": true,
+  "targets": {
+    "six_permission_error_cases": {
+      "count": 6,
+      "states": {
+        "passed": 6
+      },
+      "same_permission_error_remains": 0,
+      "passed": 6
+    },
+    "model_caller_scope": {
+      "cases": [
+        {
+          "nodeid": "tests/test_product_scope.py::test_readme_leads_with_one_docs_mcp_journey_before_advanced_surfaces",
+          "baseline_state": "passed",
+          "baseline_message": "",
+          "state": "passed",
+          "message": "",
+          "permission_error_remains": false,
+          "old_pass_regressed": false
+        },
+        {
+          "nodeid": "tests/test_product_scope.py::test_installer_prints_the_docs_mcp_happy_path",
+          "baseline_state": "passed",
+          "baseline_message": "",
+          "state": "passed",
+          "message": "",
+          "permission_error_remains": false,
+          "old_pass_regressed": false
+        },
+        {
+          "nodeid": "tests/test_product_scope.py::test_three_real_project_task_designs_are_fairness_screened_and_distributed",
+          "baseline_state": "failure",
+          "baseline_message": "PermissionError: Project docs synchronization is unresolved: this API has no explicit mutation grant and validated member transaction; catalog membership does not authorize indexing, deduplication or orphan deletion.",
+          "state": "failure",
+          "message": "ValueError: fixture requires a nonempty finite docs-only catalog",
+          "permission_error_remains": false,
+          "old_pass_regressed": false
+        },
+        {
+          "nodeid": "tests/test_product_scope.py::test_agent_developer_protocol_rejects_scope_and_working_path_drift",
+          "baseline_state": "passed",
+          "baseline_message": "",
+          "state": "passed",
+          "message": "",
+          "permission_error_remains": false,
+          "old_pass_regressed": false
+        },
+        {
+          "nodeid": "tests/test_product_scope.py::test_agent_developer_protocol_is_a_hard_ci_gate",
+          "baseline_state": "passed",
+          "baseline_message": "",
+          "state": "passed",
+          "message": "",
+          "permission_error_remains": false,
+          "old_pass_regressed": false
+        }
+      ],
+      "states": {
+        "passed": 4,
+        "failure": 1
+      }
+    },
+    "unchanged_recovery_failures": [
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[If Client.send changes, how does it work and why is it required?]",
+        "state": "failure",
+        "first_failure": "AssertionError: assert 1920 <= 220"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[\\u0415\\u0441\\u043b\\u0438 Client.send \\u0438\\u0437\\u043c\\u0435\\u043d\\u0438\\u0442\\u0441\\u044f, \\u043a\\u0430\\u043a \\u043e\\u043d \\u0440\\u0430\\u0431\\u043e\\u0442\\u0430\\u0435\\u0442 \\u0438 \\u043f\\u043e\\u0447\\u0435\\u043c\\u0443 \\u043d\\u0443\\u0436\\u0435\\u043d?]",
+        "state": "failure",
+        "first_failure": "AssertionError: assert 1770 <= 220"
+      },
+      {
+        "nodeid": "tests/test_dictionary_exit_literal_needs_mcp.py::test_recovery_diagnostics_do_not_split_or_inherit_clauses[Compare A and B. What is the default?]",
+        "state": "failure",
+        "first_failure": "AssertionError: assert 1110 <= 220"
+      }
+    ],
+    "scope_limit": "The collected product-scope tests exercise model schema/scoring/gate integration, not a live provider model benchmark session.",
+    "product_scope_failure_first_message_identical_across_python": true
+  },
+  "remaining": "1980 FAIL, 61 ERROR, 10 SKIP per Python remain. Six positive indexed-MCP tests are fixed; no blanket legacy/fixture or live model/client claims.",
+  "audit_inputs": [
+    {
+      "file": "3be9c34-core-audit-summary.json",
+      "bytes": 145428,
+      "sha256": "19a158288d524598460dfdbc78ec43f0216026a2b04dfd55deb891e7170575d8"
+    },
+    {
+      "file": "3be9c34-core-provenance.json",
+      "bytes": 7450,
+      "sha256": "26f8604e7a31fdd57f563d1a2296691fdf7f1ae9afc5d80f60bf30ace6d74eb1"
+    },
+    {
+      "file": "3be9c34-core-artifacts.json",
+      "bytes": 5894,
+      "sha256": "10fa0a03ed55bf87c0237719737aa88a1c8a5972408d2b6c87e9c0aaed407bdb"
+    },
+    {
+      "file": "3be9c34-core-target-assessment.json",
+      "bytes": 11770,
+      "sha256": "9f7e438f216f48a26ea342c3c607af11350232632e2bc1f97b8f1710252d11a1"
+    }
+  ],
+  "reconstruction": {
+    "published_evidence_source_commit": "3be9c34afa49dcf4278d2910ec29ed37c305225c",
+    "foundation_head_sha": "f0ed956ce2c2ba19dc536bbe0ad6dbebb8418fa4",
+    "foundation_gzip_path": "v2plan/PR211_CONTINUATION_OUTCOMES.json.gz",
+    "foundation_gzip_sha256": "25d2b819b06bdbec2c785ba5e6648cff18daa44069fb620710dc059f248c9da4",
+    "foundation_uncompressed_sha256": "6c9f35798f1a42e05b5933df6233bc85f7e15a3d07bdf97d42b1d3209ae94b93",
+    "foundation_core_outcomes_sha256": "0aca214edf637db22bd2de5a44be662cb5302e9e61a62313074129f0f971e499",
+    "intermediate_head_sha": "40032f7be3c6d0822e8c25a2e2c53acf9a46aeea",
+    "intermediate_delta_path": "v2plan/PR211_FOLLOWUP_CORE_ACCEPTANCE.json",
+    "intermediate_delta_sha256": "e9a1c5b0db620b7c055d52862f26d5940270b5f97abd22084f453f3a4b0e979a",
+    "intermediate_transition_count": 35,
+    "intermediate_core_outcomes_sha256": "9344538d533260a89dc4152767b3d38ef58d64807247ada6542960ce6d366b70",
+    "final_transition_count": 6,
+    "final_core_outcomes_sha256": "2b56c88f8648561a4a75f223eb987b569b8f38e0b27d6b2846ab5c12643cd01f",
+    "unique_nodes_at_every_stage": 8507,
+    "added_or_removed_at_either_delta": false,
+    "verified_against_every_actual_python_junit": true,
+    "procedure": "Verify published gzip/delta hashes; filter core records; verify f0 outcome digest; require before states and apply35 transitions; verify400 digest; require before states and apply6 transitions; verify final roster/state digests against3 actual JUnit matrices."
+  }
+}

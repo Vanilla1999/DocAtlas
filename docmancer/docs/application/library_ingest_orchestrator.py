@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import asdict
+from copy import deepcopy
+import hashlib
 from datetime import datetime, timedelta, timezone
 import json
 import time
@@ -44,25 +46,28 @@ class LibraryIngestOrchestrator:
         async_: bool = False,
         target_plan: list[DocsTarget] | None = None,
     ) -> RefreshResult | DocsTargetsPrefetchResult | DocsJobStartResult:
-        if target_plan and self.ports.prefetch_targets is None:
-            raise RuntimeError("target prefetch port is not configured")
+        # Library names, legacy raw URLs and ceilings do not establish a finite
+        # target contract. Never resolve/register guessed sources as a fallback.
+        if not target_plan or len(target_plan) != 1 or not isinstance(target_plan[0], DocsTarget):
+            return self.unresolved(library, "explicit_target_required")
+        target_plan = deepcopy(target_plan)
+        target = target_plan[0]
+        if (target.library != library
+                or (ecosystem is not None and ecosystem != target.ecosystem)
+                or (versions is not None and versions != [target.version])
+                or (source_type is not None and source_type != target.source_type)
+                or (docs_url is not None and docs_url != target.docs_url)
+                or (docs_url_template is not None and docs_url_template != target.docs_url_template)):
+            return self.unresolved(library, "explicit_target_identity_mismatch")
+        if self.ports.prefetch_targets is None:
+            return self.unresolved(library, "explicit_target_port_required")
         if not async_:
-            if target_plan:
-                return self.ports.prefetch_targets(
-                    target_plan,
-                    force_refresh=force_refresh,
-                    continue_on_error=continue_on_error,
-                )
-            return self.ports.prefetch(
-                library,
-                ecosystem=ecosystem,
-                versions=versions,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                source_type=source_type,
+            result = self.ports.prefetch_targets(
+                target_plan,
                 force_refresh=force_refresh,
                 continue_on_error=continue_on_error,
             )
+            return result if self._known_target_result(result) else self.unresolved(library, "unknown_target_result")
 
         request_identity = json.dumps(
             {
@@ -71,6 +76,11 @@ class LibraryIngestOrchestrator:
                 "docs_url": redact_url(docs_url) if docs_url else None,
                 "docs_url_template": redact_url(docs_url_template) if docs_url_template else None,
                 "versions": versions or [],
+                # Redacted URLs alone collide on meaningful query parameters.
+                "target_plan_sha256": hashlib.sha256(json.dumps(
+                    [asdict(target) for target in target_plan], sort_keys=True,
+                    ensure_ascii=False, separators=(",", ":"),
+                ).encode("utf-8")).hexdigest(),
             },
             sort_keys=True,
         )
@@ -246,29 +256,29 @@ class LibraryIngestOrchestrator:
             return not cancelled()
 
         try:
-            if target_plan:
-                self.ports.prefetch_targets(
+            if cancelled():
+                if not self.jobs.generation_active(job_id, generation_id):
+                    return
+                if self.jobs.cancellation_requested(job_id):
+                    self._cancel(job_id)
+                else:
+                    self.jobs.update(job_id, status="failed", phase="done", reason_code="job_deadline_exceeded", retryable=True)
+                return
+            if target_plan and self.ports.prefetch_targets is not None:
+                result = self.ports.prefetch_targets(
                     target_plan,
                     force_refresh=force_refresh,
                     continue_on_error=continue_on_error,
                     job_id=job_id,
                     deadline_at=deadline,
+                    should_cancel=cancelled,
+                    begin_commit=begin_commit,
+                    staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
                 )
-                return
-            result = self.ports.prefetch(
-                library,
-                ecosystem=ecosystem,
-                versions=versions,
-                docs_url=docs_url,
-                docs_url_template=docs_url_template,
-                source_type=source_type,
-                force_refresh=force_refresh,
-                continue_on_error=continue_on_error,
-                should_cancel=cancelled,
-                deadline_at=deadline,
-                begin_commit=begin_commit,
-                staging_owner={"job_id": job_id, "generation_id": generation_id or ""},
-            )
+            else:
+                result = self.unresolved(library, "explicit_target_required")
+            if not self._known_target_result(result):
+                result = self.unresolved(library, "unknown_target_result")
         except Exception as exc:
             if not self.jobs.generation_active(job_id, generation_id):
                 return
@@ -330,6 +340,22 @@ class LibraryIngestOrchestrator:
 
     def _cancel(self, job_id: str) -> None:
         self.jobs.update(job_id, status="cancelled", phase="done", reason_code="cancelled", retryable=True, message="Library docs prefetch cancelled.")
+
+    @staticmethod
+    def unresolved(library: str, reason: str) -> RefreshResult:
+        return RefreshResult(
+            library_id=None, status="needs_explicit_target", docs_url=None,
+            last_refreshed_at=None, targets_failed=1, reason_codes=[reason],
+            message=f"{reason}: supply one explicit DocsTarget with selected URLs/files and transport ceilings.",
+        )
+
+    @staticmethod
+    def _known_target_result(result: Any) -> bool:
+        if not isinstance(result, RefreshResult):
+            return False
+        if result.status in {"updated", "ok", "skipped"}:
+            return type(result.targets_completed) is int and result.targets_completed > 0
+        return result.status in {"partial", "failed", "cancelled", "needs_docs_url", "needs_explicit_target", "needs_source_manifest", "aborted", "empty_index"}
 
     @staticmethod
     def _result_reason_code(result: RefreshResult, status: str) -> str:

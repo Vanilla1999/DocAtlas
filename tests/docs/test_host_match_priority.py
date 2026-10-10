@@ -7,7 +7,6 @@ from copy import deepcopy
 import pytest
 
 from docmancer.docs.application.context_candidate_ranking import _facet_aware_candidates
-from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from tests.docs.test_question_frame_paraphrase_e2e import _service
 
@@ -84,5 +83,3 @@ def test_three_requested_commands_survive_real_index(product, tmp_path, monkeypa
     assert all(fact in visible for fact in facts), {'missing': [f for f in facts if f not in visible], 'payload': payload}
     assert payload['answer_supported'] is False
     assert payload['edit_ready'] is False
-    assert len(payload['sources']) <= 3
-    assert docs_context_budget_tokens(payload) <= 800

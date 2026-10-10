@@ -1,7 +1,6 @@
 """Bounds, inspection trust and preservation controls for the follow-up repair."""
 from copy import deepcopy
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -9,11 +8,15 @@ from docmancer.docs.domain.query_script_runs import mixed_script_phrases
 from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 from docmancer.docs.application.query_block_recovery import select_query_block_recovery
 from docmancer.docs.application.inspection_recovery_seeds import inspection_recovery_seeds
-from docmancer.docs.application.context_packet_labels import compact_section_labels
-from docmancer.docs.application.model_visible_projection import docs_context_budget_tokens
-from eval.evidence_quality_v2.run import load_protocol, documents_for, audit_payload
-from eval.evidence_quality_v2.runtime import write_project, isolated_service, index_project
-from eval.evidence_quality_v2.observer import observe_call
+from docmancer.docs.application.source_continuation import SourceContinuationReader, _read_next_row
+from eval.evidence_quality_v2.run import load_protocol, documents_for
+from tests.docs._current_source_guard_fixtures import (
+    capture_source_case, source_binding, canonical_range, assert_visible_fact,
+)
+
+SOURCE_PATH = "docs/tutorial/parameter-types/bool.md"
+FACTS = ("Have in mind that it's a string with a preceding space and then a `/`.",
+         'So, it\'s `" /-S"` not `"/-S"`.')
 
 
 @pytest.mark.parametrize("question,expected", [
@@ -35,119 +38,113 @@ def test_script_runs_are_verbatim_bounded_not_translations(question, expected):
     assert all(text in question for text in expected)
 
 
-def test_new_hints_do_not_change_original_constraints_or_optional_cap():
+def test_literal_script_runs_do_not_become_implicit_queries_or_permissions():
     question = "Как resource cache не удаляет `CACHE_DIR`, если event stream остановлен?"
     plan = build_documentation_query_plan(question)
     assert plan.original_question == question
     assert plan.queries[0].text == question
-    hints = [q for q in plan.queries if q.text in mixed_script_phrases(question)]
-    assert hints
-    assert all(q.coverage_required is False and q.public_parent_query_id is None for q in hints)
-    assert sum(q.query_id.startswith(("query-hint-", "query-concept-", "query-relation-", "query-component-"))
-               for q in plan.queries) <= 4
+    assert [(q.query_id, q.origin, q.text, q.public_parent_query_id) for q in plan.queries] == [
+        ("query-original", "original", question, None)]
+    assert not plan.component_contract and plan.component_scope_complete is False
 
 
 @pytest.fixture
-def empty_seed(tmp_path):
+def source_seed(tmp_path):
     _, cases, manifest = load_protocol()
     case = next(c for c in cases if c["id"] == "typer-05")
-    root = tmp_path / "project"
-    write_project(root, documents_for("typer", manifest))
-    with isolated_service(tmp_path / "state") as (service, config):
-        index_project(service, config, root)
-        with patch("docmancer.docs.application.query_block_recovery.select_query_block_recovery",
-                   side_effect=lambda p, s, r, **kw: (p, s)):
-            _, trace = observe_call(service, {"question": case["question"], "project_path": str(root), "scope": "all"})
-    first = trace["stages"]["projector_outputs"][0]["payload"]
-    return first, trace["snapshot"], trace["stages"]["projector_inputs"][0], root
+    documents = documents_for("typer", manifest)
+    cap = capture_source_case(tmp_path, documents, case["question"], lookups=("preceding space",), scope="all")
+    for fact in FACTS:
+        assert_visible_fact(cap, SOURCE_PATH, fact)
+    public, source, attempt = source_binding(cap, SOURCE_PATH, FACTS[0])
+    raw = documents[SOURCE_PATH]
+    start, end = raw.index(FACTS[0]), raw.index(FACTS[-1]) + len(FACTS[-1])
+    assert canonical_range(public, source, start, end) is not None
+    return {"capture": cap, "public": public, "source": source, "attempt": attempt,
+            "question": case["question"], "start": start, "end": end}
 
 
-def test_empty_packet_only_gains_inspection_not_support_or_source_quotes(empty_seed):
-    p, s, r, _ = empty_seed
+def original_empty_request(seed):
+    # An explicit unit input, not a claimed public delivery or synthesized hint.
+    payload = {"kind": "docs_context", "status": "insufficient_evidence", "sources": [],
+               "support_status": "insufficient_evidence", "answer_supported": False,
+               "answer_available": False, "edit_ready": False, "read_next": []}
+    retrieval = {"question": seed["question"], "project_identity": seed["public"]["project_identity"],
+                 "_source_continuation_project_root": str(seed["capture"]["fixture_project"]),
+                 "documentation_query_plan": build_documentation_query_plan(seed["question"]).as_payload(),
+                 "context_pack": [deepcopy(seed["source"])]}
+    return payload, {}, retrieval
+
+
+def test_original_prose_cannot_mint_inspection_or_answer_permission(source_seed):
+    p, s, r = original_empty_request(source_seed)
     before = deepcopy((p, s))
-    out, bound = select_query_block_recovery(p, s, deepcopy(r), max_tokens=800)
-    assert out["read_next"]
-    assert not out.get("sources")
-    assert out["status"] == "insufficient_evidence"
-    assert out["support_status"] == "insufficient_evidence"
-    assert out["answer_supported"] is False and out["edit_ready"] is False
-    assert docs_context_budget_tokens(out) <= 300
-    assert out["read_next"][0]["line_end"] - out["read_next"][0]["line_start"] < 40
-    assert "__read_next__" in bound
-    assert (p, s) == before
+    assert inspection_recovery_seeds(r) == []
+    assert select_query_block_recovery(p, s, r, max_tokens=None) == before
 
 
-@pytest.mark.parametrize("field,value", [
-    ("project_identity", "foreign"), ("generation_id", "old"),
-    ("resolved_version", "wrong"), ("_source_snapshot_sha256", "sha256:" + "0" * 64),
-    ("path", "docs/elsewhere.md"), ("stale", True),
-    ("risk_flags", ["untrusted_instruction"]), ("lifecycle_status", "deprecated"),
-])
-def test_invalid_hint_source_never_issues_inspection(empty_seed, field, value):
-    p, s, r, _ = deepcopy(empty_seed)
-    for source in r["context_pack"]:
-        source[field] = value
-    out, _ = select_query_block_recovery(p, s, r, max_tokens=800)
-    assert out == p
-
-
-@pytest.mark.parametrize("damage", ["raw", "missing", "scope", "false_qualified", "parent", "not_verbatim", "hard_stop"])
-def test_snapshot_and_hint_contracts_fail_closed(empty_seed, damage):
-    p, s, r, _ = deepcopy(empty_seed)
-    for source in r["context_pack"]:
-        if damage == "raw": source["_reference_evidence"]["raw_document"] += "changed"
-        elif damage == "missing": source.pop("_reference_evidence", None)
-        elif damage == "scope": source["_reference_evidence"]["source"]["scope"]["snapshot_id"] = "elsewhere"
-        elif damage == "false_qualified":
-            for match in source["retrieval_query_matches"].values():
-                match.update(query_text="nonexistent zebrawidget", query_terms=["nonexistent", "zebrawidget"], qualified=True)
-    for q in r["documentation_query_plan"]["queries"]:
-        if q.get("origin") == "retrieval_hint":
-            if damage == "parent": q["public_parent_query_id"] = "query-original"
-            elif damage in {"not_verbatim", "false_qualified"}: q["text"] = "nonexistent zebrawidget"
+@pytest.mark.parametrize("damage", ["false_qualified", "parent", "not_verbatim", "hard_stop"])
+def test_injected_legacy_hint_has_no_current_query_authority(source_seed, damage):
+    p, s, r = original_empty_request(source_seed)
+    hint = {"query_id": "query-hint-1", "origin": "retrieval_hint", "text": "boolean option",
+            "coverage_required": False, "public_parent_query_id": None}
+    if damage == "parent": hint["public_parent_query_id"] = "query-original"
+    if damage == "not_verbatim": hint["text"] = "nonexistent zebrawidget"
+    r["documentation_query_plan"]["queries"].append(hint)
+    r["context_pack"][0]["retrieval_query_matches"][hint["query_id"]] = {
+        "qualified": True, "query_text": hint["text"], "query_origin": "retrieval_hint"}
     if damage == "hard_stop": r["hard_stop"] = True
-    assert select_query_block_recovery(p, s, r, max_tokens=800)[0] == p
+    assert inspection_recovery_seeds(r) == []
+    assert select_query_block_recovery(p, s, r, max_tokens=None) == (p, s)
 
 
-def test_added_range_rechecks_policy_and_is_not_a_whole_document_grant(empty_seed):
-    p, s, r, _ = deepcopy(empty_seed)
-    for source in r["context_pack"]:
-        for match in source["retrieval_query_matches"].values():
-            match["forbidden_evidence_terms"] = ["To do that", "preceding space", "separated by"]
-    out, bound = select_query_block_recovery(p, s, r, max_tokens=800)
-    if out["read_next"]:
-        raw = bound["__read_next__"]["source"]["_reference_evidence"]["raw_document"]
-        t = out["read_next"][0]
-        text = "\n".join(raw.splitlines()[t["line_start"]-1:t["line_end"]])
-        assert not any(term.casefold() in text.casefold() for term in ["To do that", "preceding space", "separated by"])
+def test_exact_inspection_range_keeps_both_facts_and_rechecks_policy(source_seed):
+    row, source = canonical_range(source_seed["public"], source_seed["source"],
+                                  source_seed["start"], source_seed["end"])
+    assert all(fact in row["snippet"] for fact in FACTS)
+    assert row["line_end"] - row["line_start"] + 1 <= SourceContinuationReader.max_lines
+    target = _read_next_row(str(source_seed["capture"]["fixture_project"]), source,
+                           line_start=row["line_start"], line_end=row["line_end"], reason="inspect_source_context")
+    assert target is not None
+    assert (target["line_start"], target["line_end"]) == (row["line_start"], row["line_end"])
+    assert target["path"] == SOURCE_PATH
+    assert source["retrieval_query_matches"] == {} and source["_assigned_requirement_ids"] == []
+    changed = deepcopy(source_seed["source"])
+    assert changed["retrieval_query_matches"]
+    for match in changed["retrieval_query_matches"].values():
+        match["forbidden_evidence_terms"] = ["To do that", "preceding space", "separated by"]
+    assert canonical_range(source_seed["public"], changed, source_seed["start"], source_seed["end"]) is None
 
 
-def test_existing_requested_part_target_is_not_replaced(empty_seed):
-    p, s, r, _ = deepcopy(empty_seed)
+def test_existing_requested_part_target_is_not_replaced(source_seed):
+    p, s, r = original_empty_request(source_seed)
     p["read_next"] = [{"reason": "requested_part_missing", "source_uri": "docatlas://source/committed"}]
-    assert select_query_block_recovery(p, s, r, max_tokens=800) == (p, s)
+    assert select_query_block_recovery(p, s, r, max_tokens=None) == (p, s)
 
 
-@pytest.mark.parametrize("condition", ["host", "checked", "answer", "too_small", "exact_path"])
-def test_noninspection_contracts_unchanged(empty_seed, condition):
-    p, s, r, _ = deepcopy(empty_seed)
-    budget = 800
-    if condition == "host": r["documentation_query_plan"]["queries"].append({"origin": "host_lookup"})
-    elif condition == "checked": p["context_quality"] = {"status": "checked"}
-    elif condition == "answer": p["answer_supported"] = True
-    elif condition == "too_small": budget = 1
-    else: r["documentation_query_plan"]["explicit_paths"] = ["docs/another.md"]
-    assert select_query_block_recovery(p, s, r, max_tokens=budget) == (p, s)
+def test_explicit_lookup_is_not_removed_to_enable_implicit_inspection(source_seed):
+    attempt = deepcopy(source_seed["attempt"])
+    p, s, r = attempt["projected_payload"], attempt["snapshot"], attempt["before_projection"]
+    assert any(q["origin"] == "host_lookup" for q in r["documentation_query_plan"]["queries"])
+    assert select_query_block_recovery(p, s, r, max_tokens=None) == (p, s)
 
 
-def test_trial_reads_no_files_and_registers_no_resources(empty_seed, monkeypatch):
-    from docmancer.docs.application.source_continuation import SourceContinuationReader
-    p, s, r, _ = deepcopy(empty_seed)
+def test_trial_reads_no_files_and_registers_no_resources(source_seed, monkeypatch):
     def forbidden(*a, **kw):
         raise AssertionError("trial performed I/O or registered resources")
     for method in ("issue", "issue_range"):
         monkeypatch.setattr(SourceContinuationReader, method, forbidden)
     monkeypatch.setattr(Path, "read_text", forbidden)
     monkeypatch.setattr(Path, "read_bytes", forbidden)
-    out, _ = select_query_block_recovery(p, s, r, max_tokens=800)
-    assert out["read_next"]
+    row, source = canonical_range(source_seed["public"], source_seed["source"],
+                                  source_seed["start"], source_seed["end"])
+    assert _read_next_row(str(source_seed["capture"]["fixture_project"]), source,
+                          line_start=row["line_start"], line_end=row["line_end"], reason="inspect_source_context")
+
+
+def test_original_question_keeps_the_exact_negative_option_spelling(tmp_path):
+    _, cases, manifest = load_protocol()
+    case = next(c for c in cases if c["id"] == "typer-05")
+    cap = capture_source_case(tmp_path, documents_for("typer", manifest), case["question"], scope="all")
+    for fact in FACTS:
+        assert_visible_fact(cap, SOURCE_PATH, fact)

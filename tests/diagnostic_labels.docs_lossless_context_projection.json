@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_docs_lossless_context_projection.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_docs_lossless_context_projection.py": "17c23d1c7f2d3e140b90e025278109035fa1e66866dfbbcd320781ce92151ae4"
+  }
+}

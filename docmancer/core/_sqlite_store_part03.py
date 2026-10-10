@@ -313,9 +313,7 @@ class _SQLiteStorePart03:
         exact_terms = tuple(dict.fromkeys(
             token.casefold()
             for token in re.findall(r"[\w~./:+-]+", query)
-            if token.casefold() not in _GENERIC_QUERY_TERMS
-            and token.casefold() not in _QUERY_STOPWORDS
-            and is_exact_technical_token(token)
+            if is_exact_technical_token(token)
         ))
         fields = {
             "title": title.casefold(),
@@ -366,12 +364,6 @@ class _SQLiteStorePart03:
         if tokens > 600:
             contributions.append(("long_section_penalty", -0.3 * (tokens - 600) / 600))
 
-        boilerplate_overlap = title_words & _BOILERPLATE_KEYWORDS
-        if boilerplate_overlap:
-            contributions.append(
-                ("boilerplate_title_penalty", -3.0 * len(boilerplate_overlap))
-            )
-
         title_term_overlap = title_words & content_terms
         if title_term_overlap:
             contributions.append(("title_term_boost", 1.5 * len(title_term_overlap)))
@@ -389,31 +381,12 @@ class _SQLiteStorePart03:
         ):
             contributions.append(("leading_exact_phrase_boost", 2.0))
 
-        task_signals = {
-            "how", "create", "setup", "set", "configure", "install", "add",
-            "build", "deploy", "start", "connect", "enable", "generate", "register",
-        }
-        action_verbs = {
-            "create", "set", "setup", "configure", "install", "add", "build",
-            "deploy", "start", "connect", "enable", "initialize", "register",
-            "sign", "generate", "getting", "started",
-        }
-        if content_terms & task_signals and title_words & action_verbs:
-            contributions.append(("task_action_title_boost", 1.5))
-
         metadata = json.loads(str(row.get("metadata_json") or "{}"))
         authority = str(metadata.get("authority") or "").casefold()
-        legal_intent = bool(content_terms & _BOILERPLATE_KEYWORDS)
-        if authority == "legal" and not legal_intent:
-            contributions.append(("non_legal_query_legal_source_penalty", -4.0))
-        elif authority in {"generated", "mirror", "stale"}:
+        if authority in {"generated", "mirror", "stale"}:
             contributions.append((f"{authority}_authority_penalty", -3.0))
         elif authority == "external_generic":
             contributions.append(("external_generic_authority_penalty", -1.5))
-        project_signals = {"project", "repository", "repo", "docatlas", "rule", "policy"}
-        if authority == "project_rule" and content_terms & project_signals:
-            contributions.append(("project_rule_authority_boost", 2.0))
-
         source = str(row["source"])
         chunk_index = int(row["chunk_index"])
         content_hash = str(row.get("content_hash") or _chunk_hash(str(row["text"])))
@@ -501,15 +474,8 @@ class _SQLiteStorePart03:
 
     @staticmethod
     def _strip_stopwords(query: str) -> str:
-        """Remove common stopwords to reduce noise in BM25 scoring."""
-        tokens = re.findall(r"\w+", query)
-        answer_format_request = any(token.casefold() in {"ответь", "укажи"} for token in tokens)
-        filtered = [
-            token for token in tokens
-            if token.casefold() not in _QUERY_STOPWORDS
-            and not (answer_format_request and token.casefold() in {"evidence", "id", "ids"})
-        ]
-        return " ".join(filtered) if filtered else query
+        """Tokenize FTS input without a natural-language omission dictionary."""
+        return " ".join(re.findall(r"\w+", query)) or query
 
     def _search_rows(
         self,
@@ -518,15 +484,12 @@ class _SQLiteStorePart03:
         *,
         filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
-        # Contrast connectors can dominate an OR candidate window without
-        # identifying either subject. Keep the original query for qualification.
-        search_text = query
-        if not re.search(r'[`"]', query):
-            contrasted = re.sub(r"\brather\s+than\b", " ", query, flags=re.I).strip()
-            if re.search(r"\w", contrasted):
-                search_text = contrasted
-        cleaned = self._strip_stopwords(search_text)
+        cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
+        # These are literal query words, never an FTS expression. Quote every
+        # token so uppercase AND/OR/NOT remain data in both backend lanes.
+        literal_terms = [f'"{token}"' for token in terms]
+        cleaned = " ".join(literal_terms)
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
@@ -562,7 +525,7 @@ class _SQLiteStorePart03:
                     pass
                 if rows and not (filters or {}).get("project_identity"):
                     return self._mark_lexical_mode(rows, "and")
-                fallback_query = " OR ".join(terms)
+                fallback_query = " OR ".join(literal_terms)
                 if not fallback_query:
                     return []
                 child_fallback = list(

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import fnmatch
-import os
 import time
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
@@ -38,6 +37,7 @@ class SourceBoundary:
     max_directory_depth: int = 20
     gitignore_patterns: tuple[str, ...] = field(default=(), repr=False)
     enabled: bool = True
+    code_files: tuple[str, ...] = ()
 
     @classmethod
     def from_project(cls, root: Path) -> SourceBoundary:
@@ -48,7 +48,12 @@ class SourceBoundary:
                 configured = DocmancerConfig.from_yaml(config_path).project.source_boundary()
             except (OSError, ValueError):
                 return cls(enabled=False)
-        return cls.from_config(configured, root=root)
+        from dataclasses import replace
+        from docmancer.docs.project_docs_catalog import read_project_docs_catalog
+        catalog = read_project_docs_catalog(root)
+        boundary = cls.from_config(configured, root=root)
+        return replace(boundary, code_files=catalog.code_files if catalog.present and catalog.valid else (),
+                       enabled=boundary.enabled and catalog.present and catalog.valid)
 
     @classmethod
     def from_config(
@@ -81,67 +86,88 @@ def iter_bounded_source_files(
     include_generated: bool = False,
     clock: Callable[[], float] = time.monotonic,
 ) -> Iterator[Path]:
-    if not boundary.enabled:
+    if not boundary.enabled or not boundary.code_files or len(boundary.code_files) > boundary.max_scanned_files:
         return
+    include_generated = include_generated is True
     deadline = clock() + boundary.scan_deadline_seconds
     scanned_files = 0
     scanned_bytes = 0
     seen_paths: set[Path] = set()
-    roots = _safe_source_roots(root, boundary.source_roots)
-    for source_root in roots:
-        for directory, dirnames, filenames in os.walk(source_root, followlinks=False):
-            if clock() >= deadline:
-                return
-            current = Path(directory)
-            relative_directory = current.relative_to(root)
-            depth = len(relative_directory.parts)
-            if depth > boundary.max_directory_depth:
-                dirnames.clear()
-                continue
-            kept_dirs: list[str] = []
-            for name in sorted(dirnames):
-                candidate = current / name
-                relative = candidate.relative_to(root).as_posix()
-                if candidate.is_symlink() or _excluded_directory(relative, name, boundary):
-                    continue
-                if not include_generated and _generated_path(relative, boundary):
-                    continue
-                kept_dirs.append(name)
-            dirnames[:] = kept_dirs
-            for filename in sorted(filenames):
-                if clock() >= deadline or scanned_files >= boundary.max_scanned_files:
-                    return
-                path = current / filename
-                if path.is_symlink() or path in seen_paths:
-                    continue
-                seen_paths.add(path)
-                relative = path.relative_to(root).as_posix()
-                suffix = path.suffix.lower()
-                extensions = frozenset(boundary.include_extensions) or supported_extensions
-                if suffix not in extensions or suffix not in supported_extensions:
-                    continue
-                if _matches_any(relative, boundary.exclude_paths):
-                    continue
-                if not include_generated and _generated_path(relative, boundary):
-                    continue
-                if boundary.respect_gitignore and _gitignored(relative, boundary.gitignore_patterns):
-                    continue
-                try:
-                    size = path.stat().st_size
-                except OSError:
-                    continue
-                scanned_files += 1
-                if size > boundary.max_file_bytes or scanned_bytes + size > boundary.max_scanned_bytes:
-                    if scanned_bytes + size > boundary.max_scanned_bytes:
-                        return
-                    continue
-                scanned_bytes += size
-                yield path
+    # Whole declaration preflight: an invalid member cannot yield a partial grant.
+    paths = []
+    for relative in boundary.code_files:
+        if clock() >= deadline:
+            return
+        path = finite_local_path(root, relative, boundary=boundary,
+                                 supported_extensions=supported_extensions,
+                                 include_generated=include_generated)
+        if path is None or path in seen_paths:
+            return
+        seen_paths.add(path)
+        paths.append(path)
+    for path in paths:
+        if clock() >= deadline or scanned_files >= boundary.max_scanned_files:
+            return
+        try:
+            size = path.stat().st_size
+        except OSError:
+            return
+        if scanned_bytes + size > boundary.max_scanned_bytes:
+            return
+        scanned_files += 1
+        scanned_bytes += size
+        yield path
+
+
+def finite_local_path(root: Path, relative: str, *, boundary: SourceBoundary,
+                      supported_extensions: frozenset[str],
+                      include_generated: bool = False,
+                      use_configured_extensions: bool = True) -> Path | None:
+    """Check one literal member without visiting siblings or following symlinks."""
+    from pathlib import PurePosixPath
+    from docmancer.docs.project_docs_catalog import _literal_path
+    include_generated = include_generated is True
+    if not boundary.enabled or not isinstance(relative, str) or not _literal_path(relative):
+        return None
+    parts = PurePosixPath(relative).parts
+    if use_configured_extensions and boundary.source_roots and not any(
+        value == "." or (_literal_path(value) and
+            (relative == value or relative.startswith(value + "/")))
+        for value in boundary.source_roots
+    ):
+        return None
+    if len(parts) - 1 > boundary.max_directory_depth:
+        return None
+    current = root
+    for part in parts:
+        current = current / part
+        if current.is_symlink():
+            return None
+    try:
+        path = current.resolve()
+        path.relative_to(root.resolve())
+        if not path.is_file() or path.stat().st_size > boundary.max_file_bytes:
+            return None
+    except (OSError, ValueError):
+        return None
+    if any(_excluded_directory('/'.join(parts[:index + 1]), part, boundary)
+           for index, part in enumerate(parts[:-1])):
+        return None
+    extensions = (frozenset(boundary.include_extensions) or supported_extensions) if use_configured_extensions else supported_extensions
+    if path.suffix.lower() not in extensions or path.suffix.lower() not in supported_extensions:
+        return None
+    if _matches_any(relative, boundary.exclude_paths):
+        return None
+    if not include_generated and _generated_path(relative, boundary):
+        return None
+    if boundary.respect_gitignore and _gitignored(relative, boundary.gitignore_patterns):
+        return None
+    return path
 
 
 def _safe_source_roots(root: Path, configured: tuple[str, ...]) -> tuple[Path, ...]:
     if not configured:
-        return (root,)
+        return ()
     roots: list[Path] = []
     for value in configured:
         candidate = root / value
@@ -205,6 +231,9 @@ def _match_path(relative: str, pattern: str) -> bool:
 
 def _read_gitignore(root: Path) -> tuple[str, ...]:
     path = root / ".gitignore"
+    if path.is_symlink():
+        # An unreviewed external ignore file must not relax local boundaries.
+        return ("*",)
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:

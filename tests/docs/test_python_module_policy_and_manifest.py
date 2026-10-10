@@ -18,14 +18,13 @@ def test_architecture_module_docs_are_registered_as_source_of_truth():
     assert catalog.present is True
     assert catalog.valid is True, catalog.warnings
     expected = {
-        "docs/modules/question-planning.md": "docmancer/docs/domain",
-        "docs/modules/evidence-selection.md": "docmancer/docs/application",
-        "docs/modules/storage-mutation-coordination.md": "docmancer/docs/infrastructure",
+        "docs/modules/project-context-retrieval.md": "docmancer/docs",
+        "docs/modules/evidence-selection.md": "docmancer/docs",
     }
     observed = {
         entry.path: entry.module_path
         for entry in catalog.entries
-        if entry.path in expected
+        if entry.scope == "module"
     }
     assert observed == expected
     for entry in catalog.entries:
@@ -35,21 +34,26 @@ def test_architecture_module_docs_are_registered_as_source_of_truth():
             assert entry.authority == "source_of_truth"
             assert entry.status == "active"
 
-    policy = next(
-        entry for entry in catalog.entries
-        if entry.path == "docs/development/python-module-size-policy.md"
-    )
-    assert policy.scope == "project"
-    assert policy.role == "development"
-    assert policy.authority == "source_of_truth"
-    assert policy.status == "active"
+    # Maintained reference files are not implicit read membership. The reviewed
+    # finite catalog, rather than a link or conventional location, owns access.
+    unselected = {
+        "docs/modules/question-planning.md",
+        "docs/modules/storage-mutation-coordination.md",
+        "docs/development/python-module-size-policy.md",
+    }
+    assert unselected.isdisjoint(entry.path for entry in catalog.entries)
+    assert all((ROOT / path).is_file() for path in unselected)
 
 
 def test_question_planning_and_evidence_selection_document_the_same_boundary():
     planning = (ROOT / "docs/modules/question-planning.md").read_text(encoding="utf-8")
     selection = (ROOT / "docs/modules/evidence-selection.md").read_text(encoding="utf-8")
-    assert "project-answer requirement contract" in planning
-    assert "project-answer requirement contract" in selection
+    for document in (planning, selection):
+        normalized = " ".join(document.split())
+        assert "ProjectAnswerContract" in normalized
+        assert "does not compile a free-form documentation question into inferred proof obligations" in normalized
+        assert "original-query credit cannot be borrowed from host lookups" in normalized
+        assert "cannot authorize an edit" in normalized
     assert "evidence-selection" in planning
     assert "question planning" in selection.lower()
 

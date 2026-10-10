@@ -10,7 +10,6 @@ from docmancer.docs.domain.query_reference_binding import prepare_reference_prob
 from .joint_context_candidates import _context_row, _verified_document
 from .joint_context_selection import unread_lines
 from .model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS, INSUFFICIENT_EVIDENCE_MAX_TOKENS,
     docs_context_budget_tokens, validate_model_visible_projection,
 )
 from .query_block_context import MAX_OPTIONS, ranked_blocks
@@ -19,7 +18,7 @@ from .source_continuation import (
 )
 
 
-def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int):
+def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
     plan = retrieval.get("documentation_query_plan") or {}
     root = str(retrieval.get("_source_continuation_project_root") or "")
     previous = payload.get("read_next") or []
@@ -27,20 +26,20 @@ def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, 
         or payload.get("support_status") not in {"retrieval_only", "insufficient_evidence"}
         or any(payload.get(k) is not False for k in ("answer_supported", "answer_available", "edit_ready"))
         or (payload.get("context_quality") or {}).get("status") == "checked"
-        or len(payload.get("sources", [])) > 3
         or len(previous) > 1
         or previous and previous[0].get("reason") != "inspect_source_context"
         or any(q.get("origin") == "host_lookup" for q in plan.get("queries", []) if isinstance(q, dict))):
         return payload, snapshot
     question = str(plan.get("original_question") or retrieval.get("question") or "")
-    budget = min(max_tokens, DOCS_CONTEXT_MAX_TOKENS)
+    budget = max_tokens
     proposals, seen = [], set()
     seeds = [(seed, (snapshot.get(seed["evidence_id"]) or {}).get("source"))
              for seed in payload.get("sources", [])]
+    max_documents = 3  # prior optional scan work, not packet source eligibility
     if not seeds:
         from .inspection_recovery_seeds import inspection_recovery_seeds
         seeds = inspection_recovery_seeds(retrieval)
-        budget = min(budget, INSUFFICIENT_EVIDENCE_MAX_TOKENS)
+        max_documents = 32  # unchanged bounded inspection-seed acquisition
     for seed, source in seeds:
         if not isinstance(source, dict):
             continue
@@ -51,6 +50,8 @@ def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, 
         key = (seed["project_identity"], seed["path_or_url"], ref["source"]["content_sha256"])
         if key in seen:
             continue
+        if len(seen) >= max_documents:
+            break
         seen.add(key)
         ranked = ranked_blocks(raw, ref["source"]["document_id"], question)
         old_rank = (-1, -1.0)
@@ -95,24 +96,7 @@ def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, 
                     continue
                 trial, bindings = deepcopy(payload), deepcopy(snapshot)
                 if not attach_docs_context_read_next(trial, target, max_tokens=budget):
-                    from .context_packet_labels import compact_section_labels
-                    trial, bindings = compact_section_labels(payload, snapshot)
-                    if not attach_docs_context_read_next(trial, target, max_tokens=budget):
-                        # These locators have not been issued. Replace only
-                        # redundant same-snapshot exploratory readers with the
-                        # explicit bounded inspection target, never obligations
-                        # or capabilities already stored in the reader registry.
-                        for public in trial.get("sources", []):
-                            old_bound = bindings.get(public.get("evidence_id")) or {}
-                            old_source = old_bound.get("source") or {}
-                            if (public.get("path_or_url") == target["path"]
-                                and public.get("project_identity") == target["project_identity"]
-                                and old_source.get("_source_snapshot_sha256") == target["snapshot_sha256"]):
-                                public.pop("source_uri", None)
-                                old_bound.pop("source_uri", None)
-                                (old_bound.get("projected_source") or {}).pop("source_uri", None)
-                        if not attach_docs_context_read_next(trial, target, max_tokens=budget):
-                            continue
+                    continue
                 bindings["__read_next__"] = {"source": deepcopy(candidate)}
                 if validate_model_visible_projection(trial, snapshot=bindings, max_tokens=budget):
                     continue

@@ -173,27 +173,25 @@ def test_symlink_replacement_after_authorization_cannot_escape(filesystem_reader
         reader.gateway.read_snapshot(ref)
 
 
-def test_public_handler_binds_reader_to_real_active_sqlite_snapshot(tmp_path):
-    from docmancer.core.config import DocmancerConfig
-    from docmancer.docs.service import LibraryDocsService
+def test_public_handler_binds_reader_to_real_active_sqlite_snapshot(tmp_path, monkeypatch):
     from docmancer.mcp.docs_server import call_docs_tool_payload, read_docs_resource
-    (tmp_path / 'docs').mkdir()
-    (tmp_path / 'pyproject.toml').write_text('[project]\nname="reader-smoke"\nversion="0.1"\n')
-    path = tmp_path / 'docs/jobs.md'
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    project = tmp_path / 'project'
+    (project / 'docs').mkdir(parents=True)
+    (project / 'pyproject.toml').write_text('[project]\nname="reader-smoke"\nversion="0.1"\n')
+    path = project / 'docs/jobs.md'
     path.write_text('# Job polling\n\nJob polling uses docs_status to inspect progress.\n\n'
         + '\n'.join('Poll jobs with docs_status until terminal status.' for _ in range(30)) + '\n')
-    (tmp_path / 'docatlas.project-docs.yaml').write_text(
+    (project / 'docatlas.project-docs.yaml').write_text(
         'schema_version: 1\ndocuments:\n  - path: docs/jobs.md\n    role: runbook\n'
         '    scope: project\n    authority: source_of_truth\n    status: active\n'
         '    description: Job polling lifecycle\n')
-    config = DocmancerConfig()
-    config.index.provider = 'sqlite'
-    config.index.db_path = str(tmp_path / 'state/index.db')
-    config.index.extracted_dir = str(tmp_path / 'state/extracted')
-    service = LibraryDocsService(config=config, config_source='explicit')
-    assert service.sync_project_docs(str(tmp_path), with_vectors=False).status == 'success'
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ('docs/jobs.md',),
+    )
+    assert sync.status == 'success'
     args = dict(question='Explain job polling.', lookup_queries=['job polling progress'],
-                project_path=str(tmp_path), scope='all')
+                project_path=str(project), scope='all')
     payload = call_docs_tool_payload('get_docs_context', args, service)
     from scripts.run_project_docs_self_host_gate import _call_with_snapshot, _coverage_attribution
     observed, snapshot = _call_with_snapshot({**args, 'question': 'Job polling uses docs_status to inspect progress.'}, service)

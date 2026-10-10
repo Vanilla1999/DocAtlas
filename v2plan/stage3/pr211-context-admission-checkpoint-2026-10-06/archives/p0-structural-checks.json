@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "expression": "{'timeout': 'deadline'}",
+      "technical_candidate": false
+    },
+    {
+      "expression": "{'close menu': closeMenu}",
+      "technical_candidate": false
+    },
+    {
+      "expression": "{'timeout': source.deadline}",
+      "technical_candidate": false
+    },
+    {
+      "expression": "{'query': source.query}",
+      "technical_candidate": true
+    },
+    {
+      "expression": "{'query': query}",
+      "technical_candidate": true
+    },
+    {
+      "expression": "{'query': translated_query}",
+      "technical_candidate": false
+    },
+    {
+      "expression": "{'sources': list(packet.sources)}",
+      "technical_candidate": true
+    },
+    {
+      "expression": "{'permission': True, 'run': True}",
+      "technical_candidate": false
+    },
+    {
+      "expression": "{'scope': source.scope, 'freshness': source.freshness}",
+      "technical_candidate": true
+    },
+    {
+      "expression": "Literal['project', 'module', 'all']",
+      "technical_candidate": true
+    },
+    {
+      "expression": "['run', 'execute', 'invoke']",
+      "technical_candidate": false
+    },
+    {
+      "expression": "query.startswith('run ')",
+      "technical_candidate": false
+    }
+  ],
+  "passed": 12
+}

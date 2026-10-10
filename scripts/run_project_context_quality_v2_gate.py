@@ -14,6 +14,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from eval.project_context_quality_v2_protocol import run_live
+from scripts.summarize_acceptance_artifacts import (
+    _FOCUSED_CASE_IDS, _focused_fields, _focused_bound, _focused_qualification,
+    print_focused_stage_records,
+)
 
 LOCK_PATH = ROOT / "eval/project_context_quality_v2/acceptance.lock.json"
 V2_PROTOCOL_LOCK = ROOT / "eval/project_context_quality_v2/protocol.lock.json"
@@ -35,7 +39,7 @@ def _fraction(value: Any, *, name: str) -> tuple[int, int]:
 
 def load_acceptance_lock(path: Path = LOCK_PATH) -> dict[str, Any]:
     lock = json.loads(path.read_text(encoding="utf-8"))
-    if lock.get("schema_version") != "project-context-quality-v2-acceptance-v1":
+    if lock.get("schema_version") != "project-context-quality-v2-acceptance-v3":
         raise ValueError("unsupported V2 acceptance lock")
     expected = {
         "v2_protocol_lock_sha256": _sha256(V2_PROTOCOL_LOCK),
@@ -50,8 +54,10 @@ def load_acceptance_lock(path: Path = LOCK_PATH) -> dict[str, Any]:
 def verify_v2_acceptance(report: dict[str, Any], lock: dict[str, Any] | None = None) -> list[str]:
     lock = lock or load_acceptance_lock()
     failures: list[str] = []
-    if report.get("schema_version") != "project-context-quality-v2-result-2":
+    if report.get("schema_version") != "project-context-quality-v2-result-4":
         return ["unexpected V2 report schema"]
+    if report.get("output_cost_policy") != lock["output_cost_policy"]:
+        failures.append("V2 output cost policy does not match the reviewed acceptance policy")
     if report.get("run_mode") != "live_self_host":
         failures.append("V2 acceptance requires live_self_host mode")
     validation = report.get("validation") or {}
@@ -97,6 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     failures = verify_v2_acceptance(report)
+    print_focused_stage_records(report)
     if failures:
         print("V2 project-context acceptance: FAIL")
         for failure in failures:
@@ -108,7 +115,7 @@ def main(argv: list[str] | None = None) -> int:
         "V2 project-context acceptance: PASS; "
         f"natural={natural['semantic_usefulness']['numerator']}/15; "
         f"paraphrases={exposed['semantic_usefulness']['numerator']}/5; "
-        "false_full=0; safety/budgets=25/25"
+        "false_full=0; safety/cost observations=25/25; source count and output cost are measured without fixed ceilings"
     )
     return 0
 

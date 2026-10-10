@@ -5,11 +5,15 @@ from docmancer.docs.tool_choice_eval import (
     installed_guidance,
     main,
     public_tool_schemas,
+    _schema_version,
+    tool_choice_contract_sha256,
 )
-from eval.agent_developer_v1.model_report_contract import validate_report
+from eval.agent_developer_v1.model_report_contract import ReportContractError, validate_report
+import hashlib
 import httpx
 import json
 from pathlib import Path
+import pytest
 
 from scripts.openai_live_support import (
     OpenAILiveHTTPError,
@@ -40,16 +44,59 @@ class _Adapter:
         return {"tool": scenario.expected_first_tool, "arguments": scenario.expected_next_action}
 
 
-def test_tool_choice_evaluation_has_frozen_20_scenarios_and_three_repeats():
+def test_tool_choice_evaluation_has_frozen_20_scenarios_and_three_repeats(tmp_path, monkeypatch):
+    from scripts import run_live_model_closure as closure
+
     assert len(SCENARIOS) == 20
+    guidance, schemas = installed_guidance(), public_tool_schemas()
     report = evaluate_tool_choice(
-        _Adapter(), guidance=installed_guidance(), tool_schemas=public_tool_schemas()
+        _Adapter(), guidance=guidance, tool_schemas=schemas,
     )
     assert len(report["results"]) == len(SCENARIOS) * REPEATS
     assert report["metrics"]["first_tool_accuracy"] == 1.0
     assert report["metrics"]["legacy_tool_hallucination_rate"] == 0.0
     assert report["passed"] is True
     assert report["tool_schema_version"].startswith("sha256:")
+    assert report["tool_choice_contract_sha256"] == tool_choice_contract_sha256(
+        guidance=guidance, tool_schemas=schemas,
+    )
+
+    # This is a deterministic adapter control, never claimed as a live run.
+    current = json.loads(json.dumps(report))
+    current.update(provider_id="opencode-chat", reasoning_effort="medium")
+    current["adapter"]["model_version"] = "gpt-5.6-luna"
+    output = tmp_path / "task21-current-control.json"
+    monkeypatch.setattr(closure, "TASK21_REPORT", output)
+    output.write_text(json.dumps(current), encoding="utf-8")
+    assert closure._task21_report_reusable() is True
+    mutations = (
+        ("schema", lambda value: value.update(tool_schema_version="sha256:44577591d79a3b2d")),
+        ("oracle", lambda value: value.update(tool_choice_contract_sha256="0" * 64)),
+        ("missing_oracle", lambda value: value.pop("tool_choice_contract_sha256")),
+        ("duplicate_row", lambda value: value["results"].__setitem__(0, value["results"][1])),
+        ("wrong_expected_tool", lambda value: value["results"][0].update(expected_tool="docs_status")),
+        ("missing_metrics", lambda value: value.pop("metrics")),
+        ("invented_accuracy", lambda value: value["metrics"].update(first_tool_accuracy=0.0)),
+        ("legacy_decisions", lambda value: [row.update(tool="legacy_search") for row in value["results"]]),
+        ("missing_outcome", lambda value: value["results"][0].pop("first_tool_correct")),
+        ("missing_action_copy", lambda value: [row.update(next_action_correct=None) for row in value["results"] if row["scenario_id"] == "prepare-and-retry"]),
+        ("missing_original_retry", lambda value: [row.update(original_question_retried=None) for row in value["results"] if row["scenario_id"] == "prepare-and-retry"]),
+    )
+    for label, mutate in mutations:
+        invalid = json.loads(json.dumps(current))
+        mutate(invalid)
+        output.write_text(json.dumps(invalid), encoding="utf-8")
+        assert closure._task21_report_reusable() is False, label
+    low_quality = json.loads(json.dumps(current))
+    for row in low_quality["results"]:
+        if row["scenario_id"] == "prepare-and-retry":
+            row["original_question_retried"] = False
+    low_quality["metrics"]["original_question_retry_rate"] = 0.0
+    output.write_text(json.dumps(low_quality), encoding="utf-8")
+    assert closure._task21_report_reusable() is False, "consistent below-threshold retry despite passed=true"
+    output.write_text(json.dumps(current), encoding="utf-8")
+    monkeypatch.setattr(closure, "installed_guidance", lambda: guidance + "\nChanged installed contract.")
+    assert closure._task21_report_reusable() is False
 
 
 def test_tool_choice_evaluation_rejects_fake_or_empty_schemas():
@@ -200,9 +247,24 @@ def test_implementation_fact_scenarios_do_not_expect_a_docs_tool():
 
 
 def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
+    """Audit exact archived bytes; only fresh reports can prove current closure.
+
+    Provenance and the earlier Agent fingerprint-only reseal are recorded in
+    eval/results/HISTORICAL_LIVE_REPORTS.md. These archives are not new runs.
+    """
     report_path = Path("eval/results/task21_tool_choice_gate.json")
-    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report_bytes = report_path.read_bytes()
+    report = json.loads(report_bytes)
     results = report["results"]
+
+    if hashlib.sha256(report_bytes).hexdigest() == "78f41a7d92a0d115ee2e525268d1a6468684eb615da539b91bc5d0edbd362bc2":
+        assert report["tool_schema_version"] == "sha256:44577591d79a3b2d"
+        assert "tool_choice_contract_sha256" not in report
+    else:
+        assert report["tool_schema_version"] == _schema_version(public_tool_schemas())
+        assert report["tool_choice_contract_sha256"] == tool_choice_contract_sha256(
+            guidance=installed_guidance(), tool_schemas=public_tool_schemas(),
+        )
 
     assert report["tool_schema_version"].startswith("sha256:")
     assert report["scenario_count"] == len(SCENARIOS)
@@ -233,14 +295,24 @@ def test_committed_live_report_is_explicit_and_matches_frozen_scenarios():
 
     agent_path = Path("eval/agent_developer_v1/results/model-benchmark.json")
     assert agent_path.is_file()
-    agent_report = json.loads(agent_path.read_text(encoding="utf-8"))
-    summary = validate_report(
-        agent_report,
-        expected_model="gpt-5.6-luna",
-        min_pass_rate=0.0,
-        require_full=True,
-    )
-    assert summary["task_count"] == 11
+    agent_bytes = agent_path.read_bytes()
+    agent_report = json.loads(agent_bytes)
+    if hashlib.sha256(agent_bytes).hexdigest() == "3980c26740edf11feab20c8db669595048732791fb3ab1d95ac9e926b09b2d3b":
+        assert agent_report["public_tasks_sha256"] == "517853c15d0a234307199ccd4dfdbd8cb8f8dee56f7a1e12bee247a02634a9b8"
+        assert agent_report["oracle_contract_sha256"] == "666318e529a8ea8afcf30b471e2d2744723680c3c697538b9719ec9b70afe306"
+        assert agent_report["task_count"] == agent_report["executed_task_count"] == len(agent_report["tasks"]) == 11
+        assert agent_report["passed_tasks"] == 0
+        assert agent_report["pass_rate"] == 0.0
+        with pytest.raises(ReportContractError, match="oracle_contract_sha256 does not match the current evaluator contract"):
+            validate_report(agent_report, expected_model="gpt-5.6-luna", min_pass_rate=0.0, require_full=True)
+    else:
+        summary = validate_report(
+            agent_report,
+            expected_model="gpt-5.6-luna",
+            min_pass_rate=0.0,
+            require_full=True,
+        )
+        assert summary["task_count"] == 11
     assert agent_report["provider_id"] in {"openai-api", "opencode-chat"}
     assert agent_report["infrastructure_errors"] == []
     assert agent_report["false_supported"] == 0

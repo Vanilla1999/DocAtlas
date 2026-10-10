@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_docs_initial_delivery.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_docs_initial_delivery.py": "070c8135c91a5fc9c7c45beacc18d43c15f6472eb32abae29f4087061df7dba4"
+  }
+}

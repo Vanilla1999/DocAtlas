@@ -7,8 +7,8 @@ def _normal(value: Any) -> str:
     return re.sub(r"\s+", " ", str(value or "").casefold().replace("ё", "е").replace("_", " ")).strip()
 
 
-def _bounded_text(text: str) -> str:
-    return text.strip()[:MAX_ANSWER_UNIT_CHARS]
+def _bounded_text(text: str, *, representation_bounded: bool = True) -> str:
+    return text.strip()[:MAX_ANSWER_UNIT_CHARS] if representation_bounded else text.strip()
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,8 +33,6 @@ class AnswerUnit:
             or self.char_start < 0 or self.char_end <= self.char_start
         ):
             raise ValueError("invalid answer unit offsets")
-        if len(self.text) > MAX_ANSWER_UNIT_CHARS:
-            raise ValueError("answer unit exceeds bound")
         expected = hashlib.sha256(self.text.encode("utf-8")).hexdigest()
         if expected != self.content_sha256:
             raise ValueError("answer unit hash mismatch")
@@ -124,10 +122,13 @@ class LocalProof:
     reason: str = ""
 
 
-def _make_unit(kind: str, raw: str, start: int, end: int, *, proposition: bool) -> AnswerUnit | None:
+def _make_unit(
+    kind: str, raw: str, start: int, end: int, *, proposition: bool,
+    representation_bounded: bool = True,
+) -> AnswerUnit | None:
     left_trim = len(raw) - len(raw.lstrip())
     right_trim = len(raw) - len(raw.rstrip())
-    text = _bounded_text(raw)
+    text = _bounded_text(raw, representation_bounded=representation_bounded)
     if not text:
         return None
     start += left_trim
@@ -143,8 +144,10 @@ def _make_unit(kind: str, raw: str, start: int, end: int, *, proposition: bool) 
     )
 
 
-def _make_source_field_unit(name: str, value: Any) -> AnswerUnit | None:
-    text = _bounded_text(str(value or ""))
+def _make_source_field_unit(
+    name: str, value: Any, *, representation_bounded: bool = True,
+) -> AnswerUnit | None:
+    text = _bounded_text(str(value or ""), representation_bounded=representation_bounded)
     if not text:
         return None
     identity = hashlib.sha256(f"source_field\0{name}\0{text}".encode("utf-8")).hexdigest()
@@ -155,7 +158,7 @@ def _make_source_field_unit(name: str, value: Any) -> AnswerUnit | None:
         char_start=None,
         char_end=None,
         content_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        proposition=True,
+        proposition=False,
         source_field=name,
     )
 
@@ -165,28 +168,31 @@ def extract_answer_units(
     *,
     source_fields: Mapping[str, Any] | None = None,
     include_soft_wrapped_prose: bool = False,
+    representation_bounded: bool = True,
 ) -> tuple[AnswerUnit, ...]:
-    """Extract deterministic local propositions without merging unrelated chunks.
+    """Extract deterministic bounded context, not certified propositions.
 
-    The default path preserves the v2 line-oriented unit surface.  New v3
-    obligations may opt into exact paragraph sentences and continued Markdown
-    bullets when source prose is hard-wrapped.  This keeps frozen v1/v2
-    selection traces stable while allowing a predicate or object to cross one
-    physical line boundary without becoming an incomplete witness.
+    Markdown/code structure and punctuation supply boundaries only.  Optional
+    soft-wrap handling preserves exact paragraph sentences and continued
+    bullets.  Neither length nor a recognized word grants proof authority.
     """
 
     source = str(text or "")
     if not source.strip():
         return ()
     units: list[AnswerUnit] = []
+    key_value_re = _KEY_VALUE_RE if representation_bounded else _UNBOUNDED_KEY_VALUE_RE
     lines = list(re.finditer(r".*(?:\n|$)", source))
     heading_positions: list[tuple[int, int, str]] = []
     in_fence = False
     fence_start = 0
     fence_lines: list[tuple[int, int, str]] = []
 
-    def add(kind: str, raw: str, start: int, end: int, proposition: bool = True) -> None:
-        unit = _make_unit(kind, raw, start, end, proposition=proposition)
+    def add(kind: str, raw: str, start: int, end: int) -> None:
+        unit = _make_unit(
+            kind, raw, start, end, proposition=False,
+            representation_bounded=representation_bounded,
+        )
         if unit is not None:
             units.append(unit)
 
@@ -207,11 +213,11 @@ def extract_answer_units(
                 fence_lines = []
             else:
                 for code_start, code_end, code_line in fence_lines:
-                    if _CODE_DECL_RE.match(code_line) or _KEY_VALUE_RE.match(code_line):
+                    if _CODE_DECL_RE.match(code_line) or key_value_re.match(code_line):
                         add("code_declaration", code_line, code_start, code_end)
                 if fence_lines and not any(_CODE_DECL_RE.match(value[2]) for value in fence_lines):
                     raw_block = source[fence_start:line_match.end()]
-                    if len(raw_block.strip()) <= MAX_ANSWER_UNIT_CHARS:
+                    if not representation_bounded or len(raw_block.strip()) <= MAX_ANSWER_UNIT_CHARS:
                         # Preserve source-relative offsets.  Passing a stripped
                         # block with the untrimmed start used to shorten the
                         # span and could make a selected code-block witness
@@ -245,43 +251,17 @@ def extract_answer_units(
                     block_end = continuation_end
                 consumed_until = block_end
             block = source[start:block_end]
-            add(
-                "bullet", block, start, block_end,
-                proposition=bool(
-                    _COPULA_RE.search(block) or _BEHAVIOR_RE.search(block)
-                    or _KEY_VALUE_RE.match(bullet.group(1))
-                    or len(block.split()) >= 2
-                ),
-            )
+            add("bullet", block, start, block_end)
             continue
         if "|" in line and not _TABLE_SEPARATOR_RE.match(line) and len([part for part in line.split("|") if part.strip()]) >= 2:
-            add("table_row", line, start, end, proposition=True)
+            add("table_row", line, start, end)
             continue
-        if _KEY_VALUE_RE.match(line):
-            add("key_value", line, start, end, proposition=True)
+        if key_value_re.match(line):
+            add("key_value", line, start, end)
             continue
         if _CODE_DECL_RE.match(line):
-            add("code_declaration", line, start, end, proposition=True)
+            add("code_declaration", line, start, end)
             continue
-        next_line = (
-            lines[line_index + 1].group(0).rstrip("\n")
-            if line_index + 1 < len(lines) else ""
-        )
-        next_is_plain_prose = bool(
-            next_line.strip()
-            and not next_line.strip().startswith("```")
-            and not _HEADING_RE.match(next_line)
-            and not _BULLET_RE.match(next_line)
-            and not _TABLE_SEPARATOR_RE.match(next_line)
-            and not ("|" in next_line and len([part for part in next_line.split("|") if part.strip()]) >= 2)
-            and not _KEY_VALUE_RE.match(next_line)
-            and not _CODE_DECL_RE.match(next_line)
-        )
-        soft_wrapped_line = bool(
-            include_soft_wrapped_prose
-            and next_is_plain_prose
-            and not re.search(r"[.!?]\s*$", line)
-        )
         for sentence in _SENTENCE_RE.finditer(line):
             sentence_text = sentence.group(0).strip()
             if not sentence_text:
@@ -289,14 +269,6 @@ def extract_answer_units(
             sentence_start = start + sentence.start() + (len(sentence.group(0)) - len(sentence.group(0).lstrip()))
             add(
                 "sentence", sentence_text, sentence_start, sentence_start + len(sentence_text),
-                proposition=bool(
-                    not soft_wrapped_line
-                    and (
-                        _COPULA_RE.search(sentence_text) or _BEHAVIOR_RE.search(sentence_text)
-                        or _STATUS_VALUE_RE.search(sentence_text) or _VERSION_VALUE_RE.search(sentence_text)
-                        or _DURATION_RE.search(sentence_text) or len(sentence_text.split()) >= 4
-                    )
-                ),
             )
 
     if include_soft_wrapped_prose:
@@ -306,13 +278,13 @@ def extract_answer_units(
 
         def flush_paragraph() -> None:
             nonlocal paragraph_lines, paragraph_sentence_count
-            if not paragraph_lines or paragraph_sentence_count >= 16:
+            if not paragraph_lines or (representation_bounded and paragraph_sentence_count >= 16):
                 paragraph_lines = []
                 return
             paragraph_start = paragraph_lines[0][0]
             paragraph_end = paragraph_lines[-1][1]
             paragraph = source[paragraph_start:paragraph_end]
-            if "\n" not in paragraph or len(paragraph) > MAX_ANSWER_UNIT_CHARS:
+            if "\n" not in paragraph or (representation_bounded and len(paragraph) > MAX_ANSWER_UNIT_CHARS):
                 paragraph_lines = []
                 return
             for sentence in _PARAGRAPH_SENTENCE_RE.finditer(paragraph):
@@ -325,14 +297,9 @@ def extract_answer_units(
                 add(
                     "paragraph_sentence", stripped,
                     sentence_start, sentence_start + len(stripped),
-                    proposition=bool(
-                        _COPULA_RE.search(stripped) or _BEHAVIOR_RE.search(stripped)
-                        or _STATUS_VALUE_RE.search(stripped) or _VERSION_VALUE_RE.search(stripped)
-                        or _DURATION_RE.search(stripped) or len(stripped.split()) >= 4
-                    ),
                 )
                 paragraph_sentence_count += 1
-                if paragraph_sentence_count >= 16:
+                if representation_bounded and paragraph_sentence_count >= 16:
                     break
             paragraph_lines = []
 
@@ -353,7 +320,7 @@ def extract_answer_units(
                 or _BULLET_RE.match(line)
                 or _TABLE_SEPARATOR_RE.match(line)
                 or ("|" in line and len([part for part in line.split("|") if part.strip()]) >= 2)
-                or _KEY_VALUE_RE.match(line)
+                or key_value_re.match(line)
                 or _CODE_DECL_RE.match(line)
             )
             if structural:
@@ -382,8 +349,8 @@ def extract_answer_units(
         body_text = source[heading_end:block_end].strip()
         if not body_text or candidate.strip() == heading_text:
             continue
-        if len(candidate) <= MAX_ANSWER_UNIT_CHARS:
-            add("heading_context", candidate, heading_start, block_end, proposition=True)
+        if not representation_bounded or len(candidate) <= MAX_ANSWER_UNIT_CHARS:
+            add("heading_context", candidate, heading_start, block_end)
 
     positional = sorted(
         (unit for unit in units if unit.char_start is not None and unit.char_end is not None),
@@ -400,9 +367,10 @@ def extract_answer_units(
         previous = current[-1]
         gap = source[previous.char_end:unit.char_start]
         if (
-            len(current) < 6
+            (not representation_bounded or len(current) < 6)
             and not gap.strip()
-            and unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS
+            and (unit.kind == "bullet") == (previous.kind == "bullet")
+            and (not representation_bounded or unit.char_end - current[0].char_start <= MAX_ANSWER_UNIT_CHARS)
         ):
             current.append(unit)
         else:
@@ -414,8 +382,10 @@ def extract_answer_units(
 
     if include_soft_wrapped_prose:
         group_count = 0
-        for run in runs[:12]:
-            max_width = min(6, len(run))
+        for run in runs[:12] if representation_bounded else runs:
+            if not representation_bounded and not all(unit.kind == "bullet" for unit in run):
+                continue
+            max_width = min(6, len(run)) if representation_bounded else len(run)
             for width in range(2, max_width + 1):
                 for offset in range(0, len(run) - width + 1):
                     window = run[offset:offset + width]
@@ -425,28 +395,30 @@ def extract_answer_units(
                         continue
                     material = source[start:end]
                     bullet_count = sum(item.kind == "bullet" for item in window)
-                    if bullet_count >= 2 or _SEQUENCE_RE.search(material) or len(_ACTION_RE.findall(material)) >= 2:
-                        add("unit_group", material, start, end, proposition=True)
+                    if bullet_count == len(window):
+                        add("unit_group", material, start, end)
                         group_count += 1
-                        if group_count >= 24:
+                        if representation_bounded and group_count >= 24:
                             break
-                if group_count >= 24:
+                if representation_bounded and group_count >= 24:
                     break
-            if group_count >= 24:
+            if representation_bounded and group_count >= 24:
                 break
     else:
-        for run in runs[:12]:
+        for run in runs[:12] if representation_bounded else runs:
             start = run[0].char_start
             end = run[-1].char_end
             if start is None or end is None:
                 continue
             material = source[start:end]
             bullet_count = sum(item.kind == "bullet" for item in run)
-            if bullet_count >= 2 or _SEQUENCE_RE.search(material) or len(_ACTION_RE.findall(material)) >= 2:
-                add("unit_group", material, start, end, proposition=True)
+            if bullet_count == len(run):
+                add("unit_group", material, start, end)
 
     for field_name, value in sorted((source_fields or {}).items()):
-        unit = _make_source_field_unit(str(field_name), value)
+        unit = _make_source_field_unit(
+            str(field_name), value, representation_bounded=representation_bounded,
+        )
         if unit is not None:
             units.append(unit)
 
@@ -458,7 +430,7 @@ def extract_answer_units(
         item.char_end if item.char_end is not None else 10**9,
         item.kind, item.source_field or "", item.unit_id,
     ))
-    return tuple(ordered[:MAX_ANSWER_UNITS])
+    return tuple(ordered[:MAX_ANSWER_UNITS] if representation_bounded else ordered)
 
 
 def _obligation_technical_term(obligation: ProofObligation) -> TechnicalTerm | None:
@@ -551,87 +523,26 @@ def _purpose_clause(
     *,
     max_words: int = 14,
 ) -> tuple[str, int] | None:
-    """Return the strongest clause that locally binds subject and purpose.
-
-    A direct ``subject -> predicate`` proposition is preferred to a reverse
-    imperative/example (``set ... with SUBJECT``).  Both remain valid, but the
-    direct form is the better model-visible answer when both are available.
-    """
-
-    matches: list[tuple[int, str]] = []
-    for _start, _end, clause in _bounded_clauses(text):
-        subject_spans = _subject_spans(obligation, clause)
-        if not subject_spans:
-            continue
-        predicate_spans = [
-            match.span()
-            for pattern in (_PURPOSE_RE, _PURPOSE_COPULA_RE)
-            for match in pattern.finditer(clause)
-            if _positive_relation_match(match, clause)
-        ]
-        for subject in subject_spans:
-            for predicate in predicate_spans:
-                if subject[0] < predicate[1] and predicate[0] < subject[1]:
-                    continue
-                if _word_distance(subject, predicate, clause) > max_words:
-                    continue
-                matches.append((4 if subject[0] < predicate[0] else 3, clause))
-    if not matches:
-        return None
-    score, clause = max(matches, key=lambda item: (item[0], len(item[1])))
-    return clause, score
+    """Compatibility helper: literal proximity does not prove purpose."""
+    return None
 
 
 def _context_score(context: str | None, text: str, source_text: str) -> int:
-    if not context:
-        return 1
-
-    # Context matching is token based and intentionally uses only a tiny,
-    # domain-neutral derivational map.  This makes ``clear-index`` compatible
-    # with the source path ``index-cleanup.md`` without introducing a global
-    # stemmer that could corrupt API/config identities.
-    canonical = {
-        "cleanup": "clear",
-        "cleaning": "clear",
-        "clearing": "clear",
-        "indexes": "index",
-        "indices": "index",
-        "indexing": "index",
-    }
-
-    def tokens(value: str) -> set[str]:
-        return {
-            canonical.get(token.casefold(), token.casefold())
-            for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", value)
-            if len(token) > 2
-        }
-
-    wanted = tokens(context)
-    if not wanted:
-        return 1
-    haystack = tokens(f"{text}\n{source_text}")
-    return 3 if wanted.issubset(haystack) else 0
+    """Metadata/token overlap and empty context confer no semantic credit."""
+    return 0
 
 
 def _predicate_has_object(match: re.Match[str], text: str) -> bool:
-    tail = text[match.end():]
-    clause = re.split(r"[.;!?\n]", tail, maxsplit=1)[0]
-    return len(re.findall(r"[A-Za-zА-Яа-яЁё0-9_~-]+", clause)) >= 1
+    return False
 
 
 def _positive_relation_match(match: re.Match[str], text: str) -> bool:
-    prefix = text[max(0, match.start() - 30):match.start()]
-    if re.search(
-        r"\b(?:without|not|never|does\s+not|do\s+not|will\s+not)\s+(?:\w+\s+){0,2}$",
-        prefix,
-        re.I,
-    ):
-        return False
-    return _predicate_has_object(match, text)
+    """Compatibility helper: a caller-supplied predicate is not entailment."""
+    return False
 
 
 def _positive_relation(pattern: re.Pattern[str], text: str) -> bool:
-    return any(_positive_relation_match(match, text) for match in pattern.finditer(text))
+    return False
 
 
 def _effect_relation_valid(
@@ -640,35 +551,7 @@ def _effect_relation_valid(
     *,
     max_words: int = 16,
 ) -> bool:
-    """Require the requested effect and command subject in the same clause."""
-
-    relation = obligation.relation
-    for _start, _end, clause in _bounded_clauses(text):
-        subjects = _subject_spans(obligation, clause)
-        if not subjects:
-            continue
-        if relation == "delete":
-            matches = [
-                match for match in _DELETE_PREDICATE_RE.finditer(clause)
-                if _positive_relation_match(match, clause)
-            ]
-        elif relation == "preserve":
-            matches = [
-                match for match in _PRESERVE_PREDICATE_RE.finditer(clause)
-                if _positive_relation_match(match, clause)
-            ]
-            matches.extend(
-                match for match in _NEGATED_DELETE_RE.finditer(clause)
-                if _predicate_has_object(match, clause)
-            )
-        else:
-            return False
-        if any(
-            _word_distance(subject, match.span(), clause) <= max_words
-            for subject in subjects
-            for match in matches
-        ):
-            return True
+    """Compatibility helper: no effect vocabulary or negation inversion."""
     return False
 
 __all__=['_normal', '_bounded_text', 'AnswerUnit', 'materialize_answer_units', 'LocalProof', '_make_unit', '_make_source_field_unit', 'extract_answer_units', '_obligation_technical_term', '_contains_term', '_subject_spans', '_subject_present', '_bounded_clauses', '_word_distance', '_purpose_clause', '_context_score', '_predicate_has_object', '_positive_relation_match', '_positive_relation', '_effect_relation_valid']

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_current_schema_lossless_recovery.py": "schema"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_current_schema_lossless_recovery.py": "d73e5fe81ab4b44ee78c030d84ecfc46536626ff5a3459559c9ae47f257ee0d5"
+  }
+}

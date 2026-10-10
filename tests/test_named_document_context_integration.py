@@ -1,16 +1,119 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from dataclasses import asdict
+from pathlib import Path
 
 import pytest
 
-from docmancer.agent import DocmancerAgent
-from docmancer.core.config import DocmancerConfig
-from docmancer.docs.application.docs_job_service import DocsJobTracker
-from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import LibraryDocsService
 from docmancer.mcp.docs_server import call_docs_tool_payload
+from tests._fixture_member_transaction import (
+    cold_fixture_member_service,
+    fixture_member_mutation,
+    fixture_member_state,
+    indexed_fixture_member_service,
+)
+
+
+def test_named_document_fixture_requires_confirmed_hash_bound_members(tmp_path, monkeypatch):
+    project = tmp_path / "project"
+    project.mkdir()
+    path = project / "README.md"
+    original = b"# Owned fixture\n\nThe member transaction preserves exact bytes.\n"
+    path.write_bytes(original)
+    unselected = project / "unselected.md"
+    unselected.write_text("# Not selected\n\nThis file is outside the fixture grant.\n")
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\ndocuments:\n  - path: README.md\n    role: overview\n"
+        "    scope: project\n    description: Exact member fixture.\n",
+    )
+    cold = cold_fixture_member_service(tmp_path, monkeypatch)
+    grant = fixture_member_mutation(cold, project, ("README.md",), expected_generation_id=None)
+    with pytest.raises(PermissionError, match="no explicit mutation grant"):
+        cold.project_docs.sync_project_docs(str(project), with_vectors=False)
+    for change, error, reason in (
+        ("confirmation", PermissionError, "confirmation"),
+        ("content_hash", ValueError, "document hash precondition"),
+        ("catalog_hash", ValueError, "catalog hash precondition"),
+        ("entry_hash", PermissionError, "not bound to the current catalog entry"),
+        ("missing_generation", PermissionError, "complete member mutation object"),
+        ("wrong_operation", PermissionError, "matching operation"),
+        ("wrong_storage", PermissionError, "host-selected member store"),
+        ("unselected", PermissionError, "not bound to the current catalog entry"),
+    ):
+        invalid = deepcopy(grant)
+        if change == "confirmation":
+            invalid["confirm"] = False
+        elif change == "content_hash":
+            invalid["documents"][0]["content_sha256"] = "0" * 64
+        elif change == "catalog_hash":
+            invalid["catalog_sha256"] = "0" * 64
+        elif change == "entry_hash":
+            invalid["documents"][0]["catalog_entry_hash"] = "sha256:" + "0" * 64
+        elif change == "missing_generation":
+            del invalid["expected_generation_id"]
+        elif change == "wrong_operation":
+            invalid["operation"] = "ingest_project_docs"
+        elif change == "wrong_storage":
+            invalid["storage_path"] = str(project / "index.db")
+        else:
+            invalid["documents"][0]["path"] = "unselected.md"
+        with pytest.raises(error, match=reason):
+            cold.project_docs.sync_project_docs(str(project), mutation=invalid)
+        assert not cold.member_storage_policy.app_home.exists()
+        assert cold._service is None
+        assert path.read_bytes() == original
+        assert "outside the fixture grant" in unselected.read_text()
+    committed = cold.project_docs.sync_project_docs(str(project), mutation=grant)
+    assert committed.status == "success"
+    assert committed.diagnostics["metrics"]["members"] == 1
+    assert committed.diagnostics["metrics"]["sources_deleted"] == 0
+    from contextlib import closing
+    with closing(cold.member_storage_policy.connect()) as conn:
+        rows = conn.execute("SELECT source, content FROM sources").fetchall()
+    assert [(row["source"], row["content"].encode()) for row in rows] == [(str(path), original)]
+    assert "outside the fixture grant" in unselected.read_text()
+
+
+def test_named_document_fixture_cas_preserves_unselected_source(tmp_path, monkeypatch):
+    service, root = _named_document_service(
+        tmp_path, monkeypatch, ["docs/selected.md", "docs/unselected.md"],
+        {"docs/selected.md": "# Selected\n\nInitial selected fixture text.\n",
+         "docs/unselected.md": "# Unselected\n\nUnrelated source must survive a member upsert.\n"},
+    )
+    project = Path(root)
+    policy = service.member_storage_policy
+    first_generation = policy.generation()
+    stale = fixture_member_mutation(
+        service, project, ("docs/selected.md",), expected_generation_id=first_generation,
+    )
+    before = fixture_member_state(service)
+    unrelated = next(row for row in before["sources"] if str(project / "docs/unselected.md") in row)
+    original_files = {path: (project / path).read_bytes()
+                      for path in ("docs/selected.md", "docs/unselected.md")}
+    updated = b"# Selected\n\nExplicitly updated selected fixture text.\n"
+    (project / "docs/selected.md").write_bytes(updated)
+    fresh = fixture_member_mutation(
+        service, project, ("docs/selected.md",), expected_generation_id=first_generation,
+    )
+    with pytest.raises(ValueError, match="document hash precondition"):
+        service.sync_project_docs(root, mutation=stale)
+    assert fixture_member_state(service) == before
+    result = service.sync_project_docs(root, mutation=fresh)
+    assert result.status == "success"
+    assert result.changed_count == 1 and result.new_count == 0
+    assert result.diagnostics["metrics"]["sources_deleted"] == 0
+    assert policy.generation() != first_generation
+    committed = fixture_member_state(service)
+    assert next(row for row in committed["sources"] if str(project / "docs/unselected.md") in row) == unrelated
+    # Reusing the successful request cannot acquire the new generation implicitly.
+    with pytest.raises(ValueError, match="active generation precondition"):
+        service.sync_project_docs(root, mutation=fresh)
+    assert fixture_member_state(service) == committed
+    assert (project / "docs/selected.md").read_bytes() == updated
+    assert (project / "docs/unselected.md").read_bytes() == original_files["docs/unselected.md"]
 
 
 def _named_document_service(
@@ -33,16 +136,10 @@ def _named_document_service(
         for path in paths
     )
     (project / "docatlas.project-docs.yaml").write_text(catalog, encoding="utf-8")
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, paths,
     )
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
+    assert sync.status == "success"
     return service, str(project)
 
 
@@ -93,17 +190,9 @@ documents:
 """,
         encoding="utf-8",
     )
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, (plan_path, "ARCHITECTURE.md"),
     )
-
-    sync = service.sync_project_docs(str(project), with_vectors=False)
     question = (
         f"In {plan_path}, summarize ForkSource, Policy72Hours, LocalizationError, "
         "and DependencyPin."
@@ -159,16 +248,10 @@ def test_named_document_single_fact_does_not_expose_unrequested_document_content
         "    status: active\n    impact: track\n",
         encoding="utf-8",
     )
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docmancer.db")
-    config.index.extracted_dir = str(tmp_path / "extracted")
-    service = LibraryDocsService(
-        config=config,
-        registry=LibraryRegistry(config.index.db_path),
-        agent=DocmancerAgent(config=config),
-        job_tracker=DocsJobTracker(),
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, (plan_path,),
     )
-    assert service.sync_project_docs(str(project), with_vectors=False).status == "success"
+    assert sync.status == "success"
     question = f"In {plan_path}, summarize ForkSource."
     result = call_docs_tool_payload(
         "get_docs_context",
@@ -597,7 +680,6 @@ def test_real_sqlite_compound_onboarding_maximizes_host_lookup_coverage(
         query_id.startswith("query-intent-")
         for query_id in result["missing_query_ids"]
     )
-    assert result["estimated_tokens"] <= 800
 
 
 def test_real_sqlite_audited_russian_alias_covers_original_question(

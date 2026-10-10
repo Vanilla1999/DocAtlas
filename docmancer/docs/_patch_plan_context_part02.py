@@ -18,6 +18,25 @@ def build_patch_plan_context(
     max_tokens: int | None = 2400,
 ) -> dict[str, Any]:
     """Return patch-planning response shape with lightweight source discovery."""
+    from docmancer.docs.domain.source_boundary import SourceBoundary
+    root = Path(project_path).expanduser().resolve() if project_path else None
+    boundary = SourceBoundary.from_project(root) if root is not None else None
+    if boundary is None or not boundary.enabled or not boundary.code_files:
+        payload = {
+            "schema_version": PATCH_PLAN_CONTEXT_SCHEMA_VERSION,
+            "tool": PATCH_PLAN_CONTEXT_TOOL, "status": "partial",
+            "reason_code": "unresolved_local_code_membership",
+            "answer_available": False, "answer_completeness": "unresolved",
+            "task": {"title": question, "project": project_path},
+            "current_behavior": [], "relevant_files": [], "existing_apis": [],
+            "missing_symbols": [], "design_context": design_context,
+            "minimal_patch_path": [], "risks_and_constraints": [],
+            "verification": [], "evidence": [], "rejected_sources": [],
+            "warnings": ["No finite code membership; no source/dependency scan performed. Read membership is not edit permission."],
+            "next_actions": [], "token_estimate": 0,
+        }
+        payload["token_estimate"] = _estimate_tokens(payload)
+        return _enforce_patch_plan_budget(payload, max_tokens=max_tokens or 2400)
 
     relevant_files = discover_relevant_source_files(
         question,
@@ -44,19 +63,9 @@ def build_patch_plan_context(
             max_files=max_files or 12,
             max_snippets=max_snippets or 16,
         )
-    dependency_apis, dependency_warnings = discover_dart_dependency_apis(
-        question,
-        project_path=project_path,
-        symbol_queries=symbol_queries,
-        include_dependency_source=include_dependency_source,
-    )
-    missing_symbols = discover_missing_symbols(
-        question,
-        project_path=project_path,
-        symbol_queries=symbol_queries,
-        searched_dependency=bool(dependency_apis),
-        dependency_apis=dependency_apis,
-    )
+    dependency_apis = []
+    dependency_warnings = ["Dependency source membership unresolved; no dependency metadata read."]
+    missing_symbols = []
     implementation_map = build_implementation_map(
         question,
         project_path=project_path,
@@ -65,7 +74,7 @@ def build_patch_plan_context(
         missing_symbols=missing_symbols,
         design_context=design_context,
     )
-    rejected_sources = discover_rejected_sources(question, project_path=project_path, symbol_queries=symbol_queries)
+    rejected_sources = []
     warnings = [_PATCH_PLAN_LIMITED_WARNING] if project_path else [_PATCH_PLAN_NOT_IMPLEMENTED_WARNING]
     warnings.extend(dependency_warnings)
     warnings.extend(implementation_map["warnings"])
@@ -125,9 +134,13 @@ def discover_relevant_source_files(
     variants_by_term = {term: _term_variants(term) for term in ordered_terms}
 
     candidates: list[dict[str, Any]] = []
-    for path in _iter_source_files(root):
+    from docmancer.docs.domain.source_boundary import SourceBoundary, iter_bounded_source_files
+    boundary = SourceBoundary.from_project(root)
+    selected_paths = list(iter_bounded_source_files(root, boundary=boundary,
+        supported_extensions=frozenset({".py", ".dart", ".ts", ".tsx", ".js", ".go", ".rs", ".kt", ".java"})))
+    for path in selected_paths:
         rel_path = path.relative_to(root).as_posix()
-        text = _read_text(path)
+        text = _read_text(path, root=root)
         if text is None:
             continue
         candidate = _score_source_file(rel_path, text, ordered_terms, variants_by_term)
@@ -135,6 +148,8 @@ def discover_relevant_source_files(
             candidates.append(candidate)
 
     for changed_index, changed_file in enumerate(changed_files or []):
+        if changed_file not in {path.relative_to(root).as_posix() for path in selected_paths}:
+            continue
         candidate = _changed_file_candidate(root, changed_file)
         if candidate is not None:
             candidate["_changed_file_index"] = changed_index

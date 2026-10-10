@@ -1,6 +1,10 @@
 {
-  "module_labels": {"tests/test_project_context_quality_v2_protocol.py": "behavioral"},
-  "module_node_hashes": {"tests/test_project_context_quality_v2_protocol.py": "85e325d99525ebc5771f7f0237d6e8becf7b8f0a861d9f32c5819e0e68bafef3"},
+  "module_labels": {
+    "tests/test_project_context_quality_v2_protocol.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_project_context_quality_v2_protocol.py": "51da1cd6232715db1d6ccd2cd13b48ca7b454a91b9073cd1cd5ee09e0f419381"
+  },
   "node_overrides": {},
   "schema_version": 1
 }

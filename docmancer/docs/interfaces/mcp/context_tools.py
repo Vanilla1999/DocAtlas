@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
+from docmancer.docs.application.projection_decision_trace import same_call_projection_observation
+from docmancer.docs.application.query_trace import query_trace_enabled
 from docmancer.docs.application.source_continuation import (
     bind_project_source_continuations,
 )
@@ -8,10 +10,13 @@ from docmancer.docs.application.recovery import projection_recovery_action
 from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 import json
+from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
+from docmancer.docs.domain.original_body_discovery import original_body_read_scope
 import math
+import sys
+from uuid import uuid4
 from typing import Any
 from ._context_recovery_actions import (
-    _patch_navigation_hints,
     _replace_network_retries_with_prepare_actions,
 )
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
@@ -23,28 +28,26 @@ from docmancer.docs.interfaces.mcp.recovery_projection import (
     _bound_recoverable_insufficient_projection,
     _recovery_summary,
     bind_module_recovery_selector,
-    cross_module_proof_missing,
     is_operational_recovery_action,
 )
 from docmancer.docs.application.model_visible_projection import (
     DOCS_ANSWER_MAX_TOKENS,
     INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-    PATCH_CONTEXT_HARD_TOKENS,
     SUPPORT_ENVELOPE_KEYS,
     bound_insufficient_projection,
     canonical_projection_bytes,
     project_docs_answer,
     project_insufficient,
     project_patch_context,
+    patch_search_targets,
     validate_model_visible_projection,
+    _explicit_delivery_block,
 )
 from docmancer.docs.interfaces.mcp.docs_context_routing import (
     normalize_lookup_queries,
     refresh_projection_estimate as _refresh_projection_estimate,
     tuple_value as _tuple_value,
 )
-from docmancer.docs.domain.mutation_intent import build_mutation_intent
-from docmancer.docs.domain.request_intent import is_change_request
 from docmancer.docs.domain.tool_selection import normalize_public_docs_actions
 from docmancer.docs.domain.retrieval_routing import validate_routing_record
 from docmancer.docs.service import LibraryDocsService
@@ -54,7 +57,7 @@ CONTEXT_TOOL_NAMES = {"get_docs_context"}
 DOCUMENT_CONTENT_POLICY = {
     "role": "cited_untrusted_document_data",
     "actionable": False,
-    "actions_source": "typed_top_level_fields_only",
+    "actions_source": "typed_top_level_advisories_not_authorization",
 }
 BOUNDED_STRUCTURED_CONTENT_MARKER = "Structured DocAtlas result attached in structuredContent."
 
@@ -82,10 +85,8 @@ def _bounded_project_operational_diagnostics(payload: dict[str, Any]) -> dict[st
             for key in ("module_name", "module_type"):
                 value = str(row.get(key) or "").strip()
                 if value:
-                    item[key] = value[:120]
+                    item[key] = value
             candidates.append(item)
-            if len(candidates) >= 8:
-                break
         if candidates:
             result["module_candidates"] = candidates
     return result
@@ -96,9 +97,7 @@ def _prioritize_module_recovery_projection(payload: dict[str, Any]) -> None:
 
     if str(payload.get("operational_reason_code") or "") not in _MODULE_RECOVERY_REASON_CODES:
         return
-    missing = payload.get("missing")
-    if isinstance(missing, list) and len(missing) > 2:
-        payload["missing"] = missing[:2]
+    # Already accepted missing data is not sacrificed to prioritize an action.
 
 
 def context_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -161,7 +160,7 @@ def _answer_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "answer_available": answer_available,
         "answer_type": answer_type,
         "disposition": payload.get("disposition"),
-        "edit_ready": payload.get("edit_ready"),
+        "edit_ready": False,
         "source_search_status": payload.get("source_search_status"),
         **_agent_instruction(answer_type),
         "mode_selected": payload.get("mode_selected"),
@@ -211,7 +210,7 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "supporting_snippets": payload.get("supporting_snippets") or [],
         "context_pack": payload.get("context_pack") or [],
         "disposition": payload.get("disposition"),
-        "edit_ready": payload.get("edit_ready"),
+        "edit_ready": False,
         "source_search_status": payload.get("source_search_status"),
         "next_action": payload.get("next_action"),
         "next_actions": payload.get("next_actions") or [],
@@ -226,7 +225,7 @@ def _compact_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, Any]:
-    """Keep selected source risk metadata consistent with snippet metadata."""
+    """Keep selected source version bindings consistent with snippets."""
 
     contract = payload.get("trust_contract")
     if not isinstance(contract, dict):
@@ -245,11 +244,10 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
         if not keys:
             continue
         stricter = {
-            "risk_flags": list(snippet.get("risk_flags") or []),
             "version_binding": snippet.get("version_binding"),
             "exact_version_match": snippet.get("exact_version_match"),
         }
-        if not stricter["risk_flags"] and stricter["version_binding"] is None and stricter["exact_version_match"] is None:
+        if stricter["version_binding"] is None and stricter["exact_version_match"] is None:
             continue
         for key in keys:
             snippet_risks[key] = stricter
@@ -277,9 +275,6 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
             updated_selected.append(source)
             continue
         merged = dict(source)
-        risk_flags = list(dict.fromkeys([*(merged.get("risk_flags") or []), *stricter.get("risk_flags", [])]))
-        if risk_flags:
-            merged["risk_flags"] = risk_flags
         if stricter.get("version_binding"):
             merged["version_binding"] = stricter["version_binding"]
         if stricter.get("exact_version_match") is not None:
@@ -291,49 +286,59 @@ def _align_trust_contract_with_snippets(payload: dict[str, Any]) -> dict[str, An
     return updated
 
 
+@original_body_read_scope
 def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsService) -> dict[str, Any] | None:
     if name != "get_docs_context":
         return None
-    question = _clean_string(args.get("question"))
-    if not question:
+    context_format = args.get("context_format")
+    if context_format is not None and context_format != "patch_context":
+        return _bad_request("invalid_context_format", "context_format must be patch_context or null")
+    question = args.get("question") if isinstance(args.get("question"), str) else ""
+    if not question.strip():
         return _bad_request("empty_question", "question must not be empty. Examples: 'Flutter Riverpod providers', 'Firebase Auth signIn', 'How to use go_router redirect', 'FastAPI dependency injection', 'patch_constraints for adding a service'")
     lookup_queries, lookup_error = normalize_lookup_queries(args.get("lookup_queries"))
     if lookup_error:
         return _bad_request("invalid_lookup_queries", lookup_error)
-    mutation_intent = build_mutation_intent(question)
-    kind = "patch_context" if is_change_request(question) else "docs_answer"
+    # Explicit presentation choice is read-only; it is not a mutation contract
+    # and is never forwarded as permission or inferred from request prose.
+    kind = "patch_context" if context_format == "patch_context" else "docs_answer"
     maintenance = args.get("maintenance")
     if maintenance is not None:
         return _handle_maintenance_context(args, maintenance, service)
     app = getattr(service, "unified_context", service)
-    result = app.get_docs_context(
-        question,
-        project_path=args.get("project_path"),
-        library=args.get("library"),
-        libraries=args.get("libraries"),
-        ecosystem=args.get("ecosystem"),
-        version=args.get("version"),
-        source_type=args.get("source_type"),
-        docs_url=args.get("docs_url"),
-        module=args.get("module"),
-        module_path=args.get("module_path"),
-        scope=args.get("scope"),
-        mode=args.get("mode"),
-        tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
-        limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
-        expand=args.get("expand"),
-        allow_latest_fallback=args.get("allow_latest_fallback"),
-        # The public three-tool surface is retrieval-only; this handler never
-        # starts bootstrap or network work.
-        prepare_project_docs=False,
-        allow_network=False,
-        force_refresh=False,
-        prefetch_auto=False,
-        details=False,
-        response_style=args.get("response_style"),
-        mutation_intent=mutation_intent,
-        lookup_queries=lookup_queries,
-    )
+    retention_kwargs = {}
+    if kind == "patch_context":
+        retention_kwargs["retain_found_windows"] = True
+    try:
+        result = _invoke_found_window_retention(app.get_docs_context,
+            question,
+            project_path=args.get("project_path"),
+            library=args.get("library"),
+            libraries=args.get("libraries"),
+            ecosystem=args.get("ecosystem"),
+            version=args.get("version"),
+            source_type=args.get("source_type"),
+            docs_url=args.get("docs_url"),
+            module=args.get("module"),
+            module_path=args.get("module_path"),
+            scope=args.get("scope"),
+            mode=args.get("mode"),
+            tokens=_bounded_int_arg(args, "tokens", max_value=20_000),
+            limit=_bounded_int_arg(args, "limit", default=None, max_value=20),
+            expand=args.get("expand"),
+            allow_latest_fallback=args.get("allow_latest_fallback"),
+            # This read-only handler never starts bootstrap or network work.
+            prepare_project_docs=False,
+            allow_network=False,
+            force_refresh=False,
+            prefetch_auto=False,
+            details=False,
+            response_style=args.get("response_style"),
+            lookup_queries=lookup_queries,
+            **retention_kwargs,
+        )
+    except _UnsupportedFoundWindowRetention as exc:
+        return _bad_request("unsupported_found_window_retention", str(exc))
     canonical_selection = (
         result.get("selection_decision")
         if isinstance(result, dict)
@@ -350,6 +355,33 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
         for key in ("tool", "status", "reason_code", "message", "response_style", "primary_snippet", "primary_snippets", "primary_snippet_confidence", "primary_snippet_selection_reason", "primary_snippet_alternatives", "supporting_snippets", "snippet_metrics"):
             if hasattr(result, key):
                 raw[key] = getattr(result, key)
+    # Check the original operational decision before support/recovery decoration
+    # can overwrite its reason or retain a previously admitted partial quote.
+    blocked_kind = (
+        "patch_context" if kind == "patch_context" else
+        "docs_context" if raw.get("mode_selected") == "project"
+        and args.get("project_path") and not args.get("library")
+        and not args.get("libraries") else "docs_answer"
+    )
+    blocked = (
+        None if blocked_kind == "patch_context" else
+        _explicit_delivery_block(raw, kind=blocked_kind, max_tokens=None)
+    )
+    if blocked is not None:
+        if blocked_kind == "docs_context":
+            # Preserve the actual module-selection failure without weakening
+            # the delivery veto or publishing candidate paths/recovery actions.
+            reason = _bounded_project_operational_diagnostics(raw).get("operational_reason_code")
+            if reason:
+                blocked["operational_reason_code"] = reason
+                _refresh_projection_estimate(blocked)
+        errors = validate_model_visible_projection(blocked, snapshot={})
+        if errors:
+            return _bad_request("invalid_model_visible_projection", "; ".join(errors))
+        _record_model_visible_bytes(result, raw, blocked)
+        if blocked_kind == "docs_context":
+            _observe_same_call_diagnostics(service, raw, blocked, {}, delivery_blocked=True)
+        return blocked
     operational_answer_available = bool(raw.get("answer_available", True))
     operational_reason_code = raw.get("reason_code")
     canonical_support = getattr(canonical_selection, "support_decision", None)
@@ -383,7 +415,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
     ):
         kind = "docs_context"
     if kind in {"docs_answer", "docs_context", "patch_context"}:
-        output_budget = 1_500
+        output_budget = None
         recovery = bind_module_recovery_selector(_bounded_recovery_action(raw), raw)
         source_search_allowed = bool(
             kind == "patch_context"
@@ -399,7 +431,7 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 if reader is not None and source_root:
                     raw["_source_continuation_project_root"] = source_root
                 projection, snapshot = project_docs_context(
-                    retrieval=raw, max_tokens=min(800, output_budget), selection_diagnostics=selection_trace,
+                    retrieval=raw, selection_diagnostics=selection_trace,
                 )
                 if reader is not None and source_root:
                     bind_project_source_continuations(reader, source_root, projection, snapshot)
@@ -408,18 +440,30 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                         question, canonical_selection, projection=projection, retrieval=raw, request=args,
                         operational_reason_code=operational_reason_code)
             else:
+                if raw.get("mode_selected") == "mixed":
+                    raw["_mixed_project_request"] = {
+                        key: args.get(key) for key in ("project_path", "scope", "module", "module_path")
+                    }
                 projection, snapshot = project_docs_answer(
                     question=question,
                     retrieval=raw,
-                    max_tokens=min(DOCS_ANSWER_MAX_TOKENS, output_budget),
                     selection_diagnostics=selection_trace,
                     canonical_selection=canonical_selection,
                 )
             raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
+            # Retrieval-only partial context is already source/snapshot bound
+            # by the authoritative projector. Recovery must not replace it
+            # with an empty support-failure packet or apply a second crop.
+            retained_read_projection = (
+                deepcopy(projection)
+                if kind == "docs_context" and projection.get("context_available")
+                else None
+            )
+            projection_budget = None
             if projection.get("status") == "insufficient_evidence":
                 projection.update(_bounded_project_operational_diagnostics(raw))
                 projection.update(_recovery_summary(raw))
-            if projection.get("status") == "insufficient_evidence" and recovery:
+            if projection.get("status") == "insufficient_evidence" and recovery and retained_read_projection is None:
                 support_projection = {
                     key: projection[key]
                     for key in (
@@ -434,7 +478,6 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                     kind=kind,
                     missing=projection.get("missing") or [],
                     recommended_next_action=recovery,
-                    max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
                 )
                 projection.update(support_projection)
                 projection.update(_recovery_summary(raw))
@@ -445,9 +488,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
-                    projection, max_tokens=output_budget,
+                    projection, max_tokens=projection_budget,
                 )
-            if projection.get("status") == "insufficient_evidence":
+            if projection.get("status") == "insufficient_evidence" and retained_read_projection is None:
                 projection.update(_recovery_summary(raw))
                 _annotate_recovery_handoff(
                     projection,
@@ -456,21 +499,14 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
                 _prioritize_module_recovery_projection(projection)
                 _bound_recoverable_insufficient_projection(
-                    projection, max_tokens=output_budget,
+                    projection, max_tokens=projection_budget,
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
             validation_errors = validate_model_visible_projection(
                 projection,
                 snapshot=snapshot,
-                max_tokens=(
-                    output_budget
-                    if projection.get("status") == "insufficient_evidence"
-                    else min(
-                        800 if kind == "docs_context" else DOCS_ANSWER_MAX_TOKENS,
-                        output_budget,
-                    )
-                ),
+                max_tokens=projection_budget,
                 canonical_selection=(None if kind == "docs_context" else canonical_selection),
             )
             if validation_errors:
@@ -479,14 +515,21 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             _observe_same_call_diagnostics(service, raw, projection, selection_trace)
             return projection
 
-        packet_budget = min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
         selection_trace = {}
         retrieval_issues = bounded_patch_retrieval_issues(raw)
+        delivery = raw.get("delivery_decision") or {}
+        delivery_blocked = bool(
+            raw.get("hard_stop") or raw.get("requires_confirmation")
+            or raw.get("status") == "confirmation_required"
+            or (isinstance(delivery, dict) and delivery.get("deliverable") is False)
+        )
+        if delivery_blocked:
+            retrieval_issues = sorted(set((*retrieval_issues, "delivery_blocked")))
+        evidence_items = [] if delivery_blocked else raw.get("context_pack") or []
         packet = build_action_packet(
             question=question,
-            context_pack=raw.get("context_pack") or [],
+            context_pack=evidence_items,
             trust_contract=raw.get("trust_contract") or {},
-            max_tokens=packet_budget,
             project_path=_clean_string(args.get("project_path")),
             module_path=_clean_string(args.get("module_path")),
             retrieval_issues=retrieval_issues,
@@ -500,132 +543,46 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
             project_identity=_clean_string(raw.get("project_identity")),
             module_id=_clean_string(raw.get("module_id")),
             selection_diagnostics=selection_trace,
-            mutation_intent_contract=mutation_intent,
+            mutation_intent_contract=None,
         )
-        mutation = packet.get("mutation_intent") if isinstance(packet.get("mutation_intent"), dict) else {}
-        coordinated_proof_missing = cross_module_proof_missing(packet)
-        if source_search_allowed and (mutation.get("ready") is not True or coordinated_proof_missing):
-            requested = mutation.get("requested_targets") if isinstance(mutation.get("requested_targets"), list) else []
-            resolved_values = {
-                str(item.get("requested_value") or "").casefold()
-                for item in mutation.get("resolved_targets") or []
-                if isinstance(item, dict) and item.get("exists") is True
-            }
-            for item in raw.get("context_pack") or []:
-                if not isinstance(item, dict) or str(item.get("source_class") or "").casefold() not in {
-                    "code_graph", "repo_map", "project_file", "source_evidence", "test_evidence",
-                }:
-                    continue
-                path = str(item.get("path") or item.get("source_path") or "").replace("\\", "/").casefold()
-                if path:
-                    resolved_values.add(path)
-                metadata = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
-                for source in (item, metadata):
-                    for key in ("symbols", "matched_symbols", "symbol_names"):
-                        resolved_values.update(
-                            str(value.get("name") if isinstance(value, dict) else value).casefold()
-                            for value in source.get(key) or []
-                        )
-            prioritized = sorted(
-                (item for item in requested if isinstance(item, dict)),
-                key=lambda item: str(item.get("value") or "").casefold() in resolved_values,
-            )[:8]
-            navigation_paths, navigation_symbols = _patch_navigation_hints(packet, raw)
-            query_terms = [
-                str(item.get("value") or "")[:160]
-                for item in prioritized
-                if isinstance(item, dict) and str(item.get("value") or "").strip()
-            ]
-            # Project documentation can constrain an edit, but it cannot clear
-            # the code-search obligation until the requested mutation target is
-            # locally resolved.
-            recovery_reason = (
-                "Find canonical normative proof for the coordinated cross-module invariant before editing."
-                if coordinated_proof_missing
-                else "Resolve the requested mutation target before editing."
-            )
-            if "retrieval_stage_budget_exceeded" in (raw.get("warnings") or []):
-                recovery_reason += " The relevant retrieval stage exceeded its budget."
+        targets = patch_search_targets(packet)
+        recovery = None
+        if source_search_allowed and targets and packet.get("completeness") != "complete":
             recovery = {
                 "tool": "code_search",
                 "type": "search_local_source",
                 "handled_by": "coding_agent",
-                "reason": recovery_reason,
-                "query_terms": query_terms or [question[:160]],
-                "suggested_doc_paths": [
-                    str(item.get("value") or "")[:300]
-                    for item in prioritized
-                    if isinstance(item, dict) and item.get("kind") == "path"
-                ] or navigation_paths,
-                "suggested_symbols": [
-                    str(item.get("value") or "")[:160]
-                    for item in prioritized
-                    if isinstance(item, dict) and item.get("kind") == "symbol"
-                ] or navigation_symbols,
+                "query_terms": [row["value"] for row in targets],
+                "suggested_doc_paths": [row["value"] for row in targets if row["kind"] == "path"],
+                "suggested_symbols": [row["value"] for row in targets if row["kind"] == "symbol"],
                 "requires_confirmation": False,
                 "repeat_docs_context": False,
                 "auto_execute": False,
             }
+            recovery = {key: value for key, value in recovery.items() if value != []}
         raw.setdefault("retrieval_diagnostics", {})["evidence_selection"] = selection_trace
         validation_errors = validate_action_packet(
             packet,
-            evidence_items=raw.get("context_pack") or [],
-            max_tokens=packet_budget,
+            evidence_items=evidence_items,
             project_path=_clean_string(args.get("project_path")),
             module_path=_clean_string(args.get("module_path")),
         )
-        if packet.get("estimated_tokens", packet_budget + 1) > packet_budget:
-            validation_errors.append("requested packet token budget exceeded")
         if validation_errors:
             return _bad_request("invalid_action_packet", "; ".join(validation_errors))
         projection, snapshot = project_patch_context(
             packet=packet,
-            evidence_items=raw.get("context_pack") or [],
-            max_tokens=output_budget,
+            evidence_items=evidence_items,
+            project_path=_clean_string(args.get("project_path")),
+            module_path=_clean_string(args.get("module_path")),
         )
-        if (
-            isinstance(recovery, dict)
-            and recovery.get("type") == "search_local_source"
-            and projection.get("status") in {"ok", "truncated"}
-        ):
+        if recovery:
+            projection["recommended_next_action"] = deepcopy(recovery)
             projection["source_search_status"] = "required"
-            projection["edit_ready"] = False
-        if projection.get("status") == "insufficient_evidence" and recovery:
-            projection = project_insufficient(
-                kind="patch_context",
-                missing=projection.get("missing") or [],
-                recommended_next_action=recovery,
-                max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, output_budget),
-            )
-            projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=False,
-            )
-        # Recovery/source-search metadata is appended after projection.  Bound
-        # the *final* object unconditionally so no post-format mutation can
-        # reintroduce an oversized insufficient response.
-        if projection.get("status") == "insufficient_evidence":
-            projection.update(_recovery_summary(raw))
-            _annotate_recovery_handoff(
-                projection,
-                recovery,
-                edit_authorized=False,
-            )
-            _bound_recoverable_insufficient_projection(
-                projection, max_tokens=output_budget,
-            )
-        _omit_nullable_reason_code(projection)
-        _refresh_projection_estimate(projection)
+        from docmancer.docs.application.action_packet import refresh_action_packet_estimate
+        refresh_action_packet_estimate(projection)
         projection_errors = validate_model_visible_projection(
             projection,
             snapshot=snapshot,
-            max_tokens=(
-                    output_budget
-                if projection.get("status") == "insufficient_evidence"
-                else min(PATCH_CONTEXT_HARD_TOKENS, output_budget)
-            ),
         )
         if projection_errors:
             return _bad_request("invalid_model_visible_projection", "; ".join(projection_errors))
@@ -641,11 +598,21 @@ def _omit_nullable_reason_code(payload: dict[str, Any]) -> None:
 
 def _observe_same_call_diagnostics(
     service: LibraryDocsService, raw: dict[str, Any], projection: dict[str, Any],
-    selection_trace: dict[str, Any],
+    selection_trace: dict[str, Any], *, delivery_blocked: bool = False,
 ) -> None:
     """Send bounded internals to an in-process observer, never the MCP payload."""
+    if not query_trace_enabled():
+        return
     observer = getattr(service, "_same_call_diagnostics_observer", None)
     if not callable(observer):
+        try:
+            observation = same_call_projection_observation(raw, projection, delivery_blocked=delivery_blocked)
+            sys.stderr.write(json.dumps({
+                "event": "docatlas_query_trace", "request_id": uuid4().hex,
+                "projection_observation": observation,
+            }, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
         return
     ingestion = raw.get("ingestion_diagnostics") or {}
     project = ingestion.get("project") if isinstance(ingestion, dict) else {}
@@ -667,11 +634,23 @@ def _observe_same_call_diagnostics(
             "planning": "observed" if service_trace.get("planned_query_ids") is not None else "unclassified",
             "retrieval": "observed" if service_trace.get("retrieved_candidates") is not None else "unclassified",
             "qualification": "observed" if service_trace.get("qualification_outcomes") is not None else "unclassified",
-            "ranking": "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
-            "projection": "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
-            "coverage": "observed" if isinstance(coverage, dict) else "unclassified",
+            "ranking": "not_reached" if delivery_blocked else "observed" if projection_trace.get("ranked_candidate_ids") is not None else "unclassified",
+            "projection": "not_reached" if delivery_blocked else "observed" if projection_trace.get("considered_variants") is not None else "unclassified",
+            "coverage": "not_reached" if delivery_blocked else "observed" if isinstance(coverage, dict) else "unclassified",
+            "delivery": "blocked_before_projection" if delivery_blocked else "projected",
         },
     }
+    if delivery_blocked:
+        # Observe the decision already enforced above. The private callback
+        # cannot retry retrieval, bypass the veto or alter the public payload.
+        decision = raw.get("delivery_decision")
+        diagnostics["delivery_decision"] = {
+            "deliverable": False,
+            "reason_code": str(
+                (decision.get("reason_code") if isinstance(decision, dict) else None)
+                or projection.get("reason_code") or "unspecified_delivery_veto"
+            )[:120],
+        }
     if service_trace.get("planned_query_ids") is not None:
         diagnostics["planned_query_ids"] = list(service_trace.get("planned_query_ids") or ())[:32]
     if service_trace.get("retrieved_candidates") is not None:
@@ -709,6 +688,9 @@ def _observe_same_call_diagnostics(
             "final_visible_evidence_ids": final_ids,
         })
     try:
+        diagnostics["projection_observation"] = same_call_projection_observation(
+            raw, projection, delivery_blocked=delivery_blocked,
+        )
         observer(diagnostics)
     except Exception:
         # Debug observers cannot alter the validated public MCP result.
@@ -766,11 +748,11 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
             if action.get(key) not in (None, {}, [])
         }
         if isinstance(action.get("options"), list):
-            bounded["options"] = [_bounded_action_mapping(option) for option in action["options"][:3] if isinstance(option, dict)]
+            bounded["options"] = [_bounded_action_mapping(option) for option in action["options"] if isinstance(option, dict)]
         if isinstance(action.get("decision_options"), list):
             bounded["decision_options"] = [
                 _bounded_action_mapping(option)
-                for option in action["decision_options"][:3]
+                for option in action["decision_options"]
                 if isinstance(option, dict)
             ]
         bounded = _bounded_action_mapping(bounded)
@@ -780,21 +762,19 @@ def _bounded_recovery_action(payload: dict[str, Any]) -> dict[str, Any] | None:
 
 
 def _bounded_action_mapping(value: dict[str, Any], *, depth: int = 0) -> dict[str, Any]:
-    if depth > 2:
-        return {}
     result: dict[str, Any] = {}
-    for key in sorted(value)[:20]:
+    for key in sorted(value):
         item = value[key]
         if isinstance(item, str):
-            result[str(key)] = item[:300]
+            result[str(key)] = item
         elif isinstance(item, (bool, int, float)) or item is None:
             result[str(key)] = item
         elif isinstance(item, dict):
             result[str(key)] = _bounded_action_mapping(item, depth=depth + 1)
         elif isinstance(item, list):
             result[str(key)] = [
-                _bounded_action_mapping(child, depth=depth + 1) if isinstance(child, dict) else str(child)[:200]
-                for child in item[:5]
+                _bounded_action_mapping(child, depth=depth + 1) if isinstance(child, dict) else deepcopy(child)
+                for child in item
             ]
     return result
 
@@ -840,25 +820,24 @@ def bounded_patch_retrieval_issues(payload: dict[str, Any]) -> list[str]:
     """Return operational retrieval failures relevant to an ActionPacket.
 
     Docs-answer availability and semantic completeness belong to the answer
-    projection. Patch contexts independently prove requirements, authority, and
-    mutation readiness while building the ActionPacket.
+    projection. Patch contexts retain admitted evidence and explicit constraints
+    independently of docs-answer compaction; they never grant mutation permission.
     """
 
     issues: list[str] = []
     status = str(payload.get("status") or "").strip().lower()
     if status and status not in {"success"}:
-        issues.append(f"Documentation retrieval is incomplete (status={status}).")
+        issues.append(f"retrieval_status:{status}")
     if payload.get("requires_confirmation"):
-        issues.append("Documentation retrieval requires explicit user confirmation before editing.")
+        issues.append("confirmation_required")
     lanes = payload.get("lanes") if isinstance(payload.get("lanes"), dict) else {}
     accepted = {"not_requested", "success"}
     failed = sorted(
         str(name) for name, lane in lanes.items()
         if isinstance(lane, dict) and str(lane.get("status") or "") not in accepted
     )
-    if failed:
-        issues.append(f"Required documentation lanes are incomplete: {', '.join(failed[:5])}.")
-    return issues
+    issues.extend(f"retrieval_lane:{name}" for name in failed)
+    return sorted(set(issues))
 
 
 def _record_model_visible_bytes(result: Any, raw: dict[str, Any], projection: dict[str, Any]) -> None:

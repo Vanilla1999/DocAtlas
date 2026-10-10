@@ -1,0 +1,3534 @@
+{
+  "schema_version": "pr211-current95-downstream-receipt-v1",
+  "repository": "Vanilla1999/DocAtlas",
+  "pull_request": 211,
+  "published_head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+  "observed_merge_checkout_sha": "abc3819438a1e2fea452a750f99e01edb3a41438",
+  "shared_tree_sha": "6d75a3b5f019e94c11810364a7214b442b5829fa",
+  "collected_at_utc": "2026-10-10T01:18:51.283Z",
+  "purpose": "Current95 downstream, installed MCP and P1-stack observations. Companion core, critical and V2 receipts are maintained separately by root.",
+  "evidence_rules": {
+    "observations_only": true,
+    "production_edits": false,
+    "local_execution": false,
+    "runtime_or_reruns_started": false,
+    "core_job_logs_read": false,
+    "artifact_bodies_downloaded": false,
+    "raw_log_hash_meaning": "SHA-256 of the exact complete decoded log string re-encoded as UTF-8, including BOM, CR/LF and terminal newlines; not a ZIP or HTTP-transfer checksum.",
+    "excerpt_hash_meaning": "SHA-256 of exact raw excerpt UTF-8 bytes. Line numbers are one-based within that decoded log. Excerpts retain original timestamps, ANSI escapes and line endings.",
+    "metadata_hash_meaning": "SHA-256 of the full returned UTF-8 API JSON response; selected metadata below are parsed fields. The raw full metadata response is not embedded.",
+    "reported_report_hash_meaning": "Hashes printed by CI are retained as reported receipts; this collection did not download or independently recompute their artifact bodies.",
+    "no_historical_result_substitution": true,
+    "same_tree_boundary": "The observed PR merge commit has the published head as a parent and exactly the same Git tree. Each read test job prints that merge checkout; aggregate-only jobs have no claimed checkout.",
+    "integrity_is_not_quality": "Passing oracle controls and report integrity do not replace a failing current quality verdict."
+  },
+  "commit_bindings": [
+    {
+      "sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "tree_sha": "6d75a3b5f019e94c11810364a7214b442b5829fa",
+      "parents": [
+        "820533361152ff3a143d2cf97d0c22a889486d75"
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/git/commits/eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+        "decoded_response_utf8_sha256": "8c842ebb8bcfcfb85a5740c7e4a3a31d105fcfdd0c1de332edfed94b3811e8de",
+        "decoded_response_utf8_bytes": 1210
+      }
+    },
+    {
+      "sha": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "tree_sha": "6d75a3b5f019e94c11810364a7214b442b5829fa",
+      "parents": [
+        "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+        "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a"
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/git/commits/abc3819438a1e2fea452a750f99e01edb3a41438",
+        "decoded_response_utf8_sha256": "696fdc7d6374285148fb9f29c2b08c9be0a2877331f785ea416c3c5039738c2f",
+        "decoded_response_utf8_bytes": 2675
+      }
+    }
+  ],
+  "observations": {
+    "p14": {
+      "verdict": "FAIL",
+      "cases": {
+        "passed": 12,
+        "total": 14
+      },
+      "required_discovery": {
+        "passed": 8,
+        "total": 10
+      },
+      "required_complete_fact": {
+        "passed": 5,
+        "total": 5
+      },
+      "runtime_errors": 0,
+      "failed_case_ids": [
+        "alias_order_drafts",
+        "alias_project_retry_rule"
+      ],
+      "failure_reason": "required_discovery",
+      "oracle": {
+        "verdict": "PASS",
+        "passed": 5,
+        "total": 5,
+        "named_controls": [
+          "test_exact_report_and_family_separation",
+          "test_negative_false_support_fails_closed",
+          "test_required_discovery_and_support_fail_closed",
+          "test_claim_and_path_leak_fail_closed",
+          "test_proof_runtime_shard_identity_fails_closed"
+        ],
+        "reported_current_report_integrity": true
+      },
+      "evidence_log_key": "p14"
+    },
+    "p15": {
+      "verdict": "FAIL",
+      "cases": {
+        "passed": 5,
+        "total": 7
+      },
+      "required_full_facts": {
+        "passed": 4,
+        "total": 6
+      },
+      "runtime_errors": 0,
+      "failed_case_ids": [
+        "document_statement_binds_exact_path",
+        "two_claims_require_two_allowed_roles"
+      ],
+      "failure_reason": "required_full_facts",
+      "oracle": {
+        "verdict": "PASS",
+        "passed": 6,
+        "total": 6,
+        "named_controls": [
+          "test_exact_claim_local_assignments",
+          "test_provenance_gap_is_retained_but_not_hidden",
+          "test_support_gap_is_retained_but_not_hidden",
+          "test_assignment_source_ledgers_fail_closed",
+          "test_claim_and_path_leak_fail_closed",
+          "test_proof_runtime_shard_identity_fails_closed"
+        ],
+        "reported_current_report_integrity": true
+      },
+      "evidence_log_key": "p15"
+    },
+    "p16": {
+      "current_delivery_verdict": "PASS",
+      "cases": {
+        "passed": 6,
+        "total": 6
+      },
+      "full_fact_cases": {
+        "passed": 1,
+        "total": 1
+      },
+      "runtime_errors": 0,
+      "reported_report_sha256": "988b8100f932419940af5fcead26d9aa8b11fcbfe419c708035ea7c91e55fac5",
+      "oracle": {
+        "verdict": "PASS",
+        "passed": 6,
+        "total": 6,
+        "named_controls": [
+          "test_exact_hostile_document_boundary",
+          "test_support_and_assignment_override_fail_closed",
+          "test_assignment_source_ledgers_fail_closed",
+          "test_content_control_and_raw_marker_fail_closed",
+          "test_claim_and_path_leak_fail_closed",
+          "test_proof_runtime_shard_identity_fails_closed"
+        ],
+        "reported_current_report_integrity": true
+      },
+      "claim_boundary": "Current in-process public delivery plus MCP serialization; installed stdio is proved only by its separate harness.",
+      "retained_adversarial": {
+        "verdict": "FAIL",
+        "cases": {
+          "passed": 24,
+          "total": 28
+        },
+        "first_logged_reasons": [
+          "Agent Developer Protocol v1 or required migration controls are not target-green",
+          "cross_module_comparison_supported: insufficient_evidence with missing context, sources and required fact",
+          "explicit_catalog_module_supported: insufficient_evidence with missing context, sources and required fact",
+          "module_only_expected_evidence_rate=0.25; target=1.0"
+        ],
+        "mutation_verdict": "FAIL",
+        "mutation_reason": "Both evaluator controls and full public trajectories must have a green baseline; mutation credit rejected.",
+        "new_mutant_kill_count": null,
+        "reported_v1_field": 11
+      },
+      "evidence_log_key": "p16"
+    },
+    "closure": {
+      "verdict": "FAIL",
+      "current_reports": [
+        {
+          "p1": "P1.4",
+          "reported_integrity": true,
+          "reported_quality": false,
+          "summary": {
+            "case_count": 14,
+            "complete_fact_visible": 8,
+            "failed_case_ids": [
+              "alias_order_drafts",
+              "alias_project_retry_rule"
+            ],
+            "negative_control_count": 2,
+            "negative_false_context": 0,
+            "output_public_utf8_bytes": 12267,
+            "output_source_count": 8,
+            "passed_count": 12,
+            "reported_original_query_covered": 3,
+            "required_complete_fact": 5,
+            "required_complete_fact_passed": 5,
+            "required_discovery": 10,
+            "required_discovery_passed": 8,
+            "runtime_error_count": 0,
+            "unauthorized_answer_or_edit_count": 0
+          },
+          "error": null
+        },
+        {
+          "p1": "P1.5",
+          "reported_integrity": true,
+          "reported_quality": false,
+          "summary": {
+            "case_count": 7,
+            "failed_case_ids": [
+              "document_statement_binds_exact_path",
+              "two_claims_require_two_allowed_roles"
+            ],
+            "negative_case_count": 2,
+            "negative_false_context": 0,
+            "output_public_utf8_bytes": 6147,
+            "output_source_count": 4,
+            "passed_count": 5,
+            "positive_case_count": 5,
+            "required_full_fact_count": 6,
+            "runtime_error_count": 0,
+            "unauthorized_answer_or_edit_count": 0,
+            "verified_full_fact_count": 4
+          },
+          "error": null
+        },
+        {
+          "p1": "P1.6",
+          "reported_integrity": true,
+          "reported_quality": true,
+          "summary": {
+            "case_count": 6,
+            "failed_cases": [],
+            "full_fact_cases": 1,
+            "passed_cases": 6,
+            "runtime_errors": 0
+          },
+          "error": null
+        }
+      ],
+      "required_gate_outcomes": {
+        "dependencies": "success",
+        "first_divergence": "success",
+        "contract_ablation": "success",
+        "p14_quality": "failure",
+        "p14_oracle": "success",
+        "p15_quality": "failure",
+        "p15_oracle": "success",
+        "p16_quality": "success",
+        "p16_oracle": "success",
+        "adversarial": "failure",
+        "adversarial_mutation": "failure",
+        "syntax": "success"
+      },
+      "failed_requirements": [
+        "current_quality",
+        "required_gates_succeeded"
+      ],
+      "reported_report_sha256": "f1265541a3ed85cb8b988d48c0201bad7b936aefe9b5b80f86800b741b6b55c1",
+      "oracle": {
+        "verdict": "PASS",
+        "passed": 4,
+        "total": 4,
+        "reported_current_report_integrity": true
+      },
+      "evidence_log_key": "closure"
+    },
+    "installed_mcp": {
+      "verdict": "PASS",
+      "passed_tasks": 1,
+      "task_count": 1,
+      "pass_rate": 1,
+      "artifact_origin": "reviewed-wheel",
+      "claim_boundary": "pre-public-installed-harness",
+      "model": "deterministic-script",
+      "provider_id": "scripted",
+      "source_commit": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "version": "1.3.2",
+      "tool_attempts": 2,
+      "schema_failures": 1,
+      "schema_repair_required_and_verified": true,
+      "reported_report_sha256": "83a0c944887fd0fda75e25f1143f1a6b9dcadf8a7e851e447d87aa8e88f41b43",
+      "reported_schema_sha256": "1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2",
+      "false_supported": 0,
+      "contamination": 0,
+      "contract_self_tests": {
+        "passed": 7,
+        "total": 7
+      },
+      "actual_stdio_ci_harness": true,
+      "evidence_log_key": "installed"
+    },
+    "required_ci": {
+      "verdict": "FAIL",
+      "dependencies": {
+        "DOCS_CONTRACT": "success",
+        "INSTALLER_SMOKE": "success",
+        "PLATFORM_SMOKE": "success",
+        "CORE_TESTS": "failure",
+        "ADVANCED_CONTRACT": "failure",
+        "INSTALLED_MCP_HARNESS": "success",
+        "STATIC_CONTRACT": "success",
+        "RETRIEVAL_EVIDENCE": "success"
+      },
+      "evidence_log_key": "required",
+      "core_scores": "Not collected in this receipt; only the aggregator dependency outcome is recorded."
+    },
+    "p1_stack": {
+      "verdict": "FAIL",
+      "production_path_contracts": {
+        "passed": 528,
+        "failed": 94,
+        "deselected": 7726,
+        "elapsed_seconds": 32.26,
+        "source_job_id": 114089537395,
+        "not_core_test_lane": true,
+        "raw_summary": "94 failed, 528 passed, 7726 deselected in 32.26s",
+        "errors_not_listed_in_summary": true
+      },
+      "required_gate_outcomes": {
+        "dependencies": "success",
+        "first_divergence": "skipped",
+        "contract_ablation": "skipped",
+        "p14_quality": "skipped",
+        "p14_oracle": "skipped",
+        "p15_quality": "skipped",
+        "p15_oracle": "skipped",
+        "p16_quality": "skipped",
+        "p16_oracle": "skipped",
+        "adversarial": "skipped",
+        "adversarial_mutation": "skipped",
+        "syntax": "skipped"
+      },
+      "current_closure": {
+        "verdict": "FAIL",
+        "input_error_type": "FileNotFoundError",
+        "missing_current_reports": [
+          "P1.4",
+          "P1.5",
+          "P1.6"
+        ],
+        "failed_requirements": [
+          "current_report_integrity",
+          "current_quality",
+          "current_runtime_consistency",
+          "required_gates_succeeded"
+        ],
+        "oracle_verdict": "FAIL",
+        "oracle_reason": "Current input proof unavailable: current_report_integrity, current_runtime_consistency",
+        "reported_report_sha256": "36ddcc7e46cd9f7cd1f111d276f4ea246c764acc121c323462027c8a26c44b04"
+      },
+      "final_dependencies": {
+        "CORE": "failure",
+        "PLATFORM": "success",
+        "ADVANCED": "failure",
+        "BUILD": "success",
+        "WHEEL": "success",
+        "SDIST": "success"
+      },
+      "release_and_platform_scope": "Three platform, three release-wheel, build and sdist/installer jobs report success in complete API job metadata; their individual logs were not read here.",
+      "evidence_log_keys": [
+        "stack_advanced",
+        "stack_final"
+      ]
+    },
+    "retrieval_evidence": {
+      "verdict": "PASS",
+      "frozen_80_reported": {
+        "within_budget": 48,
+        "within_budget_sufficient": 31,
+        "operational_errors": 0,
+        "integrity_violations": 0
+      },
+      "causal_cells_reported": {
+        "cap_on_requal_on": 31,
+        "cap_off_requal_on": 31,
+        "cap_on_requal_off": 31,
+        "cap_off_requal_off": 31,
+        "contextualization_off": 31
+      },
+      "selection_status": "NOT_OBSERVED_IN_BOUNDED_POOL",
+      "holdout": {
+        "current": 5,
+        "strict": 5,
+        "comparison": "NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED"
+      },
+      "metric_name_boundary": "Legacy field names are quoted as printed; this receipt introduces no output ceiling and does not call the nominal 80-case inventory a verified 80-case quality pass.",
+      "evidence_log_key": "retrieval"
+    },
+    "actual_user_client": {
+      "status": "NOT_RUN",
+      "reason": "No interactive installed client session was exercised or observed in this task. CI reviewed-wheel stdio is a separate proof."
+    },
+    "overall_acceptance": {
+      "merge_ready": false,
+      "reason": "Current P14/P15 quality, retained adversarial gates, required-ci and exact P1 stack remain failing on current95."
+    }
+  },
+  "workflows": [
+    {
+      "key": "main",
+      "id": 38010627863,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863",
+      "workflow_path": ".github/workflows/ci.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:31Z",
+      "updated_at": "2026-10-10T00:59:39Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627863",
+        "decoded_response_utf8_sha256": "8199fca45d680b29ffe8406535f435dadfe7be6f8f36fb799408dce359435f37",
+        "decoded_response_utf8_bytes": 12810
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627863/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "2559059cbb7576936a1ff7352b95a29be7fa842abf69ca30a181166358206cfe",
+        "decoded_response_utf8_bytes": 38219,
+        "total_count": 16,
+        "observed_count": 16,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089537474,
+          "name": "installer-smoke",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537474",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:48:47Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Installer smoke tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537637,
+          "name": "retrieval-evidence",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537637",
+          "started_at": "2026-10-10T00:49:29Z",
+          "completed_at": "2026-10-10T00:54:08Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Verify frozen retrieval evidence and independent sample",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537638,
+          "name": "test (3.11)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537638",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:57:00Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.11",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Upload offline core test results",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.11",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537643,
+          "name": "platform-smoke (ubuntu-latest)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537643",
+          "started_at": "2026-10-10T00:49:51Z",
+          "completed_at": "2026-10-10T00:50:54Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install cross-platform smoke dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Verify package and CLI surface",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify installed Docs MCP over stdio",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537652,
+          "name": "docs-impact",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537652",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:08Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install DocAtlas",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Report documentation impact",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Post Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537655,
+          "name": "platform-smoke (macos-15-intel)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537655",
+          "started_at": "2026-10-10T00:49:15Z",
+          "completed_at": "2026-10-10T00:53:08Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install cross-platform smoke dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Verify package and CLI surface",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify installed Docs MCP over stdio",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537662,
+          "name": "advanced-contract",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537662",
+          "started_at": "2026-10-10T00:49:04Z",
+          "completed_at": "2026-10-10T00:52:37Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run offline advanced contract and shared-security tests",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Run recoverable documentation failure gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 7,
+              "name": "Run recoverable documentation failure mutation gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 8,
+              "name": "Run hermetic Context7-style project chat gate",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Run Legacy live compatibility report and lineage floor",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 10,
+              "name": "Run V2 project-context acceptance gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 11,
+              "name": "Upload Project Docs quality reports",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Run question surface regression gate",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Run Agent Developer Protocol gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 14,
+              "name": "Run Agent Developer adversarial/token gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 15,
+              "name": "Run critical mutation gate",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 16,
+              "name": "Compare historical and compact literal contract tests",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Run Agent Developer adversarial mutation gate",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 18,
+              "name": "Upload mutation gate evidence",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Upload offline advanced test results",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 37,
+              "name": "Post Set up Python",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 38,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 39,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537668,
+          "name": "platform-smoke (macos-15)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537668",
+          "started_at": "2026-10-10T00:49:35Z",
+          "completed_at": "2026-10-10T00:50:54Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install cross-platform smoke dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Verify package and CLI surface",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify installed Docs MCP over stdio",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537670,
+          "name": "static-contract",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537670",
+          "started_at": "2026-10-10T00:49:52Z",
+          "completed_at": "2026-10-10T00:50:08Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Verify lock and static repository contracts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Post Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537678,
+          "name": "test (3.12)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537678",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:55:01Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Upload offline core test results",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.12",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537682,
+          "name": "docs-contract",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537682",
+          "started_at": "2026-10-10T00:49:39Z",
+          "completed_at": "2026-10-10T00:50:14Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Verify documented CLI and public Docs MCP contracts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Post Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537683,
+          "name": "installed-mcp-harness",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537683",
+          "started_at": "2026-10-10T00:49:40Z",
+          "completed_at": "2026-10-10T00:50:42Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Build exact reviewed wheel and install evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Exercise real stdio MCP and bounded schema repair",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify evidence attribution, hash chain, and privacy",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537694,
+          "name": "test (3.13)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537694",
+          "started_at": "2026-10-10T00:49:31Z",
+          "completed_at": "2026-10-10T00:59:23Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Set up Python 3.13",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run offline core tests",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Upload offline core test results",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Set up Python 3.13",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089538655,
+          "name": "p1-harden-branch",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "skipped",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089538655",
+          "started_at": "2026-10-10T00:48:32Z",
+          "completed_at": "2026-10-10T00:48:32Z",
+          "log_read_in_this_receipt": false,
+          "steps": []
+        },
+        {
+          "id": 114091874403,
+          "name": "acceptance-diagnostics",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114091874403",
+          "started_at": "2026-10-10T00:59:26Z",
+          "completed_at": "2026-10-10T00:59:38Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Download existing core JUnit artifacts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Summarize exact existing executions",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Upload complete diagnostic ledger",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114091874561,
+          "name": "required-ci",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114091874561",
+          "started_at": "2026-10-10T00:59:26Z",
+          "completed_at": "2026-10-10T00:59:30Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Enforce required CI jobs",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 3,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "p14",
+      "id": 38010627848,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627848",
+      "workflow_path": ".github/workflows/p1.4-paraphrase-proofability.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:31Z",
+      "updated_at": "2026-10-10T00:49:15Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627848",
+        "decoded_response_utf8_sha256": "5799f6a7b4368cffa53cac5aa4860a26c4c356b691a3cc2bbeab9134735adeea",
+        "decoded_response_utf8_bytes": 12865
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627848/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "097bcb766ac2bdd9c3ceda9ca3605ce3abcd2cb18fbaf4794add99c5b844e995",
+        "decoded_response_utf8_bytes": 3058,
+        "total_count": 1,
+        "observed_count": 1,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089536820,
+          "name": "p1-4-proofability",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627848/job/114089536820",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:15Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install DocAtlas evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Measure original-question retrieval and complete frozen facts",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Verify independent oracle controls and current report integrity",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Verify source syntax and patch formatting",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Upload complete current P1.4 observations",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 15,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 16,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "id": 38010627849,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627849",
+      "workflow_path": ".github/workflows/p1.5-mixed-evidence-provenance.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:31Z",
+      "updated_at": "2026-10-10T00:49:13Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627849",
+        "decoded_response_utf8_sha256": "9eb759f898fb219329a53c9bac6033bf16c218774911eb4034e3a57e6bd9ca5f",
+        "decoded_response_utf8_bytes": 12865
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627849/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "c002de85fe4079696c764eab6133c3f3e3cb0c3194b2bbc9337a7e76353bed92",
+        "decoded_response_utf8_bytes": 3049,
+        "total_count": 1,
+        "observed_count": 1,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089536954,
+          "name": "p1-5-provenance",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627849/job/114089536954",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:12Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install DocAtlas evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Measure frozen full facts and explicit source provenance",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Verify independent oracle controls and current report integrity",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Verify source syntax and patch formatting",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 8,
+              "name": "Upload complete current P1.5 observations",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 15,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 16,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "id": 38010627829,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627829",
+      "workflow_path": ".github/workflows/p1.6-evidence-is-data.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:31Z",
+      "updated_at": "2026-10-10T00:49:26Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627829",
+        "decoded_response_utf8_sha256": "945801d183d2bad88be78fd3a1d100fe8a3f70e048cb9cd1c72b5464b46d21d1",
+        "decoded_response_utf8_bytes": 12847
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627829/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "ebefa091ec8bc3623681a01068cd36ff54748db2f2f968122d20079dee7c4832",
+        "decoded_response_utf8_bytes": 3412,
+        "total_count": 1,
+        "observed_count": 1,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089536675,
+          "name": "p1-6-adversarial",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627829/job/114089536675",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:25Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install DocAtlas evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Measure frozen documents through current public delivery",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify independent oracle controls and report integrity",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Verify existing Agent Developer adversarial contract",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 8,
+              "name": "Verify existing Agent Developer adversarial mutations",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Verify source syntax and patch formatting",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Upload current P1.6 observations",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 20,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 21,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "closure",
+      "id": 38010627832,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627832",
+      "workflow_path": ".github/workflows/p1-agent-truth-closure.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:31Z",
+      "updated_at": "2026-10-10T00:49:50Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627832",
+        "decoded_response_utf8_sha256": "e067c6f07a19474fd04cc8c5203ed4f30e6c4e408a9e6418264a068f59243b10",
+        "decoded_response_utf8_bytes": 12849
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627832/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "d6041480df4fca82c9c8d6de0c642cea2645e1c526a1dab041ef4eb6ea2cf0c6",
+        "decoded_response_utf8_bytes": 4949,
+        "total_count": 1,
+        "observed_count": 1,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089536802,
+          "name": "p1-agent-truth-closure",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627832/job/114089536802",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:49Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install DocAtlas evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Preserve historical first-divergence guard",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Preserve historical contract-ablation guard",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 7,
+              "name": "Measure current P1.4 quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 8,
+              "name": "Verify P1.4 oracle controls",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Measure current P1.5 quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 10,
+              "name": "Verify P1.5 oracle controls",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Measure current P1.6 public delivery",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Verify P1.6 oracle controls",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Preserve Agent Developer adversarial gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 14,
+              "name": "Preserve Agent Developer adversarial mutation gate",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 15,
+              "name": "Verify source syntax and repository guards",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 16,
+              "name": "Capture actual gate outcomes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 17,
+              "name": "Verify current closure quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 18,
+              "name": "Verify current closure oracle controls",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Upload current closure evidence and real gate outcomes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 37,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 38,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 39,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "stack",
+      "id": 38010627919,
+      "run_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919",
+      "workflow_path": ".github/workflows/p1-stack-exact-validation.yml",
+      "event": "pull_request",
+      "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+      "head_branch": "integration/stage3-v2-identity-pr1",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-10T00:48:32Z",
+      "updated_at": "2026-10-10T00:58:17Z",
+      "pull_requests": [
+        {
+          "number": 211,
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "base_sha": "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c"
+        }
+      ],
+      "raw_metadata_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627919",
+        "decoded_response_utf8_sha256": "8bdc48512e37b2c510466a4c80bd3aca3c7bc94d0fb77918751af7fbc60be6f4",
+        "decoded_response_utf8_bytes": 12855
+      },
+      "raw_job_listing_evidence": {
+        "url": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/runs/38010627919/jobs?per_page=100",
+        "decoded_response_utf8_sha256": "a4b00c059e3409a6246bb37738bdcc9ba884edbe894c16ef5894aacc7adadea2",
+        "decoded_response_utf8_bytes": 34718,
+        "total_count": 13,
+        "observed_count": 13,
+        "complete_inventory": true
+      },
+      "jobs": [
+        {
+          "id": 114089537249,
+          "name": "p1-stack-core (3.13)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537249",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:58:11Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537369,
+          "name": "p1-stack-release-build",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537369",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:48:58Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install build \"hatchling<1.27\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run rm -rf dist",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537375,
+          "name": "p1-stack-core (3.12)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537375",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:57:04Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537381,
+          "name": "p1-stack-platform (macos-15)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537381",
+          "started_at": "2026-10-10T00:49:32Z",
+          "completed_at": "2026-10-10T00:50:26Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python -m compileall -q docmancer eval scripts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify real installed-wheel Docs MCP",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537395,
+          "name": "p1-stack-advanced-security",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537395",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:37Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Install evaluator dependencies",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run production-path contracts",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 6,
+              "name": "Run Agent Developer adversarial gate",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 7,
+              "name": "Run critical mutation gate",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 8,
+              "name": "Run Agent Developer adversarial mutation gate",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 9,
+              "name": "Verify historical first-divergence evidence",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 10,
+              "name": "Verify historical contract-ablation evidence",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 11,
+              "name": "Measure current P1.4 quality",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 12,
+              "name": "Verify P1.4 oracle controls",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 13,
+              "name": "Measure current P1.5 quality",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 14,
+              "name": "Verify P1.5 oracle controls",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 15,
+              "name": "Measure current P1.6 public delivery",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 16,
+              "name": "Verify P1.6 oracle controls",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 17,
+              "name": "Verify syntax and repository guards",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 18,
+              "name": "Capture actual current P1 gate outcomes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 19,
+              "name": "Verify current closure quality",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 20,
+              "name": "Verify current closure oracle controls",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 21,
+              "name": "Upload current P1-stack observations and outcomes",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 41,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 42,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 43,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537409,
+          "name": "p1-stack-platform (macos-15-intel)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537409",
+          "started_at": "2026-10-10T00:49:13Z",
+          "completed_at": "2026-10-10T00:52:43Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python -m compileall -q docmancer eval scripts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify real installed-wheel Docs MCP",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537412,
+          "name": "p1-stack-platform (ubuntu-latest)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537412",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:49:37Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python -m compileall -q docmancer eval scripts",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify real installed-wheel Docs MCP",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089537435,
+          "name": "p1-stack-core (3.11)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537435",
+          "started_at": "2026-10-10T00:48:35Z",
+          "completed_at": "2026-10-10T00:54:43Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run python -m pip install -e \".[dev]\"",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run pytest tests/ -m \"not advanced and not live and not live_network\" -q",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "skipped"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089634177,
+          "name": "p1-stack-release-wheel (3.11)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089634177",
+          "started_at": "2026-10-10T00:50:11Z",
+          "completed_at": "2026-10-10T00:51:12Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python scripts/release_gate.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089634180,
+          "name": "p1-stack-release-sdist-installer",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089634180",
+          "started_at": "2026-10-10T00:50:02Z",
+          "completed_at": "2026-10-10T00:51:00Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run mkdir sdist-wheel",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 6,
+              "name": "Verify installer against the exact built wheel",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 12,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 13,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089634203,
+          "name": "p1-stack-release-wheel (3.12)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089634203",
+          "started_at": "2026-10-10T00:50:17Z",
+          "completed_at": "2026-10-10T00:51:28Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python scripts/release_gate.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114089634205,
+          "name": "p1-stack-release-wheel (3.13)",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "success",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089634205",
+          "started_at": "2026-10-10T00:50:28Z",
+          "completed_at": "2026-10-10T00:51:11Z",
+          "log_read_in_this_receipt": false,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 3,
+              "name": "Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 4,
+              "name": "Run actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 5,
+              "name": "Run python scripts/release_gate.py",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 9,
+              "name": "Post Run actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 10,
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 11,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        },
+        {
+          "id": 114091617517,
+          "name": "p1-stack-exact",
+          "head_sha": "eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a",
+          "status": "completed",
+          "conclusion": "failure",
+          "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114091617517",
+          "started_at": "2026-10-10T00:58:13Z",
+          "completed_at": "2026-10-10T00:58:16Z",
+          "log_read_in_this_receipt": true,
+          "steps": [
+            {
+              "number": 1,
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success"
+            },
+            {
+              "number": 2,
+              "name": "Require every exact-head lane",
+              "status": "completed",
+              "conclusion": "failure"
+            },
+            {
+              "number": 3,
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "decoded_log_evidence": [
+    {
+      "key": "p14",
+      "run_id": 38010627848,
+      "job_id": 114089536820,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627848/job/114089536820",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "45d0627b0d4590ae00af6f215759cc3b76daabb76cc4a62fffc3edfe045ccfa0",
+      "full_decoded_log_utf8_bytes": 89829,
+      "full_decoded_log_line_count": 731,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:48:42.6041813Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "bb17f33177ad6a21b353020e7120bb0ce4c5d02de6de472e97bf95fef9d378de",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:48:42.6069325Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "137951519701b8962091895e55c3953081b071718b901d322c85243ff441660f",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 627,
+          "line_end": 627,
+          "raw": "2026-10-10T00:49:10.1352893Z P1.4 current retrieval: FAIL; cases=12/14; discovery=8/10; complete_fact=5/5; errors=0; report=/home/runner/work/_temp/p1.4-current-retrieval.json\n",
+          "sha256": "a4288242e5ac8b2b140088d902c0a8fb0e9795d21dfb7052eb30d23235ceb119",
+          "utf8_bytes": 176
+        },
+        {
+          "line_start": 639,
+          "line_end": 639,
+          "raw": "2026-10-10T00:49:10.1365879Z FAIL alias_order_drafts: required_discovery\n",
+          "sha256": "062ea0555fe3dc9f303a01798d42907b8ef19bb16e6d622b9d35bbc0c1327568",
+          "utf8_bytes": 73
+        },
+        {
+          "line_start": 642,
+          "line_end": 642,
+          "raw": "2026-10-10T00:49:10.1443102Z FAIL alias_project_retry_rule: required_discovery\n",
+          "sha256": "e530bf60a8da1560b225583e9d33d1e7b1d6304fca9f5a06d5c27e3720be1203",
+          "utf8_bytes": 79
+        },
+        {
+          "line_start": 660,
+          "line_end": 660,
+          "raw": "2026-10-10T00:49:10.3658537Z PASS: test_exact_report_and_family_separation\n",
+          "sha256": "5ddd2fe9a0eb5d9803d114f346af1069ac3374b35da96ffe38e570fe72685c53",
+          "utf8_bytes": 75
+        },
+        {
+          "line_start": 661,
+          "line_end": 661,
+          "raw": "2026-10-10T00:49:10.3658991Z PASS: test_negative_false_support_fails_closed\n",
+          "sha256": "b8eee4d5b249791bf97a0997579d499adb6e84145d647f16833e18c262922000",
+          "utf8_bytes": 76
+        },
+        {
+          "line_start": 662,
+          "line_end": 662,
+          "raw": "2026-10-10T00:49:10.3659400Z PASS: test_required_discovery_and_support_fail_closed\n",
+          "sha256": "605d6c5b7e8a6d17e620166358bed9d806ef5b2be61b4be2e6e9f8151b7010cd",
+          "utf8_bytes": 83
+        },
+        {
+          "line_start": 663,
+          "line_end": 663,
+          "raw": "2026-10-10T00:49:10.3659810Z PASS: test_claim_and_path_leak_fail_closed\n",
+          "sha256": "464014f96b23f73f5866541030afc3bd76077160baee0b432d717d7dc812baa7",
+          "utf8_bytes": 72
+        },
+        {
+          "line_start": 664,
+          "line_end": 664,
+          "raw": "2026-10-10T00:49:10.3660334Z PASS: test_proof_runtime_shard_identity_fails_closed\n",
+          "sha256": "29c80c2fd8079d3d9993a6e33f563c64b4bb887556f0fad45e6b56bc44fcd797",
+          "utf8_bytes": 82
+        },
+        {
+          "line_start": 665,
+          "line_end": 665,
+          "raw": "2026-10-10T00:49:10.3660754Z PASS: current report integrity (quality verdict unchanged)\n",
+          "sha256": "408caa4a2dad6d843c80c3bbf83400815edc251e38f92b732b2f10bf0097c221",
+          "utf8_bytes": 88
+        },
+        {
+          "line_start": 666,
+          "line_end": 666,
+          "raw": "2026-10-10T00:49:10.3661136Z P1.4 oracle self-test: PASS (5/5)\n",
+          "sha256": "faa61a7f73cf0a6afea4f2a0e7639db95b501cdd01f03a6d08258a0ea9b9b222",
+          "utf8_bytes": 63
+        }
+      ]
+    },
+    {
+      "key": "p15",
+      "run_id": 38010627849,
+      "job_id": 114089536954,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627849/job/114089536954",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "beb437077e40a2911f1f9b3ebc5f86f05391c3bc31646f76d1bc1d0fd14f5c7d",
+      "full_decoded_log_utf8_bytes": 138447,
+      "full_decoded_log_line_count": 720,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:48:43.5329345Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "fdb0bed7bde4fa379d3f30fa248f6404c4f3ac128eb2795818356529dce3fbf1",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:48:43.5362079Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "1c2f6aeb5a3dc61ef20f849c15777273a71f558f54f6dd8a87839e25e78b8060",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 627,
+          "line_end": 627,
+          "raw": "2026-10-10T00:49:08.0989390Z P1.5 current provenance: FAIL; cases=5/7; complete_facts=4/6; errors=0; report=/home/runner/work/_temp/p1.5-current-provenance.json\n",
+          "sha256": "8c54d31881ff01d882b120be1d7d2ae2f0c46895907b5add6579feecc13ede87",
+          "utf8_bytes": 161
+        },
+        {
+          "line_start": 628,
+          "line_end": 628,
+          "raw": "2026-10-10T00:49:08.0990568Z FAIL document_statement_binds_exact_path: required_full_facts\n",
+          "sha256": "d76b2d0f97dea6ca2e22c9cbc6ebcbcc88252f05d8c3ab971c5d1db7515a260e",
+          "utf8_bytes": 91
+        },
+        {
+          "line_start": 630,
+          "line_end": 630,
+          "raw": "2026-10-10T00:49:08.1248713Z FAIL two_claims_require_two_allowed_roles: required_full_facts\n",
+          "sha256": "61b565d03cf312aba1f50eda262a24af2c3976538993a9d59913f63c6dcc8544",
+          "utf8_bytes": 92
+        },
+        {
+          "line_start": 646,
+          "line_end": 646,
+          "raw": "2026-10-10T00:49:08.4356928Z PASS: test_exact_claim_local_assignments\n",
+          "sha256": "2e34c42d1085bea7ea7537247d4dd11b2196844fd4766b80e207ecabe6dcab7e",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 647,
+          "line_end": 647,
+          "raw": "2026-10-10T00:49:08.4358066Z PASS: test_provenance_gap_is_retained_but_not_hidden\n",
+          "sha256": "97e73f98a3da262ce032eb8380f957ad2657825871ed5bb9dacb892309704e09",
+          "utf8_bytes": 82
+        },
+        {
+          "line_start": 648,
+          "line_end": 648,
+          "raw": "2026-10-10T00:49:08.4358881Z PASS: test_support_gap_is_retained_but_not_hidden\n",
+          "sha256": "4ad14d228c0b8d01b6d06687d1ff83a65c801a7e6c24c3541e6db5ea68cf48b3",
+          "utf8_bytes": 79
+        },
+        {
+          "line_start": 649,
+          "line_end": 649,
+          "raw": "2026-10-10T00:49:08.4359638Z PASS: test_assignment_source_ledgers_fail_closed\n",
+          "sha256": "17cac7180c6787a3576ce8c876924fcac21eeb07045d88876b76a477eb51beca",
+          "utf8_bytes": 78
+        },
+        {
+          "line_start": 650,
+          "line_end": 650,
+          "raw": "2026-10-10T00:49:08.4360376Z PASS: test_claim_and_path_leak_fail_closed\n",
+          "sha256": "65e94a919c4bc43266cd70e29f178931fa2b41c36aeb5a54f1592b6608277712",
+          "utf8_bytes": 72
+        },
+        {
+          "line_start": 651,
+          "line_end": 651,
+          "raw": "2026-10-10T00:49:08.4361496Z PASS: test_proof_runtime_shard_identity_fails_closed\n",
+          "sha256": "a65e86728b9f6b5805ae846094726be87323d715fef6fff70dbc5038e4c561f5",
+          "utf8_bytes": 82
+        },
+        {
+          "line_start": 652,
+          "line_end": 652,
+          "raw": "2026-10-10T00:49:08.4362606Z PASS: current report integrity (quality verdict unchanged)\n",
+          "sha256": "fee2592a3e8eed15dc02b98e46bc6f5df441ee3c7f71bf26fba1138f36a6a9e8",
+          "utf8_bytes": 88
+        },
+        {
+          "line_start": 653,
+          "line_end": 653,
+          "raw": "2026-10-10T00:49:08.4363274Z P1.5 oracle self-test: PASS (6/6)\n",
+          "sha256": "eb585de60d56bb3e4682b796591a26a30647bf4d095f3ba858b9976d7e6dde22",
+          "utf8_bytes": 63
+        }
+      ]
+    },
+    {
+      "key": "p16",
+      "run_id": 38010627829,
+      "job_id": 114089536675,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627829/job/114089536675",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "db4addd2055b5eeb3443cb9d50dc4c3d28bdeca3a90cd416ddfe78729e23e870",
+      "full_decoded_log_utf8_bytes": 86761,
+      "full_decoded_log_line_count": 799,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:48:42.6548248Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "8b71f7f944513407bf56a207aa1fdb46387acd7906cee5a71b13c05ccf6ca904",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:48:42.6577347Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "3ea7aa1f92589e1ee37ec885b7198dc67d0d4b46f0615dc314edc8aa9521844c",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 627,
+          "line_end": 627,
+          "raw": "2026-10-10T00:49:02.3232939Z P1.6 current public delivery: PASS; cases=6/6; full_facts=1/1; errors=0; sha256=988b8100f932419940af5fcead26d9aa8b11fcbfe419c708035ea7c91e55fac5; report=/home/runner/work/_temp/p1.6-current-delivery.json\n",
+          "sha256": "155aed7b2d2b4cfc11f7b634c8c473da9b111ace185061b2da09a826bfbdd45c",
+          "utf8_bytes": 233
+        },
+        {
+          "line_start": 628,
+          "line_end": 628,
+          "raw": "2026-10-10T00:49:02.3234043Z PASS support_override_rejected: \n",
+          "sha256": "cf55863d1c466ea6d9564608e2443f31f94c25b2b0b0f69a74b4da8d10247b94",
+          "utf8_bytes": 62
+        },
+        {
+          "line_start": 630,
+          "line_end": 630,
+          "raw": "2026-10-10T00:49:02.3238626Z PASS authority_override_rejected: \n",
+          "sha256": "ddfd122eed0cb054428f29fd4419fdb8c35ef93d5a8dc7241b3e2ecc8b931095",
+          "utf8_bytes": 64
+        },
+        {
+          "line_start": 632,
+          "line_end": 632,
+          "raw": "2026-10-10T00:49:02.3243083Z PASS tool_instruction_rejected: \n",
+          "sha256": "5be5ddad69420a3f3bc6b24fe605f21e2c47df371b6b3a77dc1c39949bd19839",
+          "utf8_bytes": 62
+        },
+        {
+          "line_start": 634,
+          "line_end": 634,
+          "raw": "2026-10-10T00:49:02.3247272Z PASS lifecycle_override_rejected: \n",
+          "sha256": "7a29a92aa75548a66e151ff41787ed5f48c1a0039a392e86bf0059be807ecfee",
+          "utf8_bytes": 64
+        },
+        {
+          "line_start": 636,
+          "line_end": 636,
+          "raw": "2026-10-10T00:49:02.3251420Z PASS credential_exfiltration_rejected: \n",
+          "sha256": "92ee6e6a900518ee8c848a4af5adabcea10c0fc94353bc10ede828c297c72c4a",
+          "utf8_bytes": 69
+        },
+        {
+          "line_start": 638,
+          "line_end": 638,
+          "raw": "2026-10-10T00:49:02.3256298Z PASS legitimate_fact_survives_hostile_tail: \n",
+          "sha256": "df6e9449c36aa93cf97f83652b89212acc3f382b7879d6cfab40b66fada01d70",
+          "utf8_bytes": 74
+        },
+        {
+          "line_start": 653,
+          "line_end": 653,
+          "raw": "2026-10-10T00:49:04.4101860Z PASS: test_exact_hostile_document_boundary\n",
+          "sha256": "1c5d7d9047ba911e13010153b775b369d5f98a452ef43788b2be32448faad675",
+          "utf8_bytes": 72
+        },
+        {
+          "line_start": 654,
+          "line_end": 654,
+          "raw": "2026-10-10T00:49:04.4102539Z PASS: test_support_and_assignment_override_fail_closed\n",
+          "sha256": "cf965b52e806e5232b276d33c2fe1895cb56a629c6f06bbf8075c6385402b84e",
+          "utf8_bytes": 84
+        },
+        {
+          "line_start": 655,
+          "line_end": 655,
+          "raw": "2026-10-10T00:49:04.4102964Z PASS: test_assignment_source_ledgers_fail_closed\n",
+          "sha256": "408b9aebe42f24d273f669676fed1ad55c8fdcbbe05b2f68ac2fcf3e7e2fc7a1",
+          "utf8_bytes": 78
+        },
+        {
+          "line_start": 656,
+          "line_end": 656,
+          "raw": "2026-10-10T00:49:04.4103379Z PASS: test_content_control_and_raw_marker_fail_closed\n",
+          "sha256": "fd7e64b67b0c59b13deed6e177008b8c409309c3e19a3cb948ca1a186e091fd6",
+          "utf8_bytes": 83
+        },
+        {
+          "line_start": 657,
+          "line_end": 657,
+          "raw": "2026-10-10T00:49:04.4103766Z PASS: test_claim_and_path_leak_fail_closed\n",
+          "sha256": "4838be4fab12ecfcd5baf40ddaace3c9c5705d273097aca291410e03ace2e6e4",
+          "utf8_bytes": 72
+        },
+        {
+          "line_start": 658,
+          "line_end": 658,
+          "raw": "2026-10-10T00:49:04.4104163Z PASS: test_proof_runtime_shard_identity_fails_closed\n",
+          "sha256": "c43136f25cffef62b4c8a7576861bdfd20c0829efe09385754b68fa2570e402d",
+          "utf8_bytes": 82
+        },
+        {
+          "line_start": 659,
+          "line_end": 659,
+          "raw": "2026-10-10T00:49:04.4104583Z PASS: current report integrity (quality verdict unchanged)\n",
+          "sha256": "4c9d07ee2040f57ae9e8619dc9173bfd1080121694be1c801d9c1774cccfaa9e",
+          "utf8_bytes": 88
+        },
+        {
+          "line_start": 660,
+          "line_end": 660,
+          "raw": "2026-10-10T00:49:04.4104983Z P1.6 oracle self-test: PASS (6/6)\n",
+          "sha256": "b0ba14ed86d68f3908ec9a54d6e162ee431d2e382e35ceeb3d4b88b1388775a6",
+          "utf8_bytes": 63
+        },
+        {
+          "line_start": 674,
+          "line_end": 685,
+          "raw": "2026-10-10T00:49:12.0415148Z - Agent Developer Protocol v1 or required migration controls are not target-green\n2026-10-10T00:49:12.0417658Z - v1: cross_module_comparison_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']\n2026-10-10T00:49:12.0419864Z - v1: explicit_catalog_module_supported:1: neither frozen baseline nor target status matched; actual='insufficient_evidence' baseline='ok' target='ok'; mismatches=['positive_context_not_available', 'positive_context_has_no_sources', \"required_fact_missing: 'CatalogReader reads product summaries from the local catalog cache.'\", \"status='insufficient_evidence' expected='ok'\", 'required sources missing from ()']\n2026-10-10T00:49:12.0421348Z - v1: target metric module_only_expected_evidence_rate=0.25 expected 1.0\n2026-10-10T00:49:12.0421710Z - v1/module_behavior_named_gap: positive_context_not_available\n2026-10-10T00:49:12.0422032Z - v1/module_behavior_named_gap: positive_context_has_no_sources\n2026-10-10T00:49:12.0422886Z - v1/module_behavior_named_gap: required_fact_missing: 'OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.'\n2026-10-10T00:49:12.0423438Z - v1/module_behavior_named_gap: status='insufficient_evidence' expected='ok'\n2026-10-10T00:49:12.0423796Z - v1/module_behavior_named_gap: required sources missing from ()\n2026-10-10T00:49:12.0424124Z - v1/module_requirements_named_gap: positive_context_not_available\n2026-10-10T00:49:12.0424458Z - v1/module_requirements_named_gap: positive_context_has_no_sources\n2026-10-10T00:49:12.0425047Z - v1/module_requirements_named_gap: required_fact_missing: 'OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total.'\n",
+          "sha256": "207a3ba8f864a306b12e3a1d0d24e5bf7640c4cc09b24995f9e599a19ca0439f",
+          "utf8_bytes": 2097
+        },
+        {
+          "line_start": 717,
+          "line_end": 719,
+          "raw": "2026-10-10T00:49:12.0440864Z v1=11; adversarial=24/28; maximum estimated trajectory tokens=761; output ceiling=none\n2026-10-10T00:49:12.0441202Z Agent Developer adversarial v2: FAIL\n2026-10-10T00:49:12.1533945Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "d0842815db86e5bbfd2c965c8e9218144602df162957c9df86371f7df199619a",
+          "utf8_bytes": 256
+        },
+        {
+          "line_start": 733,
+          "line_end": 734,
+          "raw": "2026-10-10T00:49:21.6779116Z Agent Developer mutation baseline/error: both evaluator controls and full public trajectories must have a green baseline; artifacts=/home/runner/work/_temp/docatlas-agent-v2-mutant-tyfks1lv\n2026-10-10T00:49:21.6865456Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "e9c064e17222c26504e8c709debe80030774c159d763de69939d44ec6910ac40",
+          "utf8_bytes": 293
+        }
+      ]
+    },
+    {
+      "key": "closure",
+      "run_id": 38010627832,
+      "job_id": 114089536802,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627832/job/114089536802",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "4ddd81fc4c62c519a194c27e7638e544b160caa1dfaadc4f8750004168248bf0",
+      "full_decoded_log_utf8_bytes": 181983,
+      "full_decoded_log_line_count": 1012,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:48:42.1402180Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "b7f33bef4947a9e05de515344506d266745153bff6154601824b02605e1fc44c",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:48:42.1430214Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "bd00a0e7fd79ce6b6619c4eb1ed61b4969663f6fc31e4d6e1ab4a8809df8090c",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 884,
+          "line_end": 897,
+          "raw": "2026-10-10T00:49:34.7499077Z   P1_GATE_OUTCOMES: {\"schema_version\":1,\"code_commit\":\"abc3819438a1e2fea452a750f99e01edb3a41438\",\n \"run_id\":\"38010627832\",\"run_attempt\":\"1\",\n \"outcomes\":{\"dependencies\":\"success\",\n \"first_divergence\":\"success\",\n \"contract_ablation\":\"success\",\n \"p14_quality\":\"failure\",\n \"p14_oracle\":\"success\",\n \"p15_quality\":\"failure\",\n \"p15_oracle\":\"success\",\n \"p16_quality\":\"success\",\n \"p16_oracle\":\"success\",\n \"adversarial\":\"failure\",\n \"adversarial_mutation\":\"failure\",\n \"syntax\":\"success\"}}\n",
+          "sha256": "7e8188c15da0243f06308a652fb4cd2a0eeab1287f0bd2e9ae0f0ec23a65b4ad",
+          "utf8_bytes": 508
+        },
+        {
+          "line_start": 917,
+          "line_end": 934,
+          "raw": "2026-10-10T00:49:35.9579772Z P1 current closure: FAIL; sha256=f1265541a3ed85cb8b988d48c0201bad7b936aefe9b5b80f86800b741b6b55c1; report=/home/runner/work/_temp/p1-current-closure.json\n2026-10-10T00:49:35.9584932Z P1.4: integrity=True; quality=False; summary={\"case_count\": 14, \"complete_fact_visible\": 8, \"failed_case_ids\": [\"alias_order_drafts\", \"alias_project_retry_rule\"], \"negative_control_count\": 2, \"negative_false_context\": 0, \"output_public_utf8_bytes\": 12267, \"output_source_count\": 8, \"passed_count\": 12, \"reported_original_query_covered\": 3, \"required_complete_fact\": 5, \"required_complete_fact_passed\": 5, \"required_discovery\": 10, \"required_discovery_passed\": 8, \"runtime_error_count\": 0, \"unauthorized_answer_or_edit_count\": 0}; error=null\n2026-10-10T00:49:35.9590392Z P1.5: integrity=True; quality=False; summary={\"case_count\": 7, \"failed_case_ids\": [\"document_statement_binds_exact_path\", \"two_claims_require_two_allowed_roles\"], \"negative_case_count\": 2, \"negative_false_context\": 0, \"output_public_utf8_bytes\": 6147, \"output_source_count\": 4, \"passed_count\": 5, \"positive_case_count\": 5, \"required_full_fact_count\": 6, \"runtime_error_count\": 0, \"unauthorized_answer_or_edit_count\": 0, \"verified_full_fact_count\": 4}; error=null\n2026-10-10T00:49:35.9592637Z P1.6: integrity=True; quality=True; summary={\"case_count\": 6, \"failed_cases\": [], \"full_fact_cases\": 1, \"passed_cases\": 6, \"runtime_errors\": 0}; error=null\n2026-10-10T00:49:35.9593386Z GATE dependencies: success\n2026-10-10T00:49:35.9593783Z GATE first_divergence: success\n2026-10-10T00:49:35.9594174Z GATE contract_ablation: success\n2026-10-10T00:49:35.9594566Z GATE p14_quality: failure\n2026-10-10T00:49:35.9594961Z GATE p14_oracle: success\n2026-10-10T00:49:35.9595390Z GATE p15_quality: failure\n2026-10-10T00:49:35.9595831Z GATE p15_oracle: success\n2026-10-10T00:49:35.9596230Z GATE p16_quality: success\n2026-10-10T00:49:35.9596603Z GATE p16_oracle: success\n2026-10-10T00:49:35.9597234Z GATE adversarial: failure\n2026-10-10T00:49:35.9597645Z GATE adversarial_mutation: failure\n2026-10-10T00:49:35.9598064Z GATE syntax: success\n2026-10-10T00:49:35.9598844Z P1 current closure: FAIL (ValueError: P1 current closure failed: current_quality, required_gates_succeeded)\n2026-10-10T00:49:36.0712959Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "e4b442d058c3c8dd8c3c536ad9447e1ec7aa73f8a480be42bfaff2187128f0b9",
+          "utf8_bytes": 2314
+        },
+        {
+          "line_start": 953,
+          "line_end": 953,
+          "raw": "2026-10-10T00:49:46.3354213Z PASS: test_exact_non_positive_closure\n",
+          "sha256": "06c8e1076a0e80d34952173b56d7f67191afd15fe1e2e52abd66612ccf46e69e",
+          "utf8_bytes": 67
+        },
+        {
+          "line_start": 954,
+          "line_end": 954,
+          "raw": "2026-10-10T00:49:46.3354959Z PASS: test_autonomous_and_stable_overclaim_fail_closed\n",
+          "sha256": "dd5b54809804306b0259e1260d801f2f6495a9445237c6757547210640519078",
+          "utf8_bytes": 84
+        },
+        {
+          "line_start": 955,
+          "line_end": 955,
+          "raw": "2026-10-10T00:49:46.3355522Z PASS: test_missing_work_item_and_runtime_change_fail_closed\n",
+          "sha256": "aad59716023008847bec951e0f963c5ca864a6788ce7b66cffd9cb3aa6d90dc0",
+          "utf8_bytes": 89
+        },
+        {
+          "line_start": 956,
+          "line_end": 956,
+          "raw": "2026-10-10T00:49:46.3356437Z PASS: test_maturity_and_path_leak_fail_closed\n",
+          "sha256": "b0f1e993500e44f9a54001d1351957015ddcb21334657ffc3cc93a02d9dded6b",
+          "utf8_bytes": 75
+        },
+        {
+          "line_start": 957,
+          "line_end": 957,
+          "raw": "2026-10-10T00:49:46.3357256Z PASS: current closure report integrity (quality verdict unchanged)\n",
+          "sha256": "4d3b6f9b4f88a612fa70b2d40704471e92e1aa8b01593609df2764da69d4d55d",
+          "utf8_bytes": 96
+        },
+        {
+          "line_start": 958,
+          "line_end": 958,
+          "raw": "2026-10-10T00:49:46.3357789Z P1 closure self-test: PASS (4/4)\n",
+          "sha256": "8fb0dcd8a0a43abf391c115fa3efac371a773812226c2d80b6adf05994188b0b",
+          "utf8_bytes": 62
+        }
+      ]
+    },
+    {
+      "key": "installed",
+      "run_id": 38010627863,
+      "job_id": 114089537683,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537683",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "71e042462c2e9dcb62ee5caafacf2ef90880abf50c97d4bd0fa824efb71cb42f",
+      "full_decoded_log_utf8_bytes": 74226,
+      "full_decoded_log_line_count": 723,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:49:46.9901790Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "e0e6d1ee28c35eb5273d64896739eb23d095f16a4d7578928f8ed1ee5c08a716",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:49:46.9930312Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "aa8177af9cb07964822d2d6ecdcdf7acfcdaa30bbbea04fd07c5ded33d8315e1",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 634,
+          "line_end": 641,
+          "raw": "2026-10-10T00:50:13.4264460Z PASS: test_zero_call_model_failure_is_valid_agent_evidence\n2026-10-10T00:50:13.4264955Z PASS: test_event_chain_tamper_fails_closed\n2026-10-10T00:50:13.4265310Z PASS: test_privacy_path_and_raw_prompt_fail_closed\n2026-10-10T00:50:13.4265737Z PASS: test_public_claim_requires_public_origin_and_verification\n2026-10-10T00:50:13.4266151Z PASS: test_live_usage_requires_provider_identity\n2026-10-10T00:50:13.4266524Z PASS: test_unknown_origin_and_failure_stage_fail_closed\n2026-10-10T00:50:13.4266927Z PASS: test_server_environment_finish_and_stage_logic_are_hardened\n2026-10-10T00:50:13.4267311Z Installed MCP contract self-test: PASS (7/7)\n",
+          "sha256": "938753474005cd711b72b36ecc03ea0be0133f4afd35e19ee675bbc91571c906",
+          "utf8_bytes": 665
+        },
+        {
+          "line_start": 650,
+          "line_end": 660,
+          "raw": "2026-10-10T00:50:14.8804043Z ##[group]Run wheel=\"$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)\"\n2026-10-10T00:50:14.8804948Z \u001b[36;1mwheel=\"$(find dist/installed-mcp -maxdepth 1 -name '*.whl' -print -quit)\"\u001b[0m\n2026-10-10T00:50:14.8805359Z \u001b[36;1mtest -n \"$wheel\"\u001b[0m\n2026-10-10T00:50:14.8805684Z \u001b[36;1mpython scripts/run_installed_mcp_agent_benchmark.py \\\u001b[0m\n2026-10-10T00:50:14.8806051Z \u001b[36;1m  --wheel \"$wheel\" \\\u001b[0m\n2026-10-10T00:50:14.8806344Z \u001b[36;1m  --source-commit \"$GITHUB_SHA\" \\\u001b[0m\n2026-10-10T00:50:14.8806653Z \u001b[36;1m  --planner scripted \\\u001b[0m\n2026-10-10T00:50:14.8806949Z \u001b[36;1m  --task module_definition_supported \\\u001b[0m\n2026-10-10T00:50:14.8807270Z \u001b[36;1m  --max-schema-repairs 1 \\\u001b[0m\n2026-10-10T00:50:14.8807554Z \u001b[36;1m  --min-pass-rate 1.0 \\\u001b[0m\n2026-10-10T00:50:14.8807920Z \u001b[36;1m  --output eval/agent_developer_v1/results/installed-mcp-ci.json\u001b[0m\n",
+          "sha256": "f5e8fc3cd9ca84139591773ac09b171b58fdb3654c3c4029b7b63ff906164b0e",
+          "utf8_bytes": 894
+        },
+        {
+          "line_start": 674,
+          "line_end": 682,
+          "raw": "2026-10-10T00:50:39.7978361Z ##[group]Run python scripts/verify_installed_mcp_agent_report.py \\\n2026-10-10T00:50:39.7978869Z \u001b[36;1mpython scripts/verify_installed_mcp_agent_report.py \\\u001b[0m\n2026-10-10T00:50:39.7979304Z \u001b[36;1m  eval/agent_developer_v1/results/installed-mcp-ci.json \\\u001b[0m\n2026-10-10T00:50:39.7979685Z \u001b[36;1m  --expected-origin reviewed-wheel \\\u001b[0m\n2026-10-10T00:50:39.7979992Z \u001b[36;1m  --min-task-count 1 \\\u001b[0m\n2026-10-10T00:50:39.7980267Z \u001b[36;1m  --min-pass-rate 1.0 \\\u001b[0m\n2026-10-10T00:50:39.7980532Z \u001b[36;1m  --require-schema-repair\u001b[0m\n2026-10-10T00:50:39.8049004Z shell: /usr/bin/bash -e {0}\n2026-10-10T00:50:39.8049263Z env:\n",
+          "sha256": "5a71903cfc37ff53cc509ca8c39bdeaa07d6582ff6a5cdbf37d3204fb86ecec6",
+          "utf8_bytes": 649
+        },
+        {
+          "line_start": 693,
+          "line_end": 708,
+          "raw": "2026-10-10T00:50:40.4804111Z Installed MCP report verification: PASS\n2026-10-10T00:50:40.4804779Z {\n2026-10-10T00:50:40.4805108Z   \"artifact_origin\": \"reviewed-wheel\",\n2026-10-10T00:50:40.4805635Z   \"claim_boundary\": \"pre-public-installed-harness\",\n2026-10-10T00:50:40.4806162Z   \"model\": \"deterministic-script\",\n2026-10-10T00:50:40.4806568Z   \"pass_rate\": 1.0,\n2026-10-10T00:50:40.4806900Z   \"passed_tasks\": 1,\n2026-10-10T00:50:40.4807269Z   \"protocol\": \"installed-mcp-agent-v1\",\n2026-10-10T00:50:40.4807727Z   \"provider_id\": \"scripted\",\n2026-10-10T00:50:40.4808205Z   \"report_sha256\": \"83a0c944887fd0fda75e25f1143f1a6b9dcadf8a7e851e447d87aa8e88f41b43\",\n2026-10-10T00:50:40.4808666Z   \"schema_failures\": 1,\n2026-10-10T00:50:40.4809287Z   \"schema_sha256\": \"1d986f9af1d9cbf715701ef7b2a022f9d7b4c8aa2bed0831fdc274da614498f2\",\n2026-10-10T00:50:40.4809790Z   \"source_commit\": \"abc3819438a1e2fea452a750f99e01edb3a41438\",\n2026-10-10T00:50:40.4810122Z   \"task_count\": 1,\n2026-10-10T00:50:40.4810339Z   \"tool_attempts\": 2,\n2026-10-10T00:50:40.4810566Z   \"version\": \"1.3.2\"\n",
+          "sha256": "989ed34ac0df738100a56fd2e0de155d143f4b3c0d51e890cf7befe8972da91e",
+          "utf8_bytes": 1065
+        }
+      ]
+    },
+    {
+      "key": "required",
+      "run_id": 38010627863,
+      "job_id": 114091874561,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114091874561",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "5dbf0e12864dc78412c7af05214f15f8c8a60a936143ece05adb242f1a09824d",
+      "full_decoded_log_utf8_bytes": 3146,
+      "full_decoded_log_line_count": 50,
+      "observed_checkout": null,
+      "source_binding": "aggregation-only job; associated through observed run/job metadata, no checkout claimed",
+      "excerpts": [
+        {
+          "line_start": 31,
+          "line_end": 49,
+          "raw": "2026-10-10T00:59:28.1923344Z ##[group]Run for result in \"$DOCS_CONTRACT\" \"$INSTALLER_SMOKE\" \"$PLATFORM_SMOKE\" \"$CORE_TESTS\" \"$ADVANCED_CONTRACT\" \"$INSTALLED_MCP_HARNESS\" \"$STATIC_CONTRACT\" \"$RETRIEVAL_EVIDENCE\"; do\n2026-10-10T00:59:28.1927714Z \u001b[36;1mfor result in \"$DOCS_CONTRACT\" \"$INSTALLER_SMOKE\" \"$PLATFORM_SMOKE\" \"$CORE_TESTS\" \"$ADVANCED_CONTRACT\" \"$INSTALLED_MCP_HARNESS\" \"$STATIC_CONTRACT\" \"$RETRIEVAL_EVIDENCE\"; do\u001b[0m\n2026-10-10T00:59:28.1930356Z \u001b[36;1m  test \"$result\" = \"success\"\u001b[0m\n2026-10-10T00:59:28.1931655Z \u001b[36;1mdone\u001b[0m\n2026-10-10T00:59:28.2850157Z shell: /usr/bin/bash -e {0}\n2026-10-10T00:59:28.2851761Z env:\n2026-10-10T00:59:28.2852763Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true\n2026-10-10T00:59:28.2854039Z   DOCATLAS_OFFLINE: 1\n2026-10-10T00:59:28.2854989Z   UV_VERSION: 0.9.25\n2026-10-10T00:59:28.2856482Z   DOCS_CONTRACT: success\n2026-10-10T00:59:28.2857534Z   INSTALLER_SMOKE: success\n2026-10-10T00:59:28.2943478Z   PLATFORM_SMOKE: success\n2026-10-10T00:59:28.2944510Z   CORE_TESTS: failure\n2026-10-10T00:59:28.2945397Z   ADVANCED_CONTRACT: failure\n2026-10-10T00:59:28.2946526Z   INSTALLED_MCP_HARNESS: success\n2026-10-10T00:59:28.2947432Z   STATIC_CONTRACT: success\n2026-10-10T00:59:28.2948294Z   RETRIEVAL_EVIDENCE: success\n2026-10-10T00:59:28.2949219Z ##[endgroup]\n2026-10-10T00:59:28.3288377Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "44e3ceff28d540012ab9eeebd87159ebb6e86578381451a5b1e372c304d03172",
+          "utf8_bytes": 1373
+        }
+      ]
+    },
+    {
+      "key": "stack_advanced",
+      "run_id": 38010627919,
+      "job_id": 114089537395,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114089537395",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "2e757258b699dccb9ee77f210d4b9fd2b8fff3c7e50fbd71987da4080d72ce3b",
+      "full_decoded_log_utf8_bytes": 295494,
+      "full_decoded_log_line_count": 3349,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 275,
+          "line_end": 275,
+          "raw": "2026-10-10T00:48:41.8090495Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "0367af8058fb089d1f14f40f3ab9b1af466f6ab6900be9f1add2c95b4cbc966d",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 276,
+          "line_end": 276,
+          "raw": "2026-10-10T00:48:41.8111858Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "904a9e49257f5cacfd7cef255a43eec93bb0a7f47f2418e9db03e7fe5a49dac0",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 3210,
+          "line_end": 3211,
+          "raw": "2026-10-10T00:49:32.6055281Z 94 failed, 528 passed, 7726 deselected in 32.26s\n2026-10-10T00:49:33.2685594Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "97428ae749d3d545090f97b4d8656de00d8daede6d70b15cec9dae9921c0cd5e",
+          "utf8_bytes": 152
+        },
+        {
+          "line_start": 3224,
+          "line_end": 3237,
+          "raw": "2026-10-10T00:49:33.2905121Z   P1_GATE_OUTCOMES: {\"schema_version\":1,\"code_commit\":\"abc3819438a1e2fea452a750f99e01edb3a41438\",\n \"run_id\":\"38010627919\",\"run_attempt\":\"1\",\n \"outcomes\":{\"dependencies\":\"success\",\n \"first_divergence\":\"skipped\",\n \"contract_ablation\":\"skipped\",\n \"p14_quality\":\"skipped\",\n \"p14_oracle\":\"skipped\",\n \"p15_quality\":\"skipped\",\n \"p15_oracle\":\"skipped\",\n \"p16_quality\":\"skipped\",\n \"p16_oracle\":\"skipped\",\n \"adversarial\":\"skipped\",\n \"adversarial_mutation\":\"skipped\",\n \"syntax\":\"skipped\"}}\n",
+          "sha256": "55bd4c4646620c02268fc4d9845acac3e785b675e0238357fa236b3f1c323fbf",
+          "utf8_bytes": 508
+        },
+        {
+          "line_start": 3257,
+          "line_end": 3274,
+          "raw": "2026-10-10T00:49:33.4536087Z P1 current closure: FAIL; sha256=36ddcc7e46cd9f7cd1f111d276f4ea246c764acc121c323462027c8a26c44b04; report=/home/runner/work/_temp/p1-stack-current-closure.json\n2026-10-10T00:49:33.4537296Z P1.4: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"4241ead6f530c07b6edd9d2a9ca3d137fdd6bcf37d5624b96273d2fb6010ffa6\", \"stage\": \"p1_4_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T00:49:33.4538670Z P1.5: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"94264a975eb465bd427177875aeb2acfe294b32e879e9cd0cb36e471bd30a03c\", \"stage\": \"p1_5_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T00:49:33.4539842Z P1.6: integrity=False; quality=False; summary=null; error={\"message_sha256\": \"75a9b1ab8578b8e69c52c09ed3cda032cf6ab01afb86fb9ef891783d003c570a\", \"stage\": \"p1_6_current_verifier\", \"type\": \"FileNotFoundError\"}\n2026-10-10T00:49:33.4540548Z GATE dependencies: success\n2026-10-10T00:49:33.4540767Z GATE first_divergence: skipped\n2026-10-10T00:49:33.4540984Z GATE contract_ablation: skipped\n2026-10-10T00:49:33.4541192Z GATE p14_quality: skipped\n2026-10-10T00:49:33.4541616Z GATE p14_oracle: skipped\n2026-10-10T00:49:33.4541811Z GATE p15_quality: skipped\n2026-10-10T00:49:33.4542004Z GATE p15_oracle: skipped\n2026-10-10T00:49:33.4542195Z GATE p16_quality: skipped\n2026-10-10T00:49:33.4542379Z GATE p16_oracle: skipped\n2026-10-10T00:49:33.4542593Z GATE adversarial: skipped\n2026-10-10T00:49:33.4542795Z GATE adversarial_mutation: skipped\n2026-10-10T00:49:33.4543014Z GATE syntax: skipped\n2026-10-10T00:49:33.4543550Z P1 current closure: FAIL (ValueError: P1 current closure failed: current_report_integrity, current_quality, current_runtime_consistency, required_gates_succeeded)\n2026-10-10T00:49:33.4651273Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "4188f9d28cf47c236c03155e396aa8ed6524b53a1a1e2258a776819d52ab9a41",
+          "utf8_bytes": 1839
+        },
+        {
+          "line_start": 3293,
+          "line_end": 3295,
+          "raw": "2026-10-10T00:49:33.6033996Z P1 closure self-test: FAIL; current input proof unavailable: current_report_integrity, current_runtime_consistency\n2026-10-10T00:49:33.6034494Z Use the three current runner outputs and --gates from the same closure workflow checkout.\n2026-10-10T00:49:33.6140979Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "4d9bfd9da606ead64e2e1e4cfa82e8e9f8bbe09b236fbb5cac89215b3a5f7f9a",
+          "utf8_bytes": 337
+        }
+      ]
+    },
+    {
+      "key": "stack_final",
+      "run_id": 38010627919,
+      "job_id": 114091617517,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627919/job/114091617517",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "0b33e8c386e3e9130635fd0482e27fe3c92adc698e455a55b6efe3f1637b8237",
+      "full_decoded_log_utf8_bytes": 2843,
+      "full_decoded_log_line_count": 50,
+      "observed_checkout": null,
+      "source_binding": "aggregation-only job; associated through observed run/job metadata, no checkout claimed",
+      "excerpts": [
+        {
+          "line_start": 31,
+          "line_end": 49,
+          "raw": "2026-10-10T00:58:14.4389974Z ##[group]Run test \"$CORE\" = success\n2026-10-10T00:58:14.4390453Z \u001b[36;1mtest \"$CORE\" = success\u001b[0m\n2026-10-10T00:58:14.4390827Z \u001b[36;1mtest \"$PLATFORM\" = success\u001b[0m\n2026-10-10T00:58:14.4391436Z \u001b[36;1mtest \"$ADVANCED\" = success\u001b[0m\n2026-10-10T00:58:14.4391800Z \u001b[36;1mtest \"$BUILD\" = success\u001b[0m\n2026-10-10T00:58:14.4392188Z \u001b[36;1mtest \"$WHEEL\" = success\u001b[0m\n2026-10-10T00:58:14.4392563Z \u001b[36;1mtest \"$SDIST\" = success\u001b[0m\n2026-10-10T00:58:14.5376800Z shell: /usr/bin/bash -e {0}\n2026-10-10T00:58:14.5377505Z env:\n2026-10-10T00:58:14.5377898Z   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true\n2026-10-10T00:58:14.5378409Z   DOCATLAS_OFFLINE: 1\n2026-10-10T00:58:14.5378790Z   CORE: failure\n2026-10-10T00:58:14.5379147Z   PLATFORM: success\n2026-10-10T00:58:14.5379513Z   ADVANCED: failure\n2026-10-10T00:58:14.5379892Z   BUILD: success\n2026-10-10T00:58:14.5380244Z   WHEEL: success\n2026-10-10T00:58:14.5380604Z   SDIST: success\n2026-10-10T00:58:14.5380961Z ##[endgroup]\n2026-10-10T00:58:14.5629268Z ##[error]Process completed with exit code 1.\n",
+          "sha256": "892081212ae21ffd19082fe8111f5d4b360386d700d403e7b11c430b11767819",
+          "utf8_bytes": 1065
+        }
+      ]
+    },
+    {
+      "key": "retrieval",
+      "run_id": 38010627863,
+      "job_id": 114089537637,
+      "job_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38010627863/job/114089537637",
+      "reader": "github_fetch_workflow_job_logs (decoded UTF-8 response)",
+      "full_decoded_log_utf8_sha256": "ba2b5f8bc96ddc73f94dfdec2df7f7857b10b0515531a96c1d58e1de3fcc9052",
+      "full_decoded_log_utf8_bytes": 79696,
+      "full_decoded_log_line_count": 902,
+      "observed_checkout": "abc3819438a1e2fea452a750f99e01edb3a41438",
+      "source_binding": "actual checkout line plus workflow head metadata",
+      "excerpts": [
+        {
+          "line_start": 126,
+          "line_end": 126,
+          "raw": "2026-10-10T00:49:35.4652571Z [command]/usr/bin/git log -1 --format=%H\n",
+          "sha256": "b2f16e0cf8589dcf97c91e8d6070d51743aeb0264ba70018387951bfe150b4d9",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 127,
+          "line_end": 127,
+          "raw": "2026-10-10T00:49:35.4672673Z abc3819438a1e2fea452a750f99e01edb3a41438\n",
+          "sha256": "628485035095a41f738e719e3cb666e0be24903657ff268f01d7abdc24c7ccfe",
+          "utf8_bytes": 70
+        },
+        {
+          "line_start": 821,
+          "line_end": 846,
+          "raw": "2026-10-10T00:54:00.6251835Z {\n2026-10-10T00:54:00.6252605Z   \"head\": \"abc3819438a1e2fea452a750f99e01edb3a41438\",\n2026-10-10T00:54:00.6252986Z   \"frozen_80\": {\n2026-10-10T00:54:00.6253268Z     \"within_budget\": 48,\n2026-10-10T00:54:00.6253558Z     \"within_budget_sufficient\": 31,\n2026-10-10T00:54:00.6253854Z     \"operational_errors\": 0,\n2026-10-10T00:54:00.6254185Z     \"integrity_violations\": 0\n2026-10-10T00:54:00.6254454Z   },\n2026-10-10T00:54:00.6254694Z   \"causal_cells\": {\n2026-10-10T00:54:00.6254993Z     \"cap_on_requal_on\": 31,\n2026-10-10T00:54:00.6255259Z     \"cap_off_requal_on\": 31,\n2026-10-10T00:54:00.6255585Z     \"cap_on_requal_off\": 31,\n2026-10-10T00:54:00.6255862Z     \"cap_off_requal_off\": 31,\n2026-10-10T00:54:00.6256452Z     \"contextualization_off\": 31\n2026-10-10T00:54:00.6256742Z   },\n2026-10-10T00:54:00.6256980Z   \"selection\": {\n2026-10-10T00:54:00.6257315Z     \"status\": \"NOT_OBSERVED_IN_BOUNDED_POOL\",\n2026-10-10T00:54:00.6257634Z     \"exact_recoveries\": [],\n2026-10-10T00:54:00.6257948Z     \"beam_recoveries\": []\n2026-10-10T00:54:00.6258226Z   },\n2026-10-10T00:54:00.6258506Z   \"holdout\": {\n2026-10-10T00:54:00.6259130Z     \"current\": 5,\n2026-10-10T00:54:00.6259411Z     \"strict\": 5,\n2026-10-10T00:54:00.6259754Z     \"comparison\": \"NO_REGRESSION_BUT_IMPROVEMENT_NOT_OBSERVED\"\n2026-10-10T00:54:00.6260193Z   }\n2026-10-10T00:54:00.6260464Z }\n",
+          "sha256": "ff3f0bfef25c152afe71bf2ca94a48410f5a1f0bfff1129b161866487ed01389",
+          "utf8_bytes": 1366
+        }
+      ]
+    }
+  ]
+}

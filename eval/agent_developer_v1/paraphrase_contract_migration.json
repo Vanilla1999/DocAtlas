@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "protocol": "paraphrase-current-contract-migration-v1",
+  "frozen_protocol_sha256": "e1586bbd628b488faeebaf271ddf10806b6e2546c307426651bbae2021f26cf5",
+  "historical_report_sha256": "adb30f8a8b8e99dc1a2176cda420bbfd4af8e5d8bdaf1947d9877dfec8be6bf5",
+  "current_report_protocol": "paraphrase-retrieval-report-v2",
+  "scope": "project",
+  "lookup_queries": [],
+  "catalog": "finite_authored_source_of_truth_documents",
+  "authority": "retrieval_only_never_answer_or_edit_permission",
+  "cost_policy": "measure_and_minimize_without_fixed_output_ceiling",
+  "crosswalk": [
+    {
+      "id": "exact_orders_identity",
+      "require_discovery": true,
+      "require_visible_complete_fact": true,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": true,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "exact_retry_policy",
+      "require_discovery": true,
+      "require_visible_complete_fact": true,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": true,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "behavior_orders_store",
+      "require_discovery": true,
+      "require_visible_complete_fact": true,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": true,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "behavior_payment_outbox",
+      "require_discovery": true,
+      "require_visible_complete_fact": true,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": true,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "requirements_validation_contract",
+      "require_discovery": true,
+      "require_visible_complete_fact": true,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": true,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "requirements_validation_conditions",
+      "require_discovery": true,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "policy_retry_count",
+      "require_discovery": true,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "policy_retry_backoff",
+      "require_discovery": true,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "typo_orders_symbol",
+      "require_discovery": false,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "typo_policy_symbol",
+      "require_discovery": false,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "alias_order_drafts",
+      "require_discovery": true,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "alias_project_retry_rule",
+      "require_discovery": true,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": false,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "negative_wrong_module_fact",
+      "require_discovery": false,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": true,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    },
+    {
+      "id": "negative_unrelated_policy",
+      "require_discovery": false,
+      "require_visible_complete_fact": false,
+      "require_no_visible_wrong_source": true,
+      "historical_support_expectation_retained_as_metadata": false,
+      "current_discovery": "actual_public_source_with_verified_bytes_and_coordinates",
+      "current_fact": "complete_frozen_candidate_text_in_one_visible_source"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_retrieval_need_adapter.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_retrieval_need_adapter.py": "a17676bae1d43b84e76b8b667de3534b004f38d0e72348a51e47a06b171cbbf4"
+  }
+}

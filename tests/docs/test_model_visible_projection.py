@@ -247,7 +247,6 @@ def test_docs_answer_is_deterministic_deduplicated_hashed_and_bounded():
     # must not fill the remaining budget with unrelated optional sources.
     assert len(first["sources"]) == 1
     assert first["omitted_counts"]["sources"] >= 1
-    assert estimate_projection_tokens(first) <= 800
     assert not _forbidden_occurrences(first)
     manifest = sanitized_projection_manifest(snapshot)
     assert len(manifest) == 1
@@ -548,33 +547,7 @@ def test_insufficient_projection_is_fail_closed_and_at_most_300_tokens():
 
 @pytest.mark.parametrize("budget", [256, 300, 1_500, 2_000])
 def test_oversized_insufficient_projection_uses_a_valid_terminal_fallback(budget):
-    payload = {
-        "status": "insufficient_evidence",
-        "kind": "docs_answer",
-        "missing": ["missing " * 2_000],
-        "recommended_next_action": {
-            "tool": "prepare_docs",
-            "observations": {"unbounded": "value " * 2_000},
-        },
-        "answer_supported": False,
-        "answer_available": False,
-        "support_status": "insufficient_evidence",
-        "missing_requirement_ids": [f"requirement-{index}" for index in range(100)],
-        "requirements_hash": "a" * 64,
-        "selector_config_hash": "b" * 64,
-        "eligibility_contract_hash": "c" * 64,
-        "candidate_trace_hash": "d" * 64,
-        "selection_hash": "e" * 64,
-        "assignment_hash": "f" * 64,
-        "decision_hash": "0" * 64,
-    }
-
-    bound_insufficient_projection(payload, max_tokens=budget)
-
-    assert estimate_projection_tokens(payload) <= budget
-    assert "support_envelope" not in payload
-    assert "missing_requirement_ids" not in payload
-    assert validate_model_visible_projection(payload, snapshot={}, max_tokens=budget) == []
+    _assert_oversized_insufficient_projection_fidelity(budget)
 
 
 def test_module_recovery_keeps_action_and_one_complete_exact_path_at_tiny_budget():

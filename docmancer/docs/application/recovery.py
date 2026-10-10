@@ -1,10 +1,9 @@
 """Bounded recovery guidance for failed project-document evidence proof.
 
 Recovery is diagnostic-only: it never changes canonical evidence selection or
-turns an unsupported documentation answer into a supported one.  It explains
-where proof failed and, for parser/retrieval/bounded-selection failures, offers
-one non-automatic retry assembled only from source question spans plus fixed
-neutral wrappers.
+turns an unsupported documentation answer into a supported one. It preserves
+bounded original diagnostic fragments and typed non-automatic recovery, without
+synthesizing a different question or certifying paraphrase equivalence.
 """
 from __future__ import annotations
 
@@ -13,34 +12,10 @@ from typing import Any
 
 from docmancer.docs.application.evidence_requirements import build_requirements
 from docmancer.docs.application.proofability import diagnose_proofability
-from docmancer.docs.domain.question_frame_core import split_question_clause_spans
 from docmancer.retrieval.query_planning import extract_document_locator
 
 RECOVERY_SCHEMA_VERSION = 1
-MAX_PROBLEM_SPANS = 2
-MAX_RECOGNIZED_SPANS = 6
 MAX_SUGGESTED_QUESTIONS = 2
-
-_GENERIC_REPHRASE_PREFIX = "What does the project documentation say about "
-_GENERATED_EXACT_REPHRASE_RE = re.compile(
-    r"^\s*according\s+to\s+[`\"']?(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)*"
-    r"[A-Za-z0-9_.-]+\.(?:md|mdx|rst|txt|adoc)[`\"']?\s*,\s*"
-    r"what\s+does\s+it\s+say\s+about\s+",
-    re.I,
-)
-_IMPERATIVE_PREFIX_RE = re.compile(
-    r"^(?:implement|create|build|write|develop|introduce|replace|add|change|edit|"
-    r"modify|fix|refactor|remove|rename|update|patch|migrate|code|"
-    r"реализ\w*|созда\w*|сдела\w*|напиш\w*|разработ\w*|добав\w*|измен\w*|"
-    r"исправ\w*|рефактор\w*|замен\w*|удал\w*|переимен\w*|обнов\w*)\b\s*",
-    re.I,
-)
-_LEADING_CODE_PATH_RE = re.compile(
-    r"^(?:\.?\.?/)?(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+\."
-    r"(?:py|dart|js|jsx|ts|tsx|go|rs|java|kt|swift|c|cc|cpp|h|hpp)"
-    r"(?:\s+(?:so|to|for|чтобы|для)\s+|\s+)",
-    re.I,
-)
 
 # These are operational states with a concrete recovery that is more precise
 # than changing the wording of the question.
@@ -59,9 +34,9 @@ def _selection_decision(value: Any) -> Any | None:
     return nested if nested is not None else value
 
 
-def _clean_fragment(value: object, *, max_chars: int = 180) -> str:
+def _clean_fragment(value: object) -> str:
     text = " ".join(str(value or "").strip().split())
-    return text.strip(" \t\r\n,;:.!?")[:max_chars]
+    return text.strip(" \t\r\n,;:.!?")
 
 
 def _requirement_spans(requirements: Any, question: str) -> list[str]:
@@ -78,14 +53,14 @@ def _requirement_spans(requirements: Any, question: str) -> list[str]:
         ):
             rows.append((start, end, text))
     rows.sort(key=lambda row: (row[0], row[1], row[2].casefold()))
-    return list(dict.fromkeys(text for _, _, text in rows))[:MAX_RECOGNIZED_SPANS]
+    return list(dict.fromkeys(text for _, _, text in rows))
 
 
 def _exact_question_hints(requirements: Any, question: str) -> list[str]:
     folded = question.casefold()
     rows: list[str] = []
     for value in getattr(requirements, "retrieval_hints", ()) or ():
-        text = _clean_fragment(value, max_chars=140)
+        text = _clean_fragment(value)
         if not text or text.casefold() not in folded:
             continue
         rows.append(text)
@@ -100,47 +75,17 @@ def _exact_question_hints(requirements: Any, question: str) -> list[str]:
             text.casefold(),
         )
     )
-    return rows[:MAX_RECOGNIZED_SPANS]
+    return rows
 
 
 def _problem_spans(question: str, requirements: Any) -> list[str]:
-    """Return exact source clauses that are not fully covered by known spans."""
+    """Preserve the original request for diagnostics, without inferred clauses.
 
-    covered: list[tuple[int, int]] = [
-        (int(start), int(end))
-        for _, start, end, _ in getattr(requirements, "query_requirement_spans", ()) or ()
-        if 0 <= int(start) < int(end) <= len(question)
-    ]
-    clauses = split_question_clause_spans(question)
-    if not clauses:
-        return [_clean_fragment(question, max_chars=220)] if question.strip() else []
-
-    scored: list[tuple[float, int, str]] = []
-    for clause in clauses:
-        overlap = sum(
-            max(0, min(clause.end, end) - max(clause.start, start))
-            for start, end in covered
-        )
-        ratio = min(1.0, overlap / max(1, clause.end - clause.start))
-        text = _clean_fragment(clause.text, max_chars=220)
-        if text:
-            scored.append((ratio, clause.start, text))
-    scored.sort(key=lambda row: (row[0], row[1]))
-    return [row[2] for row in scored[:MAX_PROBLEM_SPANS]]
-
-
-def _already_rephrased(question: str) -> bool:
-    folded = question.strip().casefold()
-    return folded.startswith(_GENERIC_REPHRASE_PREFIX.casefold()) or bool(
-        _GENERATED_EXACT_REPHRASE_RE.search(question)
-    )
-
-
-def _rephrase_subject_fragment(value: object) -> str:
-    fragment = _clean_fragment(value, max_chars=220)
-    fragment = _IMPERATIVE_PREFIX_RE.sub("", fragment, count=1)
-    fragment = _LEADING_CODE_PATH_RE.sub("", fragment, count=1)
-    return _clean_fragment(fragment, max_chars=140)
+    Requirement spans cannot establish semantic coverage of a clause. This
+    fragment is display/retry guidance only, never a generated retrieval lane.
+    """
+    text = question.strip()
+    return [text] if text else []
 
 
 def _suggested_questions(
@@ -149,47 +94,8 @@ def _suggested_questions(
     *,
     evidence_path: str | None,
 ) -> list[str]:
-    # The fixed English wrapper cannot preserve Russian grammar or semantics.
-    # Prefer the typed local-source recovery until a reviewed same-language
-    # rephrase family exists.
-    if re.search(r"[А-Яа-яЁё]", question):
-        return []
-    candidates = _requirement_spans(requirements, question)
-    for hint in _exact_question_hints(requirements, question):
-        if hint.casefold() not in {item.casefold() for item in candidates}:
-            candidates.append(hint)
-    if not candidates:
-        candidates = _problem_spans(question, requirements)
-    if evidence_path:
-        normalized_locator = evidence_path.replace("\\", "/").casefold()
-        locator_leaf = normalized_locator.rsplit("/", 1)[-1]
-        candidates = [
-            value for value in candidates
-            if _clean_fragment(value, max_chars=240).replace("\\", "/").casefold()
-            not in {normalized_locator, locator_leaf}
-        ]
-
-    result: list[str] = []
-    attempted_problem_fallback = False
-    while True:
-        for fragment in candidates:
-            fragment = _rephrase_subject_fragment(fragment)
-            if not fragment:
-                continue
-            if evidence_path:
-                suggestion = f"According to {evidence_path}, what does it say about {fragment}?"
-            else:
-                suggestion = f"{_GENERIC_REPHRASE_PREFIX}{fragment}?"
-            if suggestion.casefold() == question.strip().casefold():
-                continue
-            result.append(suggestion[:320])
-            if len(result) >= MAX_SUGGESTED_QUESTIONS:
-                break
-        if result or attempted_problem_fallback:
-            break
-        candidates = _problem_spans(question, requirements)
-        attempted_problem_fallback = True
-    return list(dict.fromkeys(result))[:MAX_SUGGESTED_QUESTIONS]
+    """Compatibility adapter: diagnostic fragments never synthesize a question."""
+    return []
 
 
 def build_recovery_diagnosis(
@@ -214,7 +120,7 @@ def build_recovery_diagnosis(
     if projection is None and support is not None and bool(getattr(support, "answer_supported", False)):
         return {}
 
-    operational_reason = _clean_fragment(operational_reason_code, max_chars=120)
+    operational_reason = _clean_fragment(operational_reason_code)
     evidence_path = extract_document_locator(question)
     profile = "project_document_answer" if evidence_path else "project_docs_answer"
     requirements = build_requirements(
@@ -232,6 +138,19 @@ def build_recovery_diagnosis(
         "investigation_allowed": True,
         "hard_stop": False,
     }
+
+    # A concrete authoritative conflict also blocks an otherwise valid
+    # operational recovery. Fetch/preparation is not permission to choose
+    # between contradictory source statements.
+    if proof_origin == "source_documentation" and "conflicting_authoritative_evidence" in proof_reasons:
+        result.update({
+            "origin": "conflict",
+            "reason_code": "authoritative_evidence_conflict",
+            "disposition": "resolve_authoritative_conflict",
+            "hard_stop": True,
+            "detail_reasons": proof_reasons,
+        })
+        return result
 
     if operational_reason in _OPERATIONAL_RECOVERY_REASONS:
         result.update({
@@ -272,7 +191,7 @@ def build_recovery_diagnosis(
     if requirements.unresolved_parts and not evidence_path:
         origin = "parsing"
         reason_code = "question_parse_uncertain"
-        detail_reasons = list(requirements.unresolved_parts)[:4]
+        detail_reasons = list(requirements.unresolved_parts)
     elif proof_origin == "retrieval":
         origin = "retrieval"
         reason_code = "retrieval_miss"
@@ -282,18 +201,6 @@ def build_recovery_diagnosis(
         reason_code = "evidence_ineligible"
         detail_reasons = proof_reasons
     elif proof_origin == "source_documentation":
-        if "conflicting_authoritative_evidence" in proof_reasons:
-            origin = "conflict"
-            reason_code = "authoritative_evidence_conflict"
-            detail_reasons = proof_reasons
-            result.update({
-                "origin": origin,
-                "reason_code": reason_code,
-                "disposition": "resolve_authoritative_conflict",
-                "hard_stop": True,
-                "detail_reasons": detail_reasons[:4],
-            })
-            return result
         if "fragmented_support_exceeds_bound" in proof_reasons:
             origin = "selection"
             reason_code = "bounded_selection_too_broad"
@@ -309,7 +216,7 @@ def build_recovery_diagnosis(
     result.update({
         "origin": origin,
         "reason_code": reason_code,
-        "detail_reasons": detail_reasons[:4],
+        "detail_reasons": detail_reasons,
     })
 
     if origin in {"eligibility", "source_documentation"}:
@@ -323,34 +230,13 @@ def build_recovery_diagnosis(
         if hint.casefold() not in {item.casefold() for item in recognized}:
             recognized.append(hint)
     if recognized:
-        result["recognized_spans"] = recognized[:MAX_RECOGNIZED_SPANS]
+        result["recognized_spans"] = recognized
     problems = _problem_spans(question, requirements)
     if problems:
-        result["problem_spans"] = problems[:MAX_PROBLEM_SPANS]
+        result["problem_spans"] = problems
 
-    if _already_rephrased(question):
-        result.update({
-            "disposition": "search_local_source",
-            "rephrase_exhausted": True,
-        })
-        return result
-
-    suggestions = _suggested_questions(
-        question,
-        requirements,
-        evidence_path=evidence_path,
-    )
-    if suggestions:
-        result.update({
-            "disposition": "rephrase_question",
-            "suggested_questions": suggestions,
-            "rephrase_exhausted": False,
-        })
-    else:
-        result.update({
-            "disposition": "search_local_source",
-            "rephrase_exhausted": True,
-        })
+    # Uncertain proof permits bounded investigation, never a synthesized retry.
+    result["disposition"] = "search_local_source"
     return result
 
 
@@ -387,45 +273,14 @@ def recovery_action(
         return None
     disposition = str(diagnosis.get("disposition") or "")
     if disposition == "rephrase_question":
-        suggestions = [
-            str(value)[:320]
-            for value in diagnosis.get("suggested_questions") or []
-            if str(value).strip()
-        ][:MAX_SUGGESTED_QUESTIONS]
-        if not suggestions:
-            return None
-        arguments_patch: dict[str, Any] = {"question": suggestions[0]}
-        for key, value in (("project_path", project_path), ("scope", scope), ("mode", mode)):
-            if value:
-                arguments_patch[key] = value
-        return {
-            "type": "rephrase_question",
-            "tool": "get_docs_context",
-            "handled_by": "coding_agent",
-            "requires_confirmation": False,
-            "reason": str(diagnosis.get("reason_code") or "question_parse_uncertain"),
-            "agent_question": (
-                "DocAtlas could not complete documentation proof for the original wording. "
-                "Retry at most one suggested question without treating it as equivalent proof."
-            ),
-            "observations": [
-                *[f"problem_span: {value}" for value in diagnosis.get("problem_spans") or []],
-                *[f"recognized_span: {value}" for value in diagnosis.get("recognized_spans") or []],
-            ][:6],
-            "decision_options": [
-                {"question": value, "preserves_source_words": True}
-                for value in suggestions
-            ],
-            "arguments_patch": arguments_patch,
-            "repeat_docs_context": True,
-            "auto_execute": False,
-        }
+        # A legacy/supplied diagnosis cannot restore semantic retry authority.
+        return None
     if disposition == "search_local_source":
         terms = [
-            str(value)[:160]
+            str(value)
             for value in diagnosis.get("recognized_spans") or diagnosis.get("problem_spans") or []
             if str(value).strip()
-        ][:8]
+        ]
         return {
             "type": "search_local_source",
             "tool": "code_search",

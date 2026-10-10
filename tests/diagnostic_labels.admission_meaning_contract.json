@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_admission_meaning_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_admission_meaning_contract.py": "8481d7e385dcfc39e2f3486a898ec3d79a460ce4fd672bcb97bebc8880909c21"
+  }
+}

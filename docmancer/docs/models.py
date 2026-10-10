@@ -429,6 +429,7 @@ class ProjectMetadata:
     warnings: list[str] = field(default_factory=list)
     docs_catalog_present: bool = False
     docs_catalog_valid: bool = True
+    code_files: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -617,6 +618,7 @@ class ProjectDocsResult:
     answer_available: bool = True
     reason: str | None = None
     message: str | None = None
+    request_scope: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -729,3 +731,4 @@ class UnifiedDocsContextResult:
     retrieval_diagnostics: dict[str, Any] = field(default_factory=dict)
     retrieval_routing: dict[str, Any] | None = None
     requirements: Any = None
+    project_context_contract: dict[str, Any] = field(default_factory=dict)

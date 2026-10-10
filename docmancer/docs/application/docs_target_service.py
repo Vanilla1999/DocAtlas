@@ -17,6 +17,7 @@ from docmancer.docs.resolver import normalize_version
 from docmancer.docs.dartdoc import discover_pub_dartdoc_seed_urls, is_pub_dartdoc_target, normalize_pub_dartdoc_target, pub_dartdoc_root_url, rank_dartdoc_seed_urls
 from docmancer.docs.fetch_policy import DocsFetchPolicy, DocsFetchSecurityError, redact_url
 from docmancer.docs.fetch_transport import DocsHttpClient
+from docmancer.docs.finite_membership import exact_url, finite_members
 from docmancer.docs.github_source_manifest import (
     GitHubApiClient,
     GitHubSourceManifestError,
@@ -49,62 +50,24 @@ class DocsTargetService:
 
     @contextmanager
     def _github_api_client(self, owner: str, repository: str):
-        if self.github_api_client_factory is not None:
-            with self.github_api_client_factory() as client:
-                yield client
-            return
-        policy = DocsFetchPolicy(
-            allowed_hosts=("api.github.com",),
-            path_prefixes=(f"/repos/{owner}/{repository}/",),
-        )
-        raw_client = httpx.Client(
-            timeout=30.0,
-            follow_redirects=False,
-            headers={"User-Agent": "docmancer/1.0"},
-            trust_env=False,
-        )
-        with DocsHttpClient(raw_client, policy) as client:
-            yield client
+        raise ValueError("directory_discovery_disabled")
 
     def resolve_github_directory_target(self, target: DocsTarget) -> DocsTarget:
-        """Resolve an approved schema-v2 directory declaration exactly once before ingest."""
-
+        """Validate already-approved immutable rows; never resolve a directory."""
         manifest = target.source_manifest or {}
-        if manifest.get("schema_version") != 2 or "documents" in manifest:
-            return target
-        official = manifest.get("official")
-        if type(official) is not bool:
-            raise ValueError("official must be a boolean")
-        discovery = manifest.get("discovery")
-        if not isinstance(discovery, dict) or discovery.get("kind") != "github_directory":
-            raise ValueError("discovery.kind must be github_directory")
-        approved = target.docs_url
-        if not approved:
-            raise ValueError("github directory manifest requires an explicitly approved blob target")
-        if not canonical_github_blob_scope_url(approved, discovery):
-            raise ValueError("github directory manifest scope does not match approved blob target")
-        security_error = url_security_error(approved)
-        if security_error:
-            raise ValueError(security_error)
-        if not target.allowed_domains or not host_allowed(approved, target.allowed_domains):
-            raise ValueError(f"URL host is not in allowed_domains: {approved}")
-        if not path_allowed(approved, target.path_prefixes):
-            raise ValueError(f"URL path is outside path_prefixes: {approved}")
+        if manifest.get("schema_version") != 2 or "documents" not in manifest:
+            raise ValueError("resolved_github_manifest_required")
         try:
-            with self._github_api_client(str(discovery.get("owner") or ""), str(discovery.get("repository") or "")) as client:
-                resolved = resolve_github_directory_manifest(
-                    client,
-                    owner=str(discovery.get("owner") or ""),
-                    repository=str(discovery.get("repository") or ""),
-                    requested_ref=str(discovery.get("requested_ref") or ""),
-                    directory=str(discovery.get("directory") or ""),
-                    official=official,
-                )
+            resolved = normalize_resolved_github_manifest(manifest)
         except GitHubSourceManifestError as exc:
             raise ValueError(str(exc)) from exc
-        if not resolved["complete"] or resolved["truncated"]:
-            raise ValueError(str(resolved.get("reason_code") or "github directory manifest is incomplete"))
-        return replace(target, source_manifest=resolved)
+        candidate = replace(target, source_manifest=resolved)
+        urls, error = self.target_urls(candidate)
+        if error:
+            raise ValueError(error)
+        if len(resolved["documents"]) > target.max_pages:
+            raise ValueError("finite_members_exceed_max_pages")
+        return candidate
 
     @staticmethod
     def target_from_dict(value: dict[str, Any] | DocsTarget) -> DocsTarget:
@@ -113,7 +76,7 @@ class DocsTargetService:
         return DocsTarget(
             library=value["library"],
             ecosystem=value.get("ecosystem"),
-            version=value.get("version") or "latest",
+            version=value.get("version"),
             source_type=value.get("source_type") or "api",
             docs_url=value.get("docs_url"),
             docs_url_template=value.get("docs_url_template"),
@@ -194,13 +157,9 @@ class DocsTargetService:
         )
 
     def record_urls(self, record: LibraryRecord) -> list[str]:
-        spec = record.target_spec or {}
-        resolved = spec.get("resolved_urls")
-        if isinstance(resolved, list) and resolved:
-            return [str(url) for url in resolved]
         target = self.target_from_record(record)
-        urls, _ = self.target_urls(target)
-        return urls or ([record.docs_url] if record.docs_url else [])
+        urls, error = self.target_urls(target)
+        return urls if error is None else []
 
     def inspect_docs_target(
         self, value: dict[str, Any] | DocsTarget, *, max_pages: int = 3
@@ -238,6 +197,7 @@ class DocsTargetService:
             allowed_hosts=exact_hosts,
             path_prefixes=path_prefixes,
             allow_subdomains=False,
+            exact_urls=tuple(explicit_urls),
         )
         raw_client = httpx.Client(
             timeout=15.0,
@@ -258,7 +218,8 @@ class DocsTargetService:
             for url in explicit_urls:
                 try:
                     response = client.get(url)
-                    pages.append(self._inspect_response(url, response, policy))
+                    # Navigation metadata reports ceilings, not admitted members.
+                    pages.append(self._inspect_response(url, response, replace(policy, exact_urls=None)))
                 except DocsFetchSecurityError as exc:
                     pages.append({
                         "requested_url": redact_url(url),
@@ -405,6 +366,8 @@ class DocsTargetService:
 
     def target_urls(self, target: DocsTarget) -> tuple[list[str], str | None]:
         manifest = target.source_manifest or {}
+        if manifest and (manifest.get("schema_version") != 2 or "documents" not in manifest):
+            return [], "resolved_github_manifest_required"
         if manifest.get("schema_version") == 2:
             try:
                 normalized = normalize_resolved_github_manifest(manifest)
@@ -429,6 +392,8 @@ class DocsTargetService:
                     return [], f"URL host is not in allowed_domains: {url}"
                 if not path_allowed(url, target.path_prefixes):
                     return [], f"URL path is outside path_prefixes: {url}"
+                if not DocsFetchPolicy(allowed_hosts=tuple(target.allowed_domains), path_prefixes=tuple(target.path_prefixes)).allows_scope(url):
+                    return [], "URL is outside transport ceilings"
             return urls or [approved], None
 
         version = normalize_version(target.version) or "latest"
@@ -436,6 +401,8 @@ class DocsTargetService:
         if target.docs_url:
             urls.insert(0, target.docs_url)
         elif target.docs_url_template:
+            if target.version is None:
+                return [], "explicit_template_version_required"
             urls.insert(0, self.render_docs_url(target.docs_url_template, target.library, version))
         if not urls:
             return [], "target must provide docs_url, docs_url_template, or seed_urls"
@@ -443,6 +410,10 @@ class DocsTargetService:
             security_error = url_security_error(url)
             if security_error:
                 return [], security_error
+            try:
+                exact_url(url)
+            except ValueError:
+                return [], "invalid_finite_member"
             if is_remote_url(url):
                 if not target.allowed_domains:
                     return [], "allowed_domains is required for remote docs targets"
@@ -450,82 +421,22 @@ class DocsTargetService:
                     return [], f"URL host is not in allowed_domains: {url}"
                 if not path_allowed(url, target.path_prefixes):
                     return [], f"URL path is outside path_prefixes: {url}"
+                if not DocsFetchPolicy(allowed_hosts=tuple(target.allowed_domains), path_prefixes=tuple(target.path_prefixes)).allows_scope(url):
+                    return [], "URL is outside transport ceilings"
         return urls, None
 
     @staticmethod
     def dependency_docs_url_guidance(target: DocsTarget) -> list[str]:
-        urls = list(target.seed_urls)
-        if target.docs_url:
-            urls.insert(0, target.docs_url)
-        elif target.docs_url_template:
-            version = normalize_version(target.version) or "latest"
-            urls.insert(0, target.docs_url_template.format(library=target.library, version=version))
-
-        warnings: list[str] = []
-        for url in urls:
-            parsed = urlparse(url)
-            if parsed.hostname == "pub.dev" and parsed.path.startswith("/packages/"):
-                version = normalize_version(target.version) or "latest"
-                warnings.append(
-                    f"{target.library}: Prefer exact pub.dev API docs such as "
-                    f"https://pub.dev/documentation/{target.library}/{version}/ over package landing pages."
-                )
-        return warnings
+        """Legacy guidance hook cannot propose guessed replacement source URLs."""
+        return []
 
     def discover_pub_dartdoc_target(self, target: DocsTarget, warnings: list[str], job_id: str | None = None, canonical_id: str | None = None) -> DocsTarget:
-        if not is_pub_dartdoc_target(target):
-            return target
-        target = normalize_pub_dartdoc_target(target)
-        version = normalize_version(target.version) or "latest"
-        root_url = pub_dartdoc_root_url(target.library, version)
-        if job_id and self.jobs:
-            self.jobs.update(job_id, phase="discovering", current_target=canonical_id, current_url=root_url, message=f"Discovering Dartdoc seed URLs for {target.library}.")
-            self.jobs.append_event(job_id, {"phase": "discovering", "message": f"Discovering Dartdoc seed URLs for {target.library}", "url": root_url})
-        try:
-            policy = DocsFetchPolicy(
-                allowed_hosts=tuple(target.allowed_domains),
-                path_prefixes=tuple(target.path_prefixes),
-            )
-            raw_client = httpx.Client(
-                timeout=30.0,
-                follow_redirects=False,
-                headers={"User-Agent": "docmancer/1.0"},
-                trust_env=False,
-            )
-            with DocsHttpClient(raw_client, policy) as client:
-                resp = client.get(root_url)
-                if resp.status_code != 200:
-                    raise ValueError(f"status {resp.status_code}")
-
-                def fetch_url(url: str) -> str | None:
-                    fetched = client.get(url)
-                    if fetched.status_code != 200:
-                        return None
-                    return fetched.text
-
-                seeds = discover_pub_dartdoc_seed_urls(target.library, version, resp.text, root_url, max_seed_urls=target.max_pages or 500, fetch_url=fetch_url)
-                seeds = rank_dartdoc_seed_urls(seeds, target.query, limit=target.max_pages or 500)
-        except DocsFetchSecurityError as exc:
-            if exc.category != "transport_error":
-                raise
-            warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs (transport_error); falling back to root URL."
-            warnings.append(warning)
-            target = replace(target, warnings=[*target.warnings, warning])
-            return target
-        except Exception as exc:
-            warning = f"{target.library}: could not discover pub.dev Dartdoc seed URLs ({exc}); falling back to root URL."
-            warnings.append(warning)
-            target = replace(target, warnings=[*target.warnings, warning])
-            return target
-        if not seeds:
-            warning = f"{target.library}: no pub.dev Dartdoc seed URLs discovered; falling back to root URL."
-            warnings.append(warning)
-            target = replace(target, warnings=[*target.warnings, warning])
-            return target
-        if job_id and self.jobs:
-            self.jobs.update(job_id, discovered_pages=len(seeds), total_pages=max((self.jobs.get(job_id).total_pages if self.jobs.get(job_id) else 0), len(seeds)), message=f"Discovered {len(seeds)} Dartdoc seed URLs for {target.library}.")
-            self.jobs.append_event(job_id, {"phase": "discovering", "message": f"Discovered {len(seeds)} Dartdoc seed URLs", "url": root_url, "discovered_pages": len(seeds), "total_pages": len(seeds)})
-        return replace(target, docs_url=None, docs_url_template=None, seed_urls=seeds)
+        """Legacy name: retain explicit members as metadata, never probe a package."""
+        urls, error = self.target_urls(target)
+        if error:
+            raise ValueError(error)
+        finite_members(urls, target.max_pages)
+        return target
 
 def target_result_summary(result: Any) -> dict[str, Any]:
     return {

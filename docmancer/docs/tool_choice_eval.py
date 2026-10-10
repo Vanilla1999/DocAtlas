@@ -105,6 +105,24 @@ def _schema_version(tool_schemas: list[dict[str, Any]]) -> str:
     return f"sha256:{hashlib.sha256(encoded).hexdigest()[:16]}"
 
 
+def tool_choice_contract_sha256(*, guidance: str, tool_schemas: list[dict[str, Any]]) -> str:
+    """Bind recorded decisions to the exact inputs and scoring contract.
+
+    A passing historical report is not reusable after its schemas, installed
+    guidance, frozen scenario oracle, thresholds or evaluator have changed.
+    """
+    contract = {
+        "tool_schemas": tool_schemas,
+        "guidance": guidance,
+        "scenarios": [asdict(scenario) for scenario in SCENARIOS],
+        "repeats": REPEATS,
+        "thresholds": THRESHOLDS,
+        "evaluator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+    encoded = json.dumps(contract, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def evaluate_tool_choice(adapter: LowCostModelAdapter, *, guidance: str, tool_schemas: list[dict[str, Any]]) -> dict[str, Any]:
     """Run the frozen scenario set; network/model access is supplied by the caller."""
     if not guidance.strip():
@@ -179,6 +197,9 @@ def evaluate_tool_choice(adapter: LowCostModelAdapter, *, guidance: str, tool_sc
     return {
         "adapter": {"name": adapter.name, "model_version": adapter.model_version},
         "tool_schema_version": _schema_version(tool_schemas),
+        "tool_choice_contract_sha256": tool_choice_contract_sha256(
+            guidance=guidance, tool_schemas=tool_schemas,
+        ),
         "scenario_count": len(SCENARIOS),
         "repeats": REPEATS,
         "thresholds": THRESHOLDS,

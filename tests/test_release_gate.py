@@ -15,14 +15,17 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def self_host_payload_runner(monkeypatch, tmp_path):
+    from contextlib import contextmanager
     from types import SimpleNamespace
     from unittest.mock import Mock
 
     from scripts import run_project_docs_self_host_gate as gate
+    from scripts._project_docs_self_host_fixture import SelfHostFixture
+    from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload
     from docmancer.docs.interfaces.mcp import context_tools
     from docmancer.docs.application.model_visible_projection import _snapshot_entry, _source_digest
 
-    text = "Docs provide grounded project documentation.\nPacks build code context bundles.\n"
+    text = "Docs provide grounded project documentation.\ndoc-atlas mcp packs-serve\n"
     (tmp_path / "wiki").mkdir()
     (tmp_path / "wiki/Commands.md").write_text(text)
     monkeypatch.setattr(gate, "REPO_ROOT", tmp_path)
@@ -48,13 +51,22 @@ def self_host_payload_runner(monkeypatch, tmp_path):
         }])),
     )
     service = SimpleNamespace(
-        sync_project_docs=Mock(return_value=SimpleNamespace(status="success")),
+        _cold=SimpleNamespace(_service=None, member_storage_policy=SimpleNamespace(
+            db_path=tmp_path / "uninitialized.db", marker=tmp_path / "uninitialized.owner",
+        )),
         unified_context=app,
         get_docs_context=Mock(side_effect=AssertionError("Do not replay the facade query")),
     )
-    monkeypatch.setattr(gate, "LibraryDocsService", lambda **kwargs: service)
-    monkeypatch.setattr(gate, "LibraryRegistry", lambda *args: None)
-    monkeypatch.setattr(gate, "DocmancerAgent", lambda **kwargs: None)
+
+    @contextmanager
+    def fixture_context(origin):
+        fixture = SelfHostFixture(tmp_path, service, None, {}, {})
+        fixture.prepare = Mock()
+        yield fixture
+        if not fixture.cold_read_verified:
+            fixture.prepare.assert_not_called()
+
+    monkeypatch.setattr(gate, "self_host_fixture", fixture_context)
     monkeypatch.setattr(context_tools, "validate_model_visible_projection", lambda *args, **kwargs: [])
 
     def run(
@@ -81,7 +93,11 @@ def self_host_payload_runner(monkeypatch, tmp_path):
             nonlocal calls
             calls += 1
             if calls == 1:
-                return preflight_transform({"recommended_next_action": {"arguments_patch": {"action": "sync_project_docs"}}})
+                return preflight_transform(build_mcp_error_payload(
+                    reason_code="permission_denied", message="permission_denied: request failed",
+                    exception=PermissionError("member_store_uninitialized"),
+                    tool="get_docs_context", phase="execution",
+                ))
             instance.unified_context.get_docs_context(arguments["question"], project_path=arguments["project_path"])
             if arguments["question"] == "negative":
                 return negative
@@ -95,7 +111,7 @@ def self_host_payload_runner(monkeypatch, tmp_path):
             ) if real_projection else value
             if real_projection:
                 snapshot["e1"]["projected_source"] = copy.deepcopy(projected["sources"][0])
-            context_tools.validate_model_visible_projection(projected, snapshot=snapshot, max_tokens=800)
+            context_tools.validate_model_visible_projection(projected, snapshot=snapshot, max_tokens=None)
             return payload_transform(copy.deepcopy(projected))
 
         monkeypatch.setattr(gate, "call_docs_tool_payload", dispatch)
@@ -122,7 +138,7 @@ def _assert_self_host_payload_baseline(self_host_payload_runner):
 
 _SELF_HOST_BAD_PAYLOADS = [
     (lambda p: p["sources"][0].update(snippet="Docs provide context.", title="grounded project documentation"), "required_facts"),
-    (lambda p: p.update(sources=p["sources"] * 4), "context_contract"),
+    (lambda p: p.update(sources=p["sources"] * 4), "citation_integrity"),
     (lambda p: p.update(answer="x" * 4000), "context_contract"),
     (lambda p: p.update(edit_ready=True), "context_contract"),
     (lambda p: p.update(answer_available=True), "context_contract"),
@@ -156,16 +172,21 @@ def _assert_self_host_metadata_is_not_top1_fact(self_host_payload_runner):
     assert report["metrics"]["top1_fact_bearing_count"] == 0
 
 
-def _assert_self_host_measures_full_budgets(self_host_payload_runner):
+def _assert_self_host_measures_cost_without_fixed_ceilings(self_host_payload_runner):
     report, _ = self_host_payload_runner(lambda p: p.update(sources=p["sources"] * 4, answer="x" * 4000))
     assert report["metrics"]["max_source_count"] == 4
-    assert report["metrics"]["source_budget_violation_count"] == 15
+    assert "source_budget_violation_count" not in report["metrics"]
+    # Duplicate evidence IDs and nonempty answer remain independently invalid.
+    assert report["verdict"] == "FAIL"
+    assert report["results"][0]["checks"]["citation_integrity"] is False
+    assert report["results"][0]["checks"]["context_contract"] is False
     assert report["metrics"]["max_estimated_tokens"] > 800
-    assert report["metrics"]["token_budget_violation_count"] == 15
+    assert "token_budget_violation_count" not in report["metrics"]
+    assert report["metrics"]["max_public_utf8_bytes"] > 3200
 
 
 def _assert_self_host_packs_content_is_intent_scoped(self_host_payload_runner, question, expected):
-    snippet = "Docs provide grounded project documentation.\nPacks build code context bundles."
+    snippet = "Docs provide grounded project documentation.\ndoc-atlas mcp packs-serve"
 
     def snapshot_mutator(snapshot):
         snapshot["e1"]["projected_source"]["snippet"] = snippet
@@ -177,6 +198,24 @@ def _assert_self_host_packs_content_is_intent_scoped(self_host_payload_runner, q
     )
     assert report["metrics"]["packs_contamination_count"] == expected
     assert report["verdict"] == ("FAIL" if expected else "PASS"), report["errors"]
+    from scripts.run_project_docs_self_host_gate import _packs_contamination
+    assert not _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "docs/PROJECT_MAP.md", "snippet": "The runtime also has a Packs gateway.",
+    }]})
+    assert not _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "wiki/Commands.md", "snippet": "Do not run doc-atlas mcp packs-serve for Docs.",
+    }]})
+    assert _packs_contamination("How do I start Docs MCP?", {"sources": [{
+        "path_or_url": "wiki/Commands.md",
+        "snippet": "Use doc-atlas mcp packs-serve instead of doc-atlas mcp docs-serve.",
+    }]})
+    for substituted in (
+        "Do not run doc-atlas mcp docs-serve; use doc-atlas mcp packs-serve for Docs.",
+        "For Docs use doc-atlas mcp packs-serve; doc-atlas mcp docs-serve is broken.",
+    ):
+        assert _packs_contamination("How do I start Docs MCP?", {"sources": [{
+            "path_or_url": "wiki/Commands.md", "snippet": substituted,
+        }]})
 
 
 def _assert_self_host_missing_payload_preserves_case_partitions(self_host_payload_runner):
@@ -214,7 +253,7 @@ def _assert_self_host_attribution_rejects_same_path_different_identity(self_host
     assert report["results"][0]["observed"]["coverage_attribution"] == []
 
 
-def _assert_self_host_token_boundary(self_host_payload_runner):
+def _assert_self_host_cost_has_no_fixed_token_ceiling(self_host_payload_runner):
     from docmancer.docs.application.model_visible_projection import estimate_projection_tokens
 
     def resize(payload, target):
@@ -223,13 +262,13 @@ def _assert_self_host_token_boundary(self_host_payload_runner):
         payload["padding"] = "x" * (4 * (target - estimate_projection_tokens(payload)))
         assert estimate_projection_tokens(payload) == target
 
-    for target in (800, 801):
+    for target in (800, 801, 1600):
         report, _ = self_host_payload_runner(
             lambda payload: resize(payload, target), negative={"status": "insufficient_evidence"},
         )
         assert report["metrics"]["max_estimated_tokens"] == target
-        assert report["metrics"]["token_budget_violation_count"] == (15 if target > 800 else 0)
-        assert report["verdict"] == ("FAIL" if target > 800 else "PASS")
+        assert "token_budget_violation_count" not in report["metrics"]
+        assert report["verdict"] == "PASS", report["errors"]
 
 
 def _assert_self_host_expected_public_inventory(self_host_payload_runner):
@@ -414,32 +453,38 @@ def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
 
 
 def test_stdio_smoke_requires_cited_content() -> None:
-    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
-    assert "assert NEEDLE in rendered" in text
-    assert 'assert set(canonical_query) == {"question", "project_path"}' in text
-    canonical_block = text[text.index("canonical_query = {"):text.index("answer = payload", text.index("canonical_query = {"))]
-    assert "output_mode" not in canonical_block
-    assert "compatibility_query" not in text
-    assert "validate_context_payload(answer, required_fragment=NEEDLE)" in text
+    from scripts.docs_mcp_stdio_smoke import NEEDLE, validate_context_payload
+
+    payload = {"status": "ok", "kind": "docs_context", "support_status": "retrieval_only",
+        "context_status": "ready", "answer_supported": False, "answer_available": False,
+        "sources": [{"path_or_url": "README.md", "snippet": NEEDLE,
+            "content_sha256": "a" * 64}]}
+    validate_context_payload(payload, required_fragment=NEEDLE)
+    for source in ({"path_or_url": "README.md", "snippet": "unrelated", "content_sha256": "a" * 64},
+                   {"path_or_url": "README.md", "snippet": NEEDLE, "content_sha256": "forged"},
+                   {"snippet": NEEDLE, "content_sha256": "a" * 64}):
+        with pytest.raises(AssertionError):
+            validate_context_payload({**payload, "sources": [source]}, required_fragment=NEEDLE)
 
 
-def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes() -> None:
-    text = (ROOT / "scripts/docs_mcp_stdio_smoke.py").read_text()
-    assert '"HOME": str(user_home)' in text
-    assert '"USERPROFILE": str(user_home)' in text
-    assert '"DOCATLAS_HOME": str(docatlas_home)' in text
-    assert 'env.pop("DOCATLAS_HOME", None)' not in text
-    assert 'not (user_home / ".docmancer").exists()' in text
+def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes(tmp_path) -> None:
+    from scripts.docs_mcp_stdio_smoke import isolated_environment
+
+    environment = isolated_environment(tmp_path)
+    assert environment["HOME"] == environment["USERPROFILE"] == str(tmp_path / "user-home")
+    assert environment["DOCATLAS_HOME"] == str(tmp_path / "docatlas-home")
+    assert not (Path(environment["HOME"]) / ".docmancer").exists()
+    assert "PYTHONPATH" not in environment
 
 
 @pytest.mark.parametrize("self_host_check,args", [
     *[(check, ()) for check in (
         _assert_self_host_payload_baseline,
         _assert_self_host_metadata_is_not_top1_fact,
-        _assert_self_host_measures_full_budgets,
+        _assert_self_host_measures_cost_without_fixed_ceilings,
         _assert_self_host_missing_payload_preserves_case_partitions,
         _assert_self_host_attribution_rejects_same_path_different_identity,
-        _assert_self_host_token_boundary,
+        _assert_self_host_cost_has_no_fixed_token_ceiling,
         _assert_self_host_expected_public_inventory,
         _assert_self_host_attribution_rejects_changed_snapshot,
         _assert_self_host_private_qualification_projection,
@@ -527,8 +572,8 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         "packs_contamination_count": 0,
         "docs_analysis_contamination_count": 0,
         "false_docs_answer_count": 0,
-        "source_budget_violation_count": 0,
-        "token_budget_violation_count": 0,
+        "max_source_count": 99,
+        "max_estimated_tokens": 4000,
     }
     assert _threshold_failures(passing_metrics, 20) == []
     for key, value in (
@@ -542,8 +587,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         ("packs_contamination_count", 1),
         ("docs_analysis_contamination_count", 1),
         ("false_docs_answer_count", 1),
-        ("source_budget_violation_count", 1),
-        ("token_budget_violation_count", 1),
     ):
         assert _threshold_failures({**passing_metrics, key: value}, 20)
 
@@ -555,7 +598,6 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
         ROOT / "docs/project-docs-demo.md",
         ROOT / "docs/INDEX.md",
         ROOT / "wiki/Architecture.md",
-        ROOT / "docmancer/mcp/_docs_server_resources.py",
     )
     for contract_path in maintained_contracts:
         contract_text = contract_path.read_text(encoding="utf-8")
@@ -563,6 +605,27 @@ def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_p
             "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
         ):
             assert result_kind in contract_text, (contract_path, result_kind)
+
+    # The short MCP resources describe the workflow; result variants are the
+    # delivered schema contract, not required literal words in a Python file.
+    from docmancer.mcp.docs_server import current_tools, read_docs_resource
+
+    context = next(tool for tool in current_tools({}) if tool["name"] == "get_docs_context")
+    output = context["outputSchema"]
+    assert output["properties"]["kind"]["enum"] == ["docs_answer", "docs_context"]
+    assert "insufficient_evidence" in output["properties"]["status"]["enum"]
+    assert "oneOf" not in output
+    assert "context_format" not in context["inputSchema"]["properties"]
+    advanced = next(tool for tool in current_tools({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
+                    if tool["name"] == "get_docs_context")
+    assert advanced["outputSchema"]["oneOf"][0] == output
+    assert advanced["outputSchema"]["oneOf"][1]["properties"]["kind"]["const"] == "patch_context"
+    resource = read_docs_resource("docmancer://agent/quickstart")
+    assert resource and resource["uri"] == "docmancer://agent/quickstart"
+    for guard in ("get_docs_context", "recommended_next_action", "hard_stop=true",
+                  "hard_stop=false", "is not permission", "DOCATLAS_MCP_ADVANCED_TOOLS=1",
+                  "does not enable this setting or load tools automatically"):
+        assert guard in resource["text"], guard
 
 
 def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:

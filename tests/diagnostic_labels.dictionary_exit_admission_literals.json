@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_admission_literals.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_admission_literals.py": "cd7123fc696ea20b73fc6cd167e277d1a611e153725899ffaf5e925756ae10e0"
+  }
+}

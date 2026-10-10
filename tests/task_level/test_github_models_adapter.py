@@ -5,6 +5,7 @@ import json
 import shlex
 import subprocess
 import time
+from copy import deepcopy
 from pathlib import Path
 from typing import cast
 
@@ -12,8 +13,12 @@ import pytest
 
 from docmancer.docs.application.action_packet import (
     build_action_packet,
-    estimate_action_packet_tokens,
+    refresh_action_packet_estimate,
     validate_action_packet,
+)
+from docmancer.docs.application.model_visible_projection import (
+    project_patch_context,
+    validate_model_visible_projection,
 )
 from eval.task_level.github_models import (
     OPENAI_API_PROVIDER,
@@ -213,60 +218,90 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
     workspace.mkdir()
     module = workspace / "module.py"
     module.write_text("VALUE = 1\n", encoding="utf-8")
+    allowed_write_paths = ("module.py",)
     actions = iter([
         _action("get_docs_context", query="Fix module.py."),
         _action("replace_text", path="module.py", old="VALUE = 1", new="VALUE = 2"),
         _action("finish", summary="used documentation"),
     ])
+    # Keep both original source facts. The former unbound long acceptance text
+    # is now an authored source window whose complete bytes must be delivered.
+    long_context = "Preserve the documented permission semantics. " + "x" * 5_200
+    evidence = [{
+        "doc_scope": "project",
+        "path": "AGENTS.md",
+        "heading_path": "Architecture",
+        "authority": "canonical",
+        "source_class": "project_doc",
+        "content": (
+            "The permission gate must preserve whole facts. "
+            "Do not bypass the gate."
+        ),
+    }, {
+        "doc_scope": "project",
+        "path": "module.py",
+        "heading_path": "VALUE",
+        "authority": "canonical",
+        "source_class": "code_graph",
+        "symbols": ["VALUE"],
+        "content": "VALUE = 1",
+    }, {
+        "doc_scope": "project",
+        "path": "docs/permission-context.md",
+        "heading_path": "Permission context",
+        "authority": "canonical",
+        "source_class": "project_doc",
+        "content": long_context,
+    }]
+    for item in evidence:
+        item.update(char_start=0, char_end=len(item["content"]), line_start=1, line_end=1)
+    # These literal facts are supplied by the fixture owner. The free-form task
+    # does not manufacture a content obligation or an edit authorization.
+    packet = build_action_packet(
+        question="Fix module.py.",
+        context_pack=evidence,
+        required_target_paths=allowed_write_paths,
+        public_requirements=(
+            "The permission gate must preserve whole facts.",
+            "Do not bypass the gate.",
+            "VALUE = 1",
+        ),
+    )
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    assert projection["result"] == "data" and projection["completeness"] == "complete"
+    assert projection["edit_ready"] is False
+    expected = {item["path"]: item["content"] for item in evidence}
+    assert {source["path"]: source["text"] for source in projection["sources"]} == expected
+    assert all(
+        source["content_sha256"] == hashlib.sha256(expected[source["path"]].encode()).hexdigest()
+        and source["instruction_trust"] == "untrusted_data"
+        for source in projection["sources"]
+    )
     captured: dict[str, object] = {}
 
     def fake_complete(self, **kwargs):
         value = next(actions)
+        if value["tool"] == "replace_text":
+            observed = [
+                message["content"].removeprefix("Observed tool output:\n")
+                for message in kwargs["messages"]
+                if message["content"].startswith("Observed tool output:\n")
+            ]
+            assert len(observed) == 1
+            assert json.loads(observed[0]) == projection
+            captured["delivered_to_model"] = True
         return value, _completion(value)
 
     def fake_handle(name, args, service):
-        packet = build_action_packet(
-            question="Fix module.py.",
-            context_pack=[{
-                "doc_scope": "project",
-                "path": "AGENTS.md",
-                "heading_path": "Architecture",
-                "authority": "canonical",
-                "source_class": "project_doc",
-                "content": (
-                    "The permission gate must preserve whole facts. "
-                    "Do not bypass the gate."
-                ),
-            }, {
-                "doc_scope": "project",
-                "path": "module.py",
-                "heading_path": "VALUE",
-                "authority": "canonical",
-                "source_class": "code_graph",
-                "symbols": ["VALUE"],
-                "content": "VALUE = 1",
-            }],
-            max_tokens=2_000,
-        )
-        evidence_id = packet["source_of_truth"][0]["evidence_id"]
-        packet["task_interpretation"]["acceptance_conditions"] = [{
-            "text": "Preserve the documented permission semantics. " + "x" * 5_200,
-            "evidence_ids": [evidence_id],
-        }]
-        for _ in range(3):
-            packet["estimated_tokens"] = estimate_action_packet_tokens(packet)
-        assert not validate_action_packet(packet, max_tokens=2_000)
-        payload = {
-            "delivery_strategy": "bounded_direct",
-            "action_packet": packet,
-        }
         captured.update({
             "name": name,
             "args": args,
             "service": service,
-            "payload_chars": len(json.dumps(payload, ensure_ascii=False, sort_keys=True)),
+            "payload_chars": len(json.dumps(projection, ensure_ascii=False, sort_keys=True)),
         })
-        return payload
+        return projection
 
     sentinel_service = object()
     monkeypatch.setattr(
@@ -294,7 +329,7 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
         mcp_config_path=None,
         tool_policy_path=tmp_path / "policy.json",
         output_dir=output_dir,
-        allowed_write_paths=("module.py",),
+        allowed_write_paths=allowed_write_paths,
         task_objective="Fix module.py.",
     )
 
@@ -305,20 +340,24 @@ def test_required_once_runner_uses_bounded_direct_docs_delivery(
     assert module.read_text(encoding="utf-8") == "VALUE = 2\n"
     assert isinstance(captured["payload_chars"], int)
     assert captured["payload_chars"] > 6_000
+    assert captured["delivered_to_model"] is True
     assert captured["name"] == "get_docs_context"
     assert captured["service"] is sentinel_service
     args = captured["args"]
     assert isinstance(args, dict)
     assert args["question"] == "Fix module.py."
     assert args["project_path"] == str(workspace)
-    assert args["delivery_strategy"] == "bounded_direct"
+    assert args["context_format"] == "patch_context"
     assert args["prepare_project_docs"] is False
+    assert args["allow_network"] is False and args["allow_latest_fallback"] is False
     trajectory = json.loads((output_dir / "trajectory.normalized.json").read_text())
     assert trajectory[0]["arguments"]["project_path"] == "."
-    assert trajectory[0]["arguments"]["delivery_strategy"] == "bounded_direct"
+    assert trajectory[0]["arguments"]["context_format"] == "patch_context"
     assert trajectory[0]["arguments"]["question_matches_task_objective"] is True
     assert trajectory[0]["arguments"]["retrieval_succeeded"] is True
-    assert trajectory[0]["arguments"]["action_packet_status"] == "ok"
+    assert trajectory[0]["arguments"]["action_packet_result"] == "data"
+    assert trajectory[0]["arguments"]["action_packet_completeness"] == "complete"
+    assert trajectory[1]["tool_name"] == "Edit.replace_text"
 
 
 def test_required_once_runner_blocks_edit_after_insufficient_evidence(
@@ -335,6 +374,18 @@ def test_required_once_runner_blocks_edit_after_insufficient_evidence(
         _action("finish", summary="retrieval failed"),
     ])
 
+    packet = build_action_packet(
+        question="Fix the permission gate.", context_pack=[],
+        retrieval_issues=("permission architecture",),
+    )
+    assert validate_action_packet(packet, evidence_items=[]) == []
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=[])
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    assert projection["result"] == "failure" and projection["completeness"] == "unavailable"
+    assert projection["edit_ready"] is False and not projection.get("sources")
+    assert "no_admitted_evidence" in projection["missing"]
+    assert "permission architecture" in projection["missing"]
+
     def fake_complete(self, **kwargs):
         value = next(actions)
         return value, _completion(value)
@@ -345,13 +396,7 @@ def test_required_once_runner_blocks_edit_after_insufficient_evidence(
     )
     monkeypatch.setattr(
         "docmancer.docs.interfaces.mcp.context_tools.handle_context_tool",
-        lambda *args, **kwargs: {
-            "delivery_strategy": "bounded_direct",
-            "action_packet": {
-                "status": "insufficient_evidence",
-                "missing_evidence": ["permission architecture"],
-            },
-        },
+        lambda *args, **kwargs: projection,
     )
     monkeypatch.setattr(
         "docmancer.docs.service.LibraryDocsService",
@@ -382,7 +427,10 @@ def test_required_once_runner_blocks_edit_after_insufficient_evidence(
     trajectory_path = output_dir / "trajectory.normalized.json"
     trajectory = json.loads(trajectory_path.read_text(encoding="utf-8"))
     assert trajectory[0]["arguments"]["retrieval_succeeded"] is False
-    assert trajectory[0]["arguments"]["action_packet_status"] == "insufficient_evidence"
+    assert trajectory[0]["arguments"]["action_packet_result"] == "failure"
+    assert trajectory[0]["arguments"]["action_packet_completeness"] == "unavailable"
+    assert trajectory[0]["arguments"]["question_matches_task_objective"] is True
+    assert trajectory[0]["arguments"]["context_format"] == "patch_context"
     assert trajectory[1]["tool_name"] == "Repo.replace_text_rejected"
     audit = audit_trajectory("docatlas_tool_required_once", trajectory_path)
     assert not audit.clean
@@ -406,28 +454,82 @@ def test_required_once_retrieval_rejects_wrong_objective_error_and_malformed_pac
         output_dir=tmp_path / "output",
         task_objective="Fix the permission gate.",
     )
-    valid_packet = build_action_packet(
+    source_text = "The permission gate must preserve whole facts."
+    evidence = [{
+        "doc_scope": "project",
+        "source_class": "project_doc",
+        "path": "AGENTS.md",
+        "heading_path": "Architecture",
+        "authority": "canonical",
+        "content": source_text,
+        "char_start": 0,
+        "char_end": len(source_text),
+        "line_start": 1,
+        "line_end": 1,
+    }]
+    packet = build_action_packet(
         question="Fix the permission gate.",
-        context_pack=[{
-            "doc_scope": "project",
-            "source_class": "project_doc",
-            "path": "AGENTS.md",
-            "heading_path": "Architecture",
-            "authority": "canonical",
-            "content": "The permission gate must preserve whole facts.",
-        }],
-        max_tokens=2_000,
+        context_pack=evidence,
+        # This fixture explicitly requests its literal source statement. The
+        # natural-language objective alone must not invent a content obligation.
+        public_requirements=(source_text,),
     )
-    valid_result = json.dumps({
-        "delivery_strategy": "bounded_direct",
-        "action_packet": valid_packet,
-    })
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    projection, snapshot = project_patch_context(packet=packet, evidence_items=evidence)
+    assert validate_model_visible_projection(projection, snapshot=snapshot) == []
+    assert projection["result"] == "data" and projection["completeness"] == "complete"
+    assert projection["sources"] == packet["sources"] and len(projection["sources"]) == 1
+    source = projection["sources"][0]
+    assert source["path"] == "AGENTS.md" and source["text"] == source_text
+    assert source["content_sha256"] == hashlib.sha256(source_text.encode()).hexdigest()
+    assert (source["char_start"], source["char_end"], source["line_start"], source["line_end"]) == (0, len(source_text), 1, 1)
+    assert source["instruction_trust"] == "untrusted_data" and projection["edit_ready"] is False
+    requirement, = projection["requirements"]
+    assert requirement["kind"] == "required_fact" and requirement["value"] == source_text
+    assert requirement["mandatory"] is True and requirement["public_provenance"] == "public_task_contract"
+    assignment, = projection["assignments"]
+    assert assignment["requirement_id"] == requirement["requirement_id"]
+    assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+    assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+    assert assignment["unit_content_hash"] == source["content_sha256"]
+    assert (assignment["unit_char_start"], assignment["unit_char_end"]) == (0, len(source_text))
+    assert "missing" not in projection
+    valid_result = json.dumps(projection)
+    action = {"tool": "get_docs_context", "query": request.task_objective}
+    positive = _required_once_retrieval_metadata(request, action, valid_result)
+    assert positive["question_matches_task_objective"] is True
+    assert positive["retrieval_succeeded"] is True
+    assert positive["action_packet_result"] == "data"
+    assert positive["action_packet_completeness"] == "complete"
+
+    # Whole source bytes without a content witness remain valid partial data;
+    # required-once metadata must not count that as successful retrieval.
+    partial_packet = build_action_packet(question=request.task_objective, context_pack=evidence)
+    assert validate_action_packet(partial_packet, evidence_items=evidence) == []
+    partial, partial_snapshot = project_patch_context(packet=partial_packet, evidence_items=evidence)
+    assert validate_model_visible_projection(partial, snapshot=partial_snapshot) == []
+    assert partial["result"] == "data" and partial["completeness"] == "partial"
+    assert partial["sources"] == projection["sources"] and partial["edit_ready"] is False
+    assert partial["missing"] == ["visible_content_assignment_required"]
+    partial_metadata = _required_once_retrieval_metadata(request, action, json.dumps(partial))
+    assert partial_metadata["question_matches_task_objective"] is True
+    assert partial_metadata["action_packet_result"] == "data"
+    assert partial_metadata["action_packet_completeness"] == "partial"
+    assert partial_metadata["retrieval_succeeded"] is False
 
     assert _required_once_retrieval_metadata(
         request,
         {"tool": "get_docs_context", "query": "Different objective"},
         valid_result,
     )["retrieval_succeeded"] is False
+    # A legacy envelope is not a successful flat v4 representation.
+    assert _required_once_retrieval_metadata(request, action, json.dumps({
+        "delivery_strategy": "bounded_direct", "action_packet": packet,
+    }))["retrieval_succeeded"] is False
+    forged = deepcopy(projection)
+    forged["edit_ready"] = True
+    refresh_action_packet_estimate(forged)
+    assert _required_once_retrieval_metadata(request, action, json.dumps(forged))["retrieval_succeeded"] is False
     assert _required_once_retrieval_metadata(
         request,
         {"tool": "get_docs_context", "query": "Fix the permission gate."},
@@ -721,6 +823,14 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
     )
 
     def fake_complete(self, **kwargs):
+        # The host envelope owns the objective; a compact packet does not infer
+        # or repeat task interpretation. Bind the actual selector request.
+        request_payload = json.loads(kwargs["messages"][1]["content"])
+        assert request_payload["objective"] == objective
+        assert request_payload["evidence_fingerprint"] == snapshot.fingerprint
+        assert request_payload["evidence"] == [
+            {"index": index, "evidence": item} for index, item in enumerate(items)
+        ]
         selected = kwargs["schema"]["properties"]["selected_indices"]
         assert selected == {"type": "array", "items": {"type": "integer"}}
         value = {"selected_indices": [0, 1, 2]}
@@ -733,8 +843,18 @@ def test_github_models_worker_selects_host_evidence_and_binds_usage(
 
     output = GitHubModelsIsolatedWorker("token").run(envelope, snapshot, timeout_seconds=10)
 
-    assert output.packet["task_interpretation"]["objective"] == objective
-    assert output.packet["source_of_truth"]
+    assert validate_action_packet(output.packet, evidence_items=items[:3]) == []
+    assert output.packet["result"] == "data" and output.packet["edit_ready"] is False
+    assert output.packet["completeness"] == "partial"
+    assert output.packet["missing"] == ["visible_content_assignment_required"]
+    expected = {item["path"]: item["content"] for item in items[:3]}
+    assert {source["path"]: source["text"] for source in output.packet["sources"]} == expected
+    assert all(
+        source["content_sha256"] == hashlib.sha256(expected[source["path"]].encode()).hexdigest()
+        and source["instruction_trust"] == "untrusted_data"
+        for source in output.packet["sources"]
+    )
+    assert output.usage.proof["evidence_fingerprint"] == snapshot.fingerprint
     assert output.usage.provider == "github-models"
     assert output.usage.proof["selected_indices"] == [0, 1, 2]
     output.usage.validate()

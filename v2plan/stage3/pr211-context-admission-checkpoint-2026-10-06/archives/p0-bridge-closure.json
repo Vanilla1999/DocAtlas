@@ -1,0 +1,2628 @@
+{
+  "schema": "p0-real-class-bridge-closure-v1",
+  "rows": [
+    {
+      "public_module": "docmancer.core.sqlite_store",
+      "class": "SQLiteStore",
+      "wrappers": [
+        {
+          "name": "_ensure_fts_projection_state",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._ensure_fts_projection_state",
+          "source_line": 20
+        },
+        {
+          "name": "_replace_fts_projection",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._replace_fts_projection",
+          "source_line": 39
+        },
+        {
+          "name": "_ensure_schema",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._ensure_schema",
+          "source_line": 70
+        },
+        {
+          "name": "_build_candidate_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._build_candidate_generation",
+          "source_line": 88
+        },
+        {
+          "name": "_activate_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._activate_generation",
+          "source_line": 104
+        },
+        {
+          "name": "_deactivate_active_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_active_fts",
+          "original_qualname": "_SQLiteStoreActiveFTS._deactivate_active_generation",
+          "source_line": 108
+        },
+        {
+          "name": "section_filter_metadata_for",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_filter_metadata",
+          "original_qualname": "_SQLiteStoreFilterMetadata.section_filter_metadata_for",
+          "source_line": 8
+        },
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "_connect",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._connect",
+          "source_line": 15
+        },
+        {
+          "name": "add_documents",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01.add_documents",
+          "source_line": 296
+        },
+        {
+          "name": "_current_schema_document",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._current_schema_document",
+          "source_line": 360
+        },
+        {
+          "name": "add_documents_stream",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01.add_documents_stream",
+          "source_line": 374
+        },
+        {
+          "name": "_stage_extraction",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._stage_extraction",
+          "source_line": 423
+        },
+        {
+          "name": "_discard_staged_extractions",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._discard_staged_extractions",
+          "source_line": 452
+        },
+        {
+          "name": "_publish_staged_extractions",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._publish_staged_extractions",
+          "source_line": 458
+        },
+        {
+          "name": "_add_document",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part01",
+          "original_qualname": "_SQLiteStorePart01._add_document",
+          "source_line": 464
+        },
+        {
+          "name": "_insert_retrieval_child_copy",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02._insert_retrieval_child_copy",
+          "source_line": 365
+        },
+        {
+          "name": "_validate_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02._validate_generation",
+          "source_line": 405
+        },
+        {
+          "name": "_active_generation_id",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02._active_generation_id",
+          "source_line": 574
+        },
+        {
+          "name": "active_generation_id",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.active_generation_id",
+          "source_line": 596
+        },
+        {
+          "name": "activate_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.activate_generation",
+          "source_line": 625
+        },
+        {
+          "name": "_has_verified_vector_witness",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02._has_verified_vector_witness",
+          "source_line": 645
+        },
+        {
+          "name": "record_vector_parity_witness",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.record_vector_parity_witness",
+          "source_line": 661
+        },
+        {
+          "name": "generation_info",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.generation_info",
+          "source_line": 689
+        },
+        {
+          "name": "superseded_generation_candidates",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.superseded_generation_candidates",
+          "source_line": 699
+        },
+        {
+          "name": "delete_superseded_generations",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.delete_superseded_generations",
+          "source_line": 715
+        },
+        {
+          "name": "discard_candidate_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part02",
+          "original_qualname": "_SQLiteStorePart02.discard_candidate_generation",
+          "source_line": 753
+        },
+        {
+          "name": "set_generation_vector_collection",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03.set_generation_vector_collection",
+          "source_line": 8
+        },
+        {
+          "name": "set_generation_vector_backend",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03.set_generation_vector_backend",
+          "source_line": 32
+        },
+        {
+          "name": "_chunking_config_from_generation",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._chunking_config_from_generation",
+          "source_line": 51
+        },
+        {
+          "name": "_build_generation_without_sources",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._build_generation_without_sources",
+          "source_line": 65
+        },
+        {
+          "name": "query",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03.query",
+          "source_line": 185
+        },
+        {
+          "name": "_lexical_match_trace",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._lexical_match_trace",
+          "source_line": 303
+        },
+        {
+          "name": "_ranking_candidate",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._ranking_candidate",
+          "source_line": 353
+        },
+        {
+          "name": "fetch_sections_by_id",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03.fetch_sections_by_id",
+          "source_line": 433
+        },
+        {
+          "name": "_strip_stopwords",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._strip_stopwords",
+          "source_line": 502
+        },
+        {
+          "name": "_search_rows",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._search_rows",
+          "source_line": 514
+        },
+        {
+          "name": "_mark_lexical_mode",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._mark_lexical_mode",
+          "source_line": 601
+        },
+        {
+          "name": "_lexical_row_identity",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._lexical_row_identity",
+          "source_line": 605
+        },
+        {
+          "name": "_metadata_filter_sql",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part03",
+          "original_qualname": "_SQLiteStorePart03._metadata_filter_sql",
+          "source_line": 616
+        },
+        {
+          "name": "_expand_row",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04._expand_row",
+          "source_line": 8
+        },
+        {
+          "name": "_raw_token_total",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04._raw_token_total",
+          "source_line": 43
+        },
+        {
+          "name": "project_scope_stats",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.project_scope_stats",
+          "source_line": 78
+        },
+        {
+          "name": "collection_stats",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.collection_stats",
+          "source_line": 135
+        },
+        {
+          "name": "orphaned_extraction_artifacts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.orphaned_extraction_artifacts",
+          "source_line": 186
+        },
+        {
+          "name": "index_health",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.index_health",
+          "source_line": 215
+        },
+        {
+          "name": "list_sources_with_dates",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.list_sources_with_dates",
+          "source_line": 389
+        },
+        {
+          "name": "list_grouped_sources_with_dates",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.list_grouped_sources_with_dates",
+          "source_line": 396
+        },
+        {
+          "name": "list_sources",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.list_sources",
+          "source_line": 410
+        },
+        {
+          "name": "list_embedding_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.list_embedding_upserts",
+          "source_line": 413
+        },
+        {
+          "name": "list_generation_vector_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.list_generation_vector_upserts",
+          "source_line": 436
+        },
+        {
+          "name": "record_generation_vector_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.record_generation_vector_upserts",
+          "source_line": 458
+        },
+        {
+          "name": "delete_generation_vector_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.delete_generation_vector_upserts",
+          "source_line": 492
+        },
+        {
+          "name": "section_ids_for_source",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.section_ids_for_source",
+          "source_line": 511
+        },
+        {
+          "name": "record_embedding_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.record_embedding_upserts",
+          "source_line": 527
+        },
+        {
+          "name": "delete_embedding_upserts",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part04",
+          "original_qualname": "_SQLiteStorePart04.delete_embedding_upserts",
+          "source_line": 566
+        },
+        {
+          "name": "adjacent_section_ids",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.adjacent_section_ids",
+          "source_line": 8
+        },
+        {
+          "name": "document_title_hashes_for",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.document_title_hashes_for",
+          "source_line": 67
+        },
+        {
+          "name": "distinct_document_count",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.distinct_document_count",
+          "source_line": 99
+        },
+        {
+          "name": "section_count_grouped_by_format",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.section_count_grouped_by_format",
+          "source_line": 119
+        },
+        {
+          "name": "list_sections_for_embedding",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.list_sections_for_embedding",
+          "source_line": 135
+        },
+        {
+          "name": "list_sections_for_source",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.list_sections_for_source",
+          "source_line": 234
+        },
+        {
+          "name": "get_document_content",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.get_document_content",
+          "source_line": 300
+        },
+        {
+          "name": "source_metadata",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.source_metadata",
+          "source_line": 305
+        },
+        {
+          "name": "has_source_content_hash",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.has_source_content_hash",
+          "source_line": 315
+        },
+        {
+          "name": "delete_docset",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.delete_docset",
+          "source_line": 323
+        },
+        {
+          "name": "delete_docset_sources_except",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.delete_docset_sources_except",
+          "source_line": 334
+        },
+        {
+          "name": "delete_source",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.delete_source",
+          "source_line": 351
+        },
+        {
+          "name": "delete_sources_under_roots",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.delete_sources_under_roots",
+          "source_line": 399
+        },
+        {
+          "name": "delete_all",
+          "wrapper_globals_module": "docmancer.core.sqlite_store",
+          "original_module": "docmancer.core._sqlite_store_part05",
+          "original_qualname": "_SQLiteStorePart05.delete_all",
+          "source_line": 443
+        }
+      ],
+      "shards": [
+        "docmancer.core._sqlite_store_shared",
+        "docmancer.core._sqlite_store_active_fts",
+        "docmancer.core._sqlite_store_filter_metadata",
+        "docmancer.core._sqlite_store_part01",
+        "docmancer.core._sqlite_store_part02",
+        "docmancer.core._sqlite_store_part03",
+        "docmancer.core._sqlite_store_part04",
+        "docmancer.core._sqlite_store_part05"
+      ],
+      "tested_global": "_BOILERPLATE_KEYWORDS",
+      "propagated_to": [
+        "docmancer.core._sqlite_store_shared",
+        "docmancer.core._sqlite_store_filter_metadata",
+        "docmancer.core._sqlite_store_part01",
+        "docmancer.core._sqlite_store_part02",
+        "docmancer.core._sqlite_store_part03",
+        "docmancer.core._sqlite_store_part04",
+        "docmancer.core._sqlite_store_part05"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.connectors.fetchers.web",
+      "class": "WebFetcher",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "_emit_progress",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._emit_progress",
+          "source_line": 68
+        },
+        {
+          "name": "_client_kwargs",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._client_kwargs",
+          "source_line": 76
+        },
+        {
+          "name": "_new_client",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._new_client",
+          "source_line": 90
+        },
+        {
+          "name": "_policy_for",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._policy_for",
+          "source_line": 110
+        },
+        {
+          "name": "fetch",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01.fetch",
+          "source_line": 120
+        },
+        {
+          "name": "_fetch_github_manifest",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._fetch_github_manifest",
+          "source_line": 274
+        },
+        {
+          "name": "_with_page_ledger",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._with_page_ledger",
+          "source_line": 421
+        },
+        {
+          "name": "_record_page",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._record_page",
+          "source_line": 434
+        },
+        {
+          "name": "_github_blob_raw_url",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._github_blob_raw_url",
+          "source_line": 446
+        },
+        {
+          "name": "_raise_if_cancelled",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._raise_if_cancelled",
+          "source_line": 450
+        },
+        {
+          "name": "_is_direct_text_url",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._is_direct_text_url",
+          "source_line": 454
+        },
+        {
+          "name": "_is_dartdoc_url",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._is_dartdoc_url",
+          "source_line": 459
+        },
+        {
+          "name": "_is_direct_dartdoc_url",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._is_direct_dartdoc_url",
+          "source_line": 467
+        },
+        {
+          "name": "_fetch_direct_text_page",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._fetch_direct_text_page",
+          "source_line": 470
+        },
+        {
+          "name": "_fetch_dartdoc_direct_page",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._fetch_dartdoc_direct_page",
+          "source_line": 555
+        },
+        {
+          "name": "_fetch_and_detect",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._fetch_and_detect",
+          "source_line": 572
+        },
+        {
+          "name": "_build_llms_full_documents",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._build_llms_full_documents",
+          "source_line": 586
+        },
+        {
+          "name": "_fetch_pages",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part01",
+          "original_qualname": "_WebFetcherPart01._fetch_pages",
+          "source_line": 607
+        },
+        {
+          "name": "_fetch_page",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part02",
+          "original_qualname": "_WebFetcherPart02._fetch_page",
+          "source_line": 8
+        },
+        {
+          "name": "_try_browser_fallback",
+          "wrapper_globals_module": "docmancer.connectors.fetchers.web",
+          "original_module": "docmancer.connectors.fetchers._web.part02",
+          "original_qualname": "_WebFetcherPart02._try_browser_fallback",
+          "source_line": 191
+        }
+      ],
+      "shards": [
+        "docmancer.connectors.fetchers._web.shared",
+        "docmancer.connectors.fetchers._web.part01",
+        "docmancer.connectors.fetchers._web.part02"
+      ],
+      "tested_global": "ContentDeduplicator",
+      "propagated_to": [
+        "docmancer.connectors.fetchers._web.shared",
+        "docmancer.connectors.fetchers._web.part01",
+        "docmancer.connectors.fetchers._web.part02"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.retrieval.dispatch",
+      "class": "RetrievalDispatcher",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "vector_readiness",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01.vector_readiness",
+          "source_line": 24
+        },
+        {
+          "name": "_public_collection_id",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._public_collection_id",
+          "source_line": 46
+        },
+        {
+          "name": "_bounded_vector_probe",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._bounded_vector_probe",
+          "source_line": 51
+        },
+        {
+          "name": "run",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01.run",
+          "source_line": 66
+        },
+        {
+          "name": "_hierarchical_active",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._hierarchical_active",
+          "source_line": 275
+        },
+        {
+          "name": "_vector_readiness_failure",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._vector_readiness_failure",
+          "source_line": 305
+        },
+        {
+          "name": "_sidecar_collection_metadata",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._sidecar_collection_metadata",
+          "source_line": 382
+        },
+        {
+          "name": "_run_hierarchical",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._run_hierarchical",
+          "source_line": 400
+        },
+        {
+          "name": "_fuse_and_hydrate",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._fuse_and_hydrate",
+          "source_line": 506
+        },
+        {
+          "name": "_apply_router",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._apply_router",
+          "source_line": 556
+        },
+        {
+          "name": "_rank_candidate_lists",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._rank_candidate_lists",
+          "source_line": 579
+        },
+        {
+          "name": "_hydration_by_stable",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._hydration_by_stable",
+          "source_line": 587
+        },
+        {
+          "name": "_top_section_ids",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._top_section_ids",
+          "source_line": 595
+        },
+        {
+          "name": "_expand_section_ids",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._expand_section_ids",
+          "source_line": 612
+        },
+        {
+          "name": "_payload_lookup_for",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part01",
+          "original_qualname": "_RetrievalDispatcherPart01._payload_lookup_for",
+          "source_line": 632
+        },
+        {
+          "name": "_fan_out",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._fan_out",
+          "source_line": 8
+        },
+        {
+          "name": "_sparse_supported",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._sparse_supported",
+          "source_line": 103
+        },
+        {
+          "name": "_hydrate",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._hydrate",
+          "source_line": 117
+        },
+        {
+          "name": "_filter_section_ids_before_hydration",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._filter_section_ids_before_hydration",
+          "source_line": 122
+        },
+        {
+          "name": "_hydrate_policy_filtered",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._hydrate_policy_filtered",
+          "source_line": 148
+        },
+        {
+          "name": "_candidate_limit_for_diversity",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._candidate_limit_for_diversity",
+          "source_line": 156
+        },
+        {
+          "name": "_limit_sections_per_source",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._limit_sections_per_source",
+          "source_line": 164
+        },
+        {
+          "name": "_filter_chunks",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._filter_chunks",
+          "source_line": 218
+        },
+        {
+          "name": "_rank_project_bodies_within_source",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._rank_project_bodies_within_source",
+          "source_line": 231
+        },
+        {
+          "name": "_rerank_intent_matches",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._rerank_intent_matches",
+          "source_line": 255
+        },
+        {
+          "name": "_append_api_term_matches",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._append_api_term_matches",
+          "source_line": 301
+        },
+        {
+          "name": "_degraded_mode_name",
+          "wrapper_globals_module": "docmancer.retrieval.dispatch",
+          "original_module": "docmancer.retrieval._dispatch_part02",
+          "original_qualname": "_RetrievalDispatcherPart02._degraded_mode_name",
+          "source_line": 339
+        }
+      ],
+      "shards": [
+        "docmancer.retrieval._dispatch_shared",
+        "docmancer.retrieval._dispatch_part01",
+        "docmancer.retrieval._dispatch_part02"
+      ],
+      "tested_global": "re",
+      "propagated_to": [
+        "docmancer.retrieval._dispatch_shared",
+        "docmancer.retrieval._dispatch_part01",
+        "docmancer.retrieval._dispatch_part02"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.patch_constraints_service",
+      "class": "PatchConstraintsService",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "get_patch_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01.get_patch_constraints",
+          "source_line": 17
+        },
+        {
+          "name": "_visible_sources",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._visible_sources",
+          "source_line": 115
+        },
+        {
+          "name": "_code_evidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_evidence",
+          "source_line": 172
+        },
+        {
+          "name": "_code_graph_evidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_graph_evidence",
+          "source_line": 190
+        },
+        {
+          "name": "_prefer_changed_file_evidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._prefer_changed_file_evidence",
+          "source_line": 219
+        },
+        {
+          "name": "_repo_map_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._repo_map_constraints",
+          "source_line": 229
+        },
+        {
+          "name": "_source_evidence_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._source_evidence_constraints",
+          "source_line": 253
+        },
+        {
+          "name": "_code_graph_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_graph_constraints",
+          "source_line": 283
+        },
+        {
+          "name": "_code_graph_constraint_diagnostics",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_graph_constraint_diagnostics",
+          "source_line": 315
+        },
+        {
+          "name": "_code_graph_constraint_confidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_graph_constraint_confidence",
+          "source_line": 329
+        },
+        {
+          "name": "_code_graph_constraint_instruction",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._code_graph_constraint_instruction",
+          "source_line": 337
+        },
+        {
+          "name": "_example_source_noise",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._example_source_noise",
+          "source_line": 347
+        },
+        {
+          "name": "_under_root",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._under_root",
+          "source_line": 354
+        },
+        {
+          "name": "_excluded_source_reason",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._excluded_source_reason",
+          "source_line": 362
+        },
+        {
+          "name": "_excluded_source",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._excluded_source",
+          "source_line": 395
+        },
+        {
+          "name": "_source_authority",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._source_authority",
+          "source_line": 399
+        },
+        {
+          "name": "_is_markdown_table_row",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._is_markdown_table_row",
+          "source_line": 431
+        },
+        {
+          "name": "_example_marker_re",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._example_marker_re",
+          "source_line": 442
+        },
+        {
+          "name": "_is_example_line",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._is_example_line",
+          "source_line": 449
+        },
+        {
+          "name": "_is_example_heading",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._is_example_heading",
+          "source_line": 462
+        },
+        {
+          "name": "_has_normative_language",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._has_normative_language",
+          "source_line": 470
+        },
+        {
+          "name": "_line_metadata_suffix",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._line_metadata_suffix",
+          "source_line": 482
+        },
+        {
+          "name": "_iter_constraint_lines",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._iter_constraint_lines",
+          "source_line": 491
+        },
+        {
+          "name": "_path_looks_forbidden_artifact",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._path_looks_forbidden_artifact",
+          "source_line": 531
+        },
+        {
+          "name": "_repo_artifact_examples",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._repo_artifact_examples",
+          "source_line": 547
+        },
+        {
+          "name": "_owner_is_repo_grounded",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._owner_is_repo_grounded",
+          "source_line": 577
+        },
+        {
+          "name": "_safe_constraint_profile",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._safe_constraint_profile",
+          "source_line": 621
+        },
+        {
+          "name": "_final_token_clamp",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part01",
+          "original_qualname": "_PatchConstraintsServicePart01._final_token_clamp",
+          "source_line": 638
+        },
+        {
+          "name": "_architecture_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._architecture_constraints",
+          "source_line": 8
+        },
+        {
+          "name": "_source_relevant_to_task",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._source_relevant_to_task",
+          "source_line": 103
+        },
+        {
+          "name": "_source_relevance_terms",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._source_relevance_terms",
+          "source_line": 126
+        },
+        {
+          "name": "_drop_non_actionable_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._drop_non_actionable_constraints",
+          "source_line": 150
+        },
+        {
+          "name": "_constraint_is_actionable",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._constraint_is_actionable",
+          "source_line": 159
+        },
+        {
+          "name": "_line_is_non_actionable_constraint",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._line_is_non_actionable_constraint",
+          "source_line": 170
+        },
+        {
+          "name": "_owner_looks_like_code_owner",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._owner_looks_like_code_owner",
+          "source_line": 185
+        },
+        {
+          "name": "_generated_file_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._generated_file_constraints",
+          "source_line": 200
+        },
+        {
+          "name": "_dependency_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._dependency_constraints",
+          "source_line": 274
+        },
+        {
+          "name": "_has_dependency_intent",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._has_dependency_intent",
+          "source_line": 315
+        },
+        {
+          "name": "_dependency_observations",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._dependency_observations",
+          "source_line": 319
+        },
+        {
+          "name": "_read_python_dependencies",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._read_python_dependencies",
+          "source_line": 331
+        },
+        {
+          "name": "_read_node_dependencies",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._read_node_dependencies",
+          "source_line": 355
+        },
+        {
+          "name": "_read_go_dependencies",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._read_go_dependencies",
+          "source_line": 390
+        },
+        {
+          "name": "_symbol_candidates",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._symbol_candidates",
+          "source_line": 401
+        },
+        {
+          "name": "_task_terms",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._task_terms",
+          "source_line": 458
+        },
+        {
+          "name": "_is_noisy_task_term",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._is_noisy_task_term",
+          "source_line": 488
+        },
+        {
+          "name": "_term_variants",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._term_variants",
+          "source_line": 498
+        },
+        {
+          "name": "_symbol_source_files",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._symbol_source_files",
+          "source_line": 514
+        },
+        {
+          "name": "extract_method_call_symbols",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02.extract_method_call_symbols",
+          "source_line": 541
+        },
+        {
+          "name": "_symbol_from_line",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._symbol_from_line",
+          "source_line": 550
+        },
+        {
+          "name": "_symbol_confidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._symbol_confidence",
+          "source_line": 577
+        },
+        {
+          "name": "_is_broad_acronym_symbol_candidate",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._is_broad_acronym_symbol_candidate",
+          "source_line": 585
+        },
+        {
+          "name": "_term_explicitly_mentions_symbol",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._term_explicitly_mentions_symbol",
+          "source_line": 592
+        },
+        {
+          "name": "_is_asset_related_task",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._is_asset_related_task",
+          "source_line": 596
+        },
+        {
+          "name": "_is_generated_asset_path",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._is_generated_asset_path",
+          "source_line": 601
+        },
+        {
+          "name": "_symbol_candidate_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._symbol_candidate_constraints",
+          "source_line": 607
+        },
+        {
+          "name": "_dedupe_dependencies",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._dedupe_dependencies",
+          "source_line": 624
+        },
+        {
+          "name": "_fallback_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._fallback_constraints",
+          "source_line": 634
+        },
+        {
+          "name": "_constraint",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._constraint",
+          "source_line": 660
+        },
+        {
+          "name": "_source_refs",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._source_refs",
+          "source_line": 680
+        },
+        {
+          "name": "_evidence_snippets",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._evidence_snippets",
+          "source_line": 695
+        },
+        {
+          "name": "_contract_id",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._contract_id",
+          "source_line": 705
+        },
+        {
+          "name": "_index_state",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part02",
+          "original_qualname": "_PatchConstraintsServicePart02._index_state",
+          "source_line": 718
+        },
+        {
+          "name": "_next_actions",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._next_actions",
+          "source_line": 8
+        },
+        {
+          "name": "_interesting_lines",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._interesting_lines",
+          "source_line": 32
+        },
+        {
+          "name": "_owner_from_line",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._owner_from_line",
+          "source_line": 60
+        },
+        {
+          "name": "_delegate_target",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._delegate_target",
+          "source_line": 82
+        },
+        {
+          "name": "_instruction_from_line",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._instruction_from_line",
+          "source_line": 87
+        },
+        {
+          "name": "_is_generated_path",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._is_generated_path",
+          "source_line": 94
+        },
+        {
+          "name": "_matching_changed_files",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._matching_changed_files",
+          "source_line": 101
+        },
+        {
+          "name": "_dependency_relevance",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._dependency_relevance",
+          "source_line": 104
+        },
+        {
+          "name": "_most_relevant_lockfile",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._most_relevant_lockfile",
+          "source_line": 124
+        },
+        {
+          "name": "_dependency_source",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._dependency_source",
+          "source_line": 132
+        },
+        {
+          "name": "_slug",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._slug",
+          "source_line": 152
+        },
+        {
+          "name": "_dedupe",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._dedupe",
+          "source_line": 156
+        },
+        {
+          "name": "_sort_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._sort_constraints",
+          "source_line": 168
+        },
+        {
+          "name": "_apply_budget",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._apply_budget",
+          "source_line": 207
+        },
+        {
+          "name": "_estimate_packet_tokens",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._estimate_packet_tokens",
+          "source_line": 218
+        },
+        {
+          "name": "_packet_confidence",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._packet_confidence",
+          "source_line": 226
+        },
+        {
+          "name": "_source_summary",
+          "wrapper_globals_module": "docmancer.docs.application.patch_constraints_service",
+          "original_module": "docmancer.docs.application._patch_constraints_service_part03",
+          "original_qualname": "_PatchConstraintsServicePart03._source_summary",
+          "source_line": 237
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._patch_constraints_service_shared",
+        "docmancer.docs.application._patch_constraints_service_part01",
+        "docmancer.docs.application._patch_constraints_service_part02",
+        "docmancer.docs.application._patch_constraints_service_part03"
+      ],
+      "tested_global": "PHRASE_ALIASES",
+      "propagated_to": [
+        "docmancer.docs.application._patch_constraints_service_shared",
+        "docmancer.docs.application._patch_constraints_service_part01",
+        "docmancer.docs.application._patch_constraints_service_part02",
+        "docmancer.docs.application._patch_constraints_service_part03"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.project_docs_service",
+      "class": "ProjectDocsService",
+      "wrappers": [
+        {
+          "name": "_clean_git_sync_digest",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._clean_git_sync_digest",
+          "source_line": 11
+        },
+        {
+          "name": "_canonical_git_remote",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._canonical_git_remote",
+          "source_line": 15
+        },
+        {
+          "name": "_repository_identity",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._repository_identity",
+          "source_line": 34
+        },
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01.__init__",
+          "source_line": 77
+        },
+        {
+          "name": "_vector_sync_enabled",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._vector_sync_enabled",
+          "source_line": 84
+        },
+        {
+          "name": "_project_sync_arguments",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_sync_arguments",
+          "source_line": 91
+        },
+        {
+          "name": "_indexed_project_doc_sources",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._indexed_project_doc_sources",
+          "source_line": 97
+        },
+        {
+          "name": "_source_state_guidance",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._source_state_guidance",
+          "source_line": 100
+        },
+        {
+          "name": "_partition_project_doc_state",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._partition_project_doc_state",
+          "source_line": 105
+        },
+        {
+          "name": "_has_high_level_project_overview",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._has_high_level_project_overview",
+          "source_line": 113
+        },
+        {
+          "name": "_project_dependency_docs_state",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_dependency_docs_state",
+          "source_line": 118
+        },
+        {
+          "name": "_module_summaries",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._module_summaries",
+          "source_line": 121
+        },
+        {
+          "name": "_resolve_module_filter",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._resolve_module_filter",
+          "source_line": 143
+        },
+        {
+          "name": "_create_project_docs_next_action",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._create_project_docs_next_action",
+          "source_line": 175
+        },
+        {
+          "name": "_invalid_project_docs_catalog_action",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._invalid_project_docs_catalog_action",
+          "source_line": 180
+        },
+        {
+          "name": "_project_docs_structured_next_action",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_docs_structured_next_action",
+          "source_line": 193
+        },
+        {
+          "name": "_project_docs_preflight_next_action",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_docs_preflight_next_action",
+          "source_line": 207
+        },
+        {
+          "name": "_project_docs_preflight_recommended_action",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_docs_preflight_recommended_action",
+          "source_line": 233
+        },
+        {
+          "name": "_looks_like_placeholder_project_doc",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._looks_like_placeholder_project_doc",
+          "source_line": 253
+        },
+        {
+          "name": "_looks_like_placeholder_search_result",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._looks_like_placeholder_search_result",
+          "source_line": 260
+        },
+        {
+          "name": "_read_text_prefix",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._read_text_prefix",
+          "source_line": 267
+        },
+        {
+          "name": "_unsupported_root_doc_files",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._unsupported_root_doc_files",
+          "source_line": 277
+        },
+        {
+          "name": "_project_docs_preflight",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01._project_docs_preflight",
+          "source_line": 312
+        },
+        {
+          "name": "inspect_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01.inspect_project_docs",
+          "source_line": 403
+        },
+        {
+          "name": "ingest_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part01",
+          "original_qualname": "_ProjectDocsServicePart01.ingest_project_docs",
+          "source_line": 598
+        },
+        {
+          "name": "_normalize_incremental_doc_path",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part02",
+          "original_qualname": "_ProjectDocsServicePart02._normalize_incremental_doc_path",
+          "source_line": 8
+        },
+        {
+          "name": "_bounded_sync_tombstones",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part02",
+          "original_qualname": "_ProjectDocsServicePart02._bounded_sync_tombstones",
+          "source_line": 25
+        },
+        {
+          "name": "_sync_project_docs_incremental",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part02",
+          "original_qualname": "_ProjectDocsServicePart02._sync_project_docs_incremental",
+          "source_line": 48
+        },
+        {
+          "name": "sync_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part02",
+          "original_qualname": "_ProjectDocsServicePart02.sync_project_docs",
+          "source_line": 311
+        },
+        {
+          "name": "bootstrap_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part02",
+          "original_qualname": "_ProjectDocsServicePart02.bootstrap_project_docs",
+          "source_line": 481
+        },
+        {
+          "name": "query_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part03",
+          "original_qualname": "_ProjectDocsServicePart03.query_project_docs",
+          "source_line": 136
+        },
+        {
+          "name": "get_project_docs",
+          "wrapper_globals_module": "docmancer.docs.application.project_docs_service",
+          "original_module": "docmancer.docs.application._project_docs_service_part03",
+          "original_qualname": "_ProjectDocsServicePart03.get_project_docs",
+          "source_line": 422
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._project_docs_service_shared",
+        "docmancer.docs.application._project_docs_service_part01",
+        "docmancer.docs.application._project_docs_service_part02",
+        "docmancer.docs.application._project_docs_service_part03"
+      ],
+      "tested_global": "re",
+      "propagated_to": [
+        "docmancer.docs.application._project_docs_service_shared",
+        "docmancer.docs.application._project_docs_service_part01",
+        "docmancer.docs.application._project_docs_service_part02",
+        "docmancer.docs.application._project_docs_service_part03"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.project_context_service",
+      "class": "ProjectContextService",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.project_context_service",
+          "original_module": "docmancer.docs.application._project_context_service_part01",
+          "original_qualname": "_ProjectContextServicePart01.__init__",
+          "source_line": 14
+        },
+        {
+          "name": "get_project_context",
+          "wrapper_globals_module": "docmancer.docs.application.project_context_service",
+          "original_module": "docmancer.docs.application._project_context_service_part01",
+          "original_qualname": "_ProjectContextServicePart01.get_project_context",
+          "source_line": 17
+        },
+        {
+          "name": "dependency_mentioned_in_question",
+          "wrapper_globals_module": "docmancer.docs.application.project_context_service",
+          "original_module": "docmancer.docs.application._project_context_service_part01",
+          "original_qualname": "_ProjectContextServicePart01.dependency_mentioned_in_question",
+          "source_line": 867
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._project_context_service_shared",
+        "docmancer.docs.application._project_context_service_part01"
+      ],
+      "tested_global": "LOW_TRUST_QUERY_TERMS",
+      "propagated_to": [
+        "docmancer.docs.application._project_context_service_shared",
+        "docmancer.docs.application._project_context_service_part01"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.unified_context_service",
+      "class": "UnifiedDocsContextService",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01.__init__",
+          "source_line": 55
+        },
+        {
+          "name": "get_docs_context",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01.get_docs_context",
+          "source_line": 58
+        },
+        {
+          "name": "_validate",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01._validate",
+          "source_line": 582
+        },
+        {
+          "name": "_invalid",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01._invalid",
+          "source_line": 611
+        },
+        {
+          "name": "_select_mode",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01._select_mode",
+          "source_line": 642
+        },
+        {
+          "name": "_patch_constraints_next_action",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01._patch_constraints_next_action",
+          "source_line": 653
+        },
+        {
+          "name": "_libraries",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part01",
+          "original_qualname": "_UnifiedDocsContextServicePart01._libraries",
+          "source_line": 667
+        },
+        {
+          "name": "_ensure_library_safe",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._ensure_library_safe",
+          "source_line": 8
+        },
+        {
+          "name": "_get_library_docs_with_latest_fallback",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._get_library_docs_with_latest_fallback",
+          "source_line": 118
+        },
+        {
+          "name": "_augment_snippet_first_context",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._augment_snippet_first_context",
+          "source_line": 179
+        },
+        {
+          "name": "_dependency_prefetch_needed",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._dependency_prefetch_needed",
+          "source_line": 234
+        },
+        {
+          "name": "_dependency_prefetch_guidance",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._dependency_prefetch_guidance",
+          "source_line": 246
+        },
+        {
+          "name": "_rank_dependencies_for_prefetch",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._rank_dependencies_for_prefetch",
+          "source_line": 280
+        },
+        {
+          "name": "_normalize_project_context",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._normalize_project_context",
+          "source_line": 299
+        },
+        {
+          "name": "_library_context_pack",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._library_context_pack",
+          "source_line": 319
+        },
+        {
+          "name": "_dedupe_and_guard",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._dedupe_and_guard",
+          "source_line": 359
+        },
+        {
+          "name": "_trust_contract",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._trust_contract",
+          "source_line": 444
+        },
+        {
+          "name": "_lane_priority_for",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._lane_priority_for",
+          "source_line": 485
+        },
+        {
+          "name": "_source_summary",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._source_summary",
+          "source_line": 497
+        },
+        {
+          "name": "_exact_version",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._exact_version",
+          "source_line": 507
+        },
+        {
+          "name": "_merge_lane_status",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._merge_lane_status",
+          "source_line": 517
+        },
+        {
+          "name": "_lane_succeeded",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._lane_succeeded",
+          "source_line": 527
+        },
+        {
+          "name": "_refresh_lane_counts",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._refresh_lane_counts",
+          "source_line": 531
+        },
+        {
+          "name": "_aggregate_status",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._aggregate_status",
+          "source_line": 542
+        },
+        {
+          "name": "_infer_project_auto_mode",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._infer_project_auto_mode",
+          "source_line": 556
+        },
+        {
+          "name": "_can_return_partial_project_context",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._can_return_partial_project_context",
+          "source_line": 569
+        },
+        {
+          "name": "_project_index_recovery_action",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._project_index_recovery_action",
+          "source_line": 579
+        },
+        {
+          "name": "_collect_pending_actions",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._collect_pending_actions",
+          "source_line": 601
+        },
+        {
+          "name": "_to_dict",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._to_dict",
+          "source_line": 630
+        },
+        {
+          "name": "_empty_lanes",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._empty_lanes",
+          "source_line": 640
+        },
+        {
+          "name": "_confirmation_result",
+          "wrapper_globals_module": "docmancer.docs.application.unified_context_service",
+          "original_module": "docmancer.docs.application._unified_context_service_part02",
+          "original_qualname": "_UnifiedDocsContextServicePart02._confirmation_result",
+          "source_line": 648
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._unified_context_service_shared",
+        "docmancer.docs.application._unified_context_service_part01",
+        "docmancer.docs.application._unified_context_service_part02"
+      ],
+      "tested_global": "_PATCH_TASK_TERMS",
+      "propagated_to": [
+        "docmancer.docs.application._unified_context_service_shared",
+        "docmancer.docs.application._unified_context_service_part01",
+        "docmancer.docs.application._unified_context_service_part02"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.patch_review_service",
+      "class": "PatchReviewService",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "run",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01.run",
+          "source_line": 11
+        },
+        {
+          "name": "_run_id",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._run_id",
+          "source_line": 181
+        },
+        {
+          "name": "_git_changed_files",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._git_changed_files",
+          "source_line": 185
+        },
+        {
+          "name": "_git_status_porcelain",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._git_status_porcelain",
+          "source_line": 190
+        },
+        {
+          "name": "_git_diff",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._git_diff",
+          "source_line": 194
+        },
+        {
+          "name": "_meaningful_untracked_files",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._meaningful_untracked_files",
+          "source_line": 198
+        },
+        {
+          "name": "_clear_stale_manifest_marker",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._clear_stale_manifest_marker",
+          "source_line": 202
+        },
+        {
+          "name": "_write_json",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._write_json",
+          "source_line": 208
+        },
+        {
+          "name": "_review_summary_manifest_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_manifest_payload",
+          "source_line": 220
+        },
+        {
+          "name": "_review_summary_pr_comment_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_pr_comment_payload",
+          "source_line": 319
+        },
+        {
+          "name": "_review_summary_trace_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_trace_payload",
+          "source_line": 376
+        },
+        {
+          "name": "_constraint_coverage_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._constraint_coverage_payload",
+          "source_line": 427
+        },
+        {
+          "name": "_empty_coverage_category",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._empty_coverage_category",
+          "source_line": 468
+        },
+        {
+          "name": "_coverage_categories_for_constraint",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._coverage_categories_for_constraint",
+          "source_line": 479
+        },
+        {
+          "name": "_add_constraint_to_coverage_category",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._add_constraint_to_coverage_category",
+          "source_line": 507
+        },
+        {
+          "name": "_review_summary_bot_bundle_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_bot_bundle_payload",
+          "source_line": 528
+        },
+        {
+          "name": "_review_summary_advisory_decision_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_advisory_decision_payload",
+          "source_line": 564
+        },
+        {
+          "name": "_review_summary_model",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part01",
+          "original_qualname": "_PatchReviewServicePart01._review_summary_model",
+          "source_line": 621
+        },
+        {
+          "name": "_review_summary_quality_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._review_summary_quality_payload",
+          "source_line": 8
+        },
+        {
+          "name": "_review_summary_quality_signals",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._review_summary_quality_signals",
+          "source_line": 79
+        },
+        {
+          "name": "_review_summary_actions_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._review_summary_actions_payload",
+          "source_line": 143
+        },
+        {
+          "name": "_actionable_item_payload",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._actionable_item_payload",
+          "source_line": 192
+        },
+        {
+          "name": "_markdown_text",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._markdown_text",
+          "source_line": 222
+        },
+        {
+          "name": "_truncate_pr_comment",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._truncate_pr_comment",
+          "source_line": 230
+        },
+        {
+          "name": "_constraints_markdown",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._constraints_markdown",
+          "source_line": 236
+        },
+        {
+          "name": "_review_summary",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._review_summary",
+          "source_line": 253
+        },
+        {
+          "name": "_summary_constraint_rank",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._summary_constraint_rank",
+          "source_line": 401
+        },
+        {
+          "name": "_summary_bucket",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._summary_bucket",
+          "source_line": 432
+        },
+        {
+          "name": "_dedupe_constraints",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._dedupe_constraints",
+          "source_line": 443
+        },
+        {
+          "name": "_task_symbol_tokens",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._task_symbol_tokens",
+          "source_line": 455
+        },
+        {
+          "name": "_is_low_value_symbol_candidate",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._is_low_value_symbol_candidate",
+          "source_line": 481
+        },
+        {
+          "name": "_has_only_low_value_symbols",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._has_only_low_value_symbols",
+          "source_line": 493
+        },
+        {
+          "name": "_has_low_value_matched_symbol",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._has_low_value_matched_symbol",
+          "source_line": 501
+        },
+        {
+          "name": "_is_broad_context_source",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._is_broad_context_source",
+          "source_line": 516
+        },
+        {
+          "name": "_unknown_buckets",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._unknown_buckets",
+          "source_line": 525
+        },
+        {
+          "name": "_unknown_triage",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._unknown_triage",
+          "source_line": 549
+        },
+        {
+          "name": "_unknown_triage_example",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._unknown_triage_example",
+          "source_line": 610
+        },
+        {
+          "name": "_has_manual_unknown_signal",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._has_manual_unknown_signal",
+          "source_line": 622
+        },
+        {
+          "name": "_has_missing_diff_unknown_signal",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._has_missing_diff_unknown_signal",
+          "source_line": 653
+        },
+        {
+          "name": "_summary_quality",
+          "wrapper_globals_module": "docmancer.docs.application.patch_review_service",
+          "original_module": "docmancer.docs.application._patch_review_service_part02",
+          "original_qualname": "_PatchReviewServicePart02._summary_quality",
+          "source_line": 674
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._patch_review_service_shared",
+        "docmancer.docs.application._patch_review_service_part01",
+        "docmancer.docs.application._patch_review_service_part02"
+      ],
+      "tested_global": "LOW_VALUE_SYMBOLS",
+      "propagated_to": [
+        "docmancer.docs.application._patch_review_service_shared",
+        "docmancer.docs.application._patch_review_service_part01",
+        "docmancer.docs.application._patch_review_service_part02"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    },
+    {
+      "public_module": "docmancer.docs.application.library_docs_service",
+      "class": "LibraryDocsApplicationService",
+      "wrappers": [
+        {
+          "name": "__init__",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01.__init__",
+          "source_line": 8
+        },
+        {
+          "name": "_target_from_record",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._target_from_record",
+          "source_line": 81
+        },
+        {
+          "name": "_record_urls",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._record_urls",
+          "source_line": 84
+        },
+        {
+          "name": "_agent_instance",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._agent_instance",
+          "source_line": 87
+        },
+        {
+          "name": "_is_stale",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._is_stale",
+          "source_line": 90
+        },
+        {
+          "name": "_now",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._now",
+          "source_line": 93
+        },
+        {
+          "name": "_index_config_for",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._index_config_for",
+          "source_line": 96
+        },
+        {
+          "name": "_record_from_info",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._record_from_info",
+          "source_line": 656
+        },
+        {
+          "name": "_lock_for",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._lock_for",
+          "source_line": 102
+        },
+        {
+          "name": "_render_docs_url",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._render_docs_url",
+          "source_line": 105
+        },
+        {
+          "name": "resolve_library",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01.resolve_library",
+          "source_line": 108
+        },
+        {
+          "name": "_candidate_payload",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._candidate_payload",
+          "source_line": 416
+        },
+        {
+          "name": "_docs_policy",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._docs_policy",
+          "source_line": 434
+        },
+        {
+          "name": "_docs_identity",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._docs_identity",
+          "source_line": 439
+        },
+        {
+          "name": "_docs_request",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._docs_request",
+          "source_line": 444
+        },
+        {
+          "name": "_url_within_root",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._url_within_root",
+          "source_line": 449
+        },
+        {
+          "name": "_library_chunk_rejection_reason",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._library_chunk_rejection_reason",
+          "source_line": 458
+        },
+        {
+          "name": "_library_chunk_allowed",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._library_chunk_allowed",
+          "source_line": 517
+        },
+        {
+          "name": "_expected_docset_roots",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._expected_docset_roots",
+          "source_line": 520
+        },
+        {
+          "name": "_empty_library_index_result",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._empty_library_index_result",
+          "source_line": 528
+        },
+        {
+          "name": "_inspection_recovery_action",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._inspection_recovery_action",
+          "source_line": 589
+        },
+        {
+          "name": "_with_dart_diagnostics",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._with_dart_diagnostics",
+          "source_line": 629
+        },
+        {
+          "name": "resolve_docs_source",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01.resolve_docs_source",
+          "source_line": 661
+        },
+        {
+          "name": "_docs_exactness",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._docs_exactness",
+          "source_line": 701
+        },
+        {
+          "name": "_join_warnings",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._join_warnings",
+          "source_line": 706
+        },
+        {
+          "name": "_refresh_record",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part01",
+          "original_qualname": "_LibraryDocsApplicationServicePart01._refresh_record",
+          "source_line": 714
+        },
+        {
+          "name": "refresh_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02.refresh_docs",
+          "source_line": 8
+        },
+        {
+          "name": "prefetch_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02.prefetch_docs",
+          "source_line": 32
+        },
+        {
+          "name": "resume_interrupted_jobs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02.resume_interrupted_jobs",
+          "source_line": 99
+        },
+        {
+          "name": "_flutter_targets_for_request",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02._flutter_targets_for_request",
+          "source_line": 134
+        },
+        {
+          "name": "_flutter_source_targets",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02._flutter_source_targets",
+          "source_line": 158
+        },
+        {
+          "name": "_library_job_timeout_seconds",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part02",
+          "original_qualname": "_LibraryDocsApplicationServicePart02._library_job_timeout_seconds",
+          "source_line": 185
+        },
+        {
+          "name": "get_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part03",
+          "original_qualname": "_LibraryDocsApplicationServicePart03.get_docs",
+          "source_line": 8
+        },
+        {
+          "name": "_bounded_library_index_witness",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04._bounded_library_index_witness",
+          "source_line": 8
+        },
+        {
+          "name": "_library_manifest_is_complete",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04._library_manifest_is_complete",
+          "source_line": 119
+        },
+        {
+          "name": "_index_size_for",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04._index_size_for",
+          "source_line": 131
+        },
+        {
+          "name": "_delete_index_for",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04._delete_index_for",
+          "source_line": 134
+        },
+        {
+          "name": "inspect_library_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04.inspect_library_docs",
+          "source_line": 137
+        },
+        {
+          "name": "remove_library_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04.remove_library_docs",
+          "source_line": 140
+        },
+        {
+          "name": "_record_age_cutoff_value",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04._record_age_cutoff_value",
+          "source_line": 143
+        },
+        {
+          "name": "prune_library_docs",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04.prune_library_docs",
+          "source_line": 146
+        },
+        {
+          "name": "list_libraries",
+          "wrapper_globals_module": "docmancer.docs.application.library_docs_service",
+          "original_module": "docmancer.docs.application._library_docs_service_part04",
+          "original_qualname": "_LibraryDocsApplicationServicePart04.list_libraries",
+          "source_line": 163
+        }
+      ],
+      "shards": [
+        "docmancer.docs.application._library_docs_service_shared",
+        "docmancer.docs.application._library_docs_service_part01",
+        "docmancer.docs.application._library_docs_service_part02",
+        "docmancer.docs.application._library_docs_service_part03",
+        "docmancer.docs.application._library_docs_service_part04"
+      ],
+      "tested_global": "re",
+      "propagated_to": [
+        "docmancer.docs.application._library_docs_service_shared",
+        "docmancer.docs.application._library_docs_service_part01",
+        "docmancer.docs.application._library_docs_service_part02",
+        "docmancer.docs.application._library_docs_service_part03",
+        "docmancer.docs.application._library_docs_service_part04"
+      ],
+      "synchronization_verified": true,
+      "restored": true
+    }
+  ],
+  "limitations": "Synchronization closures invoked directly; business methods not invoked. This proves concrete facade-to-shard override reachability, not all runtime caller paths or semantic quality."
+}

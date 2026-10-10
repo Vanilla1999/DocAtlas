@@ -245,9 +245,10 @@ FROZEN_UNSUPPORTED_QUESTIONS = tuple(
 def classify_question_ownership(question: str) -> QuestionOwnership:
     plan = compile_question_plan(question)
     contract = build_project_answer_contract(question)
-    if contract.unresolved_parts:
+    unresolved = tuple(dict.fromkeys((*contract.unresolved_parts, *plan.unresolved_parts)))
+    if unresolved:
         owner = "unsupported"
-        trace = tuple(contract.parse_trace)
+        trace = tuple(dict.fromkeys((*contract.parse_trace, *plan.parse_trace)))
     elif plan.facets:
         owner = "question_plan"
         trace = tuple(plan.parse_trace)
@@ -257,7 +258,7 @@ def classify_question_ownership(question: str) -> QuestionOwnership:
     return QuestionOwnership(
         owner,
         trace,
-        tuple(contract.unresolved_parts),
+        unresolved,
         _signature(question),
     )
 

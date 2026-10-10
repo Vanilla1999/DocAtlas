@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_mcp_delivery_member_transaction.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_mcp_delivery_member_transaction.py": "5b6adab1f5880e91ce6894f1be757811db9f10ba1d9d713bf32bdf46853ef2cb"
+  },
+  "node_overrides": {}
+}

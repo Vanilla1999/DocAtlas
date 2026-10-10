@@ -11,13 +11,14 @@ from eval.agent_developer_v1.first_divergence import (
     build_atlas,
     load_json,
     render_markdown,
+    sha256_json,
     validate_atlas,
 )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 TASKS = ROOT / "eval/agent_developer_v1/tasks.json"
-ORACLE = ROOT / "eval/agent_developer_v1/expected_trajectories.json"
+ORACLE = ROOT / "eval/agent_developer_v1/results/first-divergence-oracle-5a36a15.json"
 REPORT = ROOT / "eval/agent_developer_v1/results/model-benchmark.json"
 ATLAS = ROOT / "eval/agent_developer_v1/results/first-divergence-atlas.json"
 MARKDOWN = ROOT / "docs/analysis/p1.2-agent-developer-first-divergence.md"
@@ -28,6 +29,7 @@ def generated() -> dict:
 
 
 def test_committed_atlas_is_exactly_reproducible() -> None:
+    assert sha256_json(load_json(ORACLE)) == "666318e529a8ea8afcf30b471e2d2744723680c3c697538b9719ec9b70afe306"
     atlas = generated()
     assert atlas == load_json(ATLAS)
     assert MARKDOWN.read_text(encoding="utf-8") == render_markdown(atlas)
@@ -95,6 +97,16 @@ def test_report_identity_or_false_support_drift_fails_closed() -> None:
     unsafe["false_supported"] = 1
     with pytest.raises(ValueError, match="false support"):
         build_atlas(tasks, oracle, unsafe)
+
+    changed_tasks = copy.deepcopy(tasks)
+    changed_tasks["tasks"][0]["developer_task"] += " Changed historical input."
+    with pytest.raises(ValueError, match="public-task fingerprint"):
+        build_atlas(changed_tasks, oracle, report)
+
+    changed_oracle = copy.deepcopy(oracle)
+    changed_oracle["trajectories"][0]["calls"][0]["question"] += " Changed expectation."
+    with pytest.raises(ValueError, match="oracle fingerprint"):
+        build_atlas(tasks, changed_oracle, report)
 
 
 def test_atlas_mutation_cannot_authorize_public_api_or_agent_truth() -> None:

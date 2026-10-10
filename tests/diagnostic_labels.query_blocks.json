@@ -6,7 +6,7 @@
   },
   "module_node_hashes": {
     "tests/docs/test_query_block_delivery.py": "29cbbe36dff70ced1063bb199a9128f8122d8057c1140017df98959b327eac5a",
-    "tests/docs/test_query_block_guards.py": "d04b752bbc865d11b18e6af79e8c0fd1f5b6ab188e3ca8f49739c7edd14f8e2f"
+    "tests/docs/test_query_block_guards.py": "accfb6b2a75060425b19350da3d73987325f3c0c98597e075bbc4f406f138159"
   },
   "node_overrides": {}
 }

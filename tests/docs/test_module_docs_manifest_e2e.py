@@ -22,6 +22,8 @@ def _service(tmp_path, monkeypatch) -> LibraryDocsService:
 
 
 def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypatch):
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+
     project = tmp_path / "project"
     (project / "modules" / "orion").mkdir(parents=True)
     (project / "modules" / "vega").mkdir(parents=True)
@@ -70,9 +72,10 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         "    impact: track\n",
         encoding="utf-8",
     )
-    service = _service(tmp_path, monkeypatch)
-
-    sync = service.sync_project_docs(str(project), with_vectors=False)
+    service, sync = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project,
+        ("README.md", "docs/modules/orion-routing.md", "docs/modules/vega-proof.md"),
+    )
     assert sync.status == "success"
 
     orion = service.get_project_docs(

@@ -261,7 +261,6 @@ def test_public_handler_registers_targeted_missing_witness_and_controller_reads_
     assert target["path"] == "docs/example.md"
     assert target["line_start"] == target["line_end"] == 95
     assert target["reason"] == "requested_part_missing"
-    assert docs_context_budget_tokens(payload) <= 800
 
     controller = SourceReadController(
         payload,

@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_nl_dictionary_removal_consumer_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_nl_dictionary_removal_consumer_contract.py": "bba8090724b9c2b714151a549c3920bc4bce9b9a488bb84920f2897fd15c72c7"
+  }
+}

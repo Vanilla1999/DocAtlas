@@ -23,6 +23,7 @@ from docmancer.docs.application.unified_context_service import UnifiedDocsContex
 from docmancer.docs.patch_plan_context import PatchPlanContextService
 from docmancer.docs.domain.policies import is_stale
 from docmancer.docs.domain.project_path_validation import validate_project_path
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 from docmancer.docs.domain.target_security import host_allowed, is_remote_url, path_allowed, url_security_error
 from docmancer.docs.domain.trust_contract import build_project_context_trust_contract
 from docmancer.docs.infrastructure.agent_index_gateway import AgentIndexGateway
@@ -36,23 +37,35 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None):
+    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None, read_only_startup: bool = False):
+        if read_only_startup and (member_storage_policy is None or registry is not None or job_tracker is not None):
+            raise PermissionError("read-only startup requires the selected member store and its own read dependencies")
+        self.read_only_startup = read_only_startup
         self.config_source = config_source or ("provided" if config is not None else "defaults")
         self.config_path = str(Path(config_path).expanduser().resolve()) if config_path else None
         self.config = config or DocmancerConfig()
+        self.member_storage_policy = member_storage_policy
         self._project_service_cache: OrderedDict[tuple[str, str, str], LibraryDocsService] = OrderedDict()
         self._project_service_cache_lock = threading.RLock()
-        self.registry = registry or LibraryRegistry(self.config.index.db_path)
+        self.registry = registry if read_only_startup else registry or LibraryRegistry(self.config.index.db_path)
         self.agent_gateway = AgentIndexGateway(
             self.config,
             default_agent=agent,
             agent_factory=agent_factory,
             library_index_root=library_index_root,
+            member_storage_policy=member_storage_policy,
         )
+        read_dependencies = {}
+        if read_only_startup:
+            # Reuse the owned member reader's current-generation SQL snapshot.
+            # Ancillary lookups must not create/repair a ledger on a first read.
+            read_connection = self.agent_gateway.read_agent_instance().store._connect
+            read_dependencies = {"read_only": True, "read_connection": read_connection}
+            self.registry = LibraryRegistry(self.config.index.db_path, **read_dependencies)
         from docmancer.docs.application.source_continuation import SourceContinuationReader
         from docmancer.docs.infrastructure.project_source_read_gateway import ProjectSourceReadGateway
         self.source_reader = SourceContinuationReader(
-            ProjectSourceReadGateway(lambda: self._agent_instance().store),
+            ProjectSourceReadGateway(lambda: self._read_agent_instance().store),
         )
         self.lock_gateway = FilesystemLockGateway()
         self.project_reader = project_reader or ProjectMetadataReader()
@@ -66,6 +79,7 @@ class LibraryDocsService:
                     max_history=self.config.docs_jobs.max_terminal_jobs,
                     retention_days=self.config.docs_jobs.retention_days,
                     max_events=self.config.docs_jobs.max_events,
+                    **read_dependencies,
                 )
             )
         )
@@ -80,7 +94,7 @@ class LibraryDocsService:
         self.docs_targets = DocsTargetService(self._render_docs_url, self.jobs)
         self.docs_prefetch = DocsPrefetchService(self)
         self.docs_manifest = DocsManifestService(self)
-        self.resumed_docs_job_ids = self.library_docs.resume_interrupted_jobs()
+        self.resumed_docs_job_ids = [] if read_only_startup else self.library_docs.resume_interrupted_jobs()
 
     def _now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -92,7 +106,12 @@ class LibraryDocsService:
         return self.agent_gateway.index_config_for(record)
 
     def _agent_instance(self, record: LibraryRecord | None = None) -> Any:
+        if self.read_only_startup:
+            raise PermissionError("member read facade cannot open a writer; explicit preparation required")
         return self.agent_gateway.agent_instance(record)
+
+    def _read_agent_instance(self) -> Any:
+        return self.agent_gateway.read_agent_instance()
 
     def active_index_diagnostics(self, project_path: str | None = None) -> dict[str, Any]:
         root = validate_project_path(project_path).path if project_path else None
@@ -114,7 +133,7 @@ class LibraryDocsService:
         # configured DB has been proven to exist.
         if db_exists:
             try:
-                agent = self._agent_instance()
+                agent = self._read_agent_instance()
                 stats = agent.store.collection_stats()
                 shared_index_counts = {
                     "sources": int(stats.get("sources_count") or 0),
@@ -172,7 +191,7 @@ class LibraryDocsService:
             }
         else:
             try:
-                agent = agent or self._agent_instance()
+                agent = agent or self._read_agent_instance()
                 dispatcher = self.agent_gateway.dispatcher_for(
                     agent, mode=retrieval_mode
                 )
@@ -319,8 +338,9 @@ class LibraryDocsService:
     def query_project_docs(self, *args: Any, **kwargs: Any):
         return self.project_docs.query_project_docs(*args, **kwargs)
 
+    @_found_window_retention_producer
     def get_project_docs(self, *args: Any, **kwargs: Any):
-        return self.project_docs.get_project_docs(*args, **kwargs)
+        return _invoke_found_window_retention(self.project_docs.get_project_docs, *args, **kwargs)
 
     def _indexed_project_doc_sources(self, *args: Any, **kwargs: Any):
         return self.project_docs._indexed_project_doc_sources(*args, **kwargs)
@@ -343,8 +363,9 @@ class LibraryDocsService:
     def _project_docs_structured_next_action(self, *args: Any, **kwargs: Any):
         return self.project_docs._project_docs_structured_next_action(*args, **kwargs)
 
+    @_found_window_retention_producer
     def get_project_context(self, *args: Any, **kwargs: Any):
-        return self.project_context.get_project_context(*args, **kwargs)
+        return _invoke_found_window_retention(self.project_context.get_project_context, *args, **kwargs)
 
     def get_patch_plan_context(self, *args: Any, **kwargs: Any):
         return self.patch_plan_context.get_patch_plan_context(*args, **kwargs)

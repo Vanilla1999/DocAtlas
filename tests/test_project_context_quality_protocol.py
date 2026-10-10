@@ -70,25 +70,24 @@ def test_contract_labels_and_executes_planning_not_retrieval(lane):
     with patch.object(protocol, "build_documentation_query_plan", wraps=protocol.build_documentation_query_plan) as planner:
         report = protocol.run_contract(lane)
     assert planner.call_count == report["case_count"] * (2 if lane == "legacy" else 1)
-    assert report["evaluation_kind"] == ("alias_and_query_plan_contract" if lane == "legacy" else "query_plan_public_inventory_contract")
+    assert report["evaluation_kind"] == "literal_query_identity_and_lineage_contract"
     assert report["retrieval_executed"] is False
 
 
-def test_fact_alternatives_are_active_document_text():
-    import yaml
+def test_historical_v1_facts_are_not_relabelled_as_current_witnesses():
+    from eval import project_context_quality_v2_protocol as current
 
-    catalog = yaml.safe_load((protocol.ROOT / "docatlas.project-docs.yaml").read_text())
-    inactive = {row["path"] for row in catalog["documents"] if row.get("status") != "active"}
-    alternatives = []
-    for lane in ("natural", "paraphrases"):
-        for case in protocol.load_cases(lane):
-            assert not inactive.intersection(case.get("allowed_paths") or case["sources"])
-            for group in case["required_fact_groups"]:
-                alternatives.append(len(group))
-                for path, text in group:
-                    assert path not in inactive
-                    assert text.casefold() in (protocol.ROOT / path).read_text().casefold(), (path, text)
-    assert max(alternatives) > 1
+    # Loading still verifies the immutable v1 locks. Only V2 is the maintained
+    # document oracle; retired automatic-prune/proof wording is not current truth.
+    legacy_rows = {row["id"]: row for lane in ("natural", "paraphrases")
+                   for row in protocol.load_cases(lane)}
+    for row in current.load_cases():
+        previous = legacy_rows.get(row.get("migrated_from"))
+        if previous is not None:
+            assert row["question"] == previous["question"]
+            assert row["lookup_queries"] == previous["lookup_queries"]
+            assert row["scope"] == previous["scope"]
+    assert current.validate_corpus()["case_count"] == 25
     legacy = next(case for case in protocol.load_cases() if case["id"] == "ru-troubleshoot")
     assert "docs/adr/0002-context-retrieval-vs-answer-proof.md" in legacy["allowed_paths"]
 
@@ -143,8 +142,12 @@ def test_gate_cli_failure_still_fails(monkeypatch):
     ("Health checks the installation.", False),
 ])
 def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet, expected):
+    from contextlib import contextmanager
+    from pathlib import Path
     from types import SimpleNamespace
     from scripts import run_project_docs_self_host_gate as gate
+    from scripts._project_docs_self_host_fixture import SelfHostFixture
+    from docmancer.docs.interfaces.mcp.error_contract import build_mcp_error_payload
 
     arguments = []
     payload = {
@@ -159,15 +162,29 @@ def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet
 
     def preflight(tool, args, service):
         arguments.append(args)
-        return {"recommended_next_action": {"arguments_patch": {"action": "sync_project_docs"}}}
+        return build_mcp_error_payload(
+            reason_code="permission_denied", message="permission_denied: request failed",
+            exception=PermissionError("member_store_uninitialized"),
+            tool="get_docs_context", phase="execution",
+        )
+
+    @contextmanager
+    def fixture_context(origin):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            service = SimpleNamespace(_cold=SimpleNamespace(
+                _service=None, member_storage_policy=SimpleNamespace(
+                    db_path=root / "uninitialized.db", marker=root / "uninitialized.owner",
+                ),
+            ))
+            fixture = SelfHostFixture(root, service, None, {}, {})
+            fixture.prepare = lambda: None
+            yield fixture
 
     monkeypatch.setattr(gate, "_call_with_snapshot", capture)
     monkeypatch.setattr(gate, "call_docs_tool_payload", preflight)
-    monkeypatch.setattr(gate, "LibraryDocsService", lambda **kw: SimpleNamespace(
-        sync_project_docs=lambda *a, **kw: SimpleNamespace(status="success"),
-    ))
-    monkeypatch.setattr(gate, "LibraryRegistry", lambda *a: None)
-    monkeypatch.setattr(gate, "DocmancerAgent", lambda **kw: None)
+    monkeypatch.setattr(gate, "self_host_fixture", fixture_context)
     case = gate.LiveCase(
         question="How can I set up and verify the tool?", scope="all", case_id="stable-compound-id",
         relevant_paths=("preferred.md", "alternative.md"), expected_kind="docs_context",
@@ -188,6 +205,9 @@ def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet
     assert result["checks"]["original_coverage_attribution"] is True
     assert result["observed"]["original_query_covered"] is False
     assert result["top1_fact_bearing"] is True
+    receipt = result["legacy_fact_evidence"]
+    assert receipt["request"] == arguments[1]
+    assert receipt["observer_counts"] is None and receipt["source_bindings"] == {}
 
 
 def test_lock_rejects_corpus_drift(monkeypatch, tmp_path):
@@ -203,3 +223,22 @@ def test_project_context_quality_contract_passes():
 
     assert report["verdict"] == "PASS"
     assert report["passed_count"] == report["case_count"] == 16
+
+
+def test_literal_contract_detects_changed_original_and_inferred_extra_query(monkeypatch):
+    from dataclasses import replace
+    from docmancer.docs.domain.documentation_query_plan import DocumentationLookup
+
+    original = protocol.build_documentation_query_plan
+    for mutation in ("changed_original", "inferred_query"):
+        def corrupted(question, **kwargs):
+            plan = original(question, **kwargs)
+            if mutation == "changed_original":
+                return replace(plan, original_question=question + "!")
+            return replace(plan, queries=(*plan.queries, DocumentationLookup(
+                "query-inferred", "invented expected answer", "canonical_intent", False,
+            )))
+        monkeypatch.setattr(protocol, "build_documentation_query_plan", corrupted)
+        report = protocol.run_contract("legacy")
+        assert report["passed_count"] == 0
+        assert report["verdict"] == "FAIL"

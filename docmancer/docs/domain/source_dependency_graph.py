@@ -9,11 +9,6 @@ from docmancer.core.structured_chunking import parse_markdown_parents, _atom_spa
 from .evidence_set_types import SourceKey, SpanRef, DependencyEdge
 
 _LIST = re.compile(r'^(?P<indent>[ \t]*)(?:[-*+]|\d+[.)])[ \t]+(?P<body>.+)', re.M)
-_SUBJECT = re.compile(r'^(?P<name>`[^`\n]+`|[^\W\d][\w.:-]*)\s+'
-    r'(?P<verb>is|has|handles|processes|selects|takes|chooses|runs|returns|uses|provides|'
-    r'enforces|refers|means|denotes|configures|requires)\b')
-_ANAPHORA = re.compile(r'^(?:It|This(?:\s+(?:rule|setting|behavior|resolver|client|queue|option|method))?)\b')
-_CAUSE = re.compile(r'^This\s+(?:rule|setting|behavior|method)\s+(?:prevents|avoids|ensures|exists\s+because)\b')
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,18 +30,8 @@ def source_span(source: SourceKey, raw: str, start: int, end: int) -> SpanRef:
 
 
 def _single_subject(text: str):
-    value = text.strip()
-    match = _SUBJECT.match(value)
-    if not match or match['name'] in {'It', 'This', 'That', 'There', 'The', 'A', 'An'}:
-        return None
-    if re.search(r'\b(?:and|or|but|whereas)\b', value):
-        return None
-    # Deliberately conservative: two explicit code-style entities make the
-    # antecedent ambiguous. No nearest-name or same-page alias heuristic.
-    names = set(re.findall(r'`([^`\n]+)`|\b([A-Z][a-z]+[A-Z]\w*)\b', value))
-    if len({a or b for a,b in names}) > 1:
-        return None
-    return match['name'], match['verb']
+    """Compatibility adapter: prose ownership is unknown, not independent."""
+    return None
 
 
 def _list_parts(raw: str, source: SourceKey, start: int, end: int):
@@ -60,8 +45,6 @@ def _list_parts(raw: str, source: SourceKey, start: int, end: int):
     top=[m for m in matches if len(m['indent'])==indent]
     children=[]
     for index, item in enumerate(top):
-        if re.fullmatch(r'(?:Examples?|Aliases?):\s*',item['body'],re.I):
-            continue
         stop=top[index+1].start() if index+1<len(top) else len(text)
         children.append(source_span(source,raw,start+item.start(),start+stop))
     return (intro,tuple(children)) if children else None
@@ -94,7 +77,7 @@ def source_graph(raw: str, source: SourceKey) -> DependencyGraph:
     nodes=[];edges=[];lists=[]
     for parent in parse_markdown_parents(raw, source.document_id):
         atoms=_atom_spans(raw,parent.char_start,parent.char_end)
-        local=[];heading=None;previous=None
+        local=[];heading=None
         for atom in atoms:
             ref=source_span(source,raw,atom.start,atom.end)
             if ref.start>=ref.end or atom.atom_type=='whitespace':
@@ -102,7 +85,7 @@ def source_graph(raw: str, source: SourceKey) -> DependencyGraph:
             if atom.atom_type=='heading':
                 first_line=raw.find('\n',atom.start,atom.end)
                 heading=source_span(source,raw,atom.start,first_line if first_line>=0 else atom.end)
-                local.append(('heading',heading));previous=None
+                local.append(('heading',heading))
                 continue
             parts=(_list_parts(raw,source,atom.start,atom.end) if atom.atom_type=='list'
                    else _table_parts(raw,source,atom.start,atom.end) if atom.atom_type=='table' else None)
@@ -112,24 +95,8 @@ def source_graph(raw: str, source: SourceKey) -> DependencyGraph:
                 rule='introduced-list-item-v1' if kind=='list' else 'markdown-table-row-v1'
                 edges.extend(DependencyEdge(kind,intro,child,rule) for child in children)
                 if kind=='list':lists.append((intro,children))
-                previous=None
                 continue
             local.append((atom.atom_type,ref))
-            if atom.atom_type=='prose':
-                if previous:
-                    subject=_single_subject(raw[previous.start:previous.end])
-                    child_text=raw[ref.start:ref.end].strip()
-                    if subject:
-                        name,verb=subject
-                        if verb in {'is','means','denotes','refers'} and re.match(re.escape(name)+r'\s+\w',child_text):
-                            edges.append(DependencyEdge('definition',previous,ref,'named-definition-reference-v1'))
-                        if _ANAPHORA.match(child_text):
-                            edges.append(DependencyEdge('anaphora',previous,ref,'single-subject-anaphora-v1'))
-                        if _CAUSE.match(child_text):
-                            edges.append(DependencyEdge('cause',previous,ref,'single-subject-cause-v1'))
-                previous=ref
-            else:
-                previous=None
         if heading:
             edges.extend(DependencyEdge('heading',heading,ref,'markdown-owning-heading-v1')
                          for kind,ref in local if kind!='heading')

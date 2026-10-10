@@ -13,8 +13,8 @@ from docmancer.docs.application.model_visible_projection import (
 from docmancer.mcp.docs_server import read_docs_resource
 
 
-def test_shared_heading_metadata_does_not_evict_canonical_text(tmp_path):
-    """The actual serializer must remove duplicate labels, not canonical text."""
+def test_shared_heading_metadata_does_not_evict_canonical_text(tmp_path, record_property):
+    """Legacy output hints cannot evict any canonical text or source binding."""
     from unittest.mock import patch
     from docmancer.docs.application import joint_context_selection
     _, _, manifest = load_protocol()
@@ -40,15 +40,21 @@ def test_shared_heading_metadata_does_not_evict_canonical_text(tmp_path):
     draft["sources"].append(public)
     snapshot[public["evidence_id"]] = _snapshot_entry(original, public)
     retrieval = trace["stages"]["projector_inputs"][0]
-    full = _finish(draft, snapshot, retrieval, "", 10000)
+    full = _finish(draft, snapshot, retrieval, "", None)
     assert full is not None
-    limit = docs_context_budget_tokens(full[0]) - 1
-    result = _finish(draft, snapshot, retrieval, "", limit)
+    # The deprecated output hint is compatibility input, not permission to clip.
+    result = _finish(draft, snapshot, retrieval, "", 1)
     assert result is not None
     out, bindings, _ = result
-    assert docs_context_budget_tokens(out) <= limit
-    assert [s["snippet"] for s in out["sources"]] == [s["snippet"] for s in draft["sources"]]
-    assert validate_model_visible_projection(out, snapshot=bindings, max_tokens=limit) == []
+    record_property("output_tokens", docs_context_budget_tokens(out))
+    fields = ("evidence_id", "stable_chunk_id", "parent_logical_id", "path_or_url", "path",
+              "project_identity", "authority", "scope", "section", "snippet", "content_sha256",
+              "display_content_hash", "line_start", "line_end", "char_start", "char_end",
+              "instruction_trust", "version_binding", "resolved_version")
+    identity = lambda row: {key: row[key] for key in fields if key in row}
+    assert [identity(s) for s in out["sources"]] == [identity(s) for s in draft["sources"]]
+    assert [identity(s) for s in out["sources"]] == [identity(s) for s in full[0]["sources"]]
+    assert validate_model_visible_projection(out, snapshot=bindings) == []
 
 
 def test_priority_rule_available_in_first_packet_or_one_registered_read(tmp_path):
@@ -76,6 +82,5 @@ def test_priority_rule_available_in_first_packet_or_one_registered_read(tmp_path
             assert read["snippet"] in "\n".join(raw.splitlines()[read["line_start"]-1:read["line_end"]])
             reads.append(read["snippet"])
         assert any(fact in text for text in first + reads), {"payload": payload, "reads": reads}
-    assert docs_context_budget_tokens(payload) <= 800
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False

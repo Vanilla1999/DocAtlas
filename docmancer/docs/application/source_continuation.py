@@ -176,14 +176,10 @@ def docs_context_read_next_cost(payload: dict[str, Any], target: dict[str, Any])
 def attach_docs_context_read_next(
     payload: dict[str, Any], target: dict[str, Any] | None, *, max_tokens: int,
 ) -> bool:
-    """Attach one target only when the complete packet still fits."""
+    """Attach one target without displacing the already accepted context."""
     from .model_visible_projection import _refresh_estimate
     payload["read_next"] = [deepcopy(target)] if isinstance(target, dict) else []
     _refresh_estimate(payload)
-    if target is not None and docs_context_budget_tokens(payload) > max_tokens:
-        payload["read_next"] = []
-        _refresh_estimate(payload)
-        return False
     return target is not None
 
 

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_compact_docs_surface.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/docs/test_compact_docs_surface.py::test_compact_guidance_keeps_invocation_and_no_authority_constraints": "schema",
+    "tests/docs/test_compact_docs_surface.py::test_config_builds_are_independent_and_keep_full_internal_patch_schema": "schema"
+  },
+  "module_node_hashes": {
+    "tests/docs/test_compact_docs_surface.py": "211ed3158d9d7436b37207ee6750b92aa2c831259ebbfecfb51c8891a2bc451c"
+  }
+}

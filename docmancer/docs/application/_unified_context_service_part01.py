@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from ._unified_context_service_shared import *  # noqa: F401,F403
+from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
 
 
 _MODULE_RECOVERY_REASON_CODES = frozenset({
@@ -55,6 +56,7 @@ class _UnifiedDocsContextServicePart01:
     def __init__(self, service: Any):
         self.service = service
 
+    @_found_window_retention_producer
     def get_docs_context(
         self,
         question: str,
@@ -82,9 +84,11 @@ class _UnifiedDocsContextServicePart01:
         response_style: str | None = None,
         mutation_intent: MutationIntentContract | None = None,
         lookup_queries: tuple[str, ...] = (),
+        retain_found_windows: bool = False,
+        _retention_ack: Any = None,
     ) -> UnifiedDocsContextResult:
         response_style = validate_response_style(response_style)
-        mutation_intent = mutation_intent or build_mutation_intent(question)
+        mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
         mode_requested = (mode or "auto").lower()
         prepare_project_docs = True if prepare_project_docs is None else bool(prepare_project_docs)
         allow_network = bool(allow_network) if allow_network is not None else False
@@ -164,6 +168,7 @@ class _UnifiedDocsContextServicePart01:
                     )
 
         project_result = None
+        retention_kwargs = {"retain_found_windows": True, "_retention_ack": _retention_ack} if retain_found_windows else {}
         library_results: list[DocsResult] = []
 
         project_auto = mode_requested == "auto" and bool(project_path) and not libs
@@ -171,7 +176,7 @@ class _UnifiedDocsContextServicePart01:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}
@@ -187,13 +192,13 @@ class _UnifiedDocsContextServicePart01:
                     lanes=lanes,
                     lane_details=lane_details if details else {},
                 )
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode="deps-only", response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
         elif mode_selected == "mixed":
             # Explicit libraries are handled by the version-bound library lane
             # below. Do not also auto-route the project lane into dependency
             # preparation: that can block an already cached exact snapshot.
             project_mode = "project-only" if libs else "auto"
-            project_result = self.service.get_project_context(project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode=project_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, library=library, libraries=libraries, ecosystem=ecosystem, version=version, module=module, module_path=module_path, scope=scope, mode=project_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
             routing["dependency_detected"] = bool(getattr(project_result, "dependency_docs", None))
             explicit_library_results = []
             for lib in libs:
@@ -229,8 +234,17 @@ class _UnifiedDocsContextServicePart01:
                 library_results.append(result)
             lane_details["library"] = [self._to_dict(item) for item in library_results]
 
+        answer_completeness = {}
         if project_result:
+            # Retrieval completeness/typed target readiness is evidence data,
+            # not current host authorization. Do not propagate an upstream
+            # edit grant, even when the SDK caller supplies a mutation DTO.
+            answer_completeness = {
+                **dict(getattr(project_result, "answer_completeness", None) or {}),
+                "edit_ready": False,
+            }
             lane_details["project"] = self._to_dict(project_result)
+            lane_details["project"]["answer_completeness"] = dict(answer_completeness)
             project_items = self._normalize_project_context(project_result)
             if project_auto:
                 mode_selected = self._infer_project_auto_mode(project_result, project_items)
@@ -277,23 +291,9 @@ class _UnifiedDocsContextServicePart01:
 
         context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
         lane_priority = self._lane_priority_for(mode_selected)
-        context_pack, snippet_fallback = self._augment_snippet_first_context(
-            context_pack,
-            question=question,
-            response_style=response_style,
-            lane_priority=lane_priority,
-            library_results=library_results,
-            libs=libs,
-            tokens=tokens,
-            ecosystem=ecosystem,
-            version=version,
-            docs_url=docs_url,
-            source_type=source_type,
-            project_path=project_path,
-        )
-        if snippet_fallback:
-            context_pack, contamination, deduplication = self._dedupe_and_guard(context_pack, libs, project_path)
-            routing["snippet_first_fallback"] = snippet_fallback
+        # Presentation cannot spend another request on generated topic hints.
+        # The original project/library retrieval already owns the read budget.
+        snippet_fallback = None
         context_pack, content_trust_warnings = annotate_context_pack(context_pack, repository_root=project_path)
         warnings.extend(content_trust_warnings)
         self._refresh_lane_counts(lanes, context_pack)
@@ -448,9 +448,23 @@ class _UnifiedDocsContextServicePart01:
             project_result is None or project_result.answer_available
         )
         answer_available = answer_supported and project_delivery_available
+        project_read_allowed = bool(
+            project_result is None or (
+                getattr(project_result, "delivery_decision", None) is not None
+                and project_result.delivery_decision.deliverable
+            )
+        )
+        read_context_eligible = bool(
+            context_available and project_read_allowed
+            and not any(getattr(result, "requires_confirmation", False)
+                        or getattr(result, "status", "") not in {"success", "partial_success"}
+                        for result in pending_lane_results)
+            and not any(result.stale_before_refresh for result in library_results)
+            and all(result.status in {"success", "partial_success"} for result in library_results)
+        )
         delivery_decision = DeliveryDecision(
-            deliverable=answer_available,
-            reason_code=None if answer_available else str(
+            deliverable=bool(answer_available or read_context_eligible),
+            reason_code=None if answer_available or read_context_eligible else str(
                 support_payload.get("reason_code") or "operational_delivery_blocked"
             ),
         )
@@ -462,7 +476,8 @@ class _UnifiedDocsContextServicePart01:
         status = self._aggregate_status(requested_lanes, successful_lanes, pending_confirmation_lanes, failed_lanes)
         reason = support_payload["reason_code"]
         combined_next_actions = [*next_actions, *pending_actions.get("next_actions", [])]
-        patch_constraints_action = self._patch_constraints_next_action(question, project_path, mode_selected, mode_requested)
+        patch_constraints_action = self._patch_constraints_next_action(
+            question, project_path, mode_selected, mode_requested, mutation_intent=mutation_intent)
         if patch_constraints_action:
             routing["next_action_reason"] = patch_constraints_action["reason"]
             if patch_constraints_action not in combined_next_actions:
@@ -490,6 +505,27 @@ class _UnifiedDocsContextServicePart01:
                     retrieval_lane_diag = getattr(project_result, "retrieval_diagnostics", None) or {}
                     if retrieval_lane_diag:
                         retrieval_diagnostics.setdefault(lane_name, retrieval_lane_diag)
+
+        project_context_contract: dict[str, Any] = {}
+        if project_result and library_results:
+            project_lane = lane_details["project"]
+            project_docs_lane = project_lane.get("project_docs")
+            project_selection = project_lane.get("selection_decision")
+            project_context_contract = {
+                **{key: project_lane.get(key) for key in (
+                    "question", "project_path", "status", "requires_confirmation",
+                    "delivery_decision", "requirements",
+                )},
+                "request_project_path": project_path,
+                "read_scope": (project_docs_lane.get("request_scope")
+                               if isinstance(project_docs_lane, dict) else None),
+                "project_docs_status": (project_docs_lane.get("status")
+                                        if isinstance(project_docs_lane, dict) else None),
+                "project_docs_requires_confirmation": (project_docs_lane.get("requires_confirmation")
+                                                       if isinstance(project_docs_lane, dict) else None),
+                "unresolved_conflicts": (project_selection.get("unresolved_conflicts")
+                                         if isinstance(project_selection, dict) else None),
+            }
 
         payload = UnifiedDocsContextResult(
             status=status,
@@ -519,15 +555,13 @@ class _UnifiedDocsContextServicePart01:
             support_decision=support_decision,
             delivery_decision=delivery_decision,
             answer_type=getattr(project_result, "answer_type", None) if project_result else None,
-            answer_completeness=dict(getattr(project_result, "answer_completeness", None) or {}) if project_result else {},
+            answer_completeness=answer_completeness,
             disposition=(
                 (getattr(project_result, "answer_completeness", None) or {}).get("disposition")
                 if project_result else None
             ),
-            edit_ready=bool(
-                (getattr(project_result, "answer_completeness", None) or {}).get("edit_ready")
-                if project_result else answer_supported
-            ),
+            # This context-only SDK surface accepts no authorization input.
+            edit_ready=False,
             source_search_status=str(
                 (getattr(project_result, "answer_completeness", None) or {}).get(
                     "source_search_status", "not_required"
@@ -537,6 +571,7 @@ class _UnifiedDocsContextServicePart01:
                 getattr(project_result, "documentation_query_plan", None) or {}
             ) if project_result else {},
             context_pack=context_pack,
+            project_context_contract=project_context_contract,
             lanes=lanes,
             source_summary=source_summary,
             trust_contract=trust_contract,
@@ -651,16 +686,15 @@ class _UnifiedDocsContextServicePart01:
         return "invalid_request", "docs_context_target_missing"
 
     @staticmethod
-    def _patch_constraints_next_action(question: str, project_path: str | None, mode_selected: str, mode_requested: str) -> dict[str, Any] | None:
+    def _patch_constraints_next_action(question: str, project_path: str | None, mode_selected: str, mode_requested: str, *, mutation_intent: MutationIntentContract | None = None) -> dict[str, Any] | None:
         if not project_path or mode_requested == "library" or mode_selected == "library":
             return None
-        tokens = _PATCH_TASK_TOKEN_RE.findall(question.lower())
-        if not any(token in _PATCH_TASK_TERMS for token in tokens) and not _looks_like_imperative_patch_task(tokens):
+        if mutation_intent is None or mutation_intent.operation == "none":
             return None
         return {
             "type": "get_patch_constraints",
             "tool": "get_patch_constraints",
-            "reason": "patch_like_project_task",
+            "reason": "explicit_mutation_contract",
             "arguments_patch": {"project_path": project_path, "task": question},
         }
 

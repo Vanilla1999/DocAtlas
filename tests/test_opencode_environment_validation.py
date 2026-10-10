@@ -10,13 +10,13 @@ from docmancer.mcp import agent_config
 def test_register_refuses_falsey_non_object_opencode_environment(tmp_path, environment):
     cfg = tmp_path / "opencode.json"
     original = {
-        "mcp": {
+        "mcp": {"servers": {
             "docatlas": {
                 "type": "local",
                 "command": ["doc-atlas", "mcp", "docs-serve"],
                 "environment": environment,
             }
-        }
+        }}
     }
     cfg.write_text(json.dumps(original))
     target = agent_config.AgentTarget("opencode", cfg, "json_opencode_mcp")

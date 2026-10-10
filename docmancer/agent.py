@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+from docmancer._agent_parser_loading import _import_class
 import json
 import logging
 import os
@@ -42,12 +42,6 @@ SOURCE_DERIVED_METADATA_KEYS = {
     "lang",
     "format",
 }
-
-
-def _import_class(dotted_path: str) -> type:
-    module_path, class_name = dotted_path.rsplit(":", 1)
-    module = importlib.import_module(module_path)
-    return getattr(module, class_name)
 
 
 class DocmancerAgent:
@@ -753,9 +747,11 @@ class DocmancerAgent:
         deadline_at: float | None = None,
         source_manifest: dict[str, Any] | None = None,
         query: str | None = None,
+        exact_urls: list[str] | None = None,
+        robots_urls: list[str] | None = None,
     ):
         if fetcher is not None:
-            return fetcher
+            raise ValueError("injected_fetcher_finite_contract_unavailable")
         from docmancer.connectors.fetchers.factory import build_fetcher
 
         if provider is None and url:
@@ -787,6 +783,8 @@ class DocmancerAgent:
             deadline_at=deadline_at,
             source_manifest=source_manifest,
             query=query,
+            exact_urls=exact_urls if exact_urls is not None else ([url, *(seed_urls or [])] if url else []),
+            robots_urls=robots_urls,
         )
 
     def _auto_detect_provider(self, url: str) -> str:
@@ -813,6 +811,8 @@ class DocmancerAgent:
         with_vectors: bool = True,
         source_manifest: dict[str, Any] | None = None,
         query: str | None = None,
+        exact_urls: list[str] | None = None,
+        robots_urls: list[str] | None = None,
     ) -> int:
         f = self._get_fetcher(
             provider,
@@ -830,6 +830,8 @@ class DocmancerAgent:
             deadline_at=deadline_at,
             source_manifest=source_manifest,
             query=query,
+            exact_urls=exact_urls,
+            robots_urls=robots_urls,
         )
         documents = f.fetch(url)
         self.last_fetch_failure = getattr(f, "last_fetch_failure", None)
@@ -905,6 +907,9 @@ class DocmancerAgent:
         allowed_domains: list[str] | None = None,
         path_prefixes: list[str] | None = None,
         progress_callback: Callable[[dict[str, Any]], None] | None = None,
+        exact_urls: list[str] | None = None,
+        robots_urls: list[str] | None = None,
+        source_manifest: dict[str, Any] | None = None,
     ) -> list[Document]:
         f = self._get_fetcher(
             provider,
@@ -918,6 +923,9 @@ class DocmancerAgent:
             allowed_domains=allowed_domains,
             path_prefixes=path_prefixes,
             progress_callback=progress_callback,
+            exact_urls=exact_urls,
+            robots_urls=robots_urls,
+            source_manifest=source_manifest,
         )
         return f.fetch(url)
 

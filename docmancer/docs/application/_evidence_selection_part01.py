@@ -73,24 +73,178 @@ def validate_assignment_binding(
     requirement: EvidenceRequirement,
     candidate: EvidenceCandidate,
     assignment: EvidenceAssignment,
+    *,
+    requirements: Sequence[EvidenceRequirement] = (),
 ) -> bool:
+    from ._evidence_selection_part02 import _legacy_requirement_matches_unit
+
+    if (
+        assignment.requirement_id != requirement.requirement_id
+        or assignment.evidence_id != candidate.stable_id
+        or assignment.path != candidate.path_or_url
+        or assignment.proof_role != requirement.proof_role
+        or requirement.qualifiers
+        or not _candidate_window_valid(candidate)
+        or not _candidate_lifecycle_valid(requirement, candidate)
+        or not _proof_role_admitted(requirement, candidate, requirements)
+    ):
+        return False
     unit = resolve_assignment_unit(candidate, assignment)
     if unit is None:
-        return requirement.kind != "proof_obligation" and assignment.unit_id is None
+        return (
+            assignment.unit_id is None
+            and _technical_requirement_matches(requirement, candidate)
+            and assignment.char_start == candidate.char_start
+            and assignment.char_end == candidate.char_end
+            and assignment.line_start == candidate.line_start
+            and assignment.line_end == (
+                candidate.line_start + candidate.display_text.count("\n")
+                if not candidate.answer_units_representation_bounded and candidate.line_start is not None
+                else candidate.line_start
+            )
+            and assignment.projected_content_hash == hashlib.sha256(candidate.projected_text.encode("utf-8")).hexdigest()
+            and all(value is None for value in (
+                assignment.unit_kind, assignment.unit_char_start,
+                assignment.unit_char_end, assignment.unit_content_hash,
+            ))
+        )
+    if not _unit_matches_display(candidate, unit):
+        return False
+    absolute_start = (candidate.char_start or 0) + unit.char_start
+    absolute_end = (candidate.char_start or 0) + unit.char_end
+    line = (candidate.line_start or 0) + candidate.display_text[:unit.char_start].count("\n")
     if (
         assignment.unit_kind != unit.kind
         or assignment.unit_char_start != unit.char_start
         or assignment.unit_char_end != unit.char_end
         or assignment.unit_content_hash != unit.content_sha256
         or assignment.projected_content_hash != unit.content_sha256
+        or assignment.char_start != absolute_start
+        or assignment.char_end != absolute_end
+        or assignment.line_start != line
+        or assignment.line_end != (
+            line + unit.text.count("\n") if not candidate.answer_units_representation_bounded else line
+        )
     ):
         return False
     obligation = requirement.as_proof_obligation()
-    return obligation is None or local_proof_for_obligation(
+    if obligation is None:
+        return _legacy_requirement_matches_unit(requirement, unit, candidate)
+    return local_proof_for_obligation(
         obligation,
         unit,
         source=_candidate_source_view(candidate),
+        representation_bounded=candidate.answer_units_representation_bounded,
     ).valid
+
+
+def _candidate_window_valid(candidate: EvidenceCandidate) -> bool:
+    """Bind local units to the normalized display, not authenticate a parent source."""
+    from .evidence_candidates import _span, authority, source_path, version_binding, resolved_version
+    from docmancer.docs.domain.answer_units import MAX_ANSWER_UNITS
+
+    digest = hashlib.sha256(candidate.display_text.encode("utf-8")).hexdigest()
+    supplied = candidate.original.get("display_content_hash")
+    metadata = candidate.original.get("metadata")
+    metadata = metadata if isinstance(metadata, Mapping) else {}
+    stable = (
+        candidate.original.get("stable_chunk_id") or candidate.original.get("stable_child_id")
+        or metadata.get("stable_chunk_id") or candidate.original.get("stable_id")
+    )
+    return (
+        digest == candidate.content_sha256
+        and (not candidate.answer_units_representation_bounded or len(candidate.answer_units) <= MAX_ANSWER_UNITS)
+        and _display_text(candidate.original) == candidate.display_text
+        and source_path(candidate.original) == candidate.path_or_url
+        and authority(candidate.original) == candidate.authority
+        and (not stable or str(stable) == candidate.stable_id)
+        and str(candidate.original.get("parent_logical_id") or metadata.get("parent_logical_id") or "") == candidate.parent_logical_id
+        and str(candidate.original.get("project_identity") or "") == candidate.project_identity
+        and str(candidate.original.get("module_id") or "") == candidate.module_id
+        and version_binding(candidate.original) == candidate.version_binding
+        and resolved_version(candidate.original) == candidate.resolved_version
+        and (candidate.original.get("docs_snapshot_exact") if isinstance(candidate.original.get("docs_snapshot_exact"), bool) else None) == candidate.docs_snapshot_exact
+        and _span(candidate.original, "char") == (candidate.char_start, candidate.char_end)
+        and (
+            candidate.answer_units_representation_bounded
+            or candidate.char_start is None
+            or candidate.char_end - candidate.char_start == len(candidate.display_text)
+        )
+        and _span(candidate.original, "line") == (candidate.line_start, candidate.line_end)
+        and (not supplied or str(supplied).casefold() == digest)
+        and not candidate.original.get("stale")
+        and candidate.freshness == "current"
+        and str(candidate.original.get("freshness") or "current") == candidate.freshness
+        and str(candidate.original.get("index_freshness") or "synchronized") == "synchronized"
+    )
+
+
+def _candidate_lifecycle_valid(requirement: EvidenceRequirement, candidate: EvidenceCandidate) -> bool:
+    lifecycle = str(_candidate_source_view(candidate).get("project_doc_lifecycle_status") or "active").casefold()
+    current = lifecycle in {"active", "current", ""}
+    historical = lifecycle in {"completed", "historical", "closed", "superseded", "deprecated"}
+    return requirement.lifecycle_intent == "either" or (
+        current if requirement.lifecycle_intent == "current" else historical
+    )
+
+
+def _proof_role_admitted(
+    requirement: EvidenceRequirement,
+    candidate: EvidenceCandidate,
+    requirements: Sequence[EvidenceRequirement],
+) -> bool:
+    """Shared canonical role admission; a role label is never a proof grant."""
+    if requirement.proof_role == "project_rule":
+        return False
+    if requirement.proof_role == "implementation_fact":
+        return candidate.source_class in {"source_snippet", "test", "project_file"}
+    if requirement.proof_role == "dependency_fact":
+        return candidate.source_class not in {
+            "repo_map", "code_graph", "absent_in_source", "project_file", "source_snippet", "test",
+        } and _version_rank(candidate.version_binding) == 0
+    if requirement.proof_role == "document_statement":
+        scoped_paths = {
+            _normalized_source(item.value) for item in requirements if item.kind == "evidence_path"
+        }
+        return bool(scoped_paths) and _normalized_source(candidate.path_or_url) in scoped_paths
+    return True
+
+
+def _unit_matches_display(candidate: EvidenceCandidate, unit: AnswerUnit) -> bool:
+    if not _candidate_window_valid(candidate) or unit.source_field is not None:
+        return False
+    if unit.char_start is None or unit.char_end is None:
+        return False
+    # Re-extraction rejects forged kinds/IDs/windows; proposition is not authority.
+    return any(
+        (fresh.unit_id, fresh.kind, fresh.text, fresh.char_start, fresh.char_end, fresh.content_sha256)
+        == (unit.unit_id, unit.kind, unit.text, unit.char_start, unit.char_end, unit.content_sha256)
+        for fresh in extract_answer_units(
+            candidate.display_text, include_soft_wrapped_prose=True,
+            representation_bounded=candidate.answer_units_representation_bounded,
+        )
+    )
+
+
+def _technical_requirement_matches(requirement: EvidenceRequirement, candidate: EvidenceCandidate) -> bool:
+    """Only explicit non-content scope bindings may have unit-less assignments."""
+    if not _candidate_window_valid(candidate) or not _candidate_lifecycle_valid(requirement, candidate):
+        return False
+    if requirement.qualifiers:
+        return False
+    kind, value = requirement.kind, requirement.value
+    if kind in {"evidence_path", "target_path"}:
+        source, wanted = _normalized_source(candidate.path_or_url), _normalized_source(value)
+        return bool(wanted) and (source == wanted or source.endswith("/" + wanted))
+    if kind == "project_identity":
+        return bool(value) and candidate.project_identity == value
+    if kind == "module_id":
+        return bool(value) and candidate.module_id == value
+    if kind == "exact_version":
+        return bool(value) and candidate.resolved_version == value and _version_rank(candidate.version_binding) == 0
+    if kind == "exact_snapshot":
+        return value == "true" and candidate.docs_snapshot_exact is True
+    return False
 
 
 @dataclass(frozen=True, slots=True)
@@ -223,24 +377,12 @@ def aggregate_mixed_selection(
     })
     selected_documents = {_normalized_source(item.source_identity) for item in candidates}
     selected_tokens = sum(item.token_estimate for item in candidates)
-    bounded_materialization_failed = (
-        len(selected_documents) > MAX_VISIBLE_DOCUMENTS
-        or len(candidates) > MAX_VISIBLE_SPANS
-        or selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS > MAX_MIXED_VISIBLE_TOKENS
-    )
-    if bounded_materialization_failed:
-        missing_ids = tuple(sorted({*missing_ids, "bounded_evidence_not_materializable"}))
-        missing.append("bounded_evidence_not_materializable")
-    supported = (
-        not bounded_materialization_failed
-        and all(lane.decision.support_decision.answer_supported for lane in lanes)
-    )
+    supported = all(lane.decision.support_decision.answer_supported for lane in lanes)
     base = {
         "answer_supported": supported,
         "support_status": "supported" if supported else "insufficient_evidence",
         "reason_code": (
             None if supported else
-            "bounded_evidence_not_materializable" if bounded_materialization_failed else
             "mixed_support_incomplete"
         ),
         "missing_requirement_ids": missing_ids,
@@ -276,9 +418,9 @@ def aggregate_mixed_selection(
             "selected_spans": len(candidates),
             "selected_tokens": selected_tokens,
             "projected_total_tokens": selected_tokens + MIXED_WRAPPER_RESERVE_TOKENS,
-            "max_documents": MAX_VISIBLE_DOCUMENTS,
-            "max_spans": MAX_VISIBLE_SPANS,
-            "hard_tokens": MAX_MIXED_VISIBLE_TOKENS,
+            "max_documents": None,
+            "max_spans": None,
+            "hard_tokens": None,
         },
         selector_config_hash=support.selector_config_hash,
         eligibility_contract_hash=support.eligibility_contract_hash,
@@ -294,12 +436,8 @@ def aggregate_mixed_selection(
 
 
 def docs_selection_config(max_tokens: int) -> SelectionConfig:
-    hard = min(800, max(256, int(max_tokens)))
     return SelectionConfig(
-        result_kind="docs_answer", target_tokens=min(650, hard), hard_tokens=hard,
-        max_sources=3, max_items_per_source=2,
-        max_documents=MAX_VISIBLE_DOCUMENTS, max_spans=MAX_VISIBLE_SPANS,
-        wrapper_reserve_tokens=120,
+        result_kind="docs_answer", target_tokens=None, hard_tokens=None,
         marginal_utility_threshold=100,
     )
 
@@ -312,12 +450,12 @@ def project_docs_selection_config(max_tokens: int) -> SelectionConfig:
     return replace(docs_selection_config(max_tokens), profile="project_docs_answer")
 
 
-def patch_selection_config(max_tokens: int) -> SelectionConfig:
-    hard = min(2000, max(256, int(max_tokens)))
+def patch_selection_config() -> SelectionConfig:
     return SelectionConfig(
-        result_kind="patch_context", target_tokens=min(1200, hard), hard_tokens=hard,
-        max_sources=12, max_items_per_source=3, wrapper_reserve_tokens=min(300, hard // 3),
-        marginal_utility_threshold=160,
+        result_kind="patch_context", target_tokens=None, hard_tokens=None,
+        max_candidates=None, max_sources=None, max_items_per_source=None,
+        max_documents=None, max_spans=None, wrapper_reserve_tokens=None,
+        marginal_utility_threshold=None,
     )
 
 
@@ -331,34 +469,18 @@ def _eligible_candidates(
     result_kind: str,
     question: str,
 ) -> tuple[list[EvidenceCandidate], list[Omission], set[str]]:
-    forbidden = _trust_source_keys(trust_contract, "rejected") | _trust_source_keys(trust_contract, "risky")
     exact_versions = {item.value for item in requirements if item.kind == "exact_version" and item.mandatory}
-    canonical_policy_required = any(
-        item.kind == "canonical_policy" and item.mandatory for item in requirements
-    )
-    legal_intent = bool(
-        set(_TOKEN_RE.findall(question.casefold())).intersection(_LEGAL_INTENT_TERMS)
-    )
     query_identifiers = _query_identifier_values(requirements)
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
     critical: set[str] = set()
+    blocked_sources = _rejected_patch_source_keys(trust_contract) if result_kind == "patch_context" else set()
     for candidate in candidates:
         reason: OmissionReason | None = None
-        if set(candidate.identity_aliases) & forbidden:
+        if blocked_sources.intersection(candidate.identity_aliases):
             reason = "forbidden_source"
         elif candidate.freshness.casefold() == "stale":
             reason = "stale"
-            if candidate.authority == "canonical":
-                critical.add("stale_canonical_evidence")
-        elif candidate.instruction_risk_flags:
-            reason = "instruction_risk"
-            if candidate.authority == "canonical":
-                critical.add("risky_canonical_evidence")
-        elif canonical_policy_required and candidate.source_class.casefold() in {
-            "generated", "changelog", "research", "community", "mirror",
-        }:
-            reason = "outside_scope"
         elif project_identity and candidate.project_identity != project_identity:
             reason = "outside_scope"
         elif module_id and candidate.module_id != module_id:
@@ -369,11 +491,6 @@ def _eligible_candidates(
             reason = "wrong_version"
         elif result_kind == "docs_answer" and candidate.navigation_only:
             reason = "navigation_only"
-        elif (
-            candidate.source_class.casefold() == "legal"
-            and not legal_intent
-        ):
-            reason = "query_intent_mismatch"
         elif _query_identifier_conflict(candidate, query_identifiers):
             reason = "query_identifier_conflict"
         if reason:
@@ -381,6 +498,31 @@ def _eligible_candidates(
         else:
             eligible.append(candidate)
     return eligible, omissions, critical
+
+
+def _rejected_patch_source_keys(trust_contract: Mapping[str, Any]) -> set[str]:
+    """Match explicit source identities only, independently of legacy rendering."""
+    sources = trust_contract.get("sources")
+    rejected = sources.get("rejected") if isinstance(sources, Mapping) else None
+    rows = [rejected] if isinstance(rejected, (str, Mapping)) else rejected if isinstance(rejected, (list, tuple)) else ()
+    keys: set[str] = set()
+    for row in rows:
+        if isinstance(row, str):
+            values = [row]
+        elif isinstance(row, Mapping):
+            values = [row.get(name) for name in (
+                "source_identity", "source", "path", "url", "source_url", "canonical_id", "library_id", "library",
+            )]
+            aliases = row.get("identity_aliases")
+            values.extend(aliases if isinstance(aliases, (list, tuple)) else [aliases])
+        else:
+            continue
+        for value in values:
+            if isinstance(value, Mapping):
+                value = _source_path(value)
+            if isinstance(value, str) and (key := _normalized_source(value)):
+                keys.add(key)
+    return keys
 
 
 def _query_identifier_conflict(
@@ -429,33 +571,13 @@ def _query_identifier_values(
     )
 
 
-def _trust_source_keys(contract: Mapping[str, Any], field: str) -> set[str]:
-    sources = contract.get("sources") if isinstance(contract.get("sources"), Mapping) else {}
-    aliases = [field, f"{field}_sources"]
-    values: list[Any] = []
-    for key in aliases:
-        for raw in (contract.get(key), sources.get(key)):
-            values.extend(raw if isinstance(raw, list) else [raw] if raw else [])
-    return {
-        _normalized_source(
-            value.get("source") or value.get("path") or value.get("url")
-            or value.get("canonical_id") or value.get("library_id") or ""
-            if isinstance(value, Mapping) else value
-        )
-        for value in values
-        if _normalized_source(
-            value.get("source") or value.get("path") or value.get("url")
-            or value.get("canonical_id") or value.get("library_id") or ""
-            if isinstance(value, Mapping) else value
-        )
-    }
-
-
 def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
     metadata = candidate.original.get("metadata")
     metadata = metadata if isinstance(metadata, Mapping) else {}
     view = dict(metadata)
     view.update({
+        "content": candidate.display_text,
+        "text": candidate.display_text,
         "path": candidate.path_or_url,
         "source": candidate.path_or_url,
         "title": candidate.section,
@@ -480,13 +602,12 @@ def _candidate_source_view(candidate: EvidenceCandidate) -> dict[str, Any]:
     return view
 
 
-def _candidate_preference(candidate: EvidenceCandidate) -> tuple[Any, ...]:
+def _candidate_preference(candidate: EvidenceCandidate, *, length_dependent: bool = True) -> tuple[Any, ...]:
     return (
-        0 if candidate.authority == "canonical" else 1,
         _version_rank(candidate.version_binding),
         0 if candidate.docs_snapshot_exact is True else 1,
         -len(candidate.covered_requirement_ids),
-        candidate.token_estimate,
+        *((candidate.token_estimate,) if length_dependent else ()),
         -candidate.relevance_millis,
         candidate.retrieval_rank,
         candidate.stable_id,
@@ -522,6 +643,8 @@ def _assignment_preference(
     requirement: EvidenceRequirement,
     candidate: EvidenceCandidate,
     witness: RequirementWitness | None,
+    *,
+    length_dependent: bool = True,
 ) -> tuple[Any, ...]:
     target_identity_rank = 0
     if requirement.proof_role == "target_identity":
@@ -535,11 +658,10 @@ def _assignment_preference(
         0 if witness is not None else 1,
         -(witness.completeness_score if witness else 0),
         target_identity_rank,
-        0 if candidate.authority == "canonical" else 1,
         _lifecycle_assignment_rank(requirement, candidate),
         _version_rank(candidate.version_binding),
         -candidate.relevance_millis,
-        len(witness.unit_text) if witness else candidate.token_estimate * 4,
+        *((len(witness.unit_text) if witness else candidate.token_estimate * 4,) if length_dependent else ()),
         candidate.retrieval_rank,
         candidate.stable_id,
     )
@@ -602,7 +724,6 @@ def _repair_mandatory_selection(
             ),)
         return (
             *proof_quality,
-            sum(item.authority != "canonical" for item in rows),
             sum(_version_rank(item.version_binding) for item in rows),
             sum(item.token_estimate for item in rows),
             len(rows),
@@ -637,7 +758,6 @@ def _marginal_utility(candidate: EvidenceCandidate, selected_terms: set[str], ma
     return (
         len(candidate.covered_requirement_ids & mandatory) * 1000
         + len(candidate.covered_requirement_ids) * 180
-        + (220 if candidate.authority == "canonical" else 40)
         + (120 if _version_rank(candidate.version_binding) == 0 else 20)
         + (80 if candidate.docs_snapshot_exact is True else 0)
         + (80 if candidate.projected_text.strip() else 0)
@@ -671,4 +791,4 @@ def _count_reasons(omissions: Sequence[Omission]) -> dict[str, int]:
         counts[omission.reason_code] = counts.get(omission.reason_code, 0) + 1
     return dict(sorted(counts.items()))
 
-__all__=['SelectionDecision', 'resolve_assignment_unit', 'validate_assignment_binding', 'MixedSelectionLane', 'AggregateMixedSelectionDecision', 'aggregate_mixed_selection', 'docs_selection_config', 'library_docs_selection_config', 'project_docs_selection_config', 'patch_selection_config', '_eligible_candidates', '_query_identifier_conflict', '_query_identifier_values', '_trust_source_keys', '_candidate_source_view', '_candidate_preference', '_candidate_requirement_witness', '_lifecycle_assignment_rank', '_assignment_preference', '_selected_identity', '_shingles', '_jaccard_millis', '_repair_mandatory_selection', '_selection_terms', '_marginal_utility', '_redundant_token_ratio_millis', '_count_reasons']
+__all__=['SelectionDecision', 'resolve_assignment_unit', 'validate_assignment_binding', 'MixedSelectionLane', 'AggregateMixedSelectionDecision', 'aggregate_mixed_selection', 'docs_selection_config', 'library_docs_selection_config', 'project_docs_selection_config', 'patch_selection_config', '_eligible_candidates', '_query_identifier_conflict', '_query_identifier_values', '_candidate_source_view', '_candidate_preference', '_candidate_requirement_witness', '_lifecycle_assignment_rank', '_assignment_preference', '_selected_identity', '_shingles', '_jaccard_millis', '_repair_mandatory_selection', '_selection_terms', '_marginal_utility', '_redundant_token_ratio_millis', '_count_reasons']

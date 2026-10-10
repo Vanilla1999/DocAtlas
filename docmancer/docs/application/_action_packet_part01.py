@@ -7,7 +7,7 @@ from docmancer.docs.project_docs_catalog import read_project_docs_catalog
 def estimate_action_packet_tokens(value: Any) -> int:
     """Estimate tokens deterministically as ceil(serialized UTF-8 bytes / 4)."""
 
-    encoded = json.dumps(value, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    encoded = serialize_action_packet(value).encode("utf-8")
     return max(1, math.ceil(len(encoded) / 4))
 
 
@@ -152,7 +152,8 @@ def _effective_authority(
     }:
         return "supporting"
     if item.get("repository_authority") == "explicit_agent_policy":
-        return "canonical" if _scope_applies(item, project_path=project_path, target_paths=target_paths) else "supporting"
+        # A raw metadata claim (including a scoped filename) is not a grant.
+        return "supporting"
     if str(item.get("source_class") or "").casefold() == "project_doc" and project_path:
         root = Path(project_path).expanduser()
         if root.is_dir():
@@ -238,28 +239,6 @@ def _is_within(path: str, scope: str) -> bool:
         return os.path.commonpath([path, scope]) == scope
     except ValueError:
         return False
-
-
-def _instruction_risk_flags(item: dict[str, Any]) -> list[str]:
-    values: list[Any] = []
-    for raw in (item.get("instruction_risk_flags"), item.get("risk_flags")):
-        if isinstance(raw, (list, tuple, set)):
-            values.extend(raw)
-        elif raw:
-            values.append(raw)
-    return [
-        str(value)
-        for value in values
-        if value
-    ]
-
-
-def _content_instruction_risk_flags(text: str) -> list[str]:
-    return [
-        reason
-        for reason, pattern in _DANGEROUS_CONTENT_PATTERNS
-        if pattern.search(str(text or ""))
-    ]
 
 
 def _source_scope(item: dict[str, Any]) -> str:
@@ -351,11 +330,7 @@ def _rank_and_dedupe(items: Iterable[dict[str, Any]], trust_contract: dict[str, 
 
 
 def _blocked_source_keys(trust_contract: dict[str, Any]) -> set[str]:
-    return _risky_source_keys(trust_contract) | _rejected_source_keys(trust_contract)
-
-
-def _risky_source_keys(trust_contract: dict[str, Any]) -> set[str]:
-    return _trust_source_keys(trust_contract, "risky")
+    return _rejected_source_keys(trust_contract)
 
 
 def _rejected_source_keys(trust_contract: dict[str, Any]) -> set[str]:
@@ -409,7 +384,10 @@ def _authority(item: dict[str, Any]) -> str:
         for value in (item.get("authority"), item.get("repository_authority"))
         if value
     }
-    if declared & {"canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule"}:
+    if declared & {
+        "canonical", "source_of_truth", "explicit_agent_policy", "primary", "project_rule",
+        "official", "project_owned",
+    }:
         return "canonical"
     return "supporting"
 
@@ -419,7 +397,7 @@ def _source_row(item: dict[str, Any]) -> dict[str, Any]:
         "path": _source_path(item),
         "symbol_or_section": _section(item),
         "authority": _authority(item),
-        "instruction_trust": str(item.get("instruction_trust") or "untrusted_data"),
+        "instruction_trust": "untrusted_data",
         "scope": _source_scope(item),
         "version_binding": _version_binding(item),
         "evidence_id": _evidence_id(item),
@@ -477,8 +455,26 @@ def _dedupe_id(item: dict[str, Any]) -> str:
 
 
 def _evidence_id(item: dict[str, Any]) -> str:
+    from collections.abc import Mapping
+    from .evidence_candidates import _span, display_text, section, source_path, symbols
+    from docmancer.retrieval.contracts import canonical_hash
+
+    metadata = item.get("metadata") if isinstance(item.get("metadata"), Mapping) else {}
+    stable_id = str(item.get("stable_chunk_id") or item.get("stable_child_id")
+                    or metadata.get("stable_chunk_id") or item.get("stable_id") or "")
+    if not stable_id and source_path(item) and display_text(item):
+        # Match the selector's deterministic fallback identity exactly.
+        stable_id = "legacy:" + canonical_hash({
+            "path": source_path(item), "section": section(item),
+            "content": hashlib.sha256(display_text(item).encode("utf-8")).hexdigest(),
+            "symbols": sorted(symbols(item)),
+        })[:40]
+    char_start, char_end = _span(item, "char")
     identity = json.dumps(
         {
+            "stable_id": stable_id,
+            "char_start": char_start,
+            "char_end": char_end,
             "path": _source_path(item),
             "source": item.get("source"),
             "url": item.get("url"),
@@ -541,7 +537,7 @@ def _add_mandatory_requirement_witnesses(
     for candidate in selection.selected_candidates:
         evidence = dict(candidate.original)
         evidence_id = _evidence_id(evidence)
-        if evidence_id not in source_ids or _instruction_risk_flags(evidence):
+        if evidence_id not in source_ids:
             continue
         custom_witnesses = [
             witness for witness in candidate.requirement_witnesses
@@ -558,7 +554,7 @@ def _add_mandatory_requirement_witnesses(
         ]
         canonical_requirement_id = f"canonical_policy:{candidate.stable_id}"
         for witness in custom_witnesses:
-            if not witness.unit_text or _content_instruction_risk_flags(witness.unit_text):
+            if not witness.unit_text:
                 continue
             if _normalized_fact_text(witness.unit_text) in _normalized_fact_text(visible_text):
                 continue
@@ -599,7 +595,6 @@ def _add_mandatory_requirement_witnesses(
                 fact
                 for _, fact in _extract_facts(_content_text(evidence))[0]
                 if fact
-                and not _content_instruction_risk_flags(fact)
                 and _normalized_fact_text(fact) not in _normalized_fact_text(visible_text)
             ]
             if missing_facts:
@@ -618,9 +613,9 @@ def _add_mandatory_requirement_witnesses(
         ]
         while remaining:
             witness = _requirement_witness(
-                _content_text(evidence), [requirement.value for requirement in remaining]
+                candidate.display_text, [requirement.value for requirement in remaining]
             )
-            if not witness or _content_instruction_risk_flags(witness):
+            if not witness:
                 break
             packet["implementation_guidance"].append({
                 "text": witness,
@@ -707,50 +702,12 @@ def _requirement_witness(content: str, values: list[str]) -> str:
 
 
 def _extract_facts(content: str) -> tuple[list[tuple[str, str]], int]:
-    facts: list[tuple[str, str]] = []
-    omitted_critical = 0
-    in_fence = False
-    python_declaration_lines = python_declaration_line_indexes(content)
-    for line_index, raw in enumerate(content.splitlines()):
-        if line_index in python_declaration_lines:
-            continue
-        stripped = raw.strip()
-        if stripped.startswith("```") or stripped.startswith("~~~"):
-            in_fence = not in_fence
-            continue
-        if (
-            in_fence
-            or stripped.startswith(">")
-            or stripped.startswith("#")
-            or (stripped.startswith("|") and stripped.count("|") >= 2)
-        ):
-            continue
-        line = stripped.lstrip("-* ").strip().replace("`", "")
-        if not line:
-            continue
-        segments = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9])", line)
-        for segment in segments:
-            fact = segment.strip()
-            if not fact:
-                continue
-            modality = classify_normative_modality(fact)
-            looks_critical = bool(
-                modality
-                or _validation_command(fact)
-            )
-            if len(fact) > 500:
-                omitted_critical += int(looks_critical)
-                continue
-            if modality == "forbidden":
-                facts.append((modality, fact))
-                continue
-            command = _validation_command(fact)
-            if command:
-                facts.append(("validation", command))
-                continue
-            if modality == "required":
-                facts.append((modality, fact))
-    return facts, omitted_critical
+    """Compatibility adapter: quotes are data, not inferred policy or commands.
+
+    Even exact command grammar supplies no runnable validation intent. Keep
+    bounded quotes through the visible source path instead of fact categories.
+    """
+    return [], 0
 
 
 def _validation_command(value: str) -> str | None:
@@ -845,7 +802,7 @@ def _policy_witness_survived(
     safe_facts = {
         fact
         for _, fact in _extract_facts(_content_text(dict(candidate.original)))[0]
-        if fact and not _content_instruction_risk_flags(fact)
+        if fact
     }
     witnessed = [
         _normalized_fact_text(str(row.get("text") or ""))
@@ -876,4 +833,4 @@ def _has_actionable_items(packet: dict[str, Any]) -> bool:
         validation.get("semantic_checks"),
     ))
 
-__all__=['estimate_action_packet_tokens', 'evidence_identity_for_item', '_ensure_selection_survives_packet', '_explicit_acceptance_conditions', '_refresh_estimated_tokens', '_effective_authority', '_declares_canonical_authority', '_critical_fact_count', '_scope_applies', '_absolute_scope', '_same_path', '_is_within', '_instruction_risk_flags', '_content_instruction_risk_flags', '_source_scope', '_version_binding', '_relevance_score', '_version_exactness_rank', '_rank_and_dedupe', '_blocked_source_keys', '_risky_source_keys', '_rejected_source_keys', '_trust_source_keys', '_item_source_keys', '_normalized_source_key', '_authority', '_source_row', '_source_path', '_editable_target_path', '_section', '_dedupe_id', '_evidence_id', '_content_text', '_add_mandatory_requirement_witnesses', '_packet_visible_text', '_requirement_witness', '_extract_facts', '_validation_command', '_explicit_symbols', '_snippet_text', '_dedupe_cited', '_cited_evidence_ids', '_has_actionable_items']
+__all__=['estimate_action_packet_tokens', 'evidence_identity_for_item', '_ensure_selection_survives_packet', '_explicit_acceptance_conditions', '_refresh_estimated_tokens', '_effective_authority', '_declares_canonical_authority', '_critical_fact_count', '_scope_applies', '_absolute_scope', '_same_path', '_is_within', '_source_scope', '_version_binding', '_relevance_score', '_version_exactness_rank', '_rank_and_dedupe', '_blocked_source_keys', '_rejected_source_keys', '_trust_source_keys', '_item_source_keys', '_normalized_source_key', '_authority', '_source_row', '_source_path', '_editable_target_path', '_section', '_dedupe_id', '_evidence_id', '_content_text', '_add_mandatory_requirement_witnesses', '_packet_visible_text', '_requirement_witness', '_extract_facts', '_validation_command', '_explicit_symbols', '_snippet_text', '_dedupe_cited', '_cited_evidence_ids', '_has_actionable_items']

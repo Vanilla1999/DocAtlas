@@ -25,6 +25,7 @@ from docmancer.core.sqlite_store import SQLiteStore
 from docmancer.docs.application.action_packet import (
     build_action_packet,
     validate_action_packet,
+    refresh_action_packet_estimate,
 )
 from docmancer.docs.application.model_visible_projection import (
     project_docs_answer,
@@ -531,7 +532,6 @@ def _task42_projection(
             question=case["question"],
             context_pack=candidates,
             trust_contract=trust,
-            max_tokens=maximum,
             project_path=case.get("project_path"),
             required_evidence_paths=case.get("required_evidence_paths", []),
             required_target_paths=case.get("required_target_paths", []),
@@ -544,22 +544,21 @@ def _task42_projection(
             product.validate_action_packet(
                 packet,
                 evidence_items=candidates,
-                max_tokens=maximum,
                 project_path=case.get("project_path"),
             )
         )
         projection, snapshot = product.project_patch_context(
-            packet=packet, evidence_items=candidates, max_tokens=maximum
+            packet=packet, evidence_items=candidates, project_path=case.get("project_path"),
         )
     errors.extend(
         product.validate_projection(
             projection,
             snapshot=snapshot,
-            max_tokens=(
+            **({"max_tokens": (
                 300
                 if projection.get("status") == "insufficient_evidence"
                 else maximum
-            ),
+            )} if case["result_kind"] == "docs_answer" else {}),
         )
     )
     return projection, snapshot, errors
@@ -606,7 +605,16 @@ def _evaluate_measured_case(
         *[f"canonical_validator:{error}" for error in measured["validation_errors"]],
         *result["errors"],
     ]
-    if contract["result_kind"] == "patch_context" and projection.get("status") == "ok":
+    unsupported = []
+    if contract["result_kind"] == "patch_context":
+        if contract["expected_status"] not in {"data", "failure"}:
+            unsupported.append("legacy_packet_status")
+        legacy_fields = {"objective", "targets", "invariants", "forbidden_changes", "implementation_guidance", "checks"}
+        unsupported.extend(sorted(legacy_fields.intersection(contract.get("required_patch_fields") or {})))
+        if contract.get("required_public_commands"):
+            unsupported.append("workflow_commands_from_document_data")
+        errors.extend(f"unsupported_evaluation_requirement:{value}" for value in unsupported)
+    if contract["result_kind"] == "patch_context" and projection.get("result") == "data":
         errors.extend(_validate_patch_source_paths(projection, snapshot, contract))
     required_total = _required_item_count(contract)
     required_missing = sum("required_fact_missing" in error for error in errors)
@@ -617,12 +625,16 @@ def _evaluate_measured_case(
         "taxonomy": contract["taxonomy"],
         "result_kind": contract["result_kind"],
         "expected_status": contract["expected_status"],
-        "status": projection.get("status"),
+        "status": projection.get("result") if contract["result_kind"] == "patch_context" else projection.get("status"),
+        "completeness": projection.get("completeness"),
+        "unsupported_evaluation_requirements": unsupported,
         "estimated_tokens": projection.get("estimated_tokens"),
         "projection_digest": hashlib.sha256(canonical_bytes(projection)).hexdigest(),
-        "source_manifest": sanitized_projection_manifest(snapshot),
+        "source_manifest": sanitized_projection_manifest({
+            key: value for key, value in snapshot.items() if key != "__action_packet__"
+        }),
         "required_total": required_total,
-        "required_covered": max(0, required_total - required_missing),
+        "required_covered": 0 if unsupported else max(0, required_total - required_missing),
         "errors": sorted(set(errors)),
         "passed": not errors,
     }
@@ -677,11 +689,13 @@ def _record_auxiliary_inputs(
             "source_ref": contract["source_ref"],
             "review_context": review_context,
             "projection": measured["projection"],
-            "evidence_manifest": sanitized_projection_manifest(measured["snapshot"]),
+            "evidence_manifest": sanitized_projection_manifest({
+                key: value for key, value in measured["snapshot"].items() if key != "__action_packet__"
+            }),
         }
     if (
         contract["result_kind"] == "patch_context"
-        and measured["projection"].get("status") == "ok"
+        and measured["projection"].get("result") == "data"
         and "patch_context" not in integrity_inputs
     ):
         integrity_inputs["patch_context"] = (
@@ -731,11 +745,15 @@ def _run_integrity_mutation_gate(
         source = tampered["sources"][0]
         path_key = "path" if "path" in source else "path_or_url"
         source[path_key] = "tampered/foreign-source.md"
+        if kind == "patch_context":
+            refresh_action_packet_estimate(tampered)
         errors = validate_model_visible_projection(
-            tampered, snapshot=snapshot, max_tokens=maximum
+            tampered, snapshot=snapshot,
+            **({"max_tokens": maximum} if kind == "docs_answer" else {}),
         )
         expected_error = (
-            f"projection source {path_key} does not match the internal snapshot"
+            "source differs from bound retrieval window" if kind == "patch_context"
+            else f"projection source {path_key} does not match the internal snapshot"
         )
         checks[kind] = {
             "passed": expected_error in errors,

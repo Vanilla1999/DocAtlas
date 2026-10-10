@@ -87,7 +87,6 @@ def test_docs_context_keeps_distinct_host_lookup_sources_until_source_limit():
     assert projection["missing_query_ids"] == [
         "query-original", "query-lookup-4", "query-lookup-5",
     ]
-    assert projection["estimated_tokens"] <= 800
     assert validate_model_visible_projection(
         projection, snapshot=snapshot, max_tokens=800,
     ) == []
@@ -102,7 +101,6 @@ def test_docs_context_host_lookup_selection_is_not_a_global_latch():
     assert projection["covered_query_ids"] == [
         "query-lookup-1", "query-lookup-2", "query-lookup-3",
     ]
-    assert projection["estimated_tokens"] <= 800
 
 
 def test_docs_context_compacts_snippets_before_sacrificing_lookup_coverage():
@@ -122,7 +120,6 @@ def test_docs_context_compacts_snippets_before_sacrificing_lookup_coverage():
         "query-lookup-1", "query-lookup-2", "query-lookup-3",
     ]
     assert all(len(source["snippet"]) >= 40 for source in projection["sources"])
-    assert projection["estimated_tokens"] <= 800
     assert validate_model_visible_projection(
         projection, snapshot=snapshot, max_tokens=800,
     ) == []
@@ -155,7 +152,6 @@ def test_docs_context_compacts_long_sources_with_generated_facet_diagnostics():
         query_id.startswith("query-intent-")
         for query_id in projection["missing_query_ids"]
     )
-    assert projection["estimated_tokens"] <= 800
     assert validate_model_visible_projection(
         projection, snapshot=snapshot, max_tokens=800,
     ) == []

@@ -1,0 +1,802 @@
+{
+  "schema_version": 1,
+  "protocol": "question-plan-v4-literal-contract-precheck-v1",
+  "phase": "precheck_draft_no_retirement",
+  "repository": "Vanilla1999/DocAtlas",
+  "source_checkout": {
+    "head": "0065ce62cacaa31a41e4567717e3c67d602f578b",
+    "tree": "628bb7a2eb16f740ce84384925531040f7ec9f5e",
+    "status": "Published130; question-plan sources unchanged from the reviewed126 blobs."
+  },
+  "archives": [
+    {
+      "path": "tests/docs/test_question_plan_v4.py",
+      "blob": "a7cadec822a464a19bf917d69e28e9cc6b0b1496",
+      "sha256": "85a0de4b9bb158bbc755272ae3dee387dd77c83f46c97c8a2895eabb26a3adf3",
+      "utf8_bytes": 45553,
+      "archive_path": "eval/task_level/contract_history/question_plan_v4_inputs.py.txt",
+      "archive_blob": "a7cadec822a464a19bf917d69e28e9cc6b0b1496",
+      "archive_is_complete_source": true,
+      "executed_as_test": false
+    },
+    {
+      "path": "tests/docs/_question_plan_clause_coverage.py",
+      "blob": "4898e3459e2504cf07f9bacfae8fd6769bdd9c79",
+      "sha256": "e691a185f11accce420caf16e5c013fb7cf629b1c466c51bda29ff2d4b25c31e",
+      "utf8_bytes": 2782,
+      "archive_path": "eval/task_level/contract_history/question_plan_v4_clause_inputs.py.txt",
+      "archive_blob": "4898e3459e2504cf07f9bacfae8fd6769bdd9c79",
+      "archive_is_complete_source": true,
+      "executed_as_test": false
+    }
+  ],
+  "decision": {
+    "kind": "versioned_retirement_candidate_not_execution_equivalence",
+    "contract_sources": [
+      {
+        "path": "docmancer/docs/domain/project_answer_contract.py",
+        "blob": "073ddadc911c94aca96fded71d0a4e8538c565ed"
+      },
+      {
+        "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+        "blob": "54ab01212e66a0ad3a55cc79119cd721b20c3660"
+      },
+      {
+        "path": "docs/modules/question-planning.md",
+        "blob": "0339d28f8467326ecdec07a753b980f1e1f453c8"
+      }
+    ],
+    "contract": "Original and explicit host requests may retrieve source context; a natural-language compiler cannot infer proof obligations, aliases, complete scope, expected answers or answer/edit authority.",
+    "not_claimed": "No execution equivalence for archived questions/bodies; no retrieval-quality, source-proof, full-answer or PR-acceptance credit.",
+    "changed_ordinary_nodes": 0,
+    "deleted_ordinary_cases": 0
+  },
+  "roster": {
+    "local_definitions": 26,
+    "reexported_cases": 2,
+    "total_collected_cases": 28,
+    "retirement_candidates": 26,
+    "retained_cases": 2,
+    "current_node_roster_sha256": "ccd2869f6b9bc2c47499fde3ff5efb2fb806dfaa5daa6468e176ea29ad26c8a5",
+    "method": "Top-level source declaration spans and explicit imports, checked against the current diagnostic roster; no AST/import/pytest execution."
+  },
+  "retirement_candidates": [
+    {
+      "function": "test_question_plan_compiles_previously_unrepresentable_queries_without_generic_subjects",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_question_plan_compiles_previously_unrepresentable_queries_without_generic_subjects",
+      "definition_line": 38,
+      "source_sha256": "b1ae784d08ed0bbbb2d3c33daac1d8de2079bdd10a4a75088026814b130e0fde",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "compiled_subjects_and_relations",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters"
+      ]
+    },
+    {
+      "function": "test_question_plan_splits_compound_questions_into_mandatory_facets",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_question_plan_splits_compound_questions_into_mandatory_facets",
+      "definition_line": 63,
+      "source_sha256": "95485de3866cdfac4b9a41f9f71dfd1de4a1de262ec7dbf096aafaddee415f3e",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "compound_facet_counts_and_generated_aliases",
+      "successor_groups": [
+        "raw_untyped_request",
+        "literal_clauses",
+        "explicit_query_lineage"
+      ]
+    },
+    {
+      "function": "test_legacy_synthetic_fallback_fails_closed_and_is_diagnostic",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_legacy_synthetic_fallback_fails_closed_and_is_diagnostic",
+      "definition_line": 110,
+      "source_sha256": "510554bf0b826404b83c6e5eb1303b11cc39b4d539c780cd6a431056bece6bee",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "obsolete_semantic_diagnostics_and_resolved_operation",
+      "successor_groups": [
+        "raw_untyped_request",
+        "explicit_requirements"
+      ]
+    },
+    {
+      "function": "test_permission_semantic_frames_are_typed_and_full_span_safe",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_permission_semantic_frames_are_typed_and_full_span_safe",
+      "definition_line": 134,
+      "source_sha256": "63cc5c83d99a3e15923cbae6695a00252bed73a3362d70cfbecf9a4571936562",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "typed_permission_semantics_and_full_span",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters",
+        "literal_clauses"
+      ]
+    },
+    {
+      "function": "test_permission_semantic_frames_have_reviewed_russian_surfaces",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_permission_semantic_frames_have_reviewed_russian_surfaces",
+      "definition_line": 185,
+      "source_sha256": "d5c017301cc16ff28509d65f8232bca24ffec89a7b12a2100a33314fcbd36bd8",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "russian_typed_semantics_and_positive_prose_proof",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters",
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_interrogative_is_not_a_contract_fact_subject",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_interrogative_is_not_a_contract_fact_subject",
+      "definition_line": 263,
+      "source_sha256": "7f736a8522699d9d73397583c5b0be861e64336d3fb555310e9b6d35ff61e4ef",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "interrogative_and_inferred_fact_subject",
+      "successor_groups": [
+        "raw_untyped_request",
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_question_plan_proof_requires_local_subject_binding",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_question_plan_proof_requires_local_subject_binding",
+      "definition_line": 289,
+      "source_sha256": "f7e9906601218a1dbe6905c490667a0177bbc5d9b690094752803c190fa73119",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "inferred_subject_proof_and_answer_grants",
+      "successor_groups": [
+        "raw_untyped_request",
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_generic_requirements_accept_one_meaningful_object_or_list_item",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_generic_requirements_accept_one_meaningful_object_or_list_item",
+      "definition_line": 412,
+      "source_sha256": "c7bdc7aeea2bfd109bf8da0dc48c9339f116c2ac6160dd55eaf6a9aac27c6f68",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "natural_language_requirement_proofs",
+      "successor_groups": [
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_response_contract_requires_the_requested_relation_not_an_invocation",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_response_contract_requires_the_requested_relation_not_an_invocation",
+      "definition_line": 447,
+      "source_sha256": "a35bbf7c647894b69b31a6059ef78e81303723c7208167fe3f6b744cd6566b39",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "response_contract_relation_inference",
+      "successor_groups": [
+        "raw_untyped_request",
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_generic_free_form_terms_are_retrieval_hints_not_answer_proof",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_generic_free_form_terms_are_retrieval_hints_not_answer_proof",
+      "definition_line": 481,
+      "source_sha256": "d3dea87afd07e02bbbc3ef416d04bc098ab594b4d8261a414e4701e2cf2d9f6f",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "generated_free_form_hints_and_reason_codes",
+      "successor_groups": [
+        "raw_untyped_request",
+        "explicit_query_lineage"
+      ]
+    },
+    {
+      "function": "test_bounded_component_families_support_reordered_and_different_subjects",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_bounded_component_families_support_reordered_and_different_subjects",
+      "definition_line": 492,
+      "source_sha256": "3ec70709d592f67976f4dd85960318ded1462a1fe08a7b41abc2e81d1d188e20",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "bounded_component_semantic_compilation",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters",
+        "literal_clauses"
+      ]
+    },
+    {
+      "function": "test_component_families_fail_closed_for_unknown_generic_and_negated_surfaces",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_component_families_fail_closed_for_unknown_generic_and_negated_surfaces",
+      "definition_line": 521,
+      "source_sha256": "f98b03bb30c5e910e8c674512b7be63063c8a80cbe6f9f6006d2aa4f22e9e099",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "unknown_negated_semantic_family_diagnostics",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters",
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_conditional_behavior_requires_requested_condition_and_blocking_effect",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_conditional_behavior_requires_requested_condition_and_blocking_effect",
+      "definition_line": 543,
+      "source_sha256": "d900121fcc5e0a0bca376f12a6306926ae536677d62c2f1a6002195c04be7ab3",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "inferred_condition_and_blocking_effect_proof",
+      "successor_groups": [
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_selection_policy_and_chunking_require_complete_local_semantics",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_selection_policy_and_chunking_require_complete_local_semantics",
+      "definition_line": 558,
+      "source_sha256": "f7920e80db355fc579116eb91a161797858625cd1835083657db2c09b18de891",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_selection_and_chunking_proofs",
+      "successor_groups": [
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_named_multistep_procedure_summary_outranks_single_command_shape",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_named_multistep_procedure_summary_outranks_single_command_shape",
+      "definition_line": 586,
+      "source_sha256": "5c3d0f96eae6db4808f8fb0efe7154d54cbcec6bfdf286dc827bb2255b3b03e9",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "prose_procedure_completeness_score",
+      "successor_groups": [
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_new_probing_paraphrases_have_locally_provable_units",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_new_probing_paraphrases_have_locally_provable_units",
+      "definition_line": 603,
+      "source_sha256": "257ffc8eb978fa9b0275b4aeb06d4ec2ef4f5f74b7dc7f9b0ab35f5d6beb7301",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "paraphrase_local_proof_and_semantic_release_rules",
+      "successor_groups": [
+        "raw_untyped_request",
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_reusable_frames_are_paraphrase_invariant_for_inventory_requirements_and_sync",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_reusable_frames_are_paraphrase_invariant_for_inventory_requirements_and_sync",
+      "definition_line": 679,
+      "source_sha256": "fed132f9c4e2fe8726f73fd46d21cc1c6dd010609ab1de2f9c5489ca34fcea37",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_paraphrase_equivalence",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters"
+      ]
+    },
+    {
+      "function": "test_compound_clause_composition_preserves_single_facet_semantics",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_compound_clause_composition_preserves_single_facet_semantics",
+      "definition_line": 732,
+      "source_sha256": "07fb7e45188af538894be76c07a1012d320c6e241937b30771f2ebd0a717369f",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_compound_facet_composition",
+      "successor_groups": [
+        "literal_clauses",
+        "raw_untyped_request"
+      ]
+    },
+    {
+      "function": "test_known_clause_with_unknown_tail_fails_closed_instead_of_partial_supported",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_known_clause_with_unknown_tail_fails_closed_instead_of_partial_supported",
+      "definition_line": 754,
+      "source_sha256": "1f0645ca21437127588ac2a243d67c7f111e5922ce7fc175e8cd892121d10e0b",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "partially_compiled_known_clause_and_old_unknown_tail_code",
+      "successor_groups": [
+        "raw_untyped_request",
+        "literal_clauses",
+        "explicit_requirements",
+        "explicit_query_lineage"
+      ]
+    },
+    {
+      "function": "test_requirements_relation_needs_named_subject_and_multiple_requirement_details",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_requirements_relation_needs_named_subject_and_multiple_requirement_details",
+      "definition_line": 772,
+      "source_sha256": "c5361c8d4b67cc6a1aa173fceaa8bc59e6b1db9cbdc29cdbc62d0d7e00f1a175",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "named_requirements_semantics_and_cross_clause_proofs",
+      "successor_groups": [
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_inventory_categories_are_typed_and_do_not_conflate_sources_formats_or_markers",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_inventory_categories_are_typed_and_do_not_conflate_sources_formats_or_markers",
+      "definition_line": 805,
+      "source_sha256": "50b37c94133e3c111feab88f857d9a03c7faee8f60c48d2b22bf706d5136e973",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "typed_inventory_categories_and_prose_completeness",
+      "successor_groups": [
+        "legacy_adapters",
+        "prose_proof_exit"
+      ]
+    },
+    {
+      "function": "test_documentation_query_plan_v2_separates_required_queries_from_aliases",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_documentation_query_plan_v2_separates_required_queries_from_aliases",
+      "definition_line": 862,
+      "source_sha256": "817e4389fc24a2e489303e9762fe98377d860c89461c85fefe69e78cff792199",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "automatic_concept_alias_presence",
+      "successor_groups": [
+        "explicit_query_lineage"
+      ]
+    },
+    {
+      "function": "test_ambiguous_inventory_action_and_generic_subjects_fail_closed",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_ambiguous_inventory_action_and_generic_subjects_fail_closed",
+      "definition_line": 877,
+      "source_sha256": "f4769f748bf1afa4b1b17c00f56ba5b26ccab5304324857b9b380a34c2ec45cd",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_ambiguity_reason_codes_and_inferred_sync_command",
+      "successor_groups": [
+        "raw_untyped_request",
+        "legacy_adapters"
+      ]
+    },
+    {
+      "function": "test_semantic_cycle_frames_compile_into_typed_obligations",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_semantic_cycle_frames_compile_into_typed_obligations",
+      "definition_line": 900,
+      "source_sha256": "f1b46f830b5a294524cc7b3ae6c270a085ecd181e9d039635738040680e298ee",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_comparison_location_condition_premise_cycles",
+      "successor_groups": [
+        "legacy_adapters",
+        "prose_proof_exit",
+        "literal_source_guards"
+      ]
+    },
+    {
+      "function": "test_full_question_coverage_rejects_unknown_tails_across_boundary_forms",
+      "defined_in": "tests/docs/_question_plan_clause_coverage.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_full_question_coverage_rejects_unknown_tails_across_boundary_forms",
+      "definition_line": 11,
+      "source_sha256": "f6e0caf6fa08b46d22c6e6295b45870b89d1b249bdffcd139eb10ea663b5ae22",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "semantic_unknown_clause_reason_and_unsupported_query_inference",
+      "successor_groups": [
+        "raw_untyped_request",
+        "literal_clauses",
+        "explicit_requirements",
+        "explicit_query_lineage"
+      ]
+    },
+    {
+      "function": "test_existing_compounds_and_noun_coordination_survive_stricter_clause_coverage",
+      "defined_in": "tests/docs/_question_plan_clause_coverage.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_existing_compounds_and_noun_coordination_survive_stricter_clause_coverage",
+      "definition_line": 35,
+      "source_sha256": "9732150df4519f9b8ef319d9224967166290f0da4ab047b0ea0a44830404c5c3",
+      "collected_cases": 1,
+      "action": "candidate_only_no_deletion",
+      "retired_expectation": "known_compound_obligation_counts",
+      "successor_groups": [
+        "raw_untyped_request",
+        "literal_clauses"
+      ]
+    }
+  ],
+  "retained_originals": [
+    {
+      "function": "test_code_symbol_aliases_may_widen_retrieval_but_not_proof_shape",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_code_symbol_aliases_may_widen_retrieval_but_not_proof_shape",
+      "definition_line": 552,
+      "source_sha256": "c04d49d620d2d4b8b36d48f7e7c270be416f5e58a7eb398c99ed6edba3ea3b9c",
+      "collected_cases": 1,
+      "action": "retain_function_bytes_exact"
+    },
+    {
+      "function": "test_code_block_units_preserve_exact_source_spans_for_projection",
+      "defined_in": "tests/docs/test_question_plan_v4.py",
+      "original_nodeid": "tests/docs/test_question_plan_v4.py::test_code_block_units_preserve_exact_source_spans_for_projection",
+      "definition_line": 576,
+      "source_sha256": "2bf89ffce7d4ffb62ebec55d10af1cc05cafaad8919be304d66220ab917261c0",
+      "collected_cases": 1,
+      "action": "retain_function_bytes_exact"
+    }
+  ],
+  "compatibility_preservation": {
+    "helpers": [
+      "_rows",
+      "_unit"
+    ],
+    "other_imports": "Preserve existing non-test imports and helper names; do not rename or remove them from an absence assumption.",
+    "shared_reexport": "A future retirement must explicitly remove only the two test-function reexports after consumer review; no __test__ override or alternate collection bypass.",
+    "archives": "Both complete original files remain immutable input/history data; no runtime replay is implied."
+  },
+  "successor_groups": {
+    "raw_untyped_request": {
+      "contract": "Keep the complete raw question and bounded input diagnostics; no inferred subjects, proof obligations, retrieval hints, concept queries or complete component scope. Explicit DTO construction is still supported.",
+      "controls": [
+        "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+        "tests/docs/test_question_span_coverage.py::test_governance_question_supports_bounded_russian_surface",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_empty_and_bounded_questions_never_become_complete_empty_plans"
+      ],
+      "proof_scope": "Existing literal compiler faults plus the separate proposed direct-answer-contract fault; the latter is pending."
+    },
+    "legacy_adapters": {
+      "contract": "Each independent retired semantic entry point remains non-authorizing, including Unicode inputs; public compilation must not delegate to them.",
+      "controls": [
+        "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_public_compiler_does_not_delegate_to_normalizers_or_legacy_generators"
+      ],
+      "proof_scope": "Use the distinct-API and Unicode faults in the frozen 51-mutation manifest; one adapter kill is not credited to every API."
+    },
+    "literal_clauses": {
+      "contract": "Preserve raw bytes, Unicode, quote/code/link boundaries and spans; punctuation and conjunctions do not compile semantic facets. Unknown tails remain part of original identity.",
+      "controls": [
+        "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "tests/docs/test_question_span_coverage.py::test_clause_scanner_preserves_original_offsets_and_noun_coordination",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_exact_paragraph_spans_protect_quotes_links_and_program_syntax",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_mask_preserves_literal_offsets_and_unquoted_syntax",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_nl_heads_wrappers_and_connectives_do_not_erase_or_split_text"
+      ],
+      "proof_scope": "Existing raw/hash/span/paragraph/mask/unknown-tail faults; old unsupported_query/unresolved_question_clause strings are not restored."
+    },
+    "explicit_query_lineage": {
+      "contract": "Original question remains required and exact. Only explicit host lookups add independent optional lanes; equal text or an unknown tail grants no parent/original coverage. Source paths remain scope metadata.",
+      "controls": [
+        "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "tests/test_dictionary_exit_legacy_compilers.py::test_literal_retrieval_identity_cache_and_source_paths_survive_without_plan_facets",
+        "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference"
+      ],
+      "proof_scope": "Literal lookup/original/path faults plus the already separate alias/DQP proof; no claim of source relevance, body facts or full original-question discovery."
+    },
+    "explicit_requirements": {
+      "contract": "The retired prose compiler cannot invent mandatory requirements; explicit host evidence-path requirements and provenance checks remain active.",
+      "controls": [
+        "tests/docs/test_question_span_coverage.py::test_unresolved_residue_reaches_the_requirements_gate"
+      ],
+      "proof_scope": "Retained existing positive explicit-path and negative provenance assertions; not a standalone mutation-proof claim from the 51 manifest."
+    },
+    "prose_proof_exit": {
+      "contract": "Retire positive semantic relation/completeness/entailment results inferred from prose. Their former negative neighbors do not establish a supported semantic prover. Existing explicit residual DTO/proof controls remain collected.",
+      "controls": [
+        "tests/test_dictionary_exit_residual_proofs.py::test_supplied_proposition_and_canonical_metadata_cannot_certify",
+        "tests/test_dictionary_exit_residual_proofs.py::test_governance_and_unknown_relations_return_immutable_negative",
+        "tests/test_dictionary_exit_residual_proofs.py::test_premise_no_synonyms_cardinality_or_metadata_subject_fallback",
+        "tests/test_dictionary_exit_residual_proofs.py::test_compatibility_helpers_negative_and_negation_guard_retained"
+      ],
+      "proof_scope": "These existing residual controls are outside the literal comparison. Do not credit the 51 faults as their runtime or as source-quality/answer proof."
+    },
+    "literal_source_guards": {
+      "contract": "Retain exact literal value equality with no answer authority, source/identity/span/condition checks and unchanged code-symbol/code-block guards. The historical prose examples remain archived as data.",
+      "controls": [
+        "tests/test_dictionary_exit_residual_proofs.py::test_narrow_literal_equality_survives_without_answer_authority",
+        "tests/test_dictionary_exit_residual_proofs.py::test_literal_forged_identity_and_offsets_do_not_certify",
+        "tests/test_dictionary_exit_residual_proofs.py::test_wrong_supplied_source_cannot_certify_literal",
+        "tests/test_dictionary_exit_residual_proofs.py::test_multiline_neighboring_declaration_and_negated_prose_not_certified",
+        "tests/test_dictionary_exit_residual_proofs.py::test_literal_subject_scope_and_contract_cannot_be_inferred",
+        "tests/test_dictionary_exit_residual_proofs.py::test_context_retained_empty_and_overflow_packets_not_approved"
+      ],
+      "proof_scope": "No residual test is removed or claimed to execute inside the literal 51 comparison. Both original literal/code tests remain byte-identical."
+    }
+  },
+  "reused_literal_comparison": {
+    "manifest": {
+      "path": "eval/task_level/literal_contract_mutations.json",
+      "blob": "8f92ea6d9c0045bd32d407f407a80f8d7198673a"
+    },
+    "helper": {
+      "path": "eval/task_level/literal_contract_reduction.py",
+      "blob": "063002257925e0fb50ab8eb542fd04deae4a57cc"
+    },
+    "existing_case_counts": {
+      "historical": [
+        303,
+        399
+      ],
+      "compact": [
+        33,
+        49
+      ]
+    },
+    "mutation_count": 51,
+    "distinct_named_guards": 43,
+    "distinct_killer_selectors": 15,
+    "minimal_existing_killer_roster": [
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_public_direct_compiler_is_explicitly_unresolved",
+        "guards": [
+          "literal_original_question",
+          "literal_no_inferred_facets",
+          "literal_unresolved_semantics",
+          "literal_incomplete_scope",
+          "literal_plan_immutable"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_empty_and_bounded_questions_never_become_complete_empty_plans",
+        "guards": [
+          "literal_input_bound"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_public_compiler_does_not_delegate_to_normalizers_or_legacy_generators",
+        "guards": [
+          "literal_compiler_no_legacy_delegation"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_semantic_matcher_compatibility_is_non_authorizing",
+        "guards": [
+          "literal_adapter:match_argument_value_frame",
+          "literal_adapter:match_before_behavior_frame",
+          "literal_adapter:match_contract_scope_frame",
+          "literal_adapter:match_comparison_frame",
+          "literal_adapter:match_condition_frame",
+          "literal_adapter:match_location_frame",
+          "literal_adapter:match_decision_frame",
+          "literal_adapter:match_premise_frame",
+          "literal_adapter:match_purpose_behavior_frame"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_surface_adapters_cannot_inject_subjects_relations_or_expected_values",
+        "guards": [
+          "literal_adapter:governance_facets",
+          "literal_adapter:mcp_request_handling",
+          "literal_adapter:provider_request_timeout",
+          "literal_adapter:public_tool_usage",
+          "literal_adapter:public_tools_with_purposes",
+          "literal_adapter:python_version_support",
+          "literal_adapter:semantic_components"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_frame_and_composition_entry_points_cannot_infer_contracts",
+        "guards": [
+          "literal_adapter:match_action_frame",
+          "literal_adapter:match_inventory_frame",
+          "literal_adapter:match_requirements_frame",
+          "literal_adapter:independent_sentence_spans",
+          "literal_adapter:compositional_parts",
+          "literal_adapter:conflict_question_plan",
+          "literal_unknown_tail_authority"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_nl_heads_wrappers_and_connectives_do_not_erase_or_split_text",
+        "guards": [
+          "literal_wrapper_identity"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_mask_preserves_literal_offsets_and_unquoted_syntax",
+        "guards": [
+          "literal_mask_offsets"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_exact_paragraph_spans_protect_quotes_links_and_program_syntax",
+        "guards": [
+          "literal_quote_paragraph_protection"
+        ]
+      },
+      {
+        "selector": "tests/docs/test_question_span_coverage.py::test_clause_scanner_preserves_original_offsets_and_noun_coordination",
+        "guards": [
+          "literal_paragraphs_only"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_literal_retrieval_identity_cache_and_source_paths_survive_without_plan_facets",
+        "guards": [
+          "literal_symbol_path_separation",
+          "literal_reference_offsets"
+        ]
+      },
+      {
+        "selector": "tests/docs/test_question_span_coverage.py::test_known_frame_never_authorizes_an_unknown_tail",
+        "guards": [
+          "literal_lookup_no_coverage_credit",
+          "literal_unknown_tail_identity",
+          "literal_original_coverage_preserved"
+        ]
+      },
+      {
+        "selector": "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+        "guards": [
+          "literal_no_answer_authority"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_explicit_dtos_keep_field_shapes_and_do_not_require_prose_approval",
+        "guards": [
+          "literal_facet_immutable",
+          "literal_composition_immutable"
+        ]
+      },
+      {
+        "selector": "tests/test_dictionary_exit_legacy_compilers.py::test_existing_span_validation_still_rejects_invalid_dtos",
+        "guards": [
+          "literal_invalid_span_dto"
+        ]
+      }
+    ],
+    "unchanged_protocol": true,
+    "required_evidence": "Both complete green baselines plus every existing mutation in both modes:104 child reports, expected assertion guards/rosters/counts and actual same-process import identities with correct source hashes. Preserve full artifacts and explicit omissions.",
+    "observed_status": "Parent observed126 step16 SUCCESS; individual104 child receipts not yet reviewed by this precheck. No individual PASS is reconstructed."
+  },
+  "directed_gap": {
+    "name": "question_contract_does_not_infer_obligations",
+    "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+    "base_blob": "54ab01212e66a0ad3a55cc79119cd721b20c3660",
+    "old": "    return ProjectAnswerContract(\n        question_hash=canonical_hash(source_question),\n        retrieval_hints=(),\n        concept_queries=(),\n        subjects=(),\n        proof_obligations=(),",
+    "new": "    from ._project_answer_contract_part01 import ProofObligation\n    return ProjectAnswerContract(\n        question_hash=canonical_hash(source_question),\n        retrieval_hints=(),\n        concept_queries=(),\n        subjects=(),\n        proof_obligations=(ProofObligation(\n            \"mutation:inferred-obligation\", \"definition\", \"shared browser\",\n            query_span_start=0, query_span_end=len(source_question),\n            query_span_text=source_question,\n        ),),",
+    "killer": "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+    "expected_failures": 1,
+    "failure_guard": "critical_question_contract_no_inferred_obligations",
+    "anchor_matches": 1,
+    "before_sha256": "8b881b07cdea5dbe6f078d0e70504b7d4aa20faa983bf46ffd5a67fc9e0e134a",
+    "after_sha256": "a53ba3b53663c5e827604585a4d19c1146dc3702ec8be1313377a624e3dd7543",
+    "assertion_change": {
+      "path": "tests/docs/test_question_span_coverage.py",
+      "base_blob": "77efcc114ba4f170f50bc8b9a4cd2bd41b68a846",
+      "old": "    assert not contract.proof_obligations",
+      "new": "    assert not contract.proof_obligations, \"critical_question_contract_no_inferred_obligations\""
+    },
+    "integration": {
+      "existing_named_selector_add_to_critical_roster": 1,
+      "expected_baseline_cases_added": 1,
+      "new_pytest_function_names": 0,
+      "literal51_manifest_unchanged": true,
+      "production_source_mutation_only_in_temporary_child": true
+    }
+  },
+  "precheck_integration": {
+    "assertion_file": "tests/docs/test_question_span_coverage.py",
+    "assertion_base_blob": "77efcc114ba4f170f50bc8b9a4cd2bd41b68a846",
+    "assertion_new_blob": "f8d5a10d8a251c1394b660c6e6e4cf9a6e96d72a",
+    "change": "One existing assertion gains a named guard; no boolean expression, order, old guard, fixture, decorator or function change.",
+    "runner_status": "Recipe only; root owns the separate append to the current critical runner.",
+    "current_critical_target": {
+      "cases": 60,
+      "mutants": 37
+    },
+    "planned_critical_target": {
+      "cases": 61,
+      "mutants": 38
+    },
+    "runtime_status": "pending; target counts are not a result",
+    "new_ordinary_functions": 0,
+    "new_frozen_input_replays": 0
+  },
+  "consumer_audit": {
+    "exact_sources": [
+      {
+        "path": "scripts/run_critical_mutation_gate.py",
+        "sha": "1cf7d0de47793246db0a0016d53d45d8177bfd5b",
+        "direct_retired_module_selector": false,
+        "direct_shared_selector": false
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "sha": "9136caaa257c38f8d41558abbdca9497dcab8991",
+        "direct_retired_module_selector": false,
+        "direct_shared_selector": false
+      },
+      {
+        "path": ".github/workflows/direct-question-validation.yml",
+        "sha": "96b246bb9e97f70c6be90d0d35a48158f7f4fbc5",
+        "direct_retired_module_selector": false,
+        "direct_shared_selector": false
+      },
+      {
+        "path": ".github/workflows/task33c-pr-checks.yml",
+        "sha": "59273b9fe443f24b5e10849fcb210f6c8e6c48fd",
+        "direct_retired_module_selector": false,
+        "direct_shared_selector": false
+      }
+    ],
+    "additional_current_sources": [
+      {
+        "path": ".github/workflows/pr174-review-cleanup.yml",
+        "sha": "cac0a35939256c4ff81afb8ed40514903ca3fa78",
+        "finding": "Selects the whole existing module, which remains with two retained tests; no removed function selector."
+      },
+      {
+        "path": "tests/conftest.py",
+        "sha": "d6bc54111cbaa409f9ca81a93994328d32fcca12",
+        "finding": "Existing global diagnostic inventory remains mandatory."
+      },
+      {
+        "path": "tests/diagnostic_labels.json",
+        "sha": "ce99caa7cf3372ba754e4efde5d72d26e33ecfea",
+        "finding": "Both modules remain behavioral; label-only precheck does not change names or hashes. Eventual retirement needs the owning old-module node hash update."
+      },
+      {
+        "path": "pytest.ini",
+        "sha": "03e4da03152cf79879b8feba5e98f51028f17d32",
+        "finding": "Normal tests/ collection; archive .py.txt files do not become pytest modules."
+      },
+      {
+        "path": "pyproject.toml",
+        "sha": "0f6844a97776bb805fce05a3f6aeb6565f66e5b5",
+        "finding": "No direct main/shared-family selector found."
+      }
+    ],
+    "discovery_only": "Default-branch search was used only to nominate consumers, then relevant current content was read by exact ref. It supplies no current-tree absence proof.",
+    "prior_audit": {
+      "path": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md",
+      "blob": "d25e2ac4a1711af1b81e3c78759dd9898c0baf2e",
+      "scope": "118-file DQP/relation audit is historical related context, not a full consumer audit for this question-plan family."
+    },
+    "limitation": "No exhaustive scan of all current-PR Python consumers has been performed. Existing helpers/imports remain untouched; deletion stays pending until the narrow current consumer/selector and own-evidence checks are complete."
+  },
+  "retirement_gate": {
+    "status": "not_performed",
+    "require_before_deletion": [
+      "Review and integrate the one-label existing assertion and one valid direct-builder critical mutation.",
+      "Read complete healthy critical baseline and intended direct-builder failure with exact code/source identity; collection/setup/import exceptions do not count.",
+      "Read existing literal51 individual comparisons and both healthy baselines, preserving unknown/omitted states.",
+      "Verify the two retained original functions and every retained residual/source guard remain collected and unmodified.",
+      "Complete current consumer audit, preserve helper/API imports, and update only the owning diagnostic hash when deletion is separately authorized.",
+      "Re-run ordinary collection/required CI on the actual final SHA after retirement; no measured speedup or full PR PASS follows from static case reduction."
+    ]
+  }
+}

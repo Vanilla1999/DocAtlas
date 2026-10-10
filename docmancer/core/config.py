@@ -144,11 +144,10 @@ class HierarchicalConfig(BaseModel):
 
 
 class QueryRouter(BaseModel):
-    """A regex-matched query router.
+    """Legacy configuration DTO, retained for parsing existing configs.
 
-    When ``match`` matches the query (case-insensitive), the router's
-    ``filters`` are merged into the dispatcher filters for that call.
-    The first matching router wins; routers do not stack.
+    Query text no longer selects filters. Supply explicit dispatch filters;
+    these rows are not executed or translated into replacement routing rules.
     """
 
     match: str

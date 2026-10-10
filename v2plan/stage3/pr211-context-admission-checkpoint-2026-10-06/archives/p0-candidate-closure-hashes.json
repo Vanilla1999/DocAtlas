@@ -1,0 +1,118 @@
+{
+  "artifacts": [
+    {
+      "path": "p0_candidate_ledger.py",
+      "sha256": "f42220e8e4972068175659a3783d3d141a0fc812b3edbd832fadb3442274df8e",
+      "bytes": 18350
+    },
+    {
+      "path": "p0_bridge_closure_probe.py",
+      "sha256": "7232fbe7fa3bf17dc2e88fa12b8d0e587afb81b937ec380c689f7712429a11c9",
+      "bytes": 3813
+    },
+    {
+      "path": "p0_connector_boundary_probe.py",
+      "sha256": "4d36ff939409514be9bfb6c3161499074ee821f25f3b39aef1b4338427339f8e",
+      "bytes": 2817
+    },
+    {
+      "path": "P0_CANDIDATE_CLOSURE_RU.md",
+      "sha256": "7fab177993c32ad8e2fb6a12507e518698dd1c5b6f7096105b6f7e76846b93f9",
+      "bytes": 10348
+    },
+    {
+      "path": "DICTIONARY_EXIT_PLAN_RU.md",
+      "sha256": "4fa063a68ece339c76bb4d2cb2cec79480ec3e02e0eb670b1d3655afc8bcab43",
+      "bytes": 36542
+    },
+    {
+      "path": "DICTIONARY_INVENTORY_RU.md",
+      "sha256": "b6164fd3f3070fe7009b5241b1d16cb37bc0fd3c25650191b4620292de6dfe80",
+      "bytes": 24089
+    },
+    {
+      "path": "DICTIONARY_STAGE_STATUS_RU.md",
+      "sha256": "90276c91dcb83626c4483c78505ca7638d9bd9e2deecbbfe91b29eac395cafb3",
+      "bytes": 4100
+    },
+    {
+      "path": "P0_TO_P1_GATE_RU.md",
+      "sha256": "3683fae2c8a4731fd9c6781ce6ac90e19a27a0dd2bfcac1153481f9f81d63c9c",
+      "bytes": 12027
+    },
+    {
+      "path": "archives/p0-candidate-ledger.json.gz",
+      "sha256": "4b7bd85b4f83b0a04cf78e21d66398665793da61ad21d6a73e8a5e7824525660",
+      "bytes": 1755553
+    },
+    {
+      "path": "archives/p0-bridge-closure.json",
+      "sha256": "d7a63dc0d96abf870b8847a88d8cae757035d3616da0686b59c94bbe383c5b88",
+      "bytes": 125959
+    },
+    {
+      "path": "archives/p0-connector-boundaries.json",
+      "sha256": "84745c77fd895469b1e40053f0b6c7266147ece4acb42ac77d0b5a7acc949107",
+      "bytes": 3636
+    },
+    {
+      "path": "archives/p0-connector-baseline-pytest.log",
+      "sha256": "d08581346530e3dff35cce5bc2f68c72c2c59ccc656cbc90d513ada0b57feddc",
+      "bytes": 99
+    },
+    {
+      "path": "p0_structural_classification.py",
+      "sha256": "c4d0eedbbaf78a4caf9a1bea3d125a66b6792ddef96e87867def64946e5ea650",
+      "bytes": 10537
+    },
+    {
+      "path": "p0_structural_checks.py",
+      "sha256": "bd914f790636ec54148f40352e5d7e2437e807a39d335ebf4e57c07c64f550af",
+      "bytes": 1424
+    },
+    {
+      "path": "p0_grouped_closure.py",
+      "sha256": "aae0a90b0201e18be38b0a32e4f4110b6a393c81fa2bcbd16da761df3bdd61fe",
+      "bytes": 3189
+    },
+    {
+      "path": "P0_STRUCTURAL_CLASSIFICATION_RU.md",
+      "sha256": "1b83b86c9c21f26971e3592d915e7eb23a8bc39a1391977c540a633f3c072bb1",
+      "bytes": 3619
+    },
+    {
+      "path": "archives/p0-structural-checks.json",
+      "sha256": "d3d6a19e4c881e4998ddf7a3cf76af8b2e147d412b26b5ebde530d939127b167",
+      "bytes": 1245
+    },
+    {
+      "path": "archives/p0-grouped-review-units.json.gz",
+      "sha256": "8317e695a06fe927d4ec0d21c32b18b9eeb1f6054b7d352a81375e56197fd0d7",
+      "bytes": 439275
+    },
+    {
+      "path": "P0_RANKING_SNIPPETS_CLASSIFICATION_RU.md",
+      "sha256": "deb49f3f6240440dfcb1571c2ba5c17446824ef0775b0eeaede75cb84ca3c60e",
+      "bytes": 4699
+    },
+    {
+      "path": "P0_COMPLETENESS_SOURCE_MAP_RU.md",
+      "sha256": "d9a0be84eb5e10848f52352c127773031d57576020573b97d56b67c4186099ef",
+      "bytes": 3958
+    }
+  ],
+  "validation": {
+    "unique_candidate_ids": 9874,
+    "old_collection_scan_preserved": 5594,
+    "exact_old_regex_ast_multiset_preserved": 1276,
+    "classified_candidates": 2313,
+    "pending_candidates": 7561,
+    "product_files_hashes_unchanged": 383,
+    "real_bridges": 9,
+    "wrappers": 348,
+    "local_document_links_valid": true,
+    "grouped_review_units": 2624,
+    "grouped_review_required": 1954,
+    "structural_controls_passed": 12
+  }
+}

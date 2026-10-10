@@ -124,7 +124,7 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
     else:
         packet = build_action_packet(
             question=case["question"], context_pack=candidates,
-            trust_contract=trust_contract, max_tokens=maximum,
+            trust_contract=trust_contract,
             project_path=case.get("project_path"),
             required_evidence_paths=case.get("required_evidence_paths", []),
             required_target_paths=case.get("required_target_paths", []),
@@ -134,15 +134,15 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
             module_id=case.get("module_id"),
         )
         validation_errors.extend(validate_action_packet(
-            packet, evidence_items=candidates, max_tokens=maximum,
+            packet, evidence_items=candidates,
             project_path=case.get("project_path"),
         ))
         projection, snapshot = project_patch_context(
-            packet=packet, evidence_items=candidates, max_tokens=maximum,
+            packet=packet, evidence_items=candidates,
+            project_path=case.get("project_path"),
         )
         validation_errors.extend(validate_model_visible_projection(
             projection, snapshot=snapshot,
-            max_tokens=300 if projection.get("status") == "insufficient_evidence" else maximum,
         ))
     selector_latency_ns = time.perf_counter_ns() - started
     permuted_case = {**case, "candidates": list(reversed(case["candidates"]))}
@@ -152,12 +152,16 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
     selected_versions = {str(item.get("version") or "") for item in selected_rows}
     selected_sources = {str(item.get("source") or "").casefold() for item in selected_rows}
     visible_text = json.dumps(projection, ensure_ascii=False, sort_keys=True).casefold()
+    observed_status = projection.get("result") if kind == "patch_context" else projection.get("status")
+    evaluation_failure = observed_status == ("failure" if kind == "patch_context" else "insufficient_evidence")
     required_facts_present = (
         projection.get("status") == "insufficient_evidence"
         or all(str(fact).casefold() in visible_text for fact in case.get("required_facts", []))
     )
+    if kind == "patch_context":
+        required_facts_present = projection.get("result") == "failure" or projection.get("completeness") == "complete"
     checks = {
-        "expected_status": projection.get("status") == case["expected_status"],
+        "expected_status": observed_status == case["expected_status"],
         "expected_selected": (
             not case.get("expected_selected")
             or set(selected) == set(case["expected_selected"])
@@ -169,7 +173,8 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
         "sufficient_contract": not validation_errors,
         "required_facts_present": required_facts_present,
         "token_ceiling": int(projection.get("estimated_tokens") or maximum + 1) <= (
-            300 if projection.get("status") == "insufficient_evidence" else maximum
+            # Frozen evaluation policy only; never a producer/projection cap.
+            300 if evaluation_failure else maximum
         ),
         "forbidden_sources": not selected_sources.intersection(
             source.casefold() for source in case.get("forbidden_sources", [])
@@ -179,7 +184,12 @@ def evaluate_case(case: dict[str, Any]) -> dict[str, Any]:
     return {
         "case_id": case["case_id"],
         "result_kind": kind,
-        "status": projection.get("status"),
+        "status": observed_status,
+        "completeness": projection.get("completeness"),
+        "unsupported_evaluation_requirements": (
+            ["legacy_packet_status"] if kind == "patch_context"
+            and case["expected_status"] not in {"data", "failure"} else []
+        ),
         "selected_stable_ids": selected,
         "selected_tokens": (trace.get("metrics") or {}).get("selected_tokens"),
         "selector_budgeted_tokens": (trace.get("metrics") or {}).get("projected_total_tokens"),
@@ -305,7 +315,7 @@ def _evaluate_projection_only(case: dict[str, Any]) -> tuple[dict[str, Any], dic
     else:
         packet = build_action_packet(
             question=case["question"], context_pack=candidates,
-            trust_contract=trust, max_tokens=maximum,
+            trust_contract=trust,
             project_path=case.get("project_path"),
             required_evidence_paths=case.get("required_evidence_paths", []),
             required_target_paths=case.get("required_target_paths", []),
@@ -315,7 +325,8 @@ def _evaluate_projection_only(case: dict[str, Any]) -> tuple[dict[str, Any], dic
             module_id=case.get("module_id"),
         )
         projection, _ = project_patch_context(
-            packet=packet, evidence_items=candidates, max_tokens=maximum,
+            packet=packet, evidence_items=candidates,
+            project_path=case.get("project_path"),
         )
     return trace, projection
 

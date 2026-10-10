@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_completeness.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_completeness.py": "fbbc8bada70b25a45a20bf1e0650482b1b8011e8ac5514cac8c5b0bd976a78cb"
+  }
+}

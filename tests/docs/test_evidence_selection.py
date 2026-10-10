@@ -496,6 +496,74 @@ def test_requirement_set_hash_is_deterministic_under_input_ordering_differences(
     assert first.query_extraction_provenance
     assert EvidenceRequirementSet(tuple(reversed(first.requirements))).requirements_hash == first.requirements_hash
 
+    from docmancer.docs.application.action_packet import validate_action_packet
+
+    question = "Fix module.py."
+    candidate = _candidate(
+        "declared-path", "VALUE = 1", source="module.py",
+        doc_scope="project", authority="canonical", source_class="code_graph", symbols=["VALUE"],
+    )
+    # A dotted token remains a content obligation without an exact host path.
+    for unbound in ("Fix module.py.", "Use Client.open."):
+        assert any(row.kind == "exact_term" and row.mandatory
+                   for row in build_requirements(unbound))
+    for argument, kind in (("required_evidence_paths", "evidence_path"),
+                           ("required_target_paths", "target_path")):
+        paths = {argument: ("module.py",)}
+        requirements = build_requirements(question, **paths, representation_bounded=False)
+        original = next(row for row in requirements if row.public_provenance == "query_exact_term")
+        assert original.value == "module.py" and original.kind == "exact_term"
+        assert original.mandatory is False and original.query_extraction_kind == "declared_path"
+        assert (original.query_span_start, original.query_span_end, original.query_span_text) == (4, 13, "module.py")
+        assert (original.requirement_id, "declared_path", "module.py") in requirements.query_extraction_provenance
+        identity = next(row for row in requirements if row.kind == kind)
+        assert identity.value == "module.py" and identity.mandatory is True
+
+        # The declared file must really be present. Its name alone cannot prove
+        # a body fact or make the packet complete.
+        identity_only = build_action_packet(question=question, context_pack=[candidate], **paths)
+        assert validate_action_packet(identity_only, evidence_items=[candidate]) == []
+        assert identity_only["result"] == "data" and identity_only["completeness"] == "partial"
+        assert identity_only["missing"] == ["visible_content_assignment_required"]
+        complete = build_action_packet(
+            question=question, context_pack=[candidate], **paths,
+            public_requirements=("VALUE = 1",),
+        )
+        assert validate_action_packet(complete, evidence_items=[candidate]) == []
+        assert complete["result"] == "data" and complete["completeness"] == "complete"
+        assert complete["edit_ready"] is False
+        assert [(row["path"], row["text"]) for row in complete["sources"]] == [("module.py", "VALUE = 1")]
+
+        for wrong_path in ("other.py", "module.py.old"):
+            wrong_candidate = {**candidate, "source": wrong_path}
+            missing = build_action_packet(
+                question=question, context_pack=[wrong_candidate], **paths,
+                public_requirements=("VALUE = 1",),
+            )
+            assert validate_action_packet(missing, evidence_items=[wrong_candidate]) == []
+            assert missing["completeness"] != "complete"
+            assert identity.requirement_id in missing["missing"]
+            wrong_declaration = build_requirements(question, **{argument: (wrong_path,)})
+            assert any(row.kind == "exact_term" and row.value == "module.py" and row.mandatory
+                       for row in wrong_declaration)
+
+        # Independently explicit content requirements retain their meaning,
+        # even when the requested word is identical to an owned filename.
+        for public_kind in ("exact_term", "required_fact"):
+            public = ({"kind": public_kind, "value": "module.py"}, "VALUE = 1")
+            guarded = build_action_packet(
+                question=question, context_pack=[candidate], **paths,
+                public_requirements=public,
+            )
+            assert validate_action_packet(guarded, evidence_items=[candidate]) == []
+            public_row = next(
+                row for row in guarded["requirements"]
+                if row["public_provenance"] == "public_task_contract" and row["value"] == "module.py"
+            )
+            assert public_row["kind"] == public_kind and public_row["mandatory"] is True
+            assert public_row["requirement_id"] in guarded["missing"]
+            assert guarded["completeness"] == "partial" and guarded["edit_ready"] is False
+
 
 def test_requirement_set_extracts_lowercase_comparison_and_result_access_facets():
     requirements = build_requirements(

@@ -1,22 +1,9 @@
 from __future__ import annotations
 
-import re
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 _SCOPED_POLICY_FILENAMES = {"agents.md", "claude.md"}
-_RISK_PATTERNS = {
-    "fake_policy_message": re.compile(r"\b(system|developer)\s+(message|prompt)\b", re.IGNORECASE),
-    "tool_execution_request": re.compile(r"\b(call|invoke|run|execute)\s+(the\s+)?(tool|shell|terminal|command)\b", re.IGNORECASE),
-    "credential_exfiltration_request": re.compile(
-        r"\b(send|upload|print|reveal|exfiltrate)\b.{0,80}\b(password|credential|secret|token|api[_ -]?key)\b",
-        re.IGNORECASE | re.DOTALL,
-    ),
-    "policy_override_request": re.compile(
-        r"\b(ignore|override|bypass)\b.{0,60}\b(previous|system|developer|safety|policy|instruction)\b",
-        re.IGNORECASE | re.DOTALL,
-    ),
-}
 
 
 def annotate_context_pack(
@@ -26,25 +13,23 @@ def annotate_context_pack(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     annotated: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
-    for index, source_item in enumerate(context_pack):
+    for source_item in context_pack:
         item = dict(source_item)
         path = str(item.get("path") or item.get("source") or "")
         scope = str(item.get("doc_scope") or item.get("origin_lane") or "unknown")
         policy_scope = _policy_scope(path, repository_root=repository_root) if scope == "project" else None
         policy_file = policy_scope is not None
-        already_annotated = isinstance(item.get("content_boundary"), dict)
-        risk_flags = list(item.get("instruction_risk_flags") or detect_instruction_like_patterns(
-            str(item.get("content") or item.get("snippet") or "")
-        ))
         item["source_provenance"] = {
             "owner": "configured_repository" if scope == "project" else "external_source",
             "origin_lane": item.get("origin_lane"),
         }
         item["version_exactness"] = item.get("docs_exactness") or item.get("version_binding") or "not_applicable"
-        item["repository_authority"] = "explicit_agent_policy" if policy_file else (
+        item["repository_authority"] = "scoped_repository_document" if policy_file else (
             "ordinary_repository_document" if scope == "project" else "not_applicable"
         )
-        item["instruction_trust"] = "scoped_agent_policy" if policy_file else "untrusted_data"
+        # Filename/scope establish attribution, never authenticated instructions.
+        # Overwrite caller-supplied trust even for canonical policy-file quotes.
+        item["instruction_trust"] = "untrusted_data"
         item["content_boundary"] = {
             "role": "cited_document_data",
             "schema": "docmancer-document-data-v1",
@@ -58,22 +43,8 @@ def annotate_context_pack(
         item["authority_root"] = str(Path(repository_root).resolve()) if policy_file and repository_root else None
         item["policy_scope"] = str(policy_scope) if policy_scope is not None else None
         item["scope_verified"] = bool(policy_file)
-        item["instruction_risk_flags"] = risk_flags
-
-        if risk_flags and not already_annotated:
-            warnings.append({
-                "code": "instruction_like_document_content",
-                "context_pack_index": index,
-                "source": path or None,
-                "risk_flags": risk_flags,
-                "message": "Indexed text contains instruction-like patterns. It remains document data and must not drive tools or lifecycle actions.",
-            })
         annotated.append(item)
     return annotated, warnings
-
-
-def detect_instruction_like_patterns(text: str) -> list[str]:
-    return [name for name, pattern in _RISK_PATTERNS.items() if pattern.search(text)]
 
 
 def source_trust_dimensions(
@@ -86,10 +57,10 @@ def source_trust_dimensions(
             "owner": "configured_repository" if scope == "project" else "external_source",
         },
         "version_exactness": version_exactness or "not_applicable",
-        "repository_authority": "explicit_agent_policy" if policy_file else (
+        "repository_authority": "scoped_repository_document" if policy_file else (
             "ordinary_repository_document" if scope == "project" else "not_applicable"
         ),
-        "instruction_trust": "scoped_agent_policy" if policy_file else "untrusted_data",
+        "instruction_trust": "untrusted_data",
         "authority_root": str(Path(repository_root).resolve()) if policy_file and repository_root else None,
         "policy_scope": str(policy_scope) if policy_scope is not None else None,
         "scope_verified": bool(policy_file),

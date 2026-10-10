@@ -1,0 +1,163 @@
+{
+  "scope": "actual-query-discovery-ledger",
+  "validation": "source-only; no project imports/runtime",
+  "files": {
+    "docmancer/docs/application/reference_query_tagging.py": "61d3d06bb601ac07aae0fd5bda0773e58bf7daff5d14818ba1cd117d70ec9e2a",
+    "docmancer/docs/application/_project_docs_service_part03.py": "c7f3f4e5c4a0684217b71c68cf1668c64799154efc74d9cd981d5ed6c41ae26a",
+    "tests/docs/test_discovery_independent_qualification.py": "293ca65690bc2c361c3ef6f4658f3211f73470538a51af85cf6681df13ea6831",
+    "tests/docs/test_context_loss_boundaries.py": "df2a614fe8c8d7a601a1f53c8bc8ee7839884e2988915850362fa0ba1aba3438",
+    "scripts/run_recovery_contract_gate.py": "7d063e4584faf922e42e11794c5178124ff31c34d0b54491df4170848216dfc8",
+    "scripts/run_recovery_mutation_gate.py": "7b115e7177e1f471cdc315fe9f63ceb86132629f56ec03dcd8e6f839d2097537",
+    "tests/diagnostic_labels.global_evidence.json": "2c321d34758eb2dd75a5f3e56f24491e5395edbeeead103cfc193a2d284ee8a3"
+  },
+  "static_compile": "PASS",
+  "collection": {
+    "tests/docs/test_discovery_independent_qualification.py": {
+      "functions": 4,
+      "module_node_sha256": "5a0d7101c4729a61cb7d1bf71f2d1c9415584e96f3666120adf68fe11cf867ee"
+    },
+    "tests/docs/test_context_loss_boundaries.py": {
+      "functions": 20,
+      "module_node_sha256": "c179e209e073680ef29c46289aedac9e98be2f3f919ae3b78f1a53e52cfc3a45"
+    }
+  },
+  "case_roster": [
+    "retrieval_miss",
+    "original_fragments",
+    "operational_precedence",
+    "no_semantic_retry",
+    "evidence_eligibility",
+    "documentation_gap",
+    "authoritative_conflict",
+    "projection_states",
+    "exact_document_recovery",
+    "literal_anchor_context",
+    "original_discovery_attribution"
+  ],
+  "mutants": [
+    {
+      "name": "local-handoff-auto-executes",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "retrieval_miss",
+      "guard": "recovery_handoff_not_automatic",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "authoritative-conflict-does-not-stop",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "authoritative_conflict",
+      "guard": "recovery_authoritative_conflict_stops",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "legacy-rephrase-regains-authority",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "no_semantic_retry",
+      "guard": "recovery_legacy_rephrase_cannot_authorize",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "diagnostic-invents-domain-fact",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "original_fragments",
+      "guard": "recovery_original_diagnostic_fragments",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "eligibility-treated-as-retrieval",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "evidence_eligibility",
+      "guard": "recovery_ineligible_evidence_class",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "conflict-keeps-operational-action",
+      "path": "docmancer/docs/interfaces/mcp/recovery_projection.py",
+      "case": "authoritative_conflict",
+      "guard": "recovery_conflict_suppresses_actions",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "operational-reason-masks-conflict",
+      "path": "docmancer/docs/application/recovery.py",
+      "case": "authoritative_conflict",
+      "guard": "recovery_conflict_suppresses_actions",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "exact-document-fallback-disabled",
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "case": "exact_document_recovery",
+      "guard": "recovery_exact_document_source_fact",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "literal-context-admission-disabled",
+      "path": "docmancer/docs/domain/literal_context_admission.py",
+      "case": "literal_anchor_context",
+      "guard": "recovery_original_question_source_fact",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "literal-context-mints-original-credit",
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "case": "literal_anchor_context",
+      "guard": "recovery_partial_no_query_credit",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "identifier-only-label-admitted",
+      "path": "docmancer/docs/domain/literal_context_admission.py",
+      "case": "literal_anchor_context",
+      "guard": "recovery_literal_body_admission_safety",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "literal-context-accepts-foreign-catalog",
+      "path": "docmancer/docs/domain/literal_context_admission.py",
+      "case": "literal_anchor_context",
+      "guard": "recovery_literal_snapshot_binding",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "later-lookup-erases-prior-public-credit",
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "case": "original_discovery_attribution",
+      "guard": "retrieval_original_coverage_survives_lookups",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    },
+    {
+      "name": "lookup-only-hit-mints-original-discovery",
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "case": "original_discovery_attribution",
+      "guard": "retrieval_lookup_cannot_mint_original_discovery",
+      "anchor_count": 1,
+      "mutated_ast": "PASS"
+    }
+  ],
+  "frozen": {
+    "TREASURE": "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b",
+    "TREASURE_SOURCE": "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
+  },
+  "original100_sha256": "0616d67ef86e134365c5192701f9a6b6173e13326c08ba58a5b049147f3e81f1",
+  "runtime": "pending PR CI green baseline11/11 plus intended14/14 kills",
+  "independent_review": {
+    "agent": "agent_fixtures_impl",
+    "verdict": "APPROVE for PR CI",
+    "note": "original-discovery-independent-review.md",
+    "audit": "original-discovery-independent-static-audit.json"
+  }
+}

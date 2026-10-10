@@ -18,14 +18,6 @@ CASES_PATH = CORPUS_DIR / "cases.json"
 MIGRATION_PATH = CORPUS_DIR / "migration-crosswalk.json"
 DIAGNOSTIC_PATH = CORPUS_DIR / "diagnostic.json"
 LOCK_PATH = CORPUS_DIR / "protocol.lock.json"
-SUPPORTED_DOCUMENT_SUFFIXES = {".md", ".mdx", ".rst", ".txt", ".adoc"}
-EXCLUDED_DIRECTORY_NAMES = {
-    ".git", ".hg", ".svn", ".dart_tool", ".pytest_cache", ".ruff_cache",
-    ".mypy_cache", ".tox", ".venv", "venv", "env", "node_modules", "build",
-    "dist", "target", ".next", ".turbo", "coverage", "htmlcov", "__pycache__",
-}
-
-
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -79,21 +71,28 @@ def _witness_visible(witness: str, visible_text: str) -> bool:
 
 
 def _catalog() -> dict[str, dict[str, Any]]:
+    """Resolve only finite explicit document identity, never recursive discovery."""
     payload = yaml.safe_load((ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8"))
-    documents = {
-        str(row["path"]): row for row in payload["documents"]
-        if row.get("status") == "active"
-    }
-    for row in payload.get("roots", []):
-        if row.get("status", "active") != "active":
-            continue
-        root_path = ROOT / str(row["path"])
-        for path in root_path.glob("**/*"):
-            relative_to_root = path.relative_to(root_path)
-            if (path.is_file() and not path.is_symlink()
-                    and path.suffix.casefold() in SUPPORTED_DOCUMENT_SUFFIXES
-                    and not any(part in EXCLUDED_DIRECTORY_NAMES for part in relative_to_root.parts)):
-                documents.setdefault(path.relative_to(ROOT).as_posix(), row)
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise ValueError("quality evaluation requires the explicit catalog schema")
+    if payload.get("roots") or payload.get("code_files"):
+        raise ValueError("quality evaluation requires finite docs-only membership")
+    rows = payload.get("documents")
+    if not isinstance(rows, list):
+        raise ValueError("quality evaluation requires explicit document rows")
+    documents: dict[str, dict[str, Any]] = {}
+    seen_paths: set[str] = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            raise ValueError("quality catalog document is not structured")
+        path = row.get("path")
+        if (not isinstance(path, str) or not path or path in seen_paths
+                or path.startswith("/") or "\\" in path or ":" in path
+                or any(part in {"", ".", ".."} for part in path.split("/"))):
+            raise ValueError("quality catalog requires unique literal relative paths")
+        seen_paths.add(path)
+        if row.get("status") == "active":
+            documents[path] = row
     return documents
 
 
@@ -101,7 +100,7 @@ def _payload() -> dict[str, Any]:
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
     for name, path in (
         ("cases", CASES_PATH), ("migration_crosswalk", MIGRATION_PATH),
-        ("diagnostic", DIAGNOSTIC_PATH),
+        ("diagnostic", DIAGNOSTIC_PATH), ("catalog", ROOT / "docatlas.project-docs.yaml"),
     ):
         if lock["files"][name] != _sha256(path):
             raise ValueError(f"v2 {name} hash does not match independent lock")
@@ -260,12 +259,12 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     identity_ok = (isinstance(response.get("sources", []), list) and len(source_rows) == len(sources) and all(path and authority and scope and evidence_id and str(source.get("snippet") or "").strip() and not _heading_only(str(source.get("snippet", "")))
                        for (path, authority, scope, source), evidence_id in zip(source_rows, evidence_ids))
                    and len(returned_evidence_ids) == len(source_rows))
-    limits = _payload()["limits"]
     token_value = response.get("estimated_tokens")
     token_known = isinstance(token_value, int) and not isinstance(token_value, bool) and token_value >= 0
     public_payload = {key: value for key, value in response.items() if key != "diagnostics"}
-    actual_tokens = max(1, (len(json.dumps(public_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()) + 3) // 4)
-    budget_ok = len(sources) <= limits["maximum_sources"] and token_known and max(token_value, actual_tokens) <= limits["maximum_estimated_tokens"]
+    public_bytes = len(json.dumps(public_payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8"))
+    actual_tokens = max(1, (public_bytes + 3) // 4)
+    cost_observation_valid = token_known
     obligation_results = []
     for obligation in case["obligations"]:
         matches = []
@@ -283,7 +282,7 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     expected_negative = case_type == "strict_negative"
     unsupported_control = case_type == "unsupported_answer_control"
     all_components = bool(obligation_results) and all(row["met"] for row in obligation_results)
-    semantic_useful = response.get("kind") == "docs_context" and all_components and safety_ok and identity_ok and budget_ok
+    semantic_useful = response.get("kind") == "docs_context" and all_components and safety_ok and identity_ok and cost_observation_valid
     required_lookups = set(case["lookup_query_ids"])
     runtime_covered = {str(value) for value in response.get("covered_query_ids") or []}
     covered_lookups = required_lookups & runtime_covered
@@ -294,13 +293,13 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
     runtime_original_claimed = "query-original" in runtime_covered
     authorization_denied = not any(response.get(field) is True for field in (
         "answer_supported", "answer_available", "edit_ready", "mutation_ready", "authorized", "authorization_granted",
-    )) and not response.get("authorized_actions")
+    )) and not response.get("authorized_actions") and not response.get("answer")
     semantic_useful = semantic_useful and authorization_denied
     unsupported_payload_kind = response.get("kind") == "insufficient_evidence" or (
         response.get("kind") in {None, "docs_context"} and response.get("status") == "insufficient_evidence"
     )
-    negative_correct = expected_negative and unsupported_payload_kind and safety_ok and identity_ok and budget_ok and authorization_denied
-    unsupported_answer_control_correct = unsupported_control and safety_ok and identity_ok and budget_ok and authorization_denied and (
+    negative_correct = expected_negative and unsupported_payload_kind and safety_ok and identity_ok and cost_observation_valid and authorization_denied
+    unsupported_answer_control_correct = unsupported_control and safety_ok and identity_ok and cost_observation_valid and authorization_denied and (
         unsupported_payload_kind or (
             response.get("kind") == "docs_context"
             and response.get("answer_supported") is False
@@ -317,8 +316,8 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
         root_cause = "safety_failure"
     elif not identity_ok:
         root_cause = "source_identity_failure"
-    elif not budget_ok:
-        root_cause = "budget_failure"
+    elif not cost_observation_valid:
+        root_cause = "cost_measurement_missing"
     elif runtime_component_claim["available"] and not runtime_component_claim["valid"]:
         root_cause = "runtime_component_claim_invalid"
     elif expected_negative and not negative_correct:
@@ -357,7 +356,9 @@ def evaluate_case(case: dict[str, Any], response: dict[str, Any]) -> dict[str, A
         "unadjudicated_relevance": bool(extra_paths),
         "adjudicated_source_count": adjudicated_count, "returned_source_count": len(source_rows),
         "obligations": obligation_results,
-        "hard_gates": {"safety": safety_ok, "source_identity": identity_ok, "budget": budget_ok, "estimated_tokens_present": token_known, "authorization_denied": authorization_denied},
+        "hard_gates": {"safety": safety_ok, "source_identity": identity_ok, "cost_observation_valid": cost_observation_valid, "estimated_tokens_present": token_known, "authorization_denied": authorization_denied},
+        "output_cost": {"source_count": len(sources), "public_utf8_bytes": public_bytes, "serialized_estimated_tokens": actual_tokens,
+                        "reported_estimated_tokens": token_value if token_known else None},
         "root_cause": root_cause,
         "diagnostics": response.get("diagnostics") or {},
     }
@@ -386,17 +387,24 @@ def evaluate(responses: dict[str, dict[str, Any]]) -> dict[str, Any]:
                 "lookup_attribution": _fraction(sum(r["lookup_covered"] for r in positives), sum(r["lookup_required"] for r in positives)),
                 "source_precision": _fraction(sum(r["adjudicated_source_count"] for r in positives), sum(r["returned_source_count"] for r in positives)),
                 "safety": _fraction(sum(r["hard_gates"]["safety"] for _, r in pairs), len(pairs)),
-                "budget_compliance": _fraction(sum(r["hard_gates"]["budget"] for _, r in pairs), len(pairs)),
+                "cost_observation_completeness": _fraction(sum(r["hard_gates"]["cost_observation_valid"] for _, r in pairs), len(pairs)),
                 "negative_correctness": _fraction(sum(r["negative_correct"] for r in negatives), len(negatives)),
                 "unsupported_answer_control_correctness": _fraction(sum(r["unsupported_answer_control_correct"] for r in unsupported_controls), len(unsupported_controls)),
                 "runtime_claimed_original_retrieval_coverage": _fraction(sum(r["runtime_claimed_original_retrieval_coverage"] for r in positives), len(positives)),
                 "evaluator_verified_full_semantic_component_coverage": _fraction(sum(r["evaluator_verified_component_coverage"]["full"] for r in positives), len(positives)),
                 "false_full_coverage": _fraction(sum(r["false_full_coverage"] for r in positives), len(positives)),
             },
+            "output_cost": {
+                "total_source_count": sum(r["output_cost"]["source_count"] for _, r in pairs),
+                "max_source_count": max((r["output_cost"]["source_count"] for _, r in pairs), default=0),
+                "max_public_utf8_bytes": max((r["output_cost"]["public_utf8_bytes"] for _, r in pairs), default=0),
+                "max_serialized_estimated_tokens": max((r["output_cost"]["serialized_estimated_tokens"] for _, r in pairs), default=0),
+            },
             "root_cause_counts": dict(sorted(Counter(r["root_cause"] for _, r in pairs).items())),
         }
-    return {"schema_version": "project-context-quality-v2-result-2", "report_only": True,
+    return {"schema_version": "project-context-quality-v2-result-4", "report_only": True,
             "verdict": "REPORT_ONLY", "thresholds": None, "validation": validation,
+            "output_cost_policy": _payload()["output_cost_policy"],
             "lanes": lane_reports, "results": results}
 
 
@@ -426,6 +434,8 @@ def run_live() -> dict[str, Any]:
     report["production_runner_verdict"] = production.get("verdict")
     report["production_runner_errors"] = production.get("errors")
     report["production_results"] = production["results"]
+    if "setup_provenance" in production:
+        report["production_setup_provenance"] = production["setup_provenance"]
     return report
 
 

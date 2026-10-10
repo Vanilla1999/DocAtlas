@@ -5,9 +5,9 @@ The gate indexes this repository into an isolated temporary SQLite store and the
 runs canonical Project Docs questions through the unpatched public
 ``get_docs_context`` MCP handler. It proves the current production chain:
 
-question -> retrieval -> proof metadata -> final answer-or-context projection.
+question -> explicit retrieval lineage -> current source qualification -> final visible context.
 
-The corpus intentionally covers the stable QuestionPlan families plus two
+The immutable historical corpus retains its original questions plus two
 premise/condition cases that depend on the clear-index source of truth.
 """
 from __future__ import annotations
@@ -17,12 +17,24 @@ import hashlib
 import json
 import os
 import re
+import sys
 from collections.abc import Mapping
+from contextlib import nullcontext
 from copy import deepcopy
 from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
+
+# Preserve direct `python scripts/run_project_docs_self_host_gate.py` as well as
+# imported evaluator entrypoints; the mirrored checkout is never an import root.
+_SCRIPT_ROOT = Path(__file__).resolve().parents[1]
+if str(_SCRIPT_ROOT) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_ROOT))
+
+from scripts._project_docs_self_host_fixture import self_host_fixture
+from eval.project_context_quality.legacy_fact_acceptance import capture_legacy_evidence
 
 import yaml
 
@@ -178,10 +190,6 @@ def _query_coverage(payload: dict[str, object]) -> float:
 
 def _validate_context_result(payload: dict[str, object]) -> str | None:
     payload = {key: value for key, value in payload.items() if key != "diagnostics"}
-    if len(payload.get("sources") or ()) > 3:
-        return "result exceeds the three-source budget"
-    if estimate_projection_tokens(payload) > 800:
-        return "result exceeds the 800-token budget"
     kind = str(payload.get("kind") or "")
     if kind == "docs_answer":
         if (
@@ -198,6 +206,7 @@ def _validate_context_result(payload: dict[str, object]) -> str | None:
             and payload.get("edit_ready") is False
             and payload.get("answer_policy") == "cite_only"
             and isinstance(payload.get("facets"), list)
+            and not payload.get("answer")
         ):
             return "docs_context violates the context-first safety contract"
     else:
@@ -269,7 +278,6 @@ def _threshold_failures(metrics: dict[str, object], case_count: int) -> list[str
     for name in (
         "metadata_only_evidence_count", "packs_contamination_count",
         "docs_analysis_contamination_count", "false_docs_answer_count",
-        "source_budget_violation_count", "token_budget_violation_count",
     ):
         if int(metrics[name]):
             failures.append(f"{name} must be zero")
@@ -290,8 +298,129 @@ def _is_metadata_only_source(source: object) -> bool:
     return True
 
 
-def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[dict | None, dict]:
+
+def _delivery_observation(stage: str, result: object, args: tuple, kwargs: dict) -> dict:
+    """Summarize actual returned DTO fields; never read or emit source bodies."""
+    missing = object()
+
+    def value(obj, key, default=None):
+        return obj.get(key, default) if isinstance(obj, Mapping) else getattr(obj, key, default)
+
+    def scalar(item):
+        if item is None or type(item) in (bool, int, float):
+            return item
+        if isinstance(item, str):
+            return item if len(item) <= 512 else {
+                "characters": len(item), "sha256": hashlib.sha256(item.encode("utf-8")).hexdigest(),
+            }
+        return {"type": type(item).__name__}
+
+    def fields(obj, names):
+        pairs = ((key, value(obj, key, missing)) for key in names)
+        return {key: scalar(item) for key, item in pairs if item is not missing}
+
+    def sequence(items, render=scalar):
+        if items is None:
+            return None
+        if not isinstance(items, (list, tuple)):
+            return {"type": type(items).__name__}
+        return {"count": len(items), "items": [render(item) for item in items[:32]],
+                "omitted": max(0, len(items) - 32)}
+
+    def window(item):
+        metadata = value(item, "metadata")
+        metadata = metadata if isinstance(metadata, Mapping) else {}
+        matches = value(item, "retrieval_query_matches", metadata.get("retrieval_query_matches"))
+        row = {}
+        for key in (
+            "source", "chunk_index", "stable_chunk_id", "parent_logical_id", "path",
+            "project_identity", "doc_scope", "module_path", "source_class", "stale",
+            "lifecycle_status", "freshness", "char_start", "char_end", "display_content_hash",
+            "generation_id", "project_doc_catalog_entry_hash", "project_doc_content_hash",
+        ):
+            observed = value(item, key, metadata.get(key, missing))
+            if observed is not missing:
+                row[key] = scalar(observed)
+        row["qualified_query_ids"] = sequence([
+            str(key) for key, trace in matches.items()
+            if isinstance(trace, Mapping) and trace.get("qualified") is True
+        ]) if isinstance(matches, Mapping) else scalar(matches)
+        return row
+
+    scope_fields = (
+        "schema_version", "query", "project_path", "project_identity",
+        "requested_scope", "requested_module", "requested_module_path",
+        "doc_scope", "module_path", "evidence_path",
+    )
+    state_fields = (
+        "status", "reason", "reason_code", "mode", "mode_requested", "mode_selected",
+        "context_available", "answer_available", "answer_supported", "support_status",
+        "requires_confirmation", "confirmation_reason", "stale_before_refresh",
+    )
+
+    def packet(obj):
+        observed = fields(obj, state_fields)
+        observed["delivery_decision"] = fields(value(obj, "delivery_decision"), ("deliverable", "reason_code"))
+        observed["context_windows"] = sequence(value(obj, "context_pack"), window)
+        observed["result_windows"] = sequence(value(obj, "results"), window)
+        observed["request_scope"] = fields(value(obj, "request_scope"), scope_fields)
+        requirements = value(value(obj, "requirements"), "requirements")
+        observed["requirements"] = sequence(requirements, lambda row: fields(row, (
+            "requirement_id", "kind", "value", "mandatory", "public_provenance", "proof_role",
+        )))
+        support = value(obj, "support_decision")
+        observed["support_decision"] = {
+            **fields(support, ("answer_supported", "support_status", "reason_code")),
+            **{key: sequence(value(support, key)) for key in (
+                "missing_requirement_ids", "mandatory_requirement_ids", "satisfied_requirement_ids",
+            )},
+        }
+        return observed
+
+    question = kwargs.get("query", kwargs.get("question",
+        args[0] if stage == "unified" and args else args[1] if len(args) > 1 else None))
+    root = kwargs.get("project_path", args[0] if stage != "unified" and args else None)
+    observation = {
+        "stage": stage,
+        "request": {
+            "question": scalar(question), "project_path": scalar(root),
+            **fields(kwargs, ("scope", "module", "module_path", "evidence_path",
+                              "limit", "tokens", "expand", "retain_found_windows",
+                              "allow_network", "prepare_project_docs")),
+            "lookup_queries": sequence(kwargs.get("lookup_queries")),
+        },
+        "result": packet(result),
+    }
+    for key in ("project_docs", "dependency_docs"):
+        nested = value(result, key, missing)
+        if nested is not missing:
+            observation[key] = None if nested is None else packet(nested)
+    lanes = value(result, "lanes")
+    if isinstance(lanes, Mapping):
+        observation["lanes"] = {key: fields(lanes[key], (
+            "status", "reason_code", "source_count", "requires_confirmation",
+        )) for key in ("project", "dependency", "library") if key in lanes}
+    observation["routing"] = fields(value(result, "routing"), (
+        "reason_code", "project_path_used", "dependency_detected", "delegated_mode",
+    ))
+    diagnostics = value(result, "diagnostics")
+    if not isinstance(diagnostics, Mapping):
+        diagnostics = value(value(result, "ingestion_diagnostics"), "project", {})
+    observation["project_trust_decision"] = fields(value(diagnostics, "trust_decision"), (
+        "reason", "confidence", "answer_available", "passed_relevance_gate",
+    ))
+    stages = value(value(diagnostics, "retrieval_routing"), "stages")
+    if isinstance(stages, Mapping):
+        observation["routing_stages"] = {key: fields(stages[key], (
+            "status", "reason", "item_count", "observed_item_count",
+            "budget_projection_bytes", "observed_budget_projection_bytes", "budget_exceeded", "error_type",
+        )) for key in ("project_docs", "dependency_docs", "source_evidence", "repo_map", "code_graph")
+            if key in stages}
+    return observation
+
+def _call_with_snapshot(arguments: dict, service: LibraryDocsService, *, trace_enabled: bool = True) -> tuple[dict | None, dict]:
     """Observe the public call without replaying retrieval or changing its result."""
+    from docmancer.docs.application.query_trace import query_trace
     raw_results: list[object] = []
     qualified_sources: list[dict] = []
     snapshots: list[dict] = []
@@ -299,6 +428,13 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     component_bindings: list[dict] = []
     app = getattr(service, "unified_context", service)
     retrieve = app.get_docs_context
+    # Downstream diagnostic stages are optional capabilities of the observed app.
+    facade = getattr(app, "service", None)
+    member_facade = getattr(getattr(facade, "project_context", None), "facade", None)
+    project_read = getattr(facade, "get_project_context", None)
+    member_read = getattr(member_facade, "get_project_docs", None)
+    delivery_observations: list[dict] = []
+    delivery_counts: dict[str, int] = {}
     select = docs_context_projection.context_selection_decision
     validate = context_tools.validate_model_visible_projection
     coverage = docs_context_projection.component_coverage_decision
@@ -306,25 +442,47 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     def capture_coverage(contract, assignments, sources, **kwargs):
         contract, assignments, sources = tuple(contract), tuple(assignments), tuple(sources)
         decision = coverage(contract, assignments, sources, **kwargs)
+        if not trace_enabled:
+            return decision
         component_bindings.clear()
         for source in sources:
             original = source.get("_qualification_candidate") or {}
             source_ids = {original.get(key) for key in ("stable_id", "stable_chunk_id", "evidence_id") if original.get(key)}
-            local_assignments = tuple(item for item in assignments if item.get("evidence_id") in source_ids)
-            local = coverage(contract, local_assignments, (source,), **kwargs)
-            for component_id in local.covered_component_ids:
+            source_ids.add(source.get("evidence_id"))
+            for component_id, runtime_evidence_id in getattr(decision, "_component_evidence", ()):
+                if runtime_evidence_id not in source_ids:
+                    continue
                 component_bindings.append({
                     "component_id": component_id,
                     "evidence_id": source.get("evidence_id"),
                     "path_or_url": source.get("path_or_url"),
                     "snippet_sha256": hashlib.sha256(str(source.get("snippet") or "").encode()).hexdigest(),
-                    "runtime_evidence_ids": list(local.evidence_ids),
+                    "runtime_evidence_ids": [runtime_evidence_id],
                 })
         return decision
+
+    def capture_delivery(stage, result, args, kwargs):
+        delivery_counts[stage] = delivery_counts.get(stage, 0) + 1
+        if not trace_enabled:
+            return
+        if len(delivery_observations) < 32:
+            try:
+                delivery_observations.append(_delivery_observation(stage, result, args, kwargs))
+            except Exception as exc:
+                delivery_observations.append({"stage": stage, "observation_error": type(exc).__name__})
+
+    def delivery_observer(read, stage):
+        @wraps(read)
+        def capture_read(*args, **kwargs):
+            result = read(*args, **kwargs)
+            capture_delivery(stage, result, args, kwargs)
+            return result
+        return capture_read
 
     def capture_result(*args, **kwargs):
         result = retrieve(*args, **kwargs)
         raw_results.append(result)
+        capture_delivery("unified", result, args, kwargs)
         return result
 
     def capture_selection(sources, requested_query_ids):
@@ -337,20 +495,36 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
         snapshots.append(deepcopy(snapshot))
         return validate(payload, snapshot=snapshot, **kwargs)
 
-    service._same_call_diagnostics_observer = lambda value: diagnostics.append(deepcopy(value))
+    missing_observer = object()
+    previous_observer = getattr(service, "_same_call_diagnostics_observer", missing_observer)
+    if trace_enabled:
+        service._same_call_diagnostics_observer = lambda value: diagnostics.append(deepcopy(value))
     try:
         with (
+        query_trace(trace_enabled),
         patch.object(app, "get_docs_context", capture_result),
+        patch.object(facade, "get_project_context", delivery_observer(project_read, "project_context"))
+            if callable(project_read) else nullcontext(),
+        patch.object(member_facade, "get_project_docs", delivery_observer(member_read, "member_read"))
+            if callable(member_read) else nullcontext(),
         patch.object(docs_context_projection, "context_selection_decision", capture_selection),
         patch.object(context_tools, "validate_model_visible_projection", capture_validation),
         patch.object(docs_context_projection, "component_coverage_decision", capture_coverage),
         ):
             payload = call_docs_tool_payload("get_docs_context", arguments, service)
     finally:
-        del service._same_call_diagnostics_observer
+        if trace_enabled:
+            if previous_observer is missing_observer:
+                del service._same_call_diagnostics_observer
+            else:
+                service._same_call_diagnostics_observer = previous_observer
     if isinstance(payload, dict) and diagnostics:
         diagnostics[-1]["component_evidence_bindings"] = component_bindings
         diagnostics[-1]["observer_counts"] = {"retrieval_calls": len(raw_results), "validation_calls": len(snapshots)}
+        diagnostics[-1]["delivery_observations"] = {
+            "return_counts": delivery_counts, "returns": delivery_observations,
+            "omitted": max(0, sum(delivery_counts.values()) - len(delivery_observations)),
+        }
         payload = {**payload, "diagnostics": diagnostics[-1]}
     if len(raw_results) != 1 or len(snapshots) != 1:
         return payload, {}
@@ -392,15 +566,36 @@ def _coverage_attribution(snapshot: dict, payload: dict) -> set[str]:
 
 
 def _packs_contamination(question: str, payload: dict) -> bool:
+    """Detect Docs→Packs command substitution, not a mention of another subsystem.
+
+    Relevance and required Docs facts are checked separately. A project-map
+    paragraph mentioning the Packs gateway can be irrelevant without claiming
+    that Packs is the Docs server. Paths and titles alone never establish this
+    factual substitution.
+    """
     explicit_docs = re.search(r"\bdocs\b|get_docs_context|prepare_docs|docs_status", question, re.I)
     requested_packs = re.search(r"\bpacks?\b", question, re.I)
     excluded_packs = re.search(r"\b(?:not|without|excluding)\s+(?:the\s+)?packs?\b", question, re.I)
     if not explicit_docs or (requested_packs and not excluded_packs):
         return False
-    return any(
-        re.search(r"\bpacks?\b", str(source.get("path_or_url") or "") + "\n" + str(source.get("snippet") or ""), re.I)
-        for source in payload.get("sources") or () if isinstance(source, dict)
+    pack_command = re.compile(
+        r"\b(?:doc-atlas|docmancer)\s+(?:mcp\s+packs-serve|install-pack)\b"
+        r"|\bdocmancer_(?:search_tools|call_tool)\s*\(", re.I,
     )
+    snippets = [str(source.get("snippet") or "") for source in payload.get("sources") or ()
+                if isinstance(source, dict)]
+    if payload.get("answer"):
+        snippets.append(str(payload["answer"]))
+    for snippet in snippets:
+        for line in snippet.splitlines():
+            for command in pack_command.finditer(line):
+                # Negation must govern this exact Packs occurrence. A correct
+                # Docs command elsewhere cannot excuse a Packs substitution.
+                prefix = line[:command.start()]
+                if re.search(r"\b(?:do not|don't|never|must not|not)\s+(?:run\s+|use\s+)?[` ]*$", prefix, re.I):
+                    continue
+                return True
+    return False
 
 
 def _safe_abstention(payload: Mapping) -> bool:
@@ -419,61 +614,36 @@ def run(
     cases: tuple[LiveCase, ...] = GOLD_CASES,
     negative_cases: tuple[str | LiveCase, ...] = NEGATIVE_CASES,
 ) -> dict[str, object]:
-    previous_home = os.environ.get("DOCATLAS_HOME")
     errors: list[str] = []
     results: list[dict[str, object]] = []
     historical_paths = _historical_paths()
-    try:
-        with TemporaryDirectory(prefix="docatlas-self-host-") as raw_tmp:
-            tmp = Path(raw_tmp)
-            os.environ["DOCATLAS_HOME"] = str(tmp / "home")
-            config = DocmancerConfig()
-            config.index.db_path = str(tmp / "docmancer.db")
-            config.index.extracted_dir = str(tmp / "extracted")
-            service = LibraryDocsService(
-                config=config,
-                config_source="explicit",
-                registry=LibraryRegistry(config.index.db_path),
-                agent=DocmancerAgent(config=config),
-                job_tracker=DocsJobTracker(),
-            )
-
-            preflight_question = cases[0].question if cases else "How do Project Docs work?"
-            preflight = call_docs_tool_payload(
-                "get_docs_context",
-                {
-                    "question": preflight_question,
-                    "project_path": str(REPO_ROOT),
-                    "scope": cases[0].scope if cases else "project",
-                },
-                service,
-            )
-            preflight_payload = preflight if isinstance(preflight, Mapping) else {}
-            preflight_action = (
-                preflight_payload.get("recommended_next_action")
-                or preflight_payload.get("next_action")
-                or {}
-            )
-            action_patch = preflight_action.get("arguments_patch") if isinstance(preflight_action, Mapping) else {}
-            action_patch = action_patch if isinstance(action_patch, Mapping) else {}
-            if action_patch.get("action") != "sync_project_docs":
-                errors.append(f"pre-sync query did not recommend sync_project_docs: {preflight!r}")
-
-            sync = service.sync_project_docs(str(REPO_ROOT), with_vectors=False)
-            if getattr(sync, "status", None) != "success":
-                errors.append(f"self-host sync status={getattr(sync, 'status', None)!r}")
+    with self_host_fixture(REPO_ROOT) as fixture:
+        service = fixture.service
+        setup_provenance = fixture.provenance
+        preflight_question = cases[0].question if cases else "How do Project Docs work?"
+        preflight = call_docs_tool_payload(
+            "get_docs_context",
+            {
+                "question": preflight_question,
+                "project_path": str(fixture.root),
+                "scope": cases[0].scope if cases else "project",
+            },
+            service,
+        )
+        if not fixture.verify_cold_read(preflight):
+            errors.append(f"pre-sync query did not preserve the cold read boundary: {preflight!r}")
+        else:
+            fixture.prepare()
 
             for index, case in enumerate(cases, 1):
                 question = case.question
-                payload, snapshot = _call_with_snapshot(
-                    {
-                        "question": question,
-                        "project_path": str(REPO_ROOT),
-                        **({"lookup_queries": list(case.lookup_queries)} if case.lookup_queries else {}),
-                        "scope": case.scope,
-                    },
-                    service,
-                )
+                arguments = {
+                    "question": question,
+                    "project_path": str(fixture.root),
+                    **({"lookup_queries": list(case.lookup_queries)} if case.lookup_queries else {}),
+                    "scope": case.scope,
+                }
+                payload, snapshot = _call_with_snapshot(arguments, service)
                 if not isinstance(payload, Mapping):
                     errors.append(f"{index:02d}: missing or non-mapping payload={payload!r}: {question}")
                     payload = {}
@@ -641,6 +811,7 @@ def run(
                         "original_query_covered": original_query_covered and bool(attribution),
                         "coverage_attribution": sorted(attribution),
                         "packs_contamination": packs_contamination,
+                        "public_utf8_bytes": len(json.dumps({key: value for key, value in payload.items() if key != "diagnostics"}, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")),
                         "actual_estimated_tokens": estimate_projection_tokens({key: value for key, value in payload.items() if key != "diagnostics"}),
                         "metadata_only_sources": metadata_only_sources,
                     },
@@ -659,6 +830,7 @@ def run(
                     "top1_fact_bearing": top1_fact_bearing,
                     "answer_fact_checks": answer_fact_checks,
                     "citations": _citations(payload),
+                    "legacy_fact_evidence": capture_legacy_evidence(arguments, payload, snapshot),
                     "payload": payload,
                     "checks": checks,
                     "decision_hash": payload.get("decision_hash"),
@@ -685,10 +857,8 @@ def run(
             for index, negative in enumerate(negative_cases, 1):
                 question = negative.question if isinstance(negative, LiveCase) else negative
                 scope = negative.scope if isinstance(negative, LiveCase) else "project"
-                payload, _ = _call_with_snapshot(
-                    {"question": question, "project_path": str(REPO_ROOT), "scope": scope},
-                    service,
-                )
+                arguments = {"question": question, "project_path": str(fixture.root), "scope": scope}
+                payload, snapshot = _call_with_snapshot(arguments, service)
                 if not isinstance(payload, Mapping):
                     errors.append(f"negative query returned missing or non-mapping payload: {question}: {payload!r}")
                     payload = {}
@@ -707,15 +877,10 @@ def run(
                         "answer_supported": (payload or {}).get("answer_supported"),
                     },
                     "payload": dict(payload),
+                    "legacy_fact_evidence": capture_legacy_evidence(arguments, dict(payload), snapshot),
                     "checks": {"correct_abstention": safe_abstention},
                     "passed": safe_abstention,
                 })
-    finally:
-        if previous_home is None:
-            os.environ.pop("DOCATLAS_HOME", None)
-        else:
-            os.environ["DOCATLAS_HOME"] = previous_home
-
     positives = results[:len(cases)]
     source_count = sum(len(row.get("payload", {}).get("sources") or ()) for row in positives)
     distractor_count = sum(len(row.get("ranking", {}).get("distractor_paths", ())) for row in positives)
@@ -735,6 +900,7 @@ def run(
         "schema_version": "project-answer-quality-live-result-v1",
         "run_mode": "live_self_host",
         "provider_free": True,
+        "setup_provenance": setup_provenance,
         "case_count": len(results),
         "positive_case_count": len(positives),
         "positive_passed_count": sum(bool(row.get("passed")) for row in positives),
@@ -780,9 +946,8 @@ def run(
             ),
             "false_docs_answer_count": sum(row.get("observed", {}).get("kind") == "docs_answer" and row.get("expected", {}).get("kind") != "docs_answer" for row in positives),
             "max_source_count": max((len(row.get("payload", {}).get("sources") or ()) for row in positives), default=0),
+            "max_public_utf8_bytes": max((row.get("observed", {}).get("public_utf8_bytes", 0) for row in positives), default=0),
             "max_estimated_tokens": max((row.get("observed", {}).get("actual_estimated_tokens", 0) for row in positives), default=0),
-            "source_budget_violation_count": sum(len(row.get("payload", {}).get("sources") or ()) > 3 for row in positives),
-            "token_budget_violation_count": sum(row.get("observed", {}).get("actual_estimated_tokens", 0) > 800 for row in positives),
             "false_abstention_count": sum(
                 row.get("expected", {}).get("kind") != "insufficient_evidence"
                 and not bool(row.get("checks", {}).get("status_ok"))
@@ -792,6 +957,11 @@ def run(
             "operational_contamination_count": distractor_count,
             "cases_scoring_8_plus": sum(score >= 8.0 for score in scores),
             "mean_score": sum(scores) / max(len(scores), 1),
+        },
+        "output_cost_policy": {
+            "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
+            "measurement": "source_count_canonical_utf8_bytes_and_existing_serialized_token_estimate",
+            "constraints": "quality_source_identity_fidelity_and_safety_unchanged",
         },
         "verdict": "FAIL" if errors else "PASS",
         "errors": errors,

@@ -46,7 +46,6 @@ def test_original_negative_option_question_is_recoverable_without_host_hints(tmp
             text.append(read["snippet"])
         assert any(fact in s for s in text), {"payload": payload, "read_text": text}
     assert "lookup_queries" not in request
-    assert docs_context_budget_tokens(payload) <= 800
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
     assert "query-original" not in payload.get("covered_query_ids", [])

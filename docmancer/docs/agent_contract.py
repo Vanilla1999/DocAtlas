@@ -54,25 +54,25 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
             "documentation": docs,
             "documentation_catalog": {
                 "path": CATALOG_FILENAME,
-                "mode": "explicit" if metadata.docs_catalog_present else "cold_start_discovery",
+                "mode": "explicit" if metadata.docs_catalog_present else "unresolved",
                 "valid": metadata.docs_catalog_valid,
                 "instruction_trust": "untrusted_data",
             },
             "dependencies": dependencies,
         },
         "tool_selection": {
-            "decision_rule": "Use docs_status for an explicit health, freshness, index, or job-status request. For coding and patch tasks, call get_docs_context once before the first edit; bounded structured delivery is server-owned. Call prepare_docs only from recommended_next_action or an explicit lifecycle request.",
+            "decision_rule": 'Use docs_status for an explicit health, freshness, index, or job-status request. For coding and patch tasks, call get_docs_context once with context_format="patch_context" before the first edit. Omitted/null retains docs delivery. Call prepare_docs only from recommended_next_action or an explicit lifecycle request; neither supplies mutation authorization.',
             "default_tool": "get_docs_context",
             "tools": [
                 {
                     "name": "get_docs_context",
-                    "use_when": "Once before the first edit for repository, dependency, or mixed coding tasks. The server returns one bounded structured projection.",
+                    "use_when": 'Once before the first edit for repository, dependency, or mixed coding tasks with context_format="patch_context". The server retains full admitted v4 evidence; documentation questions may omit the format.',
                     "do_not_use_when": "The request only asks for index health, freshness, or background-job status.",
                 },
                 {
                     "name": "prepare_docs",
                     "use_when": "Only from recommended_next_action or an explicit user request to sync, refresh, index, or prefetch.",
-                    "requires_user_approval": "Network actions require approval.",
+                    "requires_user_approval": "Network actions require approval. Project writes require the explicit bound member mutation contract, not catalog membership or status.",
                 },
                 {
                     "name": "docs_status",
@@ -92,7 +92,7 @@ def build_agent_contract(project_path: str | Path) -> dict[str, Any]:
         ],
         "maintenance": {
             "check_docs_after_code_change": "doc-atlas docs-impact --base <base-ref>",
-            "refresh_project_docs": "Use prepare_docs(action=sync_project_docs) after file changes, or only when explicitly requested.",
+            "refresh_project_docs": "Use prepare_docs(action=sync_project_docs) only with the explicit confirmed project/storage/member mutation contract. File changes and clean Git do not authorize writes.",
             "fallback_without_mcp": [
                 "doc-atlas context <question>",
                 "doc-atlas query <question>",
@@ -119,7 +119,7 @@ def format_agent_contract_markdown(contract: dict[str, Any]) -> str:
         "",
         "## Required tool selection",
         "",
-        "For an explicit health, freshness, index, or job-status request, use `docs_status`. For coding and patch tasks, call `get_docs_context` once before the first edit; bounded structured delivery is server-owned. Call `prepare_docs` only from `recommended_next_action` or an explicit sync/refresh/index request.",
+        'For an explicit health, freshness, index, or job-status request, use `docs_status`. For coding and patch tasks, call `get_docs_context` once with `context_format="patch_context"` before the first edit. Omitted/null keeps docs delivery. A `prepare_docs` recommendation is not mutation authorization; project writes require the explicit confirmed member transaction.',
         "",
         "## Local documentation sources",
         "",

@@ -28,6 +28,7 @@ _SUPPORT_DECISION_KEYS = {
     "selector_config_hash", "eligibility_contract_hash", "candidate_trace_hash", "selection_hash",
     "assignment_hash", "decision_hash", "hard_stop", "next_action", "next_actions",
     "arguments_patch", "requires_confirmation", "confirmation_reason", "document_content_policy",
+    "mutation_authorized", "policy_coverage", "packet_available",
 }
 def json_bytes(payload: Any) -> int:
     return len(json.dumps(payload, ensure_ascii=False, default=str).encode("utf-8"))
@@ -146,6 +147,7 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
         "mode", "reason", "message", "response_style", "primary_snippet", "context_pack", "supporting_snippets",
         "next_actions", "next_action", "arguments_patch", "warnings", "mcp_compaction",
         "requires_confirmation", "confirmation_reason", "document_content_policy",
+        "mutation_authorized", "policy_coverage", "packet_available",
     }
     omitted = [key for key in compact if key not in keep_keys]
     compact = {key: value for key, value in compact.items() if key in keep_keys}
@@ -167,6 +169,44 @@ def _fit_payload(payload: dict[str, Any], *, max_bytes: int) -> dict[str, Any]:
     }
 
 
+def is_v4_patch_projection(payload: dict[str, Any]) -> bool:
+    """Recognize a validated v4 projection, not a transport-cap escape flag.
+
+    Binding validation belongs to the upstream projector and its snapshot.
+    This boundary rechecks the packet schema and final serialization estimate.
+    """
+    if (payload.get("kind") != "patch_context"
+        or type(payload.get("schema_version")) is not int
+        or payload.get("schema_version") != 4
+        or payload.get("edit_ready") is not False
+        or payload.get("result") not in ("data", "failure")
+        or payload.get("completeness") not in ("complete", "partial", "unavailable")):
+        return False
+    from docmancer.docs.application.action_packet import (
+        ACTION_PACKET_OUTPUT_SCHEMA, refresh_action_packet_estimate,
+    )
+    from jsonschema import Draft202012Validator, validators
+    estimated = deepcopy(payload)
+    refresh_action_packet_estimate(estimated)
+    if payload.get("estimated_tokens") != estimated["estimated_tokens"]:
+        return False
+    core = {key: deepcopy(value) for key, value in payload.items()
+            if key not in {"kind", "recommended_next_action", "source_search_status"}}
+    refresh_action_packet_estimate(core)
+    # Do not recreate selector identities from inline text at this terminal
+    # boundary: attribution/proof-role metadata lives in the upstream snapshot.
+    strict_validator = validators.extend(
+        Draft202012Validator,
+        type_checker=Draft202012Validator.TYPE_CHECKER.redefine(
+            "integer", lambda checker, value: type(value) is int,
+        ),
+    )
+    if not strict_validator(ACTION_PACKET_OUTPUT_SCHEMA).is_valid(core):
+        return False
+    from docmancer.docs.application.model_visible_projection import _patch_recovery_errors
+    return not _patch_recovery_errors(payload, core)
+
+
 def compact_mcp_payload(
     payload: dict[str, Any],
     *,
@@ -176,13 +216,33 @@ def compact_mcp_payload(
     page_size: int | None = None,
     include_sections: list[str] | None = None,
 ) -> dict[str, Any]:
+    # This is an internal representation limit, not a negotiated external
+    # transport capacity. V4 patch evidence is deliberately indivisible.
+    if is_v4_patch_projection(payload):
+        return payload
+    if payload.get("kind") in {"docs_context", "docs_answer"}:
+        return payload
     if json_bytes(payload) <= max_bytes:
         return payload
+
+    # Canonical projections bind citations, coordinates and support decisions.
+    # Once finalized, the entire projection is indivisible: terminal transport
+    # must not shorten text or lists while retaining the original source claims.
+    # Invalid patch projections do not inherit the valid-v4 exemption.
+    if payload.get("kind") == "patch_context":
+        failure = {
+            "status": "failed",
+            "reason_code": "transport_size_limit",
+            "message": "MCP payload exceeded the transport size limit.",
+        }
+        if json_bytes(failure) > max_bytes:
+            raise ValueError("transport limit cannot fit the minimal error payload")
+        return failure
 
     original_bytes = json_bytes(payload)
     compact = deepcopy(payload)
     if include_sections:
-        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "document_content_policy", "mcp_compaction", *include_sections}
+        allowed = {"status", "tool", "schema_version", "answer_available", "answer_type", "warnings", "document_content_policy", "mcp_compaction", *_SUPPORT_DECISION_KEYS, *include_sections}
         compact = {key: value for key, value in compact.items() if key in allowed}
 
     has_context_pack = "context_pack" in compact

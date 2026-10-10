@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_delivered_surfaces.py": "behavioral"
+  },
+  "node_overrides": {
+    "tests/test_dictionary_exit_delivered_surfaces.py::test_all_schema_constraints_remain_bound_to_pre_slice_snapshot": "schema",
+    "tests/test_dictionary_exit_delivered_surfaces.py::test_raw_advertised_and_runtime_lookups_deliver_only_explicit_contract": "schema",
+    "tests/test_dictionary_exit_delivered_surfaces.py::test_advanced_descriptions_do_not_turn_flags_or_context_into_edit_authority": "schema",
+    "tests/test_dictionary_exit_delivered_surfaces.py::test_explicit_bindings_and_original_lookup_inputs_keep_schema_support": "schema",
+    "tests/test_dictionary_exit_delivered_surfaces.py::test_root_guide_is_literal_not_topic_scope_or_proof_policy": "artifact"
+  },
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_delivered_surfaces.py": "d0a7e775060906b20684e7c4e6a39cfe9e16f5fba2750167aa33f4e8704fe67c"
+  }
+}

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+from itertools import islice
 import math
 import re
 
@@ -21,12 +22,14 @@ from .joint_context_lineage import retained_seed_mapping
 from .query_block_bridge import bridge_options
 from .joint_context_selection import _finish
 from .model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS, MAX_DOCS_SOURCES, _snapshot_entry,
+    _snapshot_entry,
     docs_context_budget_tokens, validate_model_visible_projection,
 )
 
 MAX_BLOCKS = 256
 MAX_OPTIONS = 3
+MAX_DOCUMENTS = 2  # prior optional scan work; never a returned-source cap
+MAX_DRAFTS = 18  # two documents * three blocks * (supplement + two bridges)
 
 
 def ranked_blocks(raw: str, document_id: str, question: str) -> list[tuple]:
@@ -77,7 +80,7 @@ def ranked_blocks(raw: str, document_id: str, question: str) -> list[tuple]:
     return sorted(result, key=lambda row: (-row[0][0], -row[0][1], row[1]))
 
 
-def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int):
+def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
     """Add at most one relevant block, validating the entire draft packet.
 
     Checked/empty/host-lookup results are unchanged. Candidates are supplemental
@@ -88,14 +91,15 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
     if (payload.get("kind") != "docs_context" or payload.get("support_status") != "retrieval_only"
         or any(payload.get(k) is not False for k in ("answer_supported", "answer_available", "edit_ready"))
         or (payload.get("context_quality") or {}).get("status") == "checked"
-        or not 0 < len(payload.get("sources", [])) < MAX_DOCS_SOURCES
+        or not payload.get("sources")
         or any(q.get("origin") == "host_lookup" for q in plan.get("queries", []) if isinstance(q, dict))):
         return payload, snapshot
     question = str(plan.get("original_question") or retrieval.get("question") or "")
-    budget = min(max_tokens, DOCS_CONTEXT_MAX_TOKENS)
+    budget = max_tokens
     root = str(retrieval.get("_source_continuation_project_root") or "")
     candidates = []
     seen_documents = set()
+    drafts = 0
     for seed in payload["sources"]:
         original = (snapshot.get(seed["evidence_id"]) or {}).get("source")
         if not isinstance(original, dict):
@@ -107,6 +111,8 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
         key = (seed["project_identity"], seed["path_or_url"], ref["source"]["content_sha256"])
         if key in seen_documents:
             continue
+        if len(seen_documents) >= MAX_DOCUMENTS:
+            break
         seen_documents.add(key)
         ranked = ranked_blocks(raw, ref["source"]["document_id"], question)
         for rank, start, end, parent in ranked[:MAX_OPTIONS]:
@@ -129,7 +135,7 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
                    for s in payload["sources"]):
                 continue
             proposals = [(row, source, None)]
-            for other in payload["sources"]:
+            for other in islice(payload["sources"], MAX_DOCUMENTS):
                 old = (snapshot.get(other["evidence_id"]) or {}).get("source")
                 if not isinstance(old, dict) or other["path_or_url"] != seed["path_or_url"]:
                     continue
@@ -139,6 +145,9 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
                 if bridge is not None:
                     proposals.append((*bridge, other["evidence_id"]))
             for row, source, replace_id in proposals:
+                if drafts >= MAX_DRAFTS:
+                    break
+                drafts += 1
                 draft, bindings = deepcopy(payload), deepcopy(snapshot)
                 if replace_id is None:
                     draft["sources"].append(row)
@@ -149,8 +158,7 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
                 if finished is None:
                     continue
                 p, b, r = finished
-                if (docs_context_budget_tokens(p) > budget
-                    or not retained_seed_mapping(payload, snapshot, p, b)
+                if (not retained_seed_mapping(payload, snapshot, p, b)
                     or validate_model_visible_projection(p, snapshot=b, max_tokens=budget)):
                     continue
                 surviving = {s["evidence_id"]: s for s in p["sources"]}

@@ -112,7 +112,6 @@ def test_real_projection_uses_visible_witness_hash_across_mixed_prefixed_ids():
     assert diagnostics["component_coverage"]["status"] == "full"
     assert projection["sources"][0]["content_sha256"] != witness_hash
     assert "_visible_assignment_hashes" not in str(projection)
-    assert projection["estimated_tokens"] <= 800
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
 
 
@@ -267,7 +266,6 @@ def test_visible_component_novelty_follows_exact_constraints_before_public_queri
     paths = [source["path_or_url"] for source in projection["sources"]]
     assert paths[0] == "docs/exact.md"
     assert len(paths) == 3
-    assert projection["estimated_tokens"] <= 800
     assert projection["answer_supported"] is False and projection["edit_ready"] is False
     assert "project_answer:" not in str(projection)
     if loss is None:

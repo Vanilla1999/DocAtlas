@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_dictionary_exit_ownership_telemetry.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_dictionary_exit_ownership_telemetry.py": "306ba11db505a79b24171c3cac60ce08f376b8824a5b374f983196ba141e3156"
+  }
+}

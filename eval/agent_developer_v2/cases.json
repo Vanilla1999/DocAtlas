@@ -2,7 +2,6 @@
   "schema_version": 1,
   "protocol": "agent-developer-adversarial-v2",
   "description": "Reviewed provider-free adversarial trajectories. These extend, but never replace, Agent Developer Protocol v1.",
-  "global_max_trajectory_tokens": 2000,
   "cases": [
     {
       "id": "module_definition_tiny_budget",
@@ -10,15 +9,12 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "packages/orders/README.md"
@@ -26,9 +22,19 @@
           "forbidden_sources": [
             "packages/payments/README.md",
             "ARCHITECTURE.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_behavior_tiny_budget",
@@ -36,15 +42,12 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What does OrdersDraftStore do?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "packages/orders/README.md"
@@ -52,9 +55,19 @@
           "forbidden_sources": [
             "packages/payments/README.md",
             "ARCHITECTURE.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_requirements_tiny_budget",
@@ -62,15 +75,12 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What does OrderValidationContract require?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "packages/orders/README.md"
@@ -78,9 +88,19 @@
           "forbidden_sources": [
             "packages/payments/README.md",
             "ARCHITECTURE.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrderValidationContract requires a non-empty customer id, at least one line item, and a positive total."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "project_policy_tiny_budget",
@@ -88,14 +108,11 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What is ProjectRetryPolicy?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "ARCHITECTURE.md"
@@ -103,9 +120,19 @@
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ProjectRetryPolicy is the project-wide retry policy."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_scope_rejects_project_policy_detail",
@@ -113,23 +140,26 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "How many retry attempts does ProjectRetryPolicy allow?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "target_edit_ready": false,
           "forbidden_sources": [
             "ARCHITECTURE.md",
             "packages/payments/README.md"
-          ]
+          ],
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "cross_module_comparison_tiny_budget",
@@ -137,21 +167,28 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 512,
       "calls": [
         {
           "question": "How does OrdersDraftStore differ from PaymentOutbox?",
           "mode": "project",
           "scope": "all",
-          "packet_tokens": 512,
-          "max_projection_tokens": 512,
           "target_expected_status": "ok",
           "target_required_sources": [
             "ARCHITECTURE.md"
           ],
-          "forbidden_sources": []
+          "forbidden_sources": [],
+          "historical_packet_tokens": 512,
+          "historical_max_projection_tokens": 512,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation."
+          ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 512,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_plus_project_two_tiny_packets",
@@ -159,38 +196,51 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 2,
-      "max_trajectory_tokens": 1600,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
           "scope": "module",
           "module_path": "packages/orders",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "packages/orders/README.md"
           ],
           "forbidden_sources": [
             "packages/payments/README.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
           ]
         },
         {
           "question": "What is ProjectRetryPolicy?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "target_required_sources": [
             "ARCHITECTURE.md"
           ],
           "forbidden_sources": [
             "packages/payments/README.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ProjectRetryPolicy is the project-wide retry policy."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 1600,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "stale_project_policy_recovery",
@@ -198,7 +248,6 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "mutation_before_calls": {
         "path": "ARCHITECTURE.md",
         "append": "\nPostIndexPolicyFact is added after indexing.\n"
@@ -208,25 +257,24 @@
           "question": "What is ProjectRetryPolicy?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
-          "target_next_action_tool": "prepare_docs",
-          "target_next_action_arguments": {
-            "action": "sync_project_docs",
-            "project_path": "$PROJECT_PATH",
-            "with_vectors": false
-          },
+          "target_next_action_tool": null,
           "target_requires_confirmation": true,
-          "target_auto_execute": false,
           "target_edit_ready": false,
           "target_confirmation_reason": "project_docs_preflight",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
-          ]
+          ],
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "target_advisory_only": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "ambiguity_recovery_whole_trajectory_budget",
@@ -234,37 +282,18 @@
       "fixture": "ambiguous_modules_monorepo",
       "working_path": "packages/auth/src/auth.py",
       "max_get_docs_context_calls": 2,
-      "max_trajectory_tokens": 1900,
       "calls": [
         {
           "question": "What is PackageAuthBoundary?",
           "mode": "project",
           "scope": "module",
-          "module": "auth",
-          "packet_tokens": 256,
-          "max_projection_tokens": 256,
-          "target_expected_status": "insufficient_evidence",
-          "target_next_action_tool": "docs_status",
-          "target_next_action_arguments": {
-            "action": "project",
-            "details": true,
-            "module": "auth",
-            "project_path": "$PROJECT_PATH"
-          },
-          "target_requires_confirmation": false,
-          "target_auto_execute": false,
+          "target_expected_status": "failed",
           "target_edit_ready": false,
-          "target_operational_reason_code": "module_ambiguous",
-          "target_module_candidates": [
-            "packages/auth",
-            "services/auth"
-          ],
           "forbidden_sources": [
             "packages/auth/README.md",
             "services/auth/README.md"
           ],
           "recovery": {
-            "max_status_projection_tokens": 800,
             "expected_module_paths": [
               "packages/auth",
               "services/auth"
@@ -274,8 +303,6 @@
               "mode": "project",
               "scope": "module",
               "module_path": "packages/auth",
-              "packet_tokens": 800,
-              "max_projection_tokens": 800,
               "target_expected_status": "ok",
               "target_required_sources": [
                 "packages/auth/README.md"
@@ -283,11 +310,38 @@
               "forbidden_sources": [
                 "services/auth/README.md",
                 "README.md"
+              ],
+              "historical_packet_tokens": 800,
+              "historical_max_projection_tokens": 800,
+              "target_read_only": true,
+              "target_edit_ready": false,
+              "target_source_fidelity": true,
+              "target_required_facts": [
+                "PackageAuthBoundary is the reusable package authentication boundary."
               ]
+            },
+            "historical_max_status_projection_tokens": 800,
+            "status_request": {
+              "action": "project",
+              "details": true,
+              "module": "auth",
+              "project_path": "$PROJECT_PATH"
             }
-          }
+          },
+          "historical_packet_tokens": 256,
+          "historical_max_projection_tokens": 256,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "rejected_arguments": {
+            "module": "auth"
+          },
+          "target_error_reason": "validation_error",
+          "target_no_action": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 1900,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "contract_migration": "Removed module-name argument is a public schema negative; explicit host status inventory then exact-path retry preserves ambiguity safety."
     },
     {
       "id": "wrong_module_orders_rejects_payment",
@@ -295,13 +349,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is PaymentOutbox?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/payments/README.md",
@@ -309,9 +360,15 @@
           ],
           "scope": "module",
           "module_path": "packages/orders",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "wrong_module_payments_rejects_orders",
@@ -319,13 +376,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/payments/src/outbox.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md",
@@ -333,9 +387,15 @@
           ],
           "scope": "module",
           "module_path": "packages/payments",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "project_scope_rejects_module_detail",
@@ -343,22 +403,31 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
           ],
           "scope": "project",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore writes order drafts before upload, whereas PaymentOutbox writes pending payment events until confirmation."
+          ],
+          "target_required_sources": [
+            "ARCHITECTURE.md"
+          ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_name_orders_supported",
@@ -366,25 +435,34 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 900,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 900,
-          "max_projection_tokens": 900,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/payments/README.md",
             "ARCHITECTURE.md"
           ],
           "scope": "module",
-          "module": "orders",
           "target_required_sources": [
             "packages/orders/README.md"
-          ]
+          ],
+          "historical_packet_tokens": 900,
+          "historical_max_projection_tokens": 900,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
+          ],
+          "historical_module_selector": "orders",
+          "module_path": "packages/orders"
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 900,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "contract_migration": "The authored working-path selector supplies the exact public module_path; module-name input itself is separately rejected by ambiguity cases."
     },
     {
       "id": "module_name_payments_supported",
@@ -392,25 +470,34 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/payments/src/outbox.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 900,
       "calls": [
         {
           "question": "What is PaymentOutbox?",
           "mode": "project",
-          "packet_tokens": 900,
-          "max_projection_tokens": 900,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/orders/README.md",
             "ARCHITECTURE.md"
           ],
           "scope": "module",
-          "module": "payments",
           "target_required_sources": [
             "packages/payments/README.md"
-          ]
+          ],
+          "historical_packet_tokens": 900,
+          "historical_max_projection_tokens": 900,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "PaymentOutbox is the module-local pending-payment store."
+          ],
+          "historical_module_selector": "payments",
+          "module_path": "packages/payments"
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 900,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "contract_migration": "The authored working-path selector supplies the exact public module_path; module-name input itself is separately rejected by ambiguity cases."
     },
     {
       "id": "stale_orders_module_recovery",
@@ -418,35 +505,33 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/payments/README.md"
           ],
           "scope": "module",
           "module_path": "packages/orders",
-          "target_next_action_tool": "prepare_docs",
-          "target_next_action_arguments": {
-            "action": "sync_project_docs",
-            "project_path": "$PROJECT_PATH",
-            "with_vectors": false
-          },
+          "target_next_action_tool": null,
           "target_requires_confirmation": true,
-          "target_auto_execute": false,
           "target_edit_ready": false,
-          "target_confirmation_reason": "project_docs_preflight"
+          "target_confirmation_reason": "project_docs_preflight",
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "target_advisory_only": true
         }
       ],
       "mutation_before_calls": {
         "path": "packages/orders/README.md",
         "append": "\nPostIndexOrdersFact is added after indexing.\n"
-      }
+      },
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "stale_payments_module_recovery",
@@ -454,35 +539,33 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/payments/src/outbox.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is PaymentOutbox?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md"
           ],
           "scope": "module",
           "module_path": "packages/payments",
-          "target_next_action_tool": "prepare_docs",
-          "target_next_action_arguments": {
-            "action": "sync_project_docs",
-            "project_path": "$PROJECT_PATH",
-            "with_vectors": false
-          },
+          "target_next_action_tool": null,
           "target_requires_confirmation": true,
-          "target_auto_execute": false,
           "target_edit_ready": false,
-          "target_confirmation_reason": "project_docs_preflight"
+          "target_confirmation_reason": "project_docs_preflight",
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "target_advisory_only": true
         }
       ],
       "mutation_before_calls": {
         "path": "packages/payments/README.md",
         "append": "\nPostIndexPaymentsFact is added after indexing.\n"
-      }
+      },
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "dependency_only_prefetch_recovery",
@@ -490,29 +573,34 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is tenacity.Retrying?",
           "mode": "dependency",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
           ],
-          "target_next_action_tool": "prepare_docs",
-          "target_next_action_arguments": {
-            "action": "prefetch_project_dependency_docs",
-            "project_path": "$PROJECT_PATH"
-          },
+          "target_next_action_tool": null,
           "target_requires_confirmation": true,
-          "target_auto_execute": false,
           "target_edit_ready": false,
-          "target_confirmation_reason": "network_fetch"
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "library": "tenacity",
+          "version": "8.2.3",
+          "target_advisory_only": true,
+          "target_confirmation_reasons": [
+            "network_fetch",
+            "library_docs_source"
+          ],
+          "target_confirmation_reason": null
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "module_plus_dependency_bounded",
@@ -520,13 +608,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 2,
-      "max_trajectory_tokens": 1100,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/payments/README.md"
@@ -535,28 +620,42 @@
           "module_path": "packages/orders",
           "target_required_sources": [
             "packages/orders/README.md"
+          ],
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "OrdersDraftStore is the module-local draft storage component."
           ]
         },
         {
           "question": "What is tenacity.Retrying?",
           "mode": "dependency",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/payments/README.md"
           ],
-          "target_next_action_tool": "prepare_docs",
-          "target_next_action_arguments": {
-            "action": "prefetch_project_dependency_docs",
-            "project_path": "$PROJECT_PATH"
-          },
+          "target_next_action_tool": null,
           "target_requires_confirmation": true,
-          "target_auto_execute": false,
           "target_edit_ready": false,
-          "target_confirmation_reason": "network_fetch"
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "library": "tenacity",
+          "version": "8.2.3",
+          "target_advisory_only": true,
+          "target_confirmation_reasons": [
+            "network_fetch",
+            "library_docs_source"
+          ],
+          "target_confirmation_reason": null
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 1100,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "traversal_module_path_rejected",
@@ -564,13 +663,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is PaymentOutbox?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/payments/README.md"
@@ -578,9 +674,15 @@
           "scope": "module",
           "module_path": "packages/orders/../payments",
           "target_operational_reason_code": "module_not_found",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "absolute_module_path_rejected",
@@ -588,13 +690,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md"
@@ -602,9 +701,15 @@
           "scope": "module",
           "module_path": "/packages/orders",
           "target_operational_reason_code": "module_not_found",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "prefix_collision_module_path_rejected",
@@ -612,13 +717,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md"
@@ -626,9 +728,15 @@
           "scope": "module",
           "module_path": "packages/order",
           "target_operational_reason_code": "module_not_found",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "case_collision_module_path_rejected",
@@ -636,13 +744,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 300,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 300,
-          "max_projection_tokens": 300,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md"
@@ -650,9 +755,15 @@
           "scope": "module",
           "module_path": "packages/Orders",
           "target_operational_reason_code": "module_not_found",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 300,
+          "historical_max_projection_tokens": 300,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 300,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "long_missing_module_path_bounded",
@@ -660,13 +771,10 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 256,
       "calls": [
         {
           "question": "What is OrdersDraftStore?",
           "mode": "project",
-          "packet_tokens": 256,
-          "max_projection_tokens": 256,
           "target_expected_status": "insufficient_evidence",
           "forbidden_sources": [
             "packages/orders/README.md"
@@ -674,9 +782,15 @@
           "scope": "module",
           "module_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end_missing",
           "target_operational_reason_code": "module_not_found",
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 256,
+          "historical_max_projection_tokens": 256,
+          "target_read_only": true,
+          "target_empty_sources": true
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 256,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "long_exact_module_path_supported",
@@ -684,13 +798,10 @@
       "fixture": "ambiguous_modules_monorepo",
       "working_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/src/worker.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 1000,
       "calls": [
         {
           "question": "What is LongPathBoundary?",
           "mode": "project",
-          "packet_tokens": 1000,
-          "max_projection_tokens": 1000,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/auth/README.md",
@@ -700,6 +811,14 @@
           "module_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end",
           "target_required_sources": [
             "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/README.md"
+          ],
+          "historical_packet_tokens": 1000,
+          "historical_max_projection_tokens": 1000,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "LongPathBoundary is the exact long-path module boundary."
           ]
         }
       ],
@@ -712,6 +831,20 @@
           "path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/src/worker.py",
           "content": "class LongPathBoundary:\n    pass\n"
         }
+      ],
+      "historical_max_trajectory_tokens": 1000,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "setup_catalog_documents": [
+        {
+          "path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end/README.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "packages/module_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_very_long_safe_segment_end",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
       ]
     },
     {
@@ -720,14 +853,11 @@
       "fixture": "ambiguous_modules_monorepo",
       "working_path": "packages/auth/src/auth.py",
       "max_get_docs_context_calls": 2,
-      "max_trajectory_tokens": 1950,
       "calls": [
         {
           "question": "What is AppAuthBoundary?",
           "mode": "project",
-          "packet_tokens": 256,
-          "max_projection_tokens": 256,
-          "target_expected_status": "insufficient_evidence",
+          "target_expected_status": "failed",
           "forbidden_sources": [
             "apps/auth/README.md",
             "lib/features/auth/docs/flow.md",
@@ -736,27 +866,8 @@
             "services/auth/README.md"
           ],
           "scope": "module",
-          "module": "auth",
-          "target_next_action_tool": "docs_status",
-          "target_next_action_arguments": {
-            "action": "project",
-            "details": true,
-            "module": "auth",
-            "project_path": "$PROJECT_PATH"
-          },
-          "target_requires_confirmation": false,
-          "target_auto_execute": false,
           "target_edit_ready": false,
-          "target_operational_reason_code": "module_ambiguous",
-          "target_module_candidates": [
-            "apps/auth",
-            "lib/features/auth",
-            "lib/modules/auth",
-            "packages/auth",
-            "services/auth"
-          ],
           "recovery": {
-            "max_status_projection_tokens": 900,
             "expected_module_paths": [
               "apps/auth",
               "lib/features/auth",
@@ -767,8 +878,6 @@
             "retry": {
               "question": "What is AppAuthBoundary?",
               "mode": "project",
-              "packet_tokens": 800,
-              "max_projection_tokens": 800,
               "target_expected_status": "ok",
               "forbidden_sources": [
                 "lib/features/auth/docs/flow.md",
@@ -780,9 +889,33 @@
               "module_path": "apps/auth",
               "target_required_sources": [
                 "apps/auth/README.md"
+              ],
+              "historical_packet_tokens": 800,
+              "historical_max_projection_tokens": 800,
+              "target_read_only": true,
+              "target_edit_ready": false,
+              "target_source_fidelity": true,
+              "target_required_facts": [
+                "AppAuthBoundary is the client authentication application boundary."
               ]
+            },
+            "historical_max_status_projection_tokens": 900,
+            "status_request": {
+              "action": "project",
+              "details": true,
+              "module": "auth",
+              "project_path": "$PROJECT_PATH"
             }
-          }
+          },
+          "historical_packet_tokens": 256,
+          "historical_max_projection_tokens": 256,
+          "target_read_only": true,
+          "target_empty_sources": true,
+          "rejected_arguments": {
+            "module": "auth"
+          },
+          "target_error_reason": "validation_error",
+          "target_no_action": true
         }
       ],
       "setup_files": [
@@ -810,6 +943,41 @@
           "path": "lib/features/auth/src/feature.py",
           "content": "class FeatureAuthBoundary:\n    pass\n"
         }
+      ],
+      "historical_max_trajectory_tokens": 1950,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "contract_migration": "Removed module-name argument is a public schema negative; explicit host status inventory then exact-path retry preserves ambiguity safety.",
+      "setup_catalog_documents": [
+        {
+          "path": "apps/auth/README.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "apps/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "lib/modules/auth/README.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "lib/modules/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "lib/features/auth/docs/flow.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "lib/features/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
       ]
     },
     {
@@ -818,13 +986,10 @@
       "fixture": "ambiguous_modules_monorepo",
       "working_path": "lib/features/auth/src/feature.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 900,
       "calls": [
         {
           "question": "What is FeatureAuthBoundary?",
           "mode": "project",
-          "packet_tokens": 900,
-          "max_projection_tokens": 900,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "apps/auth/README.md",
@@ -836,6 +1001,14 @@
           "module_path": "lib/features/auth",
           "target_required_sources": [
             "lib/features/auth/docs/flow.md"
+          ],
+          "historical_packet_tokens": 900,
+          "historical_max_projection_tokens": 900,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "FeatureAuthBoundary is the feature-local authentication flow boundary."
           ]
         }
       ],
@@ -864,6 +1037,40 @@
           "path": "lib/features/auth/src/feature.py",
           "content": "class FeatureAuthBoundary:\n    pass\n"
         }
+      ],
+      "historical_max_trajectory_tokens": 900,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09",
+      "setup_catalog_documents": [
+        {
+          "path": "apps/auth/README.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "apps/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "lib/modules/auth/README.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "lib/modules/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        },
+        {
+          "path": "lib/features/auth/docs/flow.md",
+          "role": "module_architecture",
+          "scope": "module",
+          "module_path": "lib/features/auth",
+          "description": "Authored module boundary documentation.",
+          "authority": "source_of_truth",
+          "status": "active",
+          "impact": "track"
+        }
       ]
     },
     {
@@ -872,13 +1079,10 @@
       "fixture": "ambiguous_modules_monorepo",
       "working_path": "services/auth/src/auth.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 900,
       "calls": [
         {
           "question": "What is ServiceAuthBoundary?",
           "mode": "project",
-          "packet_tokens": 900,
-          "max_projection_tokens": 900,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/auth/README.md"
@@ -887,9 +1091,19 @@
           "module_path": "services/auth",
           "target_required_sources": [
             "services/auth/README.md"
+          ],
+          "historical_packet_tokens": 900,
+          "historical_max_projection_tokens": 900,
+          "target_read_only": true,
+          "target_edit_ready": false,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ServiceAuthBoundary is the deployed authentication service boundary."
           ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 900,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     },
     {
       "id": "project_policy_detail_fails_closed",
@@ -897,22 +1111,41 @@
       "fixture": "explicit_manifest_monorepo",
       "working_path": "packages/orders/src/submission.py",
       "max_get_docs_context_calls": 1,
-      "max_trajectory_tokens": 800,
       "calls": [
         {
           "question": "How many retry attempts does ProjectRetryPolicy allow?",
           "mode": "project",
           "scope": "project",
-          "packet_tokens": 800,
-          "max_projection_tokens": 800,
           "target_expected_status": "ok",
           "forbidden_sources": [
             "packages/orders/README.md",
             "packages/payments/README.md"
           ],
-          "target_edit_ready": false
+          "target_edit_ready": false,
+          "historical_packet_tokens": 800,
+          "historical_max_projection_tokens": 800,
+          "target_read_only": true,
+          "target_source_fidelity": true,
+          "target_required_facts": [
+            "ProjectRetryPolicy governs network submission retries and allows at most two retry attempts with bounded exponential backoff."
+          ]
         }
-      ]
+      ],
+      "historical_max_trajectory_tokens": 800,
+      "contract_revision": "explicit-member-public-retrieval-2026-10-09"
     }
-  ]
+  ],
+  "historical_global_max_trajectory_tokens": 2000,
+  "cost_policy": {
+    "objective": "minimize_output_cost_preserving_useful_facts_and_guards",
+    "fixed_output_ceiling": null,
+    "measurement": "canonical_project_path_normalized_utf8_bytes_and_ceiling_bytes_div_4_estimate",
+    "historical_fields": "Frozen output-budget cohorts and packet_tokens; diagnostic only, never forwarded to public API."
+  },
+  "contract_crosswalk": {
+    "output_cost": "All original case IDs, questions and output-ceiling values are retained as diagnostic historical fields; source/fact/scope/read-only/recovery assertions remain gates.",
+    "module_name": "Removed input rejection and explicit exact-path successors are distinguished; no caller scope is inferred from document prose.",
+    "catalog": "Every prepared document is explicitly listed before the real confirmed transaction; code fixture files stay outside document membership.",
+    "stale_and_dependency": "No visible evidence before current membership or exact library source/network approval; an advisory never supplies a mutation grant."
+  }
 }

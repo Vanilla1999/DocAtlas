@@ -7,14 +7,15 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
-from .projection_decision_trace import ProjectionDecisionTrace
+from .projection_decision_trace import ProjectionDecisionTrace, record_ranked_candidates, record_core_sources
+from .query_trace import query_trace_enabled
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources, restore_visible_sources
 from .qualified_support_units import DeliveryUnit, VariantFootprint
 from .context_variant_retention import (
     is_same_origin_gain, prepare_delivery_inventory, qualified_fragments as _qualified_fragments,
     prefer_same_origin_gain_candidate, replacement_preserves_or_advances_mandatory,
-    store_variant_footprint,
+    store_variant_footprint, has_new_qualified_units,
 )
 from .context_query_probes import independent_query_probes, _has_visible_non_path_exact_term, _normalized_path
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
@@ -30,14 +31,14 @@ from docmancer.docs.application.context_selection import (
     visible_assignments,
 )
 from docmancer.docs.application.model_visible_projection import (
-    DOCS_CONTEXT_MAX_TOKENS,
-    INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-    MAX_DOCS_SOURCES,
     _docs_source,
     _refresh_estimate,
     _snapshot_entry,
     docs_context_budget_tokens,
     project_insufficient,
+    _request_input_limit_failures,
+    _requires_exact_snapshot,
+    _explicit_delivery_block,
 )
 from .context_candidate_ranking import _context_rank, _facet_aware_candidates, _fully_matched_query_ids, _prefer_missing_baseline_candidate
 from .retrieval_need_support import apply_retrieval_need_witness
@@ -54,7 +55,7 @@ from docmancer.docs.domain.evidence_qualification import (
 )
 from docmancer.docs.domain.query_terms import documentation_exact_terms
 from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
-from docmancer.docs.domain.normative_language import _FORBIDDEN_RE, _REQUIRED_RE
+from docmancer.docs.domain.literal_context_admission import admit_original_literal_context
 
 
 def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
@@ -63,27 +64,52 @@ def _diagnostics_snapshot(value: dict[str, Any]) -> dict[str, Any]:
 
 
 def project_docs_context(
-    *, retrieval: dict[str, Any], max_tokens: int = DOCS_CONTEXT_MAX_TOKENS,
+    *, retrieval: dict[str, Any], max_tokens: int | None = None,
     selection_diagnostics: dict[str, Any] | None = None,
     _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
     """Project trusted retrieval as context without claiming answer support."""
 
     max_tokens = PROJECT_CONTEXT_BUDGET.bounded_tokens(max_tokens)
+    blocked = _explicit_delivery_block(retrieval, kind="docs_context", max_tokens=max_tokens)
+    if blocked is not None:
+        return blocked, {}
     projection_diagnostics = {
         "qualified_variants": 0, "budget_rejections": 0,
+        "attempt_kind": "hint" if _allow_context_hints else "primary",
         "ranked_candidate_ids": [], "considered_variants": [],
         "projection_rejections": [], "final_visible_evidence_ids": [],
     }
     if not isinstance(retrieval.get("retrieval_diagnostics"), dict):
         retrieval["retrieval_diagnostics"] = {}
     retrieval.setdefault("retrieval_diagnostics", {})["docs_context_projection"] = projection_diagnostics
-    decision_trace = ProjectionDecisionTrace(projection_diagnostics)
+    trace_enabled = query_trace_enabled()
+    decision_trace = ProjectionDecisionTrace(projection_diagnostics, enabled=trace_enabled)
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     projection_inputs: dict[str, tuple[str, tuple[str, ...], Any]] = {}
     seen_ids: dict[str, int] = {}
     query_plan = dict(retrieval.get("documentation_query_plan") or {})
+    technical_failures = _request_input_limit_failures(
+        str(query_plan.get("original_question") or retrieval.get("question") or ""), retrieval,
+    )
+    if technical_failures:
+        payload = project_insufficient(
+            kind="docs_context", missing=technical_failures,
+            recommended_next_action=None,
+            max_tokens=max_tokens,
+        )
+        payload["reason_code"] = "request_input_limit_exceeded"
+        _refresh_estimate(payload)
+        return payload, {}
+    from .context_query_probes import authoritative_queries
+    literal_queries = authoritative_queries(query_plan)
+    query_plan.update(
+        queries=list(literal_queries.values()), query_ids=list(literal_queries),
+        public_query_ids=list(literal_queries),
+        required_query_ids=[key for key, row in literal_queries.items() if row.get("coverage_required")],
+        _component_contract=[], component_scope_complete=False,
+    )
     obligations = component_obligations(query_plan.get("_component_contract") or ())
     mandatory_component_ids = {item.obligation_id for item in obligations}
     strict_single_attribute = bool(
@@ -191,6 +217,9 @@ def project_docs_context(
         if str(value).strip()
     }
     candidates = list(retrieval.get("context_pack") or ())
+    if _requires_exact_snapshot(retrieval):
+        candidates = [item for item in candidates if isinstance(item, dict)
+                      and item.get("docs_snapshot_exact") is True]
     initially_ranked = _facet_aware_candidates(
         candidates, query_text=query_text,
         fallback_query_ids=context_hint_query_ids, need_query_ids=need_query_ids,
@@ -201,11 +230,9 @@ def project_docs_context(
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
         bound_assigned_evidence_ids=required_assigned_evidence_ids,
     )
-    projection_diagnostics["ranked_candidate_ids"] = [
-        _internal_candidate_id(item) for item in initially_ranked[:32]
-        if _internal_candidate_id(item)
-    ]
+    record_ranked_candidates(projection_diagnostics, initially_ranked, _internal_candidate_id)
     prepared: list[dict[str, Any]] = []
+    literal_context_candidates: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
     variant_inputs: dict[int, tuple[Any, ...]] = {}
     variant_footprints: dict[int, VariantFootprint] = {}
     selected_footprints: dict[str, VariantFootprint] = {}
@@ -235,6 +262,7 @@ def project_docs_context(
         original["_qualification_candidate"] = dict(original)
         original["_expected_project_identity"] = expected_project_identity
         original["_lifecycle_intent"] = request_lifecycle_intent
+        original["_independent_query_plan"] = query_plan
         qualified_original = _requalify_visible_source({
             **original,
             "path_or_url": original.get("path") or "",
@@ -249,6 +277,38 @@ def project_docs_context(
             decision_trace.record('candidate', 'rejected', 'missing_attribute', original)
             continue
         if not visible_query_ids and not component_ids:
+            raw_snippet = str(original.get("content") or original.get("display_text") or "")
+            admission = admit_original_literal_context(
+                question=original_question, evidence_text=raw_snippet, candidate=original,
+                expected_project_identity=expected_project_identity,
+                lifecycle_intent=request_lifecycle_intent,
+            )
+            normalized = _docs_source(original, display_snippet=raw_snippet) if admission is not None else None
+            if normalized is not None:
+                body_window = admission.get("body_window")
+                if body_window is not None:
+                    normalized["snippet"] = raw_snippet
+                    line_start, line_end = body_window["line_start"], body_window["line_end"]
+                else:
+                    start = raw_snippet.find(normalized["snippet"])
+                    line_start, line_end = _focused_line_range(
+                        raw_snippet, start, start + len(normalized["snippet"]), original.get("line_start"),
+                    )
+                normalized.update({
+                    "project_identity": project_identity, "line_start": line_start, "line_end": line_end,
+                    "authority": str(original.get("authority") or "supporting"),
+                    "scope": str(original.get("doc_scope") or "project"),
+                    "catalog_role": str(original.get("catalog_role") or ""),
+                    "retrieval_query_ids": [],
+                    "retrieval_query_matches": dict(original.get("retrieval_query_matches") or {}),
+                    "_qualification_candidate": original["_qualification_candidate"],
+                    "_independent_query_plan": query_plan,
+                    "_expected_project_identity": expected_project_identity,
+                    "_lifecycle_intent": request_lifecycle_intent,
+                })
+                literal_context_candidates.append((original, normalized, admission))
+                decision_trace.record('candidate', 'prepared', admission['reason'], original, normalized)
+                continue
             decision_trace.record('candidate', 'rejected', 'no_visible_qualification', original)
             continue
         required_ids = qualified_ids & required_query_id_set
@@ -341,14 +401,15 @@ def project_docs_context(
         )
         decision_trace.record('candidate', 'prepared' if variants else 'rejected',
                               'prepared' if variants else 'visible_qualification', original)
-        projection_diagnostics["qualified_variants"] += len(variants)
-        candidate_id = _internal_candidate_id(original)
-        if not variants and len(projection_diagnostics["projection_rejections"]) < 32:
+        if trace_enabled:
+            projection_diagnostics["qualified_variants"] += len(variants)
+        candidate_id = _internal_candidate_id(original) if trace_enabled else None
+        if trace_enabled and not variants and len(projection_diagnostics["projection_rejections"]) < 32:
             projection_diagnostics["projection_rejections"].append({
                 "candidate_id": candidate_id,
                 "reason": "visible_qualification",
             })
-        for variant in variants[:16]:
+        for variant in variants[:16] if trace_enabled else ():
             if len(projection_diagnostics["considered_variants"]) >= 32:
                 break
             projection_diagnostics["considered_variants"].append({
@@ -361,24 +422,12 @@ def project_docs_context(
             variant_inputs[id(variant)] = (original, raw_snippet, focus_queries, assigned_requirement_ids)
     # Context proposals join the same finite pool before selection. Their
     # source/identity/condition admission is recomputed, not copied from flags.
-    from .need_context_projection import precedence_context_variants, set_context_variants
     context_needs = {}
     selected_context_needs: set[str] = set()
-    context_candidates = [item for item in initially_ranked if isinstance(item, dict)
-                          and (not explicit_paths or
-                               _normalized_path(item.get('path') or '') in explicit_paths)]
-    for propose in (precedence_context_variants, set_context_variants):
-        for original, variant, needs in propose(
-            context_candidates, query_plan=query_plan,
-            expected_project_identity=expected_project_identity,
-            max_tokens=max_tokens, diagnostics=projection_diagnostics,
-        ):
-            prepared.append(variant)
-            variant_inputs[id(variant)] = (original, variant['snippet'], (), ())
-            context_needs[id(variant)] = frozenset(needs)
     selected_host_query_ids: set[str] = set()
     while prepared:
-        decision_trace.state["variant_attempts"] += 1
+        if trace_enabled:
+            decision_trace.state["variant_attempts"] += 1
         selected_qualified_public_ids = attributable_query_ids(sources) & public_query_id_set
         selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set
         selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids
@@ -445,15 +494,13 @@ def project_docs_context(
         original, raw_snippet, focus_queries, assigned_requirement_ids = variant_inputs[id(variant)]
         if id(variant) in context_needs:
             novel = context_needs[id(variant)] - selected_context_needs
-            if not novel or len(sources) >= MAX_DOCS_SOURCES or variant['evidence_id'] in seen_ids:
+            if not novel or variant['evidence_id'] in seen_ids:
                 continue
             candidate_sources = [*sources, variant]
             decision = context_selection_decision(candidate_sources, public_query_ids)
             packet_cost = docs_context_budget_tokens(_payload(
                 candidate_sources, decision=decision, query_plan=query_plan,
             ))
-            if packet_cost > max_tokens:
-                continue
             sources = candidate_sources
             snapshot[variant['evidence_id']] = _snapshot_entry(original, variant)
             seen_ids[variant['evidence_id']] = len(sources) - 1
@@ -462,6 +509,7 @@ def project_docs_context(
                                   variant, budget_tokens=packet_cost)
             continue
         candidate_footprint = variant_footprints.get(id(variant))
+        new_qualified_units = has_new_qualified_units(candidate_footprint, selected_footprints)
         candidate_id = _internal_candidate_id(original)
         existing_index = seen_ids.get(variant["evidence_id"])
         if existing_index is not None:
@@ -475,10 +523,10 @@ def project_docs_context(
             if (
                 disjoint
                 and qualified_query_ids((existing,)) <= qualified_query_ids((original,))
-                and qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
+                and (new_qualified_units or qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources))
             ):
-                # A second span needs an independently qualified new direction.
-                # Internal component novelty alone cannot multiply one source ID.
+                # A disjoint span retains a new query lane or exact qualified unit.
+                # Keep its own bound variant ID; never join disconnected text.
                 identity = f"{variant['evidence_id']}:{start}:{start + len(variant['snippet'])}"
                 variant = {**variant, "evidence_id": "ev-" + hashlib.sha256(identity.encode()).hexdigest()[:16]}
                 existing_index = seen_ids.get(variant["evidence_id"])
@@ -525,16 +573,6 @@ def project_docs_context(
         packet_cost = docs_context_budget_tokens(_payload(
             candidate_sources, decision=decision, query_plan=query_plan,
         ))
-        if packet_cost > max_tokens:
-            projection_diagnostics["budget_rejections"] += 1
-            if len(projection_diagnostics["projection_rejections"]) < 32:
-                projection_diagnostics["projection_rejections"].append({
-                    "candidate_id": candidate_id,
-                    "evidence_id": str(variant.get("evidence_id") or ""),
-                    "reason": "token_budget",
-                })
-            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
-            continue
         normalized = variant
         qualified_ids = qualified_query_ids((normalized,))
         attributable_ids = attributable_query_ids((normalized,))
@@ -570,7 +608,7 @@ def project_docs_context(
         ):
             decision_trace.record('selection', 'rejected', 'authority_duplicate', original, variant)
             continue
-        if sources and not (new_components or
+        if sources and not (new_components or new_qualified_units or
             attributable_ids & public_query_id_set - selected_public_ids or
             qualified_ids & canonical_intent_query_ids - selected_canonical_ids or
             qualified_ids & need_query_ids - qualified_query_ids(sources) or
@@ -597,11 +635,11 @@ def project_docs_context(
         ):
             decision_trace.record('selection', 'rejected', 'path_only', original, variant)
             continue
-        # A lexical hit does not complete a host question. Permit a complementary
-        # qualified body for one lookup only when it adds two requested terms;
-        # a lone topical mention must not spend the remaining source budget.
+        # Term diversity remains a fallback without a complete current unit.
+        # Distinct verified source bytes need no new query word; neither route
+        # proves that the host question is fully answered.
         if (host_ids and not new_components and not (host_ids - selected_host_query_ids)
-            and not same_origin_gain
+            and not same_origin_gain and not new_qualified_units
             and not required_ids and not exact_anchor_ids and not original_hit and not canonical_intent_ids
             and not (any(len(set(normalized["retrieval_query_matches"][key].get("body_matched_terms") or ()) - {
                 term for source in sources
@@ -618,25 +656,16 @@ def project_docs_context(
             packet_cost = docs_context_budget_tokens(
                 _payload(candidate_sources, decision=candidate_decision, query_plan=query_plan)
             )
-            if packet_cost <= max_tokens:
-                decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
-                                      budget_tokens=packet_cost, previous=sources[existing_index])
-                sources = candidate_sources
-                snapshot[evidence_id] = _snapshot_entry(
-                    original, sources[existing_index],
-                )
-                projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
-                if candidate_footprint is not None:
-                    selected_footprints[evidence_id] = candidate_footprint
-                selected_host_query_ids.update(host_ids)
-            else:
-                decision_trace.record('selection', 'rejected', 'token_budget', original, normalized,
-                                      budget_tokens=packet_cost)
-            continue
-        if len(sources) >= MAX_DOCS_SOURCES:
-            # Source cap blocks new rows, not content-preserving replacement of
-            # an already selected row. Keep scanning prepared same-origin upgrades.
-            decision_trace.record('selection', 'rejected', 'source_cap', original, variant)
+            decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
+                                  budget_tokens=packet_cost, previous=sources[existing_index])
+            sources = candidate_sources
+            snapshot[evidence_id] = _snapshot_entry(
+                original, sources[existing_index],
+            )
+            projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
+            if candidate_footprint is not None:
+                selected_footprints[evidence_id] = candidate_footprint
+            selected_host_query_ids.update(host_ids)
             continue
         candidate_sources = [*sources, normalized]
         candidate_decision = context_selection_decision(candidate_sources, public_query_ids)
@@ -644,9 +673,6 @@ def project_docs_context(
             candidate_sources, decision=candidate_decision, query_plan=query_plan,
         )
         packet_cost = docs_context_budget_tokens(candidate_payload)
-        if packet_cost > max_tokens:
-            decision_trace.record('selection', 'rejected', 'token_budget', original, variant, budget_tokens=packet_cost)
-            continue
         decision_trace.record('selection', 'accepted', 'accepted', original, normalized,
                               budget_tokens=packet_cost)
         sources = candidate_sources
@@ -662,15 +688,25 @@ def project_docs_context(
         if candidate_footprint is not None:
             selected_footprints[evidence_id] = candidate_footprint
         selected_host_query_ids.update(host_ids)
-    if not sources and (_allow_context_hints or not fallback_ids):
-        from .need_context_projection import project_need_context_fallback
-        contextual = project_need_context_fallback(
-            initially_ranked, query_plan=query_plan,
-            expected_project_identity=expected_project_identity,
-            max_tokens=max_tokens, diagnostics=projection_diagnostics,
-        )
-        if contextual is not None:
-            return contextual
+    # A failed whole-question match may still contain a verified literal body
+    # fragment. Keep the exact acquired window after the qualified directions;
+    # its failed trace contributes no query/answer/edit coverage. No generated
+    # probe, borrowed lookup credit, source read, or alternate projector is used.
+    for original, normalized, admission in literal_context_candidates:
+        evidence_id = normalized["evidence_id"]
+        if evidence_id in seen_ids or any(
+            source.get("path_or_url") == normalized["path_or_url"]
+            and source.get("project_identity") == normalized["project_identity"]
+            and normalized["snippet"] in source.get("snippet", "")
+            for source in sources
+        ):
+            continue
+        sources.append(normalized)
+        snapshot[evidence_id] = _snapshot_entry(original, normalized)
+        seen_ids[evidence_id] = len(sources) - 1
+        if trace_enabled:
+            projection_diagnostics.setdefault("literal_context_admissions", []).append(admission)
+        decision_trace.record('selection', 'accepted', admission['reason'], original, normalized)
     if not sources:
         if fallback_ids and not _allow_context_hints:
             # Decide fallback after visible qualification and complete DTO
@@ -697,7 +733,7 @@ def project_docs_context(
             kind="docs_context",
             missing=["No safe, current, project-scoped documentation context was retrieved."],
             recommended_next_action=None,
-            max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
+            max_tokens=max_tokens,
         )
         projection.update({
             "answer_supported": False,
@@ -732,7 +768,8 @@ def project_docs_context(
     projection_diagnostics["final_visible_evidence_ids"] = [
         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
         if source.get("evidence_id")
-    ]
+    ] if trace_enabled else []
+    record_core_sources(projection_diagnostics, payload["sources"])
     if selection_diagnostics is not None:
         selection_diagnostics["component_coverage"] = component_decision.as_payload()
     snapshot = {
@@ -744,7 +781,6 @@ def project_docs_context(
     if (
         fallback_ids
         and not _allow_context_hints
-        and len(payload["sources"]) < MAX_DOCS_SOURCES
         and (decision.missing_query_ids or component_decision.missing_component_ids)
     ):
         # A safe retrieval hint is a read-only supplement, not a replacement
@@ -781,7 +817,6 @@ def project_docs_context(
         if (
             primary_ids < hinted_ids
             and retains_visible_sources(payload, hinted_payload)
-            and docs_context_budget_tokens(hinted_payload) <= max_tokens
         ):
             retrieval["retrieval_diagnostics"]["docs_context_projection"] = hinted_diagnostics
             return hinted_payload, hinted_snapshot
@@ -806,22 +841,23 @@ def _expand_selected_snippets(
         if values is None:
             continue
         raw_snippet, focus_queries, source_line_start = values
-        for limit in _projection_limits(raw_snippet):
+        candidates = [
+            (limit, *_focused_snippet(raw_snippet, focus_queries, limit=limit))
+            for limit in _projection_limits(raw_snippet)
+        ]
+        candidates.extend(
+            (end - start, raw_snippet[start:end], start, end)
+            for start, end in source_block_alternatives(raw_snippet).spans
+        )
+        for limit, snippet, snippet_start, snippet_end in candidates:
             # Each round protects the latest accepted span, not the initial
             # short snippet captured before the expansion loop.
             source = expanded[index]
-            snippet, snippet_start, snippet_end = _focused_snippet(
-                raw_snippet, focus_queries, limit=limit,
-            )
             if len(snippet) <= len(str(source.get("snippet") or "")):
                 continue
-            # Exact-identifier witnesses need retention even without a normative
-            # keyword. Optional fuzzy alias fragments may still be reselected;
-            # public attribution, component and assignment guards below apply.
-            preserve_span = any(
-                trace.get("qualified") is True and trace.get("exact_terms")
-                for trace in (source.get("retrieval_query_matches") or {}).values()
-            ) or _REQUIRED_RE.search(source["snippet"]) or _FORBIDDEN_RE.search(source["snippet"]) or inline_command_literals(source["snippet"])
+            # Preserve the current bound quote uniformly, without interpreting
+            # wording. Requalification, assignment and budget guards still apply.
+            preserve_span = True
             retained_start = raw_snippet.find(source["snippet"])
             if preserve_span and (retained_start < 0
                     or raw_snippet.find(source["snippet"], retained_start + 1) >= 0):
@@ -858,11 +894,7 @@ def _expand_selected_snippets(
                 continue
             candidate = bind_visible_assignments(original, candidate, retained)
             candidate_sources = [*expanded[:index], candidate, *expanded[index + 1:]]
-            decision = context_selection_decision(candidate_sources, public_query_ids)
-            if docs_context_budget_tokens(_payload(
-                candidate_sources, decision=decision, query_plan=query_plan,
-            )) <= max_tokens:
-                expanded = candidate_sources
+            expanded = candidate_sources
     return expanded
 
 def _requalify_visible_source(
@@ -872,39 +904,14 @@ def _requalify_visible_source(
         "path_or_url", "section", "snippet",
     ))
     matches: dict[str, dict[str, Any]] = {}
-    for query_id, trace in independent_query_probes(source, source.get("_independent_query_plan") or {}).items():
-        if not isinstance(trace, dict) or trace.get("derived_from_query_id"):
+    from .context_query_probes import authoritative_queries, literal_query_probe
+    planned = authoritative_queries(source.get("_independent_query_plan") or {})
+    incoming = independent_query_probes(source, source.get("_independent_query_plan") or {})
+    for query_id, query in planned.items():
+        if query_text.get(query_id) != query["text"]:
             continue
-        # A physically contiguous continuation of the same structured atom was
-        # qualified by source structure upstream, not by lexical coincidence in
-        # this child.  Preserve that derived canonical context while still
-        # refusing to manufacture original/public coverage.
-        if (
-            query_id != "query-original"
-            and trace.get("qualified") is True
-            and trace.get("qualification_route") in {"same_atom_continuation", "same_list_item_continuation"}
-            and trace.get("coverage_kind") == "derived"
-        ):
-            from .context_query_probes import revalidate_structural_continuation
-            continuation_trace = revalidate_structural_continuation(trace, source, visible_text)
-            matches = merge_query_matches(
-                matches, {str(query_id): continuation_trace},
-            )
-            continue
-        # Aggregated lineage belongs to the old window; rebuild it from visible probes.
-        probe = {k: v for k, v in trace.items() if k not in {"coverage_kinds", "derived_from_query_ids"}}
-        if query_id == "query-original":
-            probe["exact_terms"] = list(dict.fromkeys((
-                *(probe.get("exact_terms") or ()),
-                *(term.normalized_value for term in documentation_exact_terms(
-                    query_text.get(str(query_id), ""),
-                )),
-            )))
-        if not probe.get("query_terms") and not probe.get("query_text"):
-            planned_text = query_text.get(str(query_id), "")
-            if planned_text:
-                probe["query_text"] = planned_text
-                probe["query_terms"] = sorted(_query_terms((planned_text,)))
+        trace = incoming.get(query_id) or {}
+        probe = literal_query_probe(query)
         qualification = qualify_evidence(
             probe, query_id=str(query_id), visible_text=visible_text,
             evidence_text=str(source.get("snippet") or ""),
@@ -912,21 +919,17 @@ def _requalify_visible_source(
             candidate={**source.get("_qualification_candidate", {}), **source},
             expected_project_identity=source.get("_expected_project_identity"),
             lifecycle_intent=source.get("_lifecycle_intent", "current"),
+            authoritative_query=query,
         )
-        qualified_trace = apply_retrieval_need_witness(
-            {**probe, "query_id": query_id, "text": query_text.get(str(query_id), "")}, qualification.trace,
-            str(source.get("snippet") or ""), source={"verified_owner": qualification.trace.get("bound_subject_context"), "authority": source.get("authority"), "lifecycle_status": "active"})
+        qualified_trace = dict(qualification.trace)
+        if query_id == "query-original" and (
+            trace.get("admission_only") or trace.get("query_text") != query["text"]
+            or trace.get("query_origin") != "original" or trace.get("relation") != "direct"
+            or trace.get("public_parent_query_id")
+            or trace.get("derived_from_query_id") or trace.get("derived_from_query_ids")
+        ):
+            qualified_trace["admission_only"] = True
         matches = merge_query_matches(matches, {str(query_id): qualified_trace})
-        parent_trace = derived_parent_trace(
-            qualified_trace,
-            source_query_id=str(query_id),
-            parent_query_id=str(trace.get("public_parent_query_id") or ""),
-        )
-        if parent_trace is not None and query_id in query_text:
-            matches = merge_query_matches(
-                matches,
-                {str(trace["public_parent_query_id"]): parent_trace},
-            )
     qualified_ids = [
         query_id for query_id, trace in matches.items() if trace.get("qualified") is True
     ]

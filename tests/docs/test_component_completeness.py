@@ -52,7 +52,6 @@ def test_inventory_needs_visible_subject_and_all_declared_names(subject, names):
     assert diagnostics["component_coverage"]["recognized_component_status"] == "full"
     assert projection["answer_supported"] is False and projection["edit_ready"] is False
     assert "component_scope_complete" not in str(projection)
-    assert len(projection["sources"]) <= 3 and projection["estimated_tokens"] <= 800
     assert validate_model_visible_projection(projection, snapshot=snapshot, max_tokens=800) == []
     for incomplete in (
         f"Its public workflow has exactly {len(names)} tools: {listing}.",

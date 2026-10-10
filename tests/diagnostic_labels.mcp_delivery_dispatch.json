@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_mcp_delivery_dispatch_boundary.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_mcp_delivery_dispatch_boundary.py": "66a9adf4f2796f518f3218224bd9bd04f07e1fbd095893aa34977d69fe176097"
+  }
+}

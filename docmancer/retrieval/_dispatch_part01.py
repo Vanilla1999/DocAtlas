@@ -85,9 +85,7 @@ class _RetrievalDispatcherPart01:
         budget = budget or self.config.query.default_budget
         per_source_limit = min(40, max(limit * 3, 20))
 
-        # Query-aware routing: first matching router merges its filters into
-        # the dispatcher's filters for this call (e.g. ``status_code=LIVE``,
-        # ``international_class=030``).
+        # Only explicit filters choose scope; legacy query routers are inert.
         merged_filters = self._apply_router(query, filters)
         backend_filters = compile_backend_filters(merged_filters) or None
         requested_lanes = (
@@ -112,8 +110,8 @@ class _RetrievalDispatcherPart01:
             "weights": dict(self.config.retrieval.fusion.weights or {}),
             "candidate_limits": {"per_lane": 40, "fused": 60},
             "post_fusion": {
-                "exact_supplement": "api-term-supplement-v2",
-                "intent_rerank": "intent-metadata-rerank-v2",
+                "exact_supplement": "explicit-query-only-v1",
+                "intent_rerank": "base-score-no-topic-boost-v1",
                 "expand": retrieval_expand,
                 "max_sections_per_source": getattr(
                     self.config.retrieval, "max_sections_per_source", None
@@ -554,26 +552,7 @@ class _RetrievalDispatcherPart01:
         )
 
     def _apply_router(self, query: str, filters: dict | None) -> dict | None:
-        """Walk ``retrieval.routers``; merge the first match's filters into ``filters``."""
-        import re as _re
-
-        routers = list(getattr(self.config.retrieval, "routers", []) or [])
-        if not routers:
-            return filters
-        for router in routers:
-            pattern = getattr(router, "match", "") or ""
-            if not pattern:
-                continue
-            try:
-                if _re.search(pattern, query, _re.IGNORECASE):
-                    merged = dict(filters or {})
-                    for k, v in (router.filters or {}).items():
-                        merged.setdefault(k, v)
-                    logger.debug("router matched: %s", getattr(router, "description", None) or pattern)
-                    return merged
-            except _re.error:
-                logger.warning("invalid router regex skipped: %r", pattern)
-                continue
+        """Compatibility hook: only explicit filters select retrieval scope."""
         return filters
 
     def _rank_candidate_lists(self, candidate_lists: dict[str, list[Any]]):

@@ -33,46 +33,14 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _repository_identity(root: Path) -> str:
-        """Return a clone-stable identity when Git metadata is available.
+        """Root-local retrieval isolation; never inspect Git or worktree markers.
 
-        Unversioned directories have no portable identity by definition.  Keep
-        them isolated in a deterministic local namespace instead of allowing
-        equal relative paths from unrelated projects to collide in one index.
+        Identity is attribution, not a grant. Legacy Git identities are not
+        aliased or migrated by this reader. The mutation lane separately binds
+        the explicit initialized storage target to this same absolute root.
         """
-        git_entry = root / ".git"
-        config_path = git_entry / "config"
-        if git_entry.is_file():
-            try:
-                marker = git_entry.read_text(encoding="utf-8").strip()
-            except OSError:
-                marker = ""
-            if marker.lower().startswith("gitdir:"):
-                git_dir = Path(marker.split(":", 1)[1].strip())
-                if not git_dir.is_absolute():
-                    git_dir = (root / git_dir).resolve()
-                config_path = git_dir / "config"
-
-        parser = configparser.RawConfigParser()
-        try:
-            if config_path.is_file():
-                parser.read(config_path, encoding="utf-8")
-        except (OSError, configparser.Error):
-            parser = configparser.RawConfigParser()
-        remote_sections = sorted(
-            section for section in parser.sections()
-            if section.startswith('remote "') and section.endswith('"')
-        )
-        preferred = 'remote "origin"'
-        if preferred in remote_sections:
-            remote_sections.remove(preferred)
-            remote_sections.insert(0, preferred)
-        for section in remote_sections:
-            remote = parser.get(section, "url", fallback="").strip().rstrip("/")
-            if remote:
-                return f"git:{ProjectDocsService._canonical_git_remote(remote)}"
-
-        local_digest = hashlib.sha256(str(root).encode("utf-8")).hexdigest()
-        return f"local:{local_digest}"
+        from .project_docs_member_transaction import local_project_identity
+        return local_project_identity(root)
 
     def __init__(self, facade: Any):
         self.facade = facade
@@ -252,17 +220,12 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _looks_like_placeholder_project_doc(text: str) -> bool:
-        stripped = text.strip()
-        if not stripped:
-            return True
-        return bool(PLACEHOLDER_PROJECT_DOC_RE.search(stripped))
+        """Only structurally empty content is unavailable; prose is not classified."""
+        return not text.strip()
 
     @classmethod
     def _looks_like_placeholder_search_result(cls, path: str | None, text: str) -> bool:
-        name = Path(str(path or "")).name.lower()
-        if not (name.startswith("readme") or name.startswith("architecture") or name in {"license", "copying"}):
-            return False
-        return cls._looks_like_placeholder_project_doc(text[:4096])
+        return cls._looks_like_placeholder_project_doc(text)
 
     @staticmethod
     def _read_text_prefix(path: Path, *, max_chars: int = 4096) -> str | None:
@@ -276,38 +239,8 @@ class _ProjectDocsServicePart01:
 
     @staticmethod
     def _unsupported_root_doc_files(root: Path, candidate_sources: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        candidate_paths = {str(item.get("path")) for item in candidate_sources if item.get("path")}
-        risks: list[dict[str, Any]] = []
-        try:
-            children = sorted(root.iterdir(), key=lambda item: item.name.lower())
-        except OSError:
-            return risks
-        for child in children:
-            if not child.is_file():
-                continue
-            try:
-                relative = child.relative_to(root).as_posix()
-            except ValueError:
-                continue
-            if relative in candidate_paths:
-                continue
-            name = child.name.lower()
-            stem = child.stem.lower()
-            doc_like = stem in ROOT_DOC_FILES or stem.startswith("readme") or name in ROOT_DOC_FILES
-            if not doc_like:
-                continue
-            suffix = child.suffix.lower()
-            supported_extensionless = name in {"license", "copying"}
-            if suffix in DOC_FILE_EXTENSIONS or supported_extensionless:
-                continue
-            risks.append({
-                "code": "unsupported_project_doc_candidate",
-                "severity": "major",
-                "path": relative,
-                "message": "A root documentation-looking file was found in a format project-doc ingest will not index automatically.",
-                "recommended_action": "Convert or mirror it as Markdown/text, or confirm indexing only the currently supported docs.",
-            })
-        return risks
+        # Unsupported declarations are catalog validation errors, not root scans.
+        return []
 
     def _project_docs_preflight(
         self,
@@ -328,10 +261,7 @@ class _ProjectDocsServicePart01:
                 continue
             path = Path(candidate_path)
             reason = str(candidate.get("reason") or "")
-            if not (
-                path.name.lower().startswith("readme")
-                or reason in {"architecture", "overview", "project_architecture"}
-            ):
+            if not candidate.get("catalog_entry_hash") or reason not in {"overview", "project_architecture"}:
                 continue
             text = self._read_text_prefix(root / candidate_path)
             if text is not None and self._looks_like_placeholder_project_doc(text):
@@ -419,12 +349,8 @@ class _ProjectDocsServicePart01:
         indexed_paths = {item.get("path") for item in [*indexed_sources, *stale_sources] if item.get("path")}
         missing_candidate_count = len(candidate_paths - indexed_paths)
         has_high_level_overview = self._has_high_level_project_overview(candidate_sources)
-        manifests_found = [name for name in ("pubspec.yaml", "Cargo.toml", "package.json") if (root / name).exists()]
-        lockfiles_found = [
-            name
-            for name in ("pubspec.lock", "Cargo.lock", "package-lock.json", "pnpm-lock.yaml", "yarn.lock")
-            if (root / name).exists()
-        ]
+        manifests_found: list[str] = []
+        lockfiles_found: list[str] = []
         dependency_docs_state = self._project_dependency_docs_state(metadata)
         exact_versions_available = dependency_docs_state["dependency_docs_available"]
         if catalog_invalid:
@@ -603,7 +529,30 @@ class _ProjectDocsServicePart01:
         with_vectors: bool = False,
         _candidate_paths: set[str] | None = None,
         _coordination_held: bool = False,
+        mutation: Any = None,
     ) -> ProjectDocsIngestResult:
+        if mutation is not None:
+            if skip_known is not True or with_vectors is not False or _candidate_paths is not None or _coordination_held is not False:
+                raise PermissionError("Member ingestion does not accept legacy mutation flags")
+            from .project_docs_member_transaction import execute_member_transaction
+            metadata, outcome = execute_member_transaction(
+                project_path, mutation, operation="ingest_project_docs",
+                storage_policy=getattr(self.facade, "member_storage_policy", None),
+            )
+            return ProjectDocsIngestResult(
+                status="success", project=metadata, candidate_count=outcome["members"],
+                sections_indexed=outcome["sections_indexed"],
+                vector_sync={"status": "not_requested", **outcome},
+                message="Explicit member-only lexical transaction committed; no extraction published.",
+            )
+        # Catalog membership is selection, not a mutation grant. This API has
+        # no validated member transaction/consent contract. Reject before path
+        # probes, adapters, locks, index/agent/queue access or staging writes.
+        raise PermissionError(
+            "Project docs ingestion is unresolved: this API has no explicit "
+            "mutation grant and validated member transaction; catalog membership "
+            "does not authorize indexing, staging or ingestion."
+        )
         root = validate_project_path(project_path).path
         mutation_config = getattr(self.facade, "config", None)
         mutation_index = getattr(mutation_config, "index", None)

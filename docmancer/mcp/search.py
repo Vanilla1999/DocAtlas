@@ -138,31 +138,14 @@ def _operation_search_text(raw: dict[str, Any]) -> str:
 _CAMEL_RE = re.compile(r"(?<=[a-z0-9])(?=[A-Z])")
 _WORD_RE = re.compile(r"[A-Za-z0-9]+")
 
-_SYNONYMS: dict[str, tuple[str, ...]] = {
-    "create": ("open", "add", "new"),
-    "open": ("create",),
-    "issue": ("ticket", "bug"),
-    "ticket": ("issue",),
-    "delete": ("remove", "destroy"),
-    "remove": ("delete",),
-    "list": ("search", "find"),
-    "find": ("search", "list"),
-}
-
-
 def _normalize_text(text: str) -> str:
     text = text.replace("_", " ").replace("-", " ").replace("/", " ")
     return _CAMEL_RE.sub(" ", text)
 
 
 def _tokens(text: str, *, expand: bool = False) -> list[str]:
-    tokens = [t.lower() for t in _WORD_RE.findall(_normalize_text(text))]
-    if not expand:
-        return tokens
-    expanded = list(tokens)
-    for token in tokens:
-        expanded.extend(_SYNONYMS.get(token, ()))
-    return expanded
+    # `expand` is retained for import/caller compatibility, not synonyms.
+    return [t.lower() for t in _WORD_RE.findall(_normalize_text(text))]
 
 
 def search(

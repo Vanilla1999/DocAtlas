@@ -123,6 +123,15 @@ def _assert_agent_developer_protocol_baseline() -> None:
     assert report["errors"] == []
     assert report["target_gaps"] == []
     assert report["metrics"] == report["target_metrics"]
+    assert report["migration_controls_ok"] is True
+    assert report["migration_control_count"] == 1
+    assert [row["task_id"] for row in report["migration_controls"]] == [
+        "explicit_catalog_module_supported",
+    ]
+    assert report["migration_controls"][0]["target_closed"] is True
+    no_catalog = next(row for row in report["tasks"] if row["task_id"] == "autodiscovery_module_supported")
+    assert no_catalog["calls"][0]["status"] == "failed"
+    assert no_catalog["calls"][0]["sources"] == []
 
     ambiguity = next(
         task for task in report["tasks"]
@@ -132,9 +141,11 @@ def _assert_agent_developer_protocol_baseline() -> None:
     assert ambiguity["recovery_contract_ok"] is True
     recovery = ambiguity["calls"][0]["recovery"]
     assert recovery["errors"] == []
-    assert ambiguity["calls"][0]["module_candidates"] == [
-        "packages/auth", "services/auth",
-    ]
+    # The removed module-name input is rejected at the public schema. The host
+    # then explicitly inspects both exact paths and selects the authored retry.
+    assert ambiguity["calls"][0]["status"] == "failed"
+    assert ambiguity["calls"][0]["module_candidates"] == []
+    assert ambiguity["calls"][0]["target_mismatches"] == []
     assert recovery["docs_status_modules"] == [
         "packages/auth", "services/auth",
     ]
@@ -201,6 +212,19 @@ def _model_context_record(
     status: str,
     sources: list[str],
 ) -> dict:
+    import hashlib
+    fixture_name = ("ambiguous_modules_monorepo" if any("auth/" in path for path in sources)
+                    else "explicit_manifest_monorepo")
+    project = (ROOT / "eval/agent_developer_v1/projects" / fixture_name).resolve()
+    rows = []
+    for path in sources:
+        original = (project / path).read_text(encoding="utf-8")
+        rows.append({"path_or_url": path, "snippet": original.strip(),
+                     "line_start": 1, "line_end": len(original.splitlines()),
+                     "project_identity": "local:" + hashlib.sha256(str(project).encode()).hexdigest(),
+                     "evidence_id": "ev-test-" + hashlib.sha256(path.encode()).hexdigest()[:16],
+                     "content_sha256": hashlib.sha256(original.encode()).hexdigest(),
+                     "version_binding": "unversioned"})
     return {
         "tool": "get_docs_context",
         "action": {
@@ -214,9 +238,12 @@ def _model_context_record(
         },
         "payload": {
             "status": status,
-            "sources": [{"path_or_url": source} for source in sources],
+            "kind": "docs_context", "context_available": bool(rows),
+            "answer_supported": False, "answer_available": False,
+            "support_status": "retrieval_only", "edit_ready": False,
+            "sources": rows,
         },
-        "project_path": "/tmp/project",
+        "project_path": str(project),
     }
 
 
@@ -375,5 +402,5 @@ def test_agent_developer_protocol_is_a_hard_ci_gate(monkeypatch, capsys) -> None
     }
     monkeypatch.setattr(agent_gate, "run_protocol", lambda: partial_report)
 
-    assert agent_gate.main() == 1
+    assert agent_gate.main([]) == 1
     assert "Agent Developer Protocol v1: TARGET FAIL" in capsys.readouterr().out

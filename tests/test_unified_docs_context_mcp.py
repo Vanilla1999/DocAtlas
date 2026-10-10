@@ -1,7 +1,10 @@
 """Split test module; helpers live in _shared_test_unified_docs_context_mcp.py."""
 from tests import _shared_test_unified_docs_context_mcp as _shared
 globals().update({k: v for k, v in vars(_shared).items() if not k.startswith("__")})
+import ast
+import re
 import pytest
+from tests.docs._scope_guidance_contract import assert_public_context_guidance
 
 def test_get_docs_context_registered_in_mcp_tool_list():
     names = [tool["name"] for tool in TOOLS]
@@ -17,7 +20,13 @@ def test_get_docs_context_schema():
         "question", "project_path", "library", "version", "module_path",
         "scope", "lookup_queries",
     }
-    assert schema["properties"]["scope"]["enum"] == ["project", "module", "all"]
+    assert_public_context_guidance(tool)
+    jsonschema.validate({"question": "Original question?"}, schema)
+    for scope in ("project", "module", "all", None):
+        jsonschema.validate({"question": "Original question?", "scope": scope}, schema)
+    for scope in ("library", "PROJECT", "", 0, False, [], {}):
+        with pytest.raises(jsonschema.ValidationError):
+            jsonschema.validate({"question": "Original question?", "scope": scope}, schema)
 
 
 def test_get_docs_context_output_schema_accepts_only_current_statuses():
@@ -149,7 +158,13 @@ def test_docmancer_agent_quickstart_resource_exists():
     assert "Docmancer is a local documentation/context router" in text
     assert "not a code auditor" in text
     assert "get_docs_context" in text
-    assert "bounded structured" in text
+    assert "Default calls return documentation context." in text
+    assert "No skill or guide read is required first." in text
+    assert "Context is not answer proof or edit readiness;" in text
+    assert "mutation requires a separate explicit target and authorization." in text
+    assert "preserves full admitted source windows without an internal evidence representation cap." in text
+    assert "Preserve text, hashes and coordinates;" in text
+    assert "within existing scope, freshness, provenance, consent, network and budget limits." in text
 
 
 def test_library_workflow_resource_uses_canonical_three_tool_workflow():
@@ -162,7 +177,30 @@ def test_library_workflow_resource_uses_canonical_three_tool_workflow():
     text = resource["text"]
 
     assert "get_docs_context" in text
-    assert "mode=\"library\"" in text
+    # Validate the advertised calls themselves: library binding belongs to the
+    # unified public schema, while the removed mode must remain rejected.
+    context_tool = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")
+    library_calls = []
+    for example in re.findall(r"`(get_docs_context\([^\n]*\))`", text):
+        expression = ast.parse(example, mode="eval").body
+        assert isinstance(expression, ast.Call) and not expression.args
+        assert isinstance(expression.func, ast.Name) and expression.func.id == "get_docs_context"
+        arguments = {}
+        for keyword in expression.keywords:
+            assert keyword.arg is not None and keyword.arg not in arguments
+            assert isinstance(keyword.value, ast.Constant) and keyword.value.value is Ellipsis
+            arguments[keyword.arg] = {
+                "question": "Original library question?", "library": "mcp",
+                "version": "1.28.0", "project_path": "/repo",
+            }[keyword.arg]
+        jsonschema.validate(arguments, context_tool["inputSchema"])
+        assert "mode" not in arguments
+        if "library" in arguments:
+            assert arguments == {"question": "Original library question?", "library": "mcp", "version": "1.28.0"}
+            library_calls.append(arguments)
+    assert library_calls
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({**library_calls[0], "mode": "library"}, context_tool["inputSchema"])
     assert "get_docs_context" in text
     assert "prepare_docs" in text
     assert "docs_status" in text

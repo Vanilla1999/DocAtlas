@@ -82,84 +82,67 @@ def load_cases(lane: str = "legacy") -> tuple[dict[str, Any], ...]:
 
 
 def run_contract(lane: str = "legacy") -> dict[str, Any]:
+    """Check literal query identity without treating planning as retrieval quality.
+
+    Legacy intent labels remain frozen historical metadata. The current contract
+    permits only the original question and explicit host lookups, with no inferred
+    obligations, aliases, or inherited original-query coverage.
+    """
     results = []
     for case in load_cases(lane):
-        if lane != "legacy":
-            plan = build_documentation_query_plan(
-                case["question"], lookup_queries=tuple(case["lookup_queries"]), requirements=(),
-            ).as_payload()
-            checks = {
-                "explicit_public_inventory": plan["public_query_ids"] == case["expected_public_query_ids"],
-                "optional_lookups": not any(q.startswith("query-lookup-") for q in plan["required_query_ids"]),
-                "no_public_canonical_aliases": not any(q.startswith("query-intent-") for q in plan["public_query_ids"]),
-            }
-            results.append({"id": case["id"], "public_query_ids": plan["public_query_ids"],
-                            "checks": checks, "passed": all(checks.values())})
-            continue
-        expected = case.get("intent")
+        inputs = (("ru", str(case["question"]), "lookup_queries"),)
+        if lane == "legacy":
+            inputs += (("en", str(case["pair"]), "pair_lookup_queries"),)
         language_results: dict[str, Any] = {}
-        passed = True
-        for language, question in (
-            ("ru", str(case["question"])),
-            ("en", str(case["pair"])),
-        ):
-            lookup_key = "lookup_queries" if language == "ru" else "pair_lookup_queries"
-            lookup_queries = tuple(str(value) for value in case.get(lookup_key) or ())
-            aliases = build_project_retrieval_aliases(question)
+        for language, question, lookup_key in inputs:
+            lookups = tuple(str(value) for value in case.get(lookup_key) or ())
             plan = build_documentation_query_plan(
-                question, lookup_queries=lookup_queries, requirements=(),
+                question, lookup_queries=lookups, requirements=(),
             )
-            plan_payload = plan.as_payload()
+            payload = plan.as_payload()
             contract = build_project_answer_contract(question)
-            intent_ids = {alias.intent_id for alias in aliases}
-            public_tools = any(
-                obligation.attribute == "public_tools"
-                for obligation in contract.proof_obligations
+            expected_ids = ["query-original", *(
+                f"query-lookup-{index}" for index in range(1, len(lookups) + 1)
+            )]
+            expected_queries = [("query-original", question, "original", "direct", True)]
+            expected_queries.extend(
+                (f"query-lookup-{index}", text, "host_lookup", "host_lookup", False)
+                for index, text in enumerate(lookups, 1)
             )
-            language_passed = (
-                (expected in intent_ids if expected else not aliases)
-                and (
-                    any(item.origin == "canonical_intent" for item in plan.queries)
-                    == bool(expected)
-                )
-                and not (case["id"] == "ru-first-commands" and public_tools)
-                and all(
-                    f"query-lookup-{index}" in plan_payload["public_query_ids"]
-                    for index in range(1, len(lookup_queries) + 1)
-                )
-                and not any(
-                    query_id.startswith("query-lookup-")
-                    for query_id in plan_payload["required_query_ids"]
-                )
-                and not any(
-                    query_id.startswith("query-intent-")
-                    for query_id in plan_payload["public_query_ids"]
-                )
-            )
-            passed = passed and language_passed
+            checks = {
+                "original_unchanged": plan.original_question == question,
+                "explicit_public_inventory": payload["public_query_ids"] == expected_ids,
+                "literal_query_lineage": [
+                    (item.query_id, item.text, item.origin, item.relation, item.coverage_required)
+                    for item in plan.queries
+                ] == expected_queries,
+                "original_required_lookups_optional": payload["required_query_ids"] == ["query-original"],
+                "no_parent_coverage_transfer": all(item.public_parent_query_id is None for item in plan.queries),
+                "no_inferred_aliases": not build_project_retrieval_aliases(question),
+                "no_inferred_answer_contract": not any((
+                    contract.proof_obligations, contract.subjects,
+                    contract.retrieval_hints, contract.concept_queries,
+                )),
+                "question_identity_bound": contract.question_hash == hashlib.sha256(
+                    json.dumps(question, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+                ).hexdigest(),
+                "no_completeness_claim": not plan.component_scope_complete and not contract.component_scope_complete,
+            }
             language_results[language] = {
-                "intent_ids": sorted(intent_ids),
-                "public_tools": public_tools,
-                "public_query_ids": plan_payload["public_query_ids"],
-                "passed": language_passed,
+                "public_query_ids": payload["public_query_ids"],
+                "checks": checks, "passed": all(checks.values()),
             }
         results.append({
-            "id": case["id"],
-            "languages": language_results,
-            "passed": passed,
+            "id": case["id"], "languages": language_results,
+            "passed": all(row["passed"] for row in language_results.values()),
         })
     report = {
-        "schema_version": "project-context-quality-contract-result-v1",
-        "case_count": len(results),
-        "passed_count": sum(row["passed"] for row in results),
-        "results": results,
-        "lane": lane,
-        "report_only": False,
-        "evaluation_kind": (
-            "alias_and_query_plan_contract" if lane == "legacy"
-            else "query_plan_public_inventory_contract"
-        ),
+        "schema_version": "project-context-quality-contract-result-v2",
+        "case_count": len(results), "passed_count": sum(row["passed"] for row in results),
+        "results": results, "lane": lane, "report_only": False,
+        "evaluation_kind": "literal_query_identity_and_lineage_contract",
         "retrieval_executed": False,
+        "quality_boundary": "useful_source_bound_positive_and_negative_facts_require_separate_live_report",
     }
     report["verdict"] = "PASS" if report["passed_count"] == report["case_count"] else "FAIL"
     return report
@@ -222,6 +205,11 @@ def run_live(lane: str = "legacy", *, question_only: bool = False) -> dict[str, 
         ).hexdigest(),
         "claim_boundary": "in_process_self_host_not_installed_agent",
     })
+    if lane == "legacy" and not question_only:
+        from eval.project_context_quality.legacy_fact_acceptance import FACT_METRIC, summarize_legacy_facts
+        facts = summarize_legacy_facts(report)
+        report["legacy_fact_acceptance"] = facts
+        report["metrics"][FACT_METRIC] = facts[FACT_METRIC]
     # The runner digest describes its unmodified report, before lane metadata.
     if "deterministic_result_digest" in report:
         report["runner_result_digest"] = report.pop("deterministic_result_digest")

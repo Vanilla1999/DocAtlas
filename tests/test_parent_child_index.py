@@ -79,11 +79,22 @@ def test_metadata_only_edit_preserves_child_identity_but_refreshes_context(tmp_p
 def test_incremental_generation_canonicalizes_metadata_from_promoted_columns(tmp_path):
     store = SQLiteStore(tmp_path / "index.db")
     store.add_documents([_doc("# Existing\n\nKeep this chunk.\n", authority="official")])
+    first_generation = store.active_generation_id()
+    assert first_generation
 
     with store._connect() as conn:
         conn.execute(
             "UPDATE retrieval_children SET metadata_json = json_set(metadata_json, '$.authority', 'community')"
         )
+        old_rows = [
+            dict(row) for row in conn.execute(
+                "SELECT * FROM retrieval_children WHERE generation_id = ? ORDER BY id",
+                (first_generation,),
+            )
+        ]
+    assert old_rows
+    assert all(json.loads(row["metadata_json"])["generation_id"] == first_generation
+               for row in old_rows)
 
     store.add_documents([
         Document(
@@ -98,6 +109,56 @@ def test_incremental_generation_canonicalizes_metadata_from_promoted_columns(tmp
         )
     ])
 
+    current_generation = store.active_generation_id()
+    assert current_generation and current_generation != first_generation
+    with store._connect() as conn:
+        copied_rows = [
+            dict(row) for row in conn.execute(
+                "SELECT * FROM retrieval_children WHERE generation_id = ? AND source = ? ORDER BY id",
+                (current_generation, "docs/guide.md"),
+            )
+        ]
+        retained_rows = [
+            dict(row) for row in conn.execute(
+                "SELECT * FROM retrieval_children WHERE generation_id = ? ORDER BY id",
+                (first_generation,),
+            )
+        ]
+    assert retained_rows == old_rows
+    assert len(copied_rows) == len(old_rows)
+    preserved_columns = set(old_rows[0]) - {"id", "generation_id", "metadata_json"}
+    expected_by_id = {}
+    for old_row, copied_row in zip(old_rows, copied_rows):
+        assert {key: copied_row[key] for key in preserved_columns} == {
+            key: old_row[key] for key in preserved_columns
+        }
+        old_metadata = json.loads(old_row["metadata_json"])
+        metadata = json.loads(copied_row["metadata_json"])
+        assert copied_row["generation_id"] == metadata["generation_id"] == current_generation
+        assert old_metadata["authority"] == "community"
+        assert metadata["authority"] == copied_row["authority"] == "official"
+        assert metadata == {
+            **old_metadata, "authority": "official", "generation_id": current_generation,
+        }
+        expected_by_id[copied_row["stable_chunk_id"]] = copied_row
+
+    query_chunks = store.query("Keep", limit=10, budget=1000)
+    hydrated_chunks = store.fetch_sections_by_id(
+        [row["hydration_id"] for row in copied_rows], budget=1000,
+    )
+    for chunks in (query_chunks, hydrated_chunks):
+        assert {chunk.metadata["stable_chunk_id"] for chunk in chunks} == set(expected_by_id)
+        for chunk in chunks:
+            row = expected_by_id[chunk.metadata["stable_chunk_id"]]
+            metadata = json.loads(row["metadata_json"])
+            assert chunk.source == row["source"] == "docs/guide.md"
+            assert chunk.text == row["display_text"]
+            assert chunk.metadata["generation_id"] == current_generation
+            assert all(chunk.metadata[key] == metadata[key] for key in (
+                "stable_chunk_id", "parent_logical_id", "source_identity",
+                "source_content_hash", "content_hash", "char_span", "byte_span", "line_span",
+                "authority",
+            ))
     assert store.index_health()["ok"] is True
 
 

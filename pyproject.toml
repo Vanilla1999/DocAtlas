@@ -41,7 +41,7 @@ dependencies = [
     "mcp>=1.28,<2",
     "sqlite-vec>=0.1.0",
     "qdrant-client>=1.10.0",
-    "fastembed>=0.4.0",
+    "fastembed==0.8.0",
     "charset-normalizer>=3.3.0",
     "pdfplumber>=0.11.0",
     "pypdf>=4.0.0",

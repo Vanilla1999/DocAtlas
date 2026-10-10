@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+import ast
 import json
+import re
 
 import jsonschema
 import pytest
 
-from docmancer.docs.interfaces.mcp.prefetch_tools import _bounded_targets
+from docmancer.docs.interfaces.mcp.prefetch_tools import _bounded_targets, _compact_project_sync
 from docmancer.docs.models import DocsJobCancelResult, DocsJobStartResult, DocsTargetInspectionResult
 from docmancer.mcp.docs_server import (
     DocsMcpSurface,
@@ -20,6 +22,9 @@ from docmancer.mcp.docs_server import (
     call_docs_tool_payload,
     current_tools,
     read_docs_resource,
+)
+from tests.docs._scope_guidance_contract import (
+    assert_public_context_guidance, assert_public_lifecycle_guidance,
 )
 
 
@@ -134,8 +139,11 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
     def walk(value):
         if isinstance(value, dict):
             enum = value.get("enum")
-            if enum is not None:
-                assert None not in enum
+            if enum is not None and None in enum:
+                declared_type = value.get("type")
+                assert declared_type == "null" or (
+                    isinstance(declared_type, list) and "null" in declared_type
+                ), "null enum values require an explicitly nullable type"
             for child in value.values():
                 walk(child)
         elif isinstance(value, list):
@@ -144,6 +152,42 @@ def test_public_mcp_schemas_do_not_put_null_in_enum_values():
 
     for tool in TOOLS:
         walk(tool["inputSchema"])
+
+    with pytest.raises(AssertionError, match="explicitly nullable type"):
+        walk({"type": "string", "enum": ["patch_context", None]})
+
+    class Service:
+        calls = []
+
+        def get_docs_context(self, question, **kwargs):
+            self.calls.append((question, kwargs))
+            return {"status": "success", "context_pack": []}
+
+    service = Service()
+    schema = next(tool for tool in TOOLS if tool["name"] == "get_docs_context")["inputSchema"]
+    advanced = build_docs_surface(DocsServerConfig(expose_advanced=True))
+    advanced_schema = next(spec.input_schema for spec in advanced.tools if spec.name == "get_docs_context")
+    omitted = {"question": "Patch code before editing"}
+    nullable = {**omitted, "context_format": None}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(nullable, schema)
+    jsonschema.validate(nullable, advanced_schema)
+    default = call_docs_tool_payload("get_docs_context", omitted, service)
+    rejected_null = call_docs_tool_payload("get_docs_context", nullable, service)
+    assert rejected_null["error"]["reason_code"] == "validation_error"
+    explicit_null = call_docs_tool_payload("get_docs_context", nullable, service, surface=advanced)
+    assert explicit_null == default
+    assert default["kind"] == "docs_answer"
+    assert len(service.calls) == 2
+    assert all("retain_found_windows" not in kwargs for _, kwargs in service.calls)
+    for invalid in (
+        {**omitted, "context_format": "docs_answer"},
+        {**nullable, "unexpected": True},
+    ):
+        for surface in (None, advanced):
+            rejected = call_docs_tool_payload("get_docs_context", invalid, service, surface=surface)
+            assert rejected["error"]["reason_code"] == "validation_error"
+    assert len(service.calls) == 2
 
 
 def test_mcp_hides_low_level_target_prefetch_from_public_surface():
@@ -237,7 +281,7 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert workflow["prepare_docs"]["speculative"] is False
     assert workflow["docs_status"]["discovery"] is False
     lookup = workflow["free_form_lookup"]
-    assert lookup["one_concept_per_lookup"] is True
+    assert lookup["lookup_queries_must_refine_same_question"] is True
     assert lookup["maximum_lookup_queries"] == 5
     assert lookup["answer_only_from_returned_sources"] is True
     assert lookup["partial_coverage_is_not_completeness"] is True
@@ -246,21 +290,22 @@ def test_agent_templates_include_three_tool_selection_guidance():
     assert recovery["after_prepare"] == "retry_original_get_docs_context_unchanged"
     assert recovery["rephrase_retry_limit"] == 1
     assert recovery["rephrase_auto_execute"] is False
-    assert recovery["investigation_allowed_when_hard_stop_false"] is True
-    assert recovery["source_search_after_rephrase_exhausted"] is True
-    assert recovery["documentation_claim_requires_support"] is True
+    assert recovery["hard_stop_false_authorizes_edit"] is False
+    assert recovery["documentation_claim_requires_cited_context"] is True
     assert recovery["stop_before_edit_when"] == "hard_stop"
 
     canonical_raw = files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8").strip()
     assert canonical_raw.count("{{DOCATLAS_AGENT_CONTRACT_ID}}") == 1
     assert "stop before editing on `insufficient_evidence`" not in canonical_raw
     assert "hard_stop=true" in canonical_raw
-    assert "documentation-governance meta-question" in canonical_raw
+    assert "(docatlas-references/troubleshooting.md)" in canonical_raw
+    troubleshooting = files("docmancer.templates").joinpath("references/troubleshooting.md").read_text(encoding="utf-8")
+    assert "documentation-governance meta-question" in troubleshooting
 
     advertised = runtime_tools["get_docs_context"]["description"]
     assert "Stop before editing on insufficient_evidence" not in advertised
     assert "hard_stop=true" in advertised
-    assert "documentation-governance meta-question" in advertised
+    assert_public_context_guidance(runtime_tools["get_docs_context"])
 
     for name in (
         "skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
@@ -298,13 +343,21 @@ def test_project_docs_workflow_documents_index_template_and_verification_loop():
     assert "## Maintained project-doc catalog" in text
     assert "docatlas.project-docs.yaml" in text
     assert "schema_version: 1" in text
-    assert "indexes only validated catalog entries" in text
-    assert "cold-start fallback" in text
-    assert "fail closed with warnings" in text
-    assert "## Verification loop" in text
-    assert "inspect_project_docs(project_path)" in text
-    assert "prepare_docs(action=\"sync_project_docs\"" in text
-    assert "Confirm the expected files are cited" in text
+    # Preserve the documented membership/consent/verification contract, without
+    # requiring retired automatic cold-start discovery or internal helper names.
+    prose = " ".join(text.split())
+    for guard, claim in (
+        ("explicit_membership", "List each admitted document by a literal relative path."),
+        ("no_discovery", "does not recursively discover `roots`, glob patterns, linked files"),
+        ("invalid_catalog", "An invalid explicit catalog blocks retrieval and synchronization without pruning the existing index."),
+        ("read_only_without_mutation", "Omitting `mutation` or passing null performs no writes."),
+        ("confirmed_generation", "`expected_generation_id`, null only when the selected store is absent"),
+        ("verified_retry", "After verified successful preparation and readiness, retry the question unchanged."),
+        ("source_fidelity", "Check useful facts, source paths, hashes, and coordinates."),
+        ("no_lookup_credit", "lookup credit must not be substituted for original coverage."),
+    ):
+        assert claim in prose, guard
+    assert 'prepare_docs(action="sync_project_docs"' in text
     assert "get_docs_context(project_path=" in text
 
 
@@ -315,9 +368,17 @@ def test_mcp_docs_server_documents_index_and_smoke_test_loop():
     assert "## Project documentation" in text
     assert "get_docs_context" in text
     assert "prepare_docs(action=\"sync_project_docs\"" in text
-    assert "## Response and source rules" in text
     assert "docs_status" in text
-    assert "does not generate or commit official documentation" in text
+    prose = " ".join(text.split())
+    for guard, claim in (
+        ("retrieval_only", "Project reads return source-attributed `docs_context`."),
+        ("no_answer_authority", "`answer_supported=false`, `answer_available=false`, `edit_ready=false`, and `answer_policy=cite_only`"),
+        ("source_fidelity", "Sources retain path, source identity, authority, scope, content hash, contiguous verbatim snippet, and source-local coordinates."),
+        ("read_only", "Reads never reconcile an index or write to the repository."),
+        ("no_generated_docs", "does not delete unselected members, prune orphans, write vectors, or generate documentation artifacts."),
+        ("explicit_edit_authorization", "Returned context alone is not permission to edit."),
+    ):
+        assert claim in prose, guard
 
 
 def test_mcp_exposes_docs_job_tools():
@@ -503,25 +564,19 @@ def test_prepare_docs_rejects_invalid_types_before_service_call():
 def test_prepare_docs_compacts_large_project_sync_inventory():
     from docmancer.docs.models import ProjectDocsSyncResult, ProjectMetadata
 
-    class Service:
-        def sync_project_docs(self, project_path, **_kwargs):
-            return ProjectDocsSyncResult(
-                status="success",
-                project=ProjectMetadata(project_path=project_path),
-                indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
-                current_count=500,
-                diagnostics={"vector_sync": {
-                    "status": "success", "requested": True, "verified": 500,
-                    "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
-                    "retrieval_mode": "dense",
-                }},
-            )
-
-    result = call_docs_tool_payload(
-        "prepare_docs",
-        {"action": "sync_project_docs", "project_path": "/repo"},
-        Service(),
+    inventory = ProjectDocsSyncResult(
+        status="success",
+        project=ProjectMetadata(project_path="/repo"),
+        indexed_sources=[{"path": f"docs/{index}.md", "content": "x" * 500} for index in range(500)],
+        current_count=500,
+        diagnostics={"vector_sync": {
+            "status": "success", "requested": True, "verified": 500,
+            "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
+            "retrieval_mode": "dense",
+        }},
     )
+
+    result = _compact_project_sync(inventory)
 
     assert len(json.dumps(result, ensure_ascii=False).encode("utf-8")) <= 32_000
     assert result["summary"]["current_count"] == 500
@@ -531,6 +586,26 @@ def test_prepare_docs_compacts_large_project_sync_inventory():
         "backfilled": 2, "extra_points": 0, "collection": "project-vectors",
         "retrieval_mode": "dense",
     }
+
+
+def test_prepare_docs_rejects_project_sync_without_member_grant():
+    class Service:
+        called = False
+
+        def sync_project_docs(self, *_args, **_kwargs):
+            self.called = True
+            raise AssertionError("authorization should have stopped this call")
+
+    service = Service()
+    result = call_docs_tool_payload(
+        "prepare_docs",
+        {"action": "sync_project_docs", "project_path": "/repo"},
+        service,
+    )
+
+    assert result["error"]["reason_code"] == "permission_denied"
+    assert service.called is False
+    assert "summary" not in result
 
 
 def test_prepare_docs_rejects_malformed_incremental_sync_paths():
@@ -613,10 +688,7 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
 
     assert set(tools) == PUBLIC_TOOL_NAMES
     context_tool = tools["get_docs_context"]
-    assert "Source-grounded documentation tool" in context_tool["description"]
-    assert 'module_path always implies module scope' in context_tool["description"]
-    assert 'make two bounded calls (module then project)' in context_tool["description"]
-    assert 'scope=all without module filters' in context_tool["description"]
+    assert_public_context_guidance(context_tool)
     context_properties = context_tool["inputSchema"]["properties"]
     assert {"output_mode", "delivery_strategy", "packet_tokens"}.isdisjoint(
         context_properties
@@ -625,15 +697,15 @@ def test_mcp_exposes_three_public_tools_with_mutually_exclusive_guidance():
         "question", "lookup_queries", "project_path", "library", "version",
         "module_path", "scope",
     }
-    assert "always implies module scope" in context_properties["module_path"]["description"]
-    assert "repo-level docs only" in context_properties["scope"]["description"]
-    assert "original request unchanged" in context_tool["description"]
-    assert "never authorize an answer or edit" in context_tool["description"]
+    assert "context_format" not in context_tool["description"]
+    assert "patch_context" not in json.dumps(context_tool["outputSchema"])
     output_properties = context_tool["outputSchema"]["properties"]
-    assert output_properties["module_candidates"]["maxItems"] == 8
+    assert "maxItems" not in output_properties["module_candidates"]
     assert output_properties["module_candidates"]["items"]["required"] == ["module_path"]
-    assert "Call only from get_docs_context" in tools["prepare_docs"]["description"]
-    assert "explicitly asks" in tools["docs_status"]["description"]
+    jsonschema.validate({"status": "insufficient_evidence", "kind": "docs_context",
+                         "module_candidates": [{"module_path": f"packages/module-{i}"} for i in range(12)]},
+                        context_tool["outputSchema"])
+    assert_public_lifecycle_guidance(tools)
     assert tools["docs_status"]["inputSchema"]["required"] == ["action"]
     assert tools["docs_status"]["inputSchema"]["properties"]["action"]["enum"] == [
         "project",
@@ -735,8 +807,29 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert "`sources`" in workflow["text"]
     assert library_workflow is not None
     assert "get_docs_context" in library_workflow["text"]
-    assert "mode=\"library\"" in library_workflow["text"]
-    assert "get_docs_context" in library_workflow["text"]
+    # The unified public call binds a library directly. Parse and validate the
+    # actual examples so the migration cannot pass with an obsolete mode or a
+    # prose mention of the right parameter next to an invalid invocation.
+    context_tool = next(tool for tool in current_tools({}) if tool["name"] == "get_docs_context")
+    library_calls = []
+    for example in re.findall(r"`(get_docs_context\([^\n]*\))`", library_workflow["text"]):
+        expression = ast.parse(example, mode="eval").body
+        assert isinstance(expression, ast.Call) and not expression.args
+        assert isinstance(expression.func, ast.Name) and expression.func.id == "get_docs_context"
+        arguments = {}
+        for keyword in expression.keywords:
+            assert keyword.arg is not None and keyword.arg not in arguments
+            assert isinstance(keyword.value, ast.Constant) and keyword.value.value is Ellipsis
+            arguments[keyword.arg] = {
+                "question": "Original library question?", "library": "mcp",
+                "version": "1.28.0", "project_path": "/repo",
+            }[keyword.arg]
+        jsonschema.validate(arguments, context_tool["inputSchema"])
+        assert "mode" not in arguments
+        if "library" in arguments:
+            assert arguments == {"question": "Original library question?", "library": "mcp", "version": "1.28.0"}
+            library_calls.append(arguments)
+    assert library_calls
     assert "prepare_docs" in library_workflow["text"]
     assert "docs_status" in library_workflow["text"]
     assert "Do not use WebFetch" in library_workflow["text"]
@@ -744,7 +837,7 @@ def test_mcp_read_resource_returns_workflow_and_schema_guidance():
     assert '"schema_version": "trust-contract-1.2"' in schema["text"]
     assert '"selected"' in schema["text"]
     assert selection is not None
-    assert "Natural documentation" in selection["text"]
+    assert "One unchanged original documentation question" in selection["text"]
     assert "get_docs_context" in selection["text"]
     assert "prepare_docs" in selection["text"]
     assert "docs_status" in selection["text"]

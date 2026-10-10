@@ -58,7 +58,6 @@ def test_full_list_beats_incomplete_alternatives_without_answer_labels(seed):
     expected = raw[raw.index('* The **connect**'):raw.index('\n\nYou can configure')]
     assert any(expected in s['snippet'] for s in out['sources'])
     assert audit_payload(out, bindings, project) == []
-    assert docs_context_budget_tokens(out) <= 800
 
 
 def test_draft_range_is_preserved_unless_its_bytes_are_delivered(seed):

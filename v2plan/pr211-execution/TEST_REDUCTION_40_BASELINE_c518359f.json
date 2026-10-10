@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+  "checkout_commit": "2d618e3b3cd92b5d86f252c9e742d1aac52a562e",
+  "checkout_tree": "8f6b492ecdeb034a9e580221ba22343feea599b5",
+  "run_id": 38030248861,
+  "run_attempt": 1,
+  "source": "downloaded complete JUnit; independently parsed and cross-checked against CI core diagnostics",
+  "reports": [
+    {
+      "artifact_file": "pytest-advanced-3.12-38030248861-1/advanced-contract.xml",
+      "sha256": "f38f84995a3922c808ccf8b92996eea736b0477f2a0c87ff84ec90049f9b26f4",
+      "cases": 622,
+      "counts": {
+        "PASS": 528,
+        "FAIL": 94
+      },
+      "suite": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "94",
+          "skipped": "0",
+          "tests": "622",
+          "time": "50.228",
+          "timestamp": "2026-10-10T06:15:05.901442+00:00",
+          "hostname": "runnervmmprz5"
+        }
+      ]
+    },
+    {
+      "artifact_file": "pytest-core-3.11-38030248861-1/core-tests-3.11.xml",
+      "sha256": "afbb0a0a54b7d359e83148e6c2691ce7efe6b947d9131db5fe4363bda0fc24e5",
+      "cases": 7669,
+      "counts": {
+        "PASS": 6070,
+        "FAIL": 1589,
+        "SKIP": 10
+      },
+      "suite": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "1589",
+          "skipped": "10",
+          "tests": "7669",
+          "time": "545.813",
+          "timestamp": "2026-10-10T06:15:09.184372+00:00",
+          "hostname": "runnervmmprz5"
+        }
+      ]
+    },
+    {
+      "artifact_file": "pytest-core-3.12-38030248861-1/core-tests-3.12.xml",
+      "sha256": "f9445f027c443cadb44a6ac7c05095d4e1b915a4aad189146d6c5aab540707de",
+      "cases": 7669,
+      "counts": {
+        "PASS": 6070,
+        "FAIL": 1589,
+        "SKIP": 10
+      },
+      "suite": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "1589",
+          "skipped": "10",
+          "tests": "7669",
+          "time": "494.769",
+          "timestamp": "2026-10-10T06:15:08.001450+00:00",
+          "hostname": "runnervmmprz5"
+        }
+      ]
+    },
+    {
+      "artifact_file": "pytest-core-3.13-38030248861-1/core-tests-3.13.xml",
+      "sha256": "299f82d7d2fb85c12f04c0e2ee47cd6420fe751e7aa4e5500f6cae9380d968e4",
+      "cases": 7669,
+      "counts": {
+        "PASS": 6070,
+        "FAIL": 1589,
+        "SKIP": 10
+      },
+      "suite": [
+        {
+          "name": "pytest",
+          "errors": "0",
+          "failures": "1589",
+          "skipped": "10",
+          "tests": "7669",
+          "time": "357.399",
+          "timestamp": "2026-10-10T06:14:59.812934+00:00",
+          "hostname": "runnervmmprz5"
+        }
+      ]
+    }
+  ],
+  "core_roster_and_outcomes_identical": true,
+  "core_advanced_overlap": 0,
+  "n_before": 8291,
+  "core_before": 7669,
+  "advanced_before": 622,
+  "target_net_removal": 3317,
+  "maximum_after": 4974,
+  "roster_file": "TEST_REDUCTION_40_ROSTER_c518359f.json.gz",
+  "roster_sha256": "c4445db231e1f59828b6f0f6c10c61ebf46c7208e62acae1c0eaadba2ce17b83",
+  "uncompressed_roster_sha256": "13507dd4ccf097a83bf2213e11cf139168bcce7e2efbe531d36d7af6591d68a3",
+  "counts": {
+    "PASS": 6598,
+    "FAIL": 1683,
+    "SKIP": 10
+  },
+  "removed": 0,
+  "added": 0,
+  "net": 0,
+  "runtime_calls": "NOT_MEASURED",
+  "client_sessions": "NOT_RUN"
+}

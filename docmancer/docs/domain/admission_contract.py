@@ -36,10 +36,14 @@ def choose_admission(guards: HardGuards, *, legacy_qualified: bool,
     if not guards.allowed:
         return AdmissionDecision(False, "rejected", guards.reasons[0])
     if witness.status == "matched":
+        if (not witness.need_id or not witness.source_key or not witness.spans
+                or any(start < 0 or end <= start for start, end in witness.spans)):
+            return AdmissionDecision(False, "rejected", "invalid_local_witness")
         return AdmissionDecision(True, "typed_local", "verified_local_demand", (witness.need_id,))
     if witness.status == "absent":
         return AdmissionDecision(False, "rejected", "missing_local_demand")
-    return AdmissionDecision(legacy_qualified, "legacy_strict", "unverified_legacy_semantics")
+    # Retain the legacy parameter/route type as ABI, not as proof authority.
+    return AdmissionDecision(False, "rejected", "unverified_local_demand")
 
 
 def choose_need_admission(probe: Mapping[str, Any], *, query_id: str, text: str,
@@ -69,8 +73,7 @@ def choose_need_admission(probe: Mapping[str, Any], *, query_id: str, text: str,
                 str(probe.get("need_relation") or "") != frame.operator
                 or str(probe.get("need_subject") or "").casefold() != frame.subject.casefold()):
             status, spans = "absent", ()
-    # Preserve the separately validated default primitive. New relational
-    # frames above have their own current-body proof; unknown forms stay strict.
+    # Preserve the default hook ABI. Unknown forms cannot fall back to overlap.
     if (probe.get("query_origin") == "retrieval_need"
             and len(current) == 1 and current[0].relation == "default"
             and str(probe.get("need_relation") or "") == "default"

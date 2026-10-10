@@ -13,7 +13,13 @@ import pytest
 
 import eval.task_level._isolated_delivery_part02 as isolated_delivery_part02
 
-from docmancer.docs.application.action_packet import build_action_packet, estimate_action_packet_tokens
+from docmancer.docs.application.action_packet import (
+    build_action_packet,
+    estimate_action_packet_tokens,
+    refresh_action_packet_estimate,
+    validate_action_packet,
+)
+from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
 from eval.task_level.conditions import CONDITIONS, TOOL_REQUIRED_ONCE_INSTRUCTION
 from eval.task_level.evaluators.policy import audit_trajectory
 from eval.task_level.execution import build_tool_policy
@@ -85,13 +91,40 @@ def _snapshot() -> HostEvidenceSnapshot:
 
 
 def _packet(*, evidence: list[dict] | None = None) -> dict:
-    return build_action_packet(
+    items = evidence if evidence is not None else _evidence()
+    # The fixture requests each authored source sentence explicitly. The
+    # selector must not derive behavioral obligations from the objective.
+    content_literals = tuple(items[0]["content"].splitlines())
+    assert content_literals and all(content_literals)
+    packet = build_action_packet(
         question=_envelope().task_objective,
-        context_pack=evidence or _evidence(),
+        context_pack=items,
         trust_contract={"selected": [{"source": "AGENTS.md"}], "rejected": [], "risky": []},
-        max_tokens=1_500,
         project_path="/repo",
+        public_requirements=content_literals,
     )
+    assert validate_action_packet(packet, evidence_items=items, project_path="/repo") == []
+    assert packet["result"] == "data" and packet["completeness"] == "complete"
+    assert len(packet["sources"]) == len(items) == 1
+    source = packet["sources"][0]
+    assert source["path"] == items[0]["path"] and source["text"] == items[0]["content"]
+    assert source["content_sha256"] == hashlib.sha256(items[0]["content"].encode()).hexdigest()
+    assert source["instruction_trust"] == "untrusted_data" and packet["edit_ready"] is False
+    assert "task_interpretation" not in packet and "mutation_intent" not in packet
+    requirements = {row["requirement_id"]: row for row in packet["requirements"]}
+    assert {row["value"] for row in requirements.values()} == set(content_literals)
+    assert all(row["kind"] == "required_fact" and row["mandatory"] is True
+               and row["public_provenance"] == "public_task_contract" for row in requirements.values())
+    assert len(packet["assignments"]) == len(requirements) == len(content_literals)
+    for assignment in packet["assignments"]:
+        literal = requirements[assignment["requirement_id"]]["value"]
+        assert assignment["evidence_id"] == source["stable_id"] and assignment["path"] == source["path"]
+        assert assignment["proof_role"] == "generic_fact" and assignment["unit_id"]
+        assert source["text"][assignment["unit_char_start"]:assignment["unit_char_end"]] == literal
+        assert assignment["unit_content_hash"] == hashlib.sha256(literal.encode()).hexdigest()
+    assert "missing" not in packet
+    assert packet["estimated_tokens"] == estimate_action_packet_tokens(packet)
+    return packet
 
 
 def _usage() -> WorkerUsage:
@@ -190,12 +223,23 @@ def test_host_owns_retrieval_evidence_objective_and_usage_contract(tmp_path):
     with pytest.raises(IsolatedDeliveryError, match="invalid_action_packet"):
         _deliver(candidate, tmp_path / "invented-evidence")
 
-    wrong_objective = _packet()
-    wrong_objective["task_interpretation"]["objective"] = "Completely different task"
-    wrong_objective["estimated_tokens"] = estimate_action_packet_tokens(wrong_objective)
-    candidate = Worker(replace(Worker().output, packet=wrong_objective))
-    with pytest.raises(IsolatedDeliveryError, match="objective_mismatch"):
-        _deliver(candidate, tmp_path / "wrong-objective")
+    # The host evidence fingerprint binds the objective; v4 has no task scaffold.
+    candidate = Worker()
+    with pytest.raises(IsolatedDeliveryError, match="host_objective_fingerprint_mismatch"):
+        deliver_with_isolated_worker(
+            worker=candidate,
+            envelope=replace(_envelope(), task_objective="Completely different task"),
+            evidence=_snapshot(),
+            output_dir=tmp_path / "wrong-objective",
+            timeout_seconds=5,
+        )
+    assert candidate.calls == 0
+    forged_scaffold = _packet()
+    forged_scaffold["task_interpretation"] = {"objective": "Completely different task"}
+    refresh_action_packet_estimate(forged_scaffold)
+    candidate = Worker(replace(Worker().output, packet=forged_scaffold))
+    with pytest.raises(IsolatedDeliveryError, match="invalid_action_packet"):
+        _deliver(candidate, tmp_path / "forged-scaffold")
 
     class MutatingWorker(Worker):
         def run(self, envelope, evidence, *, timeout_seconds):
@@ -212,8 +256,12 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     result = _deliver(worker, tmp_path)
 
     assert worker.calls == 1
-    assert result["status"] == _packet()["status"]
+    assert result["result"] == _packet()["result"] == "data"
+    assert result["completeness"] == _packet()["completeness"] == "complete"
     assert result["packet"]["estimated_tokens"] <= 1_500
+    assert result["packet"]["edit_ready"] is False
+    assert result["projection"]["sources"] == result["packet"]["sources"]
+    assert result["projection"]["edit_ready"] is False
     assert set(path.name for path in tmp_path.iterdir()) == {
         "action_packet.json",
         "context_sources.json",
@@ -229,6 +277,12 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
     manifest = json.loads((tmp_path / "host_evidence_manifest.json").read_text(encoding="utf-8"))
     snapshot = json.loads((tmp_path / "host_evidence_snapshot.json").read_text(encoding="utf-8"))
     metrics = json.loads((tmp_path / "isolated_delivery_metrics.json").read_text(encoding="utf-8"))
+    projection_snapshot = json.loads((tmp_path / "model_visible_evidence_snapshot.json").read_text(encoding="utf-8"))
+    projection = json.loads((tmp_path / "model_visible_patch_context.json").read_text(encoding="utf-8"))
+    assert projection == result["projection"]
+    assert validate_model_visible_projection(projection, snapshot=projection_snapshot) == []
+    assert projection["sources"][0]["text"] == _evidence()[0]["content"]
+    assert metrics["result"] == result["result"] and metrics["completeness"] == result["completeness"]
     assert manifest["evidence_fingerprint"] == metrics["evidence_fingerprint"] == _snapshot().fingerprint
     assert manifest["items"][0]["content_sha256"]
     assert snapshot["evidence_items"] == _evidence()
@@ -244,15 +298,19 @@ def test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff(tmp_
 def test_isolated_broker_rejects_an_insufficient_model_visible_projection(
     tmp_path, monkeypatch,
 ):
+    failure = {
+        "schema_version": 4,
+        "result": "failure",
+        "completeness": "unavailable",
+        "edit_ready": False,
+        "kind": "patch_context",
+        "missing": ["invalid_action_packet"],
+    }
+    refresh_action_packet_estimate(failure)
     monkeypatch.setattr(
         isolated_delivery_part02,
         "project_patch_context",
-        lambda **kwargs: ({
-            "status": "insufficient_evidence",
-            "kind": "patch_context",
-            "missing": ["projection exceeds budget"],
-            "estimated_tokens": 20,
-        }, {}),
+        lambda **kwargs: (failure, {}),
     )
 
     with pytest.raises(
@@ -260,6 +318,8 @@ def test_isolated_broker_rejects_an_insufficient_model_visible_projection(
         match="isolated_model_visible_projection_insufficient",
     ):
         _deliver(Worker(), tmp_path)
+    assert not (tmp_path / "model_visible_patch_context.json").exists()
+    assert not (tmp_path / "action_packet.json").exists()
 
 
 def test_subprocess_worker_is_fail_closed_and_bounds_both_output_streams(tmp_path):
@@ -363,10 +423,31 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
         context_pack=evidence,
         required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
     )
-    assert {row["path"] for row in packet["source_of_truth"]} == set(TASK33C_REQUIRED_EVIDENCE_PATHS)
-    assert [
-        row["text"] for row in packet["task_interpretation"]["acceptance_conditions"]
-    ] == ["Sync must call evaluateFlowEntry with allowOfflineFallback: false."]
+    assert validate_action_packet(packet, evidence_items=evidence) == []
+    expected = {path: "Task33 source evidence." for path in TASK33C_REQUIRED_EVIDENCE_PATHS}
+    assert {row["path"]: row["text"] for row in packet["sources"]} == expected
+    assert packet["result"] == "data" and packet["edit_ready"] is False
+    assert packet["completeness"] == "partial"
+    assert packet["missing"] == ["visible_content_assignment_required"]
+    # The existing acceptance phrase appears only in metadata, not in any
+    # source window. It must not become a claimed fact or edit permission.
+    metadata_only = "Sync must call evaluateFlowEntry with allowOfflineFallback: false."
+    assert metadata_only not in json.dumps(packet)
+    literal_packet = build_action_packet(
+        question=domain_objective, context_pack=evidence,
+        required_evidence_paths=TASK33C_REQUIRED_EVIDENCE_PATHS,
+        public_requirements=("Task33 source evidence.",),
+    )
+    assert validate_action_packet(literal_packet, evidence_items=evidence) == []
+    assert literal_packet["result"] == "data" and literal_packet["completeness"] == "complete"
+    assert literal_packet["edit_ready"] is False
+    assert {row["path"]: row["text"] for row in literal_packet["sources"]} == expected
+    assert all(
+        row["content_sha256"] == hashlib.sha256(expected[row["path"]].encode()).hexdigest()
+        and row["instruction_trust"] == "untrusted_data"
+        for row in literal_packet["sources"]
+    )
+    assert metadata_only not in json.dumps(literal_packet)
     assert plan["claims"]["may_claim_product_improvement"] is False
     direct = CONDITIONS["docatlas_bounded_direct"].tool_policy
     required = CONDITIONS["docatlas_tool_required_once"].tool_policy
@@ -375,7 +456,7 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     assert not direct.allow_docatlas
     assert "`get_docs_context` exactly once" in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert 'project_path="."' in TOOL_REQUIRED_ONCE_INSTRUCTION
-    assert 'delivery_strategy="bounded_direct"' in TOOL_REQUIRED_ONCE_INSTRUCTION
+    assert 'context_format="patch_context"' in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert "Do not make another documentation retrieval call" in TOOL_REQUIRED_ONCE_INSTRUCTION
     assert "Do not call `prepare_docs`" in TOOL_REQUIRED_ONCE_INSTRUCTION
     _, mcp_path = build_tool_policy("docatlas_tool_required_once", tmp_path)
@@ -384,10 +465,11 @@ def test_task33c_three_lane_plan_and_flags_are_frozen(tmp_path):
     trajectory.write_text(json.dumps([{
         "sequence": 1, "tool_name": "mcp", "arguments": {
             "server": "docmancer-docs", "tool": "get_docs_context",
-            "delivery_strategy": "bounded_direct",
+            "context_format": "patch_context",
             "question_matches_task_objective": True,
             "retrieval_succeeded": True,
-            "action_packet_status": "ok",
+            "action_packet_result": literal_packet["result"],
+            "action_packet_completeness": literal_packet["completeness"],
         },
     }]), encoding="utf-8")
     audit = audit_trajectory("docatlas_tool_required_once", trajectory)
@@ -411,7 +493,8 @@ def test_task33c_decision_gate_requires_complete_comparable_measurements():
             metrics.update({
                 "delivery_retrieval_calls": 1,
                 "delivery_attempts": 1,
-                "action_packet_status": "ok",
+                "action_packet_result": "data",
+                "action_packet_completeness": "complete",
                 "evidence_fingerprint": "shared-evidence",
                 "action_packet_project_doc_coverage": 0.5,
                 "action_packet_project_doc_paths": list(TASK33C_REQUIRED_EVIDENCE_PATHS),

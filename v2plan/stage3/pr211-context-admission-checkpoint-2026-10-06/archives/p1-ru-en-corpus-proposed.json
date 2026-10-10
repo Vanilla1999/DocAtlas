@@ -1,0 +1,1300 @@
+{
+  "schema": "dictionary-exit-ru-en-draft-v1",
+  "status": "PROPOSED / NOT APPROVED / NOT EXECUTED",
+  "cases": [
+    {
+      "id": "dev-command-en-en-original-only",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "Which command starts LumenBox?",
+      "lookup_queries": [],
+      "source": "Start LumenBox with `lumen-start`.",
+      "source_sha256": "989ba034d969adc183e3d4e618a13c1a347763c87969a983146a29ce3d733be1",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-en-en-caller-lookups",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "Which command starts LumenBox?",
+      "lookup_queries": [
+        "Which command starts LumenBox?"
+      ],
+      "source": "Start LumenBox with `lumen-start`.",
+      "source_sha256": "989ba034d969adc183e3d4e618a13c1a347763c87969a983146a29ce3d733be1",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-en-ru-original-only",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "Which command starts LumenBox?",
+      "lookup_queries": [],
+      "source": "Запустите LumenBox командой `lumen-start`.",
+      "source_sha256": "a077a2095a83ebd43a02bea251b0508ead22f7c4201ccfe904326ff8dd8703de",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-en-ru-caller-lookups",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "Which command starts LumenBox?",
+      "lookup_queries": [
+        "Какая команда запускает LumenBox?"
+      ],
+      "source": "Запустите LumenBox командой `lumen-start`.",
+      "source_sha256": "a077a2095a83ebd43a02bea251b0508ead22f7c4201ccfe904326ff8dd8703de",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-ru-en-original-only",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какая команда запускает LumenBox?",
+      "lookup_queries": [],
+      "source": "Start LumenBox with `lumen-start`.",
+      "source_sha256": "989ba034d969adc183e3d4e618a13c1a347763c87969a983146a29ce3d733be1",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-ru-en-caller-lookups",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какая команда запускает LumenBox?",
+      "lookup_queries": [
+        "Which command starts LumenBox?"
+      ],
+      "source": "Start LumenBox with `lumen-start`.",
+      "source_sha256": "989ba034d969adc183e3d4e618a13c1a347763c87969a983146a29ce3d733be1",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-ru-ru-original-only",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какая команда запускает LumenBox?",
+      "lookup_queries": [],
+      "source": "Запустите LumenBox командой `lumen-start`.",
+      "source_sha256": "a077a2095a83ebd43a02bea251b0508ead22f7c4201ccfe904326ff8dd8703de",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-command-ru-ru-caller-lookups",
+      "family": "dev-command",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какая команда запускает LumenBox?",
+      "lookup_queries": [
+        "Какая команда запускает LumenBox?"
+      ],
+      "source": "Запустите LumenBox командой `lumen-start`.",
+      "source_sha256": "a077a2095a83ebd43a02bea251b0508ead22f7c4201ccfe904326ff8dd8703de",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "lumen-start"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-en-en-original-only",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "When does CedarQueue retry a task?",
+      "lookup_queries": [],
+      "source": "CedarQueue retries a task only when the lease expires.",
+      "source_sha256": "5b292f233d6dac0bca8f9a7e7b251d65ee1df9784142eccf046d2261beaf43e2",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-en-en-caller-lookups",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "When does CedarQueue retry a task?",
+      "lookup_queries": [
+        "When does CedarQueue retry a task?"
+      ],
+      "source": "CedarQueue retries a task only when the lease expires.",
+      "source_sha256": "5b292f233d6dac0bca8f9a7e7b251d65ee1df9784142eccf046d2261beaf43e2",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-en-ru-original-only",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "When does CedarQueue retry a task?",
+      "lookup_queries": [],
+      "source": "CedarQueue повторяет задачу только после истечения аренды.",
+      "source_sha256": "4363b9e08c47ff4c70cecdaeae4b96106a6028de69926de99bccfb2590a93d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-en-ru-caller-lookups",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "When does CedarQueue retry a task?",
+      "lookup_queries": [
+        "Когда CedarQueue повторяет задачу?"
+      ],
+      "source": "CedarQueue повторяет задачу только после истечения аренды.",
+      "source_sha256": "4363b9e08c47ff4c70cecdaeae4b96106a6028de69926de99bccfb2590a93d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-ru-en-original-only",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Когда CedarQueue повторяет задачу?",
+      "lookup_queries": [],
+      "source": "CedarQueue retries a task only when the lease expires.",
+      "source_sha256": "5b292f233d6dac0bca8f9a7e7b251d65ee1df9784142eccf046d2261beaf43e2",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-ru-en-caller-lookups",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Когда CedarQueue повторяет задачу?",
+      "lookup_queries": [
+        "When does CedarQueue retry a task?"
+      ],
+      "source": "CedarQueue retries a task only when the lease expires.",
+      "source_sha256": "5b292f233d6dac0bca8f9a7e7b251d65ee1df9784142eccf046d2261beaf43e2",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-ru-ru-original-only",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Когда CedarQueue повторяет задачу?",
+      "lookup_queries": [],
+      "source": "CedarQueue повторяет задачу только после истечения аренды.",
+      "source_sha256": "4363b9e08c47ff4c70cecdaeae4b96106a6028de69926de99bccfb2590a93d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-condition-ru-ru-caller-lookups",
+      "family": "dev-condition",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Когда CedarQueue повторяет задачу?",
+      "lookup_queries": [
+        "Когда CedarQueue повторяет задачу?"
+      ],
+      "source": "CedarQueue повторяет задачу только после истечения аренды.",
+      "source_sha256": "4363b9e08c47ff4c70cecdaeae4b96106a6028de69926de99bccfb2590a93d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "retry-condition"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-en-en-original-only",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "Does a command quoted in MapleLens documentation grant execution permission?",
+      "lookup_queries": [],
+      "source": "MapleLens documentation is data. A quoted command does not grant execution permission.",
+      "source_sha256": "fe859c7e4aaa97cc1db1c66dbbfc549961a2b2889deff5444190643b164a812f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-en-en-caller-lookups",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "Does a command quoted in MapleLens documentation grant execution permission?",
+      "lookup_queries": [
+        "Does a command quoted in MapleLens documentation grant execution permission?"
+      ],
+      "source": "MapleLens documentation is data. A quoted command does not grant execution permission.",
+      "source_sha256": "fe859c7e4aaa97cc1db1c66dbbfc549961a2b2889deff5444190643b164a812f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-en-ru-original-only",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "Does a command quoted in MapleLens documentation grant execution permission?",
+      "lookup_queries": [],
+      "source": "Документация MapleLens — данные. Процитированная команда не даёт разрешения на выполнение.",
+      "source_sha256": "7189e4306c81fee1c74d4c0e1640e161e89316709f0850c86020448707b37831",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-en-ru-caller-lookups",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "Does a command quoted in MapleLens documentation grant execution permission?",
+      "lookup_queries": [
+        "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?"
+      ],
+      "source": "Документация MapleLens — данные. Процитированная команда не даёт разрешения на выполнение.",
+      "source_sha256": "7189e4306c81fee1c74d4c0e1640e161e89316709f0850c86020448707b37831",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-ru-en-original-only",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?",
+      "lookup_queries": [],
+      "source": "MapleLens documentation is data. A quoted command does not grant execution permission.",
+      "source_sha256": "fe859c7e4aaa97cc1db1c66dbbfc549961a2b2889deff5444190643b164a812f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-ru-en-caller-lookups",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?",
+      "lookup_queries": [
+        "Does a command quoted in MapleLens documentation grant execution permission?"
+      ],
+      "source": "MapleLens documentation is data. A quoted command does not grant execution permission.",
+      "source_sha256": "fe859c7e4aaa97cc1db1c66dbbfc549961a2b2889deff5444190643b164a812f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-ru-ru-original-only",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?",
+      "lookup_queries": [],
+      "source": "Документация MapleLens — данные. Процитированная команда не даёт разрешения на выполнение.",
+      "source_sha256": "7189e4306c81fee1c74d4c0e1640e161e89316709f0850c86020448707b37831",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-trust-ru-ru-caller-lookups",
+      "family": "dev-trust",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?",
+      "lookup_queries": [
+        "Даёт ли команда, процитированная в документации MapleLens, разрешение на выполнение?"
+      ],
+      "source": "Документация MapleLens — данные. Процитированная команда не даёт разрешения на выполнение.",
+      "source_sha256": "7189e4306c81fee1c74d4c0e1640e161e89316709f0850c86020448707b37831",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "no-execution-authority"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-en-en-original-only",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How does PineMeter synchronize offline?",
+      "lookup_queries": [],
+      "source": "PineMeter is the project name.",
+      "source_sha256": "9fc8eb7a8ff9505f8dc117e14db4839b286e1cb29b73bdf84443d92fcf5cdb9c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-en-en-caller-lookups",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How does PineMeter synchronize offline?",
+      "lookup_queries": [
+        "How does PineMeter synchronize offline?"
+      ],
+      "source": "PineMeter is the project name.",
+      "source_sha256": "9fc8eb7a8ff9505f8dc117e14db4839b286e1cb29b73bdf84443d92fcf5cdb9c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-en-ru-original-only",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How does PineMeter synchronize offline?",
+      "lookup_queries": [],
+      "source": "PineMeter — название проекта.",
+      "source_sha256": "03eeb262aa3840dbd7413f429f46204bfcf96fc2e4e76577ba31325dd9e7414f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-en-ru-caller-lookups",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How does PineMeter synchronize offline?",
+      "lookup_queries": [
+        "Как PineMeter синхронизируется без сети?"
+      ],
+      "source": "PineMeter — название проекта.",
+      "source_sha256": "03eeb262aa3840dbd7413f429f46204bfcf96fc2e4e76577ba31325dd9e7414f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-ru-en-original-only",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Как PineMeter синхронизируется без сети?",
+      "lookup_queries": [],
+      "source": "PineMeter is the project name.",
+      "source_sha256": "9fc8eb7a8ff9505f8dc117e14db4839b286e1cb29b73bdf84443d92fcf5cdb9c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-ru-en-caller-lookups",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Как PineMeter синхронизируется без сети?",
+      "lookup_queries": [
+        "How does PineMeter synchronize offline?"
+      ],
+      "source": "PineMeter is the project name.",
+      "source_sha256": "9fc8eb7a8ff9505f8dc117e14db4839b286e1cb29b73bdf84443d92fcf5cdb9c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-ru-ru-original-only",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Как PineMeter синхронизируется без сети?",
+      "lookup_queries": [],
+      "source": "PineMeter — название проекта.",
+      "source_sha256": "03eeb262aa3840dbd7413f429f46204bfcf96fc2e4e76577ba31325dd9e7414f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "dev-name-only-ru-ru-caller-lookups",
+      "family": "dev-name-only",
+      "split": "development",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Как PineMeter синхронизируется без сети?",
+      "lookup_queries": [
+        "Как PineMeter синхронизируется без сети?"
+      ],
+      "source": "PineMeter — название проекта.",
+      "source_sha256": "03eeb262aa3840dbd7413f429f46204bfcf96fc2e4e76577ba31325dd9e7414f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "no-topical-support",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-en-en-original-only",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How many attempts does WillowRelay make, and where is its configuration stored?",
+      "lookup_queries": [],
+      "source": "WillowRelay makes two attempts. AspenRelay makes nine attempts.",
+      "source_sha256": "e133463955e2ed4ebcf2987162a1a99537c1d7b29cb3cf5596aa27427f0b5190",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-en-en-caller-lookups",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How many attempts does WillowRelay make, and where is its configuration stored?",
+      "lookup_queries": [
+        "How many attempts does WillowRelay make, and where is its configuration stored?"
+      ],
+      "source": "WillowRelay makes two attempts. AspenRelay makes nine attempts.",
+      "source_sha256": "e133463955e2ed4ebcf2987162a1a99537c1d7b29cb3cf5596aa27427f0b5190",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-en-ru-original-only",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How many attempts does WillowRelay make, and where is its configuration stored?",
+      "lookup_queries": [],
+      "source": "WillowRelay делает две попытки. AspenRelay делает девять попыток.",
+      "source_sha256": "c6ccc059dd5a14a01c8b15e67034c170e5c75ac001d0c04bec306f73aef8c54f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-en-ru-caller-lookups",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How many attempts does WillowRelay make, and where is its configuration stored?",
+      "lookup_queries": [
+        "Сколько попыток делает WillowRelay и где хранится его конфигурация?"
+      ],
+      "source": "WillowRelay делает две попытки. AspenRelay делает девять попыток.",
+      "source_sha256": "c6ccc059dd5a14a01c8b15e67034c170e5c75ac001d0c04bec306f73aef8c54f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-ru-en-original-only",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Сколько попыток делает WillowRelay и где хранится его конфигурация?",
+      "lookup_queries": [],
+      "source": "WillowRelay makes two attempts. AspenRelay makes nine attempts.",
+      "source_sha256": "e133463955e2ed4ebcf2987162a1a99537c1d7b29cb3cf5596aa27427f0b5190",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-ru-en-caller-lookups",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Сколько попыток делает WillowRelay и где хранится его конфигурация?",
+      "lookup_queries": [
+        "How many attempts does WillowRelay make, and where is its configuration stored?"
+      ],
+      "source": "WillowRelay makes two attempts. AspenRelay makes nine attempts.",
+      "source_sha256": "e133463955e2ed4ebcf2987162a1a99537c1d7b29cb3cf5596aa27427f0b5190",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-ru-ru-original-only",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Сколько попыток делает WillowRelay и где хранится его конфигурация?",
+      "lookup_queries": [],
+      "source": "WillowRelay делает две попытки. AspenRelay делает девять попыток.",
+      "source_sha256": "c6ccc059dd5a14a01c8b15e67034c170e5c75ac001d0c04bec306f73aef8c54f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-partial-ru-ru-caller-lookups",
+      "family": "holdout-partial",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Сколько попыток делает WillowRelay и где хранится его конфигурация?",
+      "lookup_queries": [
+        "Сколько попыток делает WillowRelay и где хранится его конфигурация?"
+      ],
+      "source": "WillowRelay делает две попытки. AspenRelay делает девять попыток.",
+      "source_sha256": "c6ccc059dd5a14a01c8b15e67034c170e5c75ac001d0c04bec306f73aef8c54f",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "partial-context",
+      "required_fact_ids": [
+        "WillowRelay-two-attempts"
+      ],
+      "unresolved_fact_ids": [
+        "configuration-location"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-en-en-original-only",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How do HarborIndex and MeadowIndex differ in storage?",
+      "lookup_queries": [],
+      "source": "HarborIndex stores data locally. MeadowIndex stores data on the server.",
+      "source_sha256": "e7bbf1ab5b861eb9d19f0ab57487c8b2e1bed1d1e9a243a8d58de888bc1f9d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-en-en-caller-lookups",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "How do HarborIndex and MeadowIndex differ in storage?",
+      "lookup_queries": [
+        "How do HarborIndex and MeadowIndex differ in storage?"
+      ],
+      "source": "HarborIndex stores data locally. MeadowIndex stores data on the server.",
+      "source_sha256": "e7bbf1ab5b861eb9d19f0ab57487c8b2e1bed1d1e9a243a8d58de888bc1f9d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-en-ru-original-only",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How do HarborIndex and MeadowIndex differ in storage?",
+      "lookup_queries": [],
+      "source": "HarborIndex хранит данные локально. MeadowIndex хранит данные на сервере.",
+      "source_sha256": "76dee1b5077a81aefb6e5bd573c2a41c49ef03f89f4b1d59b709802d171e914e",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-en-ru-caller-lookups",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "How do HarborIndex and MeadowIndex differ in storage?",
+      "lookup_queries": [
+        "Чем отличается хранение у HarborIndex и MeadowIndex?"
+      ],
+      "source": "HarborIndex хранит данные локально. MeadowIndex хранит данные на сервере.",
+      "source_sha256": "76dee1b5077a81aefb6e5bd573c2a41c49ef03f89f4b1d59b709802d171e914e",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-ru-en-original-only",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Чем отличается хранение у HarborIndex и MeadowIndex?",
+      "lookup_queries": [],
+      "source": "HarborIndex stores data locally. MeadowIndex stores data on the server.",
+      "source_sha256": "e7bbf1ab5b861eb9d19f0ab57487c8b2e1bed1d1e9a243a8d58de888bc1f9d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-ru-en-caller-lookups",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Чем отличается хранение у HarborIndex и MeadowIndex?",
+      "lookup_queries": [
+        "How do HarborIndex and MeadowIndex differ in storage?"
+      ],
+      "source": "HarborIndex stores data locally. MeadowIndex stores data on the server.",
+      "source_sha256": "e7bbf1ab5b861eb9d19f0ab57487c8b2e1bed1d1e9a243a8d58de888bc1f9d1c",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-ru-ru-original-only",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Чем отличается хранение у HarborIndex и MeadowIndex?",
+      "lookup_queries": [],
+      "source": "HarborIndex хранит данные локально. MeadowIndex хранит данные на сервере.",
+      "source_sha256": "76dee1b5077a81aefb6e5bd573c2a41c49ef03f89f4b1d59b709802d171e914e",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-comparison-ru-ru-caller-lookups",
+      "family": "holdout-comparison",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Чем отличается хранение у HarborIndex и MeadowIndex?",
+      "lookup_queries": [
+        "Чем отличается хранение у HarborIndex и MeadowIndex?"
+      ],
+      "source": "HarborIndex хранит данные локально. MeadowIndex хранит данные на сервере.",
+      "source_sha256": "76dee1b5077a81aefb6e5bd573c2a41c49ef03f89f4b1d59b709802d171e914e",
+      "eligibility_fixture": "current-project",
+      "expected_observable": "context",
+      "required_fact_ids": [
+        "HarborIndex-local",
+        "MeadowIndex-server"
+      ],
+      "unresolved_fact_ids": [],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-en-en-original-only",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "What port does BrookNode use?",
+      "lookup_queries": [],
+      "source": "BrookNode uses port 4317.",
+      "source_sha256": "7214c2898c82ca34a99450fd230f1ac6ceca3bdb5e4ff87f219773795cf51232",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-en-en-caller-lookups",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "What port does BrookNode use?",
+      "lookup_queries": [
+        "What port does BrookNode use?"
+      ],
+      "source": "BrookNode uses port 4317.",
+      "source_sha256": "7214c2898c82ca34a99450fd230f1ac6ceca3bdb5e4ff87f219773795cf51232",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-en-ru-original-only",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "What port does BrookNode use?",
+      "lookup_queries": [],
+      "source": "BrookNode использует порт 4317.",
+      "source_sha256": "8a03ff3f9c309c5b4ac56aee79ddc3660e0601d7daffd7919a82c48806e80ff9",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-en-ru-caller-lookups",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "What port does BrookNode use?",
+      "lookup_queries": [
+        "Какой порт использует BrookNode?"
+      ],
+      "source": "BrookNode использует порт 4317.",
+      "source_sha256": "8a03ff3f9c309c5b4ac56aee79ddc3660e0601d7daffd7919a82c48806e80ff9",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-ru-en-original-only",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какой порт использует BrookNode?",
+      "lookup_queries": [],
+      "source": "BrookNode uses port 4317.",
+      "source_sha256": "7214c2898c82ca34a99450fd230f1ac6ceca3bdb5e4ff87f219773795cf51232",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-ru-en-caller-lookups",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какой порт использует BrookNode?",
+      "lookup_queries": [
+        "What port does BrookNode use?"
+      ],
+      "source": "BrookNode uses port 4317.",
+      "source_sha256": "7214c2898c82ca34a99450fd230f1ac6ceca3bdb5e4ff87f219773795cf51232",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-ru-ru-original-only",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какой порт использует BrookNode?",
+      "lookup_queries": [],
+      "source": "BrookNode использует порт 4317.",
+      "source_sha256": "8a03ff3f9c309c5b4ac56aee79ddc3660e0601d7daffd7919a82c48806e80ff9",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-wrong-module-ru-ru-caller-lookups",
+      "family": "holdout-wrong-module",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какой порт использует BrookNode?",
+      "lookup_queries": [
+        "Какой порт использует BrookNode?"
+      ],
+      "source": "BrookNode использует порт 4317.",
+      "source_sha256": "8a03ff3f9c309c5b4ac56aee79ddc3660e0601d7daffd7919a82c48806e80ff9",
+      "eligibility_fixture": "other-module",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "requested-module-port"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-en-en-original-only",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "What is the current version of FernBridge?",
+      "lookup_queries": [],
+      "source": "FernBridge version is 4.2.",
+      "source_sha256": "5189d91f00fd27df6fcd0bf1c9f2de59373c57430ccb100482129143c8c9e9c8",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-en-en-caller-lookups",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "en",
+      "question": "What is the current version of FernBridge?",
+      "lookup_queries": [
+        "What is the current version of FernBridge?"
+      ],
+      "source": "FernBridge version is 4.2.",
+      "source_sha256": "5189d91f00fd27df6fcd0bf1c9f2de59373c57430ccb100482129143c8c9e9c8",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-en-ru-original-only",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "What is the current version of FernBridge?",
+      "lookup_queries": [],
+      "source": "Версия FernBridge — 4.2.",
+      "source_sha256": "7b2d29421cef29907e70e8f80b177198ad0254e5425c19180f88152fe50b80f2",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-en-ru-caller-lookups",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "en",
+      "source_language": "ru",
+      "question": "What is the current version of FernBridge?",
+      "lookup_queries": [
+        "Какая текущая версия FernBridge?"
+      ],
+      "source": "Версия FernBridge — 4.2.",
+      "source_sha256": "7b2d29421cef29907e70e8f80b177198ad0254e5425c19180f88152fe50b80f2",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-ru-en-original-only",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какая текущая версия FernBridge?",
+      "lookup_queries": [],
+      "source": "FernBridge version is 4.2.",
+      "source_sha256": "5189d91f00fd27df6fcd0bf1c9f2de59373c57430ccb100482129143c8c9e9c8",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-ru-en-caller-lookups",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "en",
+      "question": "Какая текущая версия FernBridge?",
+      "lookup_queries": [
+        "What is the current version of FernBridge?"
+      ],
+      "source": "FernBridge version is 4.2.",
+      "source_sha256": "5189d91f00fd27df6fcd0bf1c9f2de59373c57430ccb100482129143c8c9e9c8",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-ru-ru-original-only",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какая текущая версия FernBridge?",
+      "lookup_queries": [],
+      "source": "Версия FernBridge — 4.2.",
+      "source_sha256": "7b2d29421cef29907e70e8f80b177198ad0254e5425c19180f88152fe50b80f2",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    },
+    {
+      "id": "holdout-stale-ru-ru-caller-lookups",
+      "family": "holdout-stale",
+      "split": "holdout-candidate",
+      "question_language": "ru",
+      "source_language": "ru",
+      "question": "Какая текущая версия FernBridge?",
+      "lookup_queries": [
+        "Какая текущая версия FernBridge?"
+      ],
+      "source": "Версия FernBridge — 4.2.",
+      "source_sha256": "7b2d29421cef29907e70e8f80b177198ad0254e5425c19180f88152fe50b80f2",
+      "eligibility_fixture": "stale-project",
+      "expected_observable": "reject-source",
+      "required_fact_ids": [],
+      "unresolved_fact_ids": [
+        "current-version"
+      ],
+      "answer_supported": false,
+      "edit_ready": false
+    }
+  ],
+  "limitations": [
+    "Synthetic source fixtures, not product documentation",
+    "Holdout candidate is authored before replacement, but requires independent review and freeze",
+    "Eligibility fixture labels require explicit scope/snapshot metadata in the eventual runner",
+    "Semantic fact IDs need reviewed visible-span annotations; names alone are not proof"
+  ]
+}

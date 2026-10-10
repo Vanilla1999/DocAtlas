@@ -108,5 +108,3 @@ def test_request_flow_public_contract_remains_four_fact_fail_safe():
     assert verdict["false_full_coverage"] is False
     assert payload["answer_supported"] is False
     assert payload["edit_ready"] is False
-    assert len(payload["sources"]) <= 3
-    assert payload["estimated_tokens"] <= 800
