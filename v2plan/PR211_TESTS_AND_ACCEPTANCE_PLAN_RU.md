@@ -7,56 +7,78 @@
 
 ## Состояние исполнения на 2026-10-10
 
-Последний фактический CI — PR HEAD
-`0065ce62cacaa31a41e4567717e3c67d602f578b` (130), merge
-`e4084e51b73725990a107e8b8fc930a8edb46f75`, общий tree
-`628bb7a2eb16f740ce84384925531040f7ec9f5e`.
+Последний завершённый CI — PR HEAD
+`a9fba17d13ea16ed0dbbb4692ab6029ae6da6a07` (136), merge
+`32765e44d2e85d3f638ac9d22a2fa6f4f46f6aee`, общий tree
+`7f663bac25aa6e79c48a07301d2e94e5e7352c42`.
 На каждом Python3.11/3.12/3.13:
-**6067PASS /1592FAIL /0ERROR /10SKIP**, всего7669.
-Пять FAIL меньше, collection прежняя; requiredCI/P1stack/closureFAIL.
+**6052 PASS / 1607 FAIL / 0 ERROR / 10 SKIP**, всего7669.
+Collection прежняя, FAIL на15 больше130. Их причины разбираются отдельно;
+required CI, P1 stack и closure остаются FAIL.
 
-- **P1.4 закрыт на130:**14/14cases,10/10discovery,5/5full facts,5/5oracle,0errors.
-- **Recovery закрыт на130:**12/12healthy,39/39intended kills; все39 individual
-  case/guard/count outcomes сверены. Полный independent source/import rehash не заявляется.
-- **Critical:**60entries,1observedFAIL; label oversized_original ошибочно требует public veto4000,
-  хотя schema его не задаёт.37mutants не выполнялись. Follow-up134 сохраняет полный
-  исходный4001 input и ловит truncation; legacy parser work bound не меняется.
-- Lossless32/32 и4cap killer casesPASS на трёх Python. Literal step16SUCCESS;
- 104individual child receipts прежний reader не печатает. Это не новый retirement proof.
-- Legacy8/15full source facts,raw original0; V2natural6/15,paraphrase2/5,
-  flow2/4. Контаминация/precision и недостающие факты остаются отдельными blockers.
-- AgentV1target-closed8/11,4gaps; adversarial24/28. P1.6public6/6 иfacts1/1,
-  общийjobFAIL. Installed7/7selftests+1/1scriptedtask, retrieval/platforms/P1.5SUCCESS.
-  Реальные client sessions **NOT RUN**. Workflows:11SUCCESS/6FAILURE/1SKIPPED.
+- P1.4: **14/14 cases, 10/10 discovery, 5/5 complete facts**, oracle5/5,0errors.
+- Recovery: **12/12 healthy, 43/43 intended kills**. Все43 outcomes сверены
+  по case/guard/count; полный независимый source/import rehash всех43 не заявляется.
+- Critical: **61entries,1observed FAIL** на existing retention completion.
+  Default surface отклонял context_format до handler.39mutants не выполнялись;
+  свойство остальных60entries не выдаётся за PASS без раскрытого skip count.
+- Literal comparison: **702/702 historical и82/82 compact**, aggregatePASS.
+  Из104child receipts51faults доступны87: все87 проверены индивидуально,
+  включая15 exact source blobs и actual import identity.17 не попали в console.
+  Default уже compact; `activated_compact_default=false` означает, что
+  comparison runner не менял default, а не что702cases всё ещё default.
+- Read_next: **23/31 PASS,8FAIL**. Новые failures требуют прежнего продолжения,
+  raw source/span fidelity и authorization; expected read_next==1 сохранено.
+- Installed: **7/7 selftests,1/1 scripted task**, reviewed-wheel,
+  report verificationPASS. Реальные Claude Code/Codex/OpenCode sessions NOT_RUN.
+- P1.6: public6/6,full facts1/1,oracle6/6; общий jobFAIL,
+  adversarial24/28. Retrieval/platforms/P1.5SUCCESS.
+  Legacy/V2/Agent quality stepsFAIL; текущие summaries не попали в console.
+  Последние прочитанные числа130 — Legacy8/15,raw original0,
+  V2natural6/15/paraphrase2/5,AgentV1closed8/11 — остаются историей130.
 
-Reviewed follow-up131–134 применён; собственный runtime **PENDING**:
+[Receipt136](pr211-execution/RUNTIME_EVIDENCE_a9fba17d.json) сохраняет431
+parsed records без parse errors,43 recovery outcomes,87 individual literal
+audits и exact missing17. Reader145 отдаёт quality summaries раньше тяжёлых
+records и показывает явные omissions. Product output ceilings не возвращаются.
 
-| Slice | Содержание |
+Reviewed follow-up137–150 собран; собственный совместный runtime **PENDING**:
+
+| Slice | Изменение |
 | --- | --- |
-|131|Report-only literal child/import receipts и critical traceback.|
-|132|Question-plan full archives/crosswalk, existing assertion label, direct-builder fault;28cases сохраняются.|
-|133|Full literal raw bytes, строгие current spans,2native reads/3replays/4faults; ordinary lane неизменён.|
-|134|Same4001 input full-forwarding control и truncation fault; без public ceiling и нового native read.|
+|137/142|Global иAgent fixture oracles сохраняют настоящие LF/CRLF bytes; line bounds и negative controls остаются.|
+|138/144|Exact QP26 audit; все19 исходных role questions,2resolver cases и2directed faults. Удалений ещё нет.|
+|139/140|Новые qualified source units не теряются после lookup coverage; native24 inventory, duplicate/reverse controls; pending recipe rebase.|
+|141/143|Шесть retention migrations сохраняют полный source set/guards; explicit advanced public surface проверяет missing completion.|
+|145/147|Доступные individual receipts/quality summaries и independently reviewed actual136 record.|
+|146/148|Structural window сохраняет raw text и согласованные char/UTF-8/line bounds;8 continuation scenarios с прежним authorization.|
+|149|Оба буквальных имени сравнения в одном source paragraph; исходный вопрос неизменён, answer/edit authority не выдаётся;3directed faults.|
+|150|Private diagnostics различают final validated payload, core/primary/hint и реальные decision events, не меняя selection или scorer.|
 
-Следующий joint target **critical61healthy/39kills,recovery12healthy/43kills**.
-Ноль новых pytest names не означает ноль дополнительных внутренних операций.
+Следующий joint target: **critical62 healthy/43 intended kills;
+recovery12 healthy/46 intended kills**. Ноль новых pytest names не означает
+ноль дополнительных внутренних операций: стоимость перечислена в owning notes.
 
-Существующее retirement58 подтверждено собственным121 proof; новых удалений
-после126 нет. Один старый DQP default3/800 test остаётся до собственных4cap kills.
-Question-plan26retire/2keep — до direct-builder и reused individual literal proof,
-с exact-current consumer audit. Remaining relation47 сохраняются.
+Существующее retirement58 подтверждено собственным121 proof. Подготовлены
+ещё46 exact removals: QP26 с2keepers, один DQP default3/800 case,
+reference-role19 ссохранением21othercases иnative matrix24.
+Они остаются live до собственных healthy successor/intended kills и
+проверки helpers/imports/selectors; текущий static review это не заменяет.
+Remaining relation47 также сохраняются до отдельного proof.
 
-Следующая product задача — сохранить разные source-bound факты одного explicit
-lookup при final projection, используя неизменённые24native source windows.
-Точный actual first veto V2flow ещё не известен; source-level novelty defect
-не выдаётся за per-case runtime trace. Исходные questions/facts/guards сохраняются.
-Module MISS после raw-window correction и comparison проверяются отдельно.
+V2flow136 даёт18 public sources, но old private final-ID preview только3.
+После core идут joint/query finalizers; этот preview не доказывает потерю15
+sources. Новый observer должен показать действительный first veto недостающего
+window. Далее исправляются реальные frozen facts/original-only/paraphrase/
+comparison gaps с отдельными contamination и authority guards.
 
 [Checkpoint](PR211_CHECKPOINT_RU.md) ·
+[решения](CURRENT_WAVE_DECISIONS_RU.md) ·
 [actual130](pr211-execution/RUNTIME_EVIDENCE_0065ce62.json) ·
 [retirement58](pr211-execution/COMPILER_RETIREMENT_58_RU.md) ·
 [original input](pr211-execution/PROJECT_READ_ORIGINAL_INPUT_RU.md) ·
-[raw window](PR211_LITERAL_RAW_WINDOW_BINDING_RU.md).
+[raw window](PR211_LITERAL_RAW_WINDOW_BINDING_RU.md) ·
+[final carrier](PR211_FINAL_PROJECTION_OBSERVATION_RU.md).
 Исходные числа плана ниже сохраняются как история своих SHA.
 
 ## Поправки после оценки перед исполнением
