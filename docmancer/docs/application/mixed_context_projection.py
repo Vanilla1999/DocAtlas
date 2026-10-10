@@ -14,6 +14,18 @@ from .project_docs_member_transaction import local_project_identity
 from .evidence_models import EvidenceRequirementSet
 
 
+def _is_library_snapshot_source(source: Any) -> bool:
+    """Require a literal library class; every present carrier must agree."""
+    if not isinstance(source, dict):
+        return False
+    metadata = source.get("metadata", {})
+    if not isinstance(metadata, dict):
+        return False
+    classes = [carrier["source_class"] for carrier in (source, metadata)
+               if "source_class" in carrier]
+    return bool(classes) and all(type(value) is str and value == "library_doc" for value in classes)
+
+
 def _current_project_contract(
     question: str, retrieval: dict[str, Any],
 ) -> tuple[dict[str, Any], dict[str, Any], EvidenceRequirementSet] | None:
@@ -167,8 +179,7 @@ def retain_mixed_project_context(
             return payload, snapshot
         source_ids = [source["evidence_id"] for source in combined["sources"]]
         if len(source_ids) != len(set(source_ids)) or not any(
-            isinstance(combined_snapshot[key].get("source"), dict)
-            and combined_snapshot[key]["source"].get("source_class") == "library_doc"
+            _is_library_snapshot_source(combined_snapshot[key].get("source"))
             for key in source_ids
         ):
             return payload, snapshot

@@ -211,10 +211,10 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
                     and trace["qualification_reason"] == "insufficient_visible_match",
                     "critical_mixed_no_query_credit")
         else:
-            require(original["source_class"] == "library_doc" and original["doc_scope"] == "library"
-                    and child["library_id"] == library_id and child["resolved_version"] == version,
+            require(child["library_id"] == library_id and child["resolved_version"] == version,
                     "critical_mixed_exact_library")
             for field, expected, synonyms in (
+                ("source_class", "library_doc", ()), ("doc_scope", "library", ()),
                 ("library_id", library_id, ()), ("canonical_id", library_id, ()),
                 ("resolved_version", version, ("version",)),
             ):
@@ -239,8 +239,8 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
         sources = payload.get("sources") or []
         require(payload.get("status") == "ok" and payload.get("kind") == "docs_answer"
                 and payload.get("context_available") is True and len(sources) == 2
-                and {snapshot[row["evidence_id"]]["source"]["source_class"] for row in sources}
-                    == {"project_doc", "library_doc"},
+                and {frozenset(lineage_values(snapshot[row["evidence_id"]]["source"], "source_class"))
+                     for row in sources} == {frozenset({"project_doc"}), frozenset({"library_doc"})},
                 "critical_mixed_both_lanes", {
                     "status": payload.get("status"), "paths": [row.get("path_or_url") for row in sources],
                     "error": payload.get("error"),
@@ -425,6 +425,65 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
                 replay(project_input, project_incoming, label, change, blocked=True,
                        guard="critical_mixed_library_veto")
 
+            # Keep the real bound library quote while varying only its class carrier.
+            # All cases use the same current producer request and project witness.
+            carrier_labels = []
+            absent = object()
+            for label, top_class, nested_class, malformed_metadata, include_project in (
+                ("metadata_only", absent, "library_doc", absent, True),
+                ("top_only", "library_doc", absent, absent, True),
+                ("both_agree", "library_doc", "library_doc", absent, True),
+                ("missing_both", absent, absent, absent, False),
+                ("top_none", None, "library_doc", absent, False),
+                ("nested_none", "library_doc", None, absent, False),
+                ("top_conflict", "project_doc", "library_doc", absent, False),
+                ("nested_conflict", "library_doc", "project_doc", absent, False),
+                ("boolean_class", True, "library_doc", absent, False),
+                ("empty_class", "library_doc", "", absent, False),
+                ("metadata_none", "library_doc", absent, None, False),
+                ("metadata_false", "library_doc", absent, False, False),
+                ("metadata_integer", "library_doc", absent, 1, False),
+                ("metadata_list", "library_doc", absent, [], False),
+                ("metadata_string", "library_doc", absent, "library_doc", False),
+            ):
+                carrier = deepcopy(project_incoming)
+                library_source_id = carrier["payload"]["sources"][0]["evidence_id"]
+                original = carrier["snapshot"][library_source_id]["source"]
+                if top_class is absent:
+                    original.pop("source_class", None)
+                else:
+                    original["source_class"] = top_class
+                if malformed_metadata is absent:
+                    if nested_class is absent:
+                        original["metadata"].pop("source_class", None)
+                    else:
+                        original["metadata"]["source_class"] = nested_class
+                else:
+                    original["metadata"] = malformed_metadata
+                require(not validate_model_visible_projection(carrier["payload"], snapshot=carrier["snapshot"]),
+                        "critical_mixed_class_control_healthy", {"control": label})
+                unchanged = deepcopy(carrier)
+                with (patch.object(RetrievalDispatcher, "run", deny_io),
+                      patch.object(SQLiteStore, "_connect", deny_io),
+                      patch.object(MemberReadStore, "_connect", deny_io),
+                      patch.object(_docs_context_projection_core, "attach_source_continuation_locators", deny_io)):
+                    result, snapshot = mixed_context_projection.retain_mixed_project_context(**carrier)
+                require(carrier == unchanged, "critical_mixed_replay_input_immutable", {"control": label})
+                if include_project:
+                    expected_snapshot = deepcopy(project_read["snapshot"])
+                    expected_snapshot[library_source_id] = deepcopy(carrier["snapshot"][library_source_id])
+                    require(plain_packet(result) == plain_packet(project_read["payload"])
+                            and snapshot == expected_snapshot,
+                            "critical_mixed_library_class_carrier", {"control": label})
+                else:
+                    require(plain_packet(result) == plain_packet(carrier["payload"])
+                            and snapshot == carrier["snapshot"],
+                            "critical_mixed_library_class_guard", {"control": label})
+                require(not validate_model_visible_projection(result, snapshot=snapshot),
+                        "critical_mixed_replay_snapshot", {"control": label})
+                no_authority(result)
+                carrier_labels.append(label)
+
             # A collision is between two valid source bindings, not a forged body.
             collision = deepcopy(project_incoming)
             project_id = next(row["evidence_id"] for row in project_read["payload"]["sources"]
@@ -449,5 +508,6 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
                     "critical_mixed_read_cannot_network")
             require(prepared["generation_id"] == actual.member_storage_policy.generation(),
                     "critical_mixed_read_only")
-    require(len(receipts) == 4 and len(replay_labels) == 28,
-            "critical_mixed_control_roster", {"native_reads": len(receipts), "replays": len(replay_labels)})
+    require(len(receipts) == 4 and len(replay_labels) == 28 and len(carrier_labels) == 15,
+            "critical_mixed_control_roster", {"native_reads": len(receipts), "replays": len(replay_labels),
+                                             "class_carrier_controls": len(carrier_labels)})
