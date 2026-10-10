@@ -117,6 +117,14 @@ MUTANTS = (
            "r\"\\s*(?:what[ \\t]+is|which[ \\t]+conditions[ \\t]+are[ \\t]+required[ \\t]+by)[ \\t]+\"",
            "r\"\\s*(?:what[ \\t]+is|which[ \\t]+(?:optional[ \\t]+)?conditions[ \\t]+are[ \\t]+required[ \\t]+by)[ \\t]+\"",
            "closed_literal_context", "recovery_closed_complete_syntax"),
+    Mutant("count-context-disabled", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'count_context = _closed_count_context(question)',
+           'count_context = None',
+           "closed_literal_context", "recovery_count_literal_source_fact"),
+    Mutant("count-context-bypasses-phrase-witness", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'phrase_match = re.search(technical_term_pattern(phrase, exact=True), unit_text)',
+           'phrase_match = re.search(technical_term_pattern(phrase, exact=True), unit_text) or re.search(r"$", unit_text)',
+           "closed_literal_context", "recovery_count_phrase_body_witness"),
 
 )
 

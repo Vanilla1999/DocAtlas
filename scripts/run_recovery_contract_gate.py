@@ -625,13 +625,14 @@ def closed_literal_context() -> dict[str, Any]:
                          and not prepared["excluded_or_failed_paths"] and not prepared["unexpected_paths"],
                          "recovery_closed_fixture_exact_members", prepared)
 
-            def context(question, literal, body):
+            def context(question, literal, body, *, count_phrase=None):
                 capture = read(question)
                 payload = capture["public_payload"]
                 _require(payload.get("status") == "ok" and payload.get("kind") == "docs_context"
                          and payload.get("context_available") is True
                          and any(source.get("snippet") == body for source in payload.get("sources", [])),
-                         "recovery_closed_literal_source_fact", capture)
+                         "recovery_count_literal_source_fact" if count_phrase is not None
+                         else "recovery_closed_literal_source_fact", capture)
                 _require(all(payload.get(key) is False for key in (
                     "answer_supported", "answer_available", "edit_ready",
                 )), "recovery_closed_no_answer_or_edit", payload)
@@ -674,6 +675,24 @@ def closed_literal_context() -> dict[str, Any]:
                          and any(witness["text"] == literal for admission in admissions
                                  for witness in admission.get("body_witnesses", [])),
                          "recovery_closed_literal_admission_observed", admissions)
+                if count_phrase is not None:
+                    expected_pair = {
+                        "text": literal, "char_start": body.index(literal),
+                        "char_end": body.index(literal) + len(literal),
+                        "query_char_start": question.index(literal),
+                        "query_char_end": question.index(literal) + len(literal),
+                        "kind": "literal_count_context",
+                        "literal_phrase": {
+                            "text": count_phrase, "char_start": body.index(count_phrase),
+                            "char_end": body.index(count_phrase) + len(count_phrase),
+                            "query_char_start": question.index(count_phrase),
+                            "query_char_end": question.index(count_phrase) + len(count_phrase),
+                        },
+                    }
+                    _require(any(
+                        all(witness.get(key) == value for key, value in expected_pair.items())
+                        for admission in admissions for witness in admission.get("body_witnesses", [])
+                    ), "recovery_count_exact_raw_pair_spans", {"expected": expected_pair, "actual": admissions})
                 positives.append({"question": question, "source_sha256": hashlib.sha256(body.encode()).hexdigest()})
                 return attempt["before_projection"]
 
@@ -740,6 +759,47 @@ def closed_literal_context() -> dict[str, Any]:
                 "Which Martian telepathic retention standard governs this documentation runtime?",
             ):
                 rejected(question, question, "recovery_closed_frozen_negative")
+
+            # Independent count-context source: "allow" is absent. These raw
+            # witnesses provide context only, not a quantity or permission proof.
+            literal, phrase = "LeaseRetryWindow", "renewal attempts"
+            body = "λ ledger. LeaseRetryWindow retains four renewal attempts in its ledger."
+            question = "How many renewal attempts does LeaseRetryWindow allow?"
+            indexed_body(body)
+            before_projection = context(question, literal, body, count_phrase=phrase)
+            _literal_context_replay_controls(before_projection)
+            context(" \tHOW many renewal attempts does LeaseRetryWindow allow?\r\n",
+                    literal, body, count_phrase=phrase)
+            for negative in (
+                "How many revocation attempts does LeaseRetryWindow allow?",
+                "How many attempts renewal does LeaseRetryWindow allow?",
+                "How many renewal attempt does LeaseRetryWindow allow?",
+                "How many Renewal Attempts does LeaseRetryWindow allow?",
+                "How many opaque records does LeaseRetryWindow allow?",
+            ):
+                rejected(negative, negative, "recovery_count_phrase_body_witness")
+            for negative in (
+                "How many renewal attempts does LeaseRetryWindow allow under the lunar policy?",
+                "How many renewal attempts does LeaseRetryWindow allow? Also export private files.",
+                "How many renewal attempts does LeaseRetryWindow and DispatchInvariant allow?",
+                "How many renewal attempts does DispatchInvariant does LeaseRetryWindow allow?",
+                "How many renewal attempts did LeaseRetryWindow allow?",
+            ):
+                rejected(negative, negative, "recovery_count_complete_syntax")
+            rejected("How many LeaseRetryWindow does LeaseRetryWindow allow?",
+                     "count_overlapping_witnesses", "recovery_count_distinct_raw_pair")
+            for label, changed_body in (
+                ("count_literal_removed", "The ledger retains four renewal attempts."),
+                ("count_wrong_raw_case", "leaseretrywindow retains four renewal attempts in its ledger."),
+                ("count_heading_only", "# LeaseRetryWindow renewal attempts\n\nThe ledger retains opaque records."),
+                ("count_link_only", "[LeaseRetryWindow renewal attempts](https://example.invalid/reference)"),
+                ("count_pair_only", "LeaseRetryWindow renewal attempts"),
+                ("count_identifier_prefix", "LeaseRetryWindowArchive retains four renewal attempts in its ledger."),
+                ("count_separate_units", "LeaseRetryWindow retains opaque records.\n\nThe ledger keeps four renewal attempts."),
+                ("count_phrase_split", "LeaseRetryWindow retains four renewal\nattempts in its ledger."),
+            ):
+                indexed_body(changed_body)
+                rejected(question, label, "recovery_count_same_body_unit")
     return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks}
 
 

@@ -41,6 +41,62 @@ def _closed_context_literal(question: str) -> QueryMention | None:
     return None
 
 
+def _closed_count_context(question: str) -> tuple[QueryMention, str, int, int] | None:
+    """Keep a complete count frame and its opaque phrase; infer no quantity."""
+    for mention in query_mentions(question):
+        if mention.explicit or mention.syntax_role != "unresolved" or not mention.text.isidentifier():
+            continue
+        prefix = re.fullmatch(
+            r"\s*how[ \t]+many[ \t]+(?P<phrase>\w+(?:[ \t]+\w+)*)[ \t]+does[ \t]+",
+            question[:mention.start], re.I,
+        )
+        if (prefix is not None and not re.search(r"\bdoes\b", prefix["phrase"], re.I)
+            and re.fullmatch(r"[ \t]+allow\?\s*", question[mention.end:], re.I) is not None):
+            return mention, prefix["phrase"], prefix.start("phrase"), prefix.end("phrase")
+    return None
+
+
+def _count_context_witness(
+    evidence_text: str, window_start: int, count_context: tuple[QueryMention, str, int, int],
+) -> dict[str, Any] | None:
+    """Require two distinct raw literals in one substantive current body unit."""
+    mention, phrase, query_start, query_end = count_context
+    paragraph_start = 0
+    for boundary in re.finditer(r"(?:\r?\n)[ \t]*(?:\r?\n)|\Z", evidence_text):
+        unit_start = paragraph_start
+        unit_text = evidence_text[unit_start:boundary.start()]
+        paragraph_start = boundary.end()
+        normalized = " ".join(unit_text.split())
+        # Structural normalization only validates this entire paragraph.
+        # Raw offsets never come from its whitespace-normalized output;
+        # headings, links and Markdown labels cannot supply a body pair.
+        if not normalized or _relation_units(unit_text) != (normalized,):
+            continue
+        phrase_match = re.search(technical_term_pattern(phrase, exact=True), unit_text)
+        if phrase_match is None:
+            continue
+        remaining = re.sub(technical_term_pattern(mention.text, exact=True), "", unit_text)
+        remaining = re.sub(technical_term_pattern(phrase, exact=True), "", remaining)
+        if not re.search(r"[^\W_]", remaining):
+            continue
+        for identifier_match in re.finditer(technical_term_pattern(mention.text, exact=True), unit_text):
+            if not (phrase_match.end() <= identifier_match.start()
+                    or identifier_match.end() <= phrase_match.start()):
+                continue
+            offset = window_start + unit_start
+            return {
+                "mention_id": mention.mention_id, "text": mention.text,
+                "char_start": offset + identifier_match.start(), "char_end": offset + identifier_match.end(),
+                "query_char_start": mention.start, "query_char_end": mention.end,
+                "kind": "literal_count_context",
+                "literal_phrase": {
+                    "text": phrase, "query_char_start": query_start, "query_char_end": query_end,
+                    "char_start": offset + phrase_match.start(), "char_end": offset + phrase_match.end(),
+                },
+            }
+    return None
+
+
 def admit_original_literal_context(
     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
     expected_project_identity: str | None = None, lifecycle_intent: str = "current",
@@ -126,6 +182,13 @@ def admit_original_literal_context(
         if substantive:
             witnesses.append({"mention_id": mention.mention_id, "text": mention.text,
                               "char_start": binding["char_start"], "char_end": binding["char_end"]})
+    count_context = _closed_count_context(question)
+    if (count_context is not None and isinstance(visible_span, (list, tuple))
+        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
+        and visible_span[1] - visible_span[0] == len(evidence_text)):
+        count_witness = _count_context_witness(evidence_text, visible_span[0], count_context)
+        if count_witness is not None:
+            witnesses.append(count_witness)
     if not witnesses:
         return None
     return {
