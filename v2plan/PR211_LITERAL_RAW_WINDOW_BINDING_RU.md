@@ -150,3 +150,64 @@ Current helper `relation_source_context_controls.py` (blob `c4ebf2ddb4b6c66669f1
 Независимый static review пяти code blobs завершён APPROVE; дополнительный metadata rebase и обновлённая note переданы на review. Перед публикацией нужен final root review всего manifest.
 После публикации нужны actual normal recovery 12/12 и 43 intended kills на одном checkout tree, затем неизменённые AgentDeveloper/P14 и совместные required CI/downstream gates.
 До этого нет claims о новом PASS, исправлении четырёх AgentDeveloper cases, готовности PR к merge или сокращении runtime.
+
+## Последующая интеграция source-unit fidelity: новая hash-привязка, PENDING
+
+Этот раздел относится к следующему slice поверх опубликованного HEAD
+`a9fba17d13ea16ed0dbbb4692ab6029ae6da6a07` (136). Он сохраняет предыдущий
+manifest и все исторические значения этой note: они описывают подготовку
+raw-window slice 133, а не новый runtime receipt.
+
+Предлагаемый owning core меняется
+`3dc9c8f19b4431503a073730e1c6f330cd583634` →
+`0eb803a9105bbb2b4e07e0659eb46b7739725f28`
+из-за отбора различных квалифицированных source units.
+Новые byte/unit predicates не меняют raw literal window, его formatter,
+four raw fault anchors, frozen input bytes или intended guards.
+
+Новый before SHA-256 core:
+`866d6154c0d59dd4ab76ea946cb408a2cc440e073f2988f41bdf34ef32837de2`.
+
+| Существующий fault | Source после интеграции | Anchor count | After SHA-256 | Intended guard |
+| --- | --- | ---: | --- | --- |
+| `literal-raw-window-escapes-candidate-span` | admission `2a253139`, unchanged | 1 | `23fcb7a0d1156b8c2acf877043b076cdf6ffd7560bdaf8a68a4cb65aea7e9058` | `recovery_literal_raw_window_span_replay` |
+| `literal-raw-window-uses-trimmed-origin` | admission `2a253139`, unchanged | 1 | `16ad826eae05291d5354452c696873e30a3a5658573a843be6e8a1045232ab5c` | `recovery_literal_raw_window_coordinates` |
+| `literal-raw-window-trimmed-on-wire` | core `0eb803a9` | 1 | `5151a8a979b6e1fa6e08e52089d798f7c44eda371ca6e50520996ea782944e9b` | `recovery_literal_raw_window_fact` |
+| `literal-symbol-ignores-raw-window-rejection` | admission `2a253139`, unchanged | 1 | `1b559114c24dd53efaa5908e52588b1bf205c1df3ab0e949db41a43f59913cab` | `recovery_literal_explicit_raw_window_span_replay` |
+
+Admission before SHA-256 остаётся
+`b7c4758c43b93c7e794588bb3df76b7e7263df7074e000d99256bdd2d02bd630`.
+Все четыре count и after hashes повторно вычислены из exact current/proposed
+source простой текстовой подстановкой единственного существующего anchor,
+без импорта/исполнения Python.
+
+Recovery runner `3360dce2970cab4f45b180c0fe23c8f13f23db4d` и literal helper
+`f281d68d81ca6a52d9c8dd093861046f51017f2f` повторно прочитаны на 136;
+оба неизменны. У runner по-прежнему 43 faults и строгая проверка actual module
+hash, outcome, case и intended guard. Этот раздел не заменяет такую проверку.
+
+Для соседнего `relation-callable-context-as-answer` сохраняется exact anchor
+и `critical_relation_public_no_answer_authority`; after SHA-256 на core0eb:
+`cdf41b4904080184d4e4cff844008b6afdcbec4de8f70ce36024fe9ba62b5e98`.
+В crosswalk изменены ровно три current recipe scalars:
+`base_blob`, `expected_before_sha256`, `expected_after_sha256`.
+Добавлена `qualified_unit_recipe_rebase` с требованием нового same-tree
+baseline/intended kill и `historical_receipts_reused=false`.
+Прежняя `mutation_recipe_rebase` сохранена как историческая запись raw-window
+интеграции; новый record явно помечает её значение.
+
+Frozen inputs и их digest, archive, другой relation fault, exact mutation text,
+guards/counts/errors/skips, historical source checkout и runtime section
+побайтно восстанавливаются обратной заменой трёх scalar fields и удалением
+новой записи. Relation helper и critical/recovery runners этим metadata slice
+не редактируются.
+
+| Descriptive path | Mode | Base blob на 136 | Proposed blob |
+| --- | --- | --- | --- |
+| `eval/task_level/contract_history/admission_relation_live_source_inputs.json` | 100644 | `063b66cd4b5a42be2d523f8b53d903eb510a6680` | `2e742877e97ecd476b2ffe30965de5f143a9366e` |
+| `v2plan/PR211_LITERAL_RAW_WINDOW_BINDING_RU.md` | 100644 | `cb5e3876da557fb625e2e1c2f0088c20fdfb0c2e` | this append-only revision |
+
+Старый текст note сохранён полностью; удаление только этого раздела возвращает
+base. Новые recovery 12/43 и critical baseline/все intended kills на конечном
+tree остаются **PENDING**. Предыдущие receipts, включая возможный результат
+136, нельзя выдать за собственный proof кода core0eb.

@@ -198,13 +198,13 @@
       {
         "name": "relation-callable-context-as-answer",
         "path": "docmancer/docs/application/_docs_context_projection_core.py",
-        "base_blob": "3dc9c8f19b4431503a073730e1c6f330cd583634",
+        "base_blob": "0eb803a9105bbb2b4e07e0659eb46b7739725f28",
         "before": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "after": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if original_question.startswith(\"Can \"):\n        payload.update(answer_supported=True, answer_available=True)\n        _refresh_estimate(payload)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "failure_guard": "critical_relation_public_no_answer_authority",
         "expected_anchor_occurrences": 1,
-        "expected_before_sha256": "13ea4e153f66d0e22337ac5d3a584a5f55085646b1df78dfad2c95dbf0a274cc",
-        "expected_after_sha256": "370f960f0de809289ef3d31b7b3ba04cb47bf063307482c7509e21be59867863",
+        "expected_before_sha256": "866d6154c0d59dd4ab76ea946cb408a2cc440e073f2988f41bdf34ef32837de2",
+        "expected_after_sha256": "cdf41b4904080184d4e4cff844008b6afdcbec4de8f70ce36024fe9ba62b5e98",
         "expected_failed_cases": 1,
         "expected_errors": 0,
         "expected_skipped": 0
@@ -228,6 +228,16 @@
     "reason": "The literal raw-window projection changes the owning core; the frozen input, fault anchor, guard and evaluator are unchanged.",
     "previous_core_blob": "ec87e90b8ef40faab65e514a3e417ee9d6bf0b0c",
     "current_core_blob": "3dc9c8f19b4431503a073730e1c6f330cd583634",
+    "historical_source_checkout_retained": true,
+    "historical_receipts_reused": false
+  },
+  "qualified_unit_recipe_rebase": {
+    "status": "PENDING_SAME_TREE_BASELINE_AND_INTENDED_KILL",
+    "reason": "Qualified source-unit selection changes the owning core. Frozen inputs, source qualification, fault anchor and intended no-answer guard are unchanged.",
+    "base_checkout": "a9fba17d13ea16ed0dbbb4692ab6029ae6da6a07",
+    "previous_core_blob": "3dc9c8f19b4431503a073730e1c6f330cd583634",
+    "current_core_blob": "0eb803a9105bbb2b4e07e0659eb46b7739725f28",
+    "previous_rebase_record": "mutation_recipe_rebase is retained as the historical raw-window integration record.",
     "historical_source_checkout_retained": true,
     "historical_receipts_reused": false
   }
