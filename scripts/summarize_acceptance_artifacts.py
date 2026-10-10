@@ -236,6 +236,48 @@ def _source_rows(payload: dict) -> list[dict]:
     ] if isinstance(sources, list) else []
 
 
+def _operand_case(row: dict, keys: tuple[str, ...]) -> dict:
+    """Keep exact ordinary guard labels, not traceback bodies."""
+    result = _focused_fields(row, keys)
+    if "message" in row:
+        message = row["message"]
+        result["message"] = (message.split("\n", 1)[0] if isinstance(message, str)
+                             else {"observed_type": type(message).__name__})
+    return {key: _focused_bound(value) for key, value in result.items()}
+
+
+def _critical_operand_summary(
+    provenance: dict, report: dict, junit: dict, cases: list[dict], imports: dict,
+) -> dict:
+    failed = [row for row in cases if row.get("outcome") != "passed"]
+    return {
+        "record_type": "CRITICAL_OPERANDS",
+        **provenance, **_focused_fields(report, ("run", "validated", "returncode")),
+        "junit": _focused_fields(junit, ("tests", "failures", "errors", "skipped", "roster_sha256")),
+        "observed_case_count": len(cases), "observed_nonpassing_count": len(failed),
+        "failed_cases": [_operand_case(row, ("classname", "name", "outcome")) for row in failed],
+        "mutation": ({key: _focused_bound(value) for key, value in _focused_fields(report["mutation"], (
+            "name", "path", "anchor_count", "before_sha256", "after_sha256",
+            "killer", "expected_failures", "failure_guard",
+        )).items()} if isinstance(report.get("mutation"), dict) else report.get("mutation")),
+        "import_origin": imports,
+        "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof",
+    }
+
+
+def _recovery_operand_summary(record: dict) -> dict:
+    cases = record.get("cases")
+    cases = cases if isinstance(cases, list) else []
+    return {
+        "record_type": "RECOVERY_OPERANDS",
+        **_focused_fields(record, ("artifact_file", "sha256", "bytes", "schema_version", "counts")),
+        "observed_case_count": len(cases),
+        "cases": [_operand_case(row, ("id", "outcome", "guard", "error_type"))
+                  for row in cases if isinstance(row, dict)],
+        "claim_boundary": "stored_recovery_outcomes_not_revalidated_or_inferred_mutation_credit",
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--quality-dir", type=Path, required=True)
@@ -243,6 +285,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     records: list[dict] = []
+    critical_operands: list[dict] = []
     issues: list[dict] = []
 
     def record(kind: str, value: dict) -> None:
@@ -266,6 +309,56 @@ def main() -> int:
             issues.append({**provenance, "field": field, "status": "non_object_rows",
                            "invalid_row_count": invalid, "row_count": len(value)})
         return [row for row in value if isinstance(row, dict)]
+
+    def import_origin(evidence: Path, report: dict) -> dict:
+        path = evidence.parent / "import-origin.stdout.log"
+        observed = {
+            "artifact_file": path.relative_to(args.contract_dir).as_posix(),
+            "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+        }
+        try:
+            raw = path.read_bytes()
+            observed.update(sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw))
+            value = json.loads(raw)
+        except (OSError, ValueError) as exc:
+            issues.append({**observed, "status": "unreadable_import_probe", "error_type": type(exc).__name__})
+            return {**observed, "status": "unavailable"}
+        if not isinstance(value, list):
+            issues.append({**observed, "status": "unavailable_import_array", "observed_type": type(value).__name__})
+            return {**observed, "status": "unavailable"}
+        if not value:
+            issues.append({**observed, "status": "empty_import_probe"})
+        parsed = rows(value, "import_origin_modules", observed)
+        invalid = sum(
+            not all(isinstance(row.get(key), str) and row[key] for key in ("module", "path", "sha256"))
+            or (isinstance(row.get("sha256"), str) and
+                (len(row["sha256"]) != 64 or any(char not in "0123456789abcdef" for char in row["sha256"])))
+            for row in parsed
+        )
+        modules = [row["module"] for row in parsed if isinstance(row.get("module"), str)]
+        if invalid or len(set(modules)) != len(modules):
+            issues.append({**observed, "status": "invalid_import_rows",
+                           "invalid_rows": invalid, "duplicate_module_rows": len(modules) - len(set(modules))})
+        mutation = report.get("mutation")
+        if report.get("run") == "baseline" and mutation is None:
+            selected, selection = parsed, "all_baseline_modules"
+        elif (isinstance(mutation, dict) and isinstance(mutation.get("path"), str)
+              and mutation["path"].endswith(".py")):
+            module = ".".join(Path(mutation["path"]).with_suffix("").parts)
+            selected = [row for row in parsed if row.get("module") == module]
+            selection = "mutated_module"
+            if len(selected) != 1:
+                issues.append({**observed, "status": "missing_or_ambiguous_mutated_import",
+                               "module": module, "match_count": len(selected)})
+        else:
+            selected, selection = [], "unavailable_mutation_identity"
+            issues.append({**observed, "status": selection})
+        return {
+            **observed, "selection": selection, "row_count": len(value),
+            "selected_row_count": len(selected), "unselected_row_count": len(value) - len(selected),
+            "modules": [{key: _focused_bound(item) for key, item in _focused_fields(
+                row, ("module", "path", "sha256")).items()} for row in selected],
+        }
 
     for filename, expected_schema in (
         ("project-context-quality-hermetic.json", "project-context-quality-contract-result-v2"),
@@ -374,6 +467,10 @@ def main() -> int:
                 "junit": {key: value for key, value in junit.items() if key != "cases"},
                 "claim_boundary": "stored_producer_receipt_not_revalidated",
             })
+            critical_operands.append(_critical_operand_summary(
+                provenance, report, junit, rows(junit.get("cases"), "junit.cases", provenance),
+                import_origin(path, report),
+            ))
         else:
             record("CONTRACT_ARTIFACT", {
                 **provenance, **_focused_fields(report, (
@@ -441,9 +538,12 @@ def main() -> int:
                     issues.append({**provenance, "status": "unreadable_record",
                                    "error_type": type(exc).__name__})
 
-    # Emit a compact operand row for every focused case before large ledgers.
-    # Full focused records remain unchanged below and in the saved artifact.
+    # Put small observed contract outcomes before the large quality ledgers.
+    # Full original records remain unchanged below and in the saved artifact.
     records = [
+        *critical_operands,
+        *[_recovery_operand_summary(row) for row in records
+          if row["record_type"] == "RECOVERY_ARTIFACT"],
         *[_delivery_operand_summary(row) for row in records
           if row["record_type"] == "V2_FOCUSED_STAGE"],
         *records,
@@ -456,6 +556,7 @@ def main() -> int:
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     remaining, omitted = 384_000, 0
+    priority_omitted = {"CRITICAL_OPERANDS": 0, "RECOVERY_OPERANDS": 0}
 
     def emit(kind: str, value: dict, *, already_bounded: bool = False) -> None:
         nonlocal remaining, omitted
@@ -463,6 +564,8 @@ def main() -> int:
         size = len(line.encode("utf-8")) + 1
         if size > remaining - 512:  # Retain space for the fixed console receipt below.
             omitted += 1
+            if kind in priority_omitted:
+                priority_omitted[kind] += 1
             return
         print(line)
         remaining -= size
@@ -472,10 +575,13 @@ def main() -> int:
         # Shared V2 serialization already applied the original depth/list bound.
         # Applying it twice would wrap list envelopes again and lose more leaves.
         emit(row["record_type"], {key: value for key, value in row.items() if key != "record_type"},
-             already_bounded=row["record_type"] in {"V2_FOCUSED_STAGE", "V2_DELIVERY_OPERANDS"})
+             already_bounded=row["record_type"] in {
+                 "V2_FOCUSED_STAGE", "V2_DELIVERY_OPERANDS", "CRITICAL_OPERANDS", "RECOVERY_OPERANDS",
+             })
     print("ARTIFACT_CONSOLE " + json.dumps({"omitted_rows": omitted, "record_count": len(records),
                                            "complete_selected_records_in_artifact": True,
-                                           "original_reports_preserved": True}))
+                                           "original_reports_preserved": True,
+                                           "omitted_priority_rows": priority_omitted}))
     return 2 if issues else 0
 
 

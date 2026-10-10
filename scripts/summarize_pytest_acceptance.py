@@ -116,6 +116,7 @@ def main() -> int:
         "tests/docs/test_action_packet_part02.py",
         "tests/docs/test_context_completion_followup.py",
         "tests/docs/test_docs_context_read_next.py",
+        "tests/docs/test_docs_lossless_context_projection.py",
         "tests/docs/test_source_map.py",
         "tests/docs/test_project_retrieval_alias_contract.py",
         "tests/docs/test_project_query_intent_contract.py",
@@ -147,6 +148,8 @@ def main() -> int:
                               "test_real_service_retrieves_committed_fixture_member_bytes",
                               "test_source_map_includes_generated_path_for_explicit_artifact_question",
                               "test_incremental_generation_canonicalizes_metadata_from_promoted_columns",
+                              "test_context_budget_uses_explicit_optional_output_limits",
+                              "test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
                           ))],
             })
     preferred = next((lane for lane in reports if lane["artifact_file"].endswith("core-tests-3.13.xml")), reports[0])
