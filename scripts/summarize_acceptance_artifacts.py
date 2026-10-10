@@ -780,18 +780,21 @@ def main() -> int:
 
     # Put small observed contract outcomes before the large quality ledgers.
     # Full original records remain unchanged below and in the saved artifact.
+    summary_kinds = {"QUALITY_ARTIFACT", "CONTRACT_ARTIFACT", "LEGACY_ARTIFACT_CASE"}
     records = [
         *critical_operands,
         *[row for row in records if row["record_type"] == "CRITICAL_BASELINE"],
         *[_recovery_operand_summary(row) for row in records
           if row["record_type"] == "RECOVERY_ARTIFACT"],
+        *[row for row in records if row["record_type"] in summary_kinds],
         *[_selection_operand_summary(row) for row in records
           if row["record_type"] == "V2_FOCUSED_STAGE"],
         *literal_headers,
         *literal_operands,
         *[_delivery_operand_summary(row) for row in records
           if row["record_type"] == "V2_FOCUSED_STAGE"],
-        *[row for row in records if row["record_type"] != "CRITICAL_BASELINE"],
+        *[row for row in records if row["record_type"] != "CRITICAL_BASELINE"
+          and row["record_type"] not in summary_kinds],
     ]
     result = {
         "schema_version": 1, "purpose": "existing_artifacts_only_not_gate_acceptance",
@@ -800,9 +803,11 @@ def main() -> int:
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
-    remaining, omitted = 384_000, 0
+    console_budget = 768_000
+    remaining, omitted = console_budget, 0
     priority_omitted = {"CRITICAL_OPERANDS": 0, "CRITICAL_BASELINE": 0, "RECOVERY_OPERANDS": 0,
-                        "LITERAL_COMPARISON": 0, "LITERAL_CHILD_OPERANDS": 0, "V2_SELECTION_OPERANDS": 0}
+                        "LITERAL_COMPARISON": 0, "LITERAL_CHILD_OPERANDS": 0, "V2_SELECTION_OPERANDS": 0,
+                        **{kind: 0 for kind in summary_kinds}}
 
     def emit(kind: str, value: dict, *, already_bounded: bool = False) -> None:
         nonlocal remaining, omitted
@@ -828,6 +833,8 @@ def main() -> int:
                  "LITERAL_COMPARISON", "LITERAL_CHILD_OPERANDS", "V2_SELECTION_OPERANDS",
              })
     print("ARTIFACT_CONSOLE " + json.dumps({"omitted_rows": omitted, "record_count": len(records),
+                                           "console_byte_budget": console_budget,
+                                           "emitted_record_bytes": console_budget - remaining,
                                            "complete_selected_records_in_artifact": True,
                                            "original_reports_preserved": True,
                                            "omitted_priority_rows": priority_omitted}))
