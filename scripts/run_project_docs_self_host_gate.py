@@ -19,6 +19,7 @@ import os
 import re
 import sys
 from collections.abc import Mapping
+from contextlib import nullcontext
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import wraps
@@ -426,8 +427,11 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     component_bindings: list[dict] = []
     app = getattr(service, "unified_context", service)
     retrieve = app.get_docs_context
-    facade = app.service
-    project_read, member_read = facade.get_project_context, facade.project_context.facade.get_project_docs
+    # Downstream diagnostic stages are optional capabilities of the observed app.
+    facade = getattr(app, "service", None)
+    member_facade = getattr(getattr(facade, "project_context", None), "facade", None)
+    project_read = getattr(facade, "get_project_context", None)
+    member_read = getattr(member_facade, "get_project_docs", None)
     delivery_observations: list[dict] = []
     delivery_counts: dict[str, int] = {}
     select = docs_context_projection.context_selection_decision
@@ -461,17 +465,13 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
             except Exception as exc:
                 delivery_observations.append({"stage": stage, "observation_error": type(exc).__name__})
 
-    @wraps(project_read)
-    def capture_project(*args, **kwargs):
-        result = project_read(*args, **kwargs)
-        capture_delivery("project_context", result, args, kwargs)
-        return result
-
-    @wraps(member_read)
-    def capture_member(*args, **kwargs):
-        result = member_read(*args, **kwargs)
-        capture_delivery("member_read", result, args, kwargs)
-        return result
+    def delivery_observer(read, stage):
+        @wraps(read)
+        def capture_read(*args, **kwargs):
+            result = read(*args, **kwargs)
+            capture_delivery(stage, result, args, kwargs)
+            return result
+        return capture_read
 
     def capture_result(*args, **kwargs):
         result = retrieve(*args, **kwargs)
@@ -493,8 +493,10 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     try:
         with (
         patch.object(app, "get_docs_context", capture_result),
-        patch.object(facade, "get_project_context", capture_project),
-        patch.object(facade.project_context.facade, "get_project_docs", capture_member),
+        patch.object(facade, "get_project_context", delivery_observer(project_read, "project_context"))
+            if callable(project_read) else nullcontext(),
+        patch.object(member_facade, "get_project_docs", delivery_observer(member_read, "member_read"))
+            if callable(member_read) else nullcontext(),
         patch.object(docs_context_projection, "context_selection_decision", capture_selection),
         patch.object(context_tools, "validate_model_visible_projection", capture_validation),
         patch.object(docs_context_projection, "component_coverage_decision", capture_coverage),
