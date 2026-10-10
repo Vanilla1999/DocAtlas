@@ -223,6 +223,9 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
             assert kind == "seed_envelope"
             assert 0 <= start < end < len(raw_text), "read_next_compact_envelope_range"
             assert row["snippet"] == original["content"] == raw_text[start:end]
+            assert original["byte_start"] == len(raw_text[:start].encode("utf-8"))
+            assert original["byte_end"] == len(raw_text[:end].encode("utf-8"))
+            assert raw[original["byte_start"]:original["byte_end"]] == row["snippet"].encode("utf-8")
             assert row["line_start"] == raw_text.count("\n", 0, start) + 1
             assert row["line_end"] == raw_text.count("\n", 0, end - 1) + 1
             assert all(old["snippet"] in row["snippet"] for old in seed_payload["sources"]), (

@@ -43,6 +43,8 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
     text = raw[start:end]
     new = deepcopy(original)
     new.update(content=text, display_text=text, snippet=text, char_start=start, char_end=end,
+               byte_start=len(raw[:start].encode('utf-8')),
+               byte_end=len(raw[:end].encode('utf-8')),
                line_start=raw.count('\n', 0, start) + 1,
                line_end=raw.count('\n', 0, end - 1) + 1,
                heading_path=' > '.join(parent.heading_path), title=parent.title)

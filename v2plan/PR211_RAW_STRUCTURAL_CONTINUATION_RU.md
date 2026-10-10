@@ -158,3 +158,30 @@ nonempty snippet, source matching и validator не меняются.
 Новые pytest names, native acquisition calls, gold/scorer/quality thresholds,
 runtime grants и changes к refs отсутствуют. Независимый static review выполняется
 до публикации; фактический новый PASS остаётся PENDING.
+
+## Дополнение148: byte coordinates структурного диапазона
+
+При отдельной сверке comparison control обнаружено, что после `deepcopy(original)`
+структурный producer обновлял char/line ranges, но оставлял `byte_start` и
+`byte_end` от короткого seed. Эти поля обозначают тот же текущий raw window;
+`_snapshot_entry` только копирует source и не меняет их семантику. Это дефект
+исходников, а не наблюдённый новый runtime result.
+
+Producer теперь вычисляет оба UTF-8 byte offset из `raw[:start]` и `raw[:end]`
+при том же `new.update`. Тот же existing read_next test отдельно проверяет
+оба offset и точное равенство raw byte slice видимой цитате. Символьные и
+line guards, source/owner/hash/lineage, `read_next == 1` и все исходные
+questions/fixtures/7names/31cases сохраняются. Дополнительных native calls,
+чтений источников, URI операций или runtime grants нет.
+
+| Path | Base146 | Proposed148 |
+| --- | --- | --- |
+|`docmancer/docs/application/joint_context_candidates.py`|`cd7feb12aa0dac17a5ee0d418691a8c19bcf3761`|`d59e90626cc951c980d948953327a4932ef5aa3f`|
+|`tests/docs/test_docs_context_read_next.py`|`14df87db48fc684783fa1d0dbd05ca5bad7b833c`|`316f4a23dd24e651416080397035050a66b773f8`|
+
+Mode обоих файлов100644. Producer SHA-256
+`066a1774311aac7a7129c7fba6a3b5aed6e66127c5633c7dd5b0e18e604bba2d`;
+test SHA-256 `73f91b0fa89dbebcce062ec1a342ab23893764cacadc7eb4e1571b60c08666fc`.
+Одна обратная замена в каждом файле восстанавливает соответствующий base146
+побайтно. Исторический manifest146 выше сохранён. Independent static review
+и новый совместный CI обязательны; runtime **PENDING**.
