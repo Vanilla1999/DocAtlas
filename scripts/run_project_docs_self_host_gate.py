@@ -21,6 +21,7 @@ import sys
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -296,6 +297,126 @@ def _is_metadata_only_source(source: object) -> bool:
     return True
 
 
+
+def _delivery_observation(stage: str, result: object, args: tuple, kwargs: dict) -> dict:
+    """Summarize actual returned DTO fields; never read or emit source bodies."""
+    missing = object()
+
+    def value(obj, key, default=None):
+        return obj.get(key, default) if isinstance(obj, Mapping) else getattr(obj, key, default)
+
+    def scalar(item):
+        if item is None or type(item) in (bool, int, float):
+            return item
+        if isinstance(item, str):
+            return item if len(item) <= 512 else {
+                "characters": len(item), "sha256": hashlib.sha256(item.encode("utf-8")).hexdigest(),
+            }
+        return {"type": type(item).__name__}
+
+    def fields(obj, names):
+        pairs = ((key, value(obj, key, missing)) for key in names)
+        return {key: scalar(item) for key, item in pairs if item is not missing}
+
+    def sequence(items, render=scalar):
+        if items is None:
+            return None
+        if not isinstance(items, (list, tuple)):
+            return {"type": type(items).__name__}
+        return {"count": len(items), "items": [render(item) for item in items[:32]],
+                "omitted": max(0, len(items) - 32)}
+
+    def window(item):
+        metadata = value(item, "metadata")
+        metadata = metadata if isinstance(metadata, Mapping) else {}
+        matches = value(item, "retrieval_query_matches", metadata.get("retrieval_query_matches"))
+        row = {}
+        for key in (
+            "source", "chunk_index", "stable_chunk_id", "parent_logical_id", "path",
+            "project_identity", "doc_scope", "module_path", "source_class", "stale",
+            "lifecycle_status", "freshness", "char_start", "char_end", "display_content_hash",
+            "generation_id", "project_doc_catalog_entry_hash", "project_doc_content_hash",
+        ):
+            observed = value(item, key, metadata.get(key, missing))
+            if observed is not missing:
+                row[key] = scalar(observed)
+        row["qualified_query_ids"] = sequence([
+            str(key) for key, trace in matches.items()
+            if isinstance(trace, Mapping) and trace.get("qualified") is True
+        ]) if isinstance(matches, Mapping) else scalar(matches)
+        return row
+
+    scope_fields = (
+        "schema_version", "query", "project_path", "project_identity",
+        "requested_scope", "requested_module", "requested_module_path",
+        "doc_scope", "module_path", "evidence_path",
+    )
+    state_fields = (
+        "status", "reason", "reason_code", "mode", "mode_requested", "mode_selected",
+        "context_available", "answer_available", "answer_supported", "support_status",
+        "requires_confirmation", "confirmation_reason", "stale_before_refresh",
+    )
+
+    def packet(obj):
+        observed = fields(obj, state_fields)
+        observed["delivery_decision"] = fields(value(obj, "delivery_decision"), ("deliverable", "reason_code"))
+        observed["context_windows"] = sequence(value(obj, "context_pack"), window)
+        observed["result_windows"] = sequence(value(obj, "results"), window)
+        observed["request_scope"] = fields(value(obj, "request_scope"), scope_fields)
+        requirements = value(value(obj, "requirements"), "requirements")
+        observed["requirements"] = sequence(requirements, lambda row: fields(row, (
+            "requirement_id", "kind", "value", "mandatory", "public_provenance", "proof_role",
+        )))
+        support = value(obj, "support_decision")
+        observed["support_decision"] = {
+            **fields(support, ("answer_supported", "support_status", "reason_code")),
+            **{key: sequence(value(support, key)) for key in (
+                "missing_requirement_ids", "mandatory_requirement_ids", "satisfied_requirement_ids",
+            )},
+        }
+        return observed
+
+    question = kwargs.get("query", kwargs.get("question",
+        args[0] if stage == "unified" and args else args[1] if len(args) > 1 else None))
+    root = kwargs.get("project_path", args[0] if stage != "unified" and args else None)
+    observation = {
+        "stage": stage,
+        "request": {
+            "question": scalar(question), "project_path": scalar(root),
+            **fields(kwargs, ("scope", "module", "module_path", "evidence_path",
+                              "limit", "tokens", "expand", "retain_found_windows",
+                              "allow_network", "prepare_project_docs")),
+            "lookup_queries": sequence(kwargs.get("lookup_queries")),
+        },
+        "result": packet(result),
+    }
+    for key in ("project_docs", "dependency_docs"):
+        nested = value(result, key, missing)
+        if nested is not missing:
+            observation[key] = None if nested is None else packet(nested)
+    lanes = value(result, "lanes")
+    if isinstance(lanes, Mapping):
+        observation["lanes"] = {key: fields(lanes[key], (
+            "status", "reason_code", "source_count", "requires_confirmation",
+        )) for key in ("project", "dependency", "library") if key in lanes}
+    observation["routing"] = fields(value(result, "routing"), (
+        "reason_code", "project_path_used", "dependency_detected", "delegated_mode",
+    ))
+    diagnostics = value(result, "diagnostics")
+    if not isinstance(diagnostics, Mapping):
+        diagnostics = value(value(result, "ingestion_diagnostics"), "project", {})
+    observation["project_trust_decision"] = fields(value(diagnostics, "trust_decision"), (
+        "reason", "confidence", "answer_available", "passed_relevance_gate",
+    ))
+    stages = value(value(diagnostics, "retrieval_routing"), "stages")
+    if isinstance(stages, Mapping):
+        observation["routing_stages"] = {key: fields(stages[key], (
+            "status", "reason", "item_count", "observed_item_count",
+            "budget_projection_bytes", "observed_budget_projection_bytes", "budget_exceeded", "error_type",
+        )) for key in ("project_docs", "dependency_docs", "source_evidence", "repo_map", "code_graph")
+            if key in stages}
+    return observation
+
 def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[dict | None, dict]:
     """Observe the public call without replaying retrieval or changing its result."""
     raw_results: list[object] = []
@@ -305,6 +426,10 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     component_bindings: list[dict] = []
     app = getattr(service, "unified_context", service)
     retrieve = app.get_docs_context
+    facade = app.service
+    project_read, member_read = facade.get_project_context, facade.project_context.facade.get_project_docs
+    delivery_observations: list[dict] = []
+    delivery_counts: dict[str, int] = {}
     select = docs_context_projection.context_selection_decision
     validate = context_tools.validate_model_visible_projection
     coverage = docs_context_projection.component_coverage_decision
@@ -328,9 +453,30 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
                 })
         return decision
 
+    def capture_delivery(stage, result, args, kwargs):
+        delivery_counts[stage] = delivery_counts.get(stage, 0) + 1
+        if len(delivery_observations) < 32:
+            try:
+                delivery_observations.append(_delivery_observation(stage, result, args, kwargs))
+            except Exception as exc:
+                delivery_observations.append({"stage": stage, "observation_error": type(exc).__name__})
+
+    @wraps(project_read)
+    def capture_project(*args, **kwargs):
+        result = project_read(*args, **kwargs)
+        capture_delivery("project_context", result, args, kwargs)
+        return result
+
+    @wraps(member_read)
+    def capture_member(*args, **kwargs):
+        result = member_read(*args, **kwargs)
+        capture_delivery("member_read", result, args, kwargs)
+        return result
+
     def capture_result(*args, **kwargs):
         result = retrieve(*args, **kwargs)
         raw_results.append(result)
+        capture_delivery("unified", result, args, kwargs)
         return result
 
     def capture_selection(sources, requested_query_ids):
@@ -347,6 +493,8 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     try:
         with (
         patch.object(app, "get_docs_context", capture_result),
+        patch.object(facade, "get_project_context", capture_project),
+        patch.object(facade.project_context.facade, "get_project_docs", capture_member),
         patch.object(docs_context_projection, "context_selection_decision", capture_selection),
         patch.object(context_tools, "validate_model_visible_projection", capture_validation),
         patch.object(docs_context_projection, "component_coverage_decision", capture_coverage),
@@ -357,6 +505,10 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     if isinstance(payload, dict) and diagnostics:
         diagnostics[-1]["component_evidence_bindings"] = component_bindings
         diagnostics[-1]["observer_counts"] = {"retrieval_calls": len(raw_results), "validation_calls": len(snapshots)}
+        diagnostics[-1]["delivery_observations"] = {
+            "return_counts": delivery_counts, "returns": delivery_observations,
+            "omitted": max(0, sum(delivery_counts.values()) - len(delivery_observations)),
+        }
         payload = {**payload, "diagnostics": diagnostics[-1]}
     if len(raw_results) != 1 or len(snapshots) != 1:
         return payload, {}

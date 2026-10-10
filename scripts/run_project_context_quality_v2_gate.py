@@ -201,7 +201,7 @@ def print_focused_stage_records(report: dict[str, Any]) -> None:
             "stages": {
                 "diagnostics_present": bool(diagnostics),
                 **_focused_fields(diagnostics, (
-                    "stage_status", "delivery_decision", "observer_counts", "planned_query_ids",
+                    "stage_status", "delivery_decision", "delivery_observations", "observer_counts", "planned_query_ids",
                     "retrieved_candidates", "retrieved_candidate_ids", "qualification_rejections",
                     "pre_projection_qualified_ids", "ranked_candidate_ids", "selected_candidate_ids",
                     "considered_variants", "projection_rejections", "final_visible_evidence_ids",
