@@ -44,7 +44,7 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
         documents = {path: body, other_path: other_body}
         with ExitStack() as fixture:
             service = config = policy = None
-            stores, prepared = [], []
+            stores, prepared, naming_plans = [], [], []
 
             def install(sources):
                 nonlocal documents, project, service, config, policy
@@ -82,6 +82,10 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
             def observed_prepare(context, chunks, *args, **kwargs):
                 result = real_prepare(context, chunks, *args, **kwargs)
                 stores.append(context.store)
+                naming_plans.append({
+                    "plan": deepcopy(context.plans[context.question]),
+                    "catalog": deepcopy(context.naming_catalog),
+                })
                 for chunk in result:
                     metadata = chunk.metadata or {}
                     if isinstance(metadata.get("_reference_evidence"), dict):
@@ -96,6 +100,7 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
                 nonlocal read_checks
                 before = state()
                 prepared.clear()
+                naming_plans.clear()
                 with patch.object(SourceReferenceContext, "prepare", observed_prepare):
                     capture = observed_public_call(service, {
                         "question": text, "project_path": str(project), "scope": "project",
@@ -187,6 +192,38 @@ def run_structural_filename_controls(require, observed_public_call, immutable_re
             def rejected(text, label, guard):
                 capture = read(text)
                 payload = capture["public_payload"]
+                if guard == "recovery_filename_catalog_ambiguity":
+                    # The collision contract precedes ranking/deduplication.
+                    # Observe the already computed native plan even when the
+                    # returned chunk belongs to a different opaque source ID.
+                    require(naming_plans, guard, {"control": label, "observed_plans": 0})
+                    expected_scope = {
+                        "project_id": "local:" + _digest(str(project.resolve())),
+                        "version": "", "snapshot_id": preparations[-1]["generation"],
+                    }
+                    for observed in naming_plans:
+                        plan, inventory = observed["plan"], observed["catalog"]
+                        require(isinstance(inventory, dict) and inventory.get("complete") is True
+                                and inventory.get("scope") == expected_scope
+                                and isinstance(inventory.get("sources"), list),
+                                guard, {"control": label, "observed": observed})
+                        rows = inventory["sources"]
+                        require(len(rows) == len(documents) == 2
+                                and sorted(row["canonical_path"] for row in rows) == sorted(documents)
+                                and all(row["scope"] == expected_scope
+                                        and row["content_sha256"] == _digest(documents[row["canonical_path"]])
+                                        and isinstance(row["document_id"], str) and row["document_id"]
+                                        for row in rows),
+                                guard, {"control": label, "observed": observed})
+                        expected_ids = sorted(row["document_id"] for row in rows)
+                        source_refs = [row for row in plan["references"] if row["role"] == "source_locator"]
+                        require(len(set(expected_ids)) == 2 and plan["question"] == text
+                                and plan["scope"] == expected_scope and plan["catalog_complete"] is True
+                                and plan["naming_catalog_sha256"] == _inventory_digest(inventory)
+                                and len(source_refs) == 1 and source_refs[0]["state"] == "ambiguous"
+                                and source_refs[0]["reason"] == "ambiguous_structural_source_locator"
+                                and list(source_refs[0]["source_ids"]) == expected_ids,
+                                guard, {"control": label, "observed": observed})
                 require(payload.get("error") is None
                         and payload.get("kind") == "docs_context"
                         and not payload.get("context_available") and not payload.get("sources"),
