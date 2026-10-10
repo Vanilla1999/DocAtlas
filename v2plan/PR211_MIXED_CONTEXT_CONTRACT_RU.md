@@ -89,6 +89,7 @@ replays сохраняют исходный current request; соседний и
 | --- | --- | --- | --- |
 | `tests/docs/test_mixed_context_projection_contract.py` | NEW | `bd7435f507d9360030cb3c4c4411d2f485aefe90` | 100644 |
 | `scripts/run_critical_mutation_gate.py` | `8f31dfccd02025b8355020aa4063952733c0689a` | `de247bb93baac2f328ab98aea130d82b4a7a6cbd` | 100755 |
+| `tests/diagnostic_labels.mixed_context_projection_contract.json` | NEW | `91af5129d07f31f77641cbb922f6349db2b957ad` | 100644 |
 | `v2plan/PR211_MIXED_CONTEXT_CONTRACT_RU.md` | NEW | Этот документ | 100644 |
 
 Production зависимости для общего CI дерева:
@@ -117,3 +118,21 @@ project path. Relative/`~`/symlink aliases без такого pure proof сох
 Статическая сверка: обратные четыре runner edits восстанавливают исходный blob,
 20 прежних mutation blocks и 10 selectors целиком сохранены; новый test имеет
 одно pytest-имя. Exact blob roundtrip выполняется перед передачей на публикацию.
+
+## Исправление диагностического inventory перед публикацией
+
+Дополнительный source review выявил packaging defect в первоначальном
+трёхфайловом manifest: новый test module не был зарегистрирован в diagnostic
+inventory. `tests/conftest.py` вызывает `validate_diagnostic_inventory`, а
+`tests/diagnostic_labels.py` отвергает неизвестный module и при выборе одного
+selector. Это статически установленный collection blocker, не результат
+нового запуска.
+
+Добавлен отдельный shard schema_version 1: module classification `behavioral`,
+`node_overrides={}`, один точный module roster hash.
+SHA-256 строки полного node ID без конечного LF:
+`99ffeb3efec3435d10ddf1e8f8b621621bd9b713545f0a2133ef87c04dcbd2a1`.
+Хэш независимо сверили автор и reviewer по формуле production inventory
+`sha256("\n".join(sorted(nodeids)).encode())`; при одном имени это точный
+`path::function`. Тест, runner, исходные guards и целевой состав **54/25**
+не меняются. Runtime по-прежнему **PENDING**.

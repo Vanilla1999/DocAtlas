@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/docs/test_mixed_context_projection_contract.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/docs/test_mixed_context_projection_contract.py": "99ffeb3efec3435d10ddf1e8f8b621621bd9b713545f0a2133ef87c04dcbd2a1"
+  }
+}
