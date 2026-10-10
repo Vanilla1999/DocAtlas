@@ -460,8 +460,13 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
                         original["metadata"]["source_class"] = nested_class
                 else:
                     original["metadata"] = malformed_metadata
-                require(not validate_model_visible_projection(carrier["payload"], snapshot=carrier["snapshot"]),
-                        "critical_mixed_class_control_healthy", {"control": label})
+                # The observed hook input precedes the projector's final estimate.
+                # Mirror the helper's preparation before validating this detached packet.
+                _refresh_estimate(carrier["payload"])
+                carrier_errors = validate_model_visible_projection(
+                    carrier["payload"], snapshot=carrier["snapshot"])
+                require(not carrier_errors, "critical_mixed_class_control_healthy",
+                        {"control": label, "validation_errors": carrier_errors})
                 unchanged = deepcopy(carrier)
                 with (patch.object(RetrievalDispatcher, "run", deny_io),
                       patch.object(SQLiteStore, "_connect", deny_io),
