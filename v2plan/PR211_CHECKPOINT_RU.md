@@ -1,256 +1,167 @@
 # PR #211: checkpoint продолжения
 
-Обновлено 2026-10-10, 00:19 UTC.
-Reviewed code следующего совместного прогона — до
-`6225be914656fbbc4b6d49235b1f412320a2395d` (slice88).
-Slices85–88 прошли exact Git verification; source changes86–88 — independent review.
-Их новый совместный runtime **PENDING**.
+Обновлено: 2026-10-10 00:44:49 UTC.
 
-Последний фактический полный CI относится к PR HEAD:
-`80c8fbbb3e8c379467a9075f93f7165d080f8432`, дерево
-`a838749f57ff0165ab925590656f64e0799a2e05`.
-Slices77–83 прошли source review, exact Git verification и совместный runtime80c8.
+**PR пока не готов к merge.** Последний полностью завершённый фактический CI:
+PR HEAD `f7b9253c8e477babf276ae8dd2cb18905451cd15`,
+tree `cfe816a4e295961b2b529b612bbc63c39ff99ccf`.
 
-**PR пока не готов к merge.** Полный core на каждой Python:
-**7747 = 6057 PASS / 1680 FAIL / 0 ERROR / 10 SKIP**.
-По сравнению с1c6 исчезли68 FAIL:42 retired cases и26 настоящих улучшений.
-Это разные результаты; одно уменьшение FAIL не доказывает исправление продукта.
+Следующий reviewed пакет сохранён до
+`820533361152ff3a143d2cf97d0c22a889486d75` (slices90–94).
+Его совместный runtime **PENDING**. Изменения тестов не объявляются заранее PASS.
 
 ## Действующие решения
 
 - Потолки **6144 bytes / 800 tokens / 3 sources** отменены. Измеряем и сокращаем
-  объём, сохраняя полные факты, source identity, scope/version/hash и consent guards.
-- Операционные input/read/work/call/time ограничения сохраняются.
+  объём, сохраняя факты целиком, source identity, scope/version/hash и consent.
+- Операционные input/read/work/call/time ограничения остаются.
 - Retrieval включён в позднее утверждённый план; прежний blanket deferral снят.
-- Retirement требует собственного зелёного baseline, intended mutation kills и
-  проверки сохраняемых helpers/imports/selectors. Остальные FAIL автоматически
-  устаревшими не объявляются.
-- Реальные Claude Code/Codex/OpenCode sessions **NOT RUN**. Installed SDK/stdio
-  harness не подтверждает такие sessions.
-- Quality floors и исходные gold facts сохраняются. Original coverage12 —
-  обязательство качества, а не отменённый потолок output cost.
+- Retirement — только после независимого oracle, собственного зелёного baseline,
+  intended mutation proof и сохранности helpers/imports/selectors.
+- Quality floors и исходные gold facts сохраняются. Original coverage12 — требование
+  качества, а не отменённый потолок размера ответа.
+- Реальные Claude Code/Codex/OpenCode sessions **NOT RUN**. Scripted installed
+  SDK/stdio не подтверждает работу этих клиентов.
+- Локальные runtime/import/pytest/AST/install не выполняются. Проверки идут в
+  существующих авторизованных PR workflows. Новые providers/models не подключаются.
+- Обычные commits и fast-forward двух рабочих refs разрешены; merge/release,
+  force-push и внешние comments/messages не выполняются.
 
 План: [PR211_TESTS_AND_ACCEPTANCE_PLAN_RU.md](PR211_TESTS_AND_ACCEPTANCE_PLAN_RU.md).
 Решения: [CURRENT_WAVE_DECISIONS_RU.md](CURRENT_WAVE_DECISIONS_RU.md).
-История до067: [CHECKPOINT_067dd560_RU.md](pr211-execution/CHECKPOINT_067dd560_RU.md).
-Последующие checkpoints, collection error38da и exact reviewed slices доступны
-в Git history. Local checkout устарел; читать точный текущий PR HEAD.
+Предыдущий подробный checkpoint и вся история80c8 доступны в Git на f7b9253c.
+Старый local checkout не является актуальной базой.
 
-## Полный фактический CI:80c8
+## Полный фактический CI: f7b9253c
 
-Фактический GitHub merge checkout:
-`f04b42774b00dadbca48ca579ca9ea234442b750`.
-Проверены оба parent: main
-`d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c` и PR80c8.
-Дерево merge checkout совпадает с PR: `a838749f57ff0165ab925590656f64e0799a2e05`.
+Actual merge checkout: `011e808a0dcd2ec8104611a2257d17b5f20e327a`.
+Проверены родители: main `d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c`
+и указанный PR head. Checkout tree совпадает с PR tree.
+Main и P1-stack workflow metadata также указывают именно этот PR HEAD.
 
-[Main run38006157209](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157209).
-[JUnit reader114077935805](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157209/job/114077935805).
-На всех Python3.11/3.12/3.13:6057P/1680F/0E/10S,
-integrity_issues=[] и omitted_rows=0. Матричные повторы не суммируются.
+[Main run38008532239](https://github.com/Vanilla1999/DocAtlas/actions/runs/38008532239).
+[JUnit reader114085424570](https://github.com/Vanilla1999/DocAtlas/actions/runs/38008532239/job/114085424570).
+[Полный receipt f7b9253c](pr211-execution/RUNTIME_EVIDENCE_f7b9253c.json).
 
-| Python | SHA256 JUnit80c8 |
+На **каждом** Python3.11/3.12/3.13:
+**7747 = 6057 PASS / 1680 FAIL / 0 ERROR / 10 SKIP**.
+Integrity issues пусты; omitted_rows=0. Повторы матрицы не суммируются.
+
+| Python | SHA256 JUnit |
 | --- | --- |
-|3.11|`5f63b79277b026b10016ec568b802e3df730cc10de034fd14886bdb1dd264047`|
-|3.12|`751890a134178f8bd44423c7520859ef1933ff89c2ec044f9323fbff0bcfdb2a`|
-|3.13|`fddb34296375b22e7d16c65194b2b0fbb750493eed0bac5a9d92aba651da34d8`|
+|3.11|`e698399ef2c11d2b104f194404a0d5576e8696c7c825ac7b224e3378db60cd2d`|
+|3.12|`d15d45c3ff1d9c3f86c80775dd46ddbee0e5416f4e8ff718faef615e73feb399`|
+|3.13|`d456ba1cd8002db1bc9cce3f6e8d9732d07e3795ea8b874a00a2a2af398ef948`|
 
-[CORE_FAILURE_MAP_80c8fbbb.jsonl](pr211-execution/CORE_FAILURE_MAP_80c8fbbb.jsonl):
-**215 failing modules / 1680 FAIL**, counts и первый node/message, явная triage.
-Первый failure не классифицирует весь модуль.
-[Reviewed runtime receipt80c8](pr211-execution/RUNTIME_EVIDENCE_80c8fbbb.json)
-содержит critical/recovery/mutation evidence, tracked/focused JUnit, P15 и closure.
-Предыдущие карты1c6/a348/0855 сохранены.
+Все **215 failing modules** имеют те же counts, что80c8.
+Это сравнение counts, не доказательство тождества каждого node.
+Полная прежняя карта:
+[CORE_FAILURE_MAP_80c8fbbb.jsonl](pr211-execution/CORE_FAILURE_MAP_80c8fbbb.jsonl);
+новые actual module records и focused failures находятся в receipt f7.
 
-### Изменения относительно1c6
-
-1c6:7789=6031P/1748F/0E/10S;80c8:7747=6057P/1680F/0E/10S.
-
-| Модуль | 1c6 PASS/FAIL | 80c8 PASS/FAIL | Объяснение |
-| --- | ---: | ---: | --- |
-|admission_local_binding|1/42|1/0|42 obsolete cases retired после собственного proof.|
-|admission_relation_safety|2/24|8/18|6 настоящих PASS; прочие обязанности остаются.|
-|admission_relation_witnesses|8/64|23/49|15 настоящих PASS по source-policy guards.|
-|admission_role_boundaries|28/4|30/2|Два явно quoted Cyrillic literals теперь PASS.|
-|context_projection_boundaries|13/7|14/6|Read-only fixture исправлен; шесть прежних failures остаются.|
-|pr211_catalog_equivalence|4/1|5/0|Spy принимает актуальный read_only_startup.|
-|mcp_delivery_dispatch_boundary|2/1|3/0|То же; intended denial guard действительно достигнут.|
-
-Новых failing modules и других module-count изменений не найдено.
-Это сравнение counts, не доказательство равенства каждого из7747 nodes.
-Все три новых failures предыдущего полного прогона теперь устранены.
-Focused reader прямо показывает PASS для
-test_gap_quote_is_not_a_mutation_grant и шесть оставшихся projection failures.
-
-### Отдельные проверенные семейства и jobs
-
-| Семейство | Actual80c8 PASS/FAIL |
-| --- | ---: |
-|ActionPacket main / part02|31/0 и8/0|
-|Context completion followup|1/1|
-|Docs read-next / SourceMap|31/0 и29/0|
-|Member transactions|116/0|
-|Parent-child index|21/0|
-|Alias / project-intent current controls|1/0 и1/0|
-|Catalog equivalence / MCP dispatch|5/0 и3/0|
-
-Existing copied-child regression явно PASS, включая actual query/hydration.
-Member116 подтверждает read-only boundary этого семейства, не все library paths.
-Completion mkdocs-05 priority fact остаётся реальным FAIL.
+В частности: member transactions116/116, parent-child21/21,
+catalog5/5, dispatch3/3, read-next31/31, SourceMap29/29 — PASS.
+Projection boundaries пока14P/6F; Context7 до retirement12P/45F;
+docs_service_part03 до fixture migrations6P/18F; completion followup1P/1F.
 
 Docs-contract, docs-impact, static-contract, retrieval-evidence, installer,
-installed MCP harness и все три platform smoke jobs SUCCESS.
-Core/advanced/required-ci FAIL; p1-harden-branch SKIP.
-[P1 stack38006157238](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157238):
-build, sdist installer, wheel3lanes и platform3lanes SUCCESS;
-core3lanes, advanced-security и p1-stack-exact FAIL.
-Installed harness не считается реальной client session.
+installed MCP и три platform smoke jobs SUCCESS. Core/advanced/required-ci FAIL.
+P1-stack FAIL; его platform/build/wheel3.11–3.13/sdist/installer jobs SUCCESS.
+Это packaging/stdio evidence, не подтверждение реальных клиентских sessions.
 
-## Сокращение тестов и собственные проверки
+## Critical, recovery и downstream
 
-[Advanced114075319327](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157209/job/114075319327):
-normal critical **53 baseline PASS / 19 intended mutants killed**.
-Каждый mutant дал ожидаемые failure count, intended guard и returncode1;
-anchor_count1, ERROR/SKIP0. Baseline roster:
-`b4a630000b9791fdb09c4b245bc2b213cba2cb8914b1898bc58116354cc5d585`.
+[Advanced job114082885405](https://github.com/Vanilla1999/DocAtlas/actions/runs/38008532239/job/114082885405).
 
-Slice79 сохранил16 names/98 cases и изменил только три live guard bodies.
-21 case теперь PASS; identity/freshness/raw-risk, crop/anonymous credit и no-I/O
-имеют шесть собственных intended kills. Остальные77 cases не удалялись.
-[RELATION_LIVE_GUARDS](pr211-execution/RELATION_LIVE_GUARDS_RU.md).
-
-Slice82 удалил15 obsolete default functions/42 cases после actual1c6 proof32/13.
-Frozen43 inputs, raw archive, independent control, live tail/default_need,
-все imports и non-test lines сохранены.
-Семейство с current control:44→2 collected; новый80c8 collection здоров,
-его четыре intended faults по-прежнему обнаружены.
-[ADMISSION_LOCAL_BINDING_RETIREMENT](pr211-execution/ADMISSION_LOCAL_BINDING_RETIREMENT_RU.md).
-
-Отдельный literal comparison на том же80c8:
-historical702/compact82 baseline PASS и51 парное направленное сравнение PASS.
-Это не заменяет собственные доказательства других API.
-Прежние сокращения: alias49→1, literal702→82, intent32→2, admission34→5.
-Количество внутренних iterations отдельно от количества collected cases.
-
-Slice87 добавляет в existing alias-control21 точный исходный Context7 input:
-теперь3 прежних+21 новых входов. Независимые plan/lookup positives сохранены,
-добавлен scoped Russian topic-router mutant, недостижимый прежними тремя входами.
-Raw archive/source spans/records/hashes и все остальные AST nodes сохраняются.
-Цель **53 baseline PASS /20 intended kills** — PENDING.
-До собственного нового proof эти21 и все соседние live cases остаются collected.
-[CONTEXT7_ALIAS_INPUT_PRECHECK](pr211-execution/CONTEXT7_ALIAS_INPUT_PRECHECK_RU.md).
-
-## Recovery:12/18 PASS
-
-Все12 существующих cases PASS; все18 intended mutants обнаружены.
-Gate SHA256:
-`52bf526d75951a9b32eab6a7179f74d22ac8ec824877e7c707af5444a332cedf`.
-Closed literal case:9 positive queries,20 negatives,29 state fingerprints.
-Exact-document recovery теперь использует actual read store для spy;
-запрет list_sections_for_embedding и immutable fingerprints сохранены.
-[COLD_STARTUP_READ_BOUNDARY](PR211_COLD_STARTUP_READ_BOUNDARY_RU.md).
-
-Slice78 расширил только явно quoted single-character literals; оба Cyrillic
-case PASS. Два остальных bare-uppercase/per-occurrence expectations требуют
-собственного current-contract разбора.
-[SINGLE_CHARACTER_QUOTED_LITERALS](PR211_SINGLE_CHARACTER_QUOTED_LITERALS_RU.md).
-
-## Current quality и downstream:80c8
-
-| Gate | Actual80c8 | Оставшаяся причина |
+| Gate | Фактический результат f7 | Значение |
 | --- | --- | --- |
-|P1.4|11/14; discovery7/10; full facts5/5;0errors;5/5controls|Policy retry-count и два alias-only natural questions.|
-|P1.5|5/7; verified full facts3/6;0errors;6/6controls|Document-source binding и mixed project context.|
-|P1.6|6/6; full fact1/1;0errors;6/6controls|Current public delivery PASS; separate adversarial24/28.|
+|Normal critical|53 PASS;20 intended mutations killed|Собственный precheck для Context7 retirement подтверждён. У18 mutations named guards;2 сохранённых legacy targets без named guard.|
+|Literal historical/compact|Оба baseline и51 парных mutations PASS|Это отдельное сравнение; его records не прибавляются к normal53/20.|
+|Recovery baseline|11 PASS /1 FAIL /0 ERROR|Отказ closed_literal_context: recovery_explain_literal_source_fact.|
+|Recovery mutations|Baseline rejected; mutants не исполнены|23 intended kills пока НЕ подтверждены.|
+|Advanced pytest|528 PASS /94 FAIL|Не полный PASS.|
+|P1.4|12/14; discovery8/10; required full facts5/5|Count-context исправление фактически помогло.|
+|P1.5|5/7; verified full facts4/6|Два прежних case IDs остаются FAIL; library fact теперь виден.|
+|P1.6 public delivery|6/6; full fact1/1|Собственный public gate PASS; workflow всё ещё падает на adversarial.|
+|Legacy/V2/Agent Developer/adversarial|FAIL|Пороги и source obligations сохраняются.|
 
-[P14 job114075318958](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157206/job/114075318958).
-[P15 job114075319048](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157207/job/114075319048).
-[Closure114075318873](https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157215/job/114075318873).
+P1.4 oracle5/5, P1.5 oracle6/6 и P1.6 oracle6/6 — PASS.
+Closure по-прежнему имеет четыре failing gates:
+p14_quality, p15_quality, adversarial, adversarial_mutation;
+его четыре собственных controls PASS.
 
-P15 dependency exact-version fact теперь PASS после production generation fix80
-и observer/oracle fix81. В двух remaining failures source_errors=[].
-Full original metadata не терялась в production: observer теперь сохраняет
-top-level и nested representations отдельно, oracle отвергает каждый conflict.
-Frozen7questions/13candidates/6facts/2negatives и committed child binding сохранены.
-[COPIED_CHILD_GENERATION](PR211_COPIED_CHILD_GENERATION_RU.md),
-[LIBRARY_SNAPSHOT_PROVENANCE](PR211_LIBRARY_SNAPSHOT_PROVENANCE_RU.md).
+Остались P1.4: `alias_order_drafts`, `alias_project_retry_rule`.
+P1.5: `document_statement_binds_exact_path`,
+`two_claims_require_two_allowed_roles`.
 
-P16 report SHA256:
-`b255d2b15b58e78fe5551395e2d81d39699a7b26508fcdb41b64c3546f5511bb`.
-Closure:8 SUCCESS/4 FAIL; failing outcomes:
-p14_quality, p15_quality, adversarial, adversarial_mutation.
-4/4 closure controls и integrity PASS; итог current_quality/required gates FAIL.
-Closure SHA256:
-`86f461ffa1f3b15c7e0b2a2bbbbf81eb617962ea20939f51fd8616f577ee23ae`.
+### Что фактически известно о P1.5 mixed loss
 
-P14 alias bodies уже acquired; нельзя повышать coverage снижением ratio,
-словарём из gold или host lookup credit. Общий relevance contract пока открыт.
-Slice86 реализует отдельно reviewed закрытую count source-context форму:
-exact identifier и whole phrase в одном raw body unit, без quantity/permission
-inference и без original-query/answer/edit credit. +2 intended mutants.
-Это ещё не runtime result.
-[LITERAL_COUNT_CONTEXT](PR211_LITERAL_COUNT_CONTEXT_RU.md).
+В mixed Explain-запросе native project reader допускает полный факт
+ARCHITECTURE.md как literal context без original-query credit.
+Project delivery=True; Unified получает project+library sources.
+Финальный docs_answer содержит только библиотечный источник.
+Первое доказанное исчезновение проектного факта — переход к final MCP projection.
 
-P15 document statement не содержит literal path и имеет противоречащие документы:
-нужен explicit finite structural filename-binding contract.
-Same-call diagnostics mixed request показывают acquisition обеих raw facts,
-но public sources=[]/source_bindings=[]: пустой source_errors=[] не доказывает
-успешный mixed source binding. Slice88 реализует полностью закрытую Explain
-literal-list форму, exact source-bound context и3 intended mutants.
-Старый negative What does A and B do? сохраняется. Runtime PENDING.
-[LITERAL_EXPLAIN_CONTEXT](PR211_LITERAL_EXPLAIN_CONTEXT_RU.md).
+Library-only canonical selection и library requirements действуют на объединённый
+пакет. Исправление готовится через producer-owned resolved request_scope и
+композицию уже проверенного project context внутри project_docs_answer.
+Существующие global delivery/consent/conflict и library exact-version gates
+сохраняются. Project source должен пройти собственные current scope/hash/raw checks.
+Ни patch, ни новый успешный runtime этого изменения пока не заявлены.
 
-После count+Explain остаются12 recovery cases; цель **12/12 baseline +23 kills**.
-Existing closed case ожидает16 positive+54 negative=70 state fingerprints;
-source/current/hash/consent replay и запрет original-query/answer/edit grants сохранены.
-Это ожидаемые проверки, не полученный результат.
-
-### Другие обязательства
-
-На80c8 advanced ordinary subset528P/94F. Legacy original-query coverage0<12.
-V2 verified full semantic coverage natural6/15 и exposed1/5.
-Agent Developer module-only expected evidence rate0.25 вместо1;
-cross-module comparison и CatalogReader остаются предметом разбора.
-Adversarial24/28, observed maximum761 trajectory tokens, output ceiling отсутствует.
-Failed adversarial baseline не даёт mutation credit.
-
-Предыдущий1c6 question-surface PASS на100 original inputs с member-backed
-positive/absent-fact negative/source-removal transform не доказывает usefulness
-всех100. Отдельный question-frame source-types E2E остаётся незакрытым обязательством.
-Полного успешного Legacy/V2/Agent Developer/advanced/P1-stack отчёта нет.
-
-## Reviewed slices следующей публикации
+## Reviewed slices90–94: следующий совместный прогон
 
 | Slice | Commit | Изменение |
 | --- | --- | --- |
-|85|`7856a818`|Полный actual80c8 receipt и215-module failure map.|
-|86|`926cb5af`|Закрытый count frame, raw pair witnesses и2 mutants.|
-|87|`357bbbfb`|21 Context7 input в existing control и scoped mutant; retirement0.|
-|88|`6225be91`|Закрытый Explain list, exact partial source context и3 mutants.|
+|90|`c0f54f43a2df4ea872ba3fcd0ac09fe2242c4706`|Три projection fixtures по текущему query contract и пять opt-in read fixtures с конечным catalog/member transaction. Все восемь существующих имён, source facts и проверяемые guards сохранены.|
+|91|`f4ad1374f1210fc71e79d3a8a8c435b5d1bbadf4`|Три focused V2 records из уже вычисленного report; полные reports/gold/пороги/exit неизменны.|
+|92|`c3b464aa19c2ec36560fef4adb06f06eccf8063e`|Полный фактический receipt f7, включая failing recovery и незапущенные mutations.|
+|93|`ece6555be1e68c323c4b09181faf00238d8922a5`|Report-only RECOVERY_FAILURE: exact positive/read index и source/projection hashes из уже имеющегося failed capture.|
+|94|`820533361152ff3a143d2cf97d0c22a889486d75`|Удалены только1 Context7 функция/21 obsolete topic-alias case после собственного53/20 proof;18 функций/36 других случаев остаются.|
 
-Новых ordinary test functions и удалённых cases в86–88 нет.
-Actual53/19 и12/18 на80c8 остаются базой сравнения, а не доказательством новых53/20 и12/23.
+Все source slices прошли independent review и root review.
+Exact Git parent/tree/file/blob verification выполнена; режима100755 у runners
+не потеряно. Все записи о post-change runtime остаются PENDING.
 
-## Следующие действия
+Context7: 21 исходный вопрос и historical intent IDs сохранены в exact archive,
+один current control проверяет прежние3+эти21 input. Удалённые FAIL не становятся PASS.
+Меняется один diagnostic roster hash; imports/helpers/прочие36 cases/70 query-plan
+cases/current control/critical runner остаются. Контракты collection требуют
+следующего фактического прогона на опубликованном SHA.
 
-1. Опубликовать reviewed85–88 и этот checkpoint обычным fast-forward;
-   проверить фактические merge parents/tree и совместный CI.
-2. Проверить critical53/20 и recovery12/23, полный core, P14 count и P15 mixed
-   на следующем фактическом SHA.
-   Не удалять Context7 cases до собственного нового proof.
-3. Закончить document source-locator contract, затем остальные quality obligations,
-   сохраняя исходные questions/gold и полные source facts.
-4. Разобрать215 failing modules по действующим контрактам и live guards.
-5. Final acceptance на одном конечном SHA/проверенном merge tree:
-   full core, advanced, required CI/P1/downstream, installed/transport/platform
-   и отдельные необходимые client evidence. Merge — отдельное действие.
+Подробности:
+[Projection fixtures](pr211-execution/PROJECTION_BOUNDARY_FIXTURE_CONTRACT_RU.md),
+[Five read fixtures](PR211_DOCS_SERVICE_READ_FIXTURES_RU.md),
+[V2 diagnostics](pr211-execution/V2_SAME_CALL_FOCUSED_DIAGNOSTICS_RU.md),
+[Explain failure diagnostics](PR211_EXPLAIN_RECOVERY_FAILURE_OBSERVATION_RU.md),
+[Context7 retirement](pr211-execution/CONTEXT7_ALIAS_INPUT_RETIREMENT_RU.md).
 
-## Рабочая среда
+## Следующие конкретные действия
 
-Refs: implementation/pr211-merge-readiness и integration/stage3-v2-identity-pr1.
-Только ordinary fast-forward; force/merge/release/внешние комментарии не выполнялись.
-Local checkout устарел после0049c6d; exec transport недоступен с18:09UTC9октября.
-После outage local AST/import/compile/runtime NOT RUN.
-Exact-file GitHub API и существующий разрешённый PR CI — действующий маршрут.
-Пользовательские индексы, новые модели/providers и реальные clients не запускаются.
-Exact commits и этот checkpoint сохраняют результаты независимо от volatile state.
+1. Совместный CI следующего SHA: проверить collection после retirement,
+   восемь migration cases, critical53/20 и фактический RECOVERY_FAILURE.
+2. По capture установить конкретный failing Explain positive и первый этап потери;
+   сохранить full-fact oracle и все23 intended mutants.
+3. Закончить structural filename contract с независимыми non-P15 controls:
+   полный naming roster до evidence_path, однозначное целое filename label,
+   unresolved target без выдуманной semantic role. Production drafts прошли
+   static review; controls и runtime ещё не завершены.
+4. Закончить mixed final projection: producer-owned resolved scope, independent
+   current request binding, project raw snapshot, atomic validation всего результата.
+   Проверить real same-call source delivery и направленные scope/hash/consent mutations.
+5. По трём actual V2 stage records адресно исправить cache/reset, architecture,
+   request-flow quality. Исходные вопросы и frozen witness facts сохраняются.
+   Отдельно выяснить точный смысл Legacy original-query coverage0 при floor12.
+6. Продолжать остальные failing families узкими contract slices с честным разделением
+   fixture migration, retirement и исправления продукта. Ни1680 FAIL, ни94 advanced
+   FAIL не объявлены устаревшими целиком.
+7. После этого — полный required CI/downstream и необходимые installed/client
+   проверки на одном конечном опубликованном SHA. Merge пока не выполнять.
+
+## Продолжение работы
+
+Оба authorized refs: `implementation/pr211-merge-readiness` и
+`integration/stage3-v2-identity-pr1`; обновлять только fast-forward с expected SHA.
+Root один создаёт commits/обновляет refs; агенты готовят blobs и independent reviews.
+При потере временного состояния читать этот checkpoint и точный Git HEAD,
+не возвращаться к старому основному checkout и не повторять завершённую работу.
