@@ -86,6 +86,8 @@ TARGET_MODULES = (
     "docmancer.docs.domain.project_answer_contract",
     "docmancer.docs.domain._project_answer_contract_part01",
     "docmancer.docs.domain._project_answer_contract_part02",
+    "docmancer.docs.application.context_variant_retention",
+    "docmancer.docs.application.qualified_support_units",
 )
 
 
@@ -472,6 +474,24 @@ MUTANTS = (
         TARGET_TESTS[11],
         1,
         "critical_project_read_original_input_fidelity",
+    ),
+    Mutant(
+        "project_read_preserves_units_after_query_coverage",
+        "docmancer/docs/application/_docs_context_projection_core.py",
+        "        if sources and not (new_components or new_qualified_units or",
+        "        if sources and not (new_components or",
+        TARGET_TESTS[11],
+        1,
+        "critical_project_read_distinct_lookup_units",
+    ),
+    Mutant(
+        "project_read_preserves_units_without_new_query_terms",
+        "docmancer/docs/application/_docs_context_projection_core.py",
+        "            and not same_origin_gain and not new_qualified_units",
+        "            and not same_origin_gain",
+        TARGET_TESTS[11],
+        1,
+        "critical_project_read_distinct_lookup_units",
     ),
 )
 

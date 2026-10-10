@@ -14,7 +14,7 @@ from .qualified_support_units import DeliveryUnit, VariantFootprint
 from .context_variant_retention import (
     is_same_origin_gain, prepare_delivery_inventory, qualified_fragments as _qualified_fragments,
     prefer_same_origin_gain_candidate, replacement_preserves_or_advances_mandatory,
-    store_variant_footprint,
+    store_variant_footprint, has_new_qualified_units,
 )
 from .context_query_probes import independent_query_probes, _has_visible_non_path_exact_term, _normalized_path
 from docmancer.docs.domain.context_hint_policy import fallback_context_query_ids, has_context_hint_support
@@ -507,6 +507,7 @@ def project_docs_context(
                                   variant, budget_tokens=packet_cost)
             continue
         candidate_footprint = variant_footprints.get(id(variant))
+        new_qualified_units = has_new_qualified_units(candidate_footprint, selected_footprints)
         candidate_id = _internal_candidate_id(original)
         existing_index = seen_ids.get(variant["evidence_id"])
         if existing_index is not None:
@@ -520,10 +521,10 @@ def project_docs_context(
             if (
                 disjoint
                 and qualified_query_ids((existing,)) <= qualified_query_ids((original,))
-                and qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources)
+                and (new_qualified_units or qualified_query_ids((variant,)) & eligible_query_ids - qualified_query_ids(sources))
             ):
-                # A second span needs an independently qualified new direction.
-                # Internal component novelty alone cannot multiply one source ID.
+                # A disjoint span retains a new query lane or exact qualified unit.
+                # Keep its own bound variant ID; never join disconnected text.
                 identity = f"{variant['evidence_id']}:{start}:{start + len(variant['snippet'])}"
                 variant = {**variant, "evidence_id": "ev-" + hashlib.sha256(identity.encode()).hexdigest()[:16]}
                 existing_index = seen_ids.get(variant["evidence_id"])
@@ -605,7 +606,7 @@ def project_docs_context(
         ):
             decision_trace.record('selection', 'rejected', 'authority_duplicate', original, variant)
             continue
-        if sources and not (new_components or
+        if sources and not (new_components or new_qualified_units or
             attributable_ids & public_query_id_set - selected_public_ids or
             qualified_ids & canonical_intent_query_ids - selected_canonical_ids or
             qualified_ids & need_query_ids - qualified_query_ids(sources) or
@@ -632,11 +633,11 @@ def project_docs_context(
         ):
             decision_trace.record('selection', 'rejected', 'path_only', original, variant)
             continue
-        # A lexical hit does not complete a host question. Permit a complementary
-        # qualified body for one lookup only when it adds two requested terms;
-        # a lone topical mention must not spend the remaining source budget.
+        # Term diversity remains a fallback without a complete current unit.
+        # Distinct verified source bytes need no new query word; neither route
+        # proves that the host question is fully answered.
         if (host_ids and not new_components and not (host_ids - selected_host_query_ids)
-            and not same_origin_gain
+            and not same_origin_gain and not new_qualified_units
             and not required_ids and not exact_anchor_ids and not original_hit and not canonical_intent_ids
             and not (any(len(set(normalized["retrieval_query_matches"][key].get("body_matched_terms") or ()) - {
                 term for source in sources

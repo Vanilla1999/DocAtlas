@@ -93,6 +93,8 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
         app = actual.unified_context
         get_unified, dispatch = app.get_docs_context, RetrievalDispatcher.run
         validate = context_tools.validate_model_visible_projection
+        projector = context_tools.project_docs_context
+        projector_inputs = []
         member_returns, project_returns, unified_returns, snapshots = [], [], [], []
         project_calls, dispatch_calls = [], []
 
@@ -122,6 +124,13 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
                                    "returned": len(result.chunks)})
             return result
 
+        @wraps(projector)
+        def observe_projector(*args, **kwargs):
+            before_projection = deepcopy(kwargs["retrieval"])
+            result = projector(*args, **kwargs)
+            projector_inputs.append(before_projection)
+            return result
+
         @wraps(validate)
         def observe_validation(payload, *, snapshot, **kwargs):
             errors = validate(payload, snapshot=snapshot, **kwargs)
@@ -132,13 +141,14 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
               patch.object(actual, "get_project_context", observe_project),
               patch.object(app, "get_docs_context", observe_unified),
               patch.object(RetrievalDispatcher, "run", observe_dispatch),
+              patch.object(context_tools, "project_docs_context", observe_projector),
               patch.object(context_tools, "validate_model_visible_projection", observe_validation)):
             payload = call_docs_tool_payload("get_docs_context", request, actual)
         require(state() == before, "critical_project_read_state")
-        require(len(member_returns) == len(project_returns) == len(unified_returns) == len(snapshots) == 1,
+        require(len(member_returns) == len(project_returns) == len(unified_returns) == len(snapshots) == len(projector_inputs) == 1,
                 "critical_project_read_single_native_call",
                 {"member": len(member_returns), "project": len(project_returns),
-                 "unified": len(unified_returns), "snapshots": len(snapshots),
+                 "unified": len(unified_returns), "snapshots": len(snapshots), "projectors": len(projector_inputs),
                  "status": payload.get("status"), "error": payload.get("error")})
         require([row["query"] for row in dispatch_calls] == [question, question, *lookups]
                 and all(not row["args"] and row["kwargs"].get("limit") == 20
@@ -231,11 +241,71 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
                     and body[source["char_start"]:source["char_end"]] == visible["snippet"]
                     and body.encode("utf-8")[source["byte_start"]:source["byte_end"]] == visible["snippet"].encode("utf-8"),
                     "critical_project_read_public_bound_bytes", {"path": path})
-        # The downstream no_new_direction rule may select fewer public sources.
-        # Exact all-window preservation is asserted at both preceding handoffs.
+        # Each finite document has a different authored revision fact. The same
+        # lookup is not a reason to drop any of these qualified current units.
+        expected_units = {
+            (path, child["stable_chunk_id"], child["parent_logical_id"], child["source_identity"],
+             generation, identity, "project_doc", "project",
+             child["char_start"], child["char_end"], child["byte_start"], child["byte_end"],
+             child["line_start"], child["line_end"], digest(documents[path]))
+            for path, child in by_path.items()
+        }
+
+        def require_complete_units(projected, bound_sources, *, label, guard):
+            visible = projected.get("sources") or []
+            actual_units = []
+            for row in visible:
+                bound = bound_sources.get(row.get("evidence_id"), {})
+                original = bound.get("source", {})
+                actual_units.append((
+                    row.get("path_or_url"), original.get("stable_chunk_id"),
+                    original.get("parent_logical_id"), original.get("source_identity"),
+                    original.get("generation_id"), original.get("project_identity"),
+                    original.get("source_class"), original.get("doc_scope"),
+                    original.get("char_start"), original.get("char_end"),
+                    original.get("byte_start"), original.get("byte_end"),
+                    row.get("line_start"), row.get("line_end"),
+                    digest(row.get("snippet") or ""),
+                ))
+            require(len(actual_units) == len(expected_units) and set(actual_units) == expected_units,
+                    guard, {"label": label, "expected_count": len(expected_units),
+                            "actual_count": len(actual_units),
+                            "paths": [row.get("path_or_url") for row in visible]})
+            require(set(projected.get("covered_query_ids") or ()) == {"query-lookup-1", "query-lookup-2"},
+                    "critical_project_read_public_context", {"label": label})
+            no_authority(projected)
+
+        require_complete_units(payload, snapshots[0], label="native",
+                               guard="critical_project_read_distinct_lookup_units")
 
         def deny_acquisition(*_args, **_kwargs):
             raise AssertionError("critical_project_read_replay_cannot_search")
+
+        # Reorder or repeat the actual prepared operands; never retrieve again.
+        # Public provenance/bytes stay bound to the original 24 committed rows.
+        projection_replays = []
+        saved_input = deepcopy(projector_inputs[0])
+        pack = saved_input["context_pack"]
+        require(len(pack) == 24, "critical_project_read_projection_input_units")
+        for label, replay_pack in (
+            ("repeated_current_units", [deepcopy(row) for row in pack for _ in range(2)]),
+            ("reversed_current_units", list(reversed(deepcopy(pack)))),
+        ):
+            replay = deepcopy(saved_input)
+            replay["context_pack"] = replay_pack
+            with (patch.object(actual, "get_project_docs", deny_acquisition),
+                  patch.object(actual, "get_project_context", deny_acquisition),
+                  patch.object(app, "get_docs_context", deny_acquisition),
+                  patch.object(RetrievalDispatcher, "run", deny_acquisition)):
+                projected, bound_sources = projector(retrieval=replay)
+            require(not validate_model_visible_projection(projected, snapshot=bound_sources),
+                    "critical_project_read_public_snapshot", {"label": label})
+            require_complete_units(projected, bound_sources, label=label,
+                                   guard="critical_project_read_projection_unit_identity")
+            projection_replays.append({"label": label, "input_windows": len(replay_pack),
+                                       "public_sources": len(projected["sources"])})
+        require(projector_inputs[0] == saved_input and state() == before,
+                "critical_project_read_projection_replay_state")
 
         def replay_member(label, operand, *, overrides=None, dependency=None):
             incoming = deepcopy(operand)
@@ -364,6 +434,8 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
             "bounded_control_items": len(context.project_docs.results),
             "project_windows": len(context.context_pack), "unified_windows": len(unified.context_pack),
             "public_source_count": len(payload["sources"]), "operand_replays": labels,
+            "projection_replays": projection_replays,
+            "distinct_full_source_units": len(expected_units),
             "generation": generation, "catalog_sha256": prepared["catalog_sha256"],
             "state_equal": True, "public_full_bodies_checked": len(payload["sources"]),
         }, ensure_ascii=False, sort_keys=True))

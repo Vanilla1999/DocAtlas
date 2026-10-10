@@ -27,6 +27,25 @@ def is_same_origin_gain(old: VariantFootprint, new: VariantFootprint) -> bool:
     )
 
 
+def has_new_qualified_units(
+    candidate: VariantFootprint | None, selected: dict[str, VariantFootprint],
+) -> bool:
+    """Keep complete current units even when their query lane is already seen.
+
+    Footprints are rebuilt from the qualified source window by the caller.
+    Repeated body/applicability bytes inside one immutable origin add nothing;
+    another source, snapshot or query plan is not an interchangeable origin.
+    This predicate grants no query attribution or answer authority.
+    """
+    if candidate is None or not candidate.unit_keys or not candidate.query_ids:
+        return False
+    represented = frozenset(
+        key for current in selected.values() if current.origin == candidate.origin
+        for key in current.redundancy_keys
+    )
+    return bool(candidate.redundancy_keys - represented)
+
+
 def prepare_delivery_inventory(
     *, source: dict[str, Any], raw_text: str, query_plan: dict[str, Any],
     query_text: dict[str, str], eligible_query_ids: frozenset[str],
