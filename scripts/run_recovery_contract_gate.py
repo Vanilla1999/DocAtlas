@@ -154,6 +154,58 @@ def _observed_public_call(service: Any, request: dict[str, Any]) -> dict[str, An
     return capture
 
 
+
+def _failure_diagnostics(case_id: str, detail: Any) -> dict[str, Any]:
+    """Summarize an existing failed capture; no body bytes or extra calls."""
+    def fields(value, keys):
+        return {key: value[key] for key in keys if key in value} if isinstance(value, dict) else {}
+    def rows(value):
+        return value[:16] if isinstance(value, (list, tuple)) else ()
+    def window(value):
+        if not isinstance(value, dict):
+            return {}
+        text = next((value[key] for key in ("snippet", "display_text", "content") if isinstance(value.get(key), str)), "")
+        return {**fields(value, ("evidence_id", "stable_chunk_id", "path_or_url", "path", "source_id", "generation_id")),
+                "window_sha256": hashlib.sha256(text.encode()).hexdigest(), "window_characters": len(text),
+                "original_trace": fields((value.get("retrieval_query_matches") or {}).get("query-original"),
+                    ("qualified", "qualification_reason", "matched_terms", "match_ratio", "admission_only"))}
+    capture = detail.get("capture", detail) if isinstance(detail, dict) else {}
+    capture = capture if isinstance(capture, dict) else {}
+    payload = capture.get("public_payload") or {}
+    attempts = []
+    for attempt in rows(capture.get("projection_attempts")):
+        before, after = attempt.get("before_projection") or {}, attempt.get("after_projection") or {}
+        diagnostics = (after.get("retrieval_diagnostics") or {}).get("docs_context_projection") or {}
+        projected = attempt.get("projected_payload") or {}
+        attempts.append({
+            "input": fields(before, ("status", "reason_code", "requires_confirmation", "confirmation_reason")),
+            "delivery": fields(before.get("delivery_decision"), ("deliverable", "reason_code")),
+            "input_candidate_count": len(before.get("context_pack") or ()),
+            "input_candidates": [window(row) for row in rows(before.get("context_pack"))],
+            "projected": fields(projected, ("kind", "status", "reason_code", "context_available", "covered_query_ids", "missing_query_ids")),
+            "projected_sources": [window(row) for row in rows(projected.get("sources"))],
+            "admissions": [fields(row, ("reason", "query_id", "qualification_reason", "coverage_credit",
+                                        "generation_id", "source_id", "path"))
+                           for row in rows(diagnostics.get("literal_context_admissions"))],
+            "rejections": [fields(row, ("reason", "reason_code", "evidence_id", "path", "query_id"))
+                           for row in rows(diagnostics.get("projection_rejections"))],
+            "snapshot_ids": sorted((attempt.get("snapshot") or {}).keys()),
+            "snapshot_sources": [window(row.get("source")) for row in rows(list((attempt.get("snapshot") or {}).values()))],
+        })
+    return {
+        "case": case_id, "capture_present": bool(capture.get("projection_attempts")),
+        "fixture": fields(detail, ("positive_case_index", "read_index", "expected_body_sha256", "expected_path", "literal")),
+        "request": fields(capture.get("request"), ("question", "project_path", "scope")),
+        "public": fields(payload, ("kind", "status", "reason_code", "context_available",
+                                   "answer_supported", "answer_available", "edit_ready", "covered_query_ids", "missing_query_ids")),
+        "public_source_count": len(payload.get("sources") or ()),
+        "public_sources": [window(row) for row in rows(payload.get("sources"))],
+        "projection_attempt_count": len(capture.get("projection_attempts") or ()),
+        "projection_attempts": attempts,
+        "delivery_inputs": [fields(row, ("status", "reason_code", "requires_confirmation", "confirmation_reason"))
+                            for row in rows(capture.get("delivery_inputs"))],
+    }
+
 def _assert_public_context(payload: dict[str, Any], project: Path, *, fact_guard: str,
                            capture: dict[str, Any] | None = None) -> None:
     detail = {"payload": payload, "capture": capture} if capture is not None else payload
@@ -633,7 +685,11 @@ def closed_literal_context() -> dict[str, Any]:
                          and any(source.get("snippet") == body for source in payload.get("sources", [])),
                          "recovery_count_literal_source_fact" if count_phrase is not None
                          else "recovery_explain_literal_source_fact" if explain
-                         else "recovery_closed_literal_source_fact", capture)
+                         else "recovery_closed_literal_source_fact", {
+                             "capture": capture, "positive_case_index": len(positives) + 1,
+                             "read_index": read_checks, "expected_body_sha256": hashlib.sha256(body.encode()).hexdigest(),
+                             "expected_path": source_path, "literal": literal,
+                         })
                 _require(all(payload.get(key) is False for key in (
                     "answer_supported", "answer_available", "edit_ready",
                 )), "recovery_closed_no_answer_or_edit", payload)
@@ -905,6 +961,11 @@ def main(argv: list[str] | None = None) -> int:
             measurements = run()
         except ContractFailure as error:
             row.update(outcome="failure", guard=str(error.args[0]), detail=repr(error.args[1:]))
+            try:
+                diagnostic = _failure_diagnostics(name, error.args[1])
+                print("RECOVERY_FAILURE " + json.dumps(diagnostic, ensure_ascii=False, sort_keys=True))
+            except Exception as diagnostic_error:
+                print("RECOVERY_FAILURE " + json.dumps({"case": name, "diagnostic_error": type(diagnostic_error).__name__}))
         except Exception as error:
             # AssertionError from production/setup is an error, never an oracle
             # kill. Only _require raises the dedicated ContractFailure above.
