@@ -96,7 +96,7 @@ def _assert_literal_context_boundary(question: str) -> None:
     assert need.context == ""
 
     contract = build_project_answer_contract(question)
-    assert not contract.proof_obligations
+    assert not contract.proof_obligations, "critical_question_contract_no_inferred_obligations"
     assert not contract.subjects
     assert not contract.retrieval_hints
     assert not contract.concept_queries

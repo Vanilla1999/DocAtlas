@@ -33,8 +33,9 @@ TARGET_TESTS = (
     "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
     "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
     "tests/docs/test_admission_relation_safety.py::test_raw_owner_documents_and_private_meanings_never_leak_to_public_dto",
+    "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -82,6 +83,9 @@ TARGET_MODULES = (
     "eval.agent_developer_v1.project_read_presentation_controls",
     "docmancer.docs.domain.context_budget",
     "eval.agent_developer_v1.relation_source_context_controls",
+    "docmancer.docs.domain.project_answer_contract",
+    "docmancer.docs.domain._project_answer_contract_part01",
+    "docmancer.docs.domain._project_answer_contract_part02",
 )
 
 
@@ -450,6 +454,15 @@ MUTANTS = (
         TARGET_TESTS[14],
         1,
         "critical_relation_public_no_answer_authority",
+    ),
+    Mutant(
+        "question_contract_does_not_infer_obligations",
+        "docmancer/docs/domain/_project_answer_contract_part02.py",
+        "    return ProjectAnswerContract(\n        question_hash=canonical_hash(source_question),\n        retrieval_hints=(),\n        concept_queries=(),\n        subjects=(),\n        proof_obligations=(),",
+        "    from ._project_answer_contract_part01 import ProofObligation\n    return ProjectAnswerContract(\n        question_hash=canonical_hash(source_question),\n        retrieval_hints=(),\n        concept_queries=(),\n        subjects=(),\n        proof_obligations=(ProofObligation(\n            \"mutation:inferred-obligation\", \"definition\", \"shared browser\",\n            query_span_start=0, query_span_end=len(source_question),\n            query_span_text=source_question,\n        ),),",
+        TARGET_TESTS[15],
+        1,
+        "critical_question_contract_no_inferred_obligations",
     ),
 )
 
