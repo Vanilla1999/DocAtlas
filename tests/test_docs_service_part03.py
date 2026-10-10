@@ -301,8 +301,40 @@ def test_get_project_docs_can_filter_by_module_path(tmp_path, monkeypatch):
     frontend.mkdir(parents=True)
     (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
     (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "  - path: packages/backend/README.md\n"
+        "    role: other\n"
+        "    scope: module\n"
+        "    module_path: packages/backend\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "  - path: packages/frontend/README.md\n"
+        "    role: other\n"
+        "    scope: module\n"
+        "    module_path: packages/frontend\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md", "packages/backend/README.md", "packages/frontend/README.md"),
+    )
 
     result = service.get_project_docs(str(project), "SharedNeedle", module_path="packages/backend", tokens=1200, limit=3)
 
@@ -354,8 +386,40 @@ def test_get_project_docs_can_filter_by_module_name_exact_match(tmp_path, monkey
     frontend.mkdir(parents=True)
     (backend / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
     (frontend / "README.md").write_text("# Frontend\n\nSharedNeedle FrontendOnlyAnswer.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "  - path: packages/backend/README.md\n"
+        "    role: other\n"
+        "    scope: module\n"
+        "    module_path: packages/backend\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "  - path: packages/frontend/README.md\n"
+        "    role: other\n"
+        "    scope: module\n"
+        "    module_path: packages/frontend\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md", "packages/backend/README.md", "packages/frontend/README.md"),
+    )
 
     result = service.get_project_docs(str(project), "SharedNeedle", module="backend", tokens=1200, limit=3)
 
@@ -428,8 +492,32 @@ def test_get_project_docs_project_scope_preserves_backward_compatibility(tmp_pat
     module = project / "packages" / "backend"
     module.mkdir(parents=True)
     (module / "README.md").write_text("# Backend\n\nSharedNeedle BackendOnlyAnswer.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "  - path: packages/backend/README.md\n"
+        "    role: other\n"
+        "    scope: module\n"
+        "    module_path: packages/backend\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md", "packages/backend/README.md"),
+    )
 
     result = service.get_project_docs(str(project), "SharedNeedle", scope="project", tokens=1200, limit=5)
 
@@ -465,8 +553,24 @@ def test_get_project_context_returns_trust_contract_for_project_docs(tmp_path, m
 def test_get_project_context_low_signal_single_token_query_returns_no_results(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nProjectContextAnswer uses local ADRs.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md",),
+    )
 
     result = service.get_project_context(str(project), "test", tokens=1200, limit=3)
 
@@ -778,8 +882,24 @@ def test_get_project_docs_returns_sync_next_action_when_candidates_not_indexed(t
 def test_get_project_docs_distinguishes_indexed_no_results_from_not_indexed(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     (project / "README.md").write_text("# Architecture\n\nKnown project docs topic.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
+    from tests._fixture_member_transaction import indexed_fixture_member_service
+    (project / "docatlas.project-docs.yaml").write_text(
+        "schema_version: 1\n"
+        "documents:\n"
+        "  - path: README.md\n"
+        "    role: overview\n"
+        "    scope: project\n"
+        "    description: Authored read isolation fixture.\n"
+        "    authority: supporting\n"
+        "    status: active\n"
+        "    impact: track\n"
+        "roots: []\n"
+        "code_files: []\n",
+        encoding="utf-8",
+    )
+    service, _ = indexed_fixture_member_service(
+        tmp_path, monkeypatch, project, ("README.md",),
+    )
 
     result = service.get_project_docs(str(project), "UnrelatedNeedleThatDoesNotExist", tokens=1200, limit=3)
 

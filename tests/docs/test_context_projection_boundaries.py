@@ -13,28 +13,48 @@ from docmancer.docs.application.model_visible_projection import (
 from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
 
 
-def test_path_only_projection_uses_the_current_exact_topic_guard():
-    retrieval = _host_lookup_context_retrieval()
+def test_path_only_projection_uses_the_current_exact_topic_guard(tmp_path):
+    from hashlib import sha256
+
+    from tests.docs._reference_binding_fixtures import capture_reference_case
+
     question = "In docs/settings.md, explain ALPHA_KEY."
-    plan = retrieval["documentation_query_plan"]
-    plan.update(original_question=question, explicit_paths=["docs/settings.md"],
-                required_query_ids=[], public_query_ids=["query-original", "query-path-1"],
-                queries=[
-                    {"query_id": "query-original", "text": question, "origin": "original"},
-                    {"query_id": "query-path-1", "text": "docs/settings.md", "origin": "exact_path"},
-                ])
-    source = retrieval["context_pack"][0]
-    source.update(path="docs/settings.md", content="ALPHA_KEY enables durable storage.",
-                  line_start=11, retrieval_query_matches={}, retrieval_query_ids=[])
-    retrieval["context_pack"] = [source]
-    result, snapshot = project_docs_context(retrieval=retrieval)
+    text = "ALPHA_KEY enables durable storage."
+    capture = capture_reference_case(tmp_path, {"docs/settings.md": text}, question)
+    result = capture["public_payload"]
+    snapshot = capture["projection_attempts"][-1]["snapshot"]
     assert result["context_available"] is True
-    assert result["sources"][0]["snippet"] == source["content"]
-    assert result["covered_query_ids"] == ["query-path-1"]
+    assert result["sources"][0]["snippet"] == text
+    source = result["sources"][0]
+    bound = snapshot[source["evidence_id"]]["source"]
+    reference = bound["_reference_evidence"]
+    assert source["path_or_url"] == reference["source"]["canonical_path"] == "docs/settings.md"
+    assert source["project_identity"] == reference["source"]["scope"]["project_id"]
+    assert reference["source"]["content_sha256"] == sha256(text.encode("utf-8")).hexdigest()
+    assert bound["_reference_root_plan"]["question"] == question
+    assert bound["_reference_root_plan"]["catalog_complete"] is True
+    assert (source["line_start"], source["line_end"]) == (1, 1)
+    # The literal body is useful context; a path does not become a public query.
+    assert result["covered_query_ids"] == []
+    assert result["missing_query_ids"] == ["query-original"]
     assert result["answer_supported"] is False
     assert result["edit_ready"] is False
     assert validate_model_visible_projection(result, snapshot=snapshot, max_tokens=800) == []
 
+    for label, path, body in (
+        ("filename_only", "docs/settings.md", "A generic setting enables durable storage."),
+        ("heading_only", "docs/settings.md", "# ALPHA_KEY\n\nA generic setting enables durable storage."),
+        ("identifier_prefix", "docs/settings.md", "ALPHA_KEY_EXTRA enables durable storage."),
+        ("wrong_path", "docs/other.md", text),
+    ):
+        negative = capture_reference_case(tmp_path / label, {path: body}, question)["public_payload"]
+        assert negative.get("error") is None, negative
+        assert negative["kind"] == "docs_context", negative
+        assert negative["status"] == "insufficient_evidence", negative
+        assert not negative.get("sources"), label
+        assert not negative.get("covered_query_ids"), label
+        assert negative.get("answer_supported") is not True, label
+        assert negative.get("edit_ready") is not True, label
 
 @pytest.mark.parametrize("limit", [160, 320, 520])
 def test_table_windows_never_start_or_end_inside_a_row(limit):
@@ -70,15 +90,17 @@ def test_prose_window_does_not_start_in_the_middle_of_a_word(limit):
 
 
 def test_stronger_explicit_lookup_precedes_generated_alias_bonus():
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
+
     retrieval = _host_lookup_context_retrieval()
-    plan = retrieval["documentation_query_plan"]
-    plan.update(original_question="Explain the processing path.",
-                public_query_ids=["query-original", "query-lookup-1"],
-                required_query_ids=[], queries=[
-                    {"query_id": "query-original", "text": "Explain the processing path.", "origin": "original"},
-                    {"query_id": "query-lookup-1", "text": "gateway request candidates selection", "origin": "host_lookup"},
-                    {"query_id": "query-intent-1", "text": "internal policy", "origin": "canonical_intent"},
-                ])
+    plan = build_documentation_query_plan(
+        "Explain the processing path.", lookup_queries=("gateway request candidates selection",),
+    ).as_payload()
+    # Retain the old generated alias as hostile input, never a valid lookup.
+    plan["queries"].append(
+        {"query_id": "query-intent-1", "text": "internal policy", "origin": "canonical_intent"},
+    )
+    retrieval["documentation_query_plan"] = plan
     strong, weak = retrieval["context_pack"][:2]
     strong.update(path="docs/strong.md", content="The gateway handles request candidates.",
                   retrieval_query_matches={"query-lookup-1": {"query_text": "gateway request candidates selection"}})
@@ -89,7 +111,10 @@ def test_stronger_explicit_lookup_precedes_generated_alias_bonus():
                 })
     retrieval["context_pack"] = [weak, strong]
     result, snapshot = project_docs_context(retrieval=retrieval)
+    assert result["context_available"] is True
     assert result["sources"][0]["path_or_url"] == "docs/strong.md"
+    assert result["sources"][0]["snippet"] == strong["content"]
+    assert "query-lookup-1" in result["covered_query_ids"]
     assert "query-original" not in result["covered_query_ids"]
     assert "query-intent-1" not in result["covered_query_ids"]
     assert result["answer_supported"] is False
@@ -131,6 +156,7 @@ def test_snippet_expansion_cannot_replace_an_already_visible_fact():
 
 def test_complete_qualified_variant_precedes_mid_sentence_prefix():
     from docmancer.docs.application.docs_context_projection import _qualified_fragments
+    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
 
     raw = (
         "# Cleanup\n\n"
@@ -140,6 +166,10 @@ def test_complete_qualified_variant_precedes_mid_sentence_prefix():
         "unless `--apply` is supplied.\n"
     )
     query = "Does clearing derived storage preserve source files and configuration?"
+    # This declared literal lookup makes the ordering fixture independently
+    # eligible. The full original question is preserved and remains uncovered.
+    literal_lookup = "`clear-index`"
+    plan = build_documentation_query_plan(query, lookup_queries=(literal_lookup,)).as_payload()
     source = {
         "evidence_id": "ev-cleanup",
         "path_or_url": "docs/cleanup.md",
@@ -164,17 +194,26 @@ def test_complete_qualified_variant_precedes_mid_sentence_prefix():
         },
         "_expected_project_identity": "git:example/project",
         "_lifecycle_intent": "current",
+        "_independent_query_plan": plan,
     }
     variants = _qualified_fragments(
         source,
         raw_snippet=raw,
-        query_ids={"query-lookup-2"},
-        query_text={"query-lookup-2": query},
+        query_ids={"query-lookup-1"},
+        query_text={"query-original": query, "query-lookup-1": literal_lookup, "query-lookup-2": query},
         source_line_start=1,
     )
     assert variants
     assert "silently widens the cleanup scope." in variants[0]["snippet"]
+    # The complete passage remains an eligible alternative, even when its
+    # shorter complete first sentence wins this ordering-only preference.
+    assert any(variant["snippet"] == raw.strip() for variant in variants)
     assert variants[0]["snippet"] in raw
+    assert plan["original_question"] == query
+    for variant in variants:
+        assert variant["retrieval_query_ids"] == ["query-lookup-1"]
+        assert variant["retrieval_query_matches"]["query-original"]["qualified"] is False
+        assert "query-lookup-2" not in variant["retrieval_query_matches"]
 
 
 def test_frozen_cache_reset_keeps_preview_and_preserve_in_visible_context():
