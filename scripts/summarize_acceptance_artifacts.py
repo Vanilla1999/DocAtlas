@@ -278,6 +278,31 @@ def _recovery_operand_summary(record: dict) -> dict:
     }
 
 
+def _selection_operand_summary(record: dict) -> dict:
+    """Expose existing final-source hashes and bounded selection decisions."""
+    stages = record.get("stages")
+    stages = stages if isinstance(stages, dict) else {}
+    return {
+        "record_type": "V2_SELECTION_OPERANDS",
+        **_focused_fields(record, (
+            "case_id", "artifact_file", "sha256", "bytes", "run_mode", "record_counts", "question",
+        )),
+        "payload": _focused_fields(record.get("payload"), (
+            "kind", "status", "context_available", "answer_supported", "answer_available",
+            "edit_ready", "source_count", "sources", "covered_query_ids", "missing_query_ids",
+        )),
+        "stages": _focused_fields(stages, (
+            "diagnostics_present", "stage_status", "observer_counts",
+            "pre_projection_qualified_ids", "selected_candidate_ids", "considered_variants",
+            "projection_rejections", "final_visible_evidence_ids",
+        )),
+        "claim_boundary": (
+            "existing_bounded_same_call_source_hashes_and_decisions; no body reread, "
+            "rescoring or inference of an omitted first loss; original omissions retained"
+        ),
+    }
+
+
 def _critical_baseline_console(record: dict) -> dict:
     """Show at most three retained traceback tails, without the generic 512 cut."""
     failures = record["failures"]
@@ -760,6 +785,8 @@ def main() -> int:
         *[row for row in records if row["record_type"] == "CRITICAL_BASELINE"],
         *[_recovery_operand_summary(row) for row in records
           if row["record_type"] == "RECOVERY_ARTIFACT"],
+        *[_selection_operand_summary(row) for row in records
+          if row["record_type"] == "V2_FOCUSED_STAGE"],
         *literal_headers,
         *literal_operands,
         *[_delivery_operand_summary(row) for row in records
@@ -775,7 +802,7 @@ def main() -> int:
     args.output.write_text(json.dumps(result, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")
     remaining, omitted = 384_000, 0
     priority_omitted = {"CRITICAL_OPERANDS": 0, "CRITICAL_BASELINE": 0, "RECOVERY_OPERANDS": 0,
-                        "LITERAL_COMPARISON": 0, "LITERAL_CHILD_OPERANDS": 0}
+                        "LITERAL_COMPARISON": 0, "LITERAL_CHILD_OPERANDS": 0, "V2_SELECTION_OPERANDS": 0}
 
     def emit(kind: str, value: dict, *, already_bounded: bool = False) -> None:
         nonlocal remaining, omitted
@@ -798,7 +825,7 @@ def main() -> int:
         emit(row["record_type"], {key: value for key, value in row.items() if key != "record_type"},
              already_bounded=row["record_type"] in {
                  "V2_FOCUSED_STAGE", "V2_DELIVERY_OPERANDS", "CRITICAL_OPERANDS", "RECOVERY_OPERANDS",
-                 "LITERAL_COMPARISON", "LITERAL_CHILD_OPERANDS",
+                 "LITERAL_COMPARISON", "LITERAL_CHILD_OPERANDS", "V2_SELECTION_OPERANDS",
              })
     print("ARTIFACT_CONSOLE " + json.dumps({"omitted_rows": omitted, "record_count": len(records),
                                            "complete_selected_records_in_artifact": True,
