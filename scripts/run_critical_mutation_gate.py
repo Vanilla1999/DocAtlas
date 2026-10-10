@@ -265,6 +265,15 @@ MUTANTS = (
         1,
         "critical_relation_qualification_no_io",
     ),
+    Mutant(
+        "context7_russian_topic_router_cannot_generate_aliases",
+        "docmancer/docs/domain/project_retrieval_intent.py",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+        "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    if \"установ\" in question.casefold():\n        return (ProjectRetrievalAlias(\"installation_verification\", \"installation setup verification\", True, \"en\"),)\n    return ()",
+        TARGET_TESTS[3],
+        1,
+        "critical_context7_no_topic_router_aliases",
+    ),
 )
 
 

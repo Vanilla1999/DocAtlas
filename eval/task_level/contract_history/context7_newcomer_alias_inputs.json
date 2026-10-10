@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "contract": "context7-explicit-input-alias-boundary-v1",
+  "migration_status": "precheck-original-tests-still-collected",
+  "base_commit": "80c8fbbb3e8c379467a9075f93f7165d080f8432",
+  "base_tree_sha": "a838749f57ff0165ab925590656f64e0799a2e05",
+  "source": {
+    "original_path": "tests/docs/test_context7_style_project_chat.py",
+    "archive_path": "eval/task_level/contract_history/context7_newcomer_alias_inputs.py.txt",
+    "git_blob_sha": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34",
+    "sha256": "a573bb62e7546920dd4738456b860420ce8db72fe359b6f1d61ebccfbb3f16b8",
+    "encoding": "utf-8",
+    "archive_scope": "The complete exact source module, including all 19 test definitions, imports and _EmptyRequirements, is archived as non-collected text."
+  },
+  "selected_function": {
+    "original_nodeid": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases",
+    "definition_line": 46,
+    "source_lines": [
+      20,
+      51
+    ],
+    "collected_cases": 21
+  },
+  "frozen_selected_roster_sha256": "39591084bef65604349d5f6237066b9a2492c1d83c4f38dbf033ba2bceee9f81",
+  "frozen_input_roster_sha256": "eb8a4ac593d8659f59a8081d5140109dd2684b5a23c3abd9c66c198fcd9820c6",
+  "prior_questions": [
+    "What is the recommended sequence of MCP tool calls for answering a normal project documentation question?",
+    "Как устроен полный процесс работы Docs MCP?",
+    "  Ω é `OtherTool.  open` — где описание неизвестного вызова?\r\n"
+  ],
+  "prior_questions_sha256": "fad4c95805cf51cd3257f244b00c81d3be13a6b116efa962904dd555d1aaa186",
+  "combined_questions_sha256": "77a8c8ff1372debd437a24fe1ca43ffeff6c9453907dfd534cd71714205ed7e1",
+  "inputs": [
+    {
+      "case_index": 0,
+      "question": "Как установить DocAtlas и проверить запуск?",
+      "historical_intent_id": "installation_verification",
+      "question_sha256": "6cfed9778cfcb4536eb77ee3002b896ac30d7e87909875b9ec15d323b11ecf73"
+    },
+    {
+      "case_index": 1,
+      "question": "Какие первые команды выполнить после установки?",
+      "historical_intent_id": "getting_started",
+      "question_sha256": "c0fd62396d40b9e3b01ede4796dc0fac399e98d26fe211378ec9d8970db62f67"
+    },
+    {
+      "case_index": 2,
+      "question": "Где хранится индекс и как он изолирован по проектам?",
+      "historical_intent_id": "project_storage",
+      "question_sha256": "053c799f2485574b0508e01876fe24e952e78dcf128307f27ec4e348bb4a322b"
+    },
+    {
+      "case_index": 3,
+      "question": "Как пользоваться без интернета?",
+      "historical_intent_id": "offline_usage",
+      "question_sha256": "5a06df024c24d63760535020081fe59cc260d80b099781ca08ed1ffa7c32012e"
+    },
+    {
+      "case_index": 4,
+      "question": "Что делать, когда ничего не находится?",
+      "historical_intent_id": "troubleshooting",
+      "question_sha256": "0f238c129aa0282499849c0cd931346b32f6eb10e2d86c2a9b805eee5dac2f81"
+    },
+    {
+      "case_index": 5,
+      "question": "Что нужно протестировать перед открытием pull request?",
+      "historical_intent_id": "testing_contribution",
+      "question_sha256": "c5efd20392f12b57b61a4b58751652c86d81eef9bee83d89f3f9bab972a7aae3"
+    },
+    {
+      "case_index": 6,
+      "question": "Где посмотреть карту модулей и с чего читать кодовую базу?",
+      "historical_intent_id": "contributor_start",
+      "question_sha256": "ebd8da693b353db1b015c1bb3ab1df96a25b53a0e9c3610cb2a332fe721c7812"
+    },
+    {
+      "case_index": 7,
+      "question": "Куда пишется база индекса проекта?",
+      "historical_intent_id": "project_storage",
+      "question_sha256": "80b905352911efc1778eb336fa36d11128121def86729921c22ef490ef81627c"
+    },
+    {
+      "case_index": 8,
+      "question": "Что сделать после редактирования markdown-документа, чтобы поиск увидел изменения?",
+      "historical_intent_id": "project_docs_sync",
+      "question_sha256": "5890a7c34238f0980779b742062c8009a3f412880b6b4ba44ff93dd0cee362f8"
+    },
+    {
+      "case_index": 9,
+      "question": "Почему get_docs_context вернул insufficient_evidence и что проверить первым?",
+      "historical_intent_id": "troubleshooting",
+      "question_sha256": "ee65b02ec03be1fd211c9488b458633646d54323712c21f948c6c01ffc93e6cc"
+    },
+    {
+      "case_index": 10,
+      "question": "Архитектура?",
+      "historical_intent_id": "project_architecture",
+      "question_sha256": "0cf295cda338ec846c52be1aa62d4aa3fd6d5ee8a2c7d10b0ade6afcf723b522"
+    },
+    {
+      "case_index": 11,
+      "question": "When should an agent use get_docs_context?",
+      "historical_intent_id": "docs_mcp_tool_policy",
+      "question_sha256": "7be1297a017b8a14577d5a382d46219fd5f74810d59a33634741c1d736737f1f"
+    },
+    {
+      "case_index": 12,
+      "question": "When is an agent allowed to call prepare_docs?",
+      "historical_intent_id": "docs_mcp_tool_policy",
+      "question_sha256": "0308bb55d5eb9fcab54f82af920dd806274d4f906f145f8c240b80af8605930c"
+    },
+    {
+      "case_index": 13,
+      "question": "What kinds of requests should use docs_status, and when must it not be used?",
+      "historical_intent_id": "docs_mcp_tool_policy",
+      "question_sha256": "30eea1899dd11cf7da88568c230a3b93649b43eaae13e4d6465b5d50f81f0df7"
+    },
+    {
+      "case_index": 14,
+      "question": "What does fail-closed behavior mean in the DocAtlas documentation workflow?",
+      "historical_intent_id": "fail_closed_workflow",
+      "question_sha256": "c3f4537ef35b257d340e6b78fe2b74e09625d86ef8cd9d0d90f6a42a0802cef2"
+    },
+    {
+      "case_index": 15,
+      "question": "What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?",
+      "historical_intent_id": "response_contract",
+      "question_sha256": "f7955017f789463c430fe305befb17d2e66fea94dad3c4ca3488bd856e891b71"
+    },
+    {
+      "case_index": 16,
+      "question": "Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?",
+      "historical_intent_id": "source_authority",
+      "question_sha256": "c0befc647162bca6c9dc9f745e8661ceca192c3f7a417f744de2aa48a9f552be"
+    },
+    {
+      "case_index": 17,
+      "question": "What systems does DocAtlas explicitly not replace?",
+      "historical_intent_id": "product_boundaries",
+      "question_sha256": "e2874b1e97afa89819d08bc48fd417b80a7ac3bf2fdc43d8d633ab75bd625a45"
+    },
+    {
+      "case_index": 18,
+      "question": "How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?",
+      "historical_intent_id": "dependency_version_binding",
+      "question_sha256": "f4cbe7a7a77144ce129afc3fda5f97a7b06d2ed539c27f8a67f7cb178e0cea1c"
+    },
+    {
+      "case_index": 19,
+      "question": "What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?",
+      "historical_intent_id": "module_responsibilities",
+      "question_sha256": "817021e5c61eea52807c1c1e44405a0c91aae1a08812bb8fac63a98983acff22"
+    },
+    {
+      "case_index": 20,
+      "question": "What claims about DocAtlas are not currently demonstrated according to the product brief?",
+      "historical_intent_id": "product_claims",
+      "question_sha256": "2e69f85ab1f0434a9c0619da126da4d12c84de002a7f7a0f743e318408e82116"
+    }
+  ],
+  "prior_control": {
+    "path": "tests/docs/test_project_retrieval_alias_contract.py",
+    "git_blob_sha": "15a933aaae55582ac6c633070098e00762b46676",
+    "source_sha256": "f52233a38fb90a2d2e087e2e0d728634a4e283867b633a9f666da1cb3eb707e0",
+    "current_direct_questions": 3,
+    "selected_context7_questions_in_prior_inputs": 0,
+    "note": "The old 49-case archive remains preserved, but the current production alias loop executed only these three independent questions. Archive presence is not a substitute for exercising the 21 Context7 inputs."
+  },
+  "current_contract": {
+    "source_path": "docmancer/docs/domain/project_retrieval_intent.py",
+    "source_git_blob_sha": "989e317c45a18fc19d0074a832095ed6a7e7d097",
+    "planner_path": "docmancer/docs/domain/documentation_query_plan.py",
+    "planner_git_blob_sha": "0cd20b1138f1a3a2740729677d9588414f2dcf32",
+    "selected_historical_assertions": [
+      "intent_id in {alias.intent_id for alias in aliases}",
+      "all(alias.force_context_only for alias in aliases)",
+      "all(alias.text for alias in aliases)"
+    ],
+    "classification": "This selected function asks the retired prose dictionary to generate a nonempty topic alias with a predetermined intent id. It contains no source body, finite membership, factual retrieval, lifecycle, permission or native quality assertion.",
+    "new_oracle": "Every exact original question stays the sole original query. An explicit caller lookup stays distinct with no original-query parent credit, inferred roles, forbidden terms or need fields. Free-form questions produce no generated alias DTO.",
+    "positive_controls": "The full original-only and explicit lookup/path guards run for all 24 exact questions before alias fault checks. The old three-input alias guard remains before the new guard, preserving the existing unconditional alias mutant's intended failure.",
+    "historical_intent_ids": "Retained byte-bound fixture history only; never used to derive the current expected result or an answer.",
+    "preserved_node_contract": "All working-module top-level AST nodes except the selected function match the raw archive. If the selected function is present, its complete AST also matches. The entire original module remains unchanged and collected in this precheck.",
+    "control": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+    "control_git_blob_sha": "17f64832f9fe7a4d7532ebb0fe6b6ffbfb81dc8d",
+    "new_failure_guard": "critical_context7_no_topic_router_aliases",
+    "scope_limit": "This checks alias and explicit query-plan boundaries. It does not prove retrieval recall, factual/source completeness, finite admission, source authority, installed clients, MCP delivery, or any of the 36 other Context7 cases or 70 documentation-query-plan cases.",
+    "retirement_rule": "Delete nothing in this slice. Only this one selected 21-case function can be considered for a later retirement after a green normal 53-case baseline and all 20 intended kills, including the new scoped mutant at its exact guard with one failure and zero errors/skips. Helpers, imports, other functions, selectors and final runtime acceptance remain required."
+  },
+  "expected_mutation": {
+    "name": "context7_russian_topic_router_cannot_generate_aliases",
+    "path": "docmancer/docs/domain/project_retrieval_intent.py",
+    "old": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+    "new": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    if \"установ\" in question.casefold():\n        return (ProjectRetrievalAlias(\"installation_verification\", \"installation setup verification\", True, \"en\"),)\n    return ()",
+    "source_before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+    "source_after_sha256": "7f9bb4c33c117987145c058a6f5860744eb5eaa3ee8ad08c19948957b7b9e25f",
+    "anchor_count": 1,
+    "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+    "expected_failures": 1,
+    "failure_guard": "critical_context7_no_topic_router_aliases",
+    "prior_input_matches": [],
+    "archived_input_matches": [
+      0,
+      1
+    ]
+  },
+  "critical_gate": {
+    "runner_path": "scripts/run_critical_mutation_gate.py",
+    "base_blob_sha": "7331b5a85b99887ec64334388a7b23c8eed687e5",
+    "proposed_blob_sha": "8f31dfccd02025b8355020aa4063952733c0689a",
+    "normal_baseline_cases_before": 53,
+    "normal_baseline_cases_after": 53,
+    "mutants_before": 19,
+    "mutants_after": 20,
+    "alias_target_cases": 1,
+    "expected_alias_target_roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a",
+    "new_mutant_earliest_input_index": 0,
+    "expected_first_failure_line": "AssertionError: critical_context7_no_topic_router_aliases",
+    "pre_existing_mutant_earliest_guard": "critical_alias_no_generated_queries",
+    "unchanged_sections": [
+      "TARGET_TESTS",
+      "TARGET_CASE_COUNTS",
+      "TARGET_MODULES",
+      "the first 19 MUTANTS",
+      "all runner code from def _ignore onward",
+      "literal historical/compact comparison"
+    ],
+    "runtime_status": "pending for this proposed 24-input control and 20th mutant",
+    "disposable_checkout_import_boundary": "The unchanged runner runs a separate import-origin probe for project_retrieval_intent and documentation_query_plan in the disposable checkout, records source hashes and verifies the unique mutation anchor. Its actual pytest result must have the exact baseline target roster, one assertion at the named guard, zero errors and zero skips. This is not claimed as a new same-process import receipt."
+  },
+  "preservation": {
+    "original_module_blob_unchanged": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34",
+    "original_module_definitions": 19,
+    "original_module_cases": 57,
+    "selected_definitions": 1,
+    "selected_cases": 21,
+    "other_definitions": 18,
+    "other_cases": 36,
+    "original_test_roster": [
+      {
+        "name": "test_russian_newcomer_queries_get_retrieval_only_aliases",
+        "definition_line": 46
+      },
+      {
+        "name": "test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias",
+        "definition_line": 62
+      },
+      {
+        "name": "test_state_home_variable_uses_narrow_retrieval_without_forcing_context",
+        "definition_line": 77
+      },
+      {
+        "name": "test_russian_docs_mcp_start_command_builds_a_command_obligation",
+        "definition_line": 87
+      },
+      {
+        "name": "test_exact_symbol_question_is_not_misclassified_as_product_overview",
+        "definition_line": 98
+      },
+      {
+        "name": "test_generic_project_alias_does_not_require_docatlas_product_wording",
+        "definition_line": 133
+      },
+      {
+        "name": "test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+        "definition_line": 144
+      },
+      {
+        "name": "test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+        "definition_line": 165
+      },
+      {
+        "name": "test_generic_first_commands_are_not_docs_mcp_public_tool_inventory",
+        "definition_line": 212
+      },
+      {
+        "name": "test_explicit_docs_mcp_command_inventory_remains_supported",
+        "definition_line": 223
+      },
+      {
+        "name": "test_explicit_docs_mcp_tool_inventory_remains_supported",
+        "definition_line": 234
+      },
+      {
+        "name": "test_generic_architecture_is_not_rewritten_as_mcp_server_architecture",
+        "definition_line": 245
+      },
+      {
+        "name": "test_russian_parser_failure_does_not_generate_mixed_language_rephrase",
+        "definition_line": 263
+      },
+      {
+        "name": "test_broad_retrieval_intent_requires_context_only_delivery",
+        "definition_line": 271
+      },
+      {
+        "name": "test_certified_answer_preservation_requires_a_complete_question_contract",
+        "definition_line": 280
+      },
+      {
+        "name": "test_project_retrieval_disposition_is_structural",
+        "definition_line": 317
+      },
+      {
+        "name": "test_project_scope_aliases_accept_bounded_plural_forms",
+        "definition_line": 332
+      },
+      {
+        "name": "test_project_scope_aliases_reject_prefix_collisions",
+        "definition_line": 337
+      },
+      {
+        "name": "test_current_docatlas_index_persists_across_service_restart_without_resync",
+        "definition_line": 341
+      }
+    ],
+    "original_helpers": [
+      "_EmptyRequirements"
+    ],
+    "other_module": {
+      "path": "tests/docs/test_documentation_query_plan.py",
+      "git_blob_sha": "25de8f3898ba60a33a08425d3e045353fa8014f9",
+      "cases": 70,
+      "changed": false
+    },
+    "ordinary_test_functions_added": 0,
+    "ordinary_test_cases_removed": 0,
+    "diagnostic_inventory_changed": false,
+    "diagnostic_control_node_sha256": "7ae433f3e026f13b67f5a6f9683def90a046b08f59204a1688a75df148b4799a",
+    "old_alias_archive_and_crosswalk_changed": false,
+    "production_changed": false,
+    "selectors_changed": false,
+    "note": "No source/test file is deleted. Existing module paths and test names stay; no external helper/selector retirement is attempted in this precheck."
+  },
+  "preceding_runtime": {
+    "pr_head_sha": "80c8fbbb3e8c379467a9075f93f7165d080f8432",
+    "checkout_commit_sha": "f04b42774b00dadbca48ca579ca9ea234442b750",
+    "checkout_parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "80c8fbbb3e8c379467a9075f93f7165d080f8432"
+    ],
+    "checkout_tree_sha": "a838749f57ff0165ab925590656f64e0799a2e05",
+    "pr_head_tree_sha": "a838749f57ff0165ab925590656f64e0799a2e05",
+    "same_tree_as_pr_head": true,
+    "run_id": 38006157209,
+    "run_attempt": 1,
+    "critical_job_id": 114075319327,
+    "critical_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157209/job/114075319327",
+    "baseline": {
+      "errors": 0,
+      "failures": 0,
+      "mutation": null,
+      "returncode": 0,
+      "roster_sha256": "b4a630000b9791fdb09c4b245bc2b213cba2cb8914b1898bc58116354cc5d585",
+      "run": "baseline",
+      "skipped": 0,
+      "testcase_seconds": 0.10400000000000001,
+      "tests": 53
+    },
+    "normal_intended_kills": 19,
+    "existing_alias_mutant": {
+      "errors": 0,
+      "failures": 1,
+      "mutation": {
+        "after_sha256": "486399aeb7a48cf8d25c9a988963a7aa507043344b3900cc7aa07de2c98fee74",
+        "anchor_count": 1,
+        "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+        "expected_failures": 1,
+        "failure_guard": "critical_alias_no_generated_queries",
+        "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+        "name": "project_retrieval_no_generated_aliases",
+        "new": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return (ProjectRetrievalAlias(\"inferred_query\", \"invented lookup\", True, \"en\"),)",
+        "old": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+        "path": "docmancer/docs/domain/project_retrieval_intent.py"
+      },
+      "returncode": 1,
+      "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a",
+      "run": "project_retrieval_no_generated_aliases",
+      "skipped": 0,
+      "testcase_seconds": 0.004,
+      "tests": 1
+    },
+    "full_core_reader_job_id": 114077935805,
+    "full_core_reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38006157209/job/114077935805",
+    "core_counts": [
+      {
+        "artifact_file": "pytest-core-3.11-38006157209-1/core-tests-3.11.xml",
+        "xml_sha256": "5f63b79277b026b10016ec568b802e3df730cc10de034fd14886bdb1dd264047",
+        "counts": {
+          "PASS": 6057,
+          "FAIL": 1680,
+          "ERROR": 0,
+          "SKIP": 10
+        },
+        "integrity_issues": []
+      },
+      {
+        "artifact_file": "pytest-core-3.12-38006157209-1/core-tests-3.12.xml",
+        "xml_sha256": "751890a134178f8bd44423c7520859ef1933ff89c2ec044f9323fbff0bcfdb2a",
+        "counts": {
+          "PASS": 6057,
+          "FAIL": 1680,
+          "ERROR": 0,
+          "SKIP": 10
+        },
+        "integrity_issues": []
+      },
+      {
+        "artifact_file": "pytest-core-3.13-38006157209-1/core-tests-3.13.xml",
+        "xml_sha256": "fddb34296375b22e7d16c65194b2b0fbb750493eed0bac5a9d92aba651da34d8",
+        "counts": {
+          "PASS": 6057,
+          "FAIL": 1680,
+          "ERROR": 0,
+          "SKIP": 10
+        },
+        "integrity_issues": []
+      }
+    ],
+    "relevant_module_records": [
+      {
+        "module": "tests/docs/test_context7_style_project_chat.py",
+        "counts": {
+          "FAIL": 45,
+          "PASS": 12
+        },
+        "first_node": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases[\\u041a\\u0430\\u043a \\u0443\\u0441\\u0442\\u0430\\u043d\\u043e\\u0432\\u0438\\u0442\\u044c DocAtlas \\u0438 \\u043f\\u0440\\u043e\\u0432\\u0435\\u0440\\u0438\\u0442\\u044c \\u0437\\u0430\\u043f\\u0443\\u0441\\u043a?-installation_verification]",
+        "first_message": "AssertionError: assert 'installation_verification' in set()"
+      },
+      {
+        "module": "tests/docs/test_documentation_query_plan.py",
+        "counts": {
+          "FAIL": 45,
+          "PASS": 25
+        },
+        "first_node": "tests/docs/test_documentation_query_plan.py::test_documentation_query_plan_owns_public_retrieval_query_ids",
+        "first_message": "AssertionError: assert ['query-original'] == []\n  \n  Left contains one more item: 'query-original'\n  \n  Full diff:\n  - []\n  + [\n  +     'query-original',\n  + ]"
+      }
+    ],
+    "console": {
+      "omitted_rows": 0,
+      "complete_cases_in_artifact": true
+    },
+    "limitation": "This actual 53/19 proof is for the preceding published source tree. It does not prove the proposed 24-input control or the new 20th mutant. Full core is still failing."
+  }
+}
