@@ -119,9 +119,7 @@ def project_docs_context(
         and obligations[0].value_kind
     )
     selection = retrieval.get("selection_decision") or {}
-    assignments = (
-        selection.get("assignments") or () if isinstance(selection, dict) else ()
-    )
+    assignments = selection.get("assignments") or () if isinstance(selection, dict) else ()
     assigned_evidence_by_requirement = {
         str(item.get("requirement_id") or ""): str(item.get("evidence_id") or "")
         for item in assignments
@@ -133,9 +131,7 @@ def project_docs_context(
         str(item.get("requirement_id") or "")
         for item in assignments if isinstance(item, dict) and item.get("requirement_id")
     ]
-    query_plan["missing_requirement_ids"] = list(
-        retrieval.get("missing_requirement_ids") or ()
-    )
+    query_plan["missing_requirement_ids"] = list(retrieval.get("missing_requirement_ids") or ())
     context_only_relations = {
         str(value).split(":", 1)[1]
         for value in query_plan.get("missing_requirement_ids") or ()
@@ -175,12 +171,8 @@ def project_docs_context(
     public_query_ids = _public_query_ids(query_plan)
     public_query_id_set = set(public_query_ids)
     host_query_ids = _query_ids_for_origins(query_plan, {"host_lookup"}); need_query_ids = _query_ids_for_origins(query_plan, {"retrieval_need"})
-    exact_anchor_query_ids = _query_ids_for_origins(
-        query_plan, {"exact_anchor", "exact_path"},
-    )
-    canonical_intent_query_ids = _query_ids_for_origins(
-        query_plan, {"canonical_intent"},
-    )
+    exact_anchor_query_ids = _query_ids_for_origins(query_plan, {"exact_anchor", "exact_path"})
+    canonical_intent_query_ids = _query_ids_for_origins(query_plan, {"canonical_intent"})
     audited_rewrite_query_ids = {
         str(item.get("query_id") or "")
         for item in query_plan.get("queries") or ()
@@ -439,9 +431,7 @@ def project_docs_context(
             if query_id in public_query_id_set
         }
         selected_components = {key for source in sources for key in component_witnesses(source, obligations)}
-        missing_compound_priority_ids = (
-            compound_priority_query_ids - qualified_query_ids(sources)
-        )
+        missing_compound_priority_ids = compound_priority_query_ids - qualified_query_ids(sources)
         if len(host_query_ids) > 1 and not (
             query_plan.get("component_scope_complete", True) and obligations
         ):
@@ -659,9 +649,7 @@ def project_docs_context(
             decision_trace.record('selection', 'replaced', 'replaced', original, normalized,
                                   budget_tokens=packet_cost, previous=sources[existing_index])
             sources = candidate_sources
-            snapshot[evidence_id] = _snapshot_entry(
-                original, sources[existing_index],
-            )
+            snapshot[evidence_id] = _snapshot_entry(original, sources[existing_index])
             projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
             if candidate_footprint is not None:
                 selected_footprints[evidence_id] = candidate_footprint
@@ -681,9 +669,7 @@ def project_docs_context(
             "_assigned_requirement_ids": list(assigned_requirement_ids),
         }
         snapshot[evidence_id] = _snapshot_entry(snapshot_source, normalized)
-        projection_inputs[evidence_id] = (
-            raw_snippet, focus_queries, original.get("line_start"),
-        )
+        projection_inputs[evidence_id] = (raw_snippet, focus_queries, original.get("line_start"))
         seen_ids[evidence_id] = len(sources) - 1
         if candidate_footprint is not None:
             selected_footprints[evidence_id] = candidate_footprint
@@ -874,13 +860,10 @@ def _expand_selected_snippets(
             candidate["line_start"], candidate["line_end"] = _focused_line_range(
                 raw_snippet, snippet_start, snippet_end, source_line_start,
             )
-            candidate = _requalify_visible_source(
-                candidate,
-                query_text={
-                    str(item.get("query_id") or ""): str(item.get("text") or "")
-                    for item in query_plan.get("queries") or () if isinstance(item, dict)
-                },
-            )
+            candidate = _requalify_visible_source(candidate, query_text={
+                str(item.get("query_id") or ""): str(item.get("text") or "")
+                for item in query_plan.get("queries") or () if isinstance(item, dict)
+            })
             candidate_ids = qualified_query_ids((candidate,))
             if (not candidate_ids and not component_witnesses(candidate, obligations)) or not (
                 qualified_query_ids((source,)) & set(public_query_ids)
@@ -930,9 +913,7 @@ def _requalify_visible_source(
         ):
             qualified_trace["admission_only"] = True
         matches = merge_query_matches(matches, {str(query_id): qualified_trace})
-    qualified_ids = [
-        query_id for query_id, trace in matches.items() if trace.get("qualified") is True
-    ]
+    qualified_ids = [query_id for query_id, trace in matches.items() if trace.get("qualified") is True]
     return {
         **source,
         "retrieval_query_matches": matches,

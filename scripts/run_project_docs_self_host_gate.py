@@ -54,9 +54,7 @@ from docmancer.docs.interfaces.mcp import context_tools
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROTOCOL_LOCK = json.loads(
-    (REPO_ROOT / "eval/project_context_quality/protocol.lock.json").read_text(
-        encoding="utf-8"
-    )
+    (REPO_ROOT / "eval/project_context_quality/protocol.lock.json").read_text(encoding="utf-8")
 )
 PROTOCOL_THRESHOLDS = dict(PROTOCOL_LOCK.get("thresholds") or {})
 
@@ -81,9 +79,7 @@ class LiveCase:
 
 def _load_gold_cases() -> tuple[LiveCase, ...]:
     payload = json.loads(
-        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(
-            encoding="utf-8"
-        )
+        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(encoding="utf-8")
     )
     return tuple(
         LiveCase(
@@ -100,9 +96,7 @@ def _load_gold_cases() -> tuple[LiveCase, ...]:
             forbidden_answer_fragments=tuple(
                 str(value) for value in case.get("forbidden_answer_fragments") or ()
             ),
-            lookup_queries=tuple(
-                str(value) for value in case.get("lookup_queries") or ()
-            ),
+            lookup_queries=tuple(str(value) for value in case.get("lookup_queries") or ()),
             minimum_lookup_coverage=int(case.get("minimum_lookup_coverage") or 0),
             allowed_paths=tuple(
                 str(value) for value in case.get("allowed_paths") or case.get("sources") or ()
@@ -120,13 +114,10 @@ GOLD_CASES = _load_gold_cases()
 
 def _load_negative_cases() -> tuple[str, ...]:
     payload = json.loads(
-        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(
-            encoding="utf-8"
-        )
+        (REPO_ROOT / "eval/project_context_quality/cases.json").read_text(encoding="utf-8")
     )
     return tuple(
-        str(case["question"])
-        for case in payload.get("cases") or () if not case.get("intent")
+        str(case["question"]) for case in payload.get("cases") or () if not case.get("intent")
     )
 
 
@@ -169,12 +160,8 @@ def _historical_paths() -> set[str]:
 
 
 def _query_coverage(payload: dict[str, object]) -> float:
-    covered = {
-        str(value) for value in payload.get("covered_query_ids") or () if value
-    }
-    missing = {
-        str(value) for value in payload.get("missing_query_ids") or () if value
-    }
+    covered = {str(value) for value in payload.get("covered_query_ids") or () if value}
+    missing = {str(value) for value in payload.get("missing_query_ids") or () if value}
     if covered or missing:
         return len(covered) / len(covered | missing)
     value = payload.get("query_coverage")
@@ -296,7 +283,6 @@ def _is_metadata_only_source(source: object) -> bool:
         if len(re.findall(r"[A-Za-zА-Яа-яЁё0-9_.-]+", without_links)) >= 3:
             return False
     return True
-
 
 
 def _delivery_observation(stage: str, result: object, args: tuple, kwargs: dict) -> dict:
@@ -534,8 +520,7 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService, *, trace_e
     for source in qualified_sources:
         bound = snapshot.get(str(source.get("evidence_id") or ""))
         public_source = {
-            key: value for key, value in source.items()
-            if key in DOCS_CONTEXT_SOURCE_FIELDS
+            key: value for key, value in source.items() if key in DOCS_CONTEXT_SOURCE_FIELDS
         }
         # Optional locators are attached after selection, without altering its
         # evidence. Bind qualification to the exact evidence-bearing fields;
@@ -774,9 +759,7 @@ def run(
                             fragment.casefold() in forbidden_visible
                             for fragment in case.forbidden_answer_fragments
                         ),
-                        "minimum_lookup_coverage": (
-                            len(covered_lookup_ids) >= case.minimum_lookup_coverage
-                        ),
+                        "minimum_lookup_coverage": len(covered_lookup_ids) >= case.minimum_lookup_coverage,
                         "public_query_inventory": (
                             expected_public_ids == actual_public_ids
                             and not covered_ids.intersection(missing_ids)
@@ -937,8 +920,7 @@ def run(
             "top1_fact_bearing_count": sum(bool(row.get("top1_fact_bearing")) for row in positives),
             "metadata_only_evidence_count": sum(len(row.get("observed", {}).get("metadata_only_sources", ())) for row in positives),
             "packs_contamination_count": sum(
-                bool(row.get("observed", {}).get("packs_contamination"))
-                for row in positives
+                bool(row.get("observed", {}).get("packs_contamination")) for row in positives
             ),
             "docs_analysis_contamination_count": sum(
                 any(str(path).startswith("docs/analysis/") for path in _source_paths(row.get("payload", {})))
