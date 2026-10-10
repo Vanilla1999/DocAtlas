@@ -40,6 +40,7 @@ from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.retrieval.query_planning import extract_document_locator
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
 from eval.project_context_quality.capture_public_context import capture_public_call
+from eval.agent_developer_v1.structural_filename_controls import run_structural_filename_controls
 
 REPORT_SCHEMA = "recovery-contract-v2"
 TARGET_MODULES = (
@@ -52,6 +53,8 @@ TARGET_MODULES = (
     "docmancer.docs.application._docs_context_projection_core",
     "docmancer.docs.domain.project_doc_ranking",
     "docmancer.docs.domain.literal_context_admission",
+    "docmancer.docs.domain.query_reference_binding",
+    "eval.agent_developer_v1.structural_filename_controls",
 )
 TREASURE = (
     "What is the documented contract for adaptive treasure gem trip sampling across positions 1,2,3, "
@@ -915,7 +918,9 @@ def closed_literal_context() -> dict[str, Any]:
             indexed_body("DeliveryEpoch CommitLatch")
             rejected("Explain DeliveryEpoch and CommitLatch and VacuumProbe.",
                      "explain_pair_only", "recovery_explain_exact_body")
-    return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks}
+    filename = run_structural_filename_controls(_require, _observed_public_call, _literal_context_replay_controls)
+    return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks,
+            "structural_filename": filename}
 
 
 CASES = (

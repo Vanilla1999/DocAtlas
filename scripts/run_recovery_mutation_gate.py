@@ -32,6 +32,8 @@ MODULE_PATHS = {
     "docmancer.docs.application._docs_context_projection_core": "docmancer/docs/application/_docs_context_projection_core.py",
     "docmancer.docs.domain.project_doc_ranking": "docmancer/docs/domain/project_doc_ranking.py",
     "docmancer.docs.domain.literal_context_admission": "docmancer/docs/domain/literal_context_admission.py",
+    "docmancer.docs.domain.query_reference_binding": "docmancer/docs/domain/query_reference_binding.py",
+    "eval.agent_developer_v1.structural_filename_controls": "eval/agent_developer_v1/structural_filename_controls.py",
 }
 FROZEN_QUESTION_SHA256 = "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b"
 FROZEN_SOURCE_SHA256 = "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
@@ -138,6 +140,38 @@ MUTANTS = (
            'for mention in mentions[:1]:\n            remaining = re.sub(technical_term_pattern(mention.text, exact=True), "", remaining)',
            "closed_literal_context", "recovery_explain_exact_body"),
 
+    Mutant("filename-nomination-disabled", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "    statement = document_statement_mentions(question)",
+           "    statement = None",
+           "closed_literal_context", "recovery_filename_source_fact"),
+    Mutant("filename-collision-first-winner", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "if _structural_filename_label(source.canonical_path, suffixes) == label))",
+           "if _structural_filename_label(source.canonical_path, suffixes) == label))[:1]",
+           "closed_literal_context", "recovery_filename_catalog_ambiguity"),
+    Mutant("filename-global-recheck-only-current-source", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "expected = resolve_references(item[\"question\"], catalog=catalog,",
+           "expected = resolve_references(item[\"question\"], catalog=(current_source,),",
+           "closed_literal_context", "recovery_filename_global_recheck"),
+    Mutant("filename-target-role-not-rechecked", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "                    or actual_ref[\"role\"] != expected_ref.role\n",
+           "",
+           "closed_literal_context", "recovery_filename_reference_roles"),
+    Mutant("filename-frame-ignores-extra-clause", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "r\"(?P<literal>\\w+)\\?\\s*\", question,",
+           "r\"(?P<literal>\\w+)\\?(?:[ \\t]+Also\\b[^\\n]*)?\\s*\", question,",
+           "closed_literal_context", "recovery_filename_complete_syntax"),
+    Mutant("filename-partial-stem-becomes-locator", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "if _structural_filename_label(source.canonical_path, suffixes) == label))",
+           "if label in (_structural_filename_label(source.canonical_path, suffixes) or \"\")))",
+           "closed_literal_context", "recovery_filename_whole_label"),
+    Mutant("filename-casefold-becomes-locator", MODULE_PATHS["docmancer.docs.domain.query_reference_binding"],
+           "if _structural_filename_label(source.canonical_path, suffixes) == label))",
+           "if (_structural_filename_label(source.canonical_path, suffixes) or \"\").casefold() == label.casefold()))",
+           "closed_literal_context", "recovery_filename_whole_label"),
+    Mutant("filename-path-filter-hides-collision", MODULE_PATHS["docmancer.docs.application.source_reference_evidence"],
+           "        return (tuple(self.naming_sources) if document_statement_mentions(text) is not None\n                else tuple(self.sources.values()))",
+           "        return tuple(self.sources.values())",
+           "closed_literal_context", "recovery_filename_path_selection_not_naming_scope"),
 )
 
 

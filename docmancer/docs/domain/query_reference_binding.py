@@ -1,9 +1,10 @@
 """Pure occurrence-aware query reference resolution."""
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from functools import lru_cache
 from typing import Literal, Sequence
 import hashlib
+import json
 from pathlib import PurePosixPath
 import re
 
@@ -119,6 +120,112 @@ def _source_ids(name: str, catalog: Sequence[CatalogSource], suffixes: frozenset
     return ()
 
 
+
+def document_statement_mentions(question: str) -> tuple[QueryMention, QueryMention] | None:
+    """A closed filename nomination and one unchanged literal body identifier.
+
+    Only the frame is case-insensitive. The whole filename label and identifier
+    retain their exact spelling and original character coordinates. Catalog
+    membership, source identity and useful body content are checked separately.
+    """
+    match = re.fullmatch(
+        r"\s*(?i:what)[ \t]+(?i:does)[ \t]+(?i:the)[ \t]+"
+        r"(?P<label>[^\W_]+(?: [^\W_]+)*)[ \t]+(?i:say)[ \t]+(?i:about)[ \t]+"
+        r"(?P<literal>\w+)\?\s*", question,
+    )
+    if match is None:
+        return None
+    target = next((mention for mention in query_mentions(question)
+                   if (mention.start, mention.end) == match.span("literal")
+                   and mention.text == match["literal"] and mention.text.isidentifier()
+                   and not mention.explicit and mention.syntax_role == "unresolved"), None)
+    if target is None:
+        return None
+    start, end = match.span("label")
+    digest = hashlib.sha256(question.encode("utf-8")).hexdigest()
+    return QueryMention(f"{digest}:{start}:{end}", start, end, match["label"],
+                        "source_locator", True), target
+
+
+def _structural_filename_label(path: str, suffixes: frozenset[str]) -> str | None:
+    """Whole case-preserving stem; only single ASCII separators can differ."""
+    normalized = normalize_reference_path(path)
+    if (not normalized or normalized.startswith(("/", "~/"))
+        or any(part in {"", ".", ".."} for part in normalized.split("/"))
+        or re.match(r"^[A-Za-z]:", normalized)):
+        return None
+    leaf = PurePosixPath(normalized)
+    if leaf.suffix.casefold() not in suffixes:
+        return None
+    stem = leaf.stem
+    if re.fullmatch(r"[^\W_]+(?:[-_ ][^\W_]+)*", stem) is None:
+        return None
+    return stem.replace("-", " ").replace("_", " ")
+
+
+def _structural_source_ids(label: str, catalog: Sequence[CatalogSource],
+                           suffixes: frozenset[str]) -> tuple[str, ...]:
+    # Count catalog entries, not distinct IDs or ranked hits. A collision cannot
+    # disappear through deduplication, a basename tier, or identical file bytes.
+    return tuple(sorted(source.document_id for source in catalog
+                        if _structural_filename_label(source.canonical_path, suffixes) == label))
+
+
+def naming_catalog_inventory(catalog: Sequence[CatalogSource], *, scope: ScopeKey,
+                             catalog_complete: bool) -> dict:
+    """Snapshot-owned inventory only; no caller/chunk metadata nominates rows."""
+    return {
+        "schema_version": 1, "scope": asdict(scope), "complete": catalog_complete,
+        "sources": [asdict(source) for source in sorted(
+            catalog, key=lambda source: (source.canonical_path, source.document_id))],
+    }
+
+
+def naming_catalog_digest(inventory: dict) -> str:
+    """Bind the full inventory to its prepared plan; a digest is not authority."""
+    encoded = json.dumps(inventory, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _checked_naming_catalog(plan: dict, evidence: dict, identity: dict) -> tuple[CatalogSource, ...] | None:
+    inventory = evidence.get("naming_catalog")
+    scope = identity.get("scope")
+    if (not isinstance(inventory, dict)
+        or set(inventory) != {"schema_version", "scope", "complete", "sources"}
+        or type(inventory.get("schema_version")) is not int or inventory["schema_version"] != 1
+        or inventory.get("complete") is not True or plan.get("catalog_complete") is not True
+        or not isinstance(scope, dict) or set(scope) != {"project_id", "version", "snapshot_id"}
+        or any(type(scope.get(key)) is not str for key in scope)
+        or not scope["project_id"] or not scope["snapshot_id"]
+        or inventory.get("scope") != scope or plan.get("scope") != scope):
+        return None
+    rows = inventory.get("sources")
+    if not isinstance(rows, list):
+        return None
+    sources, identities, paths = [], set(), set()
+    for row in rows:
+        if (not isinstance(row, dict)
+            or set(row) != {"document_id", "scope", "canonical_path", "content_sha256"}
+            or not isinstance(row.get("scope"), dict) or row["scope"] != scope
+            or any(type(row.get(key)) is not str or not row[key]
+                   for key in ("document_id", "canonical_path", "content_sha256"))
+            or re.fullmatch(r"[0-9a-f]{64}", row["content_sha256"]) is None):
+            return None
+        path = normalize_reference_path(row["canonical_path"])
+        if (path.startswith(("/", "~/")) or re.match(r"^[A-Za-z]:", path)
+            or any(part in {"", ".", ".."} for part in path.split("/"))
+            or row["document_id"] in identities or path in paths):
+            return None
+        identities.add(row["document_id"])
+        paths.add(path)
+        sources.append(CatalogSource(row["document_id"], ScopeKey(**scope),
+                                     row["canonical_path"], row["content_sha256"]))
+    if (sum(asdict(source) == identity for source in sources) != 1
+        or plan.get("naming_catalog_sha256") != naming_catalog_digest(inventory)):
+        return None
+    return tuple(sources)
+
+
 def resolve_references(
     question: str, *, catalog: Sequence[CatalogSource], scope: ScopeKey,
     catalog_complete: bool = True, document_suffixes: frozenset[str] = DOCUMENT_SUFFIXES,
@@ -126,7 +233,27 @@ def resolve_references(
     """Link occurrences to a complete already-allowed snapshot, never top-k."""
     allowed = tuple(source for source in catalog if source.scope == scope)
     references = []
-    for mention in query_mentions(question):
+    statement = document_statement_mentions(question)
+    mentions = query_mentions(question)
+    if statement is not None:
+        locator, _target = statement
+        mentions = tuple(sorted(
+            (locator, *(mention for mention in mentions
+                        if not (mention.start < locator.end and locator.start < mention.end))),
+            key=lambda mention: (mention.start, mention.end),
+        ))
+    for mention in mentions:
+        if statement is not None and mention.mention_id == statement[0].mention_id:
+            if catalog_complete is not True or not scope.project_id or not scope.snapshot_id:
+                ids, state, reason = (), "unresolved", "incomplete_source_catalog"
+            else:
+                ids = _structural_source_ids(mention.text, allowed, document_suffixes)
+                state = "resolved" if len(ids) == 1 else "ambiguous" if ids else "missing"
+                reason = {"resolved": "unique_structural_catalog_source",
+                          "ambiguous": "ambiguous_structural_source_locator",
+                          "missing": "missing_structural_source_locator"}[state]
+            references.append(ResolvedReference(mention, "source_locator", state, ids, reason))
+            continue
         role = mention.syntax_role
         ids: tuple[str, ...] = ()
         state: ResolutionState = "resolved"
@@ -167,10 +294,23 @@ def reference_body_question(plan: dict) -> str:
 def _valid_reference_plan(plan: dict, scope: dict) -> bool:
     if not isinstance(plan, dict) or plan.get("scope") != scope:
         return False
-    question = str(plan.get("question") or "")
+    question, references = plan.get("question"), plan.get("references")
+    if not isinstance(question, str) or not isinstance(references, (list, tuple)):
+        return False
     digest = hashlib.sha256(question.encode("utf-8")).hexdigest()
-    for ref in plan.get("references") or ():
-        mention = ref.get("mention") or {}
+    for ref in references:
+        if not isinstance(ref, dict) or not isinstance(ref.get("mention"), dict):
+            return False
+        mention = ref["mention"]
+        if (type(ref.get("role")) is not str
+            or ref["role"] not in {"source_locator", "symbol_identity", "semantic_subject", "retrieval_anchor", "unresolved"}
+            or type(ref.get("state")) is not str
+            or ref["state"] not in {"resolved", "ambiguous", "missing", "unresolved"}
+            or type(ref.get("reason")) is not str
+            or type(mention.get("explicit")) is not bool
+            or not isinstance(ref.get("source_ids"), (list, tuple))
+            or any(type(value) is not str for value in ref["source_ids"])):
+            return False
         start, end = mention.get("start"), mention.get("end")
         if (type(start) is not int or type(end) is not int or not 0 <= start < end <= len(question)
             or question[start:end] != mention.get("text")
@@ -242,8 +382,41 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
         return result, "reference_plan_mismatch"
     bindings = []
     seen = set()
+    current_source = CatalogSource(
+        str(identity.get("document_id") or ""),
+        ScopeKey(str(scope.get("project_id") or ""), str(scope.get("version") or ""),
+                 str(scope.get("snapshot_id") or "")),
+        str(identity.get("canonical_path") or ""), str(identity.get("content_sha256") or ""),
+    )
     for item in (root, plan):
-        for ref in (item or {}).get("references") or ():
+        if item is None:
+            continue
+        statement = document_statement_mentions(item["question"])
+        if statement is not None:
+            catalog = _checked_naming_catalog(item, evidence, identity)
+            if catalog is None:
+                return result, "invalid_structural_source_catalog"
+            expected = resolve_references(item["question"], catalog=catalog,
+                                          scope=current_source.scope, catalog_complete=True)
+            # A missing/rewritten source reference cannot downgrade a closed
+            # filename request into an unconstrained body lookup.
+            if len(item["references"]) != len(expected.references):
+                return result, "structural_source_plan_mismatch"
+            for actual_ref, expected_ref in zip(item["references"], expected.references):
+                if (actual_ref["mention"] != asdict(expected_ref.mention)
+                    or actual_ref["role"] != expected_ref.role
+                    or actual_ref["state"] != expected_ref.state
+                    or actual_ref["reason"] != expected_ref.reason
+                    or tuple(actual_ref["source_ids"]) != expected_ref.source_ids):
+                    return result, "structural_source_plan_mismatch"
+        else:
+            # Recheck existing literal syntax as well as the current path. A
+            # forged old-style role cannot bypass the closed-frame verifier.
+            expected = resolve_references(item["question"], catalog=(current_source,),
+                                          scope=current_source.scope, catalog_complete=True)
+        expected_locators = {ref.mention.mention_id: ref for ref in expected.references
+                             if ref.role == "source_locator"}
+        for ref in item["references"]:
             mention = ref["mention"]
             if mention["mention_id"] in seen or ref.get("role") != "source_locator":
                 continue
@@ -252,22 +425,15 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
                 return result, str(ref.get("reason") or "unresolved_source_locator")
             if identity.get("document_id") not in ref.get("source_ids", ()):
                 return result, "source_locator_mismatch"
-            # Serialized role/IDs alone cannot turn an unrelated source into a
-            # locator witness. Recheck the literal against the current path,
-            # using the same filename/stem tiers as catalog resolution.
-            current_source = CatalogSource(
-                str(identity.get("document_id") or ""),
-                ScopeKey(str(scope.get("project_id") or ""),
-                         str(scope.get("version") or ""),
-                         str(scope.get("snapshot_id") or "")),
-                str(identity.get("canonical_path") or ""),
-                str(identity.get("content_sha256") or ""),
-            )
-            if current_source.document_id not in _source_ids(
-                str(mention.get("text") or ""), (current_source,), DOCUMENT_SUFFIXES
-            ):
+            recomputed = expected_locators.get(mention["mention_id"])
+            if (recomputed is None or recomputed.state != "resolved"
+                or asdict(recomputed.mention) != mention
+                or recomputed.source_ids != (current_source.document_id,)):
                 return result, "source_locator_mismatch"
-            bindings.append({"mention_id": mention["mention_id"], "role": "source_locator", "field": "path", **identity})
+            binding = {"mention_id": mention["mention_id"], "role": "source_locator", "field": "path", **identity}
+            if statement is not None:
+                binding["syntax"] = "structural_filename"
+            bindings.append(binding)
     if plan is not None:
         body_question = reference_body_question(plan)
         exact_plan = plan

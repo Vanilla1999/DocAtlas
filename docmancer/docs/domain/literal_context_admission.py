@@ -11,7 +11,7 @@ import re
 from typing import Any, Mapping
 
 from .evidence_qualification import _relation_units, qualify_evidence
-from .query_reference_binding import QueryMention, query_mentions
+from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
 from .query_terms import documentation_query_terms, query_constraint_roles
 from .technical_tokens import technical_term_pattern
 
@@ -250,6 +250,27 @@ def admit_original_literal_context(
         count_witness = _count_context_witness(evidence_text, visible_span[0], count_context)
         if count_witness is not None:
             witnesses.append(count_witness)
+    statement_context = document_statement_mentions(question)
+    if (statement_context is not None and isinstance(visible_span, (list, tuple))
+        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
+        and visible_span[1] - visible_span[0] == len(evidence_text)):
+        locator, target = statement_context
+        # A path is supplied only by the canonical qualifier's fresh full-catalog
+        # recheck. The bare body target stays unresolved and gains no query role.
+        source_bound = any(
+            binding.get("mention_id") == locator.mention_id
+            and binding.get("role") == "source_locator" and binding.get("field") == "path"
+            and binding.get("syntax") == "structural_filename"
+            and all(binding.get(key) == value for key, value in identity.items())
+            for binding in qualification.trace.get("reference_bindings") or ()
+        )
+        if source_bound:
+            for witness in _explain_context_witnesses(evidence_text, visible_span[0], (target,)):
+                witnesses.append({
+                    **witness, "kind": "literal_document_statement_context",
+                    "source_mention_id": locator.mention_id,
+                    "source_query_char_start": locator.start, "source_query_char_end": locator.end,
+                })
     if not witnesses:
         return None
     return {
