@@ -464,6 +464,15 @@ MUTANTS = (
         1,
         "critical_question_contract_no_inferred_obligations",
     ),
+    Mutant(
+        "project_read_original_is_not_truncated",
+        "docmancer/docs/interfaces/mcp/context_tools.py",
+        "    question = args.get(\"question\") if isinstance(args.get(\"question\"), str) else \"\"",
+        "    question = args.get(\"question\")[:4000] if isinstance(args.get(\"question\"), str) else \"\"",
+        TARGET_TESTS[11],
+        1,
+        "critical_project_read_original_input_fidelity",
+    ),
 )
 
 

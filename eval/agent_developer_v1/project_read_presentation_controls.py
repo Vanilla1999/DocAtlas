@@ -312,15 +312,29 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
         def stop_before_acquisition(*_args, **_kwargs):
             attempted.append(True)
             raise AssertionError("invalid request reached acquisition")
-        for label, changes in (
-            ("too_many_host_lookups", {"lookup_queries": [f"Probe{index}" for index in range(6)]}),
-            ("oversized_original", {"question": "x" * 4001}),
-        ):
-            with patch.object(app, "get_docs_context", stop_before_acquisition):
-                failure = call_docs_tool_payload("get_docs_context", {**request, **changes}, actual)
-            require(not attempted and not failure.get("sources") and failure.get("status") != "ok",
-                    "critical_project_read_request_work_bound", {"label": label})
-            labels.append(label)
+        label = "too_many_host_lookups"
+        changes = {"lookup_queries": [f"Probe{index}" for index in range(6)]}
+        with patch.object(app, "get_docs_context", stop_before_acquisition):
+            failure = call_docs_tool_payload("get_docs_context", {**request, **changes}, actual)
+        require(not attempted and not failure.get("sources") and failure.get("status") != "ok",
+                "critical_project_read_request_work_bound", {"label": label})
+        labels.append(label)
+
+        # The public schema has no 4000-character question ceiling. The legacy
+        # compiler's internal work bound must not truncate the host's original.
+        long_original = "x" * 4001
+        forwarded = []
+        def capture_original(source_question, **_kwargs):
+            forwarded.append(source_question)
+            raise TimeoutError("fixture original identity capture")
+        with (patch.object(app, "get_docs_context", capture_original),
+              patch.object(RetrievalDispatcher, "run", deny_acquisition)):
+            failure = call_docs_tool_payload("get_docs_context",
+                {**request, "question": long_original}, actual)
+        require(forwarded == [long_original] and not failure.get("sources")
+                and failure.get("status") == "failed",
+                "critical_project_read_original_input_fidelity")
+        labels.append("long_original_identity")
 
         interrupted = []
         def interrupted_dispatch(*_args, **_kwargs):
