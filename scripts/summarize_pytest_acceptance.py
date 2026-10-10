@@ -107,6 +107,11 @@ def main() -> int:
     for lane in reports:
         emit("JUNIT_COUNTS", {key: value for key, value in lane.items() if key != "cases"})
     tracked_modules = {
+        "tests/docs/test_context7_style_project_chat.py",
+        "tests/test_docs_service_part03.py",
+        "tests/docs/test_mixed_context_projection_contract.py",
+        "tests/test_project_context_quality_acceptance.py",
+        "tests/test_project_context_quality_protocol.py",
         "tests/docs/test_action_packet.py",
         "tests/docs/test_action_packet_part02.py",
         "tests/docs/test_context_completion_followup.py",
@@ -130,10 +135,14 @@ def main() -> int:
                 "counts": {key: counts[key] for key in ("PASS", "FAIL", "ERROR", "SKIP")},
                 "nodes": [{"node": row["node"], "outcome": row["outcome"]} for row in selected
                           if module.endswith("_contract.py") or module in {
+                              "tests/docs/test_context7_style_project_chat.py",
+                              "tests/test_docs_service_part03.py",
                               "tests/docs/test_context_projection_boundaries.py",
                               "tests/docs/test_pr211_catalog_equivalence.py",
                               "tests/test_mcp_delivery_dispatch_boundary.py",
                           } or any(name in row["node"] for name in (
+                              "test_legacy_compatibility_floor_keeps_original_threshold_and_hard_safety",
+                              "test_runner_forwards_scope_and_requires_each_fact_group",
                               "test_member_read_rejects_invalid_storage_without_repair",
                               "test_real_service_retrieves_committed_fixture_member_bytes",
                               "test_source_map_includes_generated_path_for_explicit_artifact_question",
@@ -154,6 +163,7 @@ def main() -> int:
             emit("JUNIT_MODULE", {"module": module, "counts": dict(counts),
                                   "first_node": first["node"], "first_message": message[:500]})
     focused = {
+        "tests/docs/test_mixed_context_projection_contract.py",
         "tests/docs/test_context_projection_boundaries.py",
         "tests/docs/test_pr211_catalog_equivalence.py",
         "tests/test_mcp_delivery_dispatch_boundary.py",
@@ -167,7 +177,11 @@ def main() -> int:
     for row in preferred["cases"]:
         if row["outcome"] not in {"FAIL", "ERROR"}:
             continue
-        if row["module"] in focused or "delivery_veto_observer" in row["node"]:
+        if row["module"] in focused or any(name in row["node"] for name in (
+            "delivery_veto_observer",
+            "test_legacy_compatibility_floor_keeps_original_threshold_and_hard_safety",
+            "test_runner_forwards_scope_and_requires_each_fact_group",
+        )):
             details = [
                 {**reason, "message": reason["message"][:2000], "trace": reason["trace"][-6000:]}
                 for reason in row["reasons"]
