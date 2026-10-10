@@ -211,3 +211,38 @@ guards/counts/errors/skips, historical source checkout и runtime section
 base. Новые recovery 12/43 и critical baseline/все intended kills на конечном
 tree остаются **PENDING**. Предыдущие receipts, включая возможный результат
 136, нельзя выдать за собственный proof кода core0eb.
+
+## Private projection diagnostics: новая текущая hash-привязка, PENDING
+
+Этот раздел сохраняет весь предыдущий текст как историческое описание. Последующая
+диагностика различает core payload и фактически валидированный MCP result, не меняя
+raw admission, formatter, frozen inputs, mutation texts или intended guards.
+
+Текущий core: `0eb803a9105bbb2b4e07e0659eb46b7739725f28` → `e78efba8d381104b9d5d4ac32d25dad6ad1433d4`.
+Before SHA-256 нового core: `97f0876ecd70548773b5ab1f6356251bb870ff5f99da77c92ba4a0eab1bddb90`.
+
+Независимая pair-context интеграция 149 уже изменила текущий literal owner:
+`42a7f7ff3daa530585721c1f98bc39a978f2e2d4`, before SHA-256
+`96bfa45783ce7dc86927f01af385e214b05790cc8cf380b52ef16bdb3eca45b0`.
+Поэтому старые три admission after hashes выше тоже являются историческими.
+
+| Существующий fault | Текущий owner | Anchor count | After SHA-256 | Intended guard |
+| --- | --- | ---: | --- | --- |
+| `literal-raw-window-escapes-candidate-span` | literal 42a7f7ff | 1 | `394b14e98da954f5621cbd7343fb1bb3c074ca3b18e2bde4632796e73df5ebc3` | `recovery_literal_raw_window_span_replay` |
+| `literal-raw-window-uses-trimmed-origin` | literal 42a7f7ff | 1 | `ce75d010ac744a36391aea1a4825f61b1c4391d01a5f959844402a3bf80e2234` | `recovery_literal_raw_window_coordinates` |
+| `literal-raw-window-trimmed-on-wire` | core e78efba8 | 1 | `aa6274808186d502960f17a087daa8d6de21e3cc0d0c0bf92c5987be48f44221` | `recovery_literal_raw_window_fact` |
+| `literal-symbol-ignores-raw-window-rejection` | literal 42a7f7ff | 1 | `884d2877fef6cc76f4a1b34b8cc3dfd368e5e30aa7b66b2b9496032eb138442f` | `recovery_literal_explicit_raw_window_span_replay` |
+
+Все значения заново получены exact текстовой заменой одного anchor в текущем
+исходнике. Runner, порядок guards и expected failure/error counts не меняются.
+Это проверка recipes без импорта/исполнения Python; новый same-tree baseline
+и каждый intended kill по-прежнему обязательны. Исторические receipts не
+приписываются новым owner hashes.
+
+Для relation-callable-context-as-answer сохранён прежний двухстрочный anchor
+сразу после _payload; legacy diagnostic assignment специально оставлен целиком.
+After SHA-256: `2a19b5c266132f742f165e93b201b01cdaf548d45f74a2bf4fa0478e40e89c30`.
+Structured crosswalk обновляет только три current recipe scalars и добавляет
+projection_observation_recipe_rebase с historical_receipts_reused=false.
+Frozen inputs, старые rebase records и runtime section остаются прежними.
+Удаление этого append-only раздела восстанавливает предыдущую note побайтно.

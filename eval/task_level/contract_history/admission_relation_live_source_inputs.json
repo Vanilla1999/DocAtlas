@@ -198,13 +198,13 @@
       {
         "name": "relation-callable-context-as-answer",
         "path": "docmancer/docs/application/_docs_context_projection_core.py",
-        "base_blob": "0eb803a9105bbb2b4e07e0659eb46b7739725f28",
+        "base_blob": "e78efba8d381104b9d5d4ac32d25dad6ad1433d4",
         "before": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "after": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if original_question.startswith(\"Can \"):\n        payload.update(answer_supported=True, answer_available=True)\n        _refresh_estimate(payload)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "failure_guard": "critical_relation_public_no_answer_authority",
         "expected_anchor_occurrences": 1,
-        "expected_before_sha256": "866d6154c0d59dd4ab76ea946cb408a2cc440e073f2988f41bdf34ef32837de2",
-        "expected_after_sha256": "cdf41b4904080184d4e4cff844008b6afdcbec4de8f70ce36024fe9ba62b5e98",
+        "expected_before_sha256": "97f0876ecd70548773b5ab1f6356251bb870ff5f99da77c92ba4a0eab1bddb90",
+        "expected_after_sha256": "2a19b5c266132f742f165e93b201b01cdaf548d45f74a2bf4fa0478e40e89c30",
         "expected_failed_cases": 1,
         "expected_errors": 0,
         "expected_skipped": 0
@@ -239,6 +239,15 @@
     "current_core_blob": "0eb803a9105bbb2b4e07e0659eb46b7739725f28",
     "previous_rebase_record": "mutation_recipe_rebase is retained as the historical raw-window integration record.",
     "historical_source_checkout_retained": true,
+    "historical_receipts_reused": false
+  },
+  "projection_observation_recipe_rebase": {
+    "status": "PENDING_SAME_TREE_BASELINE_AND_INTENDED_KILL",
+    "reason": "Private diagnostic counts and attempt provenance change the owning source hash; frozen input, exact fault anchor, fault text, intended guard and runtime remain unchanged.",
+    "previous_core_blob": "0eb803a9105bbb2b4e07e0659eb46b7739725f28",
+    "current_core_blob": "e78efba8d381104b9d5d4ac32d25dad6ad1433d4",
+    "historical_source_checkout_retained": true,
+    "historical_rebase_records_retained": true,
     "historical_receipts_reused": false
   }
 }

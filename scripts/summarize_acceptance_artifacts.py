@@ -129,6 +129,7 @@ def print_focused_stage_records(report: dict[str, Any], emit=print) -> None:
                     "retrieved_candidates", "retrieved_candidate_ids", "qualification_rejections",
                     "pre_projection_qualified_ids", "ranked_candidate_ids", "selected_candidate_ids",
                     "considered_variants", "projection_rejections", "final_visible_evidence_ids",
+                    "projection_observation",
                 )),
                 "qualification_outcomes": [
                     _focused_qualification(row) for row in outcomes if isinstance(row, dict)
@@ -295,6 +296,7 @@ def _selection_operand_summary(record: dict) -> dict:
             "diagnostics_present", "stage_status", "observer_counts",
             "pre_projection_qualified_ids", "selected_candidate_ids", "considered_variants",
             "projection_rejections", "final_visible_evidence_ids",
+            "projection_observation",
         )),
         "claim_boundary": (
             "existing_bounded_same_call_source_hashes_and_decisions; no body reread, "

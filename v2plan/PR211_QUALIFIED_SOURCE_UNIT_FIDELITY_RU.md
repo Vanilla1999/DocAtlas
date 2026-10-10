@@ -178,3 +178,32 @@ Core остаётся в существующем 1000-line footprint.
 новая функция. Source-only review не заменяет healthy run и intended kills.
 Локальное исполнение, импорты, pytest, subprocess, refs и commits агентом не
 выполнялись.
+
+## Последующая private диагностика: текущие recipes, PENDING
+
+Весь предыдущий раздел фиксирует исходную подготовку unit-fidelity slice 139.
+После него private projection diagnostics меняет hash owning core без изменений
+selection predicates, source-unit inventory, fixture inputs, names или runner.
+
+Текущий core blob: `e78efba8d381104b9d5d4ac32d25dad6ad1433d4` (998 physical lines).
+Before SHA-256: `97f0876ecd70548773b5ab1f6356251bb870ff5f99da77c92ba4a0eab1bddb90`.
+
+| Существующий fault | Anchor count | Новый After SHA-256 | Intended guard |
+| --- | ---: | --- | --- |
+| `project_read_preserves_units_after_query_coverage` | 1 | `f5c9934746217c0584723a40bf54532a84663a1dd12f814548c208bedc5a5499` | `critical_project_read_distinct_lookup_units` |
+| `project_read_preserves_units_without_new_query_terms` | 1 | `35c651fc57953c936de4ab6d06972607406b93d5b3dcb718306b9007b2593806` | `critical_project_read_distinct_lookup_units` |
+
+Оба исходных before/after текста и guard сохранены. Exact подстановка заново
+проверена по текущему core; это не runtime kill. В runner остаются прежние
+selectors, case counts, import-origin проверки и строгие expected first guards.
+
+Новый observer показывает подготовленные варианты отдельно от принятых
+selection events и конечных source IDs после прежней model-visible validation.
+Он не добавляет source reads, reranking, requalification или projection replays.
+Неизменённый native24 control и обе detached replays должны пройти в обычном
+совместном CI на конечном tree. Исторические PASS к новым hashes не переносятся.
+
+Другие последующие изменения fixture setup (включая public patch surface/ACK)
+не переписывают изложенную выше историческую стоимость исходного slice 139.
+Этот раздел не утверждает новый healthy baseline, результат всех V2 obligations
+или готовность PR к merge. Удаление только раздела возвращает base note точно.

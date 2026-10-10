@@ -7,7 +7,7 @@ import hashlib
 import re
 from typing import Any
 from ._docs_context_payload import _payload
-from .projection_decision_trace import ProjectionDecisionTrace
+from .projection_decision_trace import ProjectionDecisionTrace, record_ranked_candidates, record_core_sources
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources, restore_visible_sources
 from .qualified_support_units import DeliveryUnit, VariantFootprint
@@ -75,6 +75,7 @@ def project_docs_context(
         return blocked, {}
     projection_diagnostics = {
         "qualified_variants": 0, "budget_rejections": 0,
+        "attempt_kind": "hint" if _allow_context_hints else "primary",
         "ranked_candidate_ids": [], "considered_variants": [],
         "projection_rejections": [], "final_visible_evidence_ids": [],
     }
@@ -227,10 +228,7 @@ def project_docs_context(
         assigned_evidence_ids=set(assigned_evidence_by_requirement.values()),
         bound_assigned_evidence_ids=required_assigned_evidence_ids,
     )
-    projection_diagnostics["ranked_candidate_ids"] = [
-        _internal_candidate_id(item) for item in initially_ranked[:32]
-        if _internal_candidate_id(item)
-    ]
+    record_ranked_candidates(projection_diagnostics, initially_ranked, _internal_candidate_id)
     prepared: list[dict[str, Any]] = []
     literal_context_candidates: list[tuple[dict[str, Any], dict[str, Any], dict[str, Any]]] = []
     variant_inputs: dict[int, tuple[Any, ...]] = {}
@@ -766,6 +764,7 @@ def project_docs_context(
         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
         if source.get("evidence_id")
     ]
+    record_core_sources(projection_diagnostics, payload["sources"])
     if selection_diagnostics is not None:
         selection_diagnostics["component_coverage"] = component_decision.as_payload()
     snapshot = {

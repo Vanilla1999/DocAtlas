@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
+from docmancer.docs.application.projection_decision_trace import same_call_projection_observation
 from docmancer.docs.application.source_continuation import (
     bind_project_source_continuations,
 )
@@ -674,6 +675,9 @@ def _observe_same_call_diagnostics(
             "final_visible_evidence_ids": final_ids,
         })
     try:
+        diagnostics["projection_observation"] = same_call_projection_observation(
+            raw, projection, delivery_blocked=delivery_blocked,
+        )
         observer(diagnostics)
     except Exception:
         # Debug observers cannot alter the validated public MCP result.
