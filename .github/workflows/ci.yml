@@ -403,7 +403,7 @@ jobs:
 
   acceptance-diagnostics:
     if: ${{ !cancelled() }}
-    needs: [test]
+    needs: [test, advanced-contract]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -418,17 +418,39 @@ jobs:
         with:
           pattern: pytest-core-*-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/core-junit
+      - name: Download existing quality reports
+        if: ${{ !cancelled() }}
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: project-docs-quality-${{ github.run_id }}
+          path: ${{ runner.temp }}/quality-reports
+      - name: Download existing contract reports
+        if: ${{ !cancelled() }}
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          pattern: critical-mutation-gate-${{ github.run_id }}
+          path: ${{ runner.temp }}/contract-reports
       - name: Summarize exact existing executions
+        if: ${{ !cancelled() }}
         run: >-
           python scripts/summarize_pytest_acceptance.py
           --input-dir "$RUNNER_TEMP/core-junit"
           --output "$RUNNER_TEMP/pytest-acceptance-diagnostics.json"
+      - name: Summarize existing quality and contract evidence
+        if: ${{ !cancelled() }}
+        run: >-
+          python scripts/summarize_acceptance_artifacts.py
+          --quality-dir "$RUNNER_TEMP/quality-reports/project-docs-quality-${{ github.run_id }}"
+          --contract-dir "$RUNNER_TEMP/contract-reports/critical-mutation-gate-${{ github.run_id }}"
+          --output "$RUNNER_TEMP/acceptance-artifact-diagnostics.json"
       - name: Upload complete diagnostic ledger
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: pytest-acceptance-diagnostics-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/pytest-acceptance-diagnostics.json
+          path: |
+            ${{ runner.temp }}/pytest-acceptance-diagnostics.json
+            ${{ runner.temp }}/acceptance-artifact-diagnostics.json
           if-no-files-found: warn
           retention-days: 14
 
