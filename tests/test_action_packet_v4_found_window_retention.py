@@ -110,7 +110,11 @@ def test_final_merge_retains_qualified_windows_without_changing_acquisition(pipe
         lookup_queries=('record binding',), limit=20, retain_found_windows=True, _control_chunks=control)
     assert p.acquisitions == calls
     assert [row.model_dump() for row in control] == [row.model_dump() for row in bounded]
-    assert len(retained) == 32 > len(bounded)
+    expected = {row.metadata['stable_chunk_id']: row.text for row in p.chunks}
+    assert len(expected) == 32
+    for rows in (bounded, retained):
+        assert len(rows) == len(expected)
+        assert {row.metadata['stable_chunk_id']: row.text for row in rows} == expected
     assert sum(row.metadata['token_estimate'] for row in retained) > 4000
     assert sum(len(row.text.encode()) for row in retained) > 64 * 1024
     assert all(row.metadata['retrieval_query_matches']['query-original']['qualified'] is True for row in retained)
@@ -537,7 +541,11 @@ def test_real_generation_context_retention_preserves_control_and_read_traces(sto
     assert retained.selection_decision == bounded.selection_decision
     assert retained.project_docs == bounded.project_docs
     assert retained.diagnostics['retrieval_routing'] == bounded.diagnostics['retrieval_routing']
-    assert len(retained.context_pack) > len(bounded.context_pack)
+    expected = {row.metadata['stable_chunk_id']: row.text for row in p.chunks}
+    assert expected
+    for result in (bounded, retained):
+        assert len(result.context_pack) == len(expected)
+        assert {row['stable_chunk_id']: row['content'] for row in result.context_pack} == expected
     assert all(row['_reference_evidence']['source']['scope']['snapshot_id'] == f.generation
                for row in retained.context_pack)
 
@@ -582,7 +590,9 @@ def test_completed_invocation_cannot_deliver_another_result_or_sink(pipeline, su
             bounded_kwargs = {key: value for key, value in kwargs.items()
                               if key not in {'retain_found_windows', '_retention_ack'}}
             bounded = original(receiver, *args, **bounded_kwargs)
-            assert bounded is not result and len(bounded.context_pack) < len(result.context_pack)
+            # Completion belongs to one returned object, even when both calls
+            # preserve every acquired window.
+            assert bounded is not result
             return bounded
         if substitution == 'changed_result':
             result.context_pack[:] = result.context_pack[:4]
@@ -714,7 +724,9 @@ def test_unacknowledged_query_preserves_noncopyable_requirements(pipeline, reten
         requirements=requirements, **retention_kwargs)
     assert len(received) == 2 and all(value is requirements for value in received)
     assert [row.model_dump() for row in actual] == [row.model_dump() for row in expected]
-    assert len(actual) == (32 if retention_kwargs.get('retain_found_windows') else 4)
+    original_windows = {row.metadata['stable_chunk_id']: row.text for row in p.chunks}
+    assert len(actual) == len(original_windows) == 32
+    assert {row.metadata['stable_chunk_id']: row.text for row in actual} == original_windows
 
 
 @pytest.fixture
@@ -862,6 +874,9 @@ def test_real_lexical_public_retention_preserves_every_qualified_window(lexical_
     projection_sql_counts = {'docs': len(statements) - len(context_sql[-1])}
     assert baseline[2] and baseline[3]
     bounded = contexts[-1]
+    docs_ranking = list(ranking_times)
+    assert len(docs_ranking) == 1
+    ranking_times.clear()
     acquisitions.clear()
     source_loads.clear()
     statements.clear()
@@ -884,9 +899,11 @@ def test_real_lexical_public_retention_preserves_every_qualified_window(lexical_
         if any(trace.get('qualified') is True for key, trace in row.metadata['retrieval_query_matches'].items()
                if key == 'query-original' or key.startswith('query-lookup-'))}
     assert len(qualified) > 32
-    assert len(ranking_times) == 1 and ranking_times[0][0] == len(qualified)
+    assert len(ranking_times) == 1 and ranking_times[0][0] == docs_ranking[0][0] == len(qualified)
     assert {row['stable_id'] for row in packet['sources']} == set(qualified)
-    assert len(packet['sources']) == len(qualified) > len(bounded.context_pack)
+    assert len(packet['sources']) == len(qualified) == len(bounded.context_pack)
+    assert {row['stable_chunk_id']: row['content'] for row in bounded.context_pack} == {
+        stable_id: chunk.text for stable_id, chunk in qualified.items()}
     for source in packet['sources']:
         chunk = qualified[source['stable_id']]
         evidence = chunk.metadata['_reference_evidence']
@@ -896,13 +913,14 @@ def test_real_lexical_public_retention_preserves_every_qualified_window(lexical_
         assert [source['line_start'], source['line_end']] == chunk.metadata['line_span']
         assert p.originals[source['path']][source['char_start']:source['char_end']] == source['text']
         assert evidence['source']['scope']['snapshot_id'] == p.generation
-    # Switching back must still deliver the same bounded docs projection.
+    # Switching back must still deliver the same ordinary docs projection.
     assert handle_context_tool('get_docs_context', args, p.service) == docs
     print(json.dumps({'qualified_windows': len(qualified), 'packet_windows': len(packet['sources']),
         'packet_source_bytes': sum(len(row['text'].encode()) for row in packet['sources']),
-        'bounded_context_windows': len(bounded.context_pack), 'acquisition_calls': len(baseline[0]),
+        'ordinary_context_windows': len(bounded.context_pack), 'acquisition_calls': len(baseline[0]),
         'source_loads': len(baseline[1]), 'context_sql_statements': len(baseline[2]),
         'projection_sql_statements': projection_sql_counts,
         'source_file_read_bytes': sum(size for _, _, size in baseline[3]),
+        'ordinary_rerank_seconds': round(docs_ranking[0][1], 6),
         'retention_rerank_seconds': round(ranking_times[0][1], 6),
         'patch_elapsed_seconds': round(elapsed, 3)}, sort_keys=True))
