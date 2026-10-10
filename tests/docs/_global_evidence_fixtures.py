@@ -29,11 +29,11 @@ def capture_fixture(
         for source in payload.get("sources") or []:
             path = (root / source["path_or_url"]).resolve()
             assert path.is_relative_to(root.resolve())
-            lines = path.read_text(encoding="utf-8").splitlines()
+            lines = path.read_bytes().decode("utf-8").splitlines(keepends=True)
             start, end = source["line_start"], source["line_end"]
             assert type(start) is int and type(end) is int
             assert 1 <= start <= end <= len(lines)
-            assert source["snippet"] in "\n".join(lines[start - 1:end])
+            assert source["snippet"] in "".join(lines[start - 1:end])
         for attempt in capture.get("projection_attempts") or []:
             assert validate_model_visible_projection(
                 attempt["projected_payload"], snapshot=attempt["snapshot"], max_tokens=800,
