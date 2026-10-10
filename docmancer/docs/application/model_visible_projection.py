@@ -455,6 +455,10 @@ def project_docs_answer(
             kind="docs_answer", missing=["No safe bounded selected context is available."],
             recommended_next_action=None, max_tokens=min(INSUFFICIENT_EVIDENCE_MAX_TOKENS, max_tokens),
         ), {}
+    from .mixed_context_projection import retain_mixed_project_context
+    payload, snapshot = retain_mixed_project_context(
+        question=question, retrieval=retrieval, payload=payload, snapshot=snapshot,
+    )
     _refresh_estimate(payload)
     return payload, snapshot
 

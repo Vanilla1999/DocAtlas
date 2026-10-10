@@ -434,6 +434,10 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                         question, canonical_selection, projection=projection, retrieval=raw, request=args,
                         operational_reason_code=operational_reason_code)
             else:
+                if raw.get("mode_selected") == "mixed":
+                    raw["_mixed_project_request"] = {
+                        key: args.get(key) for key in ("project_path", "scope", "module", "module_path")
+                    }
                 projection, snapshot = project_docs_answer(
                     question=question,
                     retrieval=raw,
