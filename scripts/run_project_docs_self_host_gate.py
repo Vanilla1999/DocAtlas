@@ -32,6 +32,7 @@ if str(_SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_ROOT))
 
 from scripts._project_docs_self_host_fixture import self_host_fixture
+from eval.project_context_quality.legacy_fact_acceptance import capture_legacy_evidence
 
 import yaml
 
@@ -468,15 +469,13 @@ def run(
 
             for index, case in enumerate(cases, 1):
                 question = case.question
-                payload, snapshot = _call_with_snapshot(
-                    {
-                        "question": question,
-                        "project_path": str(fixture.root),
-                        **({"lookup_queries": list(case.lookup_queries)} if case.lookup_queries else {}),
-                        "scope": case.scope,
-                    },
-                    service,
-                )
+                arguments = {
+                    "question": question,
+                    "project_path": str(fixture.root),
+                    **({"lookup_queries": list(case.lookup_queries)} if case.lookup_queries else {}),
+                    "scope": case.scope,
+                }
+                payload, snapshot = _call_with_snapshot(arguments, service)
                 if not isinstance(payload, Mapping):
                     errors.append(f"{index:02d}: missing or non-mapping payload={payload!r}: {question}")
                     payload = {}
@@ -663,6 +662,7 @@ def run(
                     "top1_fact_bearing": top1_fact_bearing,
                     "answer_fact_checks": answer_fact_checks,
                     "citations": _citations(payload),
+                    "legacy_fact_evidence": capture_legacy_evidence(arguments, payload, snapshot),
                     "payload": payload,
                     "checks": checks,
                     "decision_hash": payload.get("decision_hash"),
@@ -689,10 +689,8 @@ def run(
             for index, negative in enumerate(negative_cases, 1):
                 question = negative.question if isinstance(negative, LiveCase) else negative
                 scope = negative.scope if isinstance(negative, LiveCase) else "project"
-                payload, _ = _call_with_snapshot(
-                    {"question": question, "project_path": str(fixture.root), "scope": scope},
-                    service,
-                )
+                arguments = {"question": question, "project_path": str(fixture.root), "scope": scope}
+                payload, snapshot = _call_with_snapshot(arguments, service)
                 if not isinstance(payload, Mapping):
                     errors.append(f"negative query returned missing or non-mapping payload: {question}: {payload!r}")
                     payload = {}
@@ -711,6 +709,7 @@ def run(
                         "answer_supported": (payload or {}).get("answer_supported"),
                     },
                     "payload": dict(payload),
+                    "legacy_fact_evidence": capture_legacy_evidence(arguments, dict(payload), snapshot),
                     "checks": {"correct_abstention": safe_abstention},
                     "passed": safe_abstention,
                 })

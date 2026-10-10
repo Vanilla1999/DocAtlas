@@ -205,6 +205,11 @@ def run_live(lane: str = "legacy", *, question_only: bool = False) -> dict[str, 
         ).hexdigest(),
         "claim_boundary": "in_process_self_host_not_installed_agent",
     })
+    if lane == "legacy" and not question_only:
+        from eval.project_context_quality.legacy_fact_acceptance import FACT_METRIC, summarize_legacy_facts
+        facts = summarize_legacy_facts(report)
+        report["legacy_fact_acceptance"] = facts
+        report["metrics"][FACT_METRIC] = facts[FACT_METRIC]
     # The runner digest describes its unmodified report, before lane metadata.
     if "deterministic_result_digest" in report:
         report["runner_result_digest"] = report.pop("deterministic_result_digest")

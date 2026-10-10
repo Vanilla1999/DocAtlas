@@ -205,6 +205,9 @@ def test_runner_forwards_scope_and_requires_each_fact_group(monkeypatch, snippet
     assert result["checks"]["original_coverage_attribution"] is True
     assert result["observed"]["original_query_covered"] is False
     assert result["top1_fact_bearing"] is True
+    receipt = result["legacy_fact_evidence"]
+    assert receipt["request"] == arguments[1]
+    assert receipt["observer_counts"] is None and receipt["source_bindings"] == {}
 
 
 def test_lock_rejects_corpus_drift(monkeypatch, tmp_path):

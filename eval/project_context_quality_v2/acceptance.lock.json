@@ -81,7 +81,13 @@
       "packs_contamination_count",
       "docs_analysis_contamination_count",
       "false_docs_answer_count"
-    ]
+    ],
+    "schema_version": "legacy-source-fact-acceptance-v2",
+    "acceptance_metric": "verified_original_case_fact_count",
+    "positive_case_count": 15,
+    "contract_path": "eval/project_context_quality/legacy_fact_acceptance_crosswalk.json",
+    "contract_sha256": "07a0baf63be159d1ba8dc6c8595d3b01bc1d2bb209fff781bb635223b5a74cec",
+    "raw_original_query_coverage": "telemetry_with_no_lookup_transfer"
   },
   "output_cost_policy": {
     "objective": "minimize_full_public_dto_without_fixed_output_ceiling",
