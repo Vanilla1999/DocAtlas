@@ -1,10 +1,15 @@
 # PR #211: checkpoint продолжения
 
-Обновлено 2026-10-10, 00:07 UTC.
-Последний опубликованный и полностью проверенный PR HEAD:
+Обновлено 2026-10-10, 00:19 UTC.
+Reviewed code следующего совместного прогона — до
+`6225be914656fbbc4b6d49235b1f412320a2395d` (slice88).
+Slices85–88 прошли exact Git verification; source changes86–88 — independent review.
+Их новый совместный runtime **PENDING**.
+
+Последний фактический полный CI относится к PR HEAD:
 `80c8fbbb3e8c379467a9075f93f7165d080f8432`, дерево
 `a838749f57ff0165ab925590656f64e0799a2e05`.
-Slices77–83 прошли source review, exact Git verification и совместный runtime.
+Slices77–83 прошли source review, exact Git verification и совместный runtime80c8.
 
 **PR пока не готов к merge.** Полный core на каждой Python:
 **7747 = 6057 PASS / 1680 FAIL / 0 ERROR / 10 SKIP**.
@@ -127,9 +132,13 @@ historical702/compact82 baseline PASS и51 парное направленное
 Прежние сокращения: alias49→1, literal702→82, intent32→2, admission34→5.
 Количество внутренних iterations отдельно от количества collected cases.
 
-Следующий precheck:21 Context7 alias-only inputs, которых нет среди трёх
-входов существующего alias-control. До собственного нового baseline/mutant
-эти21 и все соседние live cases остаются collected.
+Slice87 добавляет в existing alias-control21 точный исходный Context7 input:
+теперь3 прежних+21 новых входов. Независимые plan/lookup positives сохранены,
+добавлен scoped Russian topic-router mutant, недостижимый прежними тремя входами.
+Raw archive/source spans/records/hashes и все остальные AST nodes сохраняются.
+Цель **53 baseline PASS /20 intended kills** — PENDING.
+До собственного нового proof эти21 и все соседние live cases остаются collected.
+[CONTEXT7_ALIAS_INPUT_PRECHECK](pr211-execution/CONTEXT7_ALIAS_INPUT_PRECHECK_RU.md).
 
 ## Recovery:12/18 PASS
 
@@ -176,15 +185,25 @@ Closure SHA256:
 
 P14 alias bodies уже acquired; нельзя повышать coverage снижением ratio,
 словарём из gold или host lookup credit. Общий relevance contract пока открыт.
-Для count question готовится отдельная закрытая source-context форма:
+Slice86 реализует отдельно reviewed закрытую count source-context форму:
 exact identifier и whole phrase в одном raw body unit, без quantity/permission
-inference и без original-query/answer/edit credit. Она ещё не runtime result.
+inference и без original-query/answer/edit credit. +2 intended mutants.
+Это ещё не runtime result.
+[LITERAL_COUNT_CONTEXT](PR211_LITERAL_COUNT_CONTEXT_RU.md).
 
 P15 document statement не содержит literal path и имеет противоречащие документы:
 нужен explicit finite structural filename-binding contract.
-Mixed request уже получает обе source facts, но project body не допускается
-как context. Проектируется полностью закрытая Explain literal-list форма;
-старый negative What does A and B do? сохраняется.
+Same-call diagnostics mixed request показывают acquisition обеих raw facts,
+но public sources=[]/source_bindings=[]: пустой source_errors=[] не доказывает
+успешный mixed source binding. Slice88 реализует полностью закрытую Explain
+literal-list форму, exact source-bound context и3 intended mutants.
+Старый negative What does A and B do? сохраняется. Runtime PENDING.
+[LITERAL_EXPLAIN_CONTEXT](PR211_LITERAL_EXPLAIN_CONTEXT_RU.md).
+
+После count+Explain остаются12 recovery cases; цель **12/12 baseline +23 kills**.
+Existing closed case ожидает16 positive+54 negative=70 state fingerprints;
+source/current/hash/consent replay и запрет original-query/answer/edit grants сохранены.
+Это ожидаемые проверки, не полученный результат.
 
 ### Другие обязательства
 
@@ -200,11 +219,24 @@ positive/absent-fact negative/source-removal transform не доказывает
 всех100. Отдельный question-frame source-types E2E остаётся незакрытым обязательством.
 Полного успешного Legacy/V2/Agent Developer/advanced/P1-stack отчёта нет.
 
+## Reviewed slices следующей публикации
+
+| Slice | Commit | Изменение |
+| --- | --- | --- |
+|85|`7856a818`|Полный actual80c8 receipt и215-module failure map.|
+|86|`926cb5af`|Закрытый count frame, raw pair witnesses и2 mutants.|
+|87|`357bbbfb`|21 Context7 input в existing control и scoped mutant; retirement0.|
+|88|`6225be91`|Закрытый Explain list, exact partial source context и3 mutants.|
+
+Новых ordinary test functions и удалённых cases в86–88 нет.
+Actual53/19 и12/18 на80c8 остаются базой сравнения, а не доказательством новых53/20 и12/23.
+
 ## Следующие действия
 
-1. Сохранить exact80c8 receipt/map; review и опубликовать только независимые узкие
-   count-context, Context7 precheck и mixed literal-context slices.
-2. Проверить новые baseline/targeted kills на следующем фактическом SHA.
+1. Опубликовать reviewed85–88 и этот checkpoint обычным fast-forward;
+   проверить фактические merge parents/tree и совместный CI.
+2. Проверить critical53/20 и recovery12/23, полный core, P14 count и P15 mixed
+   на следующем фактическом SHA.
    Не удалять Context7 cases до собственного нового proof.
 3. Закончить document source-locator contract, затем остальные quality obligations,
    сохраняя исходные questions/gold и полные source facts.
