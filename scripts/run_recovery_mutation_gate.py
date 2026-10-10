@@ -40,6 +40,7 @@ MODULE_PATHS = {
     "docmancer.docs.domain.ordinary_body_context": "docmancer/docs/domain/ordinary_body_context.py",
     "docmancer.docs.interfaces.mcp.context_tools": "docmancer/docs/interfaces/mcp/context_tools.py",
     "eval.agent_developer_v1.ordinary_body_controls": "eval/agent_developer_v1/ordinary_body_controls.py",
+    "eval.agent_developer_v1.literal_window_controls": "eval/agent_developer_v1/literal_window_controls.py",
 }
 FROZEN_QUESTION_SHA256 = "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b"
 FROZEN_SOURCE_SHA256 = "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
@@ -210,6 +211,23 @@ MUTANTS = (
            "    if (any(not (char.isalpha() or char.isspace() or char in \".?!,;:-–—\") for char in question)\n        or re.search(r\"(?<![^\\W\\d_])-|-(?![^\\W\\d_])\", question)\n        or query_mentions(question)",
            "    if (query_mentions(question)",
            "closed_literal_context", "recovery_ordinary_original_span_boundary"),
+    Mutant("literal-raw-window-escapes-candidate-span", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "or not 0 <= reference_start <= span[0] <= start < end <= span[1] <= reference_end <= len(raw)",
+           "or not 0 <= reference_start <= span[0] <= start < end <= reference_end <= len(raw)",
+           "closed_literal_context", "recovery_literal_raw_window_span_replay"),
+    Mutant("literal-raw-window-uses-trimmed-origin", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "\"char_start\": start, \"char_end\": end,",
+           "\"char_start\": visible_span[0], \"char_end\": end,",
+           "closed_literal_context", "recovery_literal_raw_window_coordinates"),
+    Mutant("literal-raw-window-trimmed-on-wire", MODULE_PATHS["docmancer.docs.application._docs_context_projection_core"],
+           "normalized[\"snippet\"] = raw_snippet",
+           "normalized[\"snippet\"] = raw_snippet.strip()",
+           "closed_literal_context", "recovery_literal_raw_window_fact"),
+    Mutant("literal-symbol-ignores-raw-window-rejection", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           "if witnesses and body_window is None:\n        return None",
+           "if False and witnesses and body_window is None:\n        return None",
+           "closed_literal_context", "recovery_literal_explicit_raw_window_span_replay"),
+
 
 )
 

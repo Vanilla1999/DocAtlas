@@ -198,13 +198,13 @@
       {
         "name": "relation-callable-context-as-answer",
         "path": "docmancer/docs/application/_docs_context_projection_core.py",
-        "base_blob": "ec87e90b8ef40faab65e514a3e417ee9d6bf0b0c",
+        "base_blob": "3dc9c8f19b4431503a073730e1c6f330cd583634",
         "before": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "after": "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if original_question.startswith(\"Can \"):\n        payload.update(answer_supported=True, answer_available=True)\n        _refresh_estimate(payload)\n    projection_diagnostics[\"final_visible_evidence_ids\"]",
         "failure_guard": "critical_relation_public_no_answer_authority",
         "expected_anchor_occurrences": 1,
-        "expected_before_sha256": "c31a8d8bb27e6b4ff6badb8348a60365befb4b2a3fa59db060d63c484d569acf",
-        "expected_after_sha256": "76f4397c0fe261ace66ad6f638528b08980a76e497ef703c56ed42c1efa99765",
+        "expected_before_sha256": "13ea4e153f66d0e22337ac5d3a584a5f55085646b1df78dfad2c95dbf0a274cc",
+        "expected_after_sha256": "370f960f0de809289ef3d31b7b3ba04cb47bf063307482c7509e21be59867863",
         "expected_failed_cases": 1,
         "expected_errors": 0,
         "expected_skipped": 0
@@ -222,5 +222,13 @@
     "mutation_receipts": [],
     "retirement_authorized_by_this_file": false
   },
-  "integration_base_commit": "23af9fc5b5934bc651e40f510ec90c88e1642dcc"
+  "integration_base_commit": "23af9fc5b5934bc651e40f510ec90c88e1642dcc",
+  "mutation_recipe_rebase": {
+    "status": "PENDING_SAME_TREE_BASELINE_AND_INTENDED_KILL",
+    "reason": "The literal raw-window projection changes the owning core; the frozen input, fault anchor, guard and evaluator are unchanged.",
+    "previous_core_blob": "ec87e90b8ef40faab65e514a3e417ee9d6bf0b0c",
+    "current_core_blob": "3dc9c8f19b4431503a073730e1c6f330cd583634",
+    "historical_source_checkout_retained": true,
+    "historical_receipts_reused": false
+  }
 }

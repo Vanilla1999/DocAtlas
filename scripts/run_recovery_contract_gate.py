@@ -43,6 +43,7 @@ from eval.project_context_quality.capture_public_context import capture_public_c
 from eval.agent_developer_v1.structural_filename_controls import run_structural_filename_controls
 from eval.agent_developer_v1.fts_literal_controls import run_fts_literal_controls
 from eval.agent_developer_v1.ordinary_body_controls import run_ordinary_body_controls
+from eval.agent_developer_v1.literal_window_controls import run_literal_window_controls
 
 REPORT_SCHEMA = "recovery-contract-v2"
 TARGET_MODULES = (
@@ -56,6 +57,7 @@ TARGET_MODULES = (
     "docmancer.core._sqlite_store_part03", "eval.agent_developer_v1.fts_literal_controls",
     "docmancer.docs.domain.original_body_discovery", "docmancer.docs.domain.ordinary_body_context",
     "docmancer.docs.interfaces.mcp.context_tools", "eval.agent_developer_v1.ordinary_body_controls",
+    "eval.agent_developer_v1.literal_window_controls",
 )
 TREASURE = (
     "What is the documented contract for adaptive treasure gem trip sampling across positions 1,2,3, "
@@ -796,7 +798,7 @@ def closed_literal_context() -> dict[str, Any]:
                 if literal == "DispatchInvariant":
                     context(f"What does {literal} require?", literal, body)
                     context(f"Which conditions are required by {literal}?", literal, body)
-
+            raw_windows = run_literal_window_controls(_require, indexed_body, read, bodies, source_path)
             indexed_body(bodies["OrdersDraftStore"])
             for question in (
                 "What does OrdersDraftStore do using telepathy?",
@@ -922,7 +924,7 @@ def closed_literal_context() -> dict[str, Any]:
     filename = run_structural_filename_controls(_require, _observed_public_call, _literal_context_replay_controls)
     ordinary = run_ordinary_body_controls(_require, _observed_public_call)
     return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks,
-            "structural_filename": filename, "fts_literal": fts, "ordinary_body": ordinary}
+            "structural_filename": filename, "fts_literal": fts, "ordinary_body": ordinary, "raw_windows": raw_windows}
 
 
 CASES = (

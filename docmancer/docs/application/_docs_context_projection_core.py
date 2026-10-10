@@ -285,10 +285,15 @@ def project_docs_context(
             )
             normalized = _docs_source(original, display_snippet=raw_snippet) if admission is not None else None
             if normalized is not None:
-                start = raw_snippet.find(normalized["snippet"])
-                line_start, line_end = _focused_line_range(
-                    raw_snippet, start, start + len(normalized["snippet"]), original.get("line_start"),
-                )
+                body_window = admission.get("body_window")
+                if body_window is not None:
+                    normalized["snippet"] = raw_snippet
+                    line_start, line_end = body_window["line_start"], body_window["line_end"]
+                else:
+                    start = raw_snippet.find(normalized["snippet"])
+                    line_start, line_end = _focused_line_range(
+                        raw_snippet, start, start + len(normalized["snippet"]), original.get("line_start"),
+                    )
                 normalized.update({
                     "project_identity": project_identity, "line_start": line_start, "line_end": line_end,
                     "authority": str(original.get("authority") or "supporting"),

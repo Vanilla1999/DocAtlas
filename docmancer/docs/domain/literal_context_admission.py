@@ -154,6 +154,43 @@ def _count_context_witness(
     return None
 
 
+
+def _checked_raw_body_window(
+    evidence_text: str, candidate: Mapping[str, Any], evidence: Mapping[str, Any],
+    visible_span: Any,
+) -> dict[str, int] | None:
+    """Translate the canonical trimmed span back to the unchanged source bytes.
+
+    The qualifier has already checked current owner, snapshot and unique visible
+    occurrence. Outer whitespace may not widen the current candidate window or
+    attest text that is absent from the immutable document.
+    """
+    if (not isinstance(visible_span, (list, tuple)) or len(visible_span) != 2
+        or any(type(value) is not int for value in visible_span)
+        or not evidence_text.strip()
+        or visible_span[1] - visible_span[0] != len(evidence_text.strip())):
+        return None
+    start = visible_span[0] - (len(evidence_text) - len(evidence_text.lstrip()))
+    end = start + len(evidence_text)
+    span = ((candidate["char_start"], candidate["char_end"])
+            if "char_start" in candidate and "char_end" in candidate
+            else candidate.get("char_span") or ())
+    raw = evidence.get("raw_document")
+    reference_start, reference_end = evidence.get("char_start"), evidence.get("char_end")
+    if (not isinstance(raw, str)
+        or type(reference_start) is not int or type(reference_end) is not int
+        or not isinstance(span, (list, tuple)) or len(span) != 2
+        or any(type(value) is not int for value in span)
+        or not 0 <= reference_start <= span[0] <= start < end <= span[1] <= reference_end <= len(raw)
+        or raw[start:end] != evidence_text
+        or raw[reference_start:reference_end] != evidence.get("text")):
+        return None
+    return {
+        "char_start": start, "char_end": end,
+        "byte_start": len(raw[:start].encode("utf-8")), "byte_end": len(raw[:end].encode("utf-8")),
+        "line_start": raw[:start].count("\n") + 1, "line_end": raw[:end - 1].count("\n") + 1,
+    }
+
 def admit_original_literal_context(
     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
     expected_project_identity: str | None = None, lifecycle_intent: str = "current",
@@ -216,14 +253,13 @@ def admit_original_literal_context(
     # no reference role or original-query trace is modified.
     closed_literal = _closed_context_literal(question)
     visible_span = qualification.trace.get("reference_visible_span")
-    if (closed_literal is not None and isinstance(visible_span, (list, tuple))
-        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
-        and visible_span[1] - visible_span[0] == len(evidence_text)):
+    body_window = _checked_raw_body_window(evidence_text, candidate, evidence, visible_span)
+    if closed_literal is not None and body_window is not None:
         pattern = technical_term_pattern(closed_literal.text, exact=True)
         for match in re.finditer(pattern, evidence_text):
             occurrences.append((closed_literal, {
-                "char_start": visible_span[0] + match.start(),
-                "char_end": visible_span[0] + match.end(),
+                "char_start": body_window["char_start"] + match.start(),
+                "char_end": body_window["char_start"] + match.end(),
             }, 0))
     units = _relation_units(evidence_text)
     witnesses = []
@@ -240,21 +276,15 @@ def admit_original_literal_context(
             witnesses.append({"mention_id": mention.mention_id, "text": mention.text,
                               "char_start": binding["char_start"], "char_end": binding["char_end"]})
     explain_literals = _closed_explain_literals(question)
-    if (explain_literals and isinstance(visible_span, (list, tuple))
-        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
-        and visible_span[1] - visible_span[0] == len(evidence_text)):
-        witnesses.extend(_explain_context_witnesses(evidence_text, visible_span[0], explain_literals))
+    if explain_literals and body_window is not None:
+        witnesses.extend(_explain_context_witnesses(evidence_text, body_window["char_start"], explain_literals))
     count_context = _closed_count_context(question)
-    if (count_context is not None and isinstance(visible_span, (list, tuple))
-        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
-        and visible_span[1] - visible_span[0] == len(evidence_text)):
-        count_witness = _count_context_witness(evidence_text, visible_span[0], count_context)
+    if count_context is not None and body_window is not None:
+        count_witness = _count_context_witness(evidence_text, body_window["char_start"], count_context)
         if count_witness is not None:
             witnesses.append(count_witness)
     statement_context = document_statement_mentions(question)
-    if (statement_context is not None and isinstance(visible_span, (list, tuple))
-        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
-        and visible_span[1] - visible_span[0] == len(evidence_text)):
+    if statement_context is not None and body_window is not None:
         locator, target = statement_context
         # A path is supplied only by the canonical qualifier's fresh full-catalog
         # recheck. The bare body target stays unresolved and gains no query role.
@@ -266,13 +296,15 @@ def admit_original_literal_context(
             for binding in qualification.trace.get("reference_bindings") or ()
         )
         if source_bound:
-            for witness in _explain_context_witnesses(evidence_text, visible_span[0], (target,)):
+            for witness in _explain_context_witnesses(evidence_text, body_window["char_start"], (target,)):
                 witnesses.append({
                     **witness, "kind": "literal_document_statement_context",
                     "source_mention_id": locator.mention_id,
                     "source_query_char_start": locator.start, "source_query_char_end": locator.end,
                 })
     reason = "literal_symbol_body_context"
+    if witnesses and body_window is None:
+        return None
     if not witnesses:
         ordinary = ordinary_body_context_witness(
             question=question, evidence_text=evidence_text, candidate=candidate,
@@ -287,4 +319,5 @@ def admit_original_literal_context(
         "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
         "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),
         "body_witnesses": witnesses,
+        **({"body_window": body_window} if reason == "literal_symbol_body_context" and body_window is not None else {}),
     }
