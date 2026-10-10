@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from typing import Any, Iterable, Mapping
 
 from docmancer.docs.domain.answer_units import _subject_present, best_local_proof, extract_answer_units
@@ -92,6 +92,7 @@ class ComponentCoverageDecision:
     evidence_ids: tuple[str, ...]
     unresolved_residue: tuple[str, ...]
     status: str
+    _component_evidence: tuple[tuple[str, str], ...] = field(default=(), repr=False, compare=False)
 
     def as_payload(self) -> dict[str, object]:
         return {
@@ -149,6 +150,7 @@ def component_coverage_decision(
         mandatory, covered, missing,
         tuple(dict.fromkeys(evidence_by_component[value] for value in covered)),
         residue, status,
+        tuple((value, evidence_by_component[value]) for value in covered),
     )
 
 

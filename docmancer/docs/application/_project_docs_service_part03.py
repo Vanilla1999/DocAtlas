@@ -652,6 +652,7 @@ class _ProjectDocsServicePart03:
                 message="Project docs candidates exist but are not indexed. Run sync_project_docs, then retry get_project_docs.",
             )
 
+        from .query_trace import query_trace_enabled
         internal_retrieval_diagnostics: dict[str, Any] = {}
         control_chunks: list[Any] = []
         retention_kwargs = ({"retain_found_windows": True, "_control_chunks": control_chunks, "_retention_ack": _retention_ack}
@@ -662,7 +663,7 @@ class _ProjectDocsServicePart03:
             requirements=requirements,
             lookup_queries=lookup_queries,
             documentation_query_plan=documentation_query_plan,
-            internal_diagnostics=internal_retrieval_diagnostics,
+            internal_diagnostics=internal_retrieval_diagnostics if query_trace_enabled() else None,
             **retention_kwargs,
         )
         found_chunks = chunks

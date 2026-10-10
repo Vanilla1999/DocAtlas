@@ -2,10 +2,18 @@
 from copy import deepcopy
 import json
 from unittest.mock import patch
+import pytest
 
 from docmancer.docs.application import _docs_context_projection_core as core
 from docmancer.docs.application.docs_context_projection import project_docs_context
 from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
+from docmancer.docs.application.query_trace import query_trace
+
+
+@pytest.fixture(autouse=True)
+def enabled_diagnostic_trace():
+    with query_trace(True):
+        yield
 
 
 def test_every_selection_iteration_has_one_terminal_event():

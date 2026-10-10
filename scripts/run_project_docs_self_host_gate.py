@@ -418,8 +418,9 @@ def _delivery_observation(stage: str, result: object, args: tuple, kwargs: dict)
             if key in stages}
     return observation
 
-def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[dict | None, dict]:
+def _call_with_snapshot(arguments: dict, service: LibraryDocsService, *, trace_enabled: bool = True) -> tuple[dict | None, dict]:
     """Observe the public call without replaying retrieval or changing its result."""
+    from docmancer.docs.application.query_trace import query_trace
     raw_results: list[object] = []
     qualified_sources: list[dict] = []
     snapshots: list[dict] = []
@@ -441,24 +442,29 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
     def capture_coverage(contract, assignments, sources, **kwargs):
         contract, assignments, sources = tuple(contract), tuple(assignments), tuple(sources)
         decision = coverage(contract, assignments, sources, **kwargs)
+        if not trace_enabled:
+            return decision
         component_bindings.clear()
         for source in sources:
             original = source.get("_qualification_candidate") or {}
             source_ids = {original.get(key) for key in ("stable_id", "stable_chunk_id", "evidence_id") if original.get(key)}
-            local_assignments = tuple(item for item in assignments if item.get("evidence_id") in source_ids)
-            local = coverage(contract, local_assignments, (source,), **kwargs)
-            for component_id in local.covered_component_ids:
+            source_ids.add(source.get("evidence_id"))
+            for component_id, runtime_evidence_id in getattr(decision, "_component_evidence", ()):
+                if runtime_evidence_id not in source_ids:
+                    continue
                 component_bindings.append({
                     "component_id": component_id,
                     "evidence_id": source.get("evidence_id"),
                     "path_or_url": source.get("path_or_url"),
                     "snippet_sha256": hashlib.sha256(str(source.get("snippet") or "").encode()).hexdigest(),
-                    "runtime_evidence_ids": list(local.evidence_ids),
+                    "runtime_evidence_ids": [runtime_evidence_id],
                 })
         return decision
 
     def capture_delivery(stage, result, args, kwargs):
         delivery_counts[stage] = delivery_counts.get(stage, 0) + 1
+        if not trace_enabled:
+            return
         if len(delivery_observations) < 32:
             try:
                 delivery_observations.append(_delivery_observation(stage, result, args, kwargs))
@@ -489,9 +495,13 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
         snapshots.append(deepcopy(snapshot))
         return validate(payload, snapshot=snapshot, **kwargs)
 
-    service._same_call_diagnostics_observer = lambda value: diagnostics.append(deepcopy(value))
+    missing_observer = object()
+    previous_observer = getattr(service, "_same_call_diagnostics_observer", missing_observer)
+    if trace_enabled:
+        service._same_call_diagnostics_observer = lambda value: diagnostics.append(deepcopy(value))
     try:
         with (
+        query_trace(trace_enabled),
         patch.object(app, "get_docs_context", capture_result),
         patch.object(facade, "get_project_context", delivery_observer(project_read, "project_context"))
             if callable(project_read) else nullcontext(),
@@ -503,7 +513,11 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService) -> tuple[d
         ):
             payload = call_docs_tool_payload("get_docs_context", arguments, service)
     finally:
-        del service._same_call_diagnostics_observer
+        if trace_enabled:
+            if previous_observer is missing_observer:
+                del service._same_call_diagnostics_observer
+            else:
+                service._same_call_diagnostics_observer = previous_observer
     if isinstance(payload, dict) and diagnostics:
         diagnostics[-1]["component_evidence_bindings"] = component_bindings
         diagnostics[-1]["observer_counts"] = {"retrieval_calls": len(raw_results), "validation_calls": len(snapshots)}

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
 from docmancer.docs.application.projection_decision_trace import same_call_projection_observation
+from docmancer.docs.application.query_trace import query_trace_enabled
 from docmancer.docs.application.source_continuation import (
     bind_project_source_continuations,
 )
@@ -12,6 +13,8 @@ import json
 from docmancer.docs.domain.project_doc_ranking import _invoke_found_window_retention, _UnsupportedFoundWindowRetention
 from docmancer.docs.domain.original_body_discovery import original_body_read_scope
 import math
+import sys
+from uuid import uuid4
 from typing import Any
 from ._context_recovery_actions import (
     _replace_network_retries_with_prepare_actions,
@@ -598,8 +601,18 @@ def _observe_same_call_diagnostics(
     selection_trace: dict[str, Any], *, delivery_blocked: bool = False,
 ) -> None:
     """Send bounded internals to an in-process observer, never the MCP payload."""
+    if not query_trace_enabled():
+        return
     observer = getattr(service, "_same_call_diagnostics_observer", None)
     if not callable(observer):
+        try:
+            observation = same_call_projection_observation(raw, projection, delivery_blocked=delivery_blocked)
+            sys.stderr.write(json.dumps({
+                "event": "docatlas_query_trace", "request_id": uuid4().hex,
+                "projection_observation": observation,
+            }, ensure_ascii=False) + "\n")
+        except Exception:
+            pass
         return
     ingestion = raw.get("ingestion_diagnostics") or {}
     project = ingestion.get("project") if isinstance(ingestion, dict) else {}

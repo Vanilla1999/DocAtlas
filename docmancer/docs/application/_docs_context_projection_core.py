@@ -8,6 +8,7 @@ import re
 from typing import Any
 from ._docs_context_payload import _payload
 from .projection_decision_trace import ProjectionDecisionTrace, record_ranked_candidates, record_core_sources
+from .query_trace import query_trace_enabled
 from .source_continuation import attach_source_continuation_locators
 from .visible_evidence_retention import retains_visible_sources, restore_visible_sources
 from .qualified_support_units import DeliveryUnit, VariantFootprint
@@ -82,7 +83,8 @@ def project_docs_context(
     if not isinstance(retrieval.get("retrieval_diagnostics"), dict):
         retrieval["retrieval_diagnostics"] = {}
     retrieval.setdefault("retrieval_diagnostics", {})["docs_context_projection"] = projection_diagnostics
-    decision_trace = ProjectionDecisionTrace(projection_diagnostics)
+    trace_enabled = query_trace_enabled()
+    decision_trace = ProjectionDecisionTrace(projection_diagnostics, enabled=trace_enabled)
     sources: list[dict[str, Any]] = []
     snapshot: dict[str, dict[str, Any]] = {}
     projection_inputs: dict[str, tuple[str, tuple[str, ...], Any]] = {}
@@ -399,14 +401,15 @@ def project_docs_context(
         )
         decision_trace.record('candidate', 'prepared' if variants else 'rejected',
                               'prepared' if variants else 'visible_qualification', original)
-        projection_diagnostics["qualified_variants"] += len(variants)
-        candidate_id = _internal_candidate_id(original)
-        if not variants and len(projection_diagnostics["projection_rejections"]) < 32:
+        if trace_enabled:
+            projection_diagnostics["qualified_variants"] += len(variants)
+        candidate_id = _internal_candidate_id(original) if trace_enabled else None
+        if trace_enabled and not variants and len(projection_diagnostics["projection_rejections"]) < 32:
             projection_diagnostics["projection_rejections"].append({
                 "candidate_id": candidate_id,
                 "reason": "visible_qualification",
             })
-        for variant in variants[:16]:
+        for variant in variants[:16] if trace_enabled else ():
             if len(projection_diagnostics["considered_variants"]) >= 32:
                 break
             projection_diagnostics["considered_variants"].append({
@@ -423,7 +426,8 @@ def project_docs_context(
     selected_context_needs: set[str] = set()
     selected_host_query_ids: set[str] = set()
     while prepared:
-        decision_trace.state["variant_attempts"] += 1
+        if trace_enabled:
+            decision_trace.state["variant_attempts"] += 1
         selected_qualified_public_ids = attributable_query_ids(sources) & public_query_id_set
         selected_public_ids = _fully_matched_query_ids(sources) & public_query_id_set
         selected_canonical_ids = qualified_query_ids(sources) & canonical_intent_query_ids
@@ -700,7 +704,8 @@ def project_docs_context(
         sources.append(normalized)
         snapshot[evidence_id] = _snapshot_entry(original, normalized)
         seen_ids[evidence_id] = len(sources) - 1
-        projection_diagnostics.setdefault("literal_context_admissions", []).append(admission)
+        if trace_enabled:
+            projection_diagnostics.setdefault("literal_context_admissions", []).append(admission)
         decision_trace.record('selection', 'accepted', admission['reason'], original, normalized)
     if not sources:
         if fallback_ids and not _allow_context_hints:
@@ -763,7 +768,7 @@ def project_docs_context(
     projection_diagnostics["final_visible_evidence_ids"] = [
         str(source.get("evidence_id") or "") for source in payload["sources"][:3]
         if source.get("evidence_id")
-    ]
+    ] if trace_enabled else []
     record_core_sources(projection_diagnostics, payload["sources"])
     if selection_diagnostics is not None:
         selection_diagnostics["component_coverage"] = component_decision.as_payload()

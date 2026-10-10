@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 from typing import Any
+from .query_trace import query_trace_enabled
 
 MAX_DECISION_EVENTS = 128
 
@@ -17,7 +18,10 @@ def _key(*parts: Any) -> str:
 class ProjectionDecisionTrace:
     """One request/attempt's event log; no global state or selection side effects."""
 
-    def __init__(self, diagnostics: dict[str, Any]) -> None:
+    def __init__(self, diagnostics: dict[str, Any], *, enabled: bool | None = None) -> None:
+        self.enabled = query_trace_enabled() if enabled is None else enabled
+        if not self.enabled:
+            return
         self.state: dict[str, Any] = {
             'schema_version': 1, 'events': [], 'counts': {},
             'variant_attempts': 0, 'omitted_events': 0,
@@ -31,6 +35,8 @@ class ProjectionDecisionTrace:
         budget_tokens: int | None = None, previous: Any = None,
     ) -> None:
         """Record an executed branch, not an inference from missing final text."""
+        if not self.enabled:
+            return
         key = f'{stage}:{reason}'
         counts = self.state['counts']
         counts[key] = counts.get(key, 0) + 1
@@ -97,6 +103,8 @@ def _preview(value: Any, *, names: tuple[str, ...] | None = None,
 def record_ranked_candidates(diagnostics: dict[str, Any], candidates: list[Any],
                              candidate_id: Any) -> None:
     """Keep the legacy preview and record the size of this exact ranked list."""
+    if not query_trace_enabled():
+        return
     ids = [candidate_id(item) for item in candidates[:_PREVIEW_LIMIT]]
     diagnostics["ranked_candidate_ids"] = [value for value in ids if value]
     diagnostics["ranked_observation"] = {"count": len(candidates), "ids": ids}
@@ -104,6 +112,8 @@ def record_ranked_candidates(diagnostics: dict[str, Any], candidates: list[Any],
 
 def record_core_sources(diagnostics: dict[str, Any], sources: list[dict[str, Any]]) -> None:
     """This payload precedes hint restoration and facade finalizers."""
+    if not query_trace_enabled():
+        return
     ids = [str(source.get("evidence_id") or "") for source in sources[:_PREVIEW_LIMIT]]
     diagnostics["core_source_observation"] = {"count": len(sources), "ids": ids}
 
