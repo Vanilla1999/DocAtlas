@@ -37,7 +37,7 @@ def assert_read_only_source_bytes(capture, documents):
         start, end = source["line_start"], source["line_end"]
         assert type(start) is int and type(end) is int
         assert 1 <= start <= end <= len(raw.splitlines())
-        assert source["snippet"] and source["snippet"] in "\n".join(raw.splitlines()[start - 1:end])
+        assert source["snippet"] and source["snippet"] in "".join(raw.splitlines(keepends=True)[start - 1:end])
     # No fixed output-cost ceiling. Fidelity and authorization remain mandatory.
     for attempt in capture.get("projection_attempts") or ():
         assert validate_model_visible_projection(

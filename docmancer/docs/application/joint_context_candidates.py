@@ -38,15 +38,13 @@ def _verified_document(original: dict, public: dict) -> str | None:
 
 def _context_row(original: dict, public: dict, raw: str, parent: Any,
                  start: int, end: int, *, supplementary: bool) -> tuple[dict, dict] | None:
-    while end > start and raw[end - 1].isspace():
-        end -= 1
     if end <= start:
         return None
     text = raw[start:end]
     new = deepcopy(original)
     new.update(content=text, display_text=text, snippet=text, char_start=start, char_end=end,
                line_start=raw.count('\n', 0, start) + 1,
-               line_end=raw.count('\n', 0, end) + 1,
+               line_end=raw.count('\n', 0, end - 1) + 1,
                heading_path=' > '.join(parent.heading_path), title=parent.title)
     # Rebind exact canonical bytes; never concatenate disjoint quotes or reuse
     # the old child boundary to certify a larger span.
@@ -71,6 +69,9 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
     row = _docs_source(new, evidence_id=None if supplementary else public['evidence_id'])
     if row is None:
         return None
+    # A structural superset must retain every canonical seed byte, including
+    # outer LF/CRLF; normalized presentation would invalidate containment.
+    row['snippet'] = text
     row.update({key: new.get(key, public.get(key)) for key in
                 ('project_identity', 'line_start', 'line_end', 'authority', 'scope')})
     if supplementary:

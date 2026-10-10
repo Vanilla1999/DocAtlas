@@ -140,13 +140,23 @@ def _continuation_document():
 def test_final_public_handler_continuation_preserves_quality_and_usable_reference(
     tmp_path, request, monkeypatch, revoked, legacy_scope, record_property,
 ):
-    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
+    from docmancer.docs.application import joint_seed_envelopes
+    from docmancer.docs.application.joint_context_lineage import retained_seed_mapping
+    from docmancer.docs.application.model_visible_projection import (
+        _snapshot_entry, validate_model_visible_projection,
+    )
     from docmancer.docs.interfaces.mcp import context_tools
 
     service = _real_service(tmp_path, request, content=_continuation_document())
     real_project = context_tools.project_docs_context
-    attempts = []
+    real_envelopes = joint_seed_envelopes.seed_envelopes
+    attempts, envelope_attempts = [], []
     witness = "Job polling uses docs_status to inspect progress until a terminal status is observed."
+
+    def observe_envelopes(seed_payload, seed_snapshot):
+        result = real_envelopes(seed_payload, seed_snapshot)
+        envelope_attempts.append(deepcopy((seed_payload, seed_snapshot, result)))
+        return result
 
     def negative_probe(*args, **kwargs):
         # Inject legacy metadata at a unit boundary, not into acquisition or a
@@ -172,6 +182,7 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
         return result
 
     monkeypatch.setattr(context_tools, "project_docs_context", negative_probe)
+    monkeypatch.setattr(joint_seed_envelopes, "seed_envelopes", observe_envelopes)
     payload = call_docs_tool_payload("get_docs_context", {
         "question": "How does docs_status polling progress work?",
         "project_path": str(tmp_path),
@@ -181,7 +192,15 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     assert payload["context_quality"] == {
         "status": "unverified", "reasons": ["coverage_unverified"],
     }, payload["read_next"]
-    assert len(payload["read_next"]) == 1
+    assert len(payload["read_next"]) == 1, {
+        "source_count": len(payload.get("sources") or ()),
+        "sources": [{
+            **{key: row.get(key) for key in ("evidence_id", "path_or_url", "line_start", "line_end")},
+            "snippet_sha256": hashlib.sha256(row["snippet"].encode()).hexdigest(),
+        } for row in (payload.get("sources") or ())[:4]],
+        "envelope_attempt_count": len(envelope_attempts),
+        "envelope_option_counts": [len(options) for _, _, options in envelope_attempts[:4]],
+    }
     target = payload["read_next"][0]
     assert target["reason"] in {"inspect_source_context", "requested_part_missing"}
     record_property("public_output_tokens", docs_context_budget_tokens(payload))
@@ -194,6 +213,25 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     retrieval, snapshot = attempts[0]
     assert validate_model_visible_projection(payload, snapshot=snapshot) == []
     raw = (tmp_path / "docs/polling.md").read_bytes()
+    raw_text = raw.decode("utf-8")
+    assert envelope_attempts
+    for seed_payload, seed_snapshot, options in envelope_attempts:
+        assert len(seed_payload["sources"]) >= 2 and options
+        for _, (row, original, kind) in options:
+            reference = original["_reference_evidence"]
+            start, end = reference["char_start"], reference["char_end"]
+            assert kind == "seed_envelope"
+            assert 0 <= start < end < len(raw_text), "read_next_compact_envelope_range"
+            assert row["snippet"] == original["content"] == raw_text[start:end]
+            assert row["line_start"] == raw_text.count("\n", 0, start) + 1
+            assert row["line_end"] == raw_text.count("\n", 0, end - 1) + 1
+            assert all(old["snippet"] in row["snippet"] for old in seed_payload["sources"]), (
+                "read_next_compact_envelope_keeps_raw_seeds"
+            )
+            mapping = retained_seed_mapping(seed_payload, seed_snapshot, {"sources": [row]}, {
+                row["evidence_id"]: _snapshot_entry(original, row),
+            })
+            assert mapping == {old["evidence_id"]: row["evidence_id"] for old in seed_payload["sources"]}
     assert target["path"] == "docs/polling.md"
     assert target["snapshot_sha256"] == "sha256:" + hashlib.sha256(raw).hexdigest()
     assert len(payload["sources"]) == 1
@@ -205,7 +243,7 @@ def test_final_public_handler_continuation_preserves_quality_and_usable_referenc
     # retain additional source facts after the output ceiling was removed.
     assert source["line_start"] == 1
     assert 11 <= source["line_end"] < len(raw_lines)
-    assert source["snippet"].encode() == b"\n".join(raw_lines[:source["line_end"]])
+    assert source["snippet"].encode() == b"".join(raw.splitlines(keepends=True)[:source["line_end"]])
     # Recovery must cover the whole unseen suffix; only blank separator lines
     # may be skipped between the visible prefix and its continuation.
     assert source["line_end"] < target["line_start"] <= target["line_end"]
