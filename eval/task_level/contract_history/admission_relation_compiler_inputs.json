@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "protocol": "admission-relation-compiler-precheck-v1",
-  "phase": "precheck_old_twenty_five_cases_remain_collected",
+  "phase": "retired25_after_own_ci",
   "source": {
     "original_path": "tests/docs/test_admission_relation_witnesses.py",
     "archive_path": "eval/task_level/contract_history/admission_relation_compiler_inputs.py.txt",
@@ -698,7 +698,7 @@
     "scope": "Module summaries and each first failure only; unprinted individual case outcomes are not claimed."
   },
   "runtime_gate": {
-    "status": "pending_not_accepted",
+    "status": "own_precheck_passed_c2a6682d",
     "required_baseline": {
       "tests": 54,
       "pass": 54,
@@ -716,10 +716,139 @@
       "exact_source_import_identity": true
     },
     "previous_dqp30_own_runtime_still_required": true,
-    "runtime_proof": null
+    "runtime_proof": {
+      "repository": "Vanilla1999/DocAtlas",
+      "pr": 211,
+      "pr_head": "c2a6682d2438c9217c3bf26938dcd003391dbc75",
+      "checkout_commit": "642a14289fddd06408400b4ee6cc5480945e7d1a",
+      "checkout_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "checkout_parents": [
+        "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+        "c2a6682d2438c9217c3bf26938dcd003391dbc75"
+      ],
+      "pr_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "same_tree_verified": true,
+      "main_run_id": 38021212993,
+      "reader_job_id": 114124354950,
+      "advanced_job_id": 114122398660,
+      "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950",
+      "evidence_path": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json",
+      "evidence_blob": "5a4a03197ed8ad93e40157ec37ecb3cb5247ea3d",
+      "evidence_sha256": "d672705adec2e132a91dc894af261a688405addf9cbc06e7fc0051fd33a52d57",
+      "decoded_log_sha256": "f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397",
+      "decoded_log_utf8_bytes": 591931,
+      "critical_baseline": {
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/evidence.json",
+        "sha256": "9191908ea3a417236cbcb6da83de474222280518fe3e1b6758211c83ff08f493",
+        "bytes": 16066,
+        "run": "baseline",
+        "validated": true,
+        "returncode": 0,
+        "junit": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "489d07c1f0d9641cef201b4bfbbbba08ce08979c721f504cb87a3e3dce94595c"
+        },
+        "observed_case_count": 54,
+        "observed_nonpassing_count": 0,
+        "failed_cases": [],
+        "stored_import_probe": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/import-origin.stdout.log",
+          "sha256": "3d48454cfecf4e547e4ad6b75797d0f40d7cb10ddb3ff6d0f27fdc8115b2a899",
+          "bytes": 10361,
+          "recorded_module_count": 42,
+          "complete_rows_in_receipt": 42,
+          "matched_modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+            },
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+            }
+          ],
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process"
+        },
+        "complete_record_in": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json"
+      },
+      "critical_mutants_total": 30,
+      "priority_rows_omitted": 0,
+      "import_claim_boundary": "Import rows are actual stored separate-process import probes, not pytest same-process observations. Producer validation and individual stored failure/source hashes are recorded without rerunning.",
+      "literal_comparison": {
+        "step": {
+          "name": "Compare historical and compact literal contract tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        "claim_boundary": "Same-checkout producer step success. No omitted individual literal mutant rows are reconstructed."
+      },
+      "scope": "Own compiler-boundary evidence; no source-quality, archived-input execution-equivalence or full-PR PASS claim.",
+      "directed_mutants": [
+        {
+          "record_type": "CRITICAL_OPERANDS",
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/evidence.json",
+          "sha256": "8ca2d26392d94eaeaa0a3f09c9abde856652517603abeb04f4f5bf9503d1a44c",
+          "bytes": 2480,
+          "run": "relation_question_does_not_generate_typed_retrieval_need",
+          "validated": true,
+          "returncode": 1,
+          "junit": {
+            "tests": 1,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+          },
+          "observed_case_count": 1,
+          "observed_nonpassing_count": 1,
+          "failed_cases": [
+            {
+              "classname": "tests.docs.test_project_retrieval_alias_contract",
+              "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+              "outcome": "failure",
+              "message": "AssertionError: critical_relation_original_does_not_generate_need_queries"
+            }
+          ],
+          "mutation": {
+            "name": "relation_question_does_not_generate_typed_retrieval_need",
+            "path": "docmancer/docs/domain/documentation_query_plan.py",
+            "anchor_count": 1,
+            "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+            "after_sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225",
+            "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "expected_failures": 1,
+            "failure_guard": "critical_relation_original_does_not_generate_need_queries"
+          },
+          "import_origin": {
+            "artifact_file": "docmancer-mutation-evidence-axh9_5uw/relation_question_does_not_generate_typed_retrieval_need/import-origin.stdout.log",
+            "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+            "sha256": "2c7cdad24ecd7c9447851bfcf4f77fbd4a9d1ca362c040d2d1cf898d32fb9dd2",
+            "bytes": 10361,
+            "selection": "mutated_module",
+            "row_count": 42,
+            "selected_row_count": 1,
+            "unselected_row_count": 41,
+            "modules": [
+              {
+                "module": "docmancer.docs.domain.documentation_query_plan",
+                "path": "/home/runner/work/_temp/docmancer-mutation-jjbdw1pj/docmancer/docs/domain/documentation_query_plan.py",
+                "sha256": "14d4948d4cd11cbde13470d60398eb35c9664372bb5608d3dfce4d8ce4688225"
+              }
+            ]
+          },
+          "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+        }
+      ]
+    }
   },
   "retirement_phase": {
-    "status": "not_performed",
+    "status": "performed_in_reviewed_retirement_slice",
     "conditions": [
       "Healthy own current baseline and intended generation mutant on bound checkout/source identity.",
       "Keep all47 unselected cases, CASES/probe/qualify and all other AST nodes intact.",
@@ -732,6 +861,18 @@
       "eval/task_level/contract_history/admission_relation_compiler_inputs.json",
       "v2plan/pr211-execution/RELATION_COMPILER_PRECHECK_RU.md"
     ],
-    "commits_or_refs_changed": false
+    "commits_or_refs_changed": false,
+    "actual": {
+      "selected_cases_removed": 25,
+      "selected_definitions_removed": 2,
+      "combined_source_cases_removed": 25,
+      "remaining_definitions": 4,
+      "remaining_cases": 47,
+      "source_blob": "6132b5b1e970e309b7ebe583ebf39d0444744097",
+      "source_sha256": "05891fce3e921626e4185fc58f2a4e007e767ec1926526d29674030d6e6e9f49",
+      "node_roster_sha256": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d",
+      "after_removal_runtime": "pending_existing_PR_CI",
+      "note": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md"
+    }
   }
 }

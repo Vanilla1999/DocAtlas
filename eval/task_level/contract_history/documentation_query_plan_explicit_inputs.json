@@ -1,7 +1,7 @@
 {
   "schema_version": "documentation-query-plan-explicit-inputs-crosswalk-v1",
   "contract": "Explicit host query slots preserve exact input identity; prose creates no extra query, role or inherited original credit.",
-  "migration_status": "precheck-only; all 70 original cases remain collected",
+  "migration_status": "retired_after_own_ci_c2a6682d",
   "base_commit": "34913345f8f6f491fc707a9028c58d7d68319cd5",
   "base_tree_sha": "018a4d9d4d006bf6a5522039afd75c5514f43183",
   "source": {
@@ -290,7 +290,191 @@
     "normal_baseline_required": "54 PASS, zero failure/error/skip before mutation credit.",
     "new_kill_required": "Each new mutation must report exactly one expected assertion failure with its named guard, zero errors/skips, correct source anchor/import/hash and isolated restoration.",
     "prior_inputs_do_not_detect_new_faults": "Deduplication changes only selected record 2; four-slot truncation changes only selected record 0. Existing 24 single-lookup fixtures remain unchanged.",
-    "runtime_status": "pending; no new proof or retirement permission is claimed"
+    "runtime_status": "Own 54-pass baseline and both individually verified intended kills observed; selected three functions retired with separate compiler30 proof.",
+    "runtime_proof": {
+      "repository": "Vanilla1999/DocAtlas",
+      "pr": 211,
+      "pr_head": "c2a6682d2438c9217c3bf26938dcd003391dbc75",
+      "checkout_commit": "642a14289fddd06408400b4ee6cc5480945e7d1a",
+      "checkout_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "checkout_parents": [
+        "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+        "c2a6682d2438c9217c3bf26938dcd003391dbc75"
+      ],
+      "pr_tree": "89106f59cf181510a25ee8b667a9ff4966a82fd6",
+      "same_tree_verified": true,
+      "main_run_id": 38021212993,
+      "reader_job_id": 114124354950,
+      "advanced_job_id": 114122398660,
+      "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38021212993/job/114124354950",
+      "evidence_path": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json",
+      "evidence_blob": "5a4a03197ed8ad93e40157ec37ecb3cb5247ea3d",
+      "evidence_sha256": "d672705adec2e132a91dc894af261a688405addf9cbc06e7fc0051fd33a52d57",
+      "decoded_log_sha256": "f2a9ab819aab5498f858d85f3525d3fbd9912e2b7ef090f2f28ca92a89e6b397",
+      "decoded_log_utf8_bytes": 591931,
+      "critical_baseline": {
+        "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/evidence.json",
+        "sha256": "9191908ea3a417236cbcb6da83de474222280518fe3e1b6758211c83ff08f493",
+        "bytes": 16066,
+        "run": "baseline",
+        "validated": true,
+        "returncode": 0,
+        "junit": {
+          "tests": 54,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "roster_sha256": "489d07c1f0d9641cef201b4bfbbbba08ce08979c721f504cb87a3e3dce94595c"
+        },
+        "observed_case_count": 54,
+        "observed_nonpassing_count": 0,
+        "failed_cases": [],
+        "stored_import_probe": {
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/baseline/import-origin.stdout.log",
+          "sha256": "3d48454cfecf4e547e4ad6b75797d0f40d7cb10ddb3ff6d0f27fdc8115b2a899",
+          "bytes": 10361,
+          "recorded_module_count": 42,
+          "complete_rows_in_receipt": 42,
+          "matched_modules": [
+            {
+              "module": "docmancer.docs.domain.project_retrieval_intent",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/project_retrieval_intent.py",
+              "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+            },
+            {
+              "module": "docmancer.docs.domain.documentation_query_plan",
+              "path": "/home/runner/work/_temp/docmancer-mutation-ivpp7a5_/docmancer/docs/domain/documentation_query_plan.py",
+              "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+            }
+          ],
+          "claim_boundary": "separate_process_import_probe_not_pytest_same_process"
+        },
+        "complete_record_in": "v2plan/pr211-execution/RUNTIME_EVIDENCE_c2a6682d.json"
+      },
+      "critical_mutants_total": 30,
+      "priority_rows_omitted": 0,
+      "import_claim_boundary": "Import rows are actual stored separate-process import probes, not pytest same-process observations. Producer validation and individual stored failure/source hashes are recorded without rerunning.",
+      "literal_comparison": {
+        "step": {
+          "name": "Compare historical and compact literal contract tests",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        "claim_boundary": "Same-checkout producer step success. No omitted individual literal mutant rows are reconstructed."
+      },
+      "scope": "Own compiler-boundary evidence; no source-quality, archived-input execution-equivalence or full-PR PASS claim.",
+      "directed_mutants": [
+        {
+          "record_type": "CRITICAL_OPERANDS",
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_duplicate_lookup_slots/evidence.json",
+          "sha256": "bbd97d9c6812c30967b00926ad105a9d19e42c4d316b791b714000d3de0cfa5d",
+          "bytes": 2336,
+          "run": "documentation_plan_keeps_duplicate_lookup_slots",
+          "validated": true,
+          "returncode": 1,
+          "junit": {
+            "tests": 1,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+          },
+          "observed_case_count": 1,
+          "observed_nonpassing_count": 1,
+          "failed_cases": [
+            {
+              "classname": "tests.docs.test_project_retrieval_alias_contract",
+              "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+              "outcome": "failure",
+              "message": "AssertionError: critical_explicit_lookup_duplicate_slots"
+            }
+          ],
+          "mutation": {
+            "name": "documentation_plan_keeps_duplicate_lookup_slots",
+            "path": "docmancer/docs/domain/documentation_query_plan.py",
+            "anchor_count": 1,
+            "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+            "after_sha256": "114891dc16d8737c3e7ea551d718e1f0a71b11e58cac4490931c19601aa82c47",
+            "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "expected_failures": 1,
+            "failure_guard": "critical_explicit_lookup_duplicate_slots"
+          },
+          "import_origin": {
+            "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_duplicate_lookup_slots/import-origin.stdout.log",
+            "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+            "sha256": "7fc96df873885942fd43f898da6de61f0502419b54ea2e315f0839b11e62f360",
+            "bytes": 10361,
+            "selection": "mutated_module",
+            "row_count": 42,
+            "selected_row_count": 1,
+            "unselected_row_count": 41,
+            "modules": [
+              {
+                "module": "docmancer.docs.domain.documentation_query_plan",
+                "path": "/home/runner/work/_temp/docmancer-mutation-phn67aur/docmancer/docs/domain/documentation_query_plan.py",
+                "sha256": "114891dc16d8737c3e7ea551d718e1f0a71b11e58cac4490931c19601aa82c47"
+              }
+            ]
+          },
+          "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+        },
+        {
+          "record_type": "CRITICAL_OPERANDS",
+          "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_fifth_lookup_slot/evidence.json",
+          "sha256": "762614a023a9056ea73b4583f61d369d4d92f174535fe573065b8e0a76bdff52",
+          "bytes": 2572,
+          "run": "documentation_plan_keeps_fifth_lookup_slot",
+          "validated": true,
+          "returncode": 1,
+          "junit": {
+            "tests": 1,
+            "failures": 1,
+            "errors": 0,
+            "skipped": 0,
+            "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+          },
+          "observed_case_count": 1,
+          "observed_nonpassing_count": 1,
+          "failed_cases": [
+            {
+              "classname": "tests.docs.test_project_retrieval_alias_contract",
+              "name": "test_current_alias_boundary_preserves_explicit_queries_without_inference",
+              "outcome": "failure",
+              "message": "AssertionError: critical_explicit_lookup_fifth_slot"
+            }
+          ],
+          "mutation": {
+            "name": "documentation_plan_keeps_fifth_lookup_slot",
+            "path": "docmancer/docs/domain/documentation_query_plan.py",
+            "anchor_count": 1,
+            "before_sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220",
+            "after_sha256": "ac7b2e58d7db719f3163752115aed265bd4bfea56a39a4e098bbb8a9a1c8d0ef",
+            "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+            "expected_failures": 1,
+            "failure_guard": "critical_explicit_lookup_fifth_slot"
+          },
+          "import_origin": {
+            "artifact_file": "docmancer-mutation-evidence-axh9_5uw/documentation_plan_keeps_fifth_lookup_slot/import-origin.stdout.log",
+            "claim_boundary": "separate_process_import_probe_not_pytest_same_process",
+            "sha256": "4c8117205eaead6bdd2a4a31c132e77a6a2db236a7022dfe9b1bb10747ad9be0",
+            "bytes": 10361,
+            "selection": "mutated_module",
+            "row_count": 42,
+            "selected_row_count": 1,
+            "unselected_row_count": 41,
+            "modules": [
+              {
+                "module": "docmancer.docs.domain.documentation_query_plan",
+                "path": "/home/runner/work/_temp/docmancer-mutation-va8ia19e/docmancer/docs/domain/documentation_query_plan.py",
+                "sha256": "ac7b2e58d7db719f3163752115aed265bd4bfea56a39a4e098bbb8a9a1c8d0ef"
+              }
+            ]
+          },
+          "claim_boundary": "stored_producer_operands_not_revalidated_or_same_pytest_process_proof"
+        }
+      ]
+    }
   },
   "preservation": {
     "original_definitions": 29,
@@ -306,5 +490,18 @@
     "imports_and_helpers": "All imports and non-test nodes remain; the original module has no local non-test function/class helper.",
     "diagnostic_labels": "No label, selector, registration or node hash changes during precheck.",
     "future_retirement": "Separate reviewed change only after own normal baseline and both intended production kills on the same checkout tree. Preserve the other 67 cases and update only this module's node roster hash."
+  },
+  "retirement": {
+    "status": "performed_in_reviewed_retirement_slice",
+    "selected_functions_removed": 3,
+    "selected_cases_removed": 3,
+    "combined_compiler_cases_removed": 33,
+    "combined_remaining_definitions": 16,
+    "combined_remaining_cases": 37,
+    "source_blob": "cbdb54d3941cc3b422d9bec25d04493c4d23e833",
+    "source_sha256": "63b18bd674cab2116a317a2bc56ccf1a3d6122bb97e1d5c430b27b56593e703b",
+    "whole_node_roster_sha256": "3e87a5d20558573e7eb7e70b3a64a22b8528843879fc13a4965aa3578da0533b",
+    "after_removal_runtime": "pending_existing_PR_CI",
+    "note": "v2plan/pr211-execution/COMPILER_RETIREMENT_58_RU.md"
   }
 }

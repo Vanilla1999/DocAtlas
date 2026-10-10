@@ -44,27 +44,8 @@ def qualify(question, body, origin='retrieval_need', candidate=None):
         expected_project_identity='repo')
 
 
-@pytest.mark.parametrize('english,russian,body,opposite,operator', CASES)
-@pytest.mark.parametrize('language', ['en', 'ru'])
-@pytest.mark.parametrize('answer', ['first', 'other'])
-def test_local_relation_not_question_word_overlap(english, russian, body, opposite, operator, language, answer):
-    text = body if answer == 'first' else opposite
-    result = qualify(english if language == 'en' else russian, text)
-    assert result.qualified and result.trace.get('admission_route') == 'typed_local', result.trace
-    spans = result.trace['need_witness_spans']
-    assert spans and all(0 <= a < b <= len(text) and text[a:b].strip() for a, b in spans)
 
 
-@pytest.mark.parametrize('question,body', [
-    ('Which has priority: command option or config file?', 'A config file takes precedence over a command option.'),
-    ('When does Cleanup run relative to transaction commit?', '- Cleanup executes before transaction commit.'),
-    ('Is a normal handler allowed?', 'A normal handler is not allowed; an async handler is required.'),
-    ('Which options configure retry policy?', 'Retry policy is configured using these options:\n\n- Select an interval.\n- Choose a limit.'),
-    ('How do input fields correspond to output fields?', '| Input fields | Output fields |\n|---|---|\n| old_name | new_name |'),
-])
-def test_new_lexical_family_and_markdown_layout(question, body):
-    result = qualify(question, body)
-    assert result.qualified and result.trace.get('admission_route') == 'typed_local', result.trace
 
 
 @pytest.mark.parametrize('question,body', [

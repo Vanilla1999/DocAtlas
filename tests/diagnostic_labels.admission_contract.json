@@ -18,7 +18,7 @@
     "tests/docs/test_admission_meaning.py": "964abdbdef8f5e41b0107bdb9fd757842d8296ebbbb986a2473d520fa434af1b",
     "tests/docs/test_admission_pipeline_invariants.py": "7e1e06a5673d11ff85e74a957429d119a6b96667fa752a149c39b0bd843da8ed",
     "tests/docs/test_admission_relation_safety.py": "077faa21a04fe876c8b34417761810456369f918e45fd4723322b3b178ff9b4f",
-    "tests/docs/test_admission_relation_witnesses.py": "a005ffa9039aa28ec770ad4fac6aa32c1f6e1ed0e7502b42b4dd20557794fe7f",
+    "tests/docs/test_admission_relation_witnesses.py": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d",
     "tests/docs/test_admission_role_boundaries.py": "c9e8b53c258a82f5e785b1b300c5aa01889795c52ef0e1480b21fd24a39318c7",
     "tests/docs/test_admission_subject_binding.py": "8b510e447e2ccec88edbf20c3b2aaf6b25bf7b6f4c4965c1638efb5734a25137"
   },
