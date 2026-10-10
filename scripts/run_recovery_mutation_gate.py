@@ -34,6 +34,8 @@ MODULE_PATHS = {
     "docmancer.docs.domain.literal_context_admission": "docmancer/docs/domain/literal_context_admission.py",
     "docmancer.docs.domain.query_reference_binding": "docmancer/docs/domain/query_reference_binding.py",
     "eval.agent_developer_v1.structural_filename_controls": "eval/agent_developer_v1/structural_filename_controls.py",
+    "docmancer.core._sqlite_store_part03": "docmancer/core/_sqlite_store_part03.py",
+    "eval.agent_developer_v1.fts_literal_controls": "eval/agent_developer_v1/fts_literal_controls.py",
 }
 FROZEN_QUESTION_SHA256 = "2febcb8d2d4fa37fd257fb8005b453e48dfce221a6f32d19b76c0db062a7129b"
 FROZEN_SOURCE_SHA256 = "17f90dd3be04d16475952da73f92d919bbe9d9b51f8e76ffa7bf0a7e64a5fc47"
@@ -172,6 +174,14 @@ MUTANTS = (
            "        return (tuple(self.naming_sources) if document_statement_mentions(text) is not None\n                else tuple(self.sources.values()))",
            "        return tuple(self.sources.values())",
            "closed_literal_context", "recovery_filename_path_selection_not_naming_scope"),
+    Mutant("fts-primary-bare-operator-token", MODULE_PATHS["docmancer.core._sqlite_store_part03"],
+           'cleaned = " ".join(literal_terms)',
+           'cleaned = " ".join(terms)',
+           "closed_literal_context", "recovery_fts_literal_primary"),
+    Mutant("fts-fallback-bare-operator-token", MODULE_PATHS["docmancer.core._sqlite_store_part03"],
+           'fallback_query = " OR ".join(literal_terms)',
+           'fallback_query = " OR ".join(terms)',
+           "closed_literal_context", "recovery_fts_literal_fallback"),
 )
 
 

@@ -486,6 +486,10 @@ class _SQLiteStorePart03:
     ) -> list[dict[str, Any]]:
         cleaned = self._strip_stopwords(query)
         terms = [token for token in re.findall(r"\w+", cleaned) if token]
+        # These are literal query words, never an FTS expression. Quote every
+        # token so uppercase AND/OR/NOT remain data in both backend lanes.
+        literal_terms = [f'"{token}"' for token in terms]
+        cleaned = " ".join(literal_terms)
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
@@ -521,7 +525,7 @@ class _SQLiteStorePart03:
                     pass
                 if rows and not (filters or {}).get("project_identity"):
                     return self._mark_lexical_mode(rows, "and")
-                fallback_query = " OR ".join(terms)
+                fallback_query = " OR ".join(literal_terms)
                 if not fallback_query:
                     return []
                 child_fallback = list(

@@ -41,6 +41,7 @@ from docmancer.retrieval.query_planning import extract_document_locator
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
 from eval.project_context_quality.capture_public_context import capture_public_call
 from eval.agent_developer_v1.structural_filename_controls import run_structural_filename_controls
+from eval.agent_developer_v1.fts_literal_controls import run_fts_literal_controls
 
 REPORT_SCHEMA = "recovery-contract-v2"
 TARGET_MODULES = (
@@ -55,6 +56,7 @@ TARGET_MODULES = (
     "docmancer.docs.domain.literal_context_admission",
     "docmancer.docs.domain.query_reference_binding",
     "eval.agent_developer_v1.structural_filename_controls",
+    "docmancer.core._sqlite_store_part03", "eval.agent_developer_v1.fts_literal_controls",
 )
 TREASURE = (
     "What is the documented contract for adaptive treasure gem trip sampling across positions 1,2,3, "
@@ -157,7 +159,6 @@ def _observed_public_call(service: Any, request: dict[str, Any]) -> dict[str, An
     return capture
 
 
-
 def _failure_diagnostics(case_id: str, detail: Any) -> dict[str, Any]:
     """Summarize an existing failed capture; no body bytes or extra calls."""
     def fields(value, keys):
@@ -201,6 +202,7 @@ def _failure_diagnostics(case_id: str, detail: Any) -> dict[str, Any]:
         "request": fields(capture.get("request"), ("question", "project_path", "scope")),
         "public": fields(payload, ("kind", "status", "reason_code", "context_available",
                                    "answer_supported", "answer_available", "edit_ready", "covered_query_ids", "missing_query_ids")),
+        "public_error": fields(payload.get("error"), ("reason_code", "exception_type", "retryable", "where")),
         "public_source_count": len(payload.get("sources") or ()),
         "public_sources": [window(row) for row in rows(payload.get("sources"))],
         "projection_attempt_count": len(capture.get("projection_attempts") or ()),
@@ -628,9 +630,9 @@ def original_discovery_attribution() -> dict[str, Any]:
                     "full_dto_tokens": estimate_projection_tokens(combined)}
 
 
-
 def closed_literal_context() -> dict[str, Any]:
     """Real source reads keep closed literal context, never inferred conditions."""
+    fts = run_fts_literal_controls(_require, _observed_public_call)
     source_path = "docs/literal-context.md"
     bodies = {
         "OrdersDraftStore": "OrdersDraftStore stores draft orders as JSON records keyed by order id before upload.",
@@ -920,7 +922,7 @@ def closed_literal_context() -> dict[str, Any]:
                      "explain_pair_only", "recovery_explain_exact_body")
     filename = run_structural_filename_controls(_require, _observed_public_call, _literal_context_replay_controls)
     return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks,
-            "structural_filename": filename}
+            "structural_filename": filename, "fts_literal": fts}
 
 
 CASES = (
