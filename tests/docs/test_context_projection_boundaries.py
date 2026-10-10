@@ -17,6 +17,7 @@ def test_path_only_projection_uses_the_current_exact_topic_guard(tmp_path):
     from hashlib import sha256
 
     from tests.docs._reference_binding_fixtures import capture_reference_case
+    from tests.docs._global_evidence_fixtures import capture_fixture
 
     question = "In docs/settings.md, explain ALPHA_KEY."
     text = "ALPHA_KEY enables durable storage."
@@ -47,7 +48,8 @@ def test_path_only_projection_uses_the_current_exact_topic_guard(tmp_path):
         ("identifier_prefix", "docs/settings.md", "ALPHA_KEY_EXTRA enables durable storage."),
         ("wrong_path", "docs/other.md", text),
     ):
-        negative = capture_reference_case(tmp_path / label, {path: body}, question)["public_payload"]
+        # A correct read veto may happen before the source projector is reached.
+        negative = capture_fixture(tmp_path / label, {path: body}, question)["public_payload"]
         assert negative.get("error") is None, negative
         assert negative["kind"] == "docs_context", negative
         assert negative["status"] == "insufficient_evidence", negative
