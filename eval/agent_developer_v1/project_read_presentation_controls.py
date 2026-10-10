@@ -18,6 +18,7 @@ from docmancer.docs.application.model_visible_projection import validate_model_v
 from docmancer.docs.interfaces.mcp import context_tools
 from docmancer.docs.models import DeliveryDecision, DocsChunk, DocsResult
 from docmancer.mcp._docs_server_part01 import call_docs_tool_payload
+from docmancer.mcp._docs_server_shared import DocsServerConfig, build_docs_surface
 from docmancer.retrieval.dispatch import RetrievalDispatcher
 from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
 
@@ -420,11 +421,26 @@ def run_project_read_presentation_controls(workspace: Path, storage_state):
                 "critical_project_read_interrupted_acquisition")
         labels.append("acquisition_timeout_no_retry")
 
-        # Ordinary reads do not advertise a retention completion for a fake.
-        with (patch.object(actual, "get_project_context", lambda *_args, **_kwargs: deepcopy(context)),
+        # Default and explicitly advanced public surfaces have distinct schemas.
+        patch_calls = []
+        def uncompleted_context(*_args, **_kwargs):
+            patch_calls.append(True)
+            return deepcopy(context)
+        patch_request = {**request, "context_format": "patch_context"}
+        default_surface = build_docs_surface(DocsServerConfig(expose_admin=False, expose_advanced=False))
+        advanced_surface = build_docs_surface(DocsServerConfig(expose_admin=False, expose_advanced=True))
+        with (patch.object(actual, "get_project_context", uncompleted_context),
               patch.object(RetrievalDispatcher, "run", deny_acquisition)):
-            failure = call_docs_tool_payload("get_docs_context", {**request, "context_format": "patch_context"}, actual)
-        require(not failure.get("sources") and "unsupported_found_window_retention" in json.dumps(failure),
+            failure = call_docs_tool_payload("get_docs_context", patch_request, actual, surface=default_surface)
+            require(not patch_calls and not failure.get("sources")
+                    and failure.get("error", {}).get("reason_code") == "validation_error",
+                    "critical_project_read_public_patch_surface")
+            labels.append("default_surface_rejects_patch_format")
+            # Exercise completion through the real explicitly advanced surface;
+            # rejection by the default schema cannot stand in for this check.
+            failure = call_docs_tool_payload("get_docs_context", patch_request, actual, surface=advanced_surface)
+        require(len(patch_calls) == 1 and not failure.get("sources")
+                and failure.get("error", {}).get("reason_code") == "unsupported_found_window_retention",
                 "critical_project_read_existing_retention_completion")
         labels.append("missing_patch_retention_completion")
         require(state() == before, "critical_project_read_state")
