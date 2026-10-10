@@ -30,8 +30,10 @@ TARGET_TESTS = (
     "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
     "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
     "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
+    "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+    "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1, 1, 3)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -77,6 +79,7 @@ TARGET_MODULES = (
     "eval.evidence_quality_v2.runtime",
     "docmancer.docs.application._project_context_service_part01",
     "eval.agent_developer_v1.project_read_presentation_controls",
+    "docmancer.docs.domain.context_budget",
 )
 
 
@@ -391,6 +394,42 @@ MUTANTS = (
         TARGET_TESTS[11],
         1,
         "critical_project_read_preserves_acquired_windows",
+    ),
+    Mutant(
+        "context_budget_has_no_default_source_cap",
+        "docmancer/docs/domain/context_budget.py",
+        "    max_sources: int | None = None",
+        "    max_sources: int | None = 3",
+        TARGET_TESTS[12],
+        1,
+        "critical_context_no_default_source_cap",
+    ),
+    Mutant(
+        "context_budget_has_no_default_token_cap",
+        "docmancer/docs/domain/context_budget.py",
+        "    max_tokens: int | None = None",
+        "    max_tokens: int | None = 800",
+        TARGET_TESTS[12],
+        1,
+        "critical_context_no_default_token_cap",
+    ),
+    Mutant(
+        "context_delivery_keeps_four_qualified_sources",
+        "docmancer/docs/application/_docs_context_projection_core.py",
+        "    payload = _payload(sources, decision=decision, query_plan=query_plan)",
+        "    payload = _payload(sources[:3], decision=decision, query_plan=query_plan)",
+        TARGET_TESTS[13],
+        3,
+        "critical_context_full_source_set",
+    ),
+    Mutant(
+        "context_delivery_ignores_legacy_800_token_ceiling",
+        "docmancer/docs/application/_docs_context_projection_core.py",
+        "    payload = _payload(sources, decision=decision, query_plan=query_plan)",
+        "    payload = _payload(sources, decision=decision, query_plan=query_plan)\n    if payload[\"estimated_tokens\"] > 800:\n        return project_insufficient(\n            kind=\"docs_context\", missing=[\"legacy output token cap\"],\n            recommended_next_action=None, max_tokens=max_tokens,\n        ), {}",
+        TARGET_TESTS[13],
+        3,
+        "critical_context_full_source_set",
     ),
 )
 

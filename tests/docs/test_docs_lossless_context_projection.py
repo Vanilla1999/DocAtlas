@@ -110,7 +110,7 @@ def test_four_distinct_qualified_lanes_survive_without_source_fit_gate(kind):
     positive(kind)
     retrieval, rows = fixture(kind, large=True, four=True)
     payload, snapshot = project_docs_context(retrieval=retrieval)
-    assert len(payload.get("sources", [])) == 4, retrieval["retrieval_diagnostics"]
+    assert len(payload.get("sources", [])) == 4, "critical_context_full_source_set"
     assert_bound(payload, snapshot, rows)
     assert payload["estimated_tokens"] > 800
     assert set(payload["covered_query_ids"]) == {"query-original", "query-lookup-1", "query-lookup-2", "query-lookup-3"}
@@ -196,7 +196,8 @@ def test_real_valid_context_keeps_canonical_snapshot_tamper_rejection(change):
 
 def test_context_budget_uses_explicit_optional_output_limits():
     budget = ContextBudget()
-    assert budget.max_sources is None and budget.max_tokens is None
+    assert budget.max_sources is None, "critical_context_no_default_source_cap"
+    assert budget.max_tokens is None, "critical_context_no_default_token_cap"
     assert budget.bounded_tokens() is None
     assert budget.bounded_tokens(1200) == 1200
     assert ContextBudget(max_sources=None, max_tokens=None) == budget
