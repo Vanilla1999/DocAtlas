@@ -371,6 +371,15 @@ MUTANTS = (
         1,
         "critical_equal_lookup_has_no_original_credit",
     ),
+    Mutant(
+        "relation_question_does_not_generate_typed_retrieval_need",
+        "docmancer/docs/domain/documentation_query_plan.py",
+        "    queries = [DocumentationLookup(\"query-original\", question, \"original\")]",
+        "    queries = [DocumentationLookup(\"query-original\", question, \"original\")]\n    if \" relative to \" in question or \" относительно \" in question:\n        queries.append(DocumentationLookup(\n            \"query-need-1\", question, \"retrieval_need\", relation=\"direct\",\n            need_relation=\"temporal_order\",\n        ))",
+        TARGET_TESTS[3],
+        1,
+        "critical_relation_original_does_not_generate_need_queries",
+    ),
 )
 
 

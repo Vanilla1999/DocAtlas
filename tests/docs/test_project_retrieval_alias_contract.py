@@ -42,6 +42,12 @@ _COMPILER_ROSTER_SHA256 = "b910fa3dd979b133e630c45aa35c4b71fd66d5c62f95094422120
 _COMPILER_RECORDS_SHA256 = "4c28bcbe98ec8fbb338555a7a45536139c60ace5dcfd2643b1cd12ae4bec6047"
 
 
+_RELATION_COMPILER_CROSSWALK = "eval/task_level/contract_history/admission_relation_compiler_inputs.json"
+_RELATION_COMPILER_SOURCE_SHA256 = "34620c11c83e58dad640b4ee56711830de9ab3ba18ca0c64e88e6f26ffea2809"
+_RELATION_COMPILER_ROSTER_SHA256 = "8f70e346a0c0cb4ba2e4580d715637895d10ebe1b11ccd4e6ebafdd7fc9ffbae"
+_RELATION_COMPILER_INPUT_SHA256 = "c75cba6725098b2ca036a47634091f015a5917c3c5b10bed88a001f57b1b474b"
+_RELATION_COMPILER_REPRESENTATIVE_SHA256 = "5943d52139a599c91cebfe3eddb1eab73fde67287d509fc3af9524c359ef57b7"
+
 def _input_digest(value):
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
@@ -280,6 +286,103 @@ def _explicit_plan_inputs():
     return records, compiler_inputs
 
 
+def _relation_compiler_inputs():
+    crosswalk = json.loads((_ROOT / _RELATION_COMPILER_CROSSWALK).read_text(encoding="utf-8"))
+    assert crosswalk["protocol"] == "admission-relation-compiler-precheck-v1"
+    original = "tests/docs/test_admission_relation_witnesses.py"
+    archive = "eval/task_level/contract_history/admission_relation_compiler_inputs.py.txt"
+    assert crosswalk["source"] == {
+        "original_path": original, "archive_path": archive,
+        "git_blob_sha": "f230beaa41ebb0b999f97493007fe253c629ef78",
+        "sha256": _RELATION_COMPILER_SOURCE_SHA256,
+    }
+    frozen = (_ROOT / archive).read_bytes()
+    assert hashlib.sha256(frozen).hexdigest() == _RELATION_COMPILER_SOURCE_SHA256
+    source = frozen.decode("utf-8")
+    archived = ast.parse(source).body
+    working = ast.parse((_ROOT / original).read_text(encoding="utf-8")).body
+    names = (
+        "test_local_relation_not_question_word_overlap",
+        "test_new_lexical_family_and_markdown_layout",
+    )
+    selected = [node for node in archived if isinstance(node, ast.FunctionDef) and node.name in names]
+    assert [node.name for node in selected] == list(names)
+    all_nodes = [ast.dump(node, include_attributes=False) for node in archived]
+    removed_nodes = [ast.dump(node, include_attributes=False) for node in archived
+                     if not (isinstance(node, ast.FunctionDef) and node.name in names)]
+    actual_nodes = [ast.dump(node, include_attributes=False) for node in working]
+    # This also binds CASES, probe, qualify, every import and all 47 other cases.
+    assert actual_nodes == all_nodes or actual_nodes == removed_nodes, "critical_relation_retirement_exact_scope"
+    roster = crosswalk["selected_functions"]
+    assert _input_digest(roster) == crosswalk["frozen_roster_sha256"] == _RELATION_COMPILER_ROSTER_SHA256
+    assert len(roster) == 2 and sum(row["collected_cases"] for row in roster) == 25
+    source_lines = source.splitlines()
+    for function, row, count in zip(selected, roster, (20, 5), strict=True):
+        start = min([function.lineno, *(node.lineno for node in function.decorator_list)])
+        assert row["function"] == function.name and row["original_nodeid"] == original + "::" + function.name
+        assert row["definition_line"] == function.lineno and row["source_lines"] == [start, function.end_lineno]
+        assert row["collected_cases"] == count and row["action"] == "future_retire_generated_typed_relation_expectation"
+        text = "\n".join(source_lines[start - 1:function.end_lineno])
+        assert hashlib.sha256(text.encode("utf-8")).hexdigest() == row["source_sha256"]
+
+    cases_assignment, = [node for node in archived if isinstance(node, ast.Assign)
+                         and any(isinstance(target, ast.Name) and target.id == "CASES" for target in node.targets)]
+    cases = ast.literal_eval(cases_assignment.value)
+    assert len(cases) == 5 and all(len(row) == 5 and all(isinstance(value, str) for value in row) for row in cases)
+    first, second = selected
+    assert len(first.decorator_list) == 3 and len(second.decorator_list) == 1
+    for decorator in (*first.decorator_list, *second.decorator_list):
+        assert isinstance(decorator, ast.Call) and isinstance(decorator.func, ast.Attribute)
+        assert decorator.func.attr == "parametrize" and len(decorator.args) == 2 and not decorator.keywords
+    assert [ast.literal_eval(node.args[0]) for node in first.decorator_list] == [
+        "english,russian,body,opposite,operator", "language", "answer",
+    ]
+    family_node = first.decorator_list[0].args[1]
+    assert isinstance(family_node, ast.Name) and family_node.id == "CASES"
+    languages = ast.literal_eval(first.decorator_list[1].args[1])
+    answers = ast.literal_eval(first.decorator_list[2].args[1])
+    assert languages == ["en", "ru"] and answers == ["first", "other"]
+    layout_decorator, = second.decorator_list
+    assert ast.literal_eval(layout_decorator.args[0]) == "question,body"
+    layouts = ast.literal_eval(layout_decorator.args[1])
+    assert len(layouts) == 5 and all(len(row) == 2 and all(isinstance(value, str) for value in row) for row in layouts)
+    # Expand literal archive data, never the retired probe/qualify/test bodies.
+    records = []
+    for answer in answers:
+        for language in languages:
+            for family, row in enumerate(cases):
+                question, body = row[0 if language == "en" else 1], row[2 if answer == "first" else 3]
+                records.append({
+                    "original_nodeid": original + "::" + names[0], "case_index": len(records),
+                    "case_family_index": family, "language": language, "answer": answer,
+                    "question": question, "body": body, "operator": row[4],
+                    "question_sha256": hashlib.sha256(question.encode("utf-8")).hexdigest(),
+                    "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+                    "historical_assertion": {
+                        "qualified": True, "admission_route": "typed_local", "nonempty_source_witness_spans": True,
+                    },
+                })
+    for index, (question, body) in enumerate(layouts):
+        records.append({
+            "original_nodeid": original + "::" + names[1], "case_index": index,
+            "question": question, "body": body,
+            "question_sha256": hashlib.sha256(question.encode("utf-8")).hexdigest(),
+            "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest(),
+            "historical_assertion": {"qualified": True, "admission_route": "typed_local"},
+        })
+    assert len(records) == 25 and records == crosswalk["archived_inputs"]
+    assert _input_digest(records) == crosswalk["frozen_input_roster_sha256"] == _RELATION_COMPILER_INPUT_SHA256
+    representatives = crosswalk["representative_inputs"]
+    assert len(representatives) == 2
+    assert _input_digest(representatives) == crosswalk["representative_inputs_sha256"] == _RELATION_COMPILER_REPRESENTATIVE_SHA256
+    for index, (record, archived_record) in enumerate(zip(representatives, (records[6], records[24]), strict=True)):
+        assert record["case_index"] == index and record["archive_nodeid"] == archived_record["original_nodeid"]
+        assert record["archive_case_index"] == archived_record["case_index"]
+        assert record["question"] == archived_record["question"]
+        assert record["question_sha256"] == archived_record["question_sha256"] and record["lookup_queries"] == []
+    return representatives
+
+
 def test_current_alias_boundary_preserves_explicit_queries_without_inference():
     crosswalk = json.loads((_ROOT / _CROSSWALK).read_text(encoding="utf-8"))
     assert crosswalk["source"]["original_path"] == "tests/docs/test_direct_question_retrieval_intents.py"
@@ -418,3 +521,19 @@ def test_current_alias_boundary_preserves_explicit_queries_without_inference():
         assert payload["required_query_ids"] == record["expected_required_query_ids"], guard
         assert all(row["public_parent_query_id"] is None for row in payload["queries"]), guard
         assert build_project_retrieval_aliases(question) == (), guard
+
+    # Two raw representatives cover the removed relation-lane generator. The
+    # 25 frozen source/answer rows above are data, not hidden qualification runs.
+    for record in _relation_compiler_inputs():
+        question, guard = record["question"], record["guard"]
+        plan = build_documentation_query_plan(question)
+        assert [[row.query_id, row.text, row.origin, row.relation, row.coverage_required]
+                for row in plan.queries] == record["expected_rows"], guard
+        assert plan.original_question == question, guard
+        original, = plan.queries
+        assert original.public_parent_query_id is None, guard
+        assert original.need_subject is original.need_relation is original.need_context is None, guard
+        assert original.preferred_catalog_roles == original.forbidden_catalog_roles == (), guard
+        assert original.forbidden_evidence_terms == original.parent_exact_terms == (), guard
+        assert plan.component_contract == () and plan.component_scope_complete is False, guard
+        assert plan.as_payload() == record["expected_payload"], guard
