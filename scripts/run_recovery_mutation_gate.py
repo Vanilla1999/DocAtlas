@@ -125,6 +125,18 @@ MUTANTS = (
            'phrase_match = re.search(technical_term_pattern(phrase, exact=True), unit_text)',
            'phrase_match = re.search(technical_term_pattern(phrase, exact=True), unit_text) or re.search(r"$", unit_text)',
            "closed_literal_context", "recovery_count_phrase_body_witness"),
+    Mutant("explain-list-context-disabled", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'explain_literals = _closed_explain_literals(question)',
+           'explain_literals = ()',
+           "closed_literal_context", "recovery_explain_literal_source_fact"),
+    Mutant("explain-list-context-ignores-tail", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           r'if re.fullmatch(r"\.\s*", question[cursor:]) is None:',
+           r'if False and re.fullmatch(r"\.\s*", question[cursor:]) is None:',
+           "closed_literal_context", "recovery_explain_complete_syntax"),
+    Mutant("explain-list-borrows-label-substance", MODULE_PATHS["docmancer.docs.domain.literal_context_admission"],
+           'for mention in mentions:\n            remaining = re.sub(technical_term_pattern(mention.text, exact=True), "", remaining)',
+           'for mention in mentions[:1]:\n            remaining = re.sub(technical_term_pattern(mention.text, exact=True), "", remaining)',
+           "closed_literal_context", "recovery_explain_exact_body"),
 
 )
 

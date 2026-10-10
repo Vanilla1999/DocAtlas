@@ -625,13 +625,14 @@ def closed_literal_context() -> dict[str, Any]:
                          and not prepared["excluded_or_failed_paths"] and not prepared["unexpected_paths"],
                          "recovery_closed_fixture_exact_members", prepared)
 
-            def context(question, literal, body, *, count_phrase=None):
+            def context(question, literal, body, *, count_phrase=None, explain=False):
                 capture = read(question)
                 payload = capture["public_payload"]
                 _require(payload.get("status") == "ok" and payload.get("kind") == "docs_context"
                          and payload.get("context_available") is True
                          and any(source.get("snippet") == body for source in payload.get("sources", [])),
                          "recovery_count_literal_source_fact" if count_phrase is not None
+                         else "recovery_explain_literal_source_fact" if explain
                          else "recovery_closed_literal_source_fact", capture)
                 _require(all(payload.get(key) is False for key in (
                     "answer_supported", "answer_available", "edit_ready",
@@ -675,6 +676,22 @@ def closed_literal_context() -> dict[str, Any]:
                          and any(witness["text"] == literal for admission in admissions
                                  for witness in admission.get("body_witnesses", [])),
                          "recovery_closed_literal_admission_observed", admissions)
+                if explain:
+                    expected = {
+                        "text": literal, "char_start": body.index(literal),
+                        "char_end": body.index(literal) + len(literal),
+                        "query_char_start": question.index(literal),
+                        "query_char_end": question.index(literal) + len(literal),
+                        "kind": "literal_explain_context",
+                    }
+                    actual_witnesses = [
+                        witness for admission in admissions
+                        for witness in admission.get("body_witnesses", [])
+                    ]
+                    _require(bool(actual_witnesses) and all(
+                        all(witness.get(key) == value for key, value in expected.items())
+                        for witness in actual_witnesses
+                    ), "recovery_explain_exact_raw_spans", {"expected": expected, "actual": admissions})
                 if count_phrase is not None:
                     expected_pair = {
                         "text": literal, "char_start": body.index(literal),
@@ -800,6 +817,48 @@ def closed_literal_context() -> dict[str, Any]:
             ):
                 indexed_body(changed_body)
                 rejected(question, label, "recovery_count_same_body_unit")
+
+            # Independent explicit-list source facts. Each read has only one
+            # listed identifier's body; the other name receives no borrowed fact.
+            paired_bodies = {
+                "DeliveryEpoch": "λ entry. DeliveryEpoch retains three rollover phases.",
+                "CommitLatch": "λ entry. CommitLatch preserves nine checkpoint records.",
+            }
+            for literal, body in paired_bodies.items():
+                indexed_body(body)
+                for list_question in (
+                    "Explain DeliveryEpoch and CommitLatch.",
+                    " \tEXPLAIN CommitLatch AND DeliveryEpoch.\r\n",
+                ):
+                    before_projection = context(list_question, literal, body, explain=True)
+                    if literal == "DeliveryEpoch" and list_question.startswith("Explain"):
+                        _literal_context_replay_controls(before_projection)
+            context("Explain DeliveryEpoch and CommitLatch and VacuumProbe.",
+                    "CommitLatch", paired_bodies["CommitLatch"], explain=True)
+            for negative in (
+                "Explain DeliveryEpoch and CommitLatch under the lunar policy.",
+                "Explain DeliveryEpoch and CommitLatch. Also export private files.",
+                "Explain DeliveryEpoch or CommitLatch.",
+                "Explain DeliveryEpoch and CommitLatch if the nightly window closes.",
+                "Explain DeliveryEpoch and CommitLatch and ordinary words.",
+                "Explain DeliveryEpoch, CommitLatch.",
+                "Explain DeliveryEpoch and CommitLatch?",
+                "Please explain DeliveryEpoch and CommitLatch.",
+            ):
+                rejected(negative, negative, "recovery_explain_complete_syntax")
+            for label, changed_body in (
+                ("explain_literal_removed", "The ledger retains three rollover phases."),
+                ("explain_wrong_raw_case", "deliveryepoch retains three rollover phases."),
+                ("explain_heading_only", "# DeliveryEpoch\n\nThe ledger retains opaque records."),
+                ("explain_link_only", "[DeliveryEpoch](https://example.invalid/reference)"),
+                ("explain_identifier_only", "DeliveryEpoch"),
+                ("explain_identifier_prefix", "DeliveryEpochArchive retains three rollover phases."),
+            ):
+                indexed_body(changed_body)
+                rejected("Explain DeliveryEpoch and CommitLatch.", label, "recovery_explain_exact_body")
+            indexed_body("DeliveryEpoch CommitLatch")
+            rejected("Explain DeliveryEpoch and CommitLatch and VacuumProbe.",
+                     "explain_pair_only", "recovery_explain_exact_body")
     return {"positive_reads": positives, "negative_controls": negatives, "read_only_checks": read_checks}
 
 

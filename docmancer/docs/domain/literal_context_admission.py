@@ -41,6 +41,62 @@ def _closed_context_literal(question: str) -> QueryMention | None:
     return None
 
 
+def _closed_explain_literals(question: str) -> tuple[QueryMention, ...]:
+    """Consume the entire explicit identifier list before admitting any body."""
+    frame = re.match(r"\s*explain[ \t]+", question, re.I)
+    if frame is None:
+        return ()
+    mentions = {mention.start: mention for mention in query_mentions(question)
+                if not mention.explicit and mention.syntax_role == "unresolved"
+                and mention.text.isidentifier()}
+    selected = []
+    cursor = frame.end()
+    while True:
+        mention = mentions.get(cursor)
+        if mention is None:
+            return ()
+        selected.append(mention)
+        cursor = mention.end
+        separator = re.match(r"[ \t]+and[ \t]+", question[cursor:], re.I)
+        if separator is None:
+            break
+        cursor += separator.end()
+    if re.fullmatch(r"\.\s*", question[cursor:]) is None:
+        return ()
+    return tuple(selected)
+
+
+def _explain_context_witnesses(
+    evidence_text: str, window_start: int, mentions: tuple[QueryMention, ...],
+) -> list[dict[str, Any]]:
+    """Return raw body occurrences only for the identifiers present here."""
+    witnesses = []
+    paragraph_start = 0
+    for boundary in re.finditer(r"(?:\r?\n)[ \t]*(?:\r?\n)|\Z", evidence_text):
+        unit_start = paragraph_start
+        unit_text = evidence_text[unit_start:boundary.start()]
+        paragraph_start = boundary.end()
+        normalized = " ".join(unit_text.split())
+        if not normalized or _relation_units(unit_text) != (normalized,):
+            continue
+        remaining = unit_text
+        for mention in mentions:
+            remaining = re.sub(technical_term_pattern(mention.text, exact=True), "", remaining)
+        if not re.search(r"[^\W_]", remaining):
+            continue
+        for mention in mentions:
+            pattern = technical_term_pattern(mention.text, exact=True)
+            for match in re.finditer(pattern, unit_text):
+                witnesses.append({
+                    "mention_id": mention.mention_id, "text": mention.text,
+                    "char_start": window_start + unit_start + match.start(),
+                    "char_end": window_start + unit_start + match.end(),
+                    "query_char_start": mention.start, "query_char_end": mention.end,
+                    "kind": "literal_explain_context",
+                })
+    return witnesses
+
+
 def _closed_count_context(question: str) -> tuple[QueryMention, str, int, int] | None:
     """Keep a complete count frame and its opaque phrase; infer no quantity."""
     for mention in query_mentions(question):
@@ -182,6 +238,11 @@ def admit_original_literal_context(
         if substantive:
             witnesses.append({"mention_id": mention.mention_id, "text": mention.text,
                               "char_start": binding["char_start"], "char_end": binding["char_end"]})
+    explain_literals = _closed_explain_literals(question)
+    if (explain_literals and isinstance(visible_span, (list, tuple))
+        and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
+        and visible_span[1] - visible_span[0] == len(evidence_text)):
+        witnesses.extend(_explain_context_witnesses(evidence_text, visible_span[0], explain_literals))
     count_context = _closed_count_context(question)
     if (count_context is not None and isinstance(visible_span, (list, tuple))
         and len(visible_span) == 2 and all(type(value) is int for value in visible_span)
