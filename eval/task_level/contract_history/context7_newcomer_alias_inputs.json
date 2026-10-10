@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "contract": "context7-explicit-input-alias-boundary-v1",
-  "migration_status": "precheck-original-tests-still-collected",
+  "migration_status": "retired-selected-context7-topic-alias-tests-after-own-runtime-proof",
   "base_commit": "80c8fbbb3e8c379467a9075f93f7165d080f8432",
   "base_tree_sha": "a838749f57ff0165ab925590656f64e0799a2e05",
   "source": {
@@ -442,5 +442,524 @@
       "complete_cases_in_artifact": true
     },
     "limitation": "This actual 53/19 proof is for the preceding published source tree. It does not prove the proposed 24-input control or the new 20th mutant. Full core is still failing."
+  },
+  "runtime_proof": {
+    "pr_head_sha": "f7b9253c8e477babf276ae8dd2cb18905451cd15",
+    "checkout_commit_sha": "011e808a0dcd2ec8104611a2257d17b5f20e327a",
+    "checkout_parents": [
+      "d2ed5c4c73dc3b7d56276fc37591cba8a4ae123c",
+      "f7b9253c8e477babf276ae8dd2cb18905451cd15"
+    ],
+    "checkout_tree_sha": "cfe816a4e295961b2b529b612bbc63c39ff99ccf",
+    "pr_head_tree_sha": "cfe816a4e295961b2b529b612bbc63c39ff99ccf",
+    "same_tree_as_pr_head": true,
+    "run_id": 38008532239,
+    "run_attempt": 1,
+    "critical_job_id": 114082885405,
+    "critical_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38008532239/job/114082885405",
+    "evidence_scope": "Normal critical gate only; historical/compact comparison records with case_mode are excluded.",
+    "baseline": {
+      "errors": 0,
+      "failures": 0,
+      "mutation": null,
+      "returncode": 0,
+      "roster_sha256": "b4a630000b9791fdb09c4b245bc2b213cba2cb8914b1898bc58116354cc5d585",
+      "run": "baseline",
+      "skipped": 0,
+      "testcase_seconds": 0.058,
+      "tests": 53
+    },
+    "normal_intended_kills": 20,
+    "scoped_context7_mutant": {
+      "errors": 0,
+      "failures": 1,
+      "mutation": {
+        "after_sha256": "7f9bb4c33c117987145c058a6f5860744eb5eaa3ee8ad08c19948957b7b9e25f",
+        "anchor_count": 1,
+        "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+        "expected_failures": 1,
+        "failure_guard": "critical_context7_no_topic_router_aliases",
+        "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+        "name": "context7_russian_topic_router_cannot_generate_aliases",
+        "new": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    if \"установ\" in question.casefold():\n        return (ProjectRetrievalAlias(\"installation_verification\", \"installation setup verification\", True, \"en\"),)\n    return ()",
+        "old": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+        "path": "docmancer/docs/domain/project_retrieval_intent.py"
+      },
+      "returncode": 1,
+      "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a",
+      "run": "context7_russian_topic_router_cannot_generate_aliases",
+      "skipped": 0,
+      "testcase_seconds": 0.008,
+      "tests": 1
+    },
+    "existing_alias_mutant": {
+      "errors": 0,
+      "failures": 1,
+      "mutation": {
+        "after_sha256": "486399aeb7a48cf8d25c9a988963a7aa507043344b3900cc7aa07de2c98fee74",
+        "anchor_count": 1,
+        "before_sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248",
+        "expected_failures": 1,
+        "failure_guard": "critical_alias_no_generated_queries",
+        "killer": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+        "name": "project_retrieval_no_generated_aliases",
+        "new": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return (ProjectRetrievalAlias(\"inferred_query\", \"invented lookup\", True, \"en\"),)",
+        "old": "def build_project_retrieval_aliases(question: str) -> tuple[ProjectRetrievalAlias, ...]:\n    return ()",
+        "path": "docmancer/docs/domain/project_retrieval_intent.py"
+      },
+      "returncode": 1,
+      "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a",
+      "run": "project_retrieval_no_generated_aliases",
+      "skipped": 0,
+      "testcase_seconds": 0.01,
+      "tests": 1
+    },
+    "normal_mutation_outcomes": [
+      {
+        "name": "normative_python_declaration_recognition",
+        "tests": 26,
+        "failures": 15,
+        "expected_failures": 15,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_python_declaration_grammar",
+        "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+      },
+      {
+        "name": "normative_no_implicit_authority",
+        "tests": 26,
+        "failures": 26,
+        "expected_failures": 26,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_normative_no_authority",
+        "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+      },
+      {
+        "name": "normative_whole_source_delivery",
+        "tests": 26,
+        "failures": 9,
+        "expected_failures": 9,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_source_delivery_fidelity",
+        "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+      },
+      {
+        "name": "normative_bound_source_fidelity",
+        "tests": 26,
+        "failures": 9,
+        "expected_failures": 9,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_bound_source_fidelity",
+        "roster_sha256": "207222289e75e6ef39932c0390814bef235071c9182c7f44eea330f39fe2d482"
+      },
+      {
+        "name": "active_task33_actionability_contract",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": null,
+        "roster_sha256": "6a4890961614cc7cf459930b5b15e5ba0cda6b8e7248afa97ef01f751766104c"
+      },
+      {
+        "name": "github_models_host_turn_limit",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": null,
+        "roster_sha256": "46f6b618a6d16e21945748e3f619b1feeb09076a769a8ebaaf3ee4a56a0051da"
+      },
+      {
+        "name": "project_retrieval_no_generated_aliases",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_alias_no_generated_queries",
+        "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+      },
+      {
+        "name": "project_query_intent_no_inferred_roles",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_project_intent_no_inferred_roles",
+        "roster_sha256": "5543c4fc19c6dad0e4853efcb14590f43d3b23eaa50c329d52e5119da8415ea4"
+      },
+      {
+        "name": "admission_meaning_no_inferred_equivalence",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_admission_meaning_no_inferred_equivalence",
+        "roster_sha256": "47cf9c22cb0a4a9a60c6d498876dd2b3d51044c1cd1cf05652c9235690042d81"
+      },
+      {
+        "name": "default_binding_unknown_not_true",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_default_binding_unknown_abi",
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+      },
+      {
+        "name": "default_binding_unknown_not_false",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_default_binding_unknown_abi",
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+      },
+      {
+        "name": "default_binding_unknown_cannot_qualify",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_default_binding_unknown_veto",
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+      },
+      {
+        "name": "default_binding_nonneeds_not_erased",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_default_binding_nonneeds_preserved",
+        "roster_sha256": "e3cf7ed8bfc9dcc0156f33d8e60a10ecb4e9c278252b93998ed561c709fa38fb"
+      },
+      {
+        "name": "relation_source_identity_guard",
+        "tests": 15,
+        "failures": 5,
+        "expected_failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_policy_identity",
+        "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+      },
+      {
+        "name": "relation_source_freshness_guard",
+        "tests": 15,
+        "failures": 5,
+        "expected_failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_policy_freshness",
+        "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+      },
+      {
+        "name": "relation_raw_metadata_cannot_authenticate_quote",
+        "tests": 15,
+        "failures": 5,
+        "expected_failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_risk_metadata_inert",
+        "roster_sha256": "e640ad58195771ee598aae792d3026cd8fe19878b4dc4351988de8f6df9ec94e"
+      },
+      {
+        "name": "relation_anonymous_trace_has_no_public_credit",
+        "tests": 5,
+        "failures": 5,
+        "expected_failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_lookup_no_borrowed_credit",
+        "roster_sha256": "04afea0f09c0cab7c625c1e7a3ea51f65f695da6bf7b933f9276771b6f5bc1a5"
+      },
+      {
+        "name": "relation_crop_clears_inherited_proof",
+        "tests": 5,
+        "failures": 5,
+        "expected_failures": 5,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_crop_no_inherited_credit",
+        "roster_sha256": "04afea0f09c0cab7c625c1e7a3ea51f65f695da6bf7b933f9276771b6f5bc1a5"
+      },
+      {
+        "name": "relation_qualification_performs_no_source_io",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_relation_qualification_no_io",
+        "roster_sha256": "342ccd86c99931db7bb93d828a34dc1431849fa7b92a168fea393ae72915f555"
+      },
+      {
+        "name": "context7_russian_topic_router_cannot_generate_aliases",
+        "tests": 1,
+        "failures": 1,
+        "expected_failures": 1,
+        "errors": 0,
+        "skipped": 0,
+        "returncode": 1,
+        "failure_guard": "critical_context7_no_topic_router_aliases",
+        "roster_sha256": "8da8e109f727ed0e60616bd1252127b9f431cf18eec4060eaa0e0e19846eac2a"
+      }
+    ],
+    "conclusion": "The 53-case normal baseline is green. All 20 mutations have the expected failures in their selected tests, with zero errors/skips. Eighteen mutations name a failure guard; two preserved legacy targets record failure_guard=null. The scoped Context7 topic-router mutation is caught at its named guard by the expanded 24-input control; the prior three inputs do not reach this mutation."
+  },
+  "retirement": {
+    "base_commit": "f7b9253c8e477babf276ae8dd2cb18905451cd15",
+    "base_tree": "cfe816a4e295961b2b529b612bbc63c39ff99ccf",
+    "base_working_module_blob": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34",
+    "working_module_git_blob_sha": "fd735fdf7402925417ca76ef591f125f2408f6e7",
+    "working_module_sha256": "291fdaf529313996cc81bfd7f82d9cc9983ac3a2c12674b65aa58fd521a2e42d",
+    "source_lines_removed": [
+      20,
+      51
+    ],
+    "removed_source_sha256": "051f39389b1615376becc165945e8082711e84e663ae0ed128363dcff5fbc508",
+    "removed_definitions": 1,
+    "removed_expanded_cases": 21,
+    "retained_definitions": 18,
+    "retained_expanded_cases": 36,
+    "existing_independent_control_cases": 1,
+    "independent_input_count": 24,
+    "ordinary_test_functions_added": 0,
+    "ordinary_test_cases_removed": 21,
+    "removed_original_nodeids": [
+      "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases"
+    ],
+    "retained_test_names": [
+      "test_named_policy_or_contract_is_not_collapsed_to_broad_storage_alias",
+      "test_state_home_variable_uses_narrow_retrieval_without_forcing_context",
+      "test_russian_docs_mcp_start_command_builds_a_command_obligation",
+      "test_exact_symbol_question_is_not_misclassified_as_product_overview",
+      "test_generic_project_alias_does_not_require_docatlas_product_wording",
+      "test_broad_intent_suppresses_mandatory_proof_queries_for_retrieval",
+      "test_canonical_intent_can_carry_bounded_context_without_answer_proof",
+      "test_generic_first_commands_are_not_docs_mcp_public_tool_inventory",
+      "test_explicit_docs_mcp_command_inventory_remains_supported",
+      "test_explicit_docs_mcp_tool_inventory_remains_supported",
+      "test_generic_architecture_is_not_rewritten_as_mcp_server_architecture",
+      "test_russian_parser_failure_does_not_generate_mixed_language_rephrase",
+      "test_broad_retrieval_intent_requires_context_only_delivery",
+      "test_certified_answer_preservation_requires_a_complete_question_contract",
+      "test_project_retrieval_disposition_is_structural",
+      "test_project_scope_aliases_accept_bounded_plural_forms",
+      "test_project_scope_aliases_reject_prefix_collisions",
+      "test_current_docatlas_index_persists_across_service_restart_without_resync"
+    ],
+    "retained_helpers": [
+      "_EmptyRequirements"
+    ],
+    "source_preservation": "Only the exact 32 source lines in selected_function.source_lines, including the decorator, are removed. Every other byte remains: all 18 test definitions and their decorators, helpers, imports, non-test statements and whitespace. Inserting the removed span at its original offset restores the complete old module byte-for-byte.",
+    "diagnostic_module_node_hash_before": "9a242ae667d5864e13ac4a9bf952ae7015f922ed877e5717814be46625844c84",
+    "diagnostic_module_node_hash_after": "96fdabc9cf426155e59d28ec756951ffc5a81cd2e47bf0b3d92adbed43b230d9",
+    "diagnostic_shard_path": "tests/diagnostic_labels.context7_project_chat.json",
+    "diagnostic_shard_base_blob": "f242c5f4d8a15e5f05994e924d103da52d1820b1",
+    "diagnostic_shard_git_blob_sha": "96fff3f3631357da09971115a820b3277a5fa78d",
+    "diagnostic_change": "Only the one module-node hash changes; its behavioral label and every other registration remain.",
+    "frozen_precheck_metadata": "Except migration_status, every pre-existing top-level field remains value-identical to the reviewed precheck. Its pending/collected descriptions are historical statements for base_commit 80c8. Current retirement state and observed proof are recorded only in these added retirement/runtime_proof sections.",
+    "frozen_metadata_preserved": [
+      "schema_version",
+      "contract",
+      "base_commit",
+      "base_tree_sha",
+      "source",
+      "selected_function",
+      "frozen_selected_roster_sha256",
+      "frozen_input_roster_sha256",
+      "prior_questions",
+      "prior_questions_sha256",
+      "combined_questions_sha256",
+      "inputs",
+      "prior_control",
+      "current_contract",
+      "expected_mutation",
+      "critical_gate",
+      "preservation",
+      "preceding_runtime"
+    ],
+    "unchanged_control_blob": "17f64832f9fe7a4d7532ebb0fe6b6ffbfb81dc8d",
+    "unchanged_critical_runner_blob": "8f31dfccd02025b8355020aa4063952733c0689a",
+    "unchanged_critical_runner_mode": "100755",
+    "unchanged_archive_blob": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34",
+    "external_consumer_and_selector_audit": {
+      "base_commit": "f7b9253c8e477babf276ae8dd2cb18905451cd15",
+      "tree_sha": "cfe816a4e295961b2b529b612bbc63c39ff99ccf",
+      "total_files": 1547,
+      "python_files": 1273,
+      "workflow_files": 39,
+      "exact_path_blob_roster_sha256": "a3ab23683bb21796d923380d1eda5eaf8b1235d39e4bb23c368e23e93820d7d7",
+      "roster_digest_encoding": "SHA-256 of UTF-8 newline-joined, lexically sorted path:git_blob_sha records; no trailing newline.",
+      "scope": "All tracked .py; all .github/workflows entries; .sh/.bash/.yml/.yaml/.toml/.ini/.cfg; Makefile/Justfile/justfile; root, .github, scripts JSON and every tests/diagnostic_labels JSON. Markdown/history/corpus result JSON are not claimed as executable selector coverage.",
+      "searched_symbols": [
+        "test_context7_style_project_chat",
+        "test_russian_newcomer_queries_get_retrieval_only_aliases",
+        "_EmptyRequirements"
+      ],
+      "read_errors": [],
+      "removed_function_external_selectors": [],
+      "shared_helper_external_imports": [],
+      "references": [
+        {
+          "path": "tests/diagnostic_labels.context7_project_chat.json",
+          "git_blob_sha": "f242c5f4d8a15e5f05994e924d103da52d1820b1",
+          "lines": [
+            3,
+            6
+          ]
+        },
+        {
+          "path": "tests/docs/test_context7_style_project_chat.py",
+          "git_blob_sha": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34",
+          "lines": [
+            46,
+            255,
+            266
+          ]
+        },
+        {
+          "path": "tests/docs/test_project_retrieval_alias_contract.py",
+          "git_blob_sha": "17f64832f9fe7a4d7532ebb0fe6b6ffbfb81dc8d",
+          "lines": [
+            18,
+            20
+          ]
+        },
+        {
+          "path": "v2plan/stage3/pr211-context-admission-checkpoint-2026-10-06/p0_transition_manifest.py",
+          "git_blob_sha": "da533441c0f9e8fbdb48f3abff6edb3e9ea82f35",
+          "lines": [
+            33
+          ]
+        }
+      ],
+      "reference_classification": "The working module and its diagnostic shard remain. The unchanged independent control names the old function only to parse the frozen archive and compare every other node. The historical p0_transition_manifest.py enumerates the existing module by filename; it contains no selector for the removed function. No other matching executable source/config reference was found in the stated scope."
+    },
+    "full_core_before_retirement": {
+      "run_id": 38008532239,
+      "reader_job_id": 114085424570,
+      "reader_url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38008532239/job/114085424570",
+      "python_junit_records": [
+        {
+          "artifact_file": "pytest-core-3.11-38008532239-1/core-tests-3.11.xml",
+          "xml_sha256": "e698399ef2c11d2b104f194404a0d5576e8696c7c825ac7b224e3378db60cd2d",
+          "counts": {
+            "PASS": 6057,
+            "FAIL": 1680,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        },
+        {
+          "artifact_file": "pytest-core-3.12-38008532239-1/core-tests-3.12.xml",
+          "xml_sha256": "d15d45c3ff1d9c3f86c80775dd46ddbee0e5416f4e8ff718faef615e73feb399",
+          "counts": {
+            "PASS": 6057,
+            "FAIL": 1680,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        },
+        {
+          "artifact_file": "pytest-core-3.13-38008532239-1/core-tests-3.13.xml",
+          "xml_sha256": "d456ba1cd8002db1bc9cce3f6e8d9732d07e3795ea8b874a00a2a2af398ef948",
+          "counts": {
+            "PASS": 6057,
+            "FAIL": 1680,
+            "ERROR": 0,
+            "SKIP": 10
+          },
+          "integrity_issues": []
+        }
+      ],
+      "module_record": {
+        "module": "tests/docs/test_context7_style_project_chat.py",
+        "counts": {
+          "FAIL": 45,
+          "PASS": 12
+        },
+        "first_node": "tests/docs/test_context7_style_project_chat.py::test_russian_newcomer_queries_get_retrieval_only_aliases[\\u041a\\u0430\\u043a \\u0443\\u0441\\u0442\\u0430\\u043d\\u043e\\u0432\\u0438\\u0442\\u044c DocAtlas \\u0438 \\u043f\\u0440\\u043e\\u0432\\u0435\\u0440\\u0438\\u0442\\u044c \\u0437\\u0430\\u043f\\u0443\\u0441\\u043a?-installation_verification]",
+        "first_message": "AssertionError: assert 'installation_verification' in set()"
+      },
+      "console": {
+        "omitted_rows": 0,
+        "complete_cases_in_artifact": true
+      },
+      "conclusion": "Each Python 3.11/3.12/3.13 has 6057 PASS, 1680 FAIL, 0 ERROR and 10 SKIP. The selected module has 12 PASS and 45 FAIL before retirement. This is not a green full core run. Post-retirement results are pending."
+    },
+    "production_changed": false,
+    "selectors_changed": false,
+    "other_context7_cases_changed": false,
+    "documentation_query_plan_cases_changed": false,
+    "final_sha_runtime_status": "pending",
+    "proof_input_blobs_at_runtime": [
+      {
+        "path": "tests/docs/test_context7_style_project_chat.py",
+        "git_blob_sha": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34"
+      },
+      {
+        "path": "tests/docs/test_project_retrieval_alias_contract.py",
+        "git_blob_sha": "17f64832f9fe7a4d7532ebb0fe6b6ffbfb81dc8d"
+      },
+      {
+        "path": "eval/task_level/contract_history/context7_newcomer_alias_inputs.py.txt",
+        "git_blob_sha": "6a9e2564f60b696e2e6f64e5f53512728f9e6c34"
+      },
+      {
+        "path": "eval/task_level/contract_history/context7_newcomer_alias_inputs.json",
+        "git_blob_sha": "1247a6857fa76388f91ac4827ebaafa954c75786"
+      },
+      {
+        "path": "scripts/run_critical_mutation_gate.py",
+        "git_blob_sha": "8f31dfccd02025b8355020aa4063952733c0689a"
+      },
+      {
+        "path": "docmancer/docs/domain/project_retrieval_intent.py",
+        "git_blob_sha": "989e317c45a18fc19d0074a832095ed6a7e7d097"
+      },
+      {
+        "path": "docmancer/docs/domain/documentation_query_plan.py",
+        "git_blob_sha": "0cd20b1138f1a3a2740729677d9588414f2dcf32"
+      },
+      {
+        "path": "tests/docs/test_documentation_query_plan.py",
+        "git_blob_sha": "25de8f3898ba60a33a08425d3e045353fa8014f9"
+      }
+    ]
   }
 }

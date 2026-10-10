@@ -17,38 +17,6 @@ from docmancer.docs.domain.project_retrieval_intent import (
 from docmancer.docs.application.recovery import _suggested_questions
 
 
-@pytest.mark.parametrize(
-    ("question", "intent_id"),
-    [
-        ("Как установить DocAtlas и проверить запуск?", "installation_verification"),
-        ("Какие первые команды выполнить после установки?", "getting_started"),
-        ("Где хранится индекс и как он изолирован по проектам?", "project_storage"),
-        ("Как пользоваться без интернета?", "offline_usage"),
-        ("Что делать, когда ничего не находится?", "troubleshooting"),
-        ("Что нужно протестировать перед открытием pull request?", "testing_contribution"),
-        ("Где посмотреть карту модулей и с чего читать кодовую базу?", "contributor_start"),
-        ("Куда пишется база индекса проекта?", "project_storage"),
-        ("Что сделать после редактирования markdown-документа, чтобы поиск увидел изменения?", "project_docs_sync"),
-        ("Почему get_docs_context вернул insufficient_evidence и что проверить первым?", "troubleshooting"),
-        ("Архитектура?", "project_architecture"),
-        ("When should an agent use get_docs_context?", "docs_mcp_tool_policy"),
-        ("When is an agent allowed to call prepare_docs?", "docs_mcp_tool_policy"),
-        ("What kinds of requests should use docs_status, and when must it not be used?", "docs_mcp_tool_policy"),
-        ("What does fail-closed behavior mean in the DocAtlas documentation workflow?", "fail_closed_workflow"),
-        ("What is the difference between docs_answer, docs_context, patch_context, and insufficient_evidence?", "response_contract"),
-        ("Which repository files are the source of truth, and which DocAtlas storage artifacts are only derived indexes?", "source_authority"),
-        ("What systems does DocAtlas explicitly not replace?", "product_boundaries"),
-        ("How does DocAtlas determine whether a dependency version is exact, declared-only, or unbound?", "dependency_version_binding"),
-        ("What are the responsibilities of docmancer/docs/application and docmancer/docs/domain in this repository?", "module_responsibilities"),
-        ("What claims about DocAtlas are not currently demonstrated according to the product brief?", "product_claims"),
-    ],
-)
-def test_russian_newcomer_queries_get_retrieval_only_aliases(question: str, intent_id: str):
-    aliases = build_project_retrieval_aliases(question)
-
-    assert intent_id in {alias.intent_id for alias in aliases}
-    assert all(alias.force_context_only for alias in aliases)
-    assert all(alias.text for alias in aliases)
 
 
 @pytest.mark.parametrize(
