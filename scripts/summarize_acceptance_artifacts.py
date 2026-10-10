@@ -139,6 +139,75 @@ def print_focused_stage_records(report: dict[str, Any], emit=print) -> None:
         emit("V2_FOCUSED_STAGE " + json.dumps(_focused_bound(record), ensure_ascii=False, sort_keys=True, separators=(",", ":")))
 
 
+def _focused_items(value: Any) -> list:
+    if isinstance(value, list):
+        return value
+    if isinstance(value, dict) and isinstance(value.get("items"), list):
+        return value["items"]
+    return []
+
+
+def _delivery_window_summary(value: Any) -> dict:
+    if not isinstance(value, dict):
+        return {"observation": "unavailable"}
+    rows = [row for row in _focused_items(value.get("items")) if isinstance(row, dict)]
+    return {
+        **_focused_fields(value, ("count", "omitted")),
+        "captured_windows": [
+            _focused_fields(row, (
+                "path", "source", "stable_chunk_id", "char_start", "char_end",
+                "source_class", "doc_scope", "module_path", "qualified_query_ids",
+            ))
+            for row in rows
+        ],
+        "claim_boundary": "captured_window_metadata_not_source_fact_proof",
+    }
+
+
+def _delivery_operand_summary(record: dict) -> dict:
+    stages = record.get("stages")
+    stages = stages if isinstance(stages, dict) else {}
+    observations = stages.get("delivery_observations")
+    observations = observations if isinstance(observations, dict) else {}
+    returns = []
+    for observed in _focused_items(observations.get("returns")):
+        if not isinstance(observed, dict):
+            continue
+        result = observed.get("result")
+        result = result if isinstance(result, dict) else {}
+        returns.append({
+            **_focused_fields(observed, (
+                "stage", "request", "project_docs", "dependency_docs", "observation_error",
+                "project_trust_decision", "routing", "routing_stages", "lanes",
+            )),
+            "result": {
+                **_focused_fields(result, (
+                    "status", "requires_confirmation", "confirmation_reason", "reason",
+                    "reason_code", "answer_available", "delivery_decision",
+                    "request_scope", "requirements",
+                )),
+                "result_windows": _delivery_window_summary(result.get("result_windows")),
+                "context_windows": _delivery_window_summary(result.get("context_windows")),
+            },
+        })
+    return {
+        "record_type": "V2_DELIVERY_OPERANDS",
+        **_focused_fields(record, (
+            "case_id", "artifact_file", "sha256", "bytes", "run_mode",
+            "record_counts", "question", "verdict",
+        )),
+        "payload": _focused_fields(record.get("payload"), (
+            "kind", "status", "reason_code", "support_status", "context_available",
+            "answer_supported", "answer_available", "edit_ready", "source_count",
+            "covered_query_ids", "missing_query_ids",
+        )),
+        "stages": _focused_fields(stages, ("diagnostics_present", "stage_status", "observer_counts")),
+        "delivery_observation_counts": _focused_fields(observations, ("return_counts", "omitted")),
+        "captured_returns": returns,
+        "claim_boundary": "existing_bounded_same_call_operands_not_new_runtime_or_source_fact_proof",
+    }
+
+
 def _json_file(path: Path, root: Path) -> tuple[dict, dict]:
     raw = path.read_bytes()
     value = json.loads(raw)
@@ -372,6 +441,13 @@ def main() -> int:
                     issues.append({**provenance, "status": "unreadable_record",
                                    "error_type": type(exc).__name__})
 
+    # Emit a compact operand row for every focused case before large ledgers.
+    # Full focused records remain unchanged below and in the saved artifact.
+    records = [
+        *[_delivery_operand_summary(row) for row in records
+          if row["record_type"] == "V2_FOCUSED_STAGE"],
+        *records,
+    ]
     result = {
         "schema_version": 1, "purpose": "existing_artifacts_only_not_gate_acceptance",
         "run_id": os.environ.get("GITHUB_RUN_ID"), "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
@@ -396,7 +472,7 @@ def main() -> int:
         # Shared V2 serialization already applied the original depth/list bound.
         # Applying it twice would wrap list envelopes again and lose more leaves.
         emit(row["record_type"], {key: value for key, value in row.items() if key != "record_type"},
-             already_bounded=row["record_type"] == "V2_FOCUSED_STAGE")
+             already_bounded=row["record_type"] in {"V2_FOCUSED_STAGE", "V2_DELIVERY_OPERANDS"})
     print("ARTIFACT_CONSOLE " + json.dumps({"omitted_rows": omitted, "record_count": len(records),
                                            "complete_selected_records_in_artifact": True,
                                            "original_reports_preserved": True}))
