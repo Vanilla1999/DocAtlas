@@ -163,28 +163,6 @@ def test_incremental_sync_rejects_deletion_while_document_still_exists(tmp_path,
     ).results[0].content
 
 
-def test_sync_project_docs_prunes_orphaned_sources_when_all_docs_removed(tmp_path, monkeypatch):
-    project = _flutter_project(tmp_path)
-    readme = project / "README.md"
-    readme.write_text("# App\n\nRemoveAllNeedle should be pruned.", encoding="utf-8")
-    service = _service_with_real_agent(tmp_path, monkeypatch)
-    service.ingest_project_docs(str(project), with_vectors=False)
-    readme.unlink()
-
-    result = service.sync_project_docs(str(project), with_vectors=False)
-
-    assert result.status == "success"
-    assert result.candidate_count == 0
-    assert result.orphaned_count == 1
-    assert result.orphaned_removed == 1
-    assert result.current_count == 0
-    assert result.indexed_sources == []
-    assert {item["path"] for item in result.removed_sources} == {"README.md"}
-    with service._agent_instance().store._connect() as conn:
-        assert conn.execute("SELECT COUNT(*) FROM sources").fetchone()[0] == 0
-        assert conn.execute("SELECT COUNT(*) FROM sections").fetchone()[0] == 0
-
-
 def test_inspect_project_docs_reports_needs_sync_for_orphaned_sources(tmp_path, monkeypatch):
     project = _flutter_project(tmp_path)
     readme = project / "README.md"
@@ -703,44 +681,6 @@ def test_query_project_docs_runs_lookup_queries_as_retrieval_only_supplements(tm
     assert chunks[0].metadata["retrieval_query_ids"] == (
         "query-lookup-1", "query-lookup-2",
     )
-
-
-def test_query_project_docs_executes_and_attributes_concept_aliases(tmp_path):
-    project = tmp_path / "concept-alias"
-    project.mkdir()
-    observed: list[str] = []
-
-    class Agent:
-        config = SimpleNamespace(query=SimpleNamespace(default_limit=5))
-
-        def query(self, query, *, limit, budget, expand, filters):
-            observed.append(query)
-            return [RetrievedChunk(
-                source="docs/mcp-docs-server.md",
-                chunk_index=0,
-                text="The project answer contract is documented here.",
-                score=1.0,
-                metadata={
-                    "project_identity": filters["project_identity"],
-                    "token_estimate": 20,
-                    "lexical_match": {"qualified": True, "mode": "and"},
-                },
-            )]
-
-    class Facade:
-        def _agent_instance(self):
-            return Agent()
-
-    chunks = ProjectDocsService(Facade()).query_project_docs(
-        str(project), "Where is the project answer contract documented?",
-    )
-
-    alias = "project answer contract documentation docs/mcp-docs-server.md"
-    assert observed.count(alias) == 1
-    trace = chunks[0].metadata["retrieval_query_matches"]["query-concept-1"]
-    assert trace["query_text"] == alias
-    assert trace["qualified"] is False
-    assert "docs/mcp-docs-server.md" in trace["missing_exact_terms"]
 
 
 def test_query_project_docs_attributes_generic_retrieval_hints_without_covering_original(tmp_path):

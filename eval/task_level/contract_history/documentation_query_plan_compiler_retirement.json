@@ -2,6 +2,22 @@
   "schema_version": 1,
   "protocol": "documentation-query-compiler-retirement-v1",
   "phase": "retired30_after_own_ci_with_separately_proved_dqp3",
+  "pr211_output_budget_retirement": {
+    "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+    "baseline_run": "38030248861",
+    "baseline_attempt": 1,
+    "removed_node": "tests/docs/test_documentation_query_plan.py::test_context_budget_is_a_product_invariant",
+    "removed_cases": 1,
+    "source_sha256_after": "49efb38f7729838fb814ab86305aee9f7efe43798bc6ca253fac8e71696ff59c",
+    "own_validated_mutants": [
+      "context_budget_has_no_default_source_cap",
+      "context_budget_has_no_default_token_cap",
+      "context_delivery_keeps_four_qualified_sources",
+      "context_delivery_ignores_legacy_800_token_ceiling"
+    ],
+    "proof": "Common TEST_REDUCTION_40_MANIFEST.json audit_sources owner A verified_prerequisites.DQP_own_kills; explicit optional limits and four-source delivery preserved.",
+    "boundary": "Canceled default output ceilings only; operational bounds unchanged. Independent review and final authorized CI pending; historical compiler30/DQP3 reductions are not credited again."
+  },
   "source": {
     "original_path": "tests/docs/test_documentation_query_plan.py",
     "archive_path": "eval/task_level/contract_history/documentation_query_plan_explicit_inputs.py.txt",
@@ -444,6 +460,14 @@
         "definitions": 16,
         "cases": 37,
         "node_roster_sha256": "3e87a5d20558573e7eb7e70b3a64a22b8528843879fc13a4965aa3578da0533b"
+      },
+      {
+        "dqp3": "retired_after_separate_proof",
+        "compiler_family": "retired30",
+        "output_budget": "retired_after_separate_proof",
+        "definitions": 15,
+        "cases": 36,
+        "node_roster_sha256": "2208f34b5d3954dbb8b4ce8f115d5d37baf5646f053f23eb9390c62fdc96b075"
       }
     ],
     "exact_retained_negative_rows": {
@@ -477,7 +501,7 @@
         }
       ]
     },
-    "all_other_nodes": "Exact archived AST sequence required, including all bodies, decorators, imports and non-test statements; no generic ignore list.",
+    "all_other_nodes": "Exact archived AST sequence required, including all bodies, decorators, imports and non-test statements; an explicit third compiler-retirement state removes only test_context_budget_is_a_product_invariant. No generic ignore list.",
     "diagnostic_registration": "tests/diagnostic_labels.compound_context.json",
     "precheck_changes_original_module_or_registration": false
   },

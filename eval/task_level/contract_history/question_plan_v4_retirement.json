@@ -2,6 +2,19 @@
   "schema_version": 1,
   "protocol": "question-plan-v4-literal-contract-precheck-v1",
   "phase": "precheck_draft_no_retirement",
+  "pr211_retirement_execution": {
+    "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+    "baseline_run": "38030248861",
+    "baseline_attempt": 1,
+    "removed_cases": 26,
+    "retained_cases": 2,
+    "retained_node_roster_sha256": "346ae9b94978030c282b6b7df4bc553fb05db6189d4b9b684af39c895d049712",
+    "prepared_source_sha256": "f069eeb98746dabfb0921d711b140581c6528e821e0bb5bb473974f590f6ccb9",
+    "retained_source_sha256": "67e1c5e63148cc16b91fad7f5f0b303cfc94de45451b621a202ec8cf38664905",
+    "formatting_delta": "Remove two trailing empty lines after the final keeper; keeper bodies/imports/helpers unchanged.",
+    "proof": "Own critical_question_contract_no_inferred_obligations kill and 104 individually validated historical/compact literal import receipts; see common TEST_REDUCTION_40_MANIFEST.json audit_sources owner A.",
+    "boundary": "Physical deletion applied; independent review and final authorized CI pending. Historical precheck fields below remain unchanged. No role19, retrieval-quality or previously completed literal-reduction credit."
+  },
   "repository": "Vanilla1999/DocAtlas",
   "source_checkout": {
     "head": "0065ce62cacaa31a41e4567717e3c67d602f578b",

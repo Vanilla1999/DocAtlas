@@ -17,14 +17,6 @@ def test_documentation_lookup_rejects_invalid_lineage():
         DocumentationLookup("query-x", "x", "canonical_intent", relation="audited_rewrite")
 
 
-def test_context_budget_is_a_product_invariant():
-    budget = ContextBudget()
-
-    assert budget.max_sources == 3
-    assert budget.max_tokens == 800
-    assert budget.bounded_tokens(2_000) == 800
-
-
 def test_evidence_qualification_fails_closed_and_owns_derived_lineage():
     rejected = qualify_evidence(
         {"qualified": True}, query_id="query-intent-1", visible_text="unrelated",
