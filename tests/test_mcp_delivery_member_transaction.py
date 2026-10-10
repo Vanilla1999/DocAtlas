@@ -964,6 +964,8 @@ def test_real_service_retrieves_committed_fixture_member_bytes(local, git_kind, 
             assert _member_storage_files(policy) == corrupted
             with writer.store._connect() as conn:
                 conn.execute(restore)
+        from eval.agent_developer_v1.project_read_presentation_controls import run_project_read_presentation_controls
+        run_project_read_presentation_controls(root.parent / "read-presentation", _member_storage_files)
     print(json.dumps({"identity_fixture": git_kind, "README_file_bytes": len(original),
                       "README_retrieved_bytes": sum(len(chunk.text.encode()) for chunk in chunks if chunk.metadata["project_doc_path"] == "README.md"),
                       "protocols_file_bytes": len(large),

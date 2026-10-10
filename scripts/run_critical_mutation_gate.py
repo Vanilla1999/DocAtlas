@@ -29,8 +29,9 @@ TARGET_TESTS = (
     "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
     "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
     "tests/docs/test_mixed_context_projection_contract.py::test_mixed_context_preserves_current_same_call_source_bindings",
+    "tests/test_mcp_delivery_member_transaction.py::test_real_service_retrieves_committed_fixture_member_bytes[none]",
 )
-TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1)
+TARGET_CASE_COUNTS = (26, 1, 1, 1, 1, 1, 1, 15, 5, 1, 1, 1)
 TARGET_MODULES = (
     "docmancer.docs.domain.normative_language",
     "docmancer.docs.domain.evidence_qualification",
@@ -74,6 +75,8 @@ TARGET_MODULES = (
     "eval.agent_developer_v1.finite_http_fixture",
     "eval.agent_developer_v1.current_retrieval_runtime",
     "eval.evidence_quality_v2.runtime",
+    "docmancer.docs.application._project_context_service_part01",
+    "eval.agent_developer_v1.project_read_presentation_controls",
 )
 
 
@@ -379,6 +382,15 @@ MUTANTS = (
         TARGET_TESTS[3],
         1,
         "critical_relation_original_does_not_generate_need_queries",
+    ),
+    Mutant(
+        "project_read_preserves_already_acquired_windows",
+        "docmancer/docs/application/_project_context_service_part01.py",
+        "            context_pack = [*context_pack, *(item for item in read_presentation_pack\n                if read_window_key(item) not in seen_windows)]",
+        "            context_pack = list(context_pack)  # mutation: drop admitted read windows after control packing",
+        TARGET_TESTS[11],
+        1,
+        "critical_project_read_preserves_acquired_windows",
     ),
 )
 
