@@ -8,54 +8,56 @@
 ## Состояние исполнения на 2026-10-10
 
 Последний фактический CI — PR HEAD
-`d76f6ab85e12f482ad6bec1d43040899f4b0a532` (126), merge
-`8120a80bbb0309a3ec0bf4add71f568666c76772`, общий tree
-`63bff21aadbfb131082db075ed95ea7e89310e44`.
-На каждом Python3.11/3.12/3.13: **6062 PASS /1597 FAIL /0 ERROR /10 SKIP**, всего7669.
-Required CI/P1-stack/closure FAIL. Удаление58cases подтверждено collection
-(DQP70→37,relation72→47); дополнительно выявлены3live failures, их не скрываем.
+`0065ce62cacaa31a41e4567717e3c67d602f578b` (130), merge
+`e4084e51b73725990a107e8b8fc930a8edb46f75`, общий tree
+`628bb7a2eb16f740ce84384925531040f7ec9f5e`.
+На каждом Python3.11/3.12/3.13:
+**6067PASS /1592FAIL /0ERROR /10SKIP**, всего7669.
+Пять FAIL меньше, collection прежняя; requiredCI/P1stack/closureFAIL.
 
-Critical baseline58P/1F из59: native24-window fixture,
-`critical_project_read_acquired_qualified`. Guard не раскрывает точный operand;
-новые35mutants не выполнялись. Recovery: собственные12PASS и33intended kills;
-все33individual outcomes сверены, полный source/import rehash всех33 не заявляется.
-Lossless32/32 и4existing cap killer cases PASS на всех трёх Python.
-Literal historical/compact step16 SUCCESS, individual51-fault console evidence ещё нужно.
+- **P1.4 закрыт на130:**14/14cases,10/10discovery,5/5full facts,5/5oracle,0errors.
+- **Recovery закрыт на130:**12/12healthy,39/39intended kills; все39 individual
+  case/guard/count outcomes сверены. Полный independent source/import rehash не заявляется.
+- **Critical:**60entries,1observedFAIL; label oversized_original ошибочно требует public veto4000,
+  хотя schema его не задаёт.37mutants не выполнялись. Follow-up134 сохраняет полный
+  исходный4001 input и ловит truncation; legacy parser work bound не меняется.
+- Lossless32/32 и4cap killer casesPASS на трёх Python. Literal step16SUCCESS;
+ 104individual child receipts прежний reader не печатает. Это не новый retirement proof.
+- Legacy8/15full source facts,raw original0; V2natural6/15,paraphrase2/5,
+  flow2/4. Контаминация/precision и недостающие факты остаются отдельными blockers.
+- AgentV1target-closed8/11,4gaps; adversarial24/28. P1.6public6/6 иfacts1/1,
+  общийjobFAIL. Installed7/7selftests+1/1scriptedtask, retrieval/platforms/P1.5SUCCESS.
+  Реальные client sessions **NOT RUN**. Workflows:11SUCCESS/6FAILURE/1SKIPPED.
 
-Legacy source-fact8/15 при floor12/15; raw original coverage0.
-V2 natural6/15,paraphrase1/5; productionFAIL. Request flow2/4facts,
-max18sources/16744public bytes/4186estimated tokens и reported Packs contamination.
-Это данные для улучшения precision и пользы; потолки не возвращаются.
-AgentV1 8target-closed/11,4gaps; adversarial24/28.
-P1.4 12/14cases и8/10discovery,5/5completefacts; два original-only gaps.
-P1.6 public delivery6/6,completefacts1/1; общий jobFAIL.
-Installed MCP/selftests7/7/scriptedtask1/1, retrieval evidence/platforms/P1.5 SUCCESS.
-Реальные client sessions **NOT RUN**.
+Reviewed follow-up131–134 применён; собственный runtime **PENDING**:
 
-Reviewed пакет127–129 применён; собственный новый runtime **PENDING**:
+| Slice | Содержание |
+| --- | --- |
+|131|Report-only literal child/import receipts и critical traceback.|
+|132|Question-plan full archives/crosswalk, existing assertion label, direct-builder fault;28cases сохраняются.|
+|133|Full literal raw bytes, строгие current spans,2native reads/3replays/4faults; ordinary lane неизменён.|
+|134|Same4001 input full-forwarding control и truncation fault; без public ceiling и нового native read.|
 
-- **127**: два fixture hash-domain исправления и узкое расширение existing diagnostics;
-  source/display raw hashes не смешиваются с prefixed project/snapshot hashes.
-- **128**: ordinary original project partial-body context, current request-scoped
-  native receipt и6recovery faults. Полный body, original missing,answer/edit false.
-- **129**:4real frozen relation reads в existing privacy test,+1critical selector/+2faults;
-  остальные47witness cases не удалены.
-- Следующий joint target **critical60healthy/37kills,recovery12healthy/39kills**.
-  Ноль новых pytest names не означает ноль дополнительной native работы.
+Следующий joint target **critical61healthy/39kills,recovery12healthy/43kills**.
+Ноль новых pytest names не означает ноль дополнительных внутренних операций.
 
-Один старый DQP default3/800 test сохраняется до собственного cap proof и
-versioned AST/crosswalk retirement. Вопросы/raw source/facts не меняются.
-Raw-versus-trimmed span mismatch исследуется отдельно; runtime first operand
-для module gaps пока не известен. Question-plan26 рассматривается для reuse
-существующих literal/span/dictionary successors, с сохранением2literal/code cases;
-нужны independent receipts,archive и current import/selector audit.
+Существующее retirement58 подтверждено собственным121 proof; новых удалений
+после126 нет. Один старый DQP default3/800 test остаётся до собственных4cap kills.
+Question-plan26retire/2keep — до direct-builder и reused individual literal proof,
+с exact-current consumer audit. Remaining relation47 сохраняются.
 
-Подробности: [checkpoint](PR211_CHECKPOINT_RU.md),
-[actual126](pr211-execution/RUNTIME_EVIDENCE_d76f6ab8.json),
-[retirement58](pr211-execution/COMPILER_RETIREMENT_58_RU.md),
-[ordinary contract](PR211_ORDINARY_PARTIAL_BODY_ADMISSION_RU.md),
-[relation precheck](pr211-execution/RELATION_SOURCE_CONTEXT_PRECHECK_RU.md).
-Исходные числа плана ниже сохраняются как история, привязанная к своим SHA.
+Следующая product задача — сохранить разные source-bound факты одного explicit
+lookup при final projection, используя неизменённые24native source windows.
+Точный actual first veto V2flow ещё не известен; source-level novelty defect
+не выдаётся за per-case runtime trace. Исходные questions/facts/guards сохраняются.
+Module MISS после raw-window correction и comparison проверяются отдельно.
+
+[Checkpoint](PR211_CHECKPOINT_RU.md) ·
+[actual130](pr211-execution/RUNTIME_EVIDENCE_0065ce62.json) ·
+[retirement58](pr211-execution/COMPILER_RETIREMENT_58_RU.md) ·
+[original input](pr211-execution/PROJECT_READ_ORIGINAL_INPUT_RU.md) ·
+[raw window](PR211_LITERAL_RAW_WINDOW_BINDING_RU.md).
+Исходные числа плана ниже сохраняются как история своих SHA.
 
 ## Поправки после оценки перед исполнением
 
