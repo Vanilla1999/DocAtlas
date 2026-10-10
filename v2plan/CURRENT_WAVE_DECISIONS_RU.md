@@ -24,6 +24,37 @@ guards. Новые providers, model/client downloads и изменение по�
 индексов в эту волну не включены. Обычный fast-forward в существующий PR разрешён;
 force-push, merge и release по-прежнему требуют отдельного поручения.
 
+## Применение принятого ADR 0003: Legacy acceptance, 2026-10-10
+
+Это уточнение реализации порученного плана на основании
+[`docs/adr/0003-context-first-project-reads.md`](../docs/adr/0003-context-first-project-reads.md),
+а не новое решение владельца. ADR требует source-attributed context для ответа
+хостом, сохранения исходного вопроса и explicit lookups и независимой проверки
+фактов по возвращённым источникам. Lookup credit не переносится в original query.
+
+В отдельном reviewed diff блокирующая Legacy-метрика явно мигрирует с raw
+`original_query_covered_count` на `verified_original_case_fact_count`: минимум
+**12 из 15** исходных положительных cases с полными замороженными обязательными
+фактами в допустимом содержимом реально выданных источников. Это сохранение
+числового floor при смене проверяемого контракта; прежняя формулировка плана
+«original coverage 0 < 12» больше не описывает новую acceptance-метрику.
+Raw original coverage сохраняется как отдельное честное измерение с собственным
+запретом lookup/parent credit. Название `original_case` означает исходный case,
+а не доказательство нахождения через original-only retrieval.
+
+Oracle независимо проверяет actual same-call source/snapshot, текущие bytes/hash,
+владельца по captured host-selected root, project scope и точные line spans.
+Факт только в heading/link/table header не получает credit. Подменённые rollups,
+metadata-only ответы и согласованная подмена public source и snapshot отклоняются.
+Все 16 вопросов, lookup strings, frozen gold, protocol lock, V2 thresholds и шесть
+hard-zero safety gates сохранены. Отмена output-cost ceilings к этому floor
+не относится. Code/review: `34913345f8f6f491fc707a9028c58d7d68319cd5`;
+[crosswalk, guards и ограничения](pr211-execution/LEGACY_SOURCE_FACT_ACCEPTANCE_RU.md).
+
+Новый runtime **PENDING**. Прежнее наблюдение полных фактов **8/15** всё ещё ниже
+floor **12/15** и не становится PASS после миграции. Старый отчёт не содержит
+новых persisted validator receipts и не сертифицирует новый oracle.
+
 Дата: 2026-10-08. Дополняет исторический V4_PRODUCT_DECISIONS_RU.md
 и NEXT_PARALLEL_IMPLEMENTATION_PROMPT_RU.md последующими указаниями владельца.
 

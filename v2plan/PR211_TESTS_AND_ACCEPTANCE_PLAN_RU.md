@@ -5,6 +5,28 @@
 `11489239ae0a5ff85c1f817f0650bea661e88ba1`. Выполненные пункты отмечаются только
 после проверки соответствующего результата.
 
+## Состояние исполнения на 2026-10-10
+
+Последний полный фактический прогон — PR HEAD
+`eb2c4f3b3e0065110a1bfe2c855e4a05803fa37a`: на каждом Python 3.11/3.12/3.13
+**6063 PASS / 1653 FAIL / 0 ERROR / 10 SKIP**. Required CI/P1 остаются FAIL.
+Normal critical: **53 PASS / 20 intended mutation kills**; отдельные historical
+и compact literal baselines **702 / 82** и **51 парная mutation** подтверждены
+в собственном сравнении. По собственному proof f7 до этого прогона удалён21
+obsolete Context7 alias case;36 остальных cases сохранились и собраны CI95.
+Question surface проверил все 100 исходных входов и отрицательные controls;
+recovery пока **11 PASS / 1 FAIL**, его mutations не запускались после отказа baseline.
+
+Reviewed пакет до `b1c6586a2f1b25dccf0b0a56232e91c02a4fa8f6` добавляет исправления
+структурных filename references, литеральных FTS operands, mixed project/library
+projection, отрицательной fixture и независимого Legacy source-fact oracle,
+а также body-free observations тех же member/project/Unified calls.
+Его **совместный runtime PENDING**; целевые critical **54/25** и recovery **12/33**
+ещё не являются результатами. Реальные пользовательские clients **NOT RUN**.
+Подробные receipts и следующие шаги — в
+[checkpoint](PR211_CHECKPOINT_RU.md). Исторические исходные числа ниже сохранены
+с указанием их SHA; они не заменяют текущее состояние.
+
 ## Поправки после оценки перед исполнением
 
 - Первыми устраняются setup/contract причины, затем оценивается качество retrieval.
@@ -110,9 +132,17 @@ errors. Если следующий барьер оказался реально
   исходные вопросы и отрицательные требования не ослаблять.
 - [ ] Получить собственный полный V2 runtime-отчёт после corpus validation.
   Появление JSON само по себе не означает прохождение quality.
-- [ ] В Legacy сохранить различие original-query и explicit lookup: lookup hits
-  не закрывают original coverage 0 < 12. Значение quality 10/16 остаётся report-only;
-  блокирующие lineage/safety проверки оцениваются отдельно.
+- [ ] В Legacy применить принятый ADR 0003 через отдельную версионированную
+  миграцию acceptance: минимум 12 из 15 исходных положительных cases с полными
+  frozen facts в реально возвращённых допустимых source windows. Независимо
+  проверять same-call snapshot, текущие bytes/hash, host-selected root, scope и spans.
+  Raw `original_query_covered_count` сохраняется отдельной метрикой: lookup hits
+  не получают original credit. Это явная смена смысла блокирующей метрики, а не
+  сохранение прежнего raw-coverage gate под новым названием. Frozen вопросы,
+  обязательные факты и шесть hard-zero safety gates остаются. Code/review готовы
+  в `34913345f8f6f491fc707a9028c58d7d68319cd5`; новый runtime PENDING.
+  [Crosswalk и обоснование](pr211-execution/LEGACY_SOURCE_FACT_ACCEPTANCE_RU.md).
+  Предыдущее доказанное полное покрытие фактов 8/15 ниже 12/15; quality не объявлен PASS.
 - [ ] Для contamination проверить нужный факт `doc-atlas mcp docs-serve` и реальную
   подмену Docs на Packs. В зафиксированном случае вернулся неподходящий фрагмент
   `PROJECT_MAP.md`; слово `packs` само по себе не доказывает выдачу или исполнение
