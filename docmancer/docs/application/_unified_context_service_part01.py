@@ -506,6 +506,27 @@ class _UnifiedDocsContextServicePart01:
                     if retrieval_lane_diag:
                         retrieval_diagnostics.setdefault(lane_name, retrieval_lane_diag)
 
+        project_context_contract: dict[str, Any] = {}
+        if project_result and library_results:
+            project_lane = lane_details["project"]
+            project_docs_lane = project_lane.get("project_docs")
+            project_selection = project_lane.get("selection_decision")
+            project_context_contract = {
+                **{key: project_lane.get(key) for key in (
+                    "question", "project_path", "status", "requires_confirmation",
+                    "delivery_decision", "requirements",
+                )},
+                "request_project_path": project_path,
+                "read_scope": (project_docs_lane.get("request_scope")
+                               if isinstance(project_docs_lane, dict) else None),
+                "project_docs_status": (project_docs_lane.get("status")
+                                        if isinstance(project_docs_lane, dict) else None),
+                "project_docs_requires_confirmation": (project_docs_lane.get("requires_confirmation")
+                                                       if isinstance(project_docs_lane, dict) else None),
+                "unresolved_conflicts": (project_selection.get("unresolved_conflicts")
+                                         if isinstance(project_selection, dict) else None),
+            }
+
         payload = UnifiedDocsContextResult(
             status=status,
             question=question,
@@ -550,6 +571,7 @@ class _UnifiedDocsContextServicePart01:
                 getattr(project_result, "documentation_query_plan", None) or {}
             ) if project_result else {},
             context_pack=context_pack,
+            project_context_contract=project_context_contract,
             lanes=lanes,
             source_summary=source_summary,
             trust_contract=trust_contract,

@@ -870,6 +870,18 @@ class _ProjectDocsServicePart03:
                 "arguments_patch": self._project_sync_arguments(root),
                 "reason": "Some indexed project docs are stale; reconcile before relying on repo-specific answers.",
             })
+        request_scope = {
+            "schema_version": 1,
+            "query": query,
+            "project_path": str(root),
+            "project_identity": self._repository_identity(root),
+            "requested_scope": scope,
+            "requested_module": module,
+            "requested_module_path": module_path,
+            "doc_scope": query_scope,
+            "module_path": resolved_module_path,
+            "evidence_path": evidence_path,
+        }
         if results:
             status = "stale" if stale_sources else ("confirmation_required" if preflight_inspect else "success")
             reason_code = preflight_inspect.reason_code if preflight_inspect else ("project_docs_stale" if stale_sources else "project_docs_ready")
@@ -887,6 +899,7 @@ class _ProjectDocsServicePart03:
                 reason=reason,
                 answer_available=True,
                 results=results,
+                request_scope=request_scope,
                 warnings=metadata.warnings,
                 candidate_sources=candidate_sources,
                 indexed_sources=result_indexed_sources or indexed_sources,
@@ -930,6 +943,7 @@ class _ProjectDocsServicePart03:
             requires_confirmation=requires_confirmation,
             confirmation_reason=confirmation_reason,
             arguments_patch=arguments_patch,
+            request_scope=request_scope,
             reason=(
                 "project_docs_stale"
                 if stale_sources
