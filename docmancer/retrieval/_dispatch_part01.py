@@ -111,7 +111,7 @@ class _RetrievalDispatcherPart01:
             "candidate_limits": {"per_lane": 40, "fused": 60},
             "post_fusion": {
                 "exact_supplement": "explicit-query-only-v1",
-                "intent_rerank": "base-score-no-topic-boost-v1",
+                "intent_rerank": "retriever-order-preserved-v2",
                 "expand": retrieval_expand,
                 "max_sections_per_source": getattr(
                     self.config.retrieval, "max_sections_per_source", None
@@ -155,7 +155,6 @@ class _RetrievalDispatcherPart01:
             chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
-            chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
             return finalized(DispatchResult(
                 chunks=chunks,
@@ -177,7 +176,6 @@ class _RetrievalDispatcherPart01:
             chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
-            chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
             return finalized(DispatchResult(
                 chunks=chunks,
@@ -221,7 +219,6 @@ class _RetrievalDispatcherPart01:
             chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
-            chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
             return finalized(DispatchResult(
                 chunks=chunks,
@@ -259,7 +256,6 @@ class _RetrievalDispatcherPart01:
         )
         chunks = self._filter_chunks(chunks, merged_filters)
         chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
-        chunks = self._rerank_intent_matches(query, chunks, expand=retrieval_expand)
         chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
         reported_mode = self._degraded_mode_name(effective_mode, candidate_lists, failures)
         return finalized(DispatchResult(
@@ -435,7 +431,6 @@ class _RetrievalDispatcherPart01:
             chunks = self.store.query(query, limit=query_limit, budget=budget, expand=expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=expand, backend_filters=backend_filters, verification_filters=filters)
-            chunks = self._rerank_intent_matches(query, chunks, expand=expand)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
             return DispatchResult(
                 chunks=chunks,
@@ -541,7 +536,6 @@ class _RetrievalDispatcherPart01:
             backend_filters=compile_backend_filters(filters),
             verification_filters=filters,
         )
-        chunks = self._rerank_intent_matches(query, chunks, expand=expand)
         chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
         return DispatchResult(
             chunks=chunks,
