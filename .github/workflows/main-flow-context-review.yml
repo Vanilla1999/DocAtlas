@@ -1,0 +1,53 @@
+name: Main flow context integration
+
+on:
+  pull_request:
+    branches: [feature/main-flow-logging]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-flow-context-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOCATLAS_OFFLINE: "1"
+      DOCATLAS_AUTO_VECTORS: "0"
+      DOCATLAS_REGISTRY_API_URL: "http://127.0.0.1:1"
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -e ".[dev]"
+      - name: Real retrieval, public MCP, CLI and source isolation
+        run: |
+          mkdir -p "$RUNNER_TEMP/main-flow-proof"
+          git rev-parse HEAD > "$RUNNER_TEMP/main-flow-proof/head.txt"
+          python -m pytest -q --tb=short \
+            tests/test_project_context_quality_v2_protocol.py \
+            tests/test_main_flow_logging_integration.py \
+            tests/test_retrieval_features.py::test_lexical_compact_results_limit_sections_per_source_when_configured \
+            tests/test_retrieval_features.py::test_expand_bypasses_sections_per_source_cap \
+            tests/docs/test_host_scope_contract.py \
+            tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content \
+            --basetemp="$RUNNER_TEMP/main-flow-proof/pytest" \
+            --junitxml="$RUNNER_TEMP/main-flow-proof/integration.xml"
+      - name: Preserve exact-commit integration evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: main-flow-context-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/main-flow-proof/
+          retention-days: 14
+          if-no-files-found: error

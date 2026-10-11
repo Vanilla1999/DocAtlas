@@ -287,7 +287,7 @@
     "tests/test_qdrant_store_unit.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests/test_query_planning.py": "c372e4e51ac5d1b1b82e524f680a69006b62b6a805cc038d5fa896d0ff8ef159",
     "tests/test_release_gate.py": "5123d90cd49c4a2070def6afa8f58d69340b0aa13f4fc6cb9c00d42d6ba13b3b",
-    "tests/test_retrieval_features.py": "df7270c0ad8b6c2d4f89079828ecbf5bbea702fc9a445c0fc21326cd9c692899",
+    "tests/test_retrieval_features.py": "c2966fb7c4ca39015e1beaf5d0a6776fe847e03c70cf1e69a94850fc79697591",
     "tests/test_retrieval_fusion.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests/test_retrieval_quality_baseline.py": "72a0873ae5ea3c42a6375a67092d7131b33dae43bf5f945e3880e9ce9d275b64",
     "tests/test_robots.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",

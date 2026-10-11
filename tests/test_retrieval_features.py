@@ -683,8 +683,9 @@ def test_hybrid_neighbor_expansion_pulls_adjacent_sections(tmp_path):
     assert chunk_indices.issuperset({sections[0]["chunk_index"], sections[2]["chunk_index"]})
 
 
-def test_lexical_compact_results_limit_sections_per_source_by_default(tmp_path):
+def test_lexical_compact_results_limit_sections_per_source_when_configured(tmp_path):
     config, store = _agent(tmp_path)
+    config.retrieval.max_sections_per_source = 2
     docs = []
     for i in range(5):
         docs.append((f"Alpha {i}", "doc-a", f"# Alpha {i}\n\nalpha repeated evidence {i}."))
@@ -699,6 +700,7 @@ def test_lexical_compact_results_limit_sections_per_source_by_default(tmp_path):
 
 def test_expand_bypasses_sections_per_source_cap(tmp_path):
     config, store = _agent(tmp_path)
+    config.retrieval.max_sections_per_source = 2
     _populate(store, [("Big Doc", "big-doc", "# Big Doc\n\n## A\nalpha.\n\n## B\nalpha.\n\n## C\nalpha.\n")])
 
     result = RetrievalDispatcher(store=store, config=config).run("alpha", mode="lexical", limit=3, expand="adjacent")
