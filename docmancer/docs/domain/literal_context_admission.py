@@ -363,18 +363,22 @@ def admit_original_literal_context(
     if witnesses and body_window is None:
         return None
     if not witnesses:
+        # A low lexical ratio and absent exact terms share one qualification
+        # reason. General partial context cannot bypass an explicit identity.
+        if qualification.trace.get("missing_exact_terms") or body_window is None:
+            return None
         ordinary = ordinary_body_context_witness(
             question=question, evidence_text=evidence_text, candidate=candidate,
         )
         if ordinary is None:
             return None
         witnesses = [ordinary]
-        reason = "ordinary_body_clause_context_v1"
+        reason = ordinary["kind"]
     return {
         "reason": reason, "query_id": "query-original",
         "qualification_reason": qualification.reason, "coverage_credit": False,
         "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
         "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),
         "body_witnesses": witnesses,
-        **({"body_window": body_window} if reason == "literal_symbol_body_context" and body_window is not None else {}),
+        **({"body_window": body_window} if body_window is not None else {}),
     }

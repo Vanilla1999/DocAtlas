@@ -461,3 +461,149 @@ def test_frozen_main_flow_questions_deliver_source_bound_facts(tmp_path, record_
     print(f"Main-flow factual delivery: {10 - len(failures)}/10; failed IDs: {[row['id'] for row in failures]}")
     assert len(raw_results) == len(reports) == 10
     assert not failures, {"failures": failures, "raw_evidence": str(report_path)}
+
+
+def test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit(tmp_path):
+    """Four reviewed defects through one preparation and real public reads."""
+    from contextlib import closing
+    import hashlib
+
+    from eval.evidence_quality_v2.runtime import index_project, isolated_service, write_project
+    from scripts import run_project_docs_self_host_gate as runner
+
+    root = (tmp_path / "project").resolve()
+    fact = "Logs flow to disk after each request."
+    documents = {
+        "docs/logs.md": "# Logging\n\n" + fact + "\n",
+        "docs/owners.md": (
+            "# OtherAPI\n\nOtherAPI validates session credentials before startup.\n\n"
+            "# DeliveryEngine\n\nPacket delivery resumes after each request.\n"
+        ),
+        "docs/packets.md": "# Packet transport\n\nPackets are delivered after each request.\n",
+        "docs/compounds.md": (
+            "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n"
+        ),
+    }
+    write_project(root, documents)
+    catalog_bytes = (root / "docatlas.project-docs.yaml").read_bytes()
+    project_identity = "local:" + hashlib.sha256(str(root).encode("utf-8")).hexdigest()
+    ordinary_request = {
+        "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+        "project_path": str(root), "scope": "project",
+    }
+    owner_request = {
+        "question": "How does OtherAPI handle packet delivery during recovery?",
+        "project_path": str(root), "scope": "project",
+    }
+    numeric_request = {
+        "question": "How are packets delivered with priority 7.",
+        "project_path": str(root), "scope": "project",
+    }
+    compound_request = {
+        "question": "How does DocAtlas combine batch queue during recovery?",
+        "project_path": str(root), "scope": "project",
+    }
+    report_path = tmp_path / "qualification-review-proof.json"
+
+    with isolated_service(tmp_path / "state") as (service, config):
+        prepared = index_project(service, config, root)
+        generation = prepared["generation_id"]
+        policy = service._cold.member_storage_policy
+        with closing(policy.connect()) as connection:
+            stored = [dict(row) for row in connection.execute(
+                "SELECT source, content, content_hash, source_identity FROM generation_sources "
+                "WHERE generation_id = ? ORDER BY source", (generation,),
+            )]
+        assert len(stored) == len(documents)
+        assert {row["source"]: (row["content"], row["content_hash"]) for row in stored} == {
+            str(root / path): (text, hashlib.sha256(text.encode("utf-8")).hexdigest())
+            for path, text in documents.items()
+        }
+        assert all(isinstance(row["source_identity"], str) and row["source_identity"] for row in stored)
+        assert prepared["indexed_paths"] == sorted(documents)
+
+        # This observer only reads the real same-call validation operands. All
+        # four public results are captured before checking their behavior.
+        ordinary, ordinary_snapshot = runner._call_with_snapshot(ordinary_request, service)
+        owner, owner_snapshot = runner._call_with_snapshot(owner_request, service)
+        numeric, numeric_snapshot = runner._call_with_snapshot(numeric_request, service)
+        compound, compound_snapshot = runner._call_with_snapshot(compound_request, service)
+        report_path.write_text(json.dumps({
+            "product_calls": {"prepare_docs": 1, "get_docs_context": 4},
+            "documents": documents, "stored_sources": stored,
+            "generation_id": generation, "project_identity": project_identity,
+            "ordinary": {"request": ordinary_request, "payload": ordinary,
+                         "validation_snapshot": ordinary_snapshot},
+            "owner": {"request": owner_request, "payload": owner,
+                      "validation_snapshot": owner_snapshot},
+            "numeric": {"request": numeric_request, "payload": numeric,
+                        "validation_snapshot": numeric_snapshot},
+            "compound": {"request": compound_request, "payload": compound,
+                         "validation_snapshot": compound_snapshot},
+        }, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
+
+        assert ordinary["kind"] == "docs_context" and ordinary["context_available"] is True
+        assert ordinary["support_status"] == "retrieval_only", str(report_path)
+        assert ordinary["answer_supported"] is ordinary["answer_available"] is ordinary["edit_ready"] is False
+        matches = [source for source in ordinary.get("sources") or []
+                   if fact in source.get("snippet", "")]
+        assert matches, {"missing_fact": fact, "raw_evidence": str(report_path)}
+        source = matches[0]
+        assert source["path_or_url"] == "docs/logs.md"
+        assert source["project_identity"] == project_identity and source["scope"] == "project"
+        assert source["authority"] == "source_of_truth" and source["version_binding"] == "unversioned"
+        bound = ordinary_snapshot[source["evidence_id"]]
+        assert bound["projected_source"] == source
+        raw = bound["source"]
+        reference = raw["_reference_evidence"]
+        identity = reference["source"]
+        original = documents["docs/logs.md"]
+        original_hash = hashlib.sha256(original.encode("utf-8")).hexdigest()
+        stored_log = next(row for row in stored if row["source"] == str(root / "docs/logs.md"))
+        assert stored_log["content"] == original and stored_log["content_hash"] == original_hash
+        assert reference["raw_document"] == original
+        assert identity["canonical_path"] == "docs/logs.md" and identity["content_sha256"] == original_hash
+        assert identity["document_id"] == stored_log["source_identity"]
+        assert identity["scope"] == {
+            "project_id": project_identity, "snapshot_id": generation, "version": "",
+        }
+        start, end = reference["char_start"], reference["char_end"]
+        assert type(start) is int and type(end) is int and 0 <= start < end <= len(original)
+        assert reference["text"] == original[start:end]
+        snippet = source["snippet"].strip()
+        assert reference["text"].count(snippet) == 1
+        snippet_start = start + reference["text"].index(snippet)
+        snippet_end = snippet_start + len(snippet)
+        fact_start = original.index(fact)
+        assert snippet_start <= fact_start and fact_start + len(fact) <= snippet_end
+        first, last = source["line_start"], source["line_end"]
+        lines = original.splitlines(keepends=True)
+        assert type(first) is int and type(last) is int and 1 <= first <= last <= len(lines)
+        assert sum(map(len, lines[:first - 1])) <= snippet_start
+        assert snippet_end <= sum(map(len, lines[:last]))
+        # Independently recompute the public DTO digest; full document identity
+        # and the exact original occurrence were checked separately above.
+        material = {
+            "path": raw.get("path") or raw.get("source") or raw.get("url") or raw.get("source_url"),
+            "section": raw.get("heading_path") or raw.get("title"),
+            "content": raw.get("content") or raw.get("display_text"),
+            "snippet": raw.get("snippet") or raw.get("code"),
+            "version": raw.get("version_binding") or raw.get("version") or raw.get("requested_version"),
+        }
+        assert source["content_sha256"] == hashlib.sha256(json.dumps(
+            material, ensure_ascii=False, sort_keys=True, separators=(",", ":"),
+        ).encode("utf-8")).hexdigest()
+
+        for label, payload in (("different section owner", owner), ("missing numeric condition", numeric),
+                               ("words inside composed identifiers", compound)):
+            assert payload["status"] == "insufficient_evidence", (label, str(report_path))
+            assert not payload.get("sources") and payload["context_available"] is False
+            assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
+        assert policy.generation() == generation
+        with closing(policy.connect()) as connection:
+            assert [dict(row) for row in connection.execute(
+                "SELECT source, content, content_hash, source_identity FROM generation_sources "
+                "WHERE generation_id = ? ORDER BY source", (generation,),
+            )] == stored
+    assert {path: (root / path).read_text(encoding="utf-8") for path in documents} == documents
+    assert (root / "docatlas.project-docs.yaml").read_bytes() == catalog_bytes

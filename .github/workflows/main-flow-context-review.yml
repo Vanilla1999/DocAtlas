@@ -34,7 +34,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/main-flow-proof"
           git rev-parse HEAD > "$RUNNER_TEMP/main-flow-proof/head.txt"
-          python -m pytest -q --tb=short \
+          python -m pytest -q --tb=short -o junit_family=legacy \
             tests/test_project_context_quality_v2_protocol.py \
             tests/test_main_flow_logging_integration.py \
             tests/test_retrieval_features.py::test_lexical_compact_results_limit_sections_per_source_when_configured \

@@ -5,7 +5,7 @@
   },
   "module_node_hashes": {
     "tests/test_main_flow_logging_integration.py": "2d1f6f847d9082072be30847b9ffa0d032f0512dcce16e011824bb7ad6cfbd6c",
-    "tests/test_project_context_quality_v2_protocol.py": "877041a15fc1e02a13c860772e086ac275e21a77383ccb47609a81013c56a694"
+    "tests/test_project_context_quality_v2_protocol.py": "9f5d393ac2478b34e251e3dbeb31d48c85cfbe5ec578868ad4948b5723ad4d8a"
   },
   "node_overrides": {},
   "schema_version": 1

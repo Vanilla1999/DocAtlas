@@ -1,37 +1,35 @@
-"""Versioned ordinary partial lexical context; never whole-query qualification.
+"""Same-call literal partial context, without whole-question coverage.
 
-Only a contiguous original-query span can identify a source clause. The general
-English function-word categories below are not topic aliases or inferred roles.
-Case folding matches literal words; no stemming, synonyms or generated query is
-used. Every delivered window still needs a private same-call native receipt.
+Source eligibility and native discovery are necessary but never topical proof.
+An unchanged query phrase, or a body-bound technical anchor with another literal
+term, can identify useful context inside an acquired structural block. No query
+rewrites, word dictionaries, stemming or answer/subject inference are used.
+Common phrases can still be weak lexical matches; this route grants no answer
+support or full-question coverage.
 """
 from __future__ import annotations
 
 import re
 from typing import Any, Mapping
 
-from .evidence_qualification import _relation_units
+from .context_blocks import source_block_alternatives
 from .original_body_discovery import original_body_discovery_binding
 from .query_reference_binding import query_mentions
-from .query_terms import documentation_technical_anchors, query_constraint_roles
+from .query_terms import documentation_technical_anchors
+from .source_subject_binding import prepared_owner_rejection
 
 
-# English question words, auxiliaries, determiners, personal pronouns, basic
-# connectors/prepositions. Temporal, conditional and negative content words
-# (before, after, until, unless, without, not, never, only, ...) stay meaningful.
-_FUNCTION_WORDS = frozenset("""
-what which who whom whose where when why how
-am are is was were be been being do does did have has had
-can could may might must shall should will would
-a an the this that these those
-i me my mine we us our ours you your yours he him his she her hers
-it its they them their theirs
-and or but of for to from in on at by with as about
-""".split())
 _WORD = re.compile(r"(?<!\w)[^\W\d_]+(?:[-'][^\W\d_]+)*(?!\w)")
-# Conservative lexical clause boundaries, not a semantic parse. Do not join
-# sentences, punctuation-delimited clauses, list cells or coordinating clauses.
+_TERM = re.compile(r"[\w.:/\\+-]+")
+# Keep the existing conservative clause boundaries for phrase witnesses. This
+# grammar only stops a phrase; it does not supply accepted words or query roles.
 _BOUNDARY = re.compile(r"[.!?;:,|–—]+|(?<!\w)-|-(?!\w)|\b(?:and|but|or|yet|whereas|although|though)\b", re.I)
+_TABLE_SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
+_NONBODY = re.compile(
+    r"<!--.*?-->|!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])|https?://\S+"
+    r"|^[ \t]*\[[^\]]+\]:[^\n]*|^ {0,3}(?:`{3,}|~{3,})[^\n]*",
+    re.S | re.M,
+)
 
 
 def _clauses(text: str):
@@ -42,58 +40,71 @@ def _clauses(text: str):
     yield cursor, text[cursor:]
 
 
-def _content_words(text: str):
-    return [match for match in _WORD.finditer(text) if match[0].casefold() not in _FUNCTION_WORDS]
+def _literal_terms(text: str):
+    """Keep complete Unicode terms and their unchanged source coordinates."""
+    for match in _TERM.finditer(text):
+        # A final period/colon is sentence punctuation. Internal decimal or
+        # identifier separators remain part of the same indivisible term.
+        value = match[0].rstrip(".:")
+        if value and any(char.isalnum() for char in value):
+            yield value, match.start(), match.start() + len(value)
 
 
-def _prose_clauses(body: str):
-    paragraph_start = 0
-    for boundary in re.finditer(r"(?:\r?\n)[ \t]*(?:\r?\n)|\Z", body):
-        unit_start = paragraph_start
-        unit = body[unit_start:boundary.start()]
-        paragraph_start = boundary.end()
-        normalized = " ".join(unit.split())
-        # The complete raw paragraph must be plain substantive prose. A heading,
-        # link, table/list label or code fence cannot supply phrase evidence.
-        # Whitespace wrapping and inline emphasis preserve the same raw tokens.
-        if not normalized or _relation_units(unit) != (normalized,):
-            continue
-        for clause_start, clause in _clauses(unit):
-            if clause.strip():
-                yield unit_start + clause_start, clause
+def _whole_word_spans(text: str):
+    terms = [(start, end) for _, start, end in _literal_terms(text)]
+    # Apostrophes remain part of one ordinary word. A slash, namespace or path
+    # separator cannot lend the separate pieces of one term as phrase words.
+    return {word.span() for word in _WORD.finditer(text) if not any(
+        start < word.end() and word.start() < end
+        and (start < word.start() or word.end() < end)
+        for start, end in terms
+    )}
 
 
-def ordinary_body_context_witness(
-    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
-) -> dict[str, Any] | None:
-    """Return one exact lexical witness, without resolving the whole question.
+def _masked_body(text: str) -> str:
+    """Remove navigation/format markers without changing source coordinates."""
+    return _NONBODY.sub(lambda match: "".join(
+        char if char in "\r\n" else " " for char in match[0]
+    ), text)
 
-    A query content word between the two endpoints cannot be omitted. Source
-    insertions are allowed inside one clause. At least two distinct content
-    words and substantive content outside the matched words exclude a repeated
-    label. This intentionally does not certify every ordinary modifier outside
-    the chosen span; the full query remains missing and all authority false.
-    """
-    # Unsupported literal syntax is a strict-lane boundary, not a token to
-    # discard. In particular digits/operators/quotes cannot disappear between
-    # two words and turn "pressure 7 packets" into a pressure/packets witness.
-    if (any(not (char.isalpha() or char.isspace() or char in ".?!,;:-–—") for char in question)
-        or re.search(r"(?<![^\W\d_])-|-(?![^\W\d_])", question)
-        or query_mentions(question) or documentation_technical_anchors(question)
-        or query_constraint_roles(question).hard_exact):
-        return None
-    binding = original_body_discovery_binding(
-        question=question, body=evidence_text, candidate=candidate,
-    )
-    if binding is None:
-        return None
-    evidence = candidate["_reference_evidence"]
-    window_start = evidence["char_start"]
+
+def _body_blocks(text: str):
+    # Keep the smallest structural alternatives. A union of distinct list items
+    # cannot lend two unrelated occurrences to a new topical witness.
+    pending = None
+    leaves = []
+    for start, end in sorted(source_block_alternatives(text).spans,
+                             key=lambda span: (span[0], -span[1])):
+        if pending is not None and not (pending[0] <= start and end <= pending[1]):
+            leaves.append(pending)
+        pending = (start, end)
+    if pending is not None:
+        leaves.append(pending)
+    for start, end in leaves:
+        raw = text[start:end]
+        lines = raw.splitlines(keepends=True)
+        if len(lines) >= 2 and _TABLE_SEPARATOR.fullmatch(lines[1].strip()):
+            # Column names cannot qualify unrelated data. Every witness is
+            # contained in one body row; the delivered raw window keeps headers.
+            offset = start + len(lines[0]) + len(lines[1])
+            for line in lines[2:]:
+                if "|" in line and not _TABLE_SEPARATOR.fullmatch(line.strip()):
+                    yield offset, _masked_body(line)
+                offset += len(line)
+        else:
+            yield start, _masked_body(raw)
+
+
+def _phrase_witness(question: str, block: str, source_offset: int):
     choices = []
+    query_word_spans = _whole_word_spans(question)
+    source_word_spans = _whole_word_spans(block)
     for query_offset, query_clause in _clauses(question):
-        query_words = _content_words(query_clause)
-        for source_offset, source_clause in _prose_clauses(evidence_text):
-            source_words = _content_words(source_clause)
+        query_words = [word for word in _WORD.finditer(query_clause)
+                       if (query_offset + word.start(), query_offset + word.end()) in query_word_spans]
+        for clause_offset, source_clause in _clauses(block):
+            source_words = [word for word in _WORD.finditer(source_clause)
+                            if (clause_offset + word.start(), clause_offset + word.end()) in source_word_spans]
             for first in range(len(query_words) - 1):
                 matched = []
                 cursor = first
@@ -103,28 +114,122 @@ def ordinary_body_context_witness(
                         cursor += 1
                         if cursor == len(query_words):
                             break
-                values = {query_word[0].casefold() for query_word, _ in matched}
-                if (len(values) < 2
-                    or not any(word[0].casefold() not in values for word in source_words)):
+                # Keep a contiguous phrase from the unchanged query. Source
+                # insertions are local to this clause; a missing query modifier
+                # or a digit/operator between its words cannot disappear.
+                anchors = {word[0].casefold() for word, _ in matched}
+                if len(anchors) < 2 or any(
+                    not query_clause[left.end():right.start()].isspace()
+                    for (left, _), (right, _) in zip(matched, matched[1:])
+                ):
+                    continue
+                if not any(word[0].casefold() not in anchors for word in source_words):
                     continue
                 query_start = query_offset + matched[0][0].start()
                 query_end = query_offset + matched[-1][0].end()
-                source_start = window_start + source_offset + matched[0][1].start()
-                source_end = window_start + source_offset + matched[-1][1].end()
+                origin = source_offset + clause_offset
                 witness = {
                     "kind": "ordinary_body_clause_context_v1",
                     "text": question[query_start:query_end],
                     "query_char_start": query_start, "query_char_end": query_end,
-                    "char_start": source_start, "char_end": source_end,
-                    "clause_char_start": window_start + source_offset,
-                    "clause_char_end": window_start + source_offset + len(source_clause),
-                    "native_discovery_binding_sha256": binding,
+                    "char_start": origin + matched[0][1].start(),
+                    "char_end": origin + matched[-1][1].end(),
+                    "clause_char_start": origin, "clause_char_end": origin + len(source_clause),
                     "content_tokens": [{
                         "query_char_start": query_offset + query_word.start(),
                         "query_char_end": query_offset + query_word.end(),
-                        "char_start": window_start + source_offset + source_word.start(),
-                        "char_end": window_start + source_offset + source_word.end(),
+                        "char_start": origin + source_word.start(),
+                        "char_end": origin + source_word.end(),
                     } for query_word, source_word in matched],
                 }
-                choices.append(((-len(matched), query_start, source_start), witness))
+                choices.append(((-len(anchors), query_start, origin), witness))
     return min(choices, key=lambda choice: choice[0])[1] if choices else None
+
+
+def _technical_block_witness(question: str, block: str, source_offset: int):
+    shaped = {value.casefold() for value in documentation_technical_anchors(question)}
+    terms = {}
+    for literal, start, end in _literal_terms(question):
+        value = literal.casefold()
+        technical = value in shaped or bool(re.search(r"\w[-_./:\\+]\w", value))
+        terms.setdefault(value, (start, end, technical))
+    source_terms = {}
+    for literal, start, end in _literal_terms(block):
+        source_terms.setdefault(literal.casefold(), (start, end))
+    matched = []
+    for value, (start, end, technical) in terms.items():
+        # Each source term is whole: the namespace and member of one composed
+        # identifier cannot be counted as two independent body anchors.
+        occurrence = source_terms.get(value)
+        if occurrence is not None:
+            matched.append((value, start, end, *occurrence, technical))
+    if len(matched) < 2 or not any(technical for _, _, _, _, _, technical in matched):
+        return None
+    # An identifier-only table/list is not a statement about that identifier.
+    matched_values = {value for value, _, _, _, _, _ in matched}
+    remainder = _TERM.sub(
+        lambda match: "" if match[0].rstrip(".:").casefold() in matched_values else match[0], block,
+    )
+    if not re.search(r"[^\W_]", remainder):
+        return None
+    query_start = min(start for _, start, _, _, _, _ in matched)
+    query_end = max(end for _, _, end, _, _, _ in matched)
+    if re.search(r"!=|==|<=|>=|[<>]|(?<!\w)-(?!\w)", question[query_start:query_end]):
+        return None
+    return {
+        "kind": "literal_body_block_context_v2",
+        "text": question[query_start:query_end],
+        "query_char_start": query_start, "query_char_end": query_end,
+        "char_start": source_offset + min(start for _, _, _, start, _, _ in matched),
+        "char_end": source_offset + max(end for _, _, _, _, end, _ in matched),
+        "block_char_start": source_offset, "block_char_end": source_offset + len(block),
+        "content_tokens": [{
+            "query_char_start": query_start, "query_char_end": query_end,
+            "char_start": source_offset + start, "char_end": source_offset + end,
+        } for _, query_start, query_end, start, end, _ in matched],
+    }
+
+
+def ordinary_body_context_witness(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Recompute a source-local relevance witness after canonical source checks.
+
+    Unresolved names must occur in the current verified structural owner (or
+    current body when it has no owner). A bare name may be the first underscore
+    namespace segment; this is lexical context, never exact symbol identity or
+    a subject relation. A separate body witness remains mandatory. The whole
+    question and all answer/edit authority stay unverified.
+    """
+    binding = original_body_discovery_binding(
+        question=question, body=evidence_text, candidate=candidate,
+    )
+    if binding is None:
+        return None
+    evidence = candidate["_reference_evidence"]
+    if prepared_owner_rejection(evidence) is not None:
+        return None
+    owner = evidence.get("owner")
+    subject_text = (evidence["raw_document"][owner["scope_start"]:owner["scope_end"]]
+                    if owner is not None else evidence_text)
+    subject_terms = {value.casefold() for value, _, _ in _literal_terms(subject_text)}
+    if any(
+        not any(value == mention.text.casefold() or (
+            value.partition("_")[0] == mention.text.casefold() and value.partition("_")[2]
+        ) for value in subject_terms)
+        for mention in query_mentions(question)
+        if not mention.explicit and mention.syntax_role == "unresolved"
+    ):
+        return None
+    numeric_terms = {value for value, _, _ in _literal_terms(question)
+                     if re.fullmatch(r"[+-]?\d+(?:\.\d+)*", value)}
+    for offset, block in _body_blocks(evidence_text):
+        block_terms = {value for value, _, _ in _literal_terms(block)}
+        if not numeric_terms <= block_terms:
+            continue
+        source_offset = evidence["char_start"] + offset
+        witness = (_phrase_witness(question, block, source_offset)
+                   or _technical_block_witness(question, block, source_offset))
+        if witness is not None:
+            return {**witness, "native_discovery_binding_sha256": binding}
+    return None

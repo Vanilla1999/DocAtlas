@@ -34,32 +34,38 @@ names. Public lookup credit never transfers to the original question.
 - Deleted, stale, and no-longer-admitted members cannot supply current evidence;
   confirmed sync does not promise physical deletion of unselected stored rows.
 
-## Ordinary partial body context v1
+## Literal partial body context
 
-`ordinary_body_clause_context_v1` is a deliberately limited additional context
-admission, not whole-question qualification. It applies to ordinary, original
-project reads through `get_docs_context`; module/library requests, explicit
-literal or technical references, quoted/path syntax, and numeric/operator
-syntax continue through their existing lanes. The ordinary fallback declines
-unsupported syntax instead of silently deleting it.
+Partial context is an additional admission for original project reads through
+`get_docs_context`, not whole-question qualification. Canonical source, scope,
+version, explicit identity and body-window checks remain mandatory. Missing
+hard-exact terms cannot be excused by a low whole-question lexical ratio.
 
-A witness is one contiguous raw span of the original question containing at
-least two distinct content words. Its content words must appear in order inside
-one substantive prose clause of the current source. Source insertions are
-allowed; query content words between the endpoints cannot be skipped, and
-separate sentences or coordinating clauses cannot be joined. Heading, link,
-table/list, code-fence and repeated-label text cannot supply this prose witness.
-Whitespace wrapping and inline emphasis preserve raw coordinates.
+`ordinary_body_clause_context_v1` uses a contiguous span of the unchanged
+question with at least two distinct literal words. All words in that span must
+appear in order inside one substantive source clause; source insertions are
+allowed. It does not delete function words, short words or query modifiers.
+`literal_body_block_context_v2` additionally permits a complete technical term
+and a separate literal query term in one substantive structural body block.
+Parts of one composed identifier cannot count as two independent terms.
+Neither witness proves an unmatched modifier or the whole question's relation.
 
-A documented, general English function-word set covers question words,
-auxiliaries, determiners, personal pronouns and basic connectors/prepositions.
-It is not a topic dictionary. Temporal, conditional and negative words such as
-`before`, `after`, `unless` and `not` remain content words. There is no stemming,
-synonym expansion, generated lookup, threshold fitted to a fixture, or new
-provider/dependency. Stored queries and canonical hard-exact extraction do not
-change.
+Paragraphs, individual list items, code bodies and individual table data rows
+can supply body context. Headings, links, table headers and fence markers cannot
+supply these body witnesses. Source bytes and coordinates survive formatting.
+Unresolved names must occur in the verified current structural owner's scope,
+or the current body when no owner exists. A bare name may match the first
+underscore namespace segment for context only; this does not establish exact
+symbol identity or a subject relation. Query numbers, including numbers next
+to sentence punctuation, must occur in the same witnessing body block.
 
-Every ordinary witness requires a private receipt from this exact original
+There is no word dictionary, minimum word length, stemming, synonym expansion,
+generated lookup or new provider/dependency. The existing conservative clause
+boundary grammar only rejects phrase joins. Stored queries and canonical
+hard-exact extraction do not change. Common literal phrases can still be weak
+relevance signals; this lane is not semantic answer validation.
+
+Every partial-body witness requires a private receipt from this exact original
 query's actual native body discovery. The receipt binds the host-requested
 local project identity independently of the candidate, the finite current
 catalog member, generation, source/file hashes and complete returned window
@@ -72,14 +78,14 @@ normal consumer replay; it is not a capability against arbitrary Python code.
 
 Admission retains the whole acquired source window and its provenance.
 Qualification remains false, original-query coverage remains missing, and
-answer/edit authority remains false. The selected lexical span does not prove
-every unmatched ordinary modifier or semantic relation in the whole question:
-a question mentioning an unknown ordinary modifier may still receive useful
-network context when a real network phrase matches. Existing explicit-literal
-and unrelated-empty controls remain required. The initial evidence obligation
-is native MCP delivery for the unchanged two P14 questions, independent prose
-and formatting, and causal source/relevance/replay counterfactuals; it does not
-establish V2 or whole-PR acceptance.
+answer/edit authority remains false. A question mentioning an unknown ordinary
+modifier may still receive partial context when a real literal phrase matches.
+Existing explicit-literal and unrelated-empty controls remain required. The
+main-flow integration check preserves the ten frozen questions and source
+bytes, independently checks required facts and source/hash/span binding, and
+keeps public negative reads for a foreign section owner and an absent numeric
+condition. This evidence does not establish installed-client or production
+behavior.
 
 ## Consequences
 
