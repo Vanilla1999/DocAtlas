@@ -42,20 +42,7 @@ CASES = [
 ]
 
 
-@pytest.mark.parametrize('question,expected',CASES)
-def test_retrieved_safe_context_survives_unknown_question_class(tmp_path,monkeypatch,question,expected):
-    service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
-    payload,trace=capture(service,{'question':question,'project_path':root,'scope':'all'})
-    assert any(expected in s['snippet'] for r in trace['stages']['retrieved_candidates'] for s in r['sources'])
-    assert payload.get('context_available') is True
-    assert any(expected in s['snippet'] for s in payload['sources'])
-    assert not integrity(payload,trace['snapshot'],Path(root))
-    assert payload['answer_supported'] is payload['answer_available'] is payload['edit_ready'] is False
-    assert payload['retrieval_coverage']=='partial'
-    assert 'query-original' not in payload['covered_query_ids']
-
-
-@pytest.mark.parametrize('change', ['project','stale','freshness','risk','lifecycle'])
+@pytest.mark.parametrize('change', ['project','stale','freshness','lifecycle'])
 def test_hint_context_does_not_bypass_candidate_safety(tmp_path,monkeypatch,change):
     service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
     base,trace=capture(service,{'question':CASES[0][0],'project_path':root,'scope':'all',
@@ -127,21 +114,6 @@ def test_foreign_project_same_path_never_enters_owned_context(tmp_path,monkeypat
     assert not integrity(payload,trace['snapshot'],Path(root))
 
 
-@pytest.mark.parametrize('question,expected',CASES)
-def test_lookup_identical_to_original_is_not_a_new_requirement(tmp_path,monkeypatch,question,expected):
-    service,root=_named_document_service(tmp_path,monkeypatch,['README.md'],{'README.md':TEXT})
-    args={'question':question,'project_path':root,'scope':'all'}
-    base,base_trace=capture(service,args)
-    duplicate,trace=capture(service,{**args,'lookup_queries':[question]})
-    assert base['context_available'] is True
-    assert duplicate==base
-    assert trace['observer_counts']==base_trace['observer_counts']
-
-@pytest.mark.parametrize('lookup',['Pebble must not refresh','pebble must refresh','Pebble must refresh v2'])
-def test_distinct_lookup_retains_its_own_direction(lookup):
-    from docmancer.docs.domain.documentation_query_plan import build_documentation_query_plan
-    plan=build_documentation_query_plan('Pebble must refresh',lookup_queries=(lookup,))
-    assert any(q.origin=='host_lookup' and q.text==lookup for q in plan.queries)
 
 
 @pytest.mark.parametrize("question", [

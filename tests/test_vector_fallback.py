@@ -130,75 +130,8 @@ def test_vector_sync_failure_after_record_ingest_raises(tmp_path, monkeypatch):
         agent.ingest_records(records, with_vectors=True)
 
 
-def test_retrieval_reuses_persisted_sqlite_backend_after_qdrant_recovers(monkeypatch):
-    config = DocmancerConfig()
-    config.retrieval.default_mode = "dense"
-    config.vector_store.provider = "qdrant"
-    config.vector_store.url = None
-    captured = {}
-    class VectorStore:
-        @staticmethod
-        def backend_identity():
-            return "persisted-identity"
-
-    vector_store = VectorStore()
-    provider = object()
-
-    class Store:
-        @staticmethod
-        def generation_info():
-            return {
-                "vector_backend": "sqlite-vec",
-                "vector_backend_identity": "persisted-identity",
-            }
-
-    agent = SimpleNamespace(
-        config=config,
-        store=Store(),
-        _vector_collection_name=lambda: "persisted_collection",
-    )
-    monkeypatch.setattr(
-        "docmancer.runtime.qdrant_manager.ensure_running",
-        lambda: pytest.fail("managed qdrant must not be probed for a sqlite-bound generation"),
-    )
-
-    def build_store(vector_config, *, embeddings_dim):
-        captured["provider"] = vector_config.provider
-        captured["dimensions"] = embeddings_dim
-        return vector_store
-
-    monkeypatch.setattr("docmancer.stores.base.get_vector_store", build_store)
-    monkeypatch.setattr("docmancer.embeddings.get_embeddings_provider", lambda _config: provider)
-
-    dispatcher = dispatcher_for_agent(agent)
-
-    assert dispatcher.vector_store is vector_store
-    assert captured["provider"] == "sqlite-vec"
 
 
-def test_retrieval_does_not_switch_qdrant_generation_to_sqlite_fallback(monkeypatch):
-    config = DocmancerConfig()
-    config.retrieval.default_mode = "dense"
-    config.vector_store.provider = "qdrant"
-    config.vector_store.url = None
-
-    class Store:
-        @staticmethod
-        def generation_info():
-            return {"vector_backend": "qdrant"}
-
-    agent = SimpleNamespace(
-        config=config,
-        store=Store(),
-        _vector_collection_name=lambda: "persisted_collection",
-    )
-    monkeypatch.setattr(
-        "docmancer.runtime.qdrant_manager.ensure_running",
-        lambda: SimpleNamespace(fallback=True, url=None),
-    )
-
-    with pytest.raises(HybridRetrievalError, match="active generation requires qdrant"):
-        dispatcher_for_agent(agent)
 
 
 def test_active_staging_generation_gets_unique_collection_before_vector_sync(tmp_path):

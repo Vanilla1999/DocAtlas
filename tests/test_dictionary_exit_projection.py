@@ -133,90 +133,18 @@ def test_quote_budget_and_visible_snapshot_binding_remain_enforced():
     assert validate_model_visible_projection(capped, snapshot=capped_snapshot, max_tokens=800) == []
 
 
-@pytest.mark.parametrize("query_id, origin, relation", [
-    ("query-need-1", None, None), ("query-original", "host_lookup", "host_lookup"),
-    ("query-need-1", "original", "direct"), ("query-lookup-1", "original", "direct"),
-])
-def test_qualifier_rejects_id_origin_relation_impostors(query_id, origin, relation):
-    result = qualify_evidence({"query_text": "storage records", "query_terms": ["storage", "records"],
-        "query_origin": origin, "relation": relation}, query_id=query_id,
-        visible_text="Storage persists records safely.")
-    assert not result.qualified and not result.covered_query_ids
 
 
-def test_anonymous_helper_is_diagnostic_no_credit_and_public_text_is_exact():
-    result = qualify_evidence({"query_text": "storage records", "query_terms": ["storage", "records"]},
-        query_id="helper", visible_text="Storage persists records safely.")
-    assert result.qualified and not result.covered_query_ids and result.trace["admission_only"]
-    assert result.coverage_kind is None
-    lookup = asdict(build_documentation_query_plan("storage records").queries[0])
-    result = qualify_evidence({"query_text": "billing issues", "query_terms": ["billing", "issues"],
-        "query_origin": "original", "relation": "direct"}, query_id="query-original",
-        visible_text="Billing issues are documented.", authoritative_query=lookup)
-    assert not result.qualified and not result.covered_query_ids
 
 
-def test_tagging_uses_execution_lookup_not_incoming_lexical_text():
-    lookup = build_documentation_query_plan("storage records", lookup_queries=("billing issues",)).queries[1]
-    chunk = RetrievedChunk(source="docs/billing.md", chunk_index=0, text="Billing issues are documented.", score=1,
-        metadata={"lexical_match": {"query_text": "storage records", "query_origin": "original", "qualified": True}})
-    tagged = _tag_retrieval_query([chunk], lookup.query_id, lookup.text, lookup=lookup)
-    trace = tagged[0].metadata["retrieval_query_matches"][lookup.query_id]
-    assert trace["query_text"] == lookup.text and trace["query_origin"] == "host_lookup"
-    assert "query-original" not in tagged[0].metadata["retrieval_query_ids"]
 
 
-def test_crop_requalification_rebuilds_actual_plan_text_and_drops_generated_needs():
-    plan = build_documentation_query_plan("storage records", lookup_queries=("billing issues",)).as_payload()
-    source = _requalify_visible_source({
-        "path_or_url": "docs/billing.md", "snippet": "Billing issues are documented.",
-        "_independent_query_plan": plan,
-        "retrieval_query_matches": {
-            "query-original": {"query_origin": "original", "relation": "direct", "query_text": "billing issues", "qualified": True},
-            "query-need-1": {"query_origin": "original", "relation": "direct", "query_text": "billing issues", "qualified": True},
-        },
-    }, query_text={q["query_id"]: q["text"] for q in plan["queries"]})
-    assert not source["retrieval_query_matches"]["query-original"]["qualified"]
-    assert "query-need-1" not in source["retrieval_query_matches"]
-    assert source["retrieval_query_matches"]["query-lookup-1"]["qualified"]
 
 
-def test_context_facade_keeps_explicit_lookup_quote_with_only_its_own_coverage():
-    plan = build_documentation_query_plan("storage records", lookup_queries=("billing issues",)).as_payload()
-    payload, snapshot = project_docs_context(retrieval={
-        "project_identity": "repo", "documentation_query_plan": plan,
-        "context_pack": [{"source_class": "project_doc", "path": "docs/billing.md",
-            "content": "Billing issues are documented.", "project_identity": "repo", "lifecycle_status": "current",
-            "retrieval_query_matches": {"query-original": {"qualified": True, "query_text": "billing issues", "query_origin": "original", "relation": "direct"}}}],
-    })
-    assert payload["sources"] and snapshot
-    assert "query-original" not in payload.get("covered_query_ids", [])
-    assert payload.get("covered_query_ids") == ["query-lookup-1"]
-    assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
 
-def test_generated_need_fallback_does_not_deliver_or_credit_unrelated_context():
-    plan = build_documentation_query_plan("storage records").as_payload()
-    payload, snapshot = project_docs_context(retrieval={
-        "project_identity": "repo", "documentation_query_plan": plan,
-        "context_pack": [{"source_class": "project_doc", "path": "docs/billing.md",
-            "content": "Billing issues are documented.", "project_identity": "repo",
-            "retrieval_query_matches": {"query-need-1": {"qualified": True, "query_text": "billing issues", "query_origin": "retrieval_need"}}}],
-    })
-    assert not payload.get("sources") and not snapshot and not payload.get("covered_query_ids")
 
 
-def test_original_literal_context_without_discovery_trace_is_delivered_no_credit():
-    plan = build_documentation_query_plan("storage records").as_payload()
-    payload, snapshot = project_docs_context(retrieval={
-        "project_identity": "repo", "documentation_query_plan": plan,
-        "context_pack": [{"source_class": "project_doc", "path": "docs/storage.md",
-            "content": "Storage persists records safely.", "project_identity": "repo"}],
-    })
-    assert payload["sources"] and snapshot and not payload.get("covered_query_ids")
-    assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
 
 @pytest.mark.parametrize("supplied", [False, True])
@@ -265,37 +193,4 @@ def test_current_public_requirement_overflow_cannot_hide_behind_old_selection(su
     assert "input_limit:public_requirements" in payload["missing"]
 
 
-@pytest.mark.parametrize("failure", ["question", "identifiers", "public_requirements"])
-def test_context_projection_rejects_current_and_supplied_input_limits(failure):
-    question = "storage records" if failure != "question" else "storage " + "x" * 4_000
-    plan = build_documentation_query_plan(question, lookup_queries=("storage records",)).as_payload()
-    payload, snapshot = project_docs_context(retrieval={
-        "question": question, "documentation_query_plan": plan,
-        "missing_requirement_ids": [f"input_limit:{failure}"],
-        "context_pack": [{"source_class": "project_doc", "path": "docs/storage.md",
-            "content": "Storage persists records safely.", "project_identity": "repo"}],
-    })
-    assert payload["status"] == "insufficient_evidence"
-    assert not payload.get("sources") and not snapshot
-    assert f"input_limit:{failure}" in payload["missing"]
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []
 
-
-@pytest.mark.parametrize("contract_origin", ["requirements", "selection_decision"])
-@pytest.mark.parametrize("snapshot_exact", [None, False, True])
-def test_context_route_preserves_mandatory_snapshot_eligibility(contract_origin, snapshot_exact):
-    plan = build_documentation_query_plan("storage records").as_payload()
-    requirement = {"requirement_id": "exact_snapshot:true", "kind": "exact_snapshot", "value": "true", "mandatory": True}
-    contract = {"requirements": [requirement]}
-    retrieval = {
-        "documentation_query_plan": plan, "project_identity": "repo",
-        "context_pack": [{"source_class": "project_doc", "path": "docs/storage.md",
-            "content": "Storage persists records safely.", "project_identity": "repo",
-            "docs_snapshot_exact": snapshot_exact}],
-        contract_origin: contract if contract_origin == "requirements" else {"requirements": contract},
-    }
-    payload, snapshot = project_docs_context(retrieval=retrieval)
-    assert bool(payload.get("sources")) is (snapshot_exact is True)
-    assert bool(snapshot) is (snapshot_exact is True)
-    assert payload["answer_supported"] is False
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=800) == []

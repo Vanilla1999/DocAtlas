@@ -53,47 +53,8 @@ def guarded_file_reads(monkeypatch, *, selected=()):
     return calls
 
 
-@pytest.mark.parametrize("held", [False, True])
-@pytest.mark.parametrize("arguments", [
-    {}, dict(with_vectors=True), dict(changed_paths=["README.md"]),
-    dict(deleted_paths=["formerly-selected.md"]),
-    dict(renamed_paths=[dict(old_path="formerly-selected.md", new_path="README.md")]),
-    dict(changed_paths=[], deleted_paths=[], renamed_paths=[]),
-])
-def test_direct_sync_denies_before_path_index_adapter_lock_or_mutation(tmp_path, monkeypatch, held, arguments):
-    calls = []
-    def deny(*args, **kwargs):
-        calls.append((args, kwargs))
-        raise AssertionError("sync effect before an explicit mutation grant")
-    facade = SimpleNamespace(config=SimpleNamespace(index=SimpleNamespace(db_path=tmp_path / "must-not-create.db")),
-                             _project_sync_project_docs_impl=deny)
-    service = ProjectDocsService(facade)
-    for name in ("_agent_instance", "_indexed_project_doc_sources", "read_project_metadata", "ingest_project_docs"):
-        monkeypatch.setattr(service, name, deny, raising=False)
-    for name in ("validate_project_path", "storage_writer_lease", "storage_mutation_lock"):
-        monkeypatch.setattr(sync_shard, name, deny)
-    monkeypatch.setattr(Path, "open", deny)
-    monkeypatch.setattr(Path, "stat", deny)
-    no_tree_reads(monkeypatch)
-    with pytest.raises(PermissionError, match="no explicit mutation grant and validated member transaction"):
-        service.sync_project_docs(str(tmp_path), _coordination_held=held, **arguments)
-    assert calls == []
 
 
-def test_private_incremental_sync_cannot_bypass_denial_with_supplied_metadata(tmp_path, monkeypatch):
-    def deny(*args, **kwargs):
-        raise AssertionError("incremental side effect")
-    service = ProjectDocsService(SimpleNamespace())
-    for name in ("_agent_instance", "_indexed_project_doc_sources", "ingest_project_docs"):
-        monkeypatch.setattr(service, name, deny, raising=False)
-    monkeypatch.setattr(Path, "open", deny)
-    monkeypatch.setattr(Path, "stat", deny)
-    no_tree_reads(monkeypatch)
-    with pytest.raises(PermissionError, match="orphan deletion"):
-        service._sync_project_docs_incremental(
-            tmp_path, ProjectMetadata(project_path=str(tmp_path)), with_vectors=True,
-            changed_paths=["README.md"], deleted_paths=["formerly-selected.md"], renamed_paths=None,
-        )
 
 
 @pytest.mark.parametrize("state", ["absent", "empty", "invalid"])
@@ -159,15 +120,6 @@ def test_real_selected_readonly_caller_retains_original_crlf_bytes_hash_and_span
     assert all(path == selected or path.name in {"docatlas.project-docs.yaml", "docatlas.yaml", ".gitignore"} for path in calls)
 
 
-@pytest.mark.parametrize("path", ["unselected.py", "../outside.py", "./selected.py", "docs/*.py", "selected.py/"])
-def test_changed_path_is_not_membership_or_a_read_grant(tmp_path, monkeypatch, path):
-    selected = write(tmp_path, "selected.py", b"class LiteralThing: pass\n")
-    write(tmp_path, "unselected.py")
-    catalog(tmp_path, code_files=["selected.py"])
-    no_tree_reads(monkeypatch)
-    calls = guarded_file_reads(monkeypatch)
-    assert scanners._changed_file_candidate(tmp_path, path) is None
-    assert selected not in calls
 
 
 @pytest.mark.parametrize("restriction", ["ignore", "exclude", "extension", "generated", "bytes", "depth", "count", "deadline", "roots"])

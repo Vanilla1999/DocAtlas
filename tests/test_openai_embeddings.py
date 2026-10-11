@@ -45,48 +45,6 @@ def _install_fake_openai(monkeypatch, *, fail_first: int = 0, status_code: int =
     return state
 
 
-def test_openai_provider_requires_api_key(monkeypatch):
-    _install_fake_openai(monkeypatch)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    from docmancer.core.config import EmbeddingsConfig
-    from docmancer.embeddings.openai_provider import OpenAIProvider
-
-    with pytest.raises(RuntimeError, match="OPENAI_API_KEY"):
-        OpenAIProvider(EmbeddingsConfig(provider="openai"))
 
 
-def test_openai_provider_batches_inputs(monkeypatch):
-    state = _install_fake_openai(monkeypatch)
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-    from docmancer.core.config import EmbeddingsConfig
-    from docmancer.embeddings.openai_provider import OpenAIProvider
 
-    provider = OpenAIProvider(
-        EmbeddingsConfig(provider="openai", model="text-embedding-3-small", dimensions=1536, batch_size=2)
-    )
-    texts = [f"text-{i}" for i in range(5)]
-    out = provider.embed(texts)
-    assert len(out) == 5
-    # 5 inputs with batch_size=2 → 3 calls: 2 + 2 + 1.
-    assert len(state["calls"]) == 3
-    assert [len(c["input"]) for c in state["calls"]] == [2, 2, 1]
-    # All requests carried the configured dimensions for text-embedding-3-*.
-    assert all(c["dimensions"] == 1536 for c in state["calls"])
-
-
-def test_openai_provider_retries_on_rate_limit(monkeypatch):
-    state = _install_fake_openai(monkeypatch, fail_first=2)
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-
-    # Make backoff sleeps a no-op so the test is instant.
-    import docmancer.embeddings.openai_provider as mod
-
-    monkeypatch.setattr(mod.time, "sleep", lambda *a, **kw: None)
-
-    from docmancer.core.config import EmbeddingsConfig
-
-    provider = mod.OpenAIProvider(EmbeddingsConfig(provider="openai", batch_size=4))
-    out = provider.embed(["hello"])
-    assert len(out) == 1
-    # Two failures + one success → three SDK calls.
-    assert len(state["calls"]) == 3

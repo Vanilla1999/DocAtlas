@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-fail-sweep-followup.json",
+  "sha256": "7f72174e6a04484350cfbaf1ef1e34226ee1f24653e0313ae9d72a15e968093a",
+  "candidate_packet_sha256": "67903c71276936007c054b4ccd0c2740ad44266f1cb55afa2495b03d018455ea",
+  "removed": 28, "added": 0,
+  "BASE_status": {"FAIL": 27, "PASS": 1},
+  "saved_CI_status": {"FAIL": 28},
+  "BASE_PASS_exception": "tests/docs/test_python_module_policy_and_manifest.py::test_all_repository_python_modules_stay_within_hard_line_budget",
+  "exact_ids_binding": "Manifest final-followup::retired-followup28 equals author newly_removed_ids exactly; one literal parameter row retired, surviving normalized definition remains.",
+  "final_source_hashes": {
+    "tests/test_patch_review_command.py": "1bf408b4073e47ada1c3cd53bad73d748a3e46231d713431b03774557b2dceb3",
+    "tests/test_library_retrieval_quality_baseline.py": "f2f176985abb3d57df8fdf3db7c4109a1e55533b446fb1d41262c0676ee6a350",
+    "tests/test_exact_version_benchmark_mvp.py": "ec8c2a62a22573b2d83f7b494e000e290b58aab60b4357395af7fd7074b302b1",
+    "tests/test_github_source_manifest.py": "456213aec4e2adb59858521215cbba2026ca97841f07c394b16399f08ea0c9ef",
+    "tests/docs/test_evidence_set_context_delivery.py": "e1fd382f42c959866e3f119694cf33b396a10b547e4493ee7b0cb17885b82502",
+    "tests/docs/test_patch_context_public.py": "3389aa82246012eec59727124529038b302bc66befc9904a98d939f6c086b531",
+    "tests/docs/test_project_context_live_quality.py": "f8235a48a2058f17f37913efb01f6cc25e961066d1be505af63ebeef3ecabf11",
+    "tests/docs/test_evidence_set_delivery_acceptance.py": "3fcd84aa8bfb89e5fb45e9d6c85578c4ed28034ea442bea53c65749627162d25",
+    "tests/docs/test_task19_project_docs_closure.py": "8de24852663b3fb1bb17de55bce0ad4ec0cb7c543ceb16d552f2ddc25e8a780d",
+    "tests/docs/test_python_module_policy_and_manifest.py": "aa573f8880a18e3e6fa8d7ad7efbad57848f8c17dcf7e7bcfc45d0ab5edc8374"
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.evidence_sets.json": {
+      "tests/docs/test_evidence_set_context_delivery.py": "456155ce829f0619aec60f2ca8c282fa895e5a5785427f6ad8d7c0cf663e4d40",
+      "tests/docs/test_evidence_set_delivery_acceptance.py": "8790d613c0397d53d52330a7781faec1f56fdf95b079d5aecd9f46cdce544637"
+    },
+    "tests/diagnostic_labels.json": {
+      "tests/docs/test_project_context_live_quality.py#module_labels": "REMOVE_ABSENT_MODULE",
+      "tests/docs/test_project_context_live_quality.py#module_node_hashes": "REMOVE_ABSENT_MODULE",
+      "tests/docs/test_python_module_policy_and_manifest.py": "970505d9fd108ba16561148430c2ae588e5ce5819941cf0d9d87edefaf4e89d2",
+      "tests/docs/test_task19_project_docs_closure.py": "a383f4dd8dfd494026ca70a1ad0fd84cc4775ff97ee0fb66969c3aa4877c18dd",
+      "tests/test_exact_version_benchmark_mvp.py#module_labels": "REMOVE_ABSENT_MODULE",
+      "tests/test_exact_version_benchmark_mvp.py#module_node_hashes": "REMOVE_ABSENT_MODULE",
+      "tests/test_github_source_manifest.py": "58bdf618c57c4533146dfd10f9e4b1a5f6a5a1ba7878d78ff2d9227731956f50",
+      "tests/test_library_retrieval_quality_baseline.py": "5b50822ae7aff7864bece9c246080b4c68db027e2ee940c447603f3e910fecca",
+      "tests/test_patch_review_command.py": "0d076c749766dc5610db5be4069fad98e4dd1d20b3f02fe1c004fcf21cd233fe"
+    },
+    "tests/diagnostic_labels.patch_context.json": {
+      "tests/docs/test_patch_context_public.py": "6778449923b920d1d0dc2b9aa1e833694641f9a60d1ecc3f01992f444a04b409"
+    }
+  },
+  "registry_method": "All10 current source SHA match completed author final SHA. Sorted unique newline-joined normalized BASE minus all integrated removals; textual definitions match survivors. Eight survivor hashes and four empty-module metadata removals. Other labels/helpers/consumers preserved.",
+  "deferred_paths": [],
+  "reviewed_packet_completion": {"candidates": 226, "removed": 28, "retained_integrations": 194, "retained_ambiguous": 4, "unreviewed": 0, "remaining_unequivocal_units": 0, "limit": "Only these226 candidates reviewed; not global unit completion or final collection. Former contrast-connector unit label corrected to real SQLite integration in author receipt."},
+  "proof": {
+    "run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "evidence_hashes": {
+      "/tmp/opencode/pr211-ci-a4844dfc/pytest-advanced-3.12-38033112465-1/advanced-contract.xml": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+      "/tmp/opencode/pr211-ci-a4844dfc/pytest-core-3.11-38033112465-1/core-tests-3.11.xml": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238"
+    },
+    "boundary": "Saved pre-retirement FAIL, not current runtime. Owner accepts coverage loss including protection checks; removal is not product fix/PASS. No runtime/AST/project imports/CI."
+  },
+  "remaining_failure_inventory": {
+    "saved_unique_FAIL": 1685, "credited_exact_removed_FAIL": 1219,
+    "additional_absent_definition_FAIL": 0,
+    "remaining_saved_FAIL_with_current_definition": 466,
+    "lanes": {"core3.11": {"saved_FAIL": 1591, "remaining": 404}, "advanced3.12": {"saved_FAIL": 94, "remaining": 62}},
+    "receipt_supported_categories": {"unit": 0, "integration": 462, "ambiguous": 4, "unclassified": 0},
+    "sorted_newline_joined_identity_sha256": {
+      "integration": "d791234d1fb55b7cbbb915181be009d25ee3ab86ac6826ce8fb15df128e4df5c",
+      "ambiguous": "8891fee3f45e9b0083c39b249e841a2932ae4bb7546c9520af76b5e5c07d5b52",
+      "unit_and_unclassified_empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "classification_receipt_hashes": {
+      "/tmp/opencode/pr211-fail-context-next.json": "c29bc995575e978247cc5ae01c2a78b44439c111b80462b5853d081280564750",
+      "/tmp/opencode/pr211-fail-fetcher-next.json": "7f07cc7a8148de948ef6640f4bab9eac96a50d8f686382f57fa22171ccbfafe6",
+      "/tmp/opencode/pr211-fail-final-sweep.json": "67903c71276936007c054b4ccd0c2740ad44266f1cb55afa2495b03d018455ea",
+      "/tmp/opencode/pr211-fail-mock-services.json": "db4ac6827848ddf427b9f817b9a55811d17adc4db31fbcecf1500d94c7996eb2",
+      "/tmp/opencode/pr211-fail-residual-next.json": "1ba3692dba3b60df5b7a9f5ebcb4e4b2e6472bd1b5cc8ca261e2a9197d1df4bb",
+      "/tmp/opencode/pr211-fail-sweep-followup.json": "7f72174e6a04484350cfbaf1ef1e34226ee1f24653e0313ae9d72a15e968093a",
+      "/tmp/opencode/pr211-fail-unified-next.json": "433ace265d3c8a7721051b605e45034bc915598aa0d39df9d40859c830dafd91"
+    },
+    "ambiguous_ids": [
+      "tests/task_level/test_task33_codex_exploratory.py::test_codex_exploratory_worker_uses_oauth_jsonl_without_claiming_verified_usage",
+      "tests/task_level/test_task_evaluation.py::test_task33_host_evidence_augments_project_docs_with_deterministic_local_evidence",
+      "tests/task_level/test_task_evaluation.py::test_task33_local_hostile_doc_remains_untrusted_document_data",
+      "tests/test_patch_review_command_part02.py::test_patch_review_bot_bundle_keeps_generic_unknowns_granular_for_consumers"
+    ],
+    "boundary": "Static saved FAILED minus exact credited removals, then textual test-definition presence. Parameter IDs not recollected; physical absence never extra ledger credit. Prior retained-integration receipt lists support categories; latest226 receipt overrides stale labels. No remaining confirmed unit in these saved failures does NOT establish global unit completion. Surviving saved FAIL does not establish current FAIL/PASS."
+  },
+  "validation": {"partition": 8291, "overlap_previous": 0, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "removed": 1229, "added": 1, "net": 1228, "projected_after": 7063, "target_gap": 2089, "classified": 1757, "unclassified": 6534},
+  "prior_manifest_sha256": "f28adc0d86d17fc880a7f71028c85788145b539d888d744164b97edf4a1c3829",
+  "pending": "All writers finished;6534 BASE unclassified identities remain. Final collection/CI pending; no runtime green claim."
+}

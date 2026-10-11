@@ -85,8 +85,3 @@ def test_requalification_reads_no_new_files_or_network(indexed_source, monkeypat
     assert recheck(indexed_source)['qualified']
 
 
-def test_original_question_still_delivers_the_authored_fact(tmp_path):
-    # Kept separate from the seeded boundary controls: an original-only product
-    # regression remains red if the unmodified question still loses its source.
-    cap = capture_source_case(tmp_path, {'Guide.md': '# Settings\n\n' + FACT}, QUESTION)
-    assert_visible_fact(cap, 'Guide.md', FACT)

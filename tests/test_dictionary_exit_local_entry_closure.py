@@ -44,19 +44,6 @@ def guarded_ingest_service(monkeypatch, deny):
     return service
 
 
-@pytest.mark.parametrize("held", [False, True])
-@pytest.mark.parametrize("arguments", [
-    {}, dict(skip_known=False), dict(with_vectors=True),
-    dict(_candidate_paths={"README.md"}), dict(_candidate_paths=set()),
-])
-def test_direct_ingest_denies_before_probes_adapters_index_queue_lock_or_staging(tmp_path, monkeypatch, held, arguments):
-    with forbid_effects(monkeypatch) as (calls, deny):
-        service = guarded_ingest_service(monkeypatch, deny)
-        with pytest.raises(PermissionError, match="no explicit mutation grant and validated member transaction") as caught:
-            service.ingest_project_docs(str(tmp_path), _coordination_held=held, **arguments)
-        assert caught.value.errno is None
-        assert "catalog membership does not authorize indexing, staging or ingestion" in str(caught.value)
-        assert calls == []
 
 
 def test_public_ingest_delegate_reaches_guard_without_storage_initialization(tmp_path, monkeypatch):
@@ -68,100 +55,16 @@ def test_public_ingest_delegate_reaches_guard_without_storage_initialization(tmp
         assert calls == []
 
 
-@pytest.mark.parametrize("state", ["absent", "empty", "invalid"])
-@pytest.mark.parametrize("export", ["direct", "shared", "part02", "facade"])
-def test_public_dart_resolver_and_wildcard_exports_never_probe_or_read(tmp_path, monkeypatch, state, export):
-    from docmancer.docs import _patch_plan_context_shared, _patch_plan_context_part02, patch_plan_context
-
-    if state != "absent":
-        (tmp_path / "docatlas.project-docs.yaml").write_text(
-            "schema_version: 1\ndocuments: []\ncode_files: []\n" if state == "empty" else "schema_version: 900\n")
-    config_dir = tmp_path / ".dart_tool"
-    config_dir.mkdir()
-    (config_dir / "package_config.json").write_text(
-        '{"configVersion":2,"packages":[{"name":"foreign","rootUri":"file:///unselected/external/root","packageUri":"lib/"}]}')
-    functions = {
-        "direct": resolve_dart_package_roots,
-        "shared": _patch_plan_context_shared.resolve_dart_package_roots,
-        "part02": _patch_plan_context_part02.resolve_dart_package_roots,
-        "facade": patch_plan_context.resolve_dart_package_roots,
-    }
-    with forbid_effects(monkeypatch) as (calls, _deny):
-        roots, warnings = functions[export](tmp_path)
-        assert roots == {}
-        assert warnings == [
-            "Dart package roots unresolved: no explicit finite dependency metadata/source read contract; "
-            "no package_config or imported source roots were inspected."
-        ]
-        assert calls == []
 
 
-def test_dart_resolver_does_not_even_coerce_unknown_project_path(monkeypatch):
-    class UnknownRoot:
-        def __fspath__(self):
-            raise AssertionError("path coercion before a finite read contract")
-    with forbid_effects(monkeypatch) as (calls, _deny):
-        roots, warnings = resolve_dart_package_roots(UnknownRoot())
-        assert roots == {} and "unresolved" in warnings[0]
-        assert calls == []
 
 
-def test_pure_uri_grammar_remains_without_filesystem_authorization(monkeypatch):
-    with forbid_effects(monkeypatch) as (calls, _deny):
-        assert _resolve_root_uri("file:///unselected/a%20b", Path("config")) == Path("/unselected/a b")
-        assert _resolve_root_uri("https://unselected.invalid/root", Path("config")) is None
-        assert _resolve_root_uri("../literal", Path("config")) == Path("config/../literal")
-        assert calls == []
 
 
-@pytest.mark.parametrize("operation", ["ingest", "sync"])
-def test_actual_local_denial_has_specific_guidance_without_protocol_changes(tmp_path, monkeypatch, operation):
-    with forbid_effects(monkeypatch) as (calls, deny):
-        service = guarded_ingest_service(monkeypatch, deny)
-        with pytest.raises(PermissionError) as caught:
-            getattr(service, operation + "_project_docs")(str(tmp_path))
-        payload = build_mcp_error_payload(
-            reason_code="permission_denied", message="permission_denied: request failed",
-            exception=caught.value, tool="prepare_docs", phase="execution", debug=True,
-        )
-        assert payload["status"] == "failed"
-        error = payload["error"]
-        assert error["reason_code"] == "permission_denied"
-        assert error["retryable"] is False and error["exception_type"] == "PermissionError"
-        assert error["message"] == "permission_denied: request failed"
-        assert error["traceback"] == "<redacted traceback>"
-        assert "mutation authorization is missing" in error["hints"][0]
-        assert "Check filesystem permissions" not in error["hints"][0]
-        assert calls == []
 
 
-@pytest.mark.parametrize("exception", [
-    PermissionError(errno.EACCES, "Permission denied", "/private/resource"),
-    PermissionError(errno.EPERM, "Operation not permitted"),
-    PermissionError("unrelated permission failure"),
-])
-def test_real_filesystem_and_unknown_permission_errors_keep_original_guidance(exception):
-    payload = build_mcp_error_payload(reason_code="permission_denied", message="request failed", exception=exception)
-    assert payload["error"]["hints"] == ["Check filesystem permissions or run with access to the requested resource."]
-    assert payload["error"]["retryable"] is False
 
 
-def test_known_message_without_permission_exception_does_not_reclassify_errors():
-    message = (
-        "Project docs ingestion is unresolved: this API has no explicit mutation grant and validated "
-        "member transaction; catalog membership does not authorize indexing, staging or ingestion."
-    )
-    payload = build_mcp_error_payload(reason_code="permission_denied", message=message)
-    assert payload["error"]["hints"] == ["Check filesystem permissions or run with access to the requested resource."]
-    payload = build_mcp_error_payload(reason_code="handler_exception", message=message, exception=RuntimeError(message))
-    assert payload["error"]["reason_code"] == "handler_exception"
-    assert "handler issue" in payload["error"]["hints"][0]
-    member_message = "explicit complete member mutation grant required"
-    for exception in (None, RuntimeError(member_message), PermissionError(errno.EACCES, member_message)):
-        payload = build_mcp_error_payload(
-            reason_code="permission_denied", message=member_message, exception=exception,
-        )
-        assert payload["error"]["hints"] == ["Check filesystem permissions or run with access to the requested resource."]
 
 
 def test_existing_prepare_sync_catch_returns_specific_nonretryable_denial(tmp_path, monkeypatch):

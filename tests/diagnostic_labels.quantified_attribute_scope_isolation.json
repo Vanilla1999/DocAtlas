@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_quantified_attribute_scope_isolation.py": "behavioral"
-  },
-  "module_node_hashes": {
-    "tests/docs/test_quantified_attribute_scope_isolation.py": "11ffa8ec9e5d5ebd6b1705ed228ef84c984adfd328e71a3d0bc2ff57f820d6a8"
-  },
+  "module_labels": {},
+  "module_node_hashes": {},
   "node_overrides": {}
 }

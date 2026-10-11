@@ -87,22 +87,3 @@ def _visible_text(payload):
     return "\n".join(str(row.get("snippet") or "") for row in payload["sources"])
 
 
-def test_v13_public_projection_keeps_general_omission_contract(tmp_path):
-    service, project = _public_service(tmp_path)
-    payload = _capture(service, project, V13)
-    _assert_retrieval_only(payload)
-    text = _visible_text(payload)
-    assert "`omitted_counts`" in text
-    assert "non-critical material" in text
-    assert "honor that field" in text
-    assert "reported as warnings" not in payload["sources"][0]["snippet"]
-
-
-def test_v15_public_projection_keeps_current_vs_history_authority(tmp_path):
-    service, project = _public_service(tmp_path)
-    payload = _capture(service, project, V15)
-    _assert_retrieval_only(payload)
-    text = _visible_text(payload)
-    assert "current documentation answers should use maintained source-of-truth" in text
-    assert "`CHANGELOG.md` is release-history/change" in text
-    assert "treat it as primary when the question asks about releases" in text

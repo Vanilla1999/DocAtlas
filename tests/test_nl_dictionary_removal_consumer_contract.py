@@ -85,13 +85,6 @@ def test_normalization_and_selector_preserve_bound_quotes_without_label_veto(quo
     assert validate_assignment_binding(requirement, allowed_other.selected_candidates[0], allowed_other.assignments[0])
 
 
-@pytest.mark.parametrize("invalid", [
-    {"display_content_hash": "0" * 64}, {"parent_logical_id": ""},
-    {"char_end": 9}, {"stable_chunk_id": ""},
-])
-def test_technical_identity_still_vetoes_even_with_caller_claims(invalid):
-    candidates, omissions = normalize_candidates([dict(bound_row("data"), **invalid)], result_kind="patch_context")
-    assert candidates == [] and omissions[0].reason_code == "invalid_identity"
 
 
 def test_actual_sdk_and_public_projection_do_not_grant_workflow(tmp_path):

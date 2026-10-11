@@ -30,18 +30,3 @@ def _unit(text: str, *, kind: str = "sentence") -> AnswerUnit:
         proposition=True,
     )
 
-
-def test_code_symbol_aliases_may_widen_retrieval_but_not_proof_shape():
-    symbol = coerce_technical_term("foo_bar", "code_symbol")
-    assert technical_term_present(symbol, "The foo bar feature is enabled.", require_kind_shape=True) is False
-    assert technical_term_present(symbol, "The `foo_bar` symbol is enabled.", require_kind_shape=True) is True
-
-
-def test_code_block_units_preserve_exact_source_spans_for_projection():
-    from docmancer.docs.domain.answer_units import extract_answer_units, materialize_answer_units
-
-    source = "   ```bash\n   python -m example \\n     --flag\n   ```\n\n"
-    units = extract_answer_units(source)
-    block = next(unit for unit in units if unit.kind == "code_block")
-    assert source[block.char_start:block.char_end] == block.text
-    assert materialize_answer_units(source, (block,)) == block.text

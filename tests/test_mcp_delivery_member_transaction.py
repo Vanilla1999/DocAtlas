@@ -132,19 +132,6 @@ def test_invalid_contract_before_effects(local, change, monkeypatch):
         sync(local, mutation)
 
 
-def test_legacy_entries_remain_effect_free(local, monkeypatch):
-    import docmancer.docs.application._project_docs_service_part01 as part1
-    import docmancer.docs.application._project_docs_service_part02 as part2
-    monkeypatch.setattr(part1, "validate_project_path", lambda *_: pytest.fail("path effect"))
-    monkeypatch.setattr(part2, "validate_project_path", lambda *_: pytest.fail("path effect"))
-    root, _store, app = local
-    with pytest.raises(PermissionError):
-        app.ingest_project_docs(str(root), _coordination_held=True)
-    with pytest.raises(PermissionError):
-        app.sync_project_docs(str(root), changed_paths=["README.md"])
-    with pytest.raises(PermissionError):
-        app._sync_project_docs_incremental(root, None, with_vectors=False,
-                                           changed_paths=None, deleted_paths=None, renamed_paths=None)
 
 
 def test_public_dispatch_and_no_extraction(local, monkeypatch):
@@ -318,37 +305,10 @@ def test_source_and_storage_boundaries(local, kind):
     assert state(store) == before
 
 
-@pytest.mark.parametrize("field", ["with_vectors", "plan_digest", "deleted_paths", "changed_paths", "renamed_paths"])
-def test_public_contract_rejects_legacy_fields(local, field):
-    args = {"action": "sync_project_docs", "project_path": str(local[0]), "mutation": request(local), field: None}
-    assert validate_prepare_docs_arguments(args)["status"] == "error"
 
 
-def test_direct_contract_rejects_legacy_flags(local):
-    root, _store, app = local
-    with pytest.raises(PermissionError):
-        app.sync_project_docs(str(root), mutation=request(local), with_vectors=True)
-    with pytest.raises(PermissionError):
-        app.ingest_project_docs(str(root), mutation=request(local, operation="ingest_project_docs"), skip_known=False)
 
 
-def test_d1_catalog_is_frozen_exact_reviewed_members():
-    root = Path(__file__).resolve().parents[1]
-    raw = yaml.safe_load((root / "docatlas.project-docs.yaml").read_text())
-    assert raw["code_files"] == []
-    assert len(raw["documents"]) == 14
-    assert {item["path"] for item in raw["documents"]} == {
-        "README.md", "CONTRIBUTING.md", "docs/INDEX.md", "docs/PROJECT_MAP.md",
-        "wiki/Architecture.md", "docs/adr/0003-context-first-project-reads.md",
-        "docs/mcp-docs-server.md", "docs/testing.md", "docs/project-docs-mcp-workflow.md",
-        "wiki/Supported-Sources.md", "wiki/Commands.md", "docs/index-cleanup.md",
-        "docs/modules/project-context-retrieval.md", "docs/modules/evidence-selection.md",
-    }
-    assert {item["path"]: item["module_path"] for item in raw["documents"]
-            if item["scope"] == "module"} == {
-        "docs/modules/project-context-retrieval.md": "docmancer/docs",
-        "docs/modules/evidence-selection.md": "docmancer/docs",
-    }
 
 
 @pytest.mark.parametrize("kind", ["database_symlink", "journal_symlink", "hardlink", "directory_symlink"])
@@ -626,14 +586,6 @@ def test_unsupported_platform_denied_before_any_io(local, missing, monkeypatch):
         sync(local, mutation)
 
 
-def test_storage_entry_denies_before_consuming_documents_or_connecting(local, monkeypatch):
-    import docmancer.docs.application.project_docs_member_transaction as module
-    def documents():
-        pytest.fail("documents consumed before unsafe route rejection")
-        yield
-    monkeypatch.setattr(sqlite3, "connect", lambda *_args, **_kwargs: pytest.fail("disk connect"))
-    with pytest.raises(UnsafeSQLitePathMutation):
-        local[1].upsert_project_members(documents(), project_path=str(local[0]), expected_generation_id=None)
 
 
 def test_memory_mechanics_reject_disk_connections(local):

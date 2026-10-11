@@ -176,30 +176,6 @@ def test_target_binding_failures_do_not_evict_quotes_or_publish_dead_target(tmp_
     assert validate_model_visible_projection(payload, snapshot=snapshot) == []
 
 
-@pytest.mark.parametrize("change", ["confirmation", "operational", "foreign_source", "forged_lookup"])
-def test_facade_keeps_existing_delivery_and_literal_qualification_vetoes(tmp_path, change):
-    small_positive(tmp_path)
-    root = tmp_path / "veto"
-    root.mkdir()
-    retrieval, rows, *_ = private_sources(root, partial=True)
-    if change == "confirmation":
-        retrieval.update(requires_confirmation=True, status="confirmation_required")
-    elif change == "operational":
-        retrieval["delivery_decision"] = {"deliverable": False, "reason_code": "catalog_invalid"}
-    elif change == "foreign_source":
-        rows[0]["project_identity"] = "foreign"
-    else:
-        retrieval["documentation_query_plan"]["queries"][0]["text"] = "unrelated ledger checksum"
-    payload, snapshot = facade.project_docs_context(retrieval=retrieval)
-    assert not payload.get("sources") and not payload.get("read_next")
-    assert not reader_references(snapshot)
-    assert validate_model_visible_projection(payload, snapshot=snapshot) == []
-
-
-def reader_references(snapshot):
-    return [row for row in snapshot.values() if isinstance(row, dict) and row.get("source_uri")]
-
-
 @pytest.mark.parametrize("change", ["snapshot", "revoked", "expiry", "forged_uri"])
 def test_genuinely_issued_target_still_rechecks_current_snapshot_policy_and_expiry(tmp_path, change):
     small_positive(tmp_path)

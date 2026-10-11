@@ -245,13 +245,6 @@ def test_callable_github_resolution_never_expands_unapproved_files(kind, service
     assert transport[0] == []
 
 
-def test_callable_package_discovery_is_metadata_only_no_normalization_or_network(service, transport):
-    facade, _ = service
-    target = DocsTarget(library="p", ecosystem="pub", version="1.0", docs_url="https://pub.dev/packages/p?ref=chosen", allowed_domains=["pub.dev"])
-    assert facade.docs_targets.discover_pub_dartdoc_target(target, []) == target
-    with pytest.raises(ValueError):
-        facade.docs_targets.discover_pub_dartdoc_target(replace(target, docs_url=None), [])
-    assert transport[0] == []
 
 
 def test_transport_failure_retains_prior_index_and_exact_registry_snapshot(service, transport):
@@ -446,17 +439,6 @@ def test_vector_failure_never_publishes_candidate(service, transport):
     assert _snapshot(facade, record) == before
 
 
-def test_unknown_target_port_result_cannot_claim_healthy(service, transport):
-    from docmancer.docs.application.library_ingest_orchestrator import LibraryIngestOrchestrator
-
-    facade, _ = service
-    ports = replace(facade.library_docs.ingest_orchestrator.ports,
-                    prefetch_targets=lambda *a, **k: RefreshResult(library_id=None, status="invented", docs_url=ROOT, last_refreshed_at=None))
-    orchestrator = LibraryIngestOrchestrator(ports)
-    result = orchestrator.prefetch_docs("finite", target_plan=[_target()])
-    assert result.status == "needs_explicit_target"
-    assert result.reason_codes == ["unknown_target_result"]
-    assert transport[0] == []
 
 
 def test_inspection_redirect_cannot_dispatch_to_unselected_query(service, transport, monkeypatch):

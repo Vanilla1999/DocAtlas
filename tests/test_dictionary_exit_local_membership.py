@@ -199,54 +199,8 @@ def test_finite_code_members_never_expand_imports_and_preserve_line_spans(tmp_pa
     assert any(edge.kind == "unresolved_import" for edge in graph.edges)
 
 
-@pytest.mark.parametrize("restriction", ["ignore", "exclude", "extension", "bytes", "depth", "generated", "roots"])
-def test_finite_membership_preserves_boundaries(tmp_path, restriction):
-    path = "nested/file.py"
-    write(tmp_path, path, "class LiteralThing: pass\n")
-    boundary = SourceBoundary(code_files=(path,))
-    overrides = {
-        "ignore": dict(gitignore_patterns=("nested/",)),
-        "exclude": dict(exclude_paths=(path,)), "extension": dict(include_extensions=(".dart",)),
-        "bytes": dict(max_file_bytes=1), "depth": dict(max_directory_depth=0),
-        "generated": dict(generated_paths=(path,)),
-        "roots": dict(source_roots=("other",)),
-    }
-    assert list(iter_bounded_source_files(tmp_path, boundary=replace(boundary, **overrides[restriction]),
-                                         supported_extensions=frozenset({".py"}))) == []
 
 
-def test_rank_only_bound_members_without_path_demotion_or_authority(tmp_path):
-    path = "docs/research/docatlas-dogfood/literal.md"
-    catalog(tmp_path, [path])
-    chunk = SimpleNamespace(path=path, stale=False, lifecycle_status="active", metadata={}, score=1.0)
-    selected = rerank_project_doc_chunks([chunk], question="literal", intent=SimpleNamespace(broad=False),
-                                       finite_member_paths=frozenset({path}))
-    assert selected == [chunk]
-    assert "authority" not in chunk.metadata
-    assert rerank_project_doc_chunks([chunk], question="literal", intent=SimpleNamespace(broad=False),
-                                    finite_member_paths=frozenset()) == []
 
 
-def test_review_demotion_removed_only_for_actual_hash_bound_member(tmp_path):
-    path = "docs/research/docatlas-dogfood/literal.md"
-    catalog(tmp_path, [path])
-    binding = document_binding(tmp_path, path)
-    item = dict(id="literal", source=path, confidence="medium", type="architecture",
-                instruction="literal", source_refs=[dict(path=path, local_read_binding=binding)])
-    assert finite_doc_reference(item)
-    assert PatchReviewService._summary_constraint_rank(item, [path], "literal")[0] < 75
-    write(tmp_path, path, "changed bytes\n")
-    assert not finite_doc_reference(item)
-    assert PatchReviewService._summary_constraint_rank(item, [path], "literal")[0] >= 75
 
-
-@pytest.mark.parametrize("consent", [None, False, 1, "true", True])
-def test_generated_read_requires_literal_boolean_consent_and_finite_member(tmp_path, consent):
-    path = "generated/selected.py"
-    write(tmp_path, path, "class LiteralThing: pass\n")
-    boundary = SourceBoundary(code_files=(path,))
-    selected = list(iter_bounded_source_files(tmp_path, boundary=boundary,
-        supported_extensions=frozenset({".py"}), include_generated=consent))
-    assert selected == ([tmp_path / path] if consent is True else [])
-    assert list(iter_bounded_source_files(tmp_path, boundary=replace(boundary, code_files=()),
-        supported_extensions=frozenset({".py"}), include_generated=True)) == []

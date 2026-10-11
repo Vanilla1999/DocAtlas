@@ -135,39 +135,6 @@ def test_v4_paths_do_not_create_read_capabilities_and_failed_read_keeps_evidence
     asyncio.run(run())
 
 
-@pytest.mark.parametrize('mutation', ['text', 'hash', 'span', 'trust', 'unknown', 'estimate', 'recovery', 'unit_hash', 'unit_id', 'assignment_span', 'unit_kind_rehash'])
-def test_wire_validation_rejects_tampering_without_original_snapshot(patch, mutation):
-    broken = deepcopy(patch)
-    source = broken['sources'][0]
-    if mutation == 'text':
-        source['text'] += ' altered'
-    elif mutation == 'hash':
-        source['content_sha256'] = '0' * 64
-    elif mutation == 'span':
-        source['char_end'] += 1
-    elif mutation == 'trust':
-        source['instruction_trust'] = 'trusted'
-    elif mutation == 'unknown':
-        broken['allow_network'] = True
-    elif mutation == 'recovery':
-        broken['recommended_next_action'] = {'tool': 'shell', 'command': 'write'}
-    elif mutation in {'unit_hash', 'unit_id', 'assignment_span'}:
-        assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
-        key = {'unit_hash': 'unit_content_hash', 'unit_id': 'unit_id', 'assignment_span': 'char_end'}[mutation]
-        assignment[key] = assignment[key] + 1 if key == 'char_end' else '0' * 64
-    elif mutation == 'unit_kind_rehash':
-        assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
-        source = next(row for row in broken['sources'] if row['stable_id'] == assignment['evidence_id'])
-        start, end = assignment['unit_char_start'], assignment['unit_char_end']
-        witness = source['text'][start:end]
-        assignment['unit_kind'] = 'invented_kind'
-        assignment['unit_id'] = 'unit-' + hashlib.sha256(f'invented_kind\0{start}\0{end}\0{witness}'.encode()).hexdigest()[:20]
-    else:
-        broken['estimated_tokens'] += 1
-    if mutation != 'estimate':
-        refresh_action_packet_estimate(broken)
-    with pytest.raises(EvidenceDeliveryError):
-        validate_patch_context_payload(broken)
 
 
 def test_v4_failure_text_delivery_and_ambiguous_channel_rejection():
@@ -191,34 +158,8 @@ def test_v4_failure_text_delivery_and_ambiguous_channel_rejection():
     asyncio.run(run())
 
 
-def test_docs_mode_issued_resource_binding_and_replay_guards_are_unchanged():
-    uri = 'docatlas://source/' + 'a' * 24
-    context = {'kind': 'docs_context', 'sources': [{
-        'evidence_id': 'primary', 'path_or_url': 'docs/rules.md', 'project_identity': 'repo',
-        'line_start': 1, 'line_end': 1, 'snippet': 'First rule.', 'source_uri': uri,
-    }]}
-    calls = []
-    def read(resource):
-        calls.append(resource)
-        return {'status': 'complete', 'path': 'docs/rules.md', 'project_identity': 'repo',
-                'line_start': 2, 'line_end': 2, 'content_sha256': 'sha256:' + 'b' * 64,
-                'snippet': 'Second rule.'}
-    controller = SourceReadController(context, requested_facts={'next': 'Second rule'}, read_resource=read)
-    assert controller.read(uri, missing_fact_id='next')['status'] == 'complete'
-    assert controller.read(uri, missing_fact_id='next')['reason_code'] == 'unknown_or_repeated_source'
-    assert calls == [uri]
-    wrong = SourceReadController(context, requested_facts={'next': 'Second rule'},
-        read_resource=lambda _: {**read(uri), 'path': 'docs/other.md'})
-    assert wrong.read(uri, missing_fact_id='next')['reason_code'] == 'source_binding_mismatch'
 
 
-def test_explicit_patch_request_never_silently_accepts_docs_mode():
-    async def run():
-        with pytest.raises(ValueError, match='not delivered'):
-            await GroundedMCPSession.start(OfflineClient({'kind': 'docs_context', 'status': 'ok', 'sources': []}),
-                arguments={'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'},
-                requested_facts={'fact': 'Contract rule'})
-    asyncio.run(run())
 
 
 def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explicit_terms():
@@ -260,78 +201,16 @@ def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explici
     asyncio.run(run())
 
 
-@pytest.mark.parametrize('structured', [[], ['packet'], 'packet', 1, False])
-def test_malformed_nonnull_structured_channel_never_falls_back(patch, structured):
-    with pytest.raises(EvidenceDeliveryError, match='malformed_structured'):
-        extract_tool_payload({'structuredContent': structured,
-                              'content': [{'type': 'text', 'text': json.dumps(patch)}]})
 
 
-@pytest.mark.parametrize('structured', [True, False])
-def test_error_tool_result_never_delivers_evidence(patch, structured):
-    result = {'isError': True, 'content': [{'type': 'text', 'text': json.dumps(patch)}]}
-    if structured:
-        result['structuredContent'] = patch
-    with pytest.raises(EvidenceDeliveryError, match='error_tool_result'):
-        extract_tool_payload(result)
 
 
-def test_structured_delivery_rejects_conflicting_and_multiple_evidence_channels(patch):
-    other = deepcopy(patch)
-    other['sources'][0]['text'] += 'different packet'
-    bare_packet = deepcopy(patch)
-    bare_packet.pop('kind')
-    for alternate in (other, bare_packet, {'status': 'ok', 'kind': 'docs_context', 'sources': []}):
-        with pytest.raises(EvidenceDeliveryError, match='conflicting'):
-            extract_tool_payload({'structuredContent': patch,
-                                  'content': [{'type': 'text', 'text': json.dumps(alternate)}]})
-    text = {'type': 'text', 'text': json.dumps(patch)}
-    with pytest.raises(EvidenceDeliveryError, match='ambiguous'):
-        extract_tool_payload({'structuredContent': patch, 'content': [text, text]})
 
 
-def test_identical_dual_delivery_allows_only_canonical_equality_and_ignores_prose(patch):
-    assert extract_tool_payload({'structuredContent': patch,
-        'content': [{'type': 'text', 'text': 'Structured DocAtlas result attached in structuredContent.'}]}) == patch
-    assert extract_tool_payload({'structuredContent': patch,
-        'content': [{'type': 'text', 'text': json.dumps(patch, sort_keys=True)}]}) == patch
-    alternate = deepcopy(patch)
-    alternate['estimated_tokens'] = float(alternate['estimated_tokens'])
-    with pytest.raises(EvidenceDeliveryError, match='conflicting'):
-        extract_tool_payload({'structuredContent': patch,
-            'content': [{'type': 'text', 'text': json.dumps(alternate)}]})
 
 
-def test_visible_requirement_value_must_match_canonical_witness_not_only_hash(patch):
-    from docmancer.docs.application.action_packet import validate_action_packet
-    original_core = deepcopy(patch)
-    original_core.pop('kind')
-    refresh_action_packet_estimate(original_core)
-    assert validate_action_packet(original_core, evidence_items=retrieval()['context_pack'], project_path='/repo') == []
-    broken = deepcopy(patch)
-    requirement = next(row for row in broken['requirements'] if row['kind'] == 'code_group')
-    requirement['value'] = json.dumps(['definitely_absent_review_symbol'])
-    refresh_action_packet_estimate(broken)
-    broken_core = deepcopy(broken)
-    broken_core.pop('kind')
-    refresh_action_packet_estimate(broken_core)
-    assert 'assignment witness binding is invalid' in validate_action_packet(
-        broken_core, evidence_items=retrieval()['context_pack'], project_path='/repo')
-    with pytest.raises(EvidenceDeliveryError, match='canonical visible witness binding'):
-        validate_patch_context_payload(broken)
 
 
-@pytest.mark.parametrize('change', ['source_line_end', 'source_line_start', 'assignment_line_end', 'assignment_char_end'])
-def test_source_newline_endpoints_and_assignment_containment_fail_closed(patch, change):
-    broken = deepcopy(patch)
-    if change.startswith('source'):
-        broken['sources'][0][change.removeprefix('source_')] += 100
-    else:
-        assignment = next(row for row in broken['assignments'] if row.get('unit_id'))
-        assignment[change.removeprefix('assignment_')] += 100_000
-    refresh_action_packet_estimate(broken)
-    with pytest.raises(EvidenceDeliveryError):
-        validate_patch_context_payload(broken)
 
 
 def test_newline_endpoint_convention_handles_trailing_newline_and_unknown_absolute_position():

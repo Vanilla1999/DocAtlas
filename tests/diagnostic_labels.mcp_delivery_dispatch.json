@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_mcp_delivery_dispatch_boundary.py": "66a9adf4f2796f518f3218224bd9bd04f07e1fbd095893aa34977d69fe176097"
+    "tests/test_mcp_delivery_dispatch_boundary.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 }

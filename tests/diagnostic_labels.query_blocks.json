@@ -1,12 +1,10 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/docs/test_query_block_delivery.py": "behavioral",
     "tests/docs/test_query_block_guards.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_query_block_delivery.py": "29cbbe36dff70ced1063bb199a9128f8122d8057c1140017df98959b327eac5a",
-    "tests/docs/test_query_block_guards.py": "accfb6b2a75060425b19350da3d73987325f3c0c98597e075bbc4f406f138159"
+    "tests/docs/test_query_block_guards.py": "d406c25f723eebcc8fa7a6d9fe30aad17d1392f336b4744e6fb7ee24fb015316"
   },
   "node_overrides": {}
 }

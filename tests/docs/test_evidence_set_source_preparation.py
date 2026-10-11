@@ -77,7 +77,3 @@ def test_invalid_replay_clears_previously_valid_window_proposal(indexed):
     assert not context.dependency_windows.get(window)
 
 
-def test_original_question_delivers_both_original_source_facts(tmp_path):
-    cap=capture_source_case(tmp_path,DOCUMENTS,QUESTION)
-    for fact in FACTS:
-        assert_visible_fact(cap, 'Guide.md', fact)

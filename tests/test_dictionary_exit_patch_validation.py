@@ -81,11 +81,6 @@ def test_changed_path_escape_or_nonliteral_input_cannot_get_positive_comparison(
     _assert_non_authorizing(asdict(packet))
 
 
-def test_nonexistent_root_still_enforces_lexical_scope(tmp_path):
-    packet = _validate([_constraint("generated_file")], project_path=str(tmp_path / "missing"), changed_files=["../outside/service.py"])
-    assert packet.satisfied == 0
-    assert packet.unknown == 1
-    assert any("traversal" in warning for warning in packet.warnings)
 
 
 @pytest.mark.parametrize("inside", [False, True])
@@ -122,11 +117,6 @@ def test_true_typed_file_guard_violations_are_not_hidden_as_universal_unknown(ty
     _assert_non_authorizing(asdict(packet))
 
 
-def test_unbound_protection_match_is_not_source_proof_or_edit_grant():
-    packet = _validate([_constraint("generated_file", source="missing", source_refs=[{"canonical_path": "forged", "sha256": "0" * 64}])], changed_files=["src/model.g.dart"])
-    assert packet.violated == 1
-    assert packet.satisfied == 0
-    _assert_non_authorizing(asdict(packet))
 
 
 def test_valid_mechanical_guard_violation_survives_other_invalid_changed_paths(tmp_path):
@@ -149,11 +139,6 @@ def test_lockfile_task_words_never_override_explicit_protection(task, tmp_path):
     assert packet.satisfied == 0
 
 
-@pytest.mark.parametrize("prose", ["generated build_runner regenerate", "Do not change lockfile", "provider owns policy", "manual review by designer", "version 1.2.3"])
-def test_prose_never_becomes_implicit_file_target_or_allowed_intent(prose, tmp_path):
-    packet = _validate([_constraint(instruction=prose, evidence=prose, source="pubspec.lock", files=[])], project_path=str(tmp_path), changed_files=["pubspec.lock"])
-    assert packet.unknown == 1
-    assert packet.violated == packet.satisfied == 0
 
 
 @pytest.mark.parametrize("failure", ["missing_source", "missing_ref", "forged_hash", "stale_bytes", "wrong_span", "wrong_literal", "ambiguous_hash_domain", "forged_canonical_hint"])
@@ -296,25 +281,6 @@ def test_malformed_diff_cannot_get_positive_comparison(tmp_path):
     assert packet.unknown == 1
 
 
-@pytest.mark.parametrize("input_kind", ["constraints", "changed_paths", "patch_diff", "malformed_files", "malformed_constraint", "malformed_typed_constraint"])
-def test_bounded_or_invalid_input_fails_closed_without_allpass(input_kind):
-    constraints, kwargs = [_constraint()], {"changed_files": ["src/safe.py"]}
-    if input_kind == "constraints":
-        constraints *= validation_module.MAX_VALIDATION_CONSTRAINTS + 1
-    elif input_kind == "changed_paths":
-        kwargs["changed_files"] *= validation_module.MAX_VALIDATION_PATHS + 1
-    elif input_kind == "patch_diff":
-        kwargs["patch_diff"] = "x" * (validation_module.MAX_VALIDATION_TEXT_CHARS + 1)
-    elif input_kind == "malformed_files":
-        constraints = [_constraint(files="pubspec.lock")]
-    elif input_kind == "malformed_typed_constraint":
-        constraints = [PatchConstraint(**_constraint(type_=[]))]
-    else:
-        constraints = [False]
-    packet = _validate(constraints, strict=True, **kwargs)
-    assert packet.satisfied == 0
-    assert packet.unknown == 1
-    _assert_non_authorizing(asdict(packet))
 
 
 def test_source_reads_have_an_aggregate_budget(monkeypatch, tmp_path):

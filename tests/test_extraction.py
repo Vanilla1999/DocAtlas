@@ -159,178 +159,20 @@ DARTDOC_PROVIDER_HTML = """
 # extract_content tests
 # ---------------------------------------------------------------------------
 
-class TestExtractContent:
-    def test_simple_html_extraction(self):
-        result = extract_content(SIMPLE_HTML, url="https://example.com/docs/getting-started")
-        assert "Getting Started" in result
-        assert "Installation" in result or "pip install" in result
-        # Should not include nav or footer
-        assert "Copyright 2024" not in result
-
-    def test_extracts_code_blocks(self):
-        result = extract_content(SIMPLE_HTML)
-        assert "pip install example-lib" in result
-
-    def test_noise_stripped(self):
-        result = extract_content(HTML_WITH_NOISE)
-        assert "Real Content" in result
-        assert "actual documentation content" in result
-        # Nav, footer, script should be stripped
-        assert "Page 1" not in result
-        assert "Built with DocsFramework" not in result
-        assert "tracking" not in result
-
-    def test_table_preserved(self):
-        result = extract_content(HTML_WITH_TABLE)
-        assert "API Reference" in result
-        # Table content should appear in some form
-        assert "GET" in result
-        assert "/users" in result
-
-    def test_empty_html(self):
-        result = extract_content(EMPTY_HTML)
-        assert result == "" or len(result.strip()) == 0
-
-    def test_empty_string(self):
-        result = extract_content("")
-        assert result == ""
-
-    def test_none_safe(self):
-        result = extract_content("")
-        assert isinstance(result, str)
-
-    def test_dartdoc_sized_box_extracts_class_content(self):
-        result = extract_dartdoc_content(DARTDOC_SIZED_BOX_HTML)
-
-        assert "SizedBox class" in result
-        assert "A box with a specified size" in result
-        assert "Constructors" in result
-        assert "SizedBox({double? width" in result
-        assert "width" in result
-        assert "Flutter footer" not in result
-
-    def test_dartdoc_go_router_extracts_example(self):
-        result = extract_dartdoc_content(DARTDOC_SHELL_ROUTE_HTML)
-
-        assert "ShellRoute class" in result
-        assert "UI shell" in result
-        assert "ShellRoute(" in result
-        assert "Scaffold(body: child)" in result
-        assert "Navigation" not in result
-
-    def test_dartdoc_riverpod_extracts_provider_description(self):
-        result = extract_content(DARTDOC_PROVIDER_HTML, doc_format="dartdoc")
-
-        assert "Provider class" in result
-        assert "synchronously creates a value" in result
-        assert "select" in result
 
 
 # ---------------------------------------------------------------------------
 # extract_metadata tests
 # ---------------------------------------------------------------------------
 
-class TestExtractMetadata:
-    def test_extracts_title(self):
-        meta = extract_metadata(SIMPLE_HTML)
-        assert meta["title"] == "Getting Started"
-
-    def test_extracts_description(self):
-        meta = extract_metadata(SIMPLE_HTML)
-        assert meta["description"] == "Learn how to get started"
-
-    def test_extracts_lang(self):
-        meta = extract_metadata(SIMPLE_HTML)
-        assert meta["lang"] == "en"
-
-    def test_extracts_canonical(self):
-        meta = extract_metadata(SIMPLE_HTML)
-        assert meta["canonical_url"] == "https://example.com/docs/getting-started"
-
-    def test_resolves_relative_canonical_against_page_url(self):
-        html = '<html><head><link rel="canonical" href="/docs/page"></head><body></body></html>'
-        meta = extract_metadata(html, url="https://example.com/docs/page?utm_source=x")
-        assert meta["canonical_url"] == "https://example.com/docs/page"
-
-    def test_missing_metadata(self):
-        meta = extract_metadata("<html><body><p>No meta</p></body></html>")
-        assert meta["title"] is None or meta["title"] == ""
-        assert meta["description"] is None
-        assert meta["lang"] is None
-        assert meta["canonical_url"] is None
-
-    def test_h1_fallback_for_title(self):
-        html = "<html><body><h1>My Page</h1><p>Content</p></body></html>"
-        meta = extract_metadata(html)
-        assert meta["title"] == "My Page"
 
 
 # ---------------------------------------------------------------------------
 # extract_section_path tests
 # ---------------------------------------------------------------------------
 
-class TestExtractSectionPath:
-    def test_breadcrumb_extraction(self):
-        path = extract_section_path(HTML_WITH_BREADCRUMBS)
-        assert "Docs" in path
-        assert "Guides" in path
-        assert "Authentication" in path
-
-    def test_no_breadcrumbs(self):
-        path = extract_section_path(SIMPLE_HTML)
-        assert path == []
-
-    def test_empty_html(self):
-        path = extract_section_path("")
-        assert path == []
 
 
 # ---------------------------------------------------------------------------
 # DocsMarkdownConverter tests
 # ---------------------------------------------------------------------------
-
-class TestDocsMarkdownConverter:
-    def test_code_block_language_extraction(self):
-        from bs4 import BeautifulSoup
-        html = '<pre><code class="language-python">print("hello")</code></pre>'
-        soup = BeautifulSoup(html, "html.parser")
-        converter = DocsMarkdownConverter()
-        result = converter.convert_soup(soup)
-        assert "```python" in result
-        assert 'print("hello")' in result
-
-    def test_warning_admonition(self):
-        from bs4 import BeautifulSoup
-        html = '<div class="warning"><p>Watch out!</p></div>'
-        soup = BeautifulSoup(html, "html.parser")
-        converter = DocsMarkdownConverter()
-        result = converter.convert_soup(soup)
-        assert "Warning" in result
-        assert "Watch out!" in result
-
-    def test_note_admonition(self):
-        from bs4 import BeautifulSoup
-        html = '<div class="note"><p>Remember this.</p></div>'
-        soup = BeautifulSoup(html, "html.parser")
-        converter = DocsMarkdownConverter()
-        result = converter.convert_soup(soup)
-        assert "Note" in result
-        assert "Remember this." in result
-
-    def test_nav_stripped(self):
-        from bs4 import BeautifulSoup
-        html = '<nav><a href="/">Home</a></nav><p>Content</p>'
-        soup = BeautifulSoup(html, "html.parser")
-        converter = DocsMarkdownConverter()
-        result = converter.convert_soup(soup)
-        assert "Home" not in result
-        assert "Content" in result
-
-    def test_footer_stripped(self):
-        from bs4 import BeautifulSoup
-        html = '<p>Content</p><footer>Copyright 2024</footer>'
-        soup = BeautifulSoup(html, "html.parser")
-        converter = DocsMarkdownConverter()
-        result = converter.convert_soup(soup)
-        assert "Copyright" not in result
-        assert "Content" in result

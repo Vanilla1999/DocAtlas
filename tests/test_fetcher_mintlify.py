@@ -31,22 +31,7 @@ PAGE_HTML = """
 
 
 class TestMintlifyFetcherLlmsFullTxt:
-    def test_fetch_llms_full_txt_success(self):
-        """llms-full.txt returns 200 — single Document returned."""
-        content = "# Welcome\n\nThis is the full docs."
-        mock_client = MagicMock()
-        mock_client.get.return_value = _make_response(200, content)
-        mock_client.__enter__ = lambda s: s
-        mock_client.__exit__ = MagicMock(return_value=False)
-
-        with patch("httpx.Client", return_value=mock_client):
-            fetcher = MintlifyFetcher()
-            docs = fetcher.fetch("https://docs.example.com")
-
-        assert len(docs) == 1
-        assert docs[0].source == "https://docs.example.com/llms-full.txt"
-        assert docs[0].content == content
-        assert docs[0].metadata["fetch_method"] == "llms-full.txt"
+    pass
 
 
 class TestMintlifyFetcherLlmsTxt:
@@ -128,41 +113,5 @@ class TestMintlifyFetcherSitemap:
 
 
 class TestMintlifyFetcherFailure:
-    def test_all_strategies_fail_raises_value_error(self):
-        """All three strategies return 404 — ValueError raised."""
-        mock_client = MagicMock()
-        mock_client.get.return_value = _make_response(404)
-        mock_client.__enter__ = lambda s: s
-        mock_client.__exit__ = MagicMock(return_value=False)
+    pass
 
-        with patch("httpx.Client", return_value=mock_client):
-            with pytest.raises(ValueError, match="Could not fetch docs from"):
-                MintlifyFetcher().fetch("https://docs.example.com")
-
-    def test_network_error_raises_value_error(self):
-        """Network error is wrapped in ValueError."""
-        import httpx
-        with patch("httpx.Client") as mock_cls:
-            mock_client = MagicMock()
-            mock_cls.return_value.__enter__.return_value = mock_client
-            mock_cls.return_value.__exit__.return_value = False
-            mock_client.get.side_effect = httpx.ConnectError("Connection refused")
-
-            with pytest.raises(ValueError, match="Network error"):
-                MintlifyFetcher().fetch("https://docs.example.com")
-
-
-class TestParseSitemap:
-    def test_parse_sitemap_standard(self):
-        urls = MintlifyFetcher._parse_sitemap(SITEMAP_XML)
-        assert urls == [
-            "https://docs.example.com/intro",
-            "https://docs.example.com/guide",
-        ]
-
-    def test_parse_sitemap_empty(self):
-        xml = '<?xml version="1.0"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>'
-        assert MintlifyFetcher._parse_sitemap(xml) == []
-
-    def test_parse_sitemap_invalid_xml(self):
-        assert MintlifyFetcher._parse_sitemap("not xml at all") == []

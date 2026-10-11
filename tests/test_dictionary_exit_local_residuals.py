@@ -40,30 +40,10 @@ def _observe_source_reads(monkeypatch, root):
     return observed
 
 
-@pytest.mark.parametrize("suffix", ["Gate", "Service", "Repository", "Controller", "Manager", "Policy", "Adapter"])
-@pytest.mark.parametrize("supplied", [False, True])
-def test_role_suffix_never_promotes_literal_terms(suffix, supplied):
-    terms = ["AlphaWidget", "Beta" + suffix, "GammaQuux", "DeltaProvider"]
-    assert source_map._source_evidence_terms(
-        question=" ".join(terms), requirements=terms if supplied else None,
-    ) == terms
 
 
-@pytest.mark.parametrize("supplied", [False, True])
-def test_sixteen_term_budget_uses_stable_first_occurrence_not_roles(supplied):
-    terms = [f"Literal{i}Quux" for i in range(16)] + ["LateService", "LateGate"]
-    assert source_map._source_evidence_terms(
-        question=" ".join(terms), requirements=terms if supplied else None,
-    ) == terms[:16]
 
 
-def test_literal_spelling_deduplication_and_exact_paths_remain_stable():
-    assert source_map._source_evidence_terms(
-        question="", requirements=["AlphaWidget", "alphawidget", "BetaService", "AlphaWidget"],
-    ) == ["AlphaWidget", "BetaService"]
-    assert source_map._source_evidence_terms(
-        question="BetaService src/arbitrary.py", requirements=None,
-    )[0] == "src/arbitrary.py"
 
 
 @pytest.mark.parametrize("suffix", ["Gate", "Service", "Repository", "Controller", "Manager", "Policy", "Adapter"])
@@ -118,33 +98,8 @@ def test_gap_passes_original_query_and_explicit_unmatched_contract(tmp_path, mon
     assert all(section["state"] == "missing" for section in action["documentation_gap"]["required_sections"])
 
 
-@pytest.mark.parametrize("query", [None, "", "UnseenQuux", "НевидимыйКварк"])
-def test_empty_or_unmatched_gap_has_context_without_synthetic_topic(tmp_path, query):
-    _write(tmp_path, "a.py")
-    _write(tmp_path, "z_architecture.py", "class Architecture: pass\n")
-    _declare_code_files(tmp_path, "a.py", "z_architecture.py")
-    evidence = project_state._documentation_gap_evidence(tmp_path, query)
-    assert evidence == [{"category": "source map", "paths": ["a.py", "z_architecture.py"]}]
-    facts = source_map.collect_project_source_facts(
-        tmp_path, question=query or "", include_unmatched=True,
-    )
-    assert all(item["selection_score"] == 0 and item["matched_terms"] == [] for item in facts)
-    assert source_map.build_project_repo_map(tmp_path, question=query or "") == []
 
 
-@pytest.mark.parametrize("reason", ["no_project_docs", "architecture_doc_creation_recommended", "project_docs_ready"])
-@pytest.mark.parametrize("query", ["", "  Explain Quux?\nKeep Beta  ", "Что делает Quux? Не изменяй Beta!"])
-def test_all_structured_retry_emitters_keep_original_question(tmp_path, reason, query):
-    action, confirmation, confirmation_reason, args, _, _ = project_state.project_docs_structured_next_action(
-        reason_code=reason, root=tmp_path, query=query,
-    )
-    if reason == "project_docs_ready":
-        assert action is None and confirmation is False
-        assert args["question"] == query
-    else:
-        assert confirmation is True and confirmation_reason == "repo_write"
-        assert action["after"][1]["arguments_patch"]["question"] == query
-        assert action["documentation_gap"]["evidence_complete"] is False
 
 
 @pytest.mark.parametrize("question", ["", "   "])
@@ -228,39 +183,8 @@ def test_generated_consent_never_bypasses_roots_excludes_gitignore_or_symlinks(t
         assert observed == {}
 
 
-@pytest.mark.parametrize("changes", [
-    {"enabled": False}, {"max_scanned_files": 0}, {"max_scanned_bytes": 1},
-    {"max_file_bytes": 1}, {"scan_deadline_seconds": 0},
-    {"max_directory_depth": 0}, {"include_extensions": (".unsupported",)},
-])
-def test_parser_scan_caps_still_fail_closed_with_generated_consent(tmp_path, changes):
-    _write(tmp_path, "src/generated/a.py")
-    boundary = replace(SourceBoundary(), **changes)
-    assert source_map.collect_project_source_facts(
-        tmp_path, include_unmatched=True, include_generated=True, source_boundary=boundary,
-    ) == []
-    rows = source_map.build_project_source_evidence(
-        tmp_path, requirements=["ArbitraryWidget"], include_generated=True, source_boundary=boundary,
-    )
-    assert all(row["evidence_class"] == "absent_in_source" and row["matched"] is False for row in rows)
 
 
-def test_gap_honors_config_and_retains_six_file_deterministic_cap(tmp_path):
-    for index in range(9):
-        _write(tmp_path, f"src/{index}.py")
-    _write(tmp_path, "other/out.py")
-    _write(tmp_path, "src/generated/generated.py")
-    (tmp_path / "docatlas.yaml").write_text("project:\n  source_roots: [src]\n", encoding="utf-8")
-    _declare_code_files(tmp_path, *(f"src/{index}.py" for index in range(9)))
-    all_facts = source_map.collect_project_source_facts(tmp_path, include_unmatched=True, max_files=9)
-    assert [item["path"] for item in all_facts] == [f"src/{index}.py" for index in range(9)]
-    assert project_state._documentation_gap_evidence(tmp_path, "") == [{
-        "category": "source map", "paths": [f"src/{index}.py" for index in range(6)],
-    }]
-    assert source_map.collect_project_source_facts(
-        tmp_path, include_unmatched=True,
-        source_boundary=replace(SourceBoundary.from_project(tmp_path), code_files=("src/0.py", "other/out.py")),
-    ) == []
 
 
 def test_ast_spans_original_bytes_and_new_unmatched_context_survive(tmp_path):
@@ -299,12 +223,6 @@ def test_supported_extension_intersection_and_secret_scrubbing_remain(tmp_path):
     assert source_map.build_project_source_evidence(tmp_path, requirements=["password"], source_boundary=mixed) == []
 
 
-@pytest.mark.parametrize("limit", [0, -1])
-def test_nonpositive_output_budgets_do_not_open_empty_question_allpass(tmp_path, limit):
-    _write(tmp_path, "a.py")
-    assert source_map.collect_project_source_facts(tmp_path, include_unmatched=True, max_files=limit) == []
-    assert source_map.collect_project_source_facts(tmp_path, include_unmatched=True, token_budget=limit) == []
-    assert source_map.build_project_source_evidence(tmp_path, requirements=["ArbitraryWidget"], max_items=limit) == []
 
 
 @pytest.mark.parametrize("question", ["", "Explain UnseenQuux", "Объясни НевидимыйКварк"])

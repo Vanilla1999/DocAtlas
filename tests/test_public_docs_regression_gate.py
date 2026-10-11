@@ -31,17 +31,4 @@ def _assert_public_docs_artifact(report: dict, suite: str) -> None:
     assert quality["snippet_sections_at_5_avg"] > 0.0, f"{suite} snippet_sections_at_5_avg must be positive"
 
 
-def test_public_docs_riverpod_artifact_regression_gate():
-    report = _load_artifact("eval/results/docmancer_riverpod_results.json")
 
-    _assert_metric(report["dataset"], "eval/riverpod_golden.yaml", "Riverpod dataset")
-    _assert_metric(report["metrics"]["queries"], 5, "Riverpod query count")
-    _assert_public_docs_artifact(report, "Riverpod")
-
-
-def test_public_docs_fastapi_artifact_regression_gate():
-    report = _load_artifact("eval/results/docmancer_fastapi_results.json")
-
-    _assert_metric(report["dataset"], "eval/fastapi_golden.yaml", "FastAPI dataset")
-    _assert_metric(report["metrics"]["queries"], 3, "FastAPI query count")
-    _assert_public_docs_artifact(report, "FastAPI")

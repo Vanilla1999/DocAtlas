@@ -1,0 +1,536 @@
+{
+  "reconciliation": {
+    "remaining_ledger_identities": 1727,
+    "BASE_survivors": 1726,
+    "addition": 1,
+    "reviewed_scope_saved_PASS": {
+      "docs": 299,
+      "AM": 1162,
+      "NZ": 208,
+      "nested": 48
+    },
+    "reviewed_union": 1717,
+    "scope_overlaps": [],
+    "nested_integration_functions": 41,
+    "nested_integration_PASS": 45,
+    "nested_ambiguous_functions": 3,
+    "nested_ambiguous_PASS": 3,
+    "trace_addition_in_reviewed_union": [
+      "tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls"
+    ],
+    "baseline_exceptions": [
+      {
+        "id": "tests/test_parsers.py::test_pdf_loader_extracts_generated_story_pdf",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_count_reports_points",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_delete_collection_refuses_foreign",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_delete_points_drops_by_id",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_ensure_collection_idempotent",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_ensure_collection_refuses_foreign_existing",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_factory_returns_qdrant_store",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_health_check_true",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_search_with_payload_filter",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_upsert_and_search_dense",
+        "BASE_status": "SKIP"
+      }
+    ],
+    "exception_status_counts": {
+      "SKIP": 10
+    },
+    "limit": "Finished owned green scopes only: no confirmed units in those inventories. Remaining baseline exceptions and unchanged skips outside this PASS classification; global unit absence not proven.",
+    "remaining_ambiguous_PASS_ids": [
+      "tests/task_level/test_task33_codex_exploratory.py::test_explicit_exploratory_delivery_is_persisted_as_non_causal",
+      "tests/task_level/test_task33_evaluation_contract.py::test_task33_evaluation_fails_closed_without_relabeling_not_applicable_compile",
+      "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff"
+    ]
+  },
+  "imports": {
+    "remaining_python_files": 381,
+    "tokenize_errors": [],
+    "tests_local_import_statements": 90,
+    "missing_local_test_modules": [],
+    "missing_literal_shared_helper_names": [],
+    "limit": "All remaining tests/**/*.py tokenize/text scans. Literal local import targets and imported names only; dynamic import, star exports, module attributes and runtime importability unverified. Production dependency imports not executed.",
+    "textually_resolved_shared_reexports": [
+      {
+        "source": "tests/docs/test_project_code_symbol_queries.py",
+        "line": 7,
+        "module": "tests.docs.test_project_context_service",
+        "name": "FakeProjectContextFacade",
+        "limit": "Imported literal name absent from module text; dynamic exports/reexports not executed.",
+        "via": "Explicit _shared module import plus globals().update; class present in _shared_test_project_context_service.py. Textually resolved, not runtime imported."
+      }
+    ],
+    "root_package_import_statements": 18,
+    "missing_root_package_helpers": [],
+    "literal_dynamic_test_imports": []
+  },
+  "diagnostics": {
+    "registries_scanned": 179,
+    "module_entries": 271,
+    "missing_modules": [],
+    "definition_mismatches": [],
+    "hash_mismatches": [],
+    "helper_only_label_entries": 84,
+    "limit": "Hashes derived from normalizedBASE survivors+addition where textual test-name sets match. Class/parameter collection semantics not executed."
+  },
+  "selectors": {
+    "literal_issues": [
+      {
+        "file": ".github/workflows/language-flow-diagnostic.yml",
+        "line": 13,
+        "selector": "tests/docs/test_language_pilot_review.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-flow-diagnostic.yml",
+        "line": 47,
+        "selector": "tests/docs/test_language_pilot_review.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 95,
+        "selector": "tests/docs/test_project_code_symbol_queries.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 96,
+        "selector": "tests/docs/test_question_plan_v4.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 97,
+        "selector": "tests/docs/test_evidence_selection.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 98,
+        "selector": "tests/docs/test_evidence_selection_part02.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 99,
+        "selector": "tests/docs/test_evidence_selection_v2.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/pr174-review-cleanup.yml",
+        "line": 100,
+        "selector": "tests/test_context7_parity_production_matrix.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-context-diagnostic.yml",
+        "line": 44,
+        "selector": "tests/docs/test_language_aware_context_reference.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-context-diagnostic.yml",
+        "line": 44,
+        "selector": "tests/docs/test_language_aware_context_probe.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-context-diagnostic.yml",
+        "line": 44,
+        "selector": "tests/docs/test_language_ci_diagnostic.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-context-diagnostic.yml",
+        "line": 44,
+        "selector": "tests/docs/test_language_source_profile.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-context-diagnostic.yml",
+        "line": 44,
+        "selector": "tests/docs/test_language_trace_serialization.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/v13-v15-public-proof.yml",
+        "line": 7,
+        "selector": "tests/docs/test_v13_v15_public_regressions.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/v13-v15-public-proof.yml",
+        "line": 38,
+        "selector": "tests/docs/test_v13_v15_public_regressions.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/v13-v15-public-proof.yml",
+        "line": 47,
+        "selector": "tests/docs/test_v13_v15_public_regressions.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/task21-live-tool-choice.yml",
+        "line": 27,
+        "selector": "tests/docs/test_tool_choice_eval.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/task33c-pr-checks.yml",
+        "line": 48,
+        "selector": "tests/task_level/test_task33_local.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/task33c-pr-checks.yml",
+        "line": 49,
+        "selector": "tests/task_level/test_task33_validation.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/agent-developer-model-benchmark.yml",
+        "line": 33,
+        "selector": "tests/test_product_scope.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/agent-developer-model-benchmark.yml",
+        "line": 33,
+        "selector": "tests/docs/test_tool_choice_eval.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-agent-pilot.yml",
+        "line": 7,
+        "selector": "tests/docs/test_language_pilot_io.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-agent-pilot.yml",
+        "line": 49,
+        "selector": "tests/docs/test_language_pilot_io.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-agent-fp32.yml",
+        "line": 47,
+        "selector": "tests/docs/test_language_pilot_io.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/language-agent-fp32.yml",
+        "line": 47,
+        "selector": "tests/docs/test_language_pilot_v2.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/task33c-actions-probe.yml",
+        "line": 156,
+        "selector": "tests/task_level/test_task33_local.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/task33c-actions-probe.yml",
+        "line": 157,
+        "selector": "tests/task_level/test_task33_validation.py",
+        "reason": "module_has_no_test_definitions",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 89,
+        "selector": "tests/docs/test_user_facing_docs_branding.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 90,
+        "selector": "tests/docs/test_documented_cli_contract.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 91,
+        "selector": "tests/docs/test_mcp_docs_tools_registration.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 92,
+        "selector": "tests/docs/test_tool_choice_eval.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 161,
+        "selector": "tests/docs/test_mcp_docs_tools_registration.py",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 21,
+        "selector": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 22,
+        "selector": "tests/task_level/test_actionability.py::test_active_task33_protocol_has_public_actionability_contract",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 24,
+        "selector": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 25,
+        "selector": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 26,
+        "selector": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 27,
+        "selector": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 28,
+        "selector": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 29,
+        "selector": "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 30,
+        "selector": "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 33,
+        "selector": "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 34,
+        "selector": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 36,
+        "selector": "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 37,
+        "selector": "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 812,
+        "selector": "tests/test_literal_control.py::test_expected",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      }
+    ],
+    "critical_TARGET_TESTS": 17,
+    "critical_missing_targets": 13,
+    "limit": "Static references only; no gate run or silent workflow/selector edit.",
+    "critical_mutant_killer_references": 43,
+    "critical_mutant_references_to_missing_targets": 31,
+    "critical_missing_selector_list": [
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 21,
+        "selector": "tests/docs/test_normative_language.py::test_normative_modality_is_deterministic_and_preserves_legacy_cases",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 22,
+        "selector": "tests/task_level/test_actionability.py::test_active_task33_protocol_has_public_actionability_contract",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 24,
+        "selector": "tests/docs/test_project_retrieval_alias_contract.py::test_current_alias_boundary_preserves_explicit_queries_without_inference",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 25,
+        "selector": "tests/docs/test_project_query_intent_contract.py::test_current_project_intent_preserves_literals_and_never_infers_roles",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 26,
+        "selector": "tests/docs/test_admission_meaning_contract.py::test_current_admission_meaning_preserves_literals_without_inferred_equivalence",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 27,
+        "selector": "tests/docs/test_admission_local_binding_contract.py::test_current_default_binding_keeps_unknown_without_inherited_need_credit",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 28,
+        "selector": "tests/docs/test_admission_relation_witnesses.py::test_relation_does_not_override_source_policy",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 29,
+        "selector": "tests/docs/test_admission_relation_safety.py::test_replaying_old_approval_recomputes_relation_after_crop",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 30,
+        "selector": "tests/docs/test_admission_relation_safety.py::test_compiled_queries_and_relations_are_pure_without_source_io",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 33,
+        "selector": "tests/docs/test_docs_lossless_context_projection.py::test_context_budget_uses_explicit_optional_output_limits",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 34,
+        "selector": "tests/docs/test_docs_lossless_context_projection.py::test_four_distinct_qualified_lanes_survive_without_source_fit_gate",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 36,
+        "selector": "tests/docs/test_question_span_coverage.py::test_governance_question_models_scope_and_every_including_facet",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 37,
+        "selector": "tests/test_dictionary_exit_reference_ranking.py::test_literal_mentions_keep_sha_unicode_offsets_and_occurrences",
+        "reason": "missing_test_definition",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      },
+      {
+        "file": "scripts/run_critical_mutation_gate.py",
+        "line": 812,
+        "selector": "tests/test_literal_control.py::test_expected",
+        "reason": "missing_module",
+        "boundary": "Literal selector reference; workflow path triggers/comments are not all execution gates."
+      }
+    ],
+    "gates_not_edited": true
+  },
+  "source_snapshot_compact_sorted_JSON_sha256": "2b920024ce2c423390c3e3c65b9b7be0c52c72325efb49585cb7d8475584e886"
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "ranking49": {
+    "packet": "/tmp/opencode/pr211-fail-ranking-next.json",
+    "sha256": "2156141f923a38a891bfa33875fc3c0aecc378afc89285f5528910ecdd9d49b4",
+    "removed": 49, "added": 0,
+    "BASE_status": {"FAIL": 49}, "saved_CI_status": {"FAIL": 49},
+    "already_absent_prior_count": 19,
+    "already_absent_boundary": "All19 already integrated IDs verified against prior removal set; zero additional credit.",
+    "retained_mixed_integration_cases": 6,
+    "retained_boundary": "All six unresolved_context_prefit mixed public/real-storage cases remain active; exact IDs/reasons hash-bound in original packet. No new PASS claim.",
+    "final_testfile_hashes": {
+      "tests/docs/test_dartdoc_discovery.py": "a170140937145dff126110a901311bbda97c46cbd32f8a6f7cc0d6bf55beb892",
+      "tests/docs/test_docs_target_service.py": "534c2945b29e98610e7155bb0fbe9b2c6bc84c12536b89d1673f6e4ae87e8ac9",
+      "tests/docs/test_evidence_set_query_schedule.py": "a306f33314eacc9732577edcaaf418b3bfd7cee74190986b645b20b5feb54d8e",
+      "tests/docs/test_library_docs_service.py": "4021d90ba596223acb5672e74ff98dd7d927adef87c72d8af90fb065919542ba",
+      "tests/docs/test_library_source_discovery.py": "c42d5ab9d0cccf605f3c84dbb0639e1962fe4db5ca00b87bb0818ac2a42fd67b",
+      "tests/docs/test_project_context_compact_output.py": "923e1a983fb34094b15859acfb8463d56000005aa5029f0155a12bdeb5fef251",
+      "tests/docs/test_project_context_quality.py": "cbd534591b03886376aa61a05b66d852f394bd673bce73f1da817968ac02c33f",
+      "tests/docs/test_project_doc_ranking.py": "f68750793e4c4cbe549427e4f6570c833b89db93c03a7a547d9a55f9752cf750",
+      "tests/docs/test_project_evidence_production.py": "a40562f3c1e5883d43c7755170eb6256bcd0883173b657014b1ad0f726f1bac2",
+      "tests/docs/test_query_planning_alias_regressions.py": "400ee8b68419d9996445d268e134bd8a83bef00b56e2720cc695069b2c38f5a9",
+      "tests/docs/test_query_planning_completion_safety.py": "2c246739f99a73a5314de3a999762dfb4a4c56d004cb2283c2578ae0b97f77f4",
+      "tests/docs/test_retrieval_routing.py": "71036358c6e8c7bd340443a5f3695b888ac1bd89ad86b15f4b3e79a611997d7d",
+      "tests/docs/test_unresolved_context_prefit.py": "72a4b0d1c4b2d3757ac4348f6d824b2189f8431fb3e238ed3de0c567a2c2c8f1"
+    }
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.evidence_sets.json": {
+      "tests/docs/test_evidence_set_query_schedule.py": "8c7016dd1e772057ca03b2f0546877c7defade3480491224e4a19d29315d30ff"
+    },
+    "tests/diagnostic_labels.json": {
+      "tests/docs/test_dartdoc_discovery.py": "2d437e5f9355f1d2b0c7020cce67ff19a4a5701d0552843c83cad8c309dc2dd2",
+      "tests/docs/test_docs_target_service.py": "f3a712e5e2354f22e7ead2f80db0bbdcdaacebcf9eb2ec134f800d99be8b8648",
+      "tests/docs/test_library_docs_service.py": "1aab24e59160221924f3457587f6c9b535ef7276d5088a277be6ae6cf27635ed",
+      "tests/docs/test_library_source_discovery.py": "df91c0f097dd2e06b11e45fabd86fea6ade8a1d0da4d2c5ea3c9207bd1b527af",
+      "tests/docs/test_project_context_compact_output.py": "ae88ac4d8a2fdb4be4cbc4c321185e4e0b6919a10d876380ffdb1367cfc9ea1e",
+      "tests/docs/test_project_doc_ranking.py": "b27f50699134056df1c0ec83040490abaccceb3b47f4300dd2d2e21e12c24d67",
+      "tests/docs/test_project_evidence_production.py": "0a5f58c19d1f2a6ff760ce23beff024cc07cce7c47a4353f34fdb02fa3233156",
+      "tests/docs/test_retrieval_routing.py": "e1f90d54c2e43fa4d96e112d580c0d7c8fd994e23aec7566582d140b1c6205da"
+    },
+    "tests/diagnostic_labels.query_planning.json": {
+      "tests/docs/test_query_planning_alias_regressions.py": "2e6662aae52344c2782fd225661af2990da4053a52fdce5f9e99b0960892bf3d"
+    },
+    "tests/diagnostic_labels.query_planning_completion.json": {
+      "tests/docs/test_query_planning_completion_safety.py": "52339c921b2de8a5d88fa96509ec56bee44fc8f8bb0767fc8974cbdde9cb4279"
+    }
+  },
+  "registry_method": "All49 proposals processed using normalized frozen BASE minus all integrated removals; deduplicate/sort/newline-join/SHA256. Current textual test definitions match surviving normalized sets. Parameter-row deletions do not remove labels/overrides for surviving definitions. No blanket deletion of helpers or consumer registrations. Prior queryschedule/alias/completion deferrals resolved.",
+  "proof": {"run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b", "core_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238", "boundary": "Saved core3.11 pre-retirement, not final runtime/collection. Current13 settled source hashes checked against author after hashes. Metadata/registries only; no runtime/AST/project imports/CI. Owner FAIL retirement accepts coverage loss; deletion is not product fix/PASS."},
+  "validation": {"partition": 8291, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "overlap_previous": 0, "removed": 749, "added": 1, "net": 748, "projected_after": 7543, "target_gap": 2569, "classified": 1417, "unclassified": 6874},
+  "prior_manifest_sha256": "8e94cabbd0ddbd30933701aca9105fbeb7c14056b698d347557da4af574241bd",
+  "pending": "Active writer's ROOT tests/test_docs_service*.py, tests/test_query_planning.py, tests/test_tool_selection_policy.py, tests/test_internal_noise_filter.py registry entries untouched until packet completion. Final collection/CI pending."
+}

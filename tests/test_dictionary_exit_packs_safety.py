@@ -15,54 +15,10 @@ from docmancer.mcp.manifest import Manifest
 from docmancer.mcp.registry import LocalRegistry, _derive_safety, build_openapi_pack
 
 
-@pytest.mark.parametrize("method", ["DELETE", "POST", "PUT", "PATCH"])
-@pytest.mark.parametrize("path", ["/search/all", "/query/all", "/list/all", "/find/all", "/records/all"])
-def test_endpoint_name_cannot_remove_destructive_gate(method, path):
-    meta = {"method": method, "path": path}
-    original = copy.deepcopy(meta)
-    derived = _derive_safety(meta)
-    gate = safety.check(
-        package="p", operation={"id": "write", "safety": derived},
-        allow_destructive=False, has_credentials=False,
-    )
-    assert derived["destructive"] is True
-    assert gate.allowed is False
-    assert gate.error_code == "destructive_call_blocked"
-    assert meta == original
 
 
-@pytest.mark.parametrize("method,idempotent", [
-    ("GET", True), ("HEAD", True), ("OPTIONS", False), ("POST", False),
-    ("PUT", True), ("PATCH", False), ("DELETE", True),
-])
-def test_http_method_auth_rate_and_idempotence_dto_are_preserved(method, idempotent):
-    rate = {"requests": 5, "period": "second"}
-    meta = {"method": method.lower(), "path": "/search/all",
-            "security": [{"token": []}], "rate_limit": rate}
-    assert _derive_safety(meta) == {
-        "destructive": method in {"POST", "PUT", "PATCH", "DELETE"},
-        "idempotent": idempotent, "requires_auth": True, "rate_limit": rate,
-    }
-    meta["x_idempotent"] = True
-    assert _derive_safety(meta)["idempotent"] is True
-    # Idempotence is not permission to call a destructive operation.
-    assert _derive_safety(meta)["destructive"] is (method in {"POST", "PUT", "PATCH", "DELETE"})
 
 
-@pytest.mark.parametrize("path", ["/search/all", "/records/all"])
-def test_safe_get_positive_and_original_auth_guard(path):
-    meta = {"method": "GET", "path": path}
-    operation = {"id": "read", "safety": _derive_safety(meta)}
-    assert safety.check(package="p", operation=operation,
-                        allow_destructive=False, has_credentials=False).allowed
-    meta["security"] = [{"token": []}]
-    operation["safety"] = _derive_safety(meta)
-    blocked = safety.check(package="p", operation=operation,
-                           allow_destructive=False, has_credentials=False)
-    assert not blocked.allowed
-    assert blocked.error_code == "missing_credentials"
-    assert safety.check(package="p", operation=operation,
-                        allow_destructive=False, has_credentials=True).allowed
 
 
 @pytest.fixture

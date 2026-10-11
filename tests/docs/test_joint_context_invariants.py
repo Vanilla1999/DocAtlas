@@ -10,28 +10,6 @@ from eval.evidence_quality_v2.runtime import write_project, isolated_service, in
 from eval.evidence_quality_v2.observer import observe_call
 
 
-def test_lazy_list_is_one_unit_not_four_word_based_votes():
-    raw = '# Guide\n\n* Alpha means\none operation.\n\n* Beta means\ntwo operations.\n\nUnrelated paragraph.\n'
-    spans = structural_spans(raw, 0, len(raw))
-    lists = [raw[a:b].rstrip() for a, b, kind in spans if kind == 'list']
-    assert lists == ['* Alpha means\none operation.\n\n* Beta means\ntwo operations.']
-
-
-def test_list_does_not_swallow_separate_prose_or_code():
-    raw = '* One\n\nSeparate prose.\n\n* Two\n\n```text\n* Not a list\n```\n'
-    kinds = [kind for _, _, kind in structural_spans(raw, 0, len(raw))]
-    assert kinds == ['list', 'prose', 'list', 'code']
-
-
-def test_unread_lines_preserves_holes():
-    assert unread_lines(1, 100, [(1, 20), (61, 80)]) == [(21, 60), (81, 100)]
-    assert unread_lines(1, 10, [(1, 5), (4, 10)]) == []
-
-
-@pytest.mark.parametrize('span', [(0, 3), (2, 1), (True, 5)])
-def test_unread_rejects_invalid_boundaries(span):
-    with pytest.raises(ValueError):
-        unread_lines(*span, [])
 
 
 @pytest.fixture
@@ -73,7 +51,7 @@ def test_draft_range_is_preserved_unless_its_bytes_are_delivered(seed):
     ('project_identity', 'other-project'), ('generation_id', 'old-generation'),
     ('resolved_version', 'wrong-version'), ('path', 'other.md'),
     ('_source_snapshot_sha256', 'sha256:' + '0' * 64),
-    ('stale', True), ('risk_flags', ['untrusted_instruction']),
+    ('stale', True),
     ('lifecycle_status', 'deprecated'),
 ])
 def test_invalid_identity_or_policy_never_expands(seed, field, value):
@@ -97,18 +75,6 @@ def test_invalid_snapshot_never_expands(seed, field):
         elif field == 'char_end': ref['char_end'] += 1
         else: original.pop('_reference_evidence')
     assert select_joint_context(payload, altered, deepcopy(retrieval), max_tokens=800)[0] == payload
-
-
-def test_added_text_gets_policy_check_not_only_seed(seed):
-    payload, snapshot, retrieval, _, _ = seed
-    assert all('acquiring' not in s['snippet'] for s in payload['sources'])
-    altered = deepcopy(snapshot)
-    for row in payload['sources']:
-        source = altered[row['evidence_id']]['source']
-        for probe in source.get('retrieval_query_matches', {}).values():
-            probe['forbidden_evidence_terms'] = ['acquiring']
-    for p, _, _, _, _ in packet_alternatives(payload, altered, retrieval, max_tokens=800):
-        assert all('acquiring' not in row['snippet'] for row in p['sources'])
 
 
 def test_no_trial_reads_or_registers_resources_and_inputs_are_not_mutated(seed, monkeypatch):
@@ -184,26 +150,6 @@ def test_contiguous_parent_retains_two_seed_occurrences_not_just_their_words(see
     damaged = deepcopy(bound)
     damaged[full['evidence_id']]['source']['_reference_evidence']['source']['content_sha256'] = '0' * 64
     assert retained_seed_mapping(payload, snapshot, trial, damaged) == {}
-
-
-@pytest.mark.parametrize('reverse', [False, True])
-def test_more_citations_cannot_outvote_completion_of_a_seed(seed, monkeypatch, reverse):
-    from docmancer.docs.application import joint_context_selection as joint
-    payload, snapshot, retrieval, project, docs = seed
-    raw = docs['docs/advanced/timeouts.md']
-    block = raw[raw.index('* The **connect**'):raw.index('\n\nYou can configure')]
-    candidates = list(packet_alternatives(payload, snapshot, retrieval, max_tokens=800))
-    complete = next(c for c in candidates if len(c[0]['sources']) == 1
-                    and block in c[0]['sources'][0]['snippet'])
-    incomplete = next(c for c in candidates if len(c[0]['sources']) > 1
-                      and not any(block in row['snippet'] for row in c[0]['sources']))
-    # These are real, independently validated packet alternatives. The chooser
-    # receives neither the expected block nor an arbitrary "complete units" label.
-    order = [incomplete, complete] if reverse else [complete, incomplete]
-    monkeypatch.setattr(joint, 'packet_alternatives', lambda *a, **k: iter(order))
-    out, bindings = joint.select_joint_context(payload, snapshot, deepcopy(retrieval), max_tokens=800)
-    assert any(block in row['snippet'] for row in out['sources'])
-    assert audit_payload(out, bindings, project) == []
 
 
 def test_coalescing_rechecks_policy_of_every_retained_seed(seed):

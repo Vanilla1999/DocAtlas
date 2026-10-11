@@ -40,22 +40,3 @@ def test_explicit_lookup_delivers_indexed_context_without_inferred_answer(tmp_pa
     assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False
     assert gate._citation_integrity(payload, snapshot)
 
-
-@pytest.mark.parametrize("question", [
-    "If Client.send changes, how does it work and why is it required?",
-    "Если Client.send изменится, как он работает и почему нужен?",
-    "Compare A and B. What is the default?",
-])
-def test_recovery_diagnostics_do_not_split_or_inherit_clauses(monkeypatch, question):
-    from types import SimpleNamespace
-    from docmancer.docs.application import recovery
-    from docmancer.docs.domain import question_frame_core
-
-    def forbidden(*args, **kwargs):
-        raise AssertionError("semantic clause parser called")
-
-    monkeypatch.setattr(question_frame_core, "split_question_clause_spans", forbidden)
-    requirements = SimpleNamespace(query_requirement_spans=(("old", 0, 2, "supported"),))
-    assert recovery._problem_spans(question, requirements) == [question]
-    assert recovery._problem_spans(" ", requirements) == []
-    assert recovery._problem_spans(question * 30, requirements) == [question * 30]

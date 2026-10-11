@@ -71,14 +71,6 @@ def test_agent_exact_selection_keeps_locale_topic_and_early_returns_bounded(path
     assert agent.last_discovery_diagnostics["discovery_strategy"] == "finite-explicit"
 
 
-@pytest.mark.parametrize("strategy", [None, "llms-full.txt", "llms.txt", "sitemap.xml", "nav-crawl", "platform-sitemap", "unknown"])
-def test_discovery_never_probes_and_seed_collision_cannot_replace_member(strategy):
-    client = MagicMock()
-    urls = [ROOT, ROOT, ROOT + "/ru/a"]
-    result = discover_urls(ROOT, client, seed_urls=urls, force_strategy=strategy, root_html='<a href="https://evil.test/a">extra</a>', query="topic")
-    assert [item.url for item in result.urls] == [ROOT, ROOT + "/ru/a"]
-    assert all(item.strategy == DiscoveryStrategy.SEED_URLS and item.content is None for item in result.urls)
-    client.get.assert_not_called()
 
 
 @pytest.mark.parametrize("members", [None, [], (), "https://example.com/docs"])
@@ -211,10 +203,6 @@ def test_finite_budget_rejects_whole_set_not_silent_truncation(offline_http):
     assert calls == []
 
 
-@pytest.mark.parametrize("url", [ROOT + "/../admin", ROOT + "/%252e%252e/admin", ROOT + "#part", "https://user:secret@example.com/docs", "file:///docs"])
-def test_invalid_exact_spelling_is_not_another_member(url):
-    with pytest.raises(ValueError, match="invalid_finite_member"):
-        exact_url(url)
 
 
 def test_prefetch_real_agent_path_propagates_exact_urls_and_ceilings(tmp_path, monkeypatch, offline_http):

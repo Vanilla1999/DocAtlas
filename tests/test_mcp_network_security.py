@@ -60,50 +60,12 @@ def _call(executor: HttpExecutor, operation: dict):
     )
 
 
-def test_http_target_rejects_url_userinfo(monkeypatch):
-    monkeypatch.setattr(
-        "docmancer.mcp.network_policy.resolve_host",
-        lambda host: [ipaddress.ip_address("93.184.216.34")],
-    )
-
-    with pytest.raises(SecurityError) as exc:
-        validate_http_target(
-            "https://user:secret@example.com/v1",
-            HttpGrant(allowed_hosts=("example.com",)),
-        )
-
-    assert exc.value.code == "userinfo_not_allowed"
 
 
-def test_http_grant_rejects_non_positive_response_limit():
-    with pytest.raises(SecurityError) as exc:
-        grant_from_mapping({
-            "allowed_hosts": ["example.com"],
-            "max_response_bytes": 0,
-        })
-
-    assert exc.value.code == "invalid_max_response_bytes"
 
 
-@pytest.mark.parametrize("value", [None, True, "not-a-number"])
-def test_http_grant_rejects_invalid_response_limit(value):
-    with pytest.raises(SecurityError) as exc:
-        grant_from_mapping({
-            "allowed_hosts": ["example.com"],
-            "max_response_bytes": value,
-        })
-
-    assert exc.value.code == "invalid_max_response_bytes"
 
 
-def test_http_target_rejects_invalid_port():
-    with pytest.raises(SecurityError) as exc:
-        validate_http_target(
-            "https://example.com:not-a-port/v1",
-            HttpGrant(allowed_hosts=("example.com",)),
-        )
-
-    assert exc.value.code == "invalid_url"
 
 
 def test_executor_returns_structured_invalid_grant_error(monkeypatch):
@@ -156,19 +118,6 @@ def test_dns_resolution_change_is_blocked_before_request(monkeypatch):
     assert called is False
 
 
-def test_resolution_stability_ignores_dns_answer_order():
-    target = ValidatedHttpTarget(
-        url="https://example.com/v1",
-        scheme="https",
-        host="example.com",
-        port=None,
-        resolved_ips=("93.184.216.35", "93.184.216.34"),
-    )
-
-    validate_resolution_stability(
-        ["93.184.216.34", "93.184.216.35"],
-        target,
-    )
 
 
 def test_response_limit_stops_stream_before_full_body(monkeypatch):

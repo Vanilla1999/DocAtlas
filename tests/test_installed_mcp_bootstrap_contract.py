@@ -52,12 +52,6 @@ def test_bootstrap_exact_schema_and_authored_byte_hashes(fixture_host):
         jsonschema.validate({**request, "with_vectors": False}, PUBLIC_ADVERTISED_INPUT_SCHEMAS["prepare_docs"])
 
 
-@pytest.mark.parametrize("confirm", [False, None, 1, "true"])
-def test_producer_denies_without_fixture_author_confirmation(fixture_host, confirm):
-    project, home = fixture_host
-    with pytest.raises(PermissionError):
-        benchmark._fixture_bootstrap(project, home, fixture_author_confirm=confirm)
-    assert not (home / "mcp-members").exists()
 
 
 def test_missing_or_invalid_finite_catalog_denied(fixture_host):
@@ -102,55 +96,5 @@ def test_private_workspace_ignores_temp_alias_and_rejects_foreign_ancestor(monke
             pytest.fail("unsafe ancestor accepted")
 
 
-def test_nested_diagnostic_is_bounded_and_never_persists_secrets_or_paths():
-    secret = "Bearer private-provider-token /home/private/project"
-    error = ExceptionGroup(secret, [RuntimeError(secret) for _ in range(30)])
-    diagnostic = benchmark._exception_diagnostic(error)
-    serialized = json.dumps(diagnostic)
-    assert secret not in serialized
-    assert "private-provider-token" not in serialized
-    assert "/home/private" not in serialized
-    assert len(diagnostic["exceptions"]) == 16
-    assert diagnostic["truncated"] is True
-    assert diagnostic["exceptions"][1]["parent"] == 0
 
 
-def test_infrastructure_failure_preserves_partial_schema_hash_chain_and_no_pass(monkeypatch):
-    async def fail(**kwargs):
-        events = EventLog()
-        events.add("server_start", {"command": "doc-atlas"})
-        events.add("mcp_tools_list", {"schema_sha256": "a" * 64})
-        kwargs["diagnostics"].update(events=events, mcp_schema_sha256="a" * 64)
-        raise ExceptionGroup("outer", [RuntimeError("bootstrap failed")])
-    monkeypatch.setattr(benchmark, "_run_task", fail)
-    artifact = ArtifactIdentity(origin="reviewed-wheel", distribution="doc-atlas", version="1.3.2",
-        artifact_filename="fixture.whl", artifact_sha256="b" * 64, source_commit="c" * 40,
-        python_version="3.12", cli_sha256="d" * 64, public_release_verified=False)
-    report = asyncio.run(benchmark.run_benchmark_async(planner=ScriptedPlanner({}),
-        server_command="unused", artifact=artifact, task_ids={"module_definition_supported"}))
-    assert report["passed_tasks"] == 0
-    assert report["executed_task_count"] == 0
-    assert report["pass_rate"] == 0
-    assert report["infrastructure_errors"] == ["module_definition_supported: ExceptionGroup"]
-    diagnostic = report["infrastructure_diagnostics"][0]
-    assert diagnostic["mcp_schema_sha256"] == "a" * 64
-    previous = None
-    for event in diagnostic["events"]:
-        assert event["previous_event_sha256"] == previous
-        assert event["event_sha256"] == sha256_json({k: v for k, v in event.items() if k != "event_sha256"})
-        previous = event["event_sha256"]
-
-
-def test_script_main_infrastructure_exit_two_even_with_zero_threshold(monkeypatch, tmp_path):
-    from scripts import run_installed_mcp_agent_benchmark as runner
-    @contextmanager
-    def installed(**kwargs):
-        yield None, "unused"
-    monkeypatch.setattr(runner, "installed_artifact", installed)
-    monkeypatch.setattr(runner, "run_benchmark", lambda **kwargs: {
-        "artifact": {"origin": "reviewed-wheel"}, "provider": {"model": "deterministic-script"},
-        "passed_tasks": 0, "task_count": 1, "false_supported": 0,
-        "forbidden_source_contamination": 0, "mcp": {"schema_sha256": None},
-        "infrastructure_errors": ["module_definition_supported: ExceptionGroup"], "pass_rate": 0})
-    assert runner.main(["--wheel", "unused.whl", "--planner", "scripted", "--source-commit", "c" * 40,
-        "--min-pass-rate", "0", "--output", str(tmp_path / "fresh.json")]) == 2

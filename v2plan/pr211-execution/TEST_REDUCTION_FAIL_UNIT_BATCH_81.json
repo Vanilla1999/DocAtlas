@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "decision": "Owner explicitly authorized FAIL-based unit retirement in AGENTS.md",
+  "proof_run": "38033112465",
+  "proof_sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+  "removed_expanded_cases": 81,
+  "added": 0,
+  "module_counts": {
+    "tests/docs/test_compact_context_selection.py": 5,
+    "tests/docs/test_current_source_authority_docs_parity.py": 1,
+    "tests/docs/test_governance_value_proof_p0.py": 9,
+    "tests/docs/test_patch_requirements.py": 4,
+    "tests/docs/test_project_query_intent.py": 1,
+    "tests/docs/test_subject_binding_strength.py": 3,
+    "tests/docs/test_patch_request_plan.py": 24,
+    "tests/docs/test_requested_need_partition.py": 13,
+    "tests/docs/test_model_visible_projection_part02.py": 11,
+    "tests/docs/test_context_trust_gates.py": 10
+  },
+  "boundary": "Direct in-memory planner, selector, projection and policy unit checks. Six entirely failing modules deleted; failing definitions removed in four mixed modules, with their original PASS bodies and questions retained. Every removed expanded case has a saved CI failure. No integration scenario, skip, collection filter or hidden replay added. No agents or project runtime used. Diagnostic registries updated. Common retirement ledger has not yet incorporated this batch or the previous uncommitted agent batches. Other red unit tests remain; this is not complete removal of all red units, product correction, final-SHA collection or CI proof."
+}

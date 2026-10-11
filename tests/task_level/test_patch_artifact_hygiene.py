@@ -15,73 +15,16 @@ from eval.task_level.execution import capture_patch
 from eval.task_level.evaluators.patch import forbidden_changed_paths
 
 
-def test_runtime_artifacts_are_filtered_from_changed_files():
-    hygiene = apply_patch_hygiene(
-        raw_status_lines=[" M tests/__pycache__/test_example.cpython-311.pyc"],
-        raw_changed_files=["tests/__pycache__/test_example.cpython-311.pyc", "src/example.py"],
-        raw_patch_diff="diff --git a/tests/__pycache__/test_example.cpython-311.pyc b/tests/__pycache__/test_example.cpython-311.pyc\nindex 1..2 100644\n--- a/tests/__pycache__/test_example.cpython-311.pyc\n+++ b/tests/__pycache__/test_example.cpython-311.pyc\n@@ -1 +1 @@\n-old\n+new\ndiff --git a/src/example.py b/src/example.py\nindex 1..2 100644\n--- a/src/example.py\n+++ b/src/example.py\n@@ -1 +1 @@\n-old\n+new\n",
-    )
-
-    assert hygiene.filtered_changed_files == ["src/example.py"]
-    assert hygiene.ignored_runtime_artifacts == ["tests/__pycache__/test_example.cpython-311.pyc"]
-    assert "__pycache__" not in hygiene.filtered_patch_diff
-    assert hygiene.raw_counts["changed_files"] == 2
-    assert hygiene.filtered_counts["changed_files"] == 1
-    assert hygiene.filtered_counts["ignored_runtime_artifacts"] == 1
 
 
-def test_repo_path_normalization_does_not_strip_top_level_a_or_b_dirs():
-    assert normalize_repo_path("a/service.py") == "a/service.py"
-    assert normalize_repo_path("b/generated/client.pb.go") == "b/generated/client.pb.go"
-    assert normalize_diff_header_path("a/service.py") == "service.py"
-    assert normalize_diff_header_path("b/generated/client.pb.go") == "generated/client.pb.go"
 
 
-def test_generated_and_lockfile_candidates_are_preserved():
-    changed = [
-        "lib/model/foo.g.dart",
-        "lib/model/foo.freezed.dart",
-        "generated/client.pb.go",
-        "pubspec.lock",
-        "package-lock.json",
-        "src/.generated.client.ts",
-    ]
-
-    hygiene = apply_patch_hygiene(raw_status_lines=[], raw_changed_files=changed, raw_patch_diff="")
-
-    assert hygiene.filtered_changed_files == changed
-    assert hygiene.preserved_generated_candidates == changed
-    assert not hygiene.ignored_runtime_artifacts
-    assert all(is_preserved_generated_candidate(path) for path in changed)
 
 
-def test_untracked_non_runtime_files_are_included_and_runtime_files_ignored():
-    hygiene = apply_patch_hygiene(
-        raw_status_lines=[
-            "?? src/new_feature.py",
-            "?? tests/__pycache__/test_new.cpython-312.pyc",
-            "?? generated/client.pb.go",
-            "?? package-lock.json",
-        ],
-        raw_changed_files=[],
-        raw_patch_diff="",
-    )
-
-    assert hygiene.filtered_changed_files == ["src/new_feature.py", "generated/client.pb.go", "package-lock.json"]
-    assert hygiene.ignored_runtime_artifacts == ["tests/__pycache__/test_new.cpython-312.pyc"]
-    assert hygiene.preserved_generated_candidates == ["generated/client.pb.go", "package-lock.json"]
 
 
-def test_runtime_artifact_detection_does_not_hide_real_generated_paths():
-    assert is_runtime_artifact("tests/__pycache__/x.cpython-311.pyc")
-    assert is_runtime_artifact(".pytest_cache/v/cache/nodeids")
-    assert not is_runtime_artifact("generated/client.pb.go")
-    assert not is_runtime_artifact("dist/client.js")
-    assert not is_runtime_artifact("package-lock.json")
 
 
-def test_forbidden_path_classification_includes_untracked_inventory():
-    assert forbidden_changed_paths(["src/ok.py", "secrets/new.txt"], ("src/",)) == ["secrets/new.txt"]
 
 
 def test_capture_patch_writes_raw_and_normalized_hygiene_artifacts(tmp_path: Path):

@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_library_witness_diagnostics.py": "behavioral"
-  },
+  "module_labels": {},
   "node_overrides": {},
-  "module_node_hashes": {
-    "tests/docs/test_library_witness_diagnostics.py": "37b3d6c7241bcfb410577bc863eb566bffe290e6c27faf85a4cefafe06f759e8"
-  }
+  "module_node_hashes": {}
 }

@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_nl_dictionary_removal_consumer_contract.py": "bba8090724b9c2b714151a549c3920bc4bce9b9a488bb84920f2897fd15c72c7"
+    "tests/test_nl_dictionary_removal_consumer_contract.py": "47442f58727fea5f847e60fb32a30396656191cc5e988bf5a04b16a62d2b2979"
   }
 }

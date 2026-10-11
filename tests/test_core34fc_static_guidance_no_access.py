@@ -30,20 +30,6 @@ def forbidden(*args, **kwargs):
     pytest.fail("guidance must not access services, tools, or storage")
 
 
-@pytest.mark.parametrize("uri", GUIDANCE_URIS + UNKNOWN_URIS)
-def test_guidance_and_unknown_resources_never_inspect_service(monkeypatch, uri):
-    import docmancer.mcp._docs_server_part01 as implementation
-
-    class NoServiceAccess:
-        def __getattribute__(self, name):
-            pytest.fail(f"service accessor executed: {name}")
-
-    monkeypatch.setattr(implementation, "call_docs_tool_payload", forbidden)
-    result = read_docs_resource(uri, NoServiceAccess())
-    if uri in UNKNOWN_URIS:
-        assert result is None
-    else:
-        assert result == read_docs_resource(uri)
 
 
 @pytest.fixture

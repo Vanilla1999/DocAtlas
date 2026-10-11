@@ -38,14 +38,6 @@ def test_catalog_selects_nonstandard_docs_and_disables_guessing(tmp_path):
     assert metadata.docs_candidates[0].authority == "source_of_truth"
 
 
-def test_absent_catalog_keeps_cold_start_discovery(tmp_path):
-    (tmp_path / "README.md").write_text("# Readme\n", encoding="utf-8")
-
-    metadata = ProjectMetadataReader().read(tmp_path)
-
-    assert [item.path for item in metadata.docs_candidates] == ["README.md"]
-
-
 def test_invalid_catalog_fails_closed_instead_of_guessing(tmp_path):
     (tmp_path / "README.md").write_text("# Readme\n", encoding="utf-8")
     (tmp_path / CATALOG_FILENAME).write_text("schema_version: 9\n", encoding="utf-8")
@@ -213,12 +205,6 @@ def test_invalid_catalog_is_explicit_and_invalid_in_agent_contract(tmp_path):
     assert "`explicit` (valid: no)" in format_agent_contract_markdown(contract)
 
 
-def test_agent_contract_does_not_turn_all_insufficient_evidence_into_a_hard_stop(tmp_path):
-    rules = "\n".join(build_agent_contract(tmp_path)["evidence_rules"])
-
-    assert "stop before editing on status=insufficient_evidence" not in rules
-    assert "hard_stop=true" in rules
-    assert "documentation-governance meta-question" in rules
 
 
 def test_catalog_rejects_inconsistent_role_scope_and_lifecycle(tmp_path):
@@ -275,24 +261,6 @@ def test_catalog_rejects_unknown_top_level_fields(tmp_path):
     assert catalog.valid is False
     assert catalog.entries == []
     assert catalog.warnings == ["Project docs catalog has unknown fields: document."]
-
-
-def test_catalog_normalizes_paths_before_duplicate_detection(tmp_path):
-    (tmp_path / "docs").mkdir()
-    (tmp_path / "docs" / "guide.md").write_text("# Guide\n", encoding="utf-8")
-    _catalog(tmp_path, """  - path: docs/guide.md
-    role: development
-    description: Canonical path.
-  - path: docs/./guide.md
-    role: development
-    description: Equivalent path must be rejected as a duplicate.
-""")
-
-    catalog = read_project_docs_catalog(tmp_path)
-
-    assert catalog.valid is False
-    assert catalog.entries == []
-    assert "duplicate path 'docs/guide.md'" in catalog.warnings[0]
 
 
 def test_catalog_requires_integer_schema_version_and_unique_yaml_keys(tmp_path):

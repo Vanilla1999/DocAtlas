@@ -12,43 +12,6 @@ from experiments.language_aware_context import packing_probe as probe
 from experiments.language_aware_context.packing_experiment import packing_experiment
 
 
-def test_collector_calls_preference_once_and_preserves_return(monkeypatch):
-    from docmancer.docs.application import _docs_context_projection_core as core
-    values = [{'snippet': 'first'}, {'snippet': 'second'}]
-    original = deepcopy(values)
-    calls = []
-    sentinel = object()
-    def preference(candidates, selected, *args):
-        calls.append(candidates)
-        candidates.reverse()
-        return sentinel
-    monkeypatch.setattr(core, '_prefer_missing_baseline_candidate', preference)
-    with probe.capture_packing_trace() as trace:
-        assert core._prefer_missing_baseline_candidate(values, [], set(), set(), set()) is sentinel
-    assert len(calls) == 1 and calls[0] is values
-    assert values == original[::-1]
-    assert trace['events'][0]['before_top3'][0]['snippet'] == 'first'
-    assert trace['events'][0]['after_top3'][0]['snippet'] == 'second'
-    assert core._prefer_missing_baseline_candidate is preference
-
-
-def test_collector_marks_omissions_instead_of_claiming_complete(monkeypatch):
-    from docmancer.docs.application import _docs_context_projection_core as core
-    monkeypatch.setattr(probe, 'MAX_EVENTS', 0)
-    with probe.capture_packing_trace() as trace:
-        core._prefer_missing_baseline_candidate([], [], set(), set(), set())
-    assert trace == {'events': [], 'omitted_events': 1}
-
-
-def test_collector_restores_hooks_after_exception():
-    from docmancer.docs.application import _docs_context_projection_core as core
-    from docmancer.docs.application import docs_context_projection as facade
-    from docmancer.docs.application.projection_decision_trace import ProjectionDecisionTrace
-    before = (core._prefer_missing_baseline_candidate, facade._run_core, ProjectionDecisionTrace.record)
-    with pytest.raises(ValueError, match='deliberate'):
-        with probe.capture_packing_trace():
-            raise ValueError('deliberate')
-    assert before == (core._prefer_missing_baseline_candidate, facade._run_core, ProjectionDecisionTrace.record)
 
 
 def test_same_prepared_input_delivers_complete_quote_with_intervention():

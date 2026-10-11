@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_dictionary_exit_residual_proofs.py": "29d21900c07810586de35dead6d489d931a2ec2a61c75aaa710ad9c2c38bc2bc"
+    "tests/test_dictionary_exit_residual_proofs.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 }

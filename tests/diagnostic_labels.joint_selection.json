@@ -6,7 +6,7 @@
   },
   "module_node_hashes": {
     "tests/docs/test_joint_context_acceptance.py": "6ece7d9abada071ce8a8c584ea3e5d30901ec138522845aa6e31fe85cc9d0666",
-    "tests/docs/test_joint_context_invariants.py": "41af77c0742d75c96d22484ae74df5549e98f42de3665e9009b12e6054516020"
+    "tests/docs/test_joint_context_invariants.py": "9d3d3c8533d731faee97a68b134cecdca6b74940a42f1d6621ff01e146bfd078"
   },
   "node_overrides": {}
 }

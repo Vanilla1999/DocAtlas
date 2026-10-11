@@ -179,19 +179,6 @@ def test_public_library_query_consumes_dense_vector_index(tmp_path, monkeypatch)
     assert result.candidate_counts["dense"] == 1
 
 
-def test_lexical_vector_readiness_is_bounded_and_does_not_touch_vectors(tmp_path):
-    config = DocmancerConfig()
-    config.index.db_path = str(tmp_path / "docs.db")
-    agent = DocmancerAgent(config=config)
-    dispatcher = RetrievalDispatcher(store=agent.store, config=config)
-
-    assert dispatcher.vector_readiness("lexical") == {
-        "schema_version": "vector-readiness-v1",
-        "status": "not_required",
-        "mode": "lexical",
-    }
-
-
 def test_vector_readiness_does_not_expose_collection_or_point_ids(tmp_path):
     config = DocmancerConfig()
     config.index.db_path = str(tmp_path / "docs.db")

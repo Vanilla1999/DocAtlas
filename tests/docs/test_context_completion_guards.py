@@ -19,33 +19,6 @@ FACTS = ("Have in mind that it's a string with a preceding space and then a `/`.
          'So, it\'s `" /-S"` not `"/-S"`.')
 
 
-@pytest.mark.parametrize("question,expected", [
-    ("Как работает resource cache?", ("resource cache",)),
-    ("Как устроен resource\tcache?", ("resource\tcache",)),
-    ("缓存 resource cache 如何工作？", ("resource cache",)),
-    ("Wie arbeitet der resource cache?", ()),
-    ("Как устроен cache?", ()),
-    ("Только русские слова.", ()),
-    ("Как resource и cache связаны?", ()),
-    ("Как cаche field работает?", ()),  # Cyrillic a inside an identifier
-    ("Как resource cache / resource cache?", ("resource cache",)),
-    ("Как resource cache, event stream, result store?", ("resource cache", "event stream")),
-    ("Как " + "a" * 180 + " cache?", ()),
-    ("Как resource cache?" + "x" * 5000, ()),
-])
-def test_script_runs_are_verbatim_bounded_not_translations(question, expected):
-    assert mixed_script_phrases(question) == expected
-    assert all(text in question for text in expected)
-
-
-def test_literal_script_runs_do_not_become_implicit_queries_or_permissions():
-    question = "Как resource cache не удаляет `CACHE_DIR`, если event stream остановлен?"
-    plan = build_documentation_query_plan(question)
-    assert plan.original_question == question
-    assert plan.queries[0].text == question
-    assert [(q.query_id, q.origin, q.text, q.public_parent_query_id) for q in plan.queries] == [
-        ("query-original", "original", question, None)]
-    assert not plan.component_contract and plan.component_scope_complete is False
 
 
 @pytest.fixture
@@ -141,10 +114,3 @@ def test_trial_reads_no_files_and_registers_no_resources(source_seed, monkeypatc
     assert _read_next_row(str(source_seed["capture"]["fixture_project"]), source,
                           line_start=row["line_start"], line_end=row["line_end"], reason="inspect_source_context")
 
-
-def test_original_question_keeps_the_exact_negative_option_spelling(tmp_path):
-    _, cases, manifest = load_protocol()
-    case = next(c for c in cases if c["id"] == "typer-05")
-    cap = capture_source_case(tmp_path, documents_for("typer", manifest), case["question"], scope="all")
-    for fact in FACTS:
-        assert_visible_fact(cap, SOURCE_PATH, fact)

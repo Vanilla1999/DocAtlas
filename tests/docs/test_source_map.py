@@ -94,37 +94,6 @@ class TicketService:
     return tmp_path
 
 
-def test_split_identifier_splits_camel_case():
-    assert _split_identifier("PermissionService") == "permission service"
-    assert _split_identifier("getProjectContext") == "get project context"
-    assert _split_identifier("_sendTicketTitleToChat") == "send ticket title to chat"
-
-
-def test_split_identifier_splits_snake_case():
-    assert _split_identifier("permission_service") == "permission service"
-    assert _split_identifier("help_request_details_screen") == "help request details screen"
-
-
-def test_find_symbol_match_exact_substring():
-    match_type, score = _find_symbol_match("PermissionService", "class PermissionService implements GrantAuthority")
-    assert match_type == "exact_substring"
-    assert score == 1.0
-
-
-def test_find_symbol_match_symbol_via_camel_case():
-    match_type, score = _find_symbol_match("permission service", "class PermissionService implements GrantAuthority")
-    assert match_type == "symbol"
-    assert score >= 0.9
-
-
-def test_find_symbol_match_symbol_via_snake_case():
-    match_type, score = _find_symbol_match("send ticket title chat", "_sendTicketTitleToChat")
-    assert match_type is not None
-
-
-def test_find_symbol_match_no_match():
-    match_type, score = _find_symbol_match("zzzxq", "class HelpService")
-    assert match_type is None
 
 
 def test_build_project_source_evidence_includes_match_type_and_confidence(tmp_path, monkeypatch):

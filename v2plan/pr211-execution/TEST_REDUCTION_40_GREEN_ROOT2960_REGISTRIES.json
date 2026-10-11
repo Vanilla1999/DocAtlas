@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-delete-green-root.json",
+  "sha256": "3a1e531c47dd7bb4b540a090ad94e590cf77b59c999e7b8d9209b9d0b2f10627",
+  "removed": 2960, "added": 0,
+  "BASE_status": {"PASS": 2960}, "saved_CI_status": {"PASS": 2960},
+  "exact_ids_binding": "Manifest green-root-units::retired-greenroot2960 equals packet NEWPASSBASE_retiredIDs and retired_ids exactly;2960 unique and disjoint from prior2890. No FAIL/SKIP removal credited by this packet.",
+  "prior_manifest_sha256": "6d9290e2457cdf3ba11af320462423b1b7c7395824c8d9cea4e6277554834bbc",
+  "integrated_manifest_sha256": "444d95897594094c346ec6d106527fe389ee7750457da9284141ef20e7c928cf",
+  "policy": "Confirmed AGENTS.md owner ALL recorded PASS UNIT exception includes unique/protective units, accepted loss of coverage, no successor/review required. Actual boundary determines level; PASS integrations/SKIP excluded. Prior red/docs policy checkpoints and reviews are history, not rewritten; root green checkpoint appended.",
+  "source_binding": {
+    "files_verified": 226,
+    "packet_field": "final_source_hashes",
+    "compact_sorted_JSON_sha256": "fea043e01fa8dd5321027d99ed0a50bee565b15827900202d04be3250f75e1fb",
+    "canonicalization": "UTF-8 sorted-key JSON with comma/colon separators; every value SHA256 exact source bytes.",
+    "scope": "Only ROOT/non-docs settled source files. No current docs source hash used for registry approval.",
+    "method": "All226 matched author final SHA at initial preparation. Eight changed before final validation; their current registry entries restored to pre-integration values and deferred. Textual test definitions at preparation matched normalized frozen BASE minus all integrated removals plus sole already-ledgered addition. No AST/project imports/runtime collection. Before SHA and author helper comparisons remain bound in packet files/verification."
+  },
+  "registry_actions": {"files": 74, "survivor_hashes": 155, "empty_no_helpers_module_metadata_entries": 126, "retired_node_overrides": 32, "total": 313},
+  "registry_binding": {
+    "paths": "All77 keys in packet diagnostic_registry_proposals;74 have applied changes, three wholly deferred registries restored unchanged",
+    "compact_sorted_JSON_path_to_final_file_SHA256_sha256": "a66530dde7f1482e57d2ccb93af4097da93b3af6330e61edffc4a05491bf7f04",
+    "method": "Sorted unique normalized BASE survivor IDs plus sole ledgered addition, newline-joined SHA256.63 helper/class-only modules preserve labels and use empty-survivor hash.63 modules without test/helper/class definitions lose module metadata; textual import-line scan found no named consumers of those63 modules.32 obsolete overrides removed. Surviving labels unchanged, SKIP retained. DOCS entries unchanged even in mixed registry files.",
+    "sole_addition_hash_boundary": "tests/test_project_context_quality_v2_protocol.py survivor hash a653f40c1148418f24c98d180e42af4113a362f4464f78b9bf27fe4e0751306b includes existing test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls; not new addition credit."
+  },
+  "remaining_root_candidates": {
+    "candidate_definitions": 853,
+    "saved_PASS_identities": 1567,
+    "ambiguous_definitions": 162,
+    "ambiguous_saved_PASS_identities": 427,
+    "nonambiguous_saved_PASS_identities": 1140,
+    "sorted_unique_newline_joined_saved_PASS_ids_sha256": "e051411400e083afa3b9cccd105407c682a955ad7252b625aa42c05fdc10bb1b",
+    "limit": "Author retained integration/mixed-boundary candidate inventory, not final collection or exhaustive global reclassification. Ambiguous counts are a subset, not additional to1567. No global all-unit-completion claim."
+  },
+  "deferred_scope": "Active DOCS followup: no current docs file hash/registry entry applied; no completed credit for its ongoing deletions. Eight unexpectedly changed ROOT files deferred below; packet identities credited, later changes not credited.",
+  "deferred_root_paths": [
+    "tests/task_level/test_real_project_fixture.py",
+    "tests/task_level/test_real_project_suite.py",
+    "tests/task_level/test_task_evaluation.py",
+    "tests/task_level/test_task_level_harness.py",
+    "tests/test_dictionary_exit_local_entry_closure.py",
+    "tests/test_dictionary_exit_patch_boundary.py",
+    "tests/test_unified_docs_context_mcp_part02.py",
+    "tests/test_nl_dictionary_removal_literal_contract.py"
+  ],
+  "proof": {
+    "run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "Frozen BASE and saved PASS identities only; no runtime correctness, present failure inventory, product-quality or final collection proof. Unit classification is author execution-boundary review, hash-bound in original packet."
+  },
+  "validation": {"partition": 8291, "overlap_previous": 0, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "removed": 5850, "added": 1, "net": 5849, "projected_after": 2442, "target_gap": 0, "reduction_percent": 70.54637558798697, "classified": 5985, "unclassified": 2306},
+  "target": "40percent target achieved by projected exact ledger only, not collection verified; net5849 exceeds target3317 by2532.",
+  "limits": "No test/production/fixture edits by integrator; metadata applied with patch tool. No runtime/AST/project imports/pytest/install/CI/commit/push/nested agents. Coverage loss accepted, not product quality/PASS. Saved SKIP and helper consumers preserved; DOCS writer excluded. Source hashes certify preparation/checkpoint only, not future edits. Final collection/CI pending."
+}

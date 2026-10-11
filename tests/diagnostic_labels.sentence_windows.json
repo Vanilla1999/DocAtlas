@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_context_sentence_windows.py": "behavioral"
-  },
-  "module_node_hashes": {
-    "tests/docs/test_context_sentence_windows.py": "e37cde47125bdd6526b14220930dd7b56432e972bcd33e0a74cc7730085af8f6"
-  },
+  "module_labels": {},
+  "module_node_hashes": {},
   "node_overrides": {}
 }

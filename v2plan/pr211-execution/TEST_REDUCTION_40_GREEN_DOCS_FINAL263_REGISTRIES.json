@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "docsfinal263": {
+      "packet": "/tmp/opencode/pr211-delete-green-docs-final.json",
+      "sha256": "a923436b901f1736003d9807f09c65562fe4048259209284d2b15e5bfde4d9b4",
+      "removed": 263,
+      "BASE_status": {
+        "PASS": 263
+      },
+      "saved_CI_status": {
+        "PASS": 263
+      },
+      "final_source_hashes": {
+        "tests/docs/test_action_packet.py": "fbbdb419c334d5be4470e917d59736d29972e392fabf1ccb423ec758b8c70349",
+        "tests/docs/test_admission_relation_safety.py": "ae5c4e79827c8b5f7873a71372533367a4229eaa41f76559c319eb8af2b390c0",
+        "tests/docs/test_code_graph.py": "5de015fc9bf3c71d2225386cc2fa9f102054a6a457f0f1f75cdc56db700cb9e5",
+        "tests/docs/test_context_projection_boundaries.py": "7418b60c0d1f168abe6db41b5d72f5d485eeedfe183f416811b4ef929d2872e8",
+        "tests/docs/test_docs_context_read_next.py": "623a1f1a353ea27774bb6dcb6dd65a3f7443218954568db5766303ae0344472b",
+        "tests/docs/test_docs_impact_task20.py": "54412b8d3352d60c05618e78bd2ac73c9b6453da471fba52a2e9dd1fb953f842",
+        "tests/docs/test_docs_initial_delivery.py": null,
+        "tests/docs/test_docs_job_service.py": "19baf4232bbdac796fd2e7a434ad16f91d5990debdfed5eddd031042f43b6331",
+        "tests/docs/test_docs_service_characterization.py": "31ae8bc27e931006e6d068333a73d652ca257ccb4a14bc97b363feca5ada2f6a",
+        "tests/docs/test_docs_target_service.py": null,
+        "tests/docs/test_documentation_query_plan.py": "3778b9ac12d08f1049300519c4c777ba259c0eac01293cf00cda244c14af74e2",
+        "tests/docs/test_generic_context_workflows.py": "ac96b8f7ca7b0f4182e15e65fd5e0d31c032fba3bc08206bb1bc84676224fb26",
+        "tests/docs/test_go_project.py": "7b644d165043634451154b8d2cd7df1b93664a80931e4a75b08cd4ccfa61a734",
+        "tests/docs/test_joint_context_invariants.py": "9ae6c499152b9860237b0e10e4a74bf8efb9c2cf03e9fbac762bbbadcc30ff94",
+        "tests/docs/test_language_flow_experiment.py": "72656ebbd7782ae9e18e861ae49849fe6f9b5b63ae5642fc0447647b67517981",
+        "tests/docs/test_language_packing_experiment.py": "0aeb5ace1ad6cace81c6ba95a3d11348d4814c0b2b9f3bc312584158b5172f1e",
+        "tests/docs/test_library_source_discovery.py": null,
+        "tests/docs/test_pr211_catalog_equivalence.py": "efe2122338724a92c2904741c4adc74018c2b60aab8313ff4ac448614f049bd4",
+        "tests/docs/test_project_docs_catalog.py": "f01f2ac917669de016337af6f94f3ba0852415ae5e72dfe6fd5cf82538db6aed",
+        "tests/docs/test_query_block_guards.py": "69b4d9775b35470d468c49cf39883beef20b2c4b84ed57401f4ea2818fa58839",
+        "tests/docs/test_query_planning_scope_regressions.py": "5f07491464746bf2d74853218e174b9023797668db5da8481b2b969498a3d606",
+        "tests/docs/test_source_map.py": "088a806b15e392c308aa5f9f4c794e9926555c92d3a8d4e3048c40c34c774def",
+        "tests/docs/test_visible_support_units.py": "9e7a4375e3291437f9e5e6fbc2651bdd1ec2986588452cd680c110048d2c4ccd"
+      }
+    }
+  },
+  "removed": 263,
+  "added": 0,
+  "prior_manifest_sha256": "f448089ebf52b820969e6ea8e8515027b2aa913f46b667e6012cab8b18b469c9",
+  "integrated_manifest_sha256": "72c888746412bcea6ff8ad55edeed667b6120264aa2b82a72d7f0593322782e7",
+  "deferred_source_paths": {},
+  "remaining": {
+    "docsfinal263": {
+      "reviewed_modules": 57,
+      "integration_PASS_ids": 299,
+      "confirmed_units": 0,
+      "ambiguous_PASS_ids": 0,
+      "limit": "Owned frozen docs57module inventory only. Author integration boundaries not fresh runtime PASS or global completion."
+    }
+  },
+  "source_observed_at_preparation": {
+    "tests/docs/test_action_packet.py": "fbbdb419c334d5be4470e917d59736d29972e392fabf1ccb423ec758b8c70349",
+    "tests/docs/test_admission_relation_safety.py": "ae5c4e79827c8b5f7873a71372533367a4229eaa41f76559c319eb8af2b390c0",
+    "tests/docs/test_code_graph.py": "5de015fc9bf3c71d2225386cc2fa9f102054a6a457f0f1f75cdc56db700cb9e5",
+    "tests/docs/test_context_projection_boundaries.py": "7418b60c0d1f168abe6db41b5d72f5d485eeedfe183f416811b4ef929d2872e8",
+    "tests/docs/test_docs_context_read_next.py": "623a1f1a353ea27774bb6dcb6dd65a3f7443218954568db5766303ae0344472b",
+    "tests/docs/test_docs_impact_task20.py": "54412b8d3352d60c05618e78bd2ac73c9b6453da471fba52a2e9dd1fb953f842",
+    "tests/docs/test_docs_initial_delivery.py": null,
+    "tests/docs/test_docs_job_service.py": "19baf4232bbdac796fd2e7a434ad16f91d5990debdfed5eddd031042f43b6331",
+    "tests/docs/test_docs_service_characterization.py": "31ae8bc27e931006e6d068333a73d652ca257ccb4a14bc97b363feca5ada2f6a",
+    "tests/docs/test_docs_target_service.py": null,
+    "tests/docs/test_documentation_query_plan.py": "3778b9ac12d08f1049300519c4c777ba259c0eac01293cf00cda244c14af74e2",
+    "tests/docs/test_generic_context_workflows.py": "ac96b8f7ca7b0f4182e15e65fd5e0d31c032fba3bc08206bb1bc84676224fb26",
+    "tests/docs/test_go_project.py": "7b644d165043634451154b8d2cd7df1b93664a80931e4a75b08cd4ccfa61a734",
+    "tests/docs/test_joint_context_invariants.py": "9ae6c499152b9860237b0e10e4a74bf8efb9c2cf03e9fbac762bbbadcc30ff94",
+    "tests/docs/test_language_flow_experiment.py": "72656ebbd7782ae9e18e861ae49849fe6f9b5b63ae5642fc0447647b67517981",
+    "tests/docs/test_language_packing_experiment.py": "0aeb5ace1ad6cace81c6ba95a3d11348d4814c0b2b9f3bc312584158b5172f1e",
+    "tests/docs/test_library_source_discovery.py": null,
+    "tests/docs/test_pr211_catalog_equivalence.py": "efe2122338724a92c2904741c4adc74018c2b60aab8313ff4ac448614f049bd4",
+    "tests/docs/test_project_docs_catalog.py": "f01f2ac917669de016337af6f94f3ba0852415ae5e72dfe6fd5cf82538db6aed",
+    "tests/docs/test_query_block_guards.py": "69b4d9775b35470d468c49cf39883beef20b2c4b84ed57401f4ea2818fa58839",
+    "tests/docs/test_query_planning_scope_regressions.py": "5f07491464746bf2d74853218e174b9023797668db5da8481b2b969498a3d606",
+    "tests/docs/test_source_map.py": "088a806b15e392c308aa5f9f4c794e9926555c92d3a8d4e3048c40c34c774def",
+    "tests/docs/test_visible_support_units.py": "9e7a4375e3291437f9e5e6fbc2651bdd1ec2986588452cd680c110048d2c4ccd"
+  },
+  "helper_labels_preserved": [
+    "tests/docs/test_pr211_catalog_equivalence.py"
+  ],
+  "registry_actions": {
+    "HASH": 20,
+    "REMOVE_ABSENT_MODULE": 6,
+    "REMOVE_RETIRED_OVERRIDE": 2
+  },
+  "registry_files": 14,
+  "validation": {
+    "partition": 8291,
+    "removed": 6440,
+    "added": 1,
+    "net": 6439,
+    "projected_after": 1852,
+    "target_gap": 0,
+    "reduction_percent": 77.66252563020142,
+    "classified": 6527,
+    "unclassified": 1764,
+    "overlap": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0
+  },
+  "limits": "Metadata/registries only. Prior history/policies/8ROOT deferrals unchanged. Only completed263 PASS IDs credited; activeROOTAMfinal excluded. Preserve helper labels/SKIP; no runtime/AST/project imports/CI/commit/push/nestedagents. Target projected, not collection/product-quality proof.",
+  "registry_final_sha256": {
+    "tests/diagnostic_labels.admission_contract.json": "f17f55b400b8a3fc00c12ad22fc5c616316396a74abad419e21e5c8529ec8efe",
+    "tests/diagnostic_labels.compound_context.json": "64a1827fc9c6f7c0f075843687c2996c8f7fa742aa91b246251797fc4ed83893",
+    "tests/diagnostic_labels.docs_context_read_next.json": "def0628d3576d1465493e819861afeb8564127218aa905adc64031d695766326",
+    "tests/diagnostic_labels.docs_initial_delivery.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.generic_context_workflows.json": "fe46fd65d8bf612341ad38c95ca22f409db651a05b19a39154baf42ac7079795",
+    "tests/diagnostic_labels.joint_selection.json": "2d80ff3be11b6d25f5acaf896b35443ed3e7ae77b2c1f6a1797c0a526b7c5bf7",
+    "tests/diagnostic_labels.json": "6f70385062289af24a62cc776f131502a87267a07beda014e20d236a8bb5367d",
+    "tests/diagnostic_labels.language_flow_experiment.json": "0f28ed1e8bcdcf84d0f5844546eace68a1e653b9188e40bf07fc23b6e415c86e",
+    "tests/diagnostic_labels.language_packing_experiment.json": "07521b8486770a769d8c407d4f0b0c29eec0b7487d8e1f1065fef2da19550237",
+    "tests/diagnostic_labels.pr211_catalog_equivalence.json": "ae12a977e200ba079f70035a299e1280b9ad8620fc866664ad75a7e8d995ddf4",
+    "tests/diagnostic_labels.projection_boundaries.json": "1c8146e4f734d9b203df45f1b438caa581edda772700100a5042098428319a3e",
+    "tests/diagnostic_labels.query_blocks.json": "70509c30d9a30ecaec848ce1643a32dbe40112525f27ab9e972889a9a20fae55",
+    "tests/diagnostic_labels.query_planning.json": "fe33218326a1097b5f0b810209a676bf56d35cadd7c31bc85188d0fab4623c6f",
+    "tests/diagnostic_labels.support_retention.json": "cdfd653c492df70495a9baf9ed512f9faeb3304be305dfb59691794a38c976ac"
+  },
+  "owned_classification": {
+    "reviewed_modules": 57,
+    "retained_saved_PASS_integrations": 299,
+    "confirmed_remaining_units": 0,
+    "ambiguous_PASS": 0,
+    "retained_sorted_unique_newline_joined_ids_sha256": "2ca4ddea050068a238a17ca292f2e6a779bd10dfc719cda34b62d20f619e98dd",
+    "limit": "Only author owned frozen57docs module inventory. module_boundary_audit and299exact IDs hash-bound in packet; no global completion or fresh runtime/installed/production proof."
+  },
+  "registry_method": "Current23packet bindings:3deleted modules absent,20final hashes match. Derive normalized BASE survivors minus all6440integrated removals plus sole ledgered addition; sorted unique newline-joined SHA256. All physically surviving helper/module labels retained;ROOT entries untouched, including activeAMfinal in mixed registries.",
+  "exact_ids_binding": "Manifest green-followup::retired-docsfinal263 exactly equals packet new_removed_pass_base_ids/new_retired_PASS_ids:263unique BASE/saved PASS, disjoint from6177prior.",
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "SavedPASS/frozenBASE retirement under accepted coverage loss; not product-quality/currentPASS/green/final collection."
+  }
+}

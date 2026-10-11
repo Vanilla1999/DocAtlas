@@ -70,50 +70,8 @@ def test_generated_guidance_installs_all_references_and_preserves_user_text(tmp_
         assert text == f"{guidance._AGENTS_MD_START}\n{expected}\n{guidance._AGENTS_MD_END}\n\nUser guide annotation.\n"
 
 
-def test_root_workflow_matches_generated_contract_and_links_to_real_assets():
-    root = (ROOT / "SKILL.md").read_text(encoding="utf-8")
-    canonical = _canonical()
-    assert root[root.index("1. Start"):].replace("docmancer/templates/references/", "docatlas-references/").strip() == canonical[canonical.index("1. Start"):]
-    for link in _links(root):
-        assert (ROOT / link).is_file()
-    # Compact entry points link detail rather than embedding it.
-    assert len(root.encode()) < len(b"".join((ROOT / link).read_bytes() for link in _links(root)))
-    assert 'context_format="patch_context"' not in root
-    assert 'context_format="patch_context"' not in canonical
 
 
-def test_default_examples_and_installed_identity_match_exact_runtime_contract(monkeypatch):
-    contract = public_agent_contract()
-    payload = deepcopy(contract)
-    identity = payload.pop("identity")
-    digest = lambda value: hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-    assert identity == "sha256:" + digest(payload)
-    tools = runtime_public_tool_dicts()
-    assert tuple(tool["name"] for tool in tools) == ("get_docs_context", "prepare_docs", "docs_status")
-    assert contract["tools"] == [{
-        "name": tool["name"],
-        "description_sha256": digest(tool["description"]),
-        "input_schema_sha256": digest(tool["inputSchema"]),
-        "output_schema_sha256": digest(tool.get("outputSchema")),
-        "tool_contract_sha256": digest(tool),
-    } for tool in tools]
-    by_name = {tool["name"]: tool for tool in tools}
-    for example in contract["examples"]:
-        jsonschema.validate(example["arguments"], by_name[example["tool"]]["inputSchema"])
-        assert "context_format" not in example["arguments"]
-    assert contract["workflow"]["first_call"]["coding_context_format"] is None
-    assert contract["workflow"]["first_call"]["skill_read_required"] is False
-    assert contract["workflow"]["advanced_patch"] == {
-        "default_available": False,
-        "startup_setting": "DOCATLAS_MCP_ADVANCED_TOOLS=1",
-        "context_format": "patch_context",
-        "patch_evidence_representation_cap": None,
-        "authorizes_edit": False,
-    }
-    assert identity in guidance._get_template_content("skill.md")
-    # Ambient advanced mode never silently changes the installed default contract.
-    monkeypatch.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
-    assert public_agent_contract() == contract
 
 
 def test_desktop_archive_contains_exact_generated_skill_and_linked_guides(tmp_path, monkeypatch):
@@ -127,22 +85,6 @@ def test_desktop_archive_contains_exact_generated_skill_and_linked_guides(tmp_pa
         for link in _links(skill):
             expected = files("docmancer.templates").joinpath("references", Path(link).name).read_bytes()
             assert package.read("docatlas/" + link) == expected
-
-
-def test_wheel_contains_templates_and_all_linked_guide_bytes(tmp_path):
-    # Existing build backend only: no dependency installation or child process.
-    from hatchling.builders.wheel import WheelBuilder
-
-    builder = WheelBuilder(str(ROOT))
-    wheel = next(builder.build(directory=str(tmp_path), versions=["standard"]))
-    with zipfile.ZipFile(wheel) as package:
-        template = package.read("docmancer/templates/agent_contract.md").decode()
-        assert template == files("docmancer.templates").joinpath("agent_contract.md").read_text(encoding="utf-8")
-        for link in _links(template):
-            source = files("docmancer.templates").joinpath("references", Path(link).name)
-            assert package.read("docmancer/templates/references/" + source.name) == source.read_bytes()
-        for name in ("skill.md", "claude_code_skill.md", "claude_desktop_skill.md", "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md"):
-            assert package.read("docmancer/templates/" + name) == files("docmancer.templates").joinpath(name).read_bytes()
 
 
 @pytest.mark.parametrize("writer", ["skill", "instructions"])

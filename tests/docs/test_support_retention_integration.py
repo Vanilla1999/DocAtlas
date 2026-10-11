@@ -43,37 +43,6 @@ def test_same_origin_upgrade_survives_three_source_cap_after_required_lookups(tm
     assert "--backup-relay" in retry["snippet"]
 
 
-def test_full_origin_must_not_displace_independent_required_exception(tmp_path) -> None:
-    from copy import deepcopy
-
-    from docmancer.docs.application import _docs_context_projection_core as core
-    from docmancer.docs.application.model_visible_projection import validate_model_visible_projection
-    from docmancer.docs.application.model_visible_projection_helpers import docs_context_budget_tokens
-
-    docs = {
-        "a.md": (
-            "# RelayClient\n\nThe default timeout is 11 seconds.\n\n"
-            + "RelayClient can configure its default timeout for long operations. " * 6
-            + "\n"
-        ),
-        "b.md": "# RelayClient\n\nThe exception raised after expiration is `RelayExpired`.\n",
-    }
-    capture = capture_reference_case(
-        tmp_path,
-        docs,
-        "What is RelayClient default timeout, and which exception is raised?",
-    )
-    retrieval = deepcopy(capture["projection_attempts"][0]["before_projection"])
-    retrieval.pop("_source_continuation_project_root", None)
-    budget = 575  # Test-only measured packet geometry; shipping cap remains 800.
-    payload, snapshot = core.project_docs_context(retrieval=retrieval, max_tokens=budget)
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=budget) == []
-    assert docs_context_budget_tokens(payload) <= budget
-    visible = "\n".join(source["snippet"] for source in payload.get("sources") or ())
-    assert "11 seconds" in visible
-    assert "RelayExpired" in visible
-
-
 def test_projector_uses_prepared_snapshot_without_source_io(tmp_path, monkeypatch) -> None:
     from copy import deepcopy
     from pathlib import Path

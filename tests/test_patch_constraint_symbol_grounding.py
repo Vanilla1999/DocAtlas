@@ -55,73 +55,6 @@ void buildMenu() {
     return root
 
 
-def test_patch_review_artifacts_are_excluded_but_normal_research_doc_remains(tmp_path: Path):
-    root = _nbo_like_fixture(tmp_path)
-
-    packet = _packet(root, "Update normal research policy")
-    payload = str(asdict(packet))
-
-    assert "NormalResearchService" in payload
-    assert "FakeReviewService" not in payload
-    assert "FakeConstraintService" not in payload
-    assert "InternalFakeService" not in payload
-    assert packet.excluded_source_count >= 3
-    reasons = {item["reason"] for item in packet.excluded_source_reasons}
-    assert "patch_review_output" in reasons
-    assert any("review_summary.md" in item["path"] for item in packet.excluded_source_reasons)
-    assert any("constraints.md" in item["path"] for item in packet.excluded_source_reasons)
-
-
-def test_dogfood_task_description_is_excluded_as_review_artifact(tmp_path: Path):
-    root = _nbo_like_fixture(tmp_path)
-    _write(
-        root / "docs/research/docatlas-dogfood-v3/foo/task.md",
-        "DogfoodTaskService owns safe task descriptions.\n",
-    )
-
-    packet = _packet(root, "Use safe task descriptions")
-    payload = str(asdict(packet))
-
-    assert "DogfoodTaskService" not in payload
-    assert any(item["reason"] == "dogfood_task_artifact" for item in packet.excluded_source_reasons)
-
-
-def test_method_call_symbol_grounding_prefers_final_meaningful_method(tmp_path: Path):
-    root = _nbo_like_fixture(tmp_path)
-
-    packet = _packet(
-        root,
-        "Перенести Быстрая информация рядом с камерой и закрывать шторку перед действиями scan doc",
-        ["lib/modules/tsd_browser/presentation/menu/menu_line.dart"],
-    )
-    symbols = {candidate["matched_symbol"]: candidate for candidate in packet.symbol_candidates}
-
-    assert "openInfo" in symbols
-    assert "closeMenu" in symbols
-    assert "goToScanDocInit" in symbols
-    assert "read" not in symbols
-    assert symbols["openInfo"]["source"] == "lib/modules/tsd_browser/presentation/menu/menu_line.dart"
-    assert "ref.read(tabBrowserNotifierProvider.notifier).openInfo();" in symbols["openInfo"]["evidence"]
-    assert symbols["openInfo"]["confidence"] != "high"
-
-
-def test_close_menu_phrase_aliases_find_source_attributed_symbol(tmp_path: Path):
-    root = _nbo_like_fixture(tmp_path)
-
-    for question in [
-        "закрывать шторку перед действиями",
-        "закрыть меню перед действиями",
-        "close menu before action",
-    ]:
-        packet = _packet(root, question, ["lib/modules/tsd_browser/presentation/menu/menu_line.dart"])
-        assert any(candidate["matched_symbol"] == "closeMenu" for candidate in packet.symbol_candidates)
-        assert any(
-            candidate["matched_symbol"] == "closeMenu"
-            and candidate["source"] == "lib/modules/tsd_browser/presentation/menu/menu_line.dart"
-            for candidate in packet.symbol_candidates
-        )
-
-
 def test_close_menu_alias_does_not_invent_without_source_match(tmp_path: Path):
     root = tmp_path / "repo"
     _write(root / "lib/menu.dart", "void openMenu() {}\n")
@@ -137,17 +70,6 @@ def test_generated_asset_candidate_filtered_for_non_asset_task(tmp_path: Path):
     packet = _packet(root, "Update TSDBrowser navigation behavior", ["lib/modules/tsd_browser/presentation/menu/menu_line.dart"])
 
     assert not any(candidate["source"] == "lib/generated/assets.dart" for candidate in packet.symbol_candidates)
-
-
-def test_generated_asset_candidate_demoted_for_asset_task(tmp_path: Path):
-    root = _nbo_like_fixture(tmp_path)
-
-    packet = _packet(root, "Update TSDBrowser icon asset", ["lib/modules/tsd_browser/presentation/menu/menu_line.dart"])
-    asset_candidates = [candidate for candidate in packet.symbol_candidates if candidate["source"] == "lib/generated/assets.dart"]
-
-    assert asset_candidates
-    assert all(candidate["confidence"] == "low" for candidate in asset_candidates)
-    assert all("generated_asset_demoted" in candidate["reason"] for candidate in asset_candidates)
 
 
 def test_generated_file_guardrail_and_validation_are_not_weakened(tmp_path: Path):

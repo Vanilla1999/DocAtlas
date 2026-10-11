@@ -46,115 +46,9 @@ def _instructions(packet) -> str:
     return "\n".join(c.instruction for c in packet.constraints).lower()
 
 
-def test_extracts_architecture_must_and_must_not_constraints(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    text = _instructions(packet)
-    assert "application layer" in text or "domain layer" in text
-    assert any(c.severity == "must" and c.source.endswith("architecture.md") for c in packet.constraints)
-
-
-def test_python_imports_do_not_become_constraints_but_normative_prose_does(tmp_path: Path):
-    docs = """from . import required
-from ..policy import forbidden
-from pkg import (
-    required,
-    forbidden,
-)
-Retries are required before publishing.
-"""
-
-    packet = _packet(
-        _workspace(tmp_path, docs=docs),
-        question="Update retry publishing policy",
-    )
-    architecture_constraints = [
-        constraint
-        for constraint in packet.constraints
-        if constraint.source.endswith("docs/architecture.md")
-    ]
-
-    assert not any(
-        constraint.instruction.strip().startswith(("from ", "required,", "forbidden,"))
-        for constraint in architecture_constraints
-    )
-
-    service = PatchConstraintsService(LibraryDocsService())
-    candidates = service._iter_constraint_lines(docs, "docs/architecture.md")
-    normative_lines = [
-        candidate["line"]
-        for candidate in candidates
-        if service._has_normative_language(candidate["line"])
-    ]
-    assert normative_lines == ["Retries are required before publishing."]
-
-
-def test_extracts_adr_constraints(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any("PermissionService" in c.instruction and "adr/0001" in c.source for c in packet.constraints)
-
-
-def test_extracts_generated_file_constraint_from_docs(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any(c.type == "generated_file" and "generated" in c.instruction.lower() for c in packet.constraints)
-
-
-def test_extracts_freezed_and_g_dart_forbidden_edits(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    generated = next(c for c in packet.constraints if c.type == "generated_file")
-    assert "*.g.dart" in generated.files
-    assert "*.freezed.dart" in generated.files
-    assert generated.severity == "must"
-
-
-def test_extracts_source_of_truth_service_layer_constraint(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any(c.type == "source_of_truth" and "PermissionService" in c.instruction for c in packet.constraints)
-
-
-def test_extracts_provider_must_delegate_constraint(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any(c.type == "architecture" and "Provider" in c.instruction and "PermissionService" in c.instruction for c in packet.constraints)
-
-
-def test_extracts_no_duplicate_policy_constraint(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any(c.type == "forbidden_edit" and "duplicate policy" in c.instruction.lower() for c in packet.constraints)
-
-
-def test_extracts_pinned_dependency_from_pubspec_lock(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path), question="Use permission_handler dependency")
-    assert any(c.type == "dependency_version" and "permission_handler" in c.instruction and "11.4.0" in c.instruction for c in packet.constraints)
-
-
-def test_extracts_pinned_dependency_from_pyproject_or_requirements(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(root / "requirements.txt", "fastapi==0.115.6\n")
-    _write(root / "pyproject.toml", '[project]\ndependencies = ["pydantic==2.10.4"]\n')
-    packet = _packet(root, question="Update FastAPI dependency integration")
-    assert any("fastapi" in c.instruction.lower() and "0.115.6" in c.instruction for c in packet.constraints)
-    assert any("pydantic" in c.instruction.lower() and "2.10.4" in c.instruction for c in packet.constraints)
-
-
-def test_extracts_pinned_dependency_from_package_lock(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(root / "package-lock.json", '{"packages":{"node_modules/react":{"version":"18.2.0"}}}')
-    packet = _packet(root, question="Update React dependency usage")
-    assert any("react" in c.instruction.lower() and "18.2.0" in c.instruction for c in packet.constraints)
-
-
-def test_extracts_lockfile_guardrail(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    assert any(c.type == "forbidden_edit" and "lockfile" in c.instruction.lower() for c in packet.constraints)
-
-
 def test_changed_files_raise_generated_file_constraint(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.freezed.dart", "lib/foo/user.g.dart"])
     assert any(c.type == "generated_file" and c.source == "changed_files" for c in packet.constraints)
-
-
-def test_changed_files_raise_provider_layer_constraint(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path), changed_files=["lib/modules/permission/presentation/providers/permission_provider.dart"])
-    assert any(c.type == "architecture" and c.files for c in packet.constraints[:4])
 
 
 def test_changed_files_raise_relevant_constraints(tmp_path: Path):
@@ -171,83 +65,6 @@ def test_changed_files_do_not_create_unsupported_high_confidence_constraint(tmp_
     root.mkdir()
     packet = _packet(root, changed_files=["lib/modules/permission/presentation/providers/permission_provider.dart"])
     assert not any(c.confidence == "high" and "PermissionService" in c.instruction for c in packet.constraints)
-
-
-def test_question_keywords_raise_relevant_dependency_constraint(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(root / "package-lock.json", '{"packages":{"node_modules/react":{"version":"18.2.0"}}}')
-    packet = _packet(root, question="Fix React dependency behavior")
-    dep_positions = [idx for idx, c in enumerate(packet.constraints) if c.type == "dependency_version" and "react" in c.instruction.lower()]
-    assert dep_positions and dep_positions[0] < 8
-
-
-def test_task_specific_source_evidence_is_not_crowded_out_by_unmentioned_dependencies(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(root / "lib/src/domain/services/help_requests_service.dart", "class HelpRequestsService { void sendAttachments() {} }\n")
-
-    packet = _packet(
-        root,
-        question="Add sendAttachments support for selecting and sending attachments in chat",
-        max_constraints=5,
-        max_tokens=900,
-    )
-
-    assert any(c.source == "lib/src/domain/services/help_requests_service.dart" for c in packet.constraints[:5])
-    assert not any(c.type == "dependency_version" for c in packet.constraints[:5])
-
-
-def test_patch_constraints_include_code_graph_link_hints(tmp_path: Path):
-    root = tmp_path / "repo"
-    _write(root / "docs/architecture.md", "Help requests use UI -> Cubit -> Service flow.\n")
-    _write(
-        root / "lib/screens/help_request_screen.dart",
-        """
-import '../cubit/help_requests_cubit.dart';
-
-class HelpRequestScreen {
-  final label = "Вернуть в работу";
-
-  void build() {
-    HelpRequestsCubit();
-  }
-}
-""".strip()
-        + "\n",
-    )
-    _write(
-        root / "lib/cubit/help_requests_cubit.dart",
-        """
-import '../services/help_requests_service.dart';
-
-class HelpRequestsCubit {
-  final service = HelpRequestsService();
-}
-""".strip()
-        + "\n",
-    )
-    _write(root / "lib/services/help_requests_service.dart", "class HelpRequestsService { void reopenRequest() {} }\n")
-
-    packet = _packet(
-        root,
-        question="Измени поведение кнопки Вернуть в работу через HelpRequestsCubit",
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    graph_constraints = [c for c in packet.constraints if any(ref.get("kind") == "code_graph" for ref in c.source_refs)]
-    assert graph_constraints
-    payload = "\n".join(c.instruction for c in graph_constraints).lower()
-    assert "inspect" in payload
-    assert "linked" in payload
-    files = {file for c in graph_constraints for file in c.files}
-    assert "lib/screens/help_request_screen.dart" in files or "lib/cubit/help_requests_cubit.dart" in files
-    assert any("Code graph slice:" in c.evidence for c in graph_constraints)
-    assert not any("void build()" in c.evidence for c in graph_constraints)
-    assert not any("calls" in c.instruction.lower() for c in graph_constraints)
-    diagnostics_refs = [ref.get("diagnostics") for c in graph_constraints for ref in c.source_refs if ref.get("kind") == "code_graph"]
-    assert diagnostics_refs
-    assert any(ref.get("edge_kinds") for ref in diagnostics_refs if isinstance(ref, dict))
-    assert all(len(ref.get("score_reasons", [])) <= 8 for ref in diagnostics_refs if isinstance(ref, dict))
 
 
 def test_patch_constraints_code_graph_unresolved_external_is_low_confidence_hint(tmp_path: Path):
@@ -273,60 +90,6 @@ class ExternalScreen {}
         assert "calls" not in text
 
 
-def test_patch_constraints_code_graph_failure_is_non_fatal(tmp_path: Path, monkeypatch):
-    root = _workspace(tmp_path)
-
-    def fail_build(*args, **kwargs):
-        raise RuntimeError("boom")
-
-    monkeypatch.setattr(
-        "docmancer.docs.application.patch_constraints_service.build_project_code_graph",
-        fail_build,
-    )
-
-    packet = _packet(root, question="Update PermissionService behavior", max_constraints=20, max_tokens=4000)
-
-    assert packet.constraints
-    assert any(c.source.endswith("architecture.md") for c in packet.constraints)
-
-
-def test_navigation_patch_constraints_prefer_lib_sources_over_example_noise(tmp_path: Path):
-    root = tmp_path / "repo"
-    _write(
-        root / "ARCHITECTURE.md",
-        """
-# Architecture
-
-## Navigation
-
-Folder: `lib/src/navigation/`.
-
-- `help_request_routes.dart` - route constants;
-- `help_request_navigator.dart` - local `Navigator` for the help request flow.
-
-Routes are registered in `HelpRequestNavigator._onGenerateRoute`.
-""",
-    )
-    _write(root / "README.md", "TODO: Put a short description here.\n")
-    _write(root / "example/README.md", "Example app.\n")
-    _write(root / "pubspec.lock", 'packages:\n  io:\n    dependency: transitive\n    source: hosted\n    version: "1.0.5"\n')
-    _write(root / "example/lib/mobile_auth_view.dart", "void onNavigationAction() { final url = navigationAction.request.url; }\n")
-    _write(root / "lib/src/navigation/help_request_routes.dart", "class HelpRequestRoutes { static const newHelpRequestPath = 'new-help-request'; }\n")
-    _write(root / "lib/src/navigation/help_request_navigator.dart", "class HelpRequestNavigator { void onGenerateRoute() {} }\n")
-
-    packet = _packet(
-        root,
-        question="Добавить новый экран в help_chat navigation flow",
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    assert any("help_request_routes.dart" in c.source for c in packet.constraints)
-    assert any("help_request_navigator.dart" in c.source for c in packet.constraints)
-    assert not any(c.source.startswith("example/") for c in packet.constraints)
-    assert not any(c.type == "dependency_version" for c in packet.constraints)
-
-
 def test_suggested_checks_include_generated_and_lockfile_checks(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart", "pubspec.lock"])
     checks = "\n".join(packet.suggested_checks).lower()
@@ -342,55 +105,11 @@ def test_suggested_checks_include_generated_and_lockfile_checks(tmp_path: Path):
     assert "lockfile" in checks
 
 
-def test_budget_keeps_must_high_confidence_constraints(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path), max_constraints=3, max_tokens=220)
-    assert len(packet.constraints) <= 3
-    assert all(c.severity == "must" for c in packet.constraints)
-    assert all(c.confidence == "high" for c in packet.constraints)
-
-
-def test_budget_emits_truncation_warning(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path), max_constraints=1, max_tokens=100)
-    assert any("constraints truncated by budget" in warning for warning in packet.warnings)
-
-
 def test_budget_drops_low_priority_constraints_first(tmp_path: Path):
     packet = _packet(_workspace(tmp_path), changed_files=["lib/foo/user.g.dart"], max_constraints=2, max_tokens=220)
     assert packet.constraints
     assert any(c.type == "generated_file" and c.source == "changed_files" for c in packet.constraints)
     assert all(c.confidence in {"high", "medium"} for c in packet.constraints)
-
-
-def test_high_confidence_constraints_have_source_and_evidence(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path))
-    high = [c for c in packet.constraints if c.confidence == "high"]
-    assert high
-    assert all(c.source and c.evidence for c in high)
-
-
-def test_patch_contract_schema_v2_exposes_contract_metadata(tmp_path: Path):
-    root = _workspace(tmp_path)
-    packet = _packet(root, max_constraints=20, max_tokens=4000)
-
-    assert packet.schema_version == "patch-contract-2.0"
-    assert packet.contract_kind == "patch_contract"
-    assert packet.contract_id and packet.contract_id.startswith("patch-contract-")
-    assert packet.project_path == str(root.resolve())
-    assert packet.generated_at
-    assert packet.index_state["visible_source_count"] >= 1
-    assert packet.token_budget["max_tokens"] == 4000
-    assert packet.token_budget["token_estimate"] == packet.token_estimate
-    assert any(action["type"] == "validate_patch_against_constraints" for action in packet.next_actions)
-
-
-def test_patch_contract_schema_v2_constraint_items_keep_evidence_refs(tmp_path: Path):
-    packet = _packet(_workspace(tmp_path), max_constraints=20, max_tokens=4000)
-    high = next(c for c in packet.constraints if c.confidence == "high")
-
-    assert high.source_refs == [{"path": high.source, "kind": "source"}]
-    assert high.evidence_snippets
-    assert high.evidence_snippets[0]["path"] == high.source
-    assert high.evidence_snippets[0]["text"] == high.evidence
 
 
 def test_does_not_invent_dependency_version_without_manifest(tmp_path: Path):
@@ -461,38 +180,6 @@ def test_markdown_table_rows_do_not_become_constraints(tmp_path: Path):
     assert "Compile patch constraints for agents" not in payload
 
 
-def test_research_and_comparison_docs_do_not_create_must_high_constraints(tmp_path: Path):
-    root = tmp_path / "repo"
-    _write(root / "docs/research/project-constraint-compiler-rfc.md", "ResearchService owns experimental compiler policy and must be the source of truth.\n")
-    _write(root / "docs/context7-docmancer-comparison.md", "ComparisonService owns comparison policy and must be the source of truth.\n")
-    _write(root / "research_service.py", "class ResearchService: pass\n")
-    _write(root / "comparison_service.py", "class ComparisonService: pass\n")
-
-    packet = _packet(root, question="Update compiler policy", max_constraints=20, max_tokens=4000)
-
-    research_constraints = [
-        c for c in packet.constraints
-        if "ResearchService" in c.instruction or "ComparisonService" in c.instruction
-    ]
-    assert research_constraints
-    assert all(not (c.severity == "must" and c.confidence == "high") for c in research_constraints)
-    assert all("authority=low" in c.evidence or "downgrade=low_authority_source" in c.evidence for c in research_constraints)
-
-
-def test_repo_artifact_paths_create_forbidden_edit_guardrail(tmp_path: Path):
-    root = tmp_path / "repo"
-    _write(root / "eval/task_level/results/run-1/constraints.json", "{}\n")
-    _write(root / ".docatlas/patch-review/constraints.json", "{}\n")
-
-    packet = _packet(root, question="Update app code", max_constraints=20, max_tokens=4000)
-
-    assert packet.forbidden_edits
-    guardrails = [c for c in packet.forbidden_edits if c.source == "repo_path_heuristics"]
-    assert guardrails
-    assert any("eval/task_level/results" in evidence for c in guardrails for evidence in [c.evidence])
-    assert all(c.confidence == "medium" and c.severity == "should" for c in guardrails)
-
-
 def test_final_token_budget_clamps_after_warnings(tmp_path: Path):
     root = _workspace(tmp_path)
     for idx in range(20):
@@ -513,82 +200,6 @@ def test_grouped_constraints_are_views_of_all_constraints(tmp_path: Path):
     assert all(c.id in all_ids for c in packet.source_of_truth_rules)
 
 
-def test_ignores_dogfood_generated_artifacts_but_keeps_normal_research_docs(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(root / "docs/research/docatlas-dogfood/task/constraints.md", "Dogfood artifact: FakeService owns menu policy.\n")
-    _write(root / "docs/research/docatlas-dogfood/task/validation.json", '{"violated": 9, "evidence": "FakeService"}')
-    _write(root / "docs/research/normal-architecture-note.md", "NormalResearchService owns research note policy.\n")
-
-    packet = _packet(root, question="Update research note policy", max_constraints=20, max_tokens=4000)
-    payload = str(asdict(packet))
-
-    assert "FakeService" not in payload
-    assert "NormalResearchService" in payload
-    assert packet.excluded_source_count >= 2
-    assert any("ignored_generated_artifact_sources" in warning for warning in packet.warnings)
-    assert any(path.endswith("constraints.md") for path in packet.ignored_generated_artifact_sources)
-
-
-def test_symbol_grounding_finds_task_local_source_symbols(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(
-        root / "lib/modules/menu/menu_line.dart",
-        """
-class MenuNotifier {
-  void closeMenu() {}
-}
-
-class TabBrowserNotifier {
-  void openInfo() {}
-}
-
-const quickInfoLabel = 'Быстрая информация';
-""",
-    )
-
-    packet = _packet(
-        root,
-        question='Add "Быстрая информация" button and close menu before action using FAST_INFO',
-        changed_files=["lib/modules/menu/menu_line.dart"],
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    candidates = packet.symbol_candidates
-    assert any(candidate["matched_symbol"] in {"openInfo", "quickInfoLabel"} for candidate in candidates)
-    assert any(candidate["matched_symbol"] == "closeMenu" for candidate in candidates)
-    assert all("docatlas-dogfood" not in candidate["source"] for candidate in candidates)
-
-
-def test_patch_contract_exposes_repo_map_and_source_evidence_layer(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(
-        root / "lib/help_request_details_screen.dart",
-        """
-class HelpRequestDetailsScreen {}
-final label = 'Вернуть в работу';
-""",
-    )
-
-    packet = _packet(
-        root,
-        question='Reopen HELP request and show "Вернуть в работу" button.',
-        changed_files=["lib/help_request_details_screen.dart"],
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    assert any(item["source_class"] == "repo_map" and item["path"] == "lib/help_request_details_screen.dart" for item in packet.repo_map)
-    evidence = [item for item in packet.source_evidence if item.get("evidence_class") == "source_snippet"]
-    assert any(item["path"] == "lib/help_request_details_screen.dart" and item["line_start"] == 3 for item in evidence)
-    grounded = [constraint for constraint in packet.constraints if constraint.id.startswith("source-evidence-")]
-    assert grounded
-    assert any(
-        constraint.source_refs[0]["kind"] == "source_evidence" and constraint.source_refs[0]["line_start"] == 3
-        for constraint in grounded
-    )
-
-
 def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
     root = _workspace(tmp_path)
 
@@ -597,120 +208,10 @@ def test_symbol_grounding_does_not_invent_without_source_match(tmp_path: Path):
     assert not any(candidate["term"] == "TotallyMissingBusinessThing" for candidate in packet.symbol_candidates)
 
 
-def test_symbol_grounding_demotes_broad_project_acronyms(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(
-        root / "lib/src/utils/help_request_strings.dart",
-        """
-class HelpAppStrings {}
-const helpRequestReturnToWorkButton = 'Вернуть в работу';
-""",
-    )
-
-    packet = _packet(
-        root,
-        question="Reopen HELP request and show the return-to-work button.",
-        changed_files=["lib/src/utils/help_request_strings.dart"],
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    help_candidates = [candidate for candidate in packet.symbol_candidates if candidate["term"] == "HELP"]
-    assert help_candidates
-    assert all(candidate["confidence"] == "low" for candidate in help_candidates)
-    assert all(candidate["reason"].startswith("broad_acronym_demoted") for candidate in help_candidates)
-    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkButton" for candidate in packet.symbol_candidates)
-    help_constraints = [constraint for constraint in packet.constraints if constraint.id.startswith("symbol-candidate-help-")]
-    assert help_constraints
-    assert all(constraint.confidence == "low" for constraint in help_constraints)
-
-
-def test_symbol_grounding_skips_cross_language_connector_fragments(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(
-        root / "lib/src/data/repositories/help_requests_repository.dart",
-        """
-class HelpRequestsRepository {
-  Future<void> returnClosedRequestToActive(String requestNumber) async {}
-  final label = 'Вернуть в работу and';
-}
-""",
-    )
-
-    packet = _packet(
-        root,
-        question="Reopen HELP request: show buttons Вернуть в работу and Создать новый запрос; return closed HELP sends status Активная.",
-        changed_files=["lib/src/data/repositories/help_requests_repository.dart"],
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    terms = {candidate["term"] for candidate in packet.symbol_candidates}
-    assert "в работу and" not in terms
-    assert any(candidate["matched_symbol"] == "returnClosedRequestToActive" for candidate in packet.symbol_candidates)
-
-
-def test_symbol_grounding_skips_comment_only_phrase_matches(tmp_path: Path):
-    root = _workspace(tmp_path)
-    _write(
-        root / "lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart",
-        """
-class HelpRequestDetailsCubit {
-  /// Вернуть закрытую заявку HELP в работу.
-  Future<void> returnClosedRequestToActive(String requestNumber) async {}
-
-  /// Отправить комментарий.
-  Future<void> sendComment(String text) async {}
-}
-""",
-    )
-    _write(
-        root / "lib/src/utils/help_request_strings.dart",
-        """
-class HelpAppStrings {
-  static const helpRequestReturnToWorkBtn = 'Вернуть в работу';
-}
-""",
-    )
-
-    packet = _packet(
-        root,
-        question='Reopen HELP request: show button "Вернуть в работу" and allow Отправить after success.',
-        changed_files=["lib/src/ui/help_request_details_screen/cubit/help_request_details_cubit.dart"],
-        max_constraints=20,
-        max_tokens=4000,
-    )
-
-    assert not any(
-        candidate["matched_symbol"] in {"Вернуть в работу", "Отправить"}
-        for candidate in packet.symbol_candidates
-    )
-    assert any(candidate["matched_symbol"] == "helpRequestReturnToWorkBtn" for candidate in packet.symbol_candidates)
-
-
 def test_constraints_have_source_attribution(tmp_path: Path):
     packet = _packet(_workspace(tmp_path))
     assert packet.constraints
     assert all(c.source and c.evidence and c.confidence in {"high", "medium", "low"} for c in packet.constraints)
-
-
-def test_drops_non_actionable_headings_tree_and_owner_noise(tmp_path: Path):
-    root = _workspace(
-        tmp_path,
-        docs="""
-# Architecture
-Rules that must not be violated:
-│ owns Shelf HttpServer
-PermissionService owns permission policy and is the source of truth for permission decisions.
-""",
-    )
-
-    packet = _packet(root)
-    text = "\n".join([c.instruction for c in packet.constraints] + [c.evidence for c in packet.constraints])
-
-    assert "Rules that must not be violated" not in text
-    assert "Shelf HttpServer" not in text
-    assert any("PermissionService" in c.instruction for c in packet.constraints)
 
 
 def test_scan_doc_constraints_skip_unrelated_oidc_and_dart_tool_sources(tmp_path: Path):

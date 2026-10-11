@@ -3,7 +3,7 @@
     "tests/test_project_context_quality_v2_protocol.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_project_context_quality_v2_protocol.py": "51da1cd6232715db1d6ccd2cd13b48ca7b454a91b9073cd1cd5ee09e0f419381"
+    "tests/test_project_context_quality_v2_protocol.py": "a653f40c1148418f24c98d180e42af4113a362f4464f78b9bf27fe4e0751306b"
   },
   "node_overrides": {},
   "schema_version": 1

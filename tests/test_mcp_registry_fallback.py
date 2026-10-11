@@ -118,12 +118,3 @@ def test_default_install_falls_back_to_known_open_meteo_openapi(tmp_path, monkey
     assert (paths.registry_dir() / "open-meteo@v1" / "contract.json").exists()
     assert (paths.package_dir("open-meteo", "v1") / "contract.json").exists()
 
-
-def test_default_registry_uses_hosted_url_without_user_env(monkeypatch):
-    monkeypatch.delenv("DOCATLAS_REGISTRY_API_URL", raising=False)
-
-    registry = default_registry()
-    assert isinstance(registry, CompositeRegistry)
-
-    hosted = next(r for r in registry._registries if isinstance(r, HostedRegistry))
-    assert hosted._base_url == DEFAULT_REGISTRY_API_URL

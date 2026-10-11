@@ -109,28 +109,8 @@ def test_bound_and_visible_version_witnesses_reject_tampering(attack):
     assert projection["edit_ready"] is False
 
 
-@pytest.mark.parametrize("actual", [None, "3.0"])
-def test_request_never_synthesizes_actual_version_or_exact_assignment(actual):
-    item = window(actual)
-    packet = packet_for(item)
-    assert packet["result"] == "failure"
-    assert "exact_version:2.0" in packet["missing"]
-    assert not packet.get("assignments")
-    assert validate_action_packet(packet, evidence_items=[item]) == []
 
 
-def test_unversioned_project_packet_keeps_optional_field_abi():
-    item = window()
-    del item["resolved_version"]
-    item.update(source_class="project_doc", doc_scope="project", version_binding="not_applicable")
-    packet = build_action_packet(question="reference", context_pack=[item], public_requirements=[TEXT])
-    assert packet["completeness"] == "complete"
-    assert "resolved_version" not in packet["sources"][0]
-    source_schema = ACTION_PACKET_OUTPUT_SCHEMA["properties"]["sources"]["items"]
-    assert "resolved_version" not in source_schema["required"]
-    assert source_schema["additionalProperties"] is False
-    assert validate_action_packet(packet, evidence_items=[item]) == []
-    assert validate_action_packet(packet) == []
 
 
 def test_runtime_public_schema_and_mcp_validation_preserve_null_docs_route():

@@ -28,39 +28,6 @@ def _doc(source: str, title: str, body: str, *, project_identity: str | None = N
     )
 
 
-def test_explicit_utility_rewards_title_matches_and_penalizes_legal_noise(tmp_path):
-    legal_repetition = " ".join(["configure widget cache mode"] * 80)
-    store = _store(
-        tmp_path,
-        [
-            _doc(
-                "docs/configuration.md",
-                "Configure widget cache mode",
-                "configure widget cache mode with cache_mode = bounded",
-            ),
-            _doc(
-                "docs/legal.md",
-                "Terms and Conditions for widget cache mode",
-                legal_repetition,
-            ),
-        ],
-    )
-
-    results = store.query("configure widget cache mode", limit=2, budget=5_000)
-
-    assert [result.source for result in results] == [
-        "docs/configuration.md",
-        "docs/legal.md",
-    ]
-    config_trace = results[0].metadata["ranking"]
-    legal_trace = results[1].metadata["ranking"]
-    assert config_trace["score_direction"] == "higher_is_better"
-    assert config_trace["feature_contributions"]["title_term_boost"] > 0
-    assert config_trace["feature_contributions"]["task_action_title_boost"] > 0
-    assert legal_trace["feature_contributions"]["boilerplate_title_penalty"] < 0
-    assert legal_trace["final_utility"] < config_trace["final_utility"]
-
-
 def test_long_section_penalty_is_negative_and_does_not_reward_length(tmp_path):
     store = _store(
         tmp_path,
@@ -217,28 +184,6 @@ def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
     assert not qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
 
 
-def test_sentence_initial_politeness_is_not_an_exact_technical_term(tmp_path):
-    store = _store(
-        tmp_path,
-        [_doc(
-            "docs/architecture.md",
-            "DocAtlas architecture",
-            "DocAtlas architecture describes the retrieval runtime.",
-        )],
-    )
-
-    result = store.query(
-        "Please explain the DocAtlas architecture", limit=1, budget=1_000,
-    )[0]
-    trace = result.metadata["lexical_match"]
-
-    assert "please" not in trace["exact_terms"]
-    assert "please" not in trace["missing_exact_terms"]
-    assert "docatlas" in trace["exact_terms"]
-    assert "qualified" not in trace
-    assert qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
-
-
 def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
     requested = _doc(
         "docatlas.project-docs.yaml",
@@ -267,19 +212,3 @@ def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
         if result.source == "docatlas.docs.yaml"
     )
 
-
-def test_lexical_trace_reports_field_level_provenance():
-    trace = SQLiteStore._lexical_match_trace(
-        "architecture storage retrieval",
-        title="Architecture",
-        body="Storage details",
-        retrieval_text="Architecture Storage Retrieval catalog metadata",
-        mode="and",
-        bm25_cost=-1.0,
-    )
-
-    assert trace["field_matches"]["title"] == ["architecture"]
-    assert trace["field_matches"]["body"] == ["storage"]
-    assert trace["field_matches"]["retrieval_text"] == [
-        "architecture", "storage", "retrieval",
-    ]

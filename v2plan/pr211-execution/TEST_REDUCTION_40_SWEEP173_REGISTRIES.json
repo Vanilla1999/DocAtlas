@@ -1,0 +1,237 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-fail-final-sweep.json",
+  "sha256": "67903c71276936007c054b4ccd0c2740ad44266f1cb55afa2495b03d018455ea",
+  "removed": 173,
+  "added": 0,
+  "BASE_status": {
+    "FAIL": 173
+  },
+  "saved_CI_status": {
+    "FAIL": 173
+  },
+  "exact_ids_binding": "Manifest families suffixed retired-sweep173 equal author newly_removed_ids exactly; no duplicate receipt list.",
+  "final_source_hashes": {
+    "tests/test_live_benchmark_unified_dependency.py": "e40cf50fbc23480d9867c7063d9b2942d3e9ea9e932605f4a7f4429f401b4bb4",
+    "tests/test_answer_quality_runner.py": "35e969b139c10d4e082cebc8b24dd4e4ccaebdf55bfb55a10798563eccea2408",
+    "tests/test_answer_quality_gate.py": "9d8da1fc337906f707e029dbc502f7840561b40a94d99b7e10df8c0c1144fb1d",
+    "tests/test_dictionary_exit_admission.py": "298aa5749e9976a2914c77f56da36ba359e2e54875569457b1f758503b304e88",
+    "tests/test_dictionary_exit_patch_boundary.py": "84821f93282d1b3088ec299c1e80f6f5525d0cfe7005b99c01310088762fca6e",
+    "tests/test_dictionary_exit_read_routing.py": "ee486c8b261c0d2cd7845cc90d8c4e7a714ed4545947996114901539f006b597",
+    "tests/test_patch_review_command_part02.py": "d5b67fcf03c53ffac458228389c6eddc4c0d68301ddef65e085f687256a81a5f",
+    "tests/test_source_search_edit_readiness.py": "12f8e73f94f3fab20ec0619377fead38d3c121cdad972ecbc78cb0f2af177030",
+    "tests/test_patch_review_command_part03.py": "43adac64a6313a6a9c441b4ec6b3c32d45234ec7bc1bb33cd5b326fd7ddb994d",
+    "tests/test_library_natural_language_retrieval.py": "9788d48693cbf43139a867078e1cc2bb7dd1edd5928657b9894c812913f5958e",
+    "tests/test_action_packet_v4_projection_split.py": "089aa445355024323a2e525a59f9d391689f95c61afc589dd1e41cff98b6a6b1",
+    "tests/test_patch_constraint_validation_service.py": "d69404b8a5ccbdd28f9288cea498505923442451d21c647b48fab01a0ae066e8",
+    "tests/test_action_packet_v4_eval.py": "1bb5597c0cfa6a87b1ed1bcaee1ff50498f3fc25b709b1a5cbec2010d551fb6d",
+    "tests/test_sqlite_phrase_ranking.py": "5a632f749bed6d7f79988b972f17ccfe93400bc104f4e3334fa0a08270781d36",
+    "tests/test_patch_review_command_part04.py": "5314bc4b212bb71ec0f5b536616a1783ab638354b290e2ae9d2da51a15c8ac6c",
+    "tests/evidence_quality_v2/test_condition_lead.py": "a6fe2bc492b14ab407328fa22a22b956f776c1caa1a5cc372a58ccf8fd8f7efc",
+    "tests/docs/test_generic_context_workflows.py": "1251aeceff02802aed8d4c3d337ca9e6527ade539693291ed79584fe2b771a3e",
+    "tests/docs/test_self_host_agent_contract_surface.py": "ac0774bf81fe45c51fc732b7c861a8f47e262929b8ef249621688e2ed8966433",
+    "tests/docs/test_query_planning_budget_regressions.py": "fa1360955f9cc981f0439f5479d59de53f5984509ca7834920dad47f050c5e12",
+    "tests/docs/test_document_local_rescue.py": "f0ff7a84ae06aab423ecea29f774cb844e13635c1018b240273476491b3ffab5",
+    "tests/docs/test_project_state.py": "6f3826cc68605a736cec62f51ef2a453eabf36dc47599ea3293187c276ed59ee",
+    "tests/docs/test_docs_lossless_remaining_caps.py": "78d2dd9333668d6f3ff823972b4092c65994a0251ab5f2bb77fbacf4eb15f25c",
+    "tests/docs/test_source_recovery_targeting.py": "882ae0adecb97190654d35eafd5573c2fd02dc388b6ab5c40f8d317ffc37e231",
+    "tests/docs/test_retrieval_alias_subject_binding.py": "08a50d4ee34f2c8555e4e1628779735540bac41ea65e818517e475afcfaf60ef",
+    "tests/docs/test_mixed_script_recovery.py": "129d333e48e9345c5794424f1fc8072d37c1bf33874915deed1c4f1f30c698bc",
+    "tests/docs/test_agent_index_gateway.py": "61a88519b3f3376b830d6bc4565fb37216e1fcd1d77de15da8d0162604dcab45",
+    "tests/docs/test_project_docs_catalog.py": "33a7e67260e93e1996950386413ecaf78e000ab6819bfc54244301b07cd25d38",
+    "tests/docs/test_project_docs_service.py": "d99ccc72a9b92a55e87d9e0b90b43d9de601affd41408202cff8e9196ab7c78c",
+    "tests/docs/test_mcp_boundary.py": "0ac405890163806d7192343ef45028b81c455d7e795c400dd13e13905f0aadcf",
+    "tests/docs/test_java_project.py": "4a06560e8ee637a9187ce3d68adcc48e471c32691f1995b122d47cf0ad74582c",
+    "tests/docs/test_go_project.py": "7cc775fb79ffa090c9aafaf37627fa3585e614487f8baac8a82c6b7d4aa73e9f",
+    "tests/docs/test_curated_sources.py": "65e5aa448b9f1595d5e14aebd5deedbbbcd92ab01c7b2ef80391d5dd67de0860",
+    "tests/task_level/test_one_call_agent_loop.py": "028532df98707f964aea3c5624a3332124c96cdd8a92fc4416751c9129fe26cd",
+    "tests/task_level/test_task33_semantic_density.py": "734bca2230d5cf081ed76d3da437d7d52ba3aa70d66182bf0dd2daaf5fb912b8",
+    "tests/task_level/test_actionability_projection.py": "d8ede9566b0bcf75ce9804e5dd4b3c91387cf9127967937c338f3ff0862f718f",
+    "tests/task_level/test_policy_isolation.py": "86156d7338eeef3e9837b79783664c497c75b0b2a19235c22ea37fbd9ed35015"
+  },
+  "source_binding_observed": {
+    "tests/test_live_benchmark_unified_dependency.py": "e40cf50fbc23480d9867c7063d9b2942d3e9ea9e932605f4a7f4429f401b4bb4",
+    "tests/test_answer_quality_runner.py": "35e969b139c10d4e082cebc8b24dd4e4ccaebdf55bfb55a10798563eccea2408",
+    "tests/test_answer_quality_gate.py": "9d8da1fc337906f707e029dbc502f7840561b40a94d99b7e10df8c0c1144fb1d",
+    "tests/test_dictionary_exit_admission.py": "298aa5749e9976a2914c77f56da36ba359e2e54875569457b1f758503b304e88",
+    "tests/test_dictionary_exit_patch_boundary.py": "84821f93282d1b3088ec299c1e80f6f5525d0cfe7005b99c01310088762fca6e",
+    "tests/test_dictionary_exit_read_routing.py": "ee486c8b261c0d2cd7845cc90d8c4e7a714ed4545947996114901539f006b597",
+    "tests/test_patch_review_command_part02.py": "d5b67fcf03c53ffac458228389c6eddc4c0d68301ddef65e085f687256a81a5f",
+    "tests/test_source_search_edit_readiness.py": "12f8e73f94f3fab20ec0619377fead38d3c121cdad972ecbc78cb0f2af177030",
+    "tests/test_patch_review_command_part03.py": "43adac64a6313a6a9c441b4ec6b3c32d45234ec7bc1bb33cd5b326fd7ddb994d",
+    "tests/test_library_natural_language_retrieval.py": "9788d48693cbf43139a867078e1cc2bb7dd1edd5928657b9894c812913f5958e",
+    "tests/test_action_packet_v4_projection_split.py": "089aa445355024323a2e525a59f9d391689f95c61afc589dd1e41cff98b6a6b1",
+    "tests/test_patch_constraint_validation_service.py": "d69404b8a5ccbdd28f9288cea498505923442451d21c647b48fab01a0ae066e8",
+    "tests/test_action_packet_v4_eval.py": "1bb5597c0cfa6a87b1ed1bcaee1ff50498f3fc25b709b1a5cbec2010d551fb6d",
+    "tests/test_sqlite_phrase_ranking.py": "5a632f749bed6d7f79988b972f17ccfe93400bc104f4e3334fa0a08270781d36",
+    "tests/test_patch_review_command_part04.py": "5314bc4b212bb71ec0f5b536616a1783ab638354b290e2ae9d2da51a15c8ac6c",
+    "tests/evidence_quality_v2/test_condition_lead.py": "a6fe2bc492b14ab407328fa22a22b956f776c1caa1a5cc372a58ccf8fd8f7efc",
+    "tests/docs/test_generic_context_workflows.py": "1251aeceff02802aed8d4c3d337ca9e6527ade539693291ed79584fe2b771a3e",
+    "tests/docs/test_self_host_agent_contract_surface.py": "ac0774bf81fe45c51fc732b7c861a8f47e262929b8ef249621688e2ed8966433",
+    "tests/docs/test_query_planning_budget_regressions.py": "fa1360955f9cc981f0439f5479d59de53f5984509ca7834920dad47f050c5e12",
+    "tests/docs/test_document_local_rescue.py": "f0ff7a84ae06aab423ecea29f774cb844e13635c1018b240273476491b3ffab5",
+    "tests/docs/test_project_state.py": "6f3826cc68605a736cec62f51ef2a453eabf36dc47599ea3293187c276ed59ee",
+    "tests/docs/test_docs_lossless_remaining_caps.py": "78d2dd9333668d6f3ff823972b4092c65994a0251ab5f2bb77fbacf4eb15f25c",
+    "tests/docs/test_source_recovery_targeting.py": "882ae0adecb97190654d35eafd5573c2fd02dc388b6ab5c40f8d317ffc37e231",
+    "tests/docs/test_retrieval_alias_subject_binding.py": "08a50d4ee34f2c8555e4e1628779735540bac41ea65e818517e475afcfaf60ef",
+    "tests/docs/test_mixed_script_recovery.py": "129d333e48e9345c5794424f1fc8072d37c1bf33874915deed1c4f1f30c698bc",
+    "tests/docs/test_agent_index_gateway.py": "61a88519b3f3376b830d6bc4565fb37216e1fcd1d77de15da8d0162604dcab45",
+    "tests/docs/test_project_docs_catalog.py": "33a7e67260e93e1996950386413ecaf78e000ab6819bfc54244301b07cd25d38",
+    "tests/docs/test_project_docs_service.py": "d99ccc72a9b92a55e87d9e0b90b43d9de601affd41408202cff8e9196ab7c78c",
+    "tests/docs/test_mcp_boundary.py": "0ac405890163806d7192343ef45028b81c455d7e795c400dd13e13905f0aadcf",
+    "tests/docs/test_java_project.py": "4a06560e8ee637a9187ce3d68adcc48e471c32691f1995b122d47cf0ad74582c",
+    "tests/docs/test_go_project.py": "7cc775fb79ffa090c9aafaf37627fa3585e614487f8baac8a82c6b7d4aa73e9f",
+    "tests/docs/test_curated_sources.py": "65e5aa448b9f1595d5e14aebd5deedbbbcd92ab01c7b2ef80391d5dd67de0860",
+    "tests/task_level/test_one_call_agent_loop.py": "028532df98707f964aea3c5624a3332124c96cdd8a92fc4416751c9129fe26cd",
+    "tests/task_level/test_task33_semantic_density.py": "734bca2230d5cf081ed76d3da437d7d52ba3aa70d66182bf0dd2daaf5fb912b8",
+    "tests/task_level/test_actionability_projection.py": "d8ede9566b0bcf75ce9804e5dd4b3c91387cf9127967937c338f3ff0862f718f",
+    "tests/task_level/test_policy_isolation.py": "86156d7338eeef3e9837b79783664c497c75b0b2a19235c22ea37fbd9ed35015"
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.action_packet_v4_delivery_b.json": {
+      "tests/test_action_packet_v4_projection_split.py": "7f84b553eed88a3da919a8bc528275ccbb22cfc71cce356f673a9ee947dccc77"
+    },
+    "tests/diagnostic_labels.action_packet_v4_eval.json": {
+      "tests/test_action_packet_v4_eval.py": "713dbf7f0683781867a8bd82edb2dff9bd5120340ca65c05573e0555cb492123"
+    },
+    "tests/diagnostic_labels.condition_lead.json": {
+      "tests/evidence_quality_v2/test_condition_lead.py": "3e0e9750982da629803685226d29936d72690d49a199287c760a27d977781923"
+    },
+    "tests/diagnostic_labels.dictionary_exit_patch_boundary.json": {
+      "tests/test_dictionary_exit_patch_boundary.py": "485e9b27bf90da38dc4302c3c323cfb60903873165d1570df10f6e385753393b"
+    },
+    "tests/diagnostic_labels.dictionary_exit_read_routing.json": {
+      "tests/test_dictionary_exit_read_routing.py": "53ddf139dbfc316567bf83c1f333ea8104569138d9439d07f11d03a3c6e6ec8c"
+    },
+    "tests/diagnostic_labels.docs_lossless_remaining_caps.json": {
+      "tests/docs/test_docs_lossless_remaining_caps.py": "cf25cb762bacf8f5e6538a8cfdc2b85c2e9bb2c8f01b78e895cdf610e56a51a2"
+    },
+    "tests/diagnostic_labels.document_local_rescue.json": {
+      "tests/docs/test_document_local_rescue.py": "6369bd4a647c562cc15ebf543645b16ba956ba48620acda431672c1e9b44b22e"
+    },
+    "tests/diagnostic_labels.generic_context_workflows.json": {
+      "tests/docs/test_generic_context_workflows.py": "85f1b0c4b77efaab1d9e7a2f1f4f11ef324576776b97f2bdfc75cf755c0fefef"
+    },
+    "tests/diagnostic_labels.json": {
+      "tests/docs/test_agent_index_gateway.py": "a299c31f5a063f36d2a31792a60ed951b957eef611e6937580a0ba9fade27678",
+      "tests/docs/test_curated_sources.py": "75a1908816033607be72699ae9b13f48ccc68d130aa50601031213ca369e0037",
+      "tests/docs/test_go_project.py": "2cc0c9e3b75ded970f593ddbae5a15aec452ff733a7ed75f48adb4b849252486",
+      "tests/docs/test_java_project.py": "aec66d3cae21722ba49c48423681a84077e4039185b15fe73c9cfa6b2e7dbffe",
+      "tests/docs/test_mcp_boundary.py": "e9ce809dd0c96619496e7ea379f7cb40b73c3cc6462ac5f95ec084fa45013ee4",
+      "tests/docs/test_project_docs_catalog.py": "a5f0bc9ff55a0a366548f3c8e9527ec6aae796ab984f977e7d5ec7ad87bc988b",
+      "tests/docs/test_project_docs_service.py": "42b5bd6aa47d5454938f029191597b89a3b6114071b7eb35996c3627f5e0c593",
+      "tests/docs/test_project_state.py": "af7dbbea67c10b74968020548b12b6273a56bad3db05d21a520f3ff26cdf5aef",
+      "tests/task_level/test_one_call_agent_loop.py": "e69180b45d7cfc80dbadc1d8d8cf4206d9b6a94b3ce4a3f8c5e4156a9919e57d",
+      "tests/task_level/test_policy_isolation.py": "3299b72f6db6cc59278e8feed0040b8db8a3e15cb925a16d1ab35701d2305d6b",
+      "tests/test_answer_quality_gate.py": "4af20c12e3ed28911796c7cd38beefba62cbd563480f367d31dbe036b853d077",
+      "tests/test_answer_quality_runner.py": "045880288c51827c09ca88232f1f9d335a25fc33202cec0230a7c96518d97a68",
+      "tests/test_library_natural_language_retrieval.py": "07239f9db22dbd6d994c0a7ba605e20a6f244e05739fe5a067f082f1df133226",
+      "tests/test_live_benchmark_unified_dependency.py": "19da72bb28b707c1f13af4a78fac3094596f7fe8c3da96436c6cbf164b4371fd",
+      "tests/test_patch_constraint_validation_service.py": "7ba8e1ad4aab93d7e207dfa9f96d1759ee2eeea79d4883fc18266dfa35c70470",
+      "tests/test_patch_review_command_part02.py": "41c86702de4486999a038dd7cd46889cc4ab999092e06d15b49cb4235b861e22",
+      "tests/test_patch_review_command_part03.py": "0a5c628f6cadf0a784349f63439602dc7cfbae7c468a1d86cd50086e4d3bd688",
+      "tests/test_patch_review_command_part04.py": "6dd37f8d6cfcc3e6d122c85941ade68c704e528aa0806100e06a9d039f79a01b",
+      "tests/test_source_search_edit_readiness.py": "899fefcd8a959986913fbc0a44d2c9ca8196c871d3760ef8c6944ba28486f435",
+      "tests/docs/test_project_docs_service.py::test_project_docs_candidate_has_stable_serializable_shape_and_freshness": "REMOVE_RETIRED_OVERRIDE"
+    },
+    "tests/diagnostic_labels.query_planning.json": {
+      "tests/docs/test_query_planning_budget_regressions.py#module_labels": "REMOVE_ABSENT_MODULE",
+      "tests/docs/test_query_planning_budget_regressions.py#module_node_hashes": "REMOVE_ABSENT_MODULE"
+    },
+    "tests/diagnostic_labels.retrieval_recheck.json": {
+      "tests/docs/test_retrieval_alias_subject_binding.py": "fcd24f74201dce9d941cbaaecb6a631ca16db5b1055da574cbf1b988d3692118"
+    },
+    "tests/diagnostic_labels.script_recovery.json": {
+      "tests/docs/test_mixed_script_recovery.py": "b36a7752620a403ae13eb9046b94d46723ee54bee72914c645b77fa571ad9df3"
+    },
+    "tests/diagnostic_labels.self_host_agent_contract_surface.json": {
+      "tests/docs/test_self_host_agent_contract_surface.py": "0b42fade94d2bdb1ae7f20059458525e96bd650d4b3fdb332f2f7d9a23fa1f14"
+    },
+    "tests/diagnostic_labels.semantic_density.json": {
+      "tests/task_level/test_actionability_projection.py": "f857c9faee57f2c072b78b671c99e8c0e017f105184e71f54d9d15221ac10fbc",
+      "tests/task_level/test_task33_semantic_density.py#module_labels": "REMOVE_ABSENT_MODULE",
+      "tests/task_level/test_task33_semantic_density.py#module_node_hashes": "REMOVE_ABSENT_MODULE"
+    },
+    "tests/diagnostic_labels.source_recovery_targeting.json": {
+      "tests/docs/test_source_recovery_targeting.py": "aced3e682a928b7ddf6f42a9d68a12c8e5974b42520817d5eca0c069ea29e70e"
+    }
+  },
+  "deferred_paths": {},
+  "remaining": {
+    "remaining_classified_unit_ids": {
+      "count": 1,
+      "ids_sha256": "5653c434621e2c3c4e94a0597052ca8fadc3f57158d4186ed6c3a817809205c6",
+      "boundary": "Author saved-candidate inventory, not final runtime collection; parameter rows may already be absent in source.",
+      "ids": [
+        "tests/docs/test_generic_context_workflows.py::test_contrast_connector_does_not_fill_candidate_window"
+      ]
+    },
+    "remaining_ambiguous_ids": {
+      "count": 12,
+      "ids_sha256": "0f265c015e4f662f444d63875df90eee4e76833fc0628794316e7fbc6553704c",
+      "boundary": "Author saved-candidate inventory, not final runtime collection; parameter rows may already be absent in source.",
+      "ids": [
+        "tests/docs/test_docs_impact_task20_part02.py::test_labeled_30_change_corpus_meets_precision_and_recall_gate",
+        "tests/docs/test_evidence_selection_v2.py::test_permission_frames_select_and_project_decisive_local_evidence",
+        "tests/docs/test_patch_plan_context.py::test_patch_plan_context_graph_failure_falls_back_to_existing_discovery",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_does_not_preserve_ineligible_source[freshness]",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_does_not_preserve_ineligible_source[lifecycle]",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_does_not_preserve_ineligible_source[project]",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_does_not_preserve_ineligible_source[risk]",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_does_not_preserve_ineligible_source[stale]",
+        "tests/docs/test_unresolved_context_prefit.py::test_prefit_recomputes_body_support_without_qualifying_answer",
+        "tests/docs/test_visible_support_units.py::test_native_inventory_keeps_repeated_body_with_distinct_conditions_as_composites",
+        "tests/test_retrieval_features.py::test_api_term_matches_are_appended_from_lexical_search",
+        "tests/test_web_fetcher.py::test_github_blob_raw_fetch_keeps_canonical_docset_root"
+      ]
+    },
+    "remaining_unreviewed_or_not_independently_classified_ids": {
+      "count": 213,
+      "ids_sha256": "540eaae7c6848a633b7799058f8feadd0c0d798bef09c3f1a498cb079b7b9166",
+      "boundary": "Author saved-candidate inventory, not final runtime collection; parameter rows may already be absent in source."
+    },
+    "retained_prior_integration_ids": {
+      "count": 273,
+      "ids_sha256": "17cd8d7e2e1d65a5dc803ded7e3ce84f130edc817f3544af6a9a268620dc11a3",
+      "boundary": "Author saved-candidate inventory, not final runtime collection; parameter rows may already be absent in source."
+    }
+  },
+  "completion_limit": "Partial broad sweep, not exhaustive retirement. 173 saved-FAIL cases retired across 36 files. Remaining candidate identities are listed; prior integration/ambiguity classifications reused only where exact IDs match. Parameterized remaining candidates may include already absent rows: no runtime collection or generic parameter reconstruction performed. One read/classified unit remains unapplied. No claim that all remaining units were removed.",
+  "author_validation": {
+    "tokenize": "PASS",
+    "surviving_function_and_helper_bodies": "unchanged; trailing whitespace ignored",
+    "only_expected_deletion_and_literal_parameter_edits": "PASS token comparison",
+    "whole_function_saved_xml_outcomes": "all FAIL",
+    "partial_rows_saved_xml_outcomes": "all removed rows FAIL; green literal rows preserved",
+    "consumer_references_to_removed_functions": [],
+    "scoped_git_diff_check": "PASS",
+    "runtime": "not run",
+    "production_shared_fixtures_registries_ledgers": "not edited"
+  },
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "evidence_hashes": {
+      "/tmp/opencode/pr211-ci-a4844dfc/pytest-advanced-3.12-38033112465-1/advanced-contract.xml": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+      "/tmp/opencode/pr211-ci-a4844dfc/pytest-core-3.11-38033112465-1/core-tests-3.11.xml": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238"
+    },
+    "boundary": "Saved core3.11 and advanced3.12, pre-retirement; no final runtime/collection. Current matching source SHA plus normalized BASE minus all integrated removals determine registry hashes. Owner accepts protective coverage loss; removal is not product fix/PASS. No runtime/AST/project imports/CI."
+  },
+  "validation": {
+    "partition": 8291,
+    "overlap_previous": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0,
+    "removed": 1201,
+    "added": 1,
+    "net": 1200,
+    "projected_after": 7091,
+    "target_gap": 2117,
+    "classified": 1729,
+    "unclassified": 6562
+  },
+  "prior_manifest_sha256": "c8ce11449da3306b65e6f34367f8d6536352b957e3cce3253cee131ae785470a",
+  "pending": "No current test writers. Partial sweep: no claim all red tests/units removed; remaining candidate inventories not collection certification. Final collection/CI pending."
+}

@@ -48,21 +48,3 @@ def test_requested_condition_wins_over_opposite_configuration_example(tmp_path):
     assert "RuleSwitch has no effect" in text
 
 
-def test_three_short_requested_sources_beat_long_topical_paragraph(tmp_path):
-    docs = {
-        "a.md": "# RelayClient\n\nThe default timeout is 11 seconds.\n",
-        "b.md": "# RelayClient\n\nThe exception raised after expiration is `RelayExpired`.\n",
-        "c.md": "# RelayClient\n\nThe required retry count is 3.\n",
-        "noise.md": "# RelayClient overview\n\n" + (
-            "RelayClient timeout exception retries requests behavior configuration overview. " * 12
-        ) + "\n",
-    }
-    capture = capture_fixture(
-        tmp_path, docs,
-        "What is RelayClient default timeout, which exception is raised, "
-        "and which retry count is required?",
-    )
-    text = visible(capture)
-    assert "11 seconds" in text
-    assert "RelayExpired" in text
-    assert "retry count is 3" in text

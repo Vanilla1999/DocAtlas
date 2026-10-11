@@ -1,0 +1,321 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "amfinal125": {
+      "packet": "/tmp/opencode/pr211-green-root-am-final.json",
+      "sha256": "6c98ed739c20e24b7c6b9ac29b270b79222cbb143ef5c36dfb93894dc25d5d68",
+      "removed": 125,
+      "BASE_status": {
+        "PASS": 125
+      },
+      "saved_CI_status": {
+        "PASS": 125
+      },
+      "final_source_hashes": {
+        "tests/test_action_packet_v4_contract.py": "3ec9a789bfdb5b44f5f68ca8cb8b76942b97b330a00d4dbf34eb00cb6d31ff77",
+        "tests/test_action_packet_v4_delivery_consumers.py": "741fb8ad4c440e770b402bc7b0922324368ee77e420ecffd72d23aee9ae86f62",
+        "tests/test_action_packet_v4_eval.py": "d4428d9ef9518c50ff75584a69a84a4ef2d86dc26f7ef8f3eecb25872a9d79a2",
+        "tests/test_action_packet_v4_found_window_retention.py": "c328f8449e59c0cf385d35e99c10207d26a0e502034c0ef82a9df8f6a3e0e07d",
+        "tests/test_action_packet_v4_integrated.py": "19d973973e5fd053f46a77451c1fc3b65f1ae6b2cc92abe156c7cf9e9966b85e",
+        "tests/test_action_packet_v4_public.py": "8cfad14601a521bc9fbd78f7a1bcd33f6ad02d408180feaf478f9a8ffa45d3be",
+        "tests/test_action_packet_v4_wire_version.py": "ccfba65ba2d9773f270d7d0a7f08a529ad1ebcfdb0b3f05026d8518ba7a78f88",
+        "tests/test_action_packet_v4_workflow_surface.py": "cd8808665f829d57834e43ac7e375e2414f8714fcc42e4c2bfc3b0e248022d70",
+        "tests/test_dictionary_exit_delivered_surfaces.py": "1a63e0b3beb7d1a276c478ce0892f62bf7a7272cf84120cff176cc7f4ad6f8a4",
+        "tests/test_dictionary_exit_finite_corrections.py": "ce14a1d31f4a8fa3e1e199bb9338af2ed6313201db827592e98e2749e79d6a3a",
+        "tests/test_dictionary_exit_inert_security.py": "e1a69a3e09ca3f1afc17beac69fa49c7e25b34e48a26cb69b1c4e91099866041",
+        "tests/test_dictionary_exit_local_callers.py": "02afad68cadded283ea9ac698f7cefcec336d72bc9874c25ad55446e0a452c0b",
+        "tests/test_dictionary_exit_local_residuals.py": "053091a81a41cad59c73c6dd37e5524e7f7478adfc9bc43724ab26f5d90630e4",
+        "tests/test_dictionary_exit_patch_validation.py": "70a617376e2cc24b2fdb188608ee71d990e27a048f14f3d61f786687074086be",
+        "tests/test_dictionary_exit_projection.py": "cc488567a41f19899cc7ef34306fefd36a75cad325dd7612d59a349142764a6a",
+        "tests/test_dictionary_exit_public_request.py": "052b69cce727684b6416447742aa283c0955aa424f060c445faf52a4c175988b",
+        "tests/test_dictionary_exit_read_packet_residuals.py": "c956343cb10c2d12f1b0ea65095ae404bbcc92a4f8a24291749935d6ae98a7cb",
+        "tests/test_dictionary_exit_review_boundaries.py": "aa8ebf127328c44442f1736ce1be3dab3f8e67c7cd94ddd691b33b3457eacaa7",
+        "tests/test_docs_service_part08.py": "b552bf2306b3dbd4538d55e373e14804f4368c95c93ae354d0deaa353eaba837",
+        "tests/test_fetcher_gitbook.py": "2335499a36d7441bac460bc1f826edab5e85ad92ec16174e3814aa8c535f53b3",
+        "tests/test_fetcher_mintlify.py": "5e7eec7f3f06e18d6472d6bf7b3f43f84c865e88cafb81b99245fb45ed90e64b",
+        "tests/test_mcp_delivery_member_transaction.py": "8138d6401180d70c94dcec077b2961ff0309510f90501d46b211f53826659d82",
+        "tests/test_mcp_idempotency.py": "310e84f52dbf982b1bcfc1081c7dd0eab06103045bd7ccf4b0fd2ce401418576",
+        "tests/test_mcp_dispatcher.py": "6719ab20c9a83e3fae227d420a2332da4671ea31bc70be8046c1097d0b4e7535",
+        "tests/test_installed_mcp_bootstrap_contract.py": "57628813a733bdb9a649ae59c2334ec8110fc5c4c6d70c0c30481f7317d392fa"
+      }
+    }
+  },
+  "removed": 125,
+  "added": 0,
+  "prior_manifest_sha256": "72c888746412bcea6ff8ad55edeed667b6120264aa2b82a72d7f0593322782e7",
+  "integrated_manifest_sha256": "da8730bb1f7c05a0c92d729bde9434fbc803276fbf7bf41c477ec555c171d2b4",
+  "deferred_source_paths": {},
+  "remaining": {
+    "amfinal125": {
+      "author_counts": {
+        "owned_candidate_definitions": 623,
+        "owned_saved_PASS_ids": 1287,
+        "new_retired_PASS_ids": 125,
+        "removed_definitions": 68,
+        "changed_files": 25,
+        "retained_integration_definitions": 555,
+        "retained_integration_PASS_ids": 1162,
+        "remaining_genuine_ambiguity_definitions": 0,
+        "remaining_genuine_ambiguity_PASS_ids": 0,
+        "remaining_confirmed_unit_definitions": 0,
+        "remaining_confirmed_unit_PASS_ids": 0,
+        "UNREVIEWED_definitions": 0,
+        "UNREVIEWED_PASS_ids": 0,
+        "helpers_checked_unchanged": 87,
+        "added_tests": 0,
+        "removed_SKIP_ids": 0
+      },
+      "limit": "All 623 owned remaining candidate definitions classified by body/shared fixture/component boundary; all confirmed units retired. Not a global repository inventory or runtime result."
+    }
+  },
+  "source_observed_at_preparation": {
+    "tests/test_action_packet_v4_contract.py": "3ec9a789bfdb5b44f5f68ca8cb8b76942b97b330a00d4dbf34eb00cb6d31ff77",
+    "tests/test_action_packet_v4_delivery_consumers.py": "741fb8ad4c440e770b402bc7b0922324368ee77e420ecffd72d23aee9ae86f62",
+    "tests/test_action_packet_v4_eval.py": "d4428d9ef9518c50ff75584a69a84a4ef2d86dc26f7ef8f3eecb25872a9d79a2",
+    "tests/test_action_packet_v4_found_window_retention.py": "c328f8449e59c0cf385d35e99c10207d26a0e502034c0ef82a9df8f6a3e0e07d",
+    "tests/test_action_packet_v4_integrated.py": "19d973973e5fd053f46a77451c1fc3b65f1ae6b2cc92abe156c7cf9e9966b85e",
+    "tests/test_action_packet_v4_public.py": "8cfad14601a521bc9fbd78f7a1bcd33f6ad02d408180feaf478f9a8ffa45d3be",
+    "tests/test_action_packet_v4_wire_version.py": "ccfba65ba2d9773f270d7d0a7f08a529ad1ebcfdb0b3f05026d8518ba7a78f88",
+    "tests/test_action_packet_v4_workflow_surface.py": "cd8808665f829d57834e43ac7e375e2414f8714fcc42e4c2bfc3b0e248022d70",
+    "tests/test_dictionary_exit_delivered_surfaces.py": "1a63e0b3beb7d1a276c478ce0892f62bf7a7272cf84120cff176cc7f4ad6f8a4",
+    "tests/test_dictionary_exit_finite_corrections.py": "ce14a1d31f4a8fa3e1e199bb9338af2ed6313201db827592e98e2749e79d6a3a",
+    "tests/test_dictionary_exit_inert_security.py": "e1a69a3e09ca3f1afc17beac69fa49c7e25b34e48a26cb69b1c4e91099866041",
+    "tests/test_dictionary_exit_local_callers.py": "02afad68cadded283ea9ac698f7cefcec336d72bc9874c25ad55446e0a452c0b",
+    "tests/test_dictionary_exit_local_residuals.py": "053091a81a41cad59c73c6dd37e5524e7f7478adfc9bc43724ab26f5d90630e4",
+    "tests/test_dictionary_exit_patch_validation.py": "70a617376e2cc24b2fdb188608ee71d990e27a048f14f3d61f786687074086be",
+    "tests/test_dictionary_exit_projection.py": "cc488567a41f19899cc7ef34306fefd36a75cad325dd7612d59a349142764a6a",
+    "tests/test_dictionary_exit_public_request.py": "052b69cce727684b6416447742aa283c0955aa424f060c445faf52a4c175988b",
+    "tests/test_dictionary_exit_read_packet_residuals.py": "c956343cb10c2d12f1b0ea65095ae404bbcc92a4f8a24291749935d6ae98a7cb",
+    "tests/test_dictionary_exit_review_boundaries.py": "aa8ebf127328c44442f1736ce1be3dab3f8e67c7cd94ddd691b33b3457eacaa7",
+    "tests/test_docs_service_part08.py": "b552bf2306b3dbd4538d55e373e14804f4368c95c93ae354d0deaa353eaba837",
+    "tests/test_fetcher_gitbook.py": "2335499a36d7441bac460bc1f826edab5e85ad92ec16174e3814aa8c535f53b3",
+    "tests/test_fetcher_mintlify.py": "5e7eec7f3f06e18d6472d6bf7b3f43f84c865e88cafb81b99245fb45ed90e64b",
+    "tests/test_mcp_delivery_member_transaction.py": "8138d6401180d70c94dcec077b2961ff0309510f90501d46b211f53826659d82",
+    "tests/test_mcp_idempotency.py": "310e84f52dbf982b1bcfc1081c7dd0eab06103045bd7ccf4b0fd2ce401418576",
+    "tests/test_mcp_dispatcher.py": "6719ab20c9a83e3fae227d420a2332da4671ea31bc70be8046c1097d0b4e7535",
+    "tests/test_installed_mcp_bootstrap_contract.py": "57628813a733bdb9a649ae59c2334ec8110fc5c4c6d70c0c30481f7317d392fa"
+  },
+  "helper_labels_preserved": [
+    "tests/test_action_packet_v4_contract.py",
+    "tests/test_action_packet_v4_workflow_surface.py",
+    "tests/test_dictionary_exit_delivered_surfaces.py"
+  ],
+  "registry_actions": {
+    "HASH": 25,
+    "REMOVE_RETIRED_OVERRIDE": 1
+  },
+  "registry_files": 20,
+  "validation": {
+    "partition": 8291,
+    "removed": 6565,
+    "added": 1,
+    "net": 6564,
+    "projected_after": 1727,
+    "target_gap": 0,
+    "reduction_percent": 79.17018453745025,
+    "classified": 6638,
+    "unclassified": 1653,
+    "overlap": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0
+  },
+  "limits": "Onlymetadata/registries changed by integrator via patchtool. No tests/production/workflow/fixtures edits; no runtime/AST/projectimports/pytest/install/CI/commit/push/nestedagents. ReviewedPASS units complete only within owned frozen scopes;3ambiguousPASS and10BASESKIP preserved. Roster historical unclassified1653 is not updated to infer modern reviewclasses. Dynamicimports, runtimeclass/paramcollection, newerrors and productquality unproven. Missing explicit workflowselectors and13criticalkillers are blockers, not silently disabled.",
+  "registry_final_sha256": {
+    "tests/diagnostic_labels.action_packet_v4_a.json": "d3b1eb74c3d6c26359c81d4845da99294e2ddbf7b3361900fa4c58d9e9add848",
+    "tests/diagnostic_labels.action_packet_v4_c.json": "16342fe4d4d8f67fa82979b5ad15b3a0fa0ddec314ae4c0d64ce479c86263f19",
+    "tests/diagnostic_labels.action_packet_v4_delivery_b.json": "78af7259af584e7ea2c0f1af9ac8538a02680448786b8a85fe648bfe2ad2cd85",
+    "tests/diagnostic_labels.action_packet_v4_eval.json": "454a56e438d9d774c3880720bdf70e9bfef0fe0d323420601825a5ab3ca5d709",
+    "tests/diagnostic_labels.action_packet_v4_found_window_retention.json": "7f63f82803b51188456c1863c32c725f2634535ce430d2cb9b2b713aee8a9231",
+    "tests/diagnostic_labels.action_packet_v4_integrated.json": "ce88f0938a057eaddebe959096d8b1cfe65a46c9b87f91da72d393514fb26410",
+    "tests/diagnostic_labels.action_packet_v4_wire_version.json": "1f0268a40dc0757e28a8c0cfb26dea7900a7111a885b210f33701cab1caaf6d5",
+    "tests/diagnostic_labels.dictionary_exit_delivered_surfaces.json": "bdd79b84b261f2a4bab4f589f281da2203cc216a2f3b0bcbe7c94c525c241f3d",
+    "tests/diagnostic_labels.dictionary_exit_finite_corrections.json": "8bb263d351b19f012b630ba166afd94985ff562b8d32d699a7018a3af808f9d7",
+    "tests/diagnostic_labels.dictionary_exit_inert_security.json": "0cad0706964eaf4873054c5c60490e44a03d9e92ad7218376d7bb6388294a029",
+    "tests/diagnostic_labels.dictionary_exit_local_callers.json": "8d441e33d29a84362d89dda5d3bc67402f98c799bbce80c1deab67a26922d7bd",
+    "tests/diagnostic_labels.dictionary_exit_local_residuals.json": "7db5cdc2fb9ba86e65d81dc43c41db1c82b3ed882d58ac836e5449a6c65bdaaf",
+    "tests/diagnostic_labels.dictionary_exit_patch_validation.json": "9774938c47a91631ece7e8ab434c2bd17f5e9fda17fcdd5a139611f451321c1e",
+    "tests/diagnostic_labels.dictionary_exit_projection.json": "80999618bbe90aeec56f99cddc860808498a45c4de9c7c19af2931905bc53380",
+    "tests/diagnostic_labels.dictionary_exit_public_request.json": "2f256b1a0ca35c4424df75e049c0fb32021b561881f371a29cb1c21326339846",
+    "tests/diagnostic_labels.dictionary_exit_review_boundaries.json": "b0e65da1da64f5abd361f32ee49d4c552a198a11bc4fd3e71819091501bad487",
+    "tests/diagnostic_labels.installed_mcp_bootstrap_contract.json": "6f463a77428bf78c5c6963c14e8359abb1abc1851e7f66043b20611b18ca096f",
+    "tests/diagnostic_labels.json": "1114e6758937de1a27a8b2db0ca0189a8296ab78c1a28f3f91cba81d070e6323",
+    "tests/diagnostic_labels.mcp_delivery_member_transaction.json": "321423b94f07dfb4548557d4a6c50978ec714e9fc2819ae553038123b40c8a20",
+    "tests/diagnostic_labels.read_packet_residuals.json": "c6f66b5ff9fe61e0f4b44cdfc2a0fc25df5800483e5c3a84393901bfd95c1b77"
+  },
+  "exact_ids_binding": "Manifest green-followup::retired-amfinal125 exactly equals authoritative NEWPASSBASE_retiredIDs/retired_ids:125 unique BASE/savedPASS, no overlap with6440prior. No new addition credit.",
+  "classified_module_source_hashes": {
+    "tests/test_action_packet_v4_contract.py": "3ec9a789bfdb5b44f5f68ca8cb8b76942b97b330a00d4dbf34eb00cb6d31ff77",
+    "tests/test_action_packet_v4_delivery_consumers.py": "741fb8ad4c440e770b402bc7b0922324368ee77e420ecffd72d23aee9ae86f62",
+    "tests/test_action_packet_v4_eval.py": "d4428d9ef9518c50ff75584a69a84a4ef2d86dc26f7ef8f3eecb25872a9d79a2",
+    "tests/test_action_packet_v4_found_window_retention.py": "c328f8449e59c0cf385d35e99c10207d26a0e502034c0ef82a9df8f6a3e0e07d",
+    "tests/test_action_packet_v4_integrated.py": "19d973973e5fd053f46a77451c1fc3b65f1ae6b2cc92abe156c7cf9e9966b85e",
+    "tests/test_action_packet_v4_projection_split.py": "74dbb8fd33ff215cc675a66ebb5f0ad0bc691a6e3d1972304c27d8c9b1b266fa",
+    "tests/test_action_packet_v4_public.py": "8cfad14601a521bc9fbd78f7a1bcd33f6ad02d408180feaf478f9a8ffa45d3be",
+    "tests/test_action_packet_v4_wire_version.py": "ccfba65ba2d9773f270d7d0a7f08a529ad1ebcfdb0b3f05026d8518ba7a78f88",
+    "tests/test_action_packet_v4_workflow_surface.py": "cd8808665f829d57834e43ac7e375e2414f8714fcc42e4c2bfc3b0e248022d70",
+    "tests/test_active_fts_projection.py": "6ada68fd19c2010a56dd19b31b9999420962126a6f5b2df79931e3a45c1a1325",
+    "tests/test_agent.py": "52c589b833a517961dc2deab22b3b0f4bc5b2b7c75f619f346cf4ea1867ceae3",
+    "tests/test_async_agent.py": "dee8e147eb9a2032f7a78455562fd431714d3acb2e2cccb191ca34139589ff39",
+    "tests/test_cli.py": "26764e8de4896414b3b32b13c58c0e0667eaa73a841264d90dffbc8ed04ed9ad",
+    "tests/test_client.py": "b0eef34f4c365ddcfe2a26612cc8e249bfc10296db3fc98da638110af7a90110",
+    "tests/test_compact_installed_skill.py": "3aeacdb25b4fc7ce3065132e6065133a1a4b9e80f7d9b6514ec865d3bad25ff2",
+    "tests/test_config_resolution.py": "cafd6c663d7ce28288e8ebdd522a0cb657d33e784ed4f9ba5a694632250503bd",
+    "tests/test_contextual_indexing.py": "880983de371271d5636f607cc268af95455fa07f3b8c5b8bbc19a9dc6fc5c01a",
+    "tests/test_core34fc_static_guidance_no_access.py": "2d654497b5f2cbf3e0626a07a033330a36044655609f05f4243b7348e77e3082",
+    "tests/test_cross_index_retrieval_mvp.py": "0dbda919c5414e3ef89d297bb76087d84809648b8e133cdfee3ee343faad11c0",
+    "tests/test_dart_service_integration.py": "1abbae0624b2a3954faf5173c5be90c3c9a9708c9eb257260882c109ef3a285f",
+    "tests/test_diagnostic_labels.py": "d88ca315c7569147d6526a88b066ec55bfd2d398281adf1ec81384918f5216cc",
+    "tests/test_dictionary_exit_delivered_surfaces.py": "1a63e0b3beb7d1a276c478ce0892f62bf7a7272cf84120cff176cc7f4ad6f8a4",
+    "tests/test_dictionary_exit_discovery_literals.py": "6e5e8425886f6f8d4d1deeb8b450b9f3102fa36d529f920e5a223979583f846e",
+    "tests/test_dictionary_exit_finite_callers.py": "ed6cecbae8dac69d976a4db7a8833bc5a0f6095686d1421a28651a6d2bcf33b4",
+    "tests/test_dictionary_exit_finite_corpus.py": "0fd25364c6090b60683f0f3c694558113256e6a423a8425fbe6c33b3fafd2644",
+    "tests/test_dictionary_exit_finite_corrections.py": "ce14a1d31f4a8fa3e1e199bb9338af2ed6313201db827592e98e2749e79d6a3a",
+    "tests/test_dictionary_exit_indexed_mcp.py": "030cf127dcbba98a2de1a0e4a796c962b8253c15d1b760eec78cfe1f5a161a9b",
+    "tests/test_dictionary_exit_inert_security.py": "e1a69a3e09ca3f1afc17beac69fa49c7e25b34e48a26cb69b1c4e91099866041",
+    "tests/test_dictionary_exit_literal_needs_mcp.py": "281dc8a5c3b3bea5ea002d6c2d9b3f653a9b322ffc38729def18b1a47db5da32",
+    "tests/test_dictionary_exit_local_callers.py": "02afad68cadded283ea9ac698f7cefcec336d72bc9874c25ad55446e0a452c0b",
+    "tests/test_dictionary_exit_local_entry_closure.py": "2c3192b4a69f4b3bd618fcb89efb527d2d56bf93c76a81a3692009223fd9f7be",
+    "tests/test_dictionary_exit_local_membership.py": "ed8c6c3421d06793799a3b134226cc5c8e5ad1e324df2614e8379629013d4a58",
+    "tests/test_dictionary_exit_local_residuals.py": "053091a81a41cad59c73c6dd37e5524e7f7478adfc9bc43724ab26f5d90630e4",
+    "tests/test_dictionary_exit_packs_safety.py": "90f4303e828921a82caf3691222587d6c987c00d9988dd92b260deaf57bcec60",
+    "tests/test_dictionary_exit_patch_boundary.py": "6cb8ba964a51bd777f3cac2b63ced7a20913794e0797163f9d7c62cba3e2cec5",
+    "tests/test_dictionary_exit_patch_literals.py": "757c7ecd57c3e57f9c6e38387716547c0a476baf75b53fa45482fe2922b75d8b",
+    "tests/test_dictionary_exit_patch_validation.py": "70a617376e2cc24b2fdb188608ee71d990e27a048f14f3d61f786687074086be",
+    "tests/test_dictionary_exit_projection.py": "cc488567a41f19899cc7ef34306fefd36a75cad325dd7612d59a349142764a6a",
+    "tests/test_dictionary_exit_public_request.py": "052b69cce727684b6416447742aa283c0955aa424f060c445faf52a4c175988b",
+    "tests/test_dictionary_exit_read_packet_residuals.py": "c956343cb10c2d12f1b0ea65095ae404bbcc92a4f8a24291749935d6ae98a7cb",
+    "tests/test_dictionary_exit_read_tails.py": "0a738faaf54b025ec17072cea0655b66cabcc7e0ea96448ec0d6bd4a22c4c6ab",
+    "tests/test_dictionary_exit_refresh_identity.py": "bd24166fa480c0cdb4a765b83b4a0d22642bbe276030e0f898546d4c306fd7ac",
+    "tests/test_dictionary_exit_retrieval.py": "07b6719b8c0a3f0b8ff318538b0dd03a6f8ae331a8bce4571691a0f15a13d370",
+    "tests/test_dictionary_exit_review_boundaries.py": "aa8ebf127328c44442f1736ce1be3dab3f8e67c7cd94ddd691b33b3457eacaa7",
+    "tests/test_dictionary_exit_selector_visibility.py": "4682274b2df0797117fb76c3edd68e29461ff1259c8bd58763b414f00b8aa2c1",
+    "tests/test_dictionary_exit_source_identity.py": "563a9fdbb6fec1d7cf8326fed840808e8fe5adf9c6e1f5b1a2a8dda797d33f9b",
+    "tests/test_docs_fetch_transport.py": "0571a873dfcfdb33f332a633f0f3f7e56eea273aeade0f466323ee5714984c0a",
+    "tests/test_docs_mcp_stdio_delivery.py": "64d683bb58087f22746daf3a86bdc7c3ca6564e8a9890bd7dc1078b63f7f84de",
+    "tests/test_docs_service.py": "f741df2aebcff149be313efbe8555a1f7584151e092c66cd3db197b5bc34c818",
+    "tests/test_docs_service_part02.py": "5f7af2aab61de83ccc184bf759d6b123a213d7c3b468edac787458ad76fb62d4",
+    "tests/test_docs_service_part03.py": "8b743af945e7fc9de415cce5b44a252ebfaacb4b1e9321c784555ee8881086fe",
+    "tests/test_docs_service_part04.py": "2804a90e0eff7c6b92f3ec34ae2b1abbf54e4ba8e5eb81f0001a91aea4581ad7",
+    "tests/test_docs_service_part05.py": "40d8f972949428621add88ac180bbcaccb18f568a3aadaa2c277afdfa7bbe16d",
+    "tests/test_docs_service_part06.py": "4c2ba5f5c431246c6e4f4ad20116821238ab73fbc3f6810cf501b7814980bae1",
+    "tests/test_docs_service_part07.py": "bfc1b50186bc2665bfd985d87316eb31f7068fc7ec9fb54afa6aa5679ed705c1",
+    "tests/test_docs_service_part08.py": "b552bf2306b3dbd4538d55e373e14804f4368c95c93ae354d0deaa353eaba837",
+    "tests/test_docs_service_part09.py": "e356f26735e560ee618a8ea76f2b90e72ef19056c24e64a769b9ca3bd31b4db0",
+    "tests/test_docs_service_part10.py": "d4199815abed3e59b8f982ea2b01c783611127a10fe93d71d978c27d159c6d9f",
+    "tests/test_embeddings_pipeline.py": "a5fd87f2790460bc9f595b997fa8b0ad129abde7c6515ef1e276951a95b69ea6",
+    "tests/test_eval.py": "87e1cf98f0d2726f3edc2884c259163fa6b99fe9cf04b88f0fa3c59cf422565f",
+    "tests/test_evidence_quality_v2_fixture_runtime.py": "73869435d588f6c49a4f6467a3d0054af0c00051e390e8f077d8e0954a6794e6",
+    "tests/test_exact_version_integration.py": "f573eba6ad18e9d939f5113d2db2c85bc0c18f52a48690b5bd9530bb36addf3a",
+    "tests/test_fetcher_gitbook.py": "2335499a36d7441bac460bc1f826edab5e85ad92ec16174e3814aa8c535f53b3",
+    "tests/test_fetcher_mintlify.py": "5e7eec7f3f06e18d6472d6bf7b3f43f84c865e88cafb81b99245fb45ed90e64b",
+    "tests/test_index_storage_cleanup.py": "5343ba019148466dbf6b66245c32ab3f0b2c1488d85cabb359799be1cfbc28f0",
+    "tests/test_install_cmd.py": "d7c0311dddfeb9eaa49c606368258495fa862b597f6709dfaa4685db74661cd0",
+    "tests/test_install_mcp_handshake.py": "051754dc98f073ca5c52b3bab3b79e994a003bf9b313471a4c50578c92878172",
+    "tests/test_installed_mcp_bootstrap_contract.py": "57628813a733bdb9a649ae59c2334ec8110fc5c4c6d70c0c30481f7317d392fa",
+    "tests/test_library_discovery_candidates.py": "121d403df2ce5773c2fadcfe40f1a6bd0e5104b337ccbe047dc7093a434107dc",
+    "tests/test_mcp_cli.py": "44133acc7711ce6be79c212bb2d49b49938a09e64820a628b544b9fb810618e4",
+    "tests/test_mcp_code_context_tool.py": "45e7ab21c550b56642ba1cba7ffd4c094bbdeda3fdc4e3f9d07f9aa2aa0dc53d",
+    "tests/test_mcp_delivery_member_transaction.py": "8138d6401180d70c94dcec077b2961ff0309510f90501d46b211f53826659d82",
+    "tests/test_mcp_dispatcher.py": "6719ab20c9a83e3fae227d420a2332da4671ea31bc70be8046c1097d0b4e7535",
+    "tests/test_mcp_doctor.py": "0be333d0ca8e3923329907b94cda4a043c256b8e2fefeb17f0f47044390cecd4",
+    "tests/test_mcp_executor_extras.py": "98096c5869d27295992e9960ad92764747ca7302743b5705bb77c800a0281475",
+    "tests/test_mcp_idempotency.py": "310e84f52dbf982b1bcfc1081c7dd0eab06103045bd7ccf4b0fd2ce401418576",
+    "tests/test_mcp_installer.py": "2ae53186245d1a9981451a4f1456ab2e8d23188b4c510c4a0c5736b16b4a08da",
+    "tests/test_mcp_network_security.py": "3d7f1e2cd77f57b573b27507b1421bbf75c9039d7d8de15a553c18420763688f",
+    "tests/test_mcp_patch_constraint_validation_tool.py": "b5e07360aa1cd5c1be7281ad488ac5e4c51e2c79c341d0b24eb46f6175e3d22d",
+    "tests/test_mcp_patch_constraints_tool.py": "f7c7150b19f09edb1b787838dca0d547f4d8de9bbe2a057409e85f6611103d52",
+    "tests/test_mcp_patch_plan_context_compact_budget.py": "e5f6d194963c1a3e0aac7faf7882977ba9c526c8b6a576bc796d90f374f040a8",
+    "tests/test_mcp_patch_plan_context_output_contract.py": "b0baf7c63851cfeb2eb25f9e58a3141b0202316ed7f0ef3eea0c999b72e5e997",
+    "tests/test_mcp_patch_plan_context_tool.py": "3c3703a3bf86f03cde6a15b6726439c3c58a4a63be3b56e43f964f7835003946",
+    "tests/test_mcp_python_executor.py": "8aaa0a551b2aa994669aa8adfc69d75253cdae0f6d899367e1d1d0505a1fd96d",
+    "tests/test_mcp_registry_fallback.py": "1ab2d6fe05ac67028eb5330ff9f12a87ca30c32e5b22c26222387f727f00bb17",
+    "tests/test_mcp_sha_verify.py": "fb5642e8f1037c76477eb4abe20a6c2b25015031f3facd90d8485e529a67696d",
+    "tests/test_mcp_trusted_storage_lifecycle.py": "fc725b6e429dc665cbdbef03a786af820086083186b6b9047bd685c0bee8e96c"
+  },
+  "registry_method": "All25changed file SHA and87classified module SHA match author final proof. Derive normalizedBASE survivors plus existingaddition;25hashes/1override updated in20registries. Otherlabels/SKIP/helperconsumers preserved. All179registries/271module entries statically checked against text-compatible normalizedsurvivors, zero missing modules/definition mismatches/hashmismatches;84helper-only labels retained.",
+  "static_audit": {
+    "receipt": "TEST_REDUCTION_40_FINAL_STATIC_COMPATIBILITY_AUDIT.json",
+    "sha256": "02f4779eb4cbfd4d1875383b351c7350ac0e77bcc2579403148abf4318660a9c",
+    "boundary": "Full remainingtestsource tokenize/text and literal imports/selectors, not collection/runtime. Gates unchanged; concrete blockers recorded."
+  },
+  "remaining_reconciliation": {
+    "remaining_ledger_identities": 1727,
+    "BASE_survivors": 1726,
+    "addition": 1,
+    "reviewed_scope_saved_PASS": {
+      "docs": 299,
+      "AM": 1162,
+      "NZ": 208,
+      "nested": 48
+    },
+    "reviewed_union": 1717,
+    "scope_overlaps": [],
+    "nested_integration_functions": 41,
+    "nested_integration_PASS": 45,
+    "nested_ambiguous_functions": 3,
+    "nested_ambiguous_PASS": 3,
+    "trace_addition_in_reviewed_union": [
+      "tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls"
+    ],
+    "baseline_exceptions": [
+      {
+        "id": "tests/test_parsers.py::test_pdf_loader_extracts_generated_story_pdf",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_count_reports_points",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_delete_collection_refuses_foreign",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_delete_points_drops_by_id",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_ensure_collection_idempotent",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_ensure_collection_refuses_foreign_existing",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_factory_returns_qdrant_store",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_health_check_true",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_search_with_payload_filter",
+        "BASE_status": "SKIP"
+      },
+      {
+        "id": "tests/test_qdrant_store.py::test_upsert_and_search_dense",
+        "BASE_status": "SKIP"
+      }
+    ],
+    "exception_status_counts": {
+      "SKIP": 10
+    },
+    "limit": "Finished owned green scopes only: no confirmed units in those inventories. Remaining baseline exceptions and unchanged skips outside this PASS classification; global unit absence not proven.",
+    "remaining_ambiguous_PASS_ids": [
+      "tests/task_level/test_task33_codex_exploratory.py::test_explicit_exploratory_delivery_is_persisted_as_non_causal",
+      "tests/task_level/test_task33_evaluation_contract.py::test_task33_evaluation_fails_closed_without_relabeling_not_applicable_compile",
+      "tests/task_level/test_task33_isolated_delivery.py::test_isolated_broker_persists_recomputable_evidence_and_bounded_handoff"
+    ]
+  },
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "FrozenBASE/savedPASS only; acceptedcoverage loss notproduct quality/currentgreen/finalcollection."
+  }
+}

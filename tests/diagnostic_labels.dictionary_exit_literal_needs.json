@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_dictionary_exit_literal_needs.py": "76c1750f98c8d33f7681080a861518a4f51bb84f80444cc7f5f916f29666e68d"
+    "tests/test_dictionary_exit_literal_needs.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 }

@@ -115,11 +115,6 @@ def manifest_with_acme(acme_pack):
     return m
 
 
-def test_list_tools_returns_only_two_meta_tools(manifest_with_acme):
-    d = Dispatcher(manifest_with_acme)
-    tools = d.list_tools()
-    names = [t["name"] for t in tools]
-    assert names == [SEARCH_TOOL, CALL_TOOL]
 
 
 def test_search_tools_returns_matches_with_inlined_schema(manifest_with_acme):

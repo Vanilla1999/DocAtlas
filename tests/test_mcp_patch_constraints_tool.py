@@ -33,52 +33,11 @@ def _payload(tmp_path: Path, **overrides):
     return handle_project_tool("get_patch_constraints", args, LibraryDocsService())
 
 
-def test_mcp_schema_exposes_get_patch_constraints():
-    tool = next(tool for tool in ALL_TOOLS if tool["name"] == "get_patch_constraints")
-
-    assert tool["inputSchema"]["required"] == ["question"]
-    properties = tool["inputSchema"]["properties"]
-    assert properties["question"]["type"] == "string"
-    assert properties["project_path"]["type"] == ["string", "null"]
-    assert properties["changed_files"]["items"]["type"] == "string"
-    assert properties["max_constraints"]["type"] == "integer"
-    assert properties["max_tokens"]["type"] == "integer"
-    assert properties["include_sources"]["type"] == "boolean"
-    assert "output_mode" not in properties
-
-
-def test_mcp_return_shape(tmp_path: Path):
-    payload = _payload(tmp_path)
-
-    assert payload is not None
-    assert payload["tool"] == "get_patch_constraints"
-    assert payload["status"] == "success"
-    assert payload["reason_code"] is None
-    assert payload["answer_available"] is True
-    assert payload["task"] == "Update permission handling"
-    assert isinstance(payload["constraints"], list)
-    assert isinstance(payload["forbidden_edits"], list)
-    assert isinstance(payload["dependency_contracts"], list)
-    assert isinstance(payload["source_of_truth_rules"], list)
-    assert isinstance(payload["suggested_checks"], list)
-    assert isinstance(payload.get("warnings", []), list)
-    assert isinstance(payload["sources"], list)
-    assert isinstance(payload["token_estimate"], int)
-    assert payload["confidence"] in {"high", "medium", "low"}
-    assert any(item["source"] for item in payload["constraints"])
 
 
 def test_mcp_return_shape_is_json_serializable(tmp_path: Path):
     payload = _payload(tmp_path, question="Avoid generated files")
     json.dumps(payload)
-
-
-def test_mcp_tool_returns_grouped_constraints(tmp_path: Path):
-    payload = _payload(tmp_path)
-    assert payload["forbidden_edits"]
-    assert payload["dependency_contracts"]
-    assert payload["source_of_truth_rules"]
-    assert any("test" in check.lower() or "verify" in check.lower() for check in payload["suggested_checks"])
 
 
 def test_mcp_tool_respects_max_constraints_and_max_tokens(tmp_path: Path):

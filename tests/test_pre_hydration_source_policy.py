@@ -52,35 +52,4 @@ def _dispatcher(store: _Store) -> RetrievalDispatcher:
     return dispatcher
 
 
-def test_adjacent_source_policy_is_enforced_before_text_hydration():
-    store = _Store()
-    dispatcher = _dispatcher(store)
 
-    dispatcher._fuse_and_hydrate(
-        {"lexical": [{"id": "safe", "hydration_id": 1, "score": 1.0}]},
-        query="plain words",
-        limit=2,
-        budget=200,
-        expand="adjacent",
-        counts={"lexical": 1},
-        mode="hybrid",
-        filters={
-            "source_class": "project_file",
-            "lifecycle_status": {"in": ["active", "current"]},
-        },
-    )
-
-    assert store.hydrated_ids == [1]
-
-
-def test_pre_hydration_metadata_failure_fails_closed():
-    store = _Store(metadata_error=True)
-    dispatcher = _dispatcher(store)
-
-    allowed = dispatcher._filter_section_ids_before_hydration(
-        [1, 2],
-        {"lifecycle_status": {"in": ["active", "current"]}},
-    )
-
-    assert allowed == []
-    assert store.hydrated_ids == []

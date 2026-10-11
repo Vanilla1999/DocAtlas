@@ -1,13 +1,9 @@
 {
   "module_labels": {
-    "tests/docs/test_patch_context_public.py": "behavioral",
-    "tests/docs/test_patch_request_plan.py": "behavioral",
-    "tests/docs/test_patch_requirements.py": "behavioral"
+    "tests/docs/test_patch_request_plan.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_patch_context_public.py": "ab10dbe004e0cb12109eb61a9c715b509808570a5724ba4922c1e45b1b972d27",
-    "tests/docs/test_patch_request_plan.py": "e642740901d070941ba1f7ee7a79c976c1b3bfa5888f20c55007127d20a3a539",
-    "tests/docs/test_patch_requirements.py": "66d5987bcc6a69bced6b63af683d85e9b37238e2795b93b481d073cb894c85cf"
+    "tests/docs/test_patch_request_plan.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "node_overrides": {},
   "schema_version": 1

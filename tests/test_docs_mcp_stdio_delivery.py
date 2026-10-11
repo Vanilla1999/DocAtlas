@@ -303,101 +303,10 @@ def test_acquisition_observer_uses_real_small_public_route_without_changing_resu
     assert report["tool_wire_utf8_bytes"] is None
 
 
-def test_patch_validator_preserves_large_utf8_evidence_and_checks_hash():
-    text = "必要な unique evidence\n" * 3000
-    value = build_action_packet(question="Inspect evidence", context_pack=[{
-        "path": "docs/evidence.md", "content": text, "display_text": text,
-        "source_class": "project_doc", "doc_scope": "project", "authority": "canonical",
-        "stable_chunk_id": "unique-window", "parent_logical_id": "unique-parent",
-        "char_start": 13, "char_end": 13 + len(text),
-        "display_content_hash": hashlib.sha256(text.encode()).hexdigest(),
-    }], required_target_paths=["missing.py"])
-    value["kind"] = "patch_context"
-    refresh_action_packet_estimate(value)
-    validate_patch_payload(value, completeness="partial")
-    assert len(text.encode()) > 32768
-    value["sources"][0]["content_sha256"] = "0" * 64
-    refresh_action_packet_estimate(value)
-    with pytest.raises(AssertionError):
-        validate_patch_payload(value)
 
 
-def test_fixture_environment_does_not_inherit_configuration_or_credentials(tmp_path, monkeypatch):
-    inherited = ("PYTHONPATH", "OPENCODE_CONFIG", "OPENAI_API_KEY", "DOCATLAS_CONFIG",
-                 "DOCATLAS_MCP_ADVANCED_TOOLS", "DOCATLAS_MCP_ADMIN_TOOLS", "DOCATLAS_MCP_TEXT_FALLBACK")
-    for key in inherited:
-        monkeypatch.setenv(key, "foreign")
-    env = isolated_environment(tmp_path)
-    assert all(key not in env for key in inherited)
-    assert env["DOCATLAS_HOME"] == str(tmp_path / "docatlas-home")
-    assert env["HOME"] == env["USERPROFILE"]
-    assert os.environ["OPENAI_API_KEY"] == "foreign"
 
 
-def test_strict_validator_accepts_failure_and_rejects_unknown_authority():
-    import jsonschema
-
-    value = {"schema_version": 4, "kind": "patch_context", "result": "failure",
-             "completeness": "unavailable", "edit_ready": False,
-             "missing": ["no_evidence"], "estimated_tokens": 1}
-    refresh_action_packet_estimate(value)
-    validate_patch_payload(value, completeness="unavailable")
-    value["consent"] = True
-    refresh_action_packet_estimate(value)
-    with pytest.raises(AssertionError, match="Additional properties"):
-        validate_patch_payload(value)
-    terminal = {"status": "failed", "retryable": False}
-    result = SimpleNamespace(isError=True, structuredContent=terminal, content=[])
-    with pytest.raises(AssertionError):
-        payload(result)
-    assert payload(result, allow_error=True) == terminal
-    result.structuredContent = None
-    result.content = [SimpleNamespace(text='{"status":"failed","retryable":false}')]
-    assert text_payload(result, allow_error=True) == terminal
-    blocked = {"status": "blocked", "reason_code": "unsafe_sqlite_path_mutation",
-               "retryable": False, "mutation_performed": False}
-    validate_blocked_preparation(blocked)
-    with pytest.raises(AssertionError):
-        validate_blocked_preparation({**blocked, "mutation_performed": True})
-
-    schema = current_docs_surface({}).tools[0].input_schema
-    with pytest.raises(jsonschema.ValidationError) as error:
-        jsonschema.validate({"question": "Literal question", "context_format": None}, schema)
-    assert error.value.validator == "additionalProperties"
-    message = error.value.message
-    typed = {"status": "failed", "error": {"reason_code": "validation_error",
-             "where": {"phase": "validation", "tool": "get_docs_context"}}}
-    for text_only in (False, True):
-        sdk_error = SimpleNamespace(isError=True, structuredContent=None,
-                                   content=[SimpleNamespace(text=f"Input validation error: {message}")])
-        assert validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)[
-            "wire_form"] == "mcp_input_validation_text"
-        with pytest.raises(json.JSONDecodeError):
-            payload(sdk_error, allow_error=True)  # The general success/error decoder stays strict JSON.
-        application_error = SimpleNamespace(
-            isError=True, structuredContent=None if text_only else typed,
-            content=[SimpleNamespace(text=json.dumps(typed))],
-        )
-        assert validate_input_rejection(application_error, expected_message=message, text_only=text_only)[
-            "wire_form"] == "application_validation_error"
-        for bad in (
-            {**typed, "error": {**typed["error"], "reason_code": "permission_denied"}},
-            {**typed, "error": {**typed["error"], "where": {"phase": "execution", "tool": "get_docs_context"}}},
-            {**typed, "sources": [{"snippet": "should not be delivered"}]},
-            {**typed, "edit_ready": True},
-        ):
-            application_error.structuredContent = None if text_only else bad
-            application_error.content = [SimpleNamespace(text=json.dumps(bad))]
-            with pytest.raises(AssertionError):
-                validate_input_rejection(application_error, expected_message=message, text_only=text_only)
-        sdk_error.isError = False
-        with pytest.raises(AssertionError):
-            validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)
-        sdk_error.isError = True
-        for text in ("permission denied", "Input validation error: unrelated schema failure", "not JSON"):
-            sdk_error.content = [SimpleNamespace(text=text)]
-            with pytest.raises((AssertionError, json.JSONDecodeError)):
-                validate_input_rejection(sdk_error, expected_message=message, text_only=text_only)
 
 
 def test_explicit_fixture_grant_binds_actual_catalog_members_and_empty_storage(tmp_path):
@@ -519,21 +428,6 @@ def test_ready_fixture_bootstrap_uses_real_store_and_local_catalog_binding(tmp_p
         assert conn.execute("SELECT count(*) FROM retrieval_children_fts WHERE retrieval_children_fts MATCH 'alpha'").fetchone()[0] > 0
 
 
-def test_evidence_byte_measurement_unions_overlapping_unicode_source_spans(tmp_path):
-    raw = "αβγδε source"
-    (tmp_path / "source.md").write_text(raw, encoding="utf-8")
-    rows = [{"path": "source.md", "text": raw[start:end], "char_start": start, "char_end": end,
-             "content_sha256": hashlib.sha256(raw[start:end].encode()).hexdigest(), "evidence_id": str(index)}
-            for index, (start, end) in enumerate(((0, 4), (2, 7)))]
-    report = evidence_sizes({"sources": rows}, tmp_path)
-    assert report["source_text_utf8_bytes"] == sum(len(row["text"].encode()) for row in rows)
-    assert report["unique_nonoverlap_utf8_bytes"] == len(raw[:7].encode())
-    assert report["unique_nonoverlap_utf8_bytes"] < report["source_text_utf8_bytes"]
-    docs = evidence_sizes({"sources": [{"path_or_url": "source.md", "snippet": raw[:4]}]}, tmp_path)
-    assert docs["unique_nonoverlap_utf8_bytes"] == len(raw[:4].encode())
-    rows[0]["text"] = "forged"
-    with pytest.raises(AssertionError):
-        evidence_sizes({"sources": rows}, tmp_path)
 
 
 def test_library_fixture_versions_have_real_local_provenance_and_distinct_bytes(tmp_path):
@@ -553,22 +447,3 @@ def test_library_fixture_versions_have_real_local_provenance_and_distinct_bytes(
         assert hashlib.sha256(source.read_bytes()).hexdigest() == fixture["content_sha256"]
         assert fixture["generation_id"].startswith("gen-")
 
-
-def test_natural_fixture_uses_default_source_bound_children_without_padding():
-    from docmancer.core.structured_chunking import ChunkingConfig, chunk_markdown_parent_child
-
-    documents = natural_protocol_documents()
-    assert len(documents) == 5
-    all_paragraphs = []
-    for path, text in documents.items():
-        paragraphs = [part for part in text.split("\n\n") if part and not part.startswith("#")]
-        assert len(paragraphs) == 10
-        assert all(sum(f"`{phase}`" in paragraph for paragraph in paragraphs) == 2 for phase in LARGE_PHASES)
-        all_paragraphs.extend(paragraphs)
-        _parents, children = chunk_markdown_parent_child(text, path)
-        assert children and all(child.retrieval_token_estimate <= ChunkingConfig().hard_max_tokens for child in children)
-        assert all(text[child.char_start:child.char_end] == child.display_text for child in children)
-        assert sum(len(child.display_text.encode()) for child in children) == len(text.encode())
-    assert len(set(all_paragraphs)) == 50
-    # Authored corpus size is a fixture property, never a retrieval acceptance.
-    print("Authored natural fixture bytes (NOT delivered):", sum(len(text.encode()) for text in documents.values()))

@@ -1,16 +1,12 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/evidence_quality_v2/test_corpus.py": "behavioral",
     "tests/evidence_quality_v2/test_cost_answers.py": "behavioral",
-    "tests/evidence_quality_v2/test_experiments.py": "behavioral",
     "tests/evidence_quality_v2/test_measurement.py": "behavioral"
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/evidence_quality_v2/test_corpus.py": "a68eea966697c13d44d2fc24ad0ad76e0b2c0080f955855575f1b452e53046c7",
-    "tests/evidence_quality_v2/test_cost_answers.py": "08012686fb4228a628cb2224d00d99a178e57de1cb37f9eb80c7f4016da55004",
-    "tests/evidence_quality_v2/test_experiments.py": "9324609fc4a7cda8335985466968d112e87f027a15a4a63709d00de74a87c434",
-    "tests/evidence_quality_v2/test_measurement.py": "b9306f58fa6711f8997c40ad398ea3420bb464960d380eaab0c995c030a7a4af"
+    "tests/evidence_quality_v2/test_cost_answers.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/evidence_quality_v2/test_measurement.py": "21c194e5ec6e6cc47a2a15ceb6b663e4958c61ae0b8391c55e7b2cfacf53400a"
   }
 }

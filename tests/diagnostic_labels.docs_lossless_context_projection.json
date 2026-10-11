@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/docs/test_docs_lossless_context_projection.py": "17c23d1c7f2d3e140b90e025278109035fa1e66866dfbbcd320781ce92151ae4"
+    "tests/docs/test_docs_lossless_context_projection.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   }
 }

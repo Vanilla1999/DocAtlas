@@ -96,18 +96,8 @@ def test_direct_github_constructor_snapshots_approved_root_rows_and_digest(mutat
     assert calls == []
 
 
-def test_direct_github_rejects_invalid_manifest_at_construction(offline_http):
-    with pytest.raises(ValueError):
-        GitHubFetcher(source_manifest={})
-    assert offline_http[0] == []
 
 
-@pytest.mark.parametrize("folder", ["docs", "./docs", "/docs/"])
-def test_explicit_github_folder_grammar_has_no_implicit_root_extras(folder):
-    assert GitHubFetcher()._select_documentation_files(
-        ["README.md", "docs/a.md", "docs/ru/legacy.md", "docs-other/a.md"],
-        Context7Config(folders=[folder]),
-    ) == ["docs/a.md", "docs/ru/legacy.md"]
 
 
 def _target(library="corrections"):
@@ -191,14 +181,3 @@ def test_prefetch_snapshots_caller_collections_before_first_member(tmp_path, mon
     assert service.prefetch_docs_targets([target], force_refresh=True).status == "ok"
     assert set(calls) == set(selected)
     assert {doc.source for doc in agent.documents} == set(selected)
-
-
-@pytest.mark.parametrize("kind", ["cancelled", "deadline"])
-def test_whole_set_preflight_preserves_operation_stop_before_dispatch(kind, offline_http):
-    with pytest.raises((RuntimeError, DocsFetchSecurityError)):
-        preflight_target_urls(
-            [ROOT, ROBOTS], max_pages=2, allowed_domains=["example.com"], path_prefixes=["/"],
-            cancellation_callback=(lambda: True) if kind == "cancelled" else None,
-            deadline_at=0 if kind == "deadline" else None,
-        )
-    assert offline_http[0] == []

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "pr_head_sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+  "run_id": 38033112465,
+  "run_attempt": 1,
+  "workflow": "CI",
+  "url": "https://github.com/Vanilla1999/DocAtlas/actions/runs/38033112465",
+  "conclusion": "failure",
+  "independent_parser": "Stdlib XML/JSON over complete downloaded artifacts; no project imports/runtime. Compare raw JUnit classname/name/outcome identities against BASE JUnit to avoid misinterpreting class-based names.",
+  "core_each_python_lane": {"tests": 7670, "PASS": 6069, "FAIL": 1591, "SKIP": 10, "ERROR": 0},
+  "advanced": {"tests": 622, "PASS": 528, "FAIL": 94, "SKIP": 0, "ERROR": 0},
+  "core_lane_full_roster_and_outcomes_equal": true,
+  "base_core_delta": {
+    "removed": 0,
+    "added": ["tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls"],
+    "existing_outcome_changes": {
+      "tests/docs/test_python_module_policy_and_manifest.py::test_all_repository_python_modules_stay_within_hard_line_budget": "PASS -> FAIL",
+      "tests/docs/test_structural_item_integrity.py::test_projection_owner_remains_within_repository_module_budget": "PASS -> FAIL"
+    },
+    "cause": "New logging lines exceed unchanged1000-line policy: projection1003, self-host1001. Separately reviewed formatting-only correction75e32770 gives984/983; correction runtime is not proved by this run."
+  },
+  "trace_integration": {
+    "status_each_lane": "PASS",
+    "seconds": {"3.11": 2.298, "3.12": 2.526, "3.13": 2.753},
+    "public_query_calls_each_execution": 8,
+    "fixture_setup": "Additional preparation/indexing; not included in eight queries.",
+    "boundary": "In-process plus child public API serialization; not installed MCP stdio or client proof. Parent acquisition/coverage parity covers five calls, child startup payload/stderr checks cover three."
+  },
+  "critical_saved_receipts": {
+    "healthy": {"tests": 62, "failures": 0, "errors": 0, "skipped": 0},
+    "validated_mutants": 43,
+    "total_validated_receipts": 44,
+    "own_role_guards": ["critical_reference_nl_context_keeps_bare_unresolved", "critical_reference_nl_context_keeps_quoted_symbol"],
+    "each_role_mutant": "1 intended failure /0 errors /0 skips; exact first-line guard",
+    "verification": "Coordinator read all44 evidence JSON and43 mutation XML; independently reconstructed before/after source hashes from proof-SHA for all43. Unit32 reviewer separately checked all44 outcomes/rosters/guards and reconstructed own role and no-inference mutations. Full source/import verification boundaries remain in respective receipts."
+  },
+  "selected_jobs": {
+    "installed-mcp-harness": "success",
+    "platform-smoke (ubuntu-latest)": "success",
+    "platform-smoke (macos-15)": "success",
+    "platform-smoke (macos-15-intel)": "success",
+    "installer-smoke": "success",
+    "retrieval-evidence": "success",
+    "static-contract": "failure",
+    "required-ci": "failure"
+  },
+  "junit_sha256": {
+    "core-tests-3.11.xml": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "core-tests-3.12.xml": "ae521797f70eb9e17e259fdaed1de607501c5ef8e935167dee24bc8d0bb925f0",
+    "core-tests-3.13.xml": "439b1e168e2b6f20c6010b83c029c8f51b2496b1a12f6d182b20d4d701a64c17",
+    "advanced-contract.xml": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc"
+  },
+  "boundary": "This run predates all retirement edits. It does not prove final collection/parity, retirement-SHA CI, P1 closure or real-client acceptance. Core/advanced failures remain explicit; scripted installed success is not real Claude/Codex/OpenCode client proof."
+}

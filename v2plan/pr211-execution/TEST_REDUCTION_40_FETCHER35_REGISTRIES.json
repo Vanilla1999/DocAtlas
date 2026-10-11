@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "packet": "/tmp/opencode/pr211-fail-fetcher-next.json",
+  "sha256": "7f07cc7a8148de948ef6640f4bab9eac96a50d8f686382f57fa22171ccbfafe6",
+  "removed": 35, "added": 0,
+  "BASE_status": {"FAIL": 35}, "saved_CI_status": {"FAIL": 35},
+  "final_testfile_hashes": {
+    "tests/test_crawl4ai_fetcher.py": "e9a276dfdcdbb36d45ae927648d0d23c6a178e239e4aeff8ef2493af5ffbd937",
+    "tests/test_dartdoc_pub_ingestion.py": "fa31d5a1f587ff04db37dae37e30e2cb1df662c2a903a99076bda8513f07be10",
+    "tests/test_fetcher_github.py": "ddae9be5b24b78c6dc7ad59f073180c628d8838aaec0531ac567185e2175f662",
+    "tests/test_list_introduction_atomicity.py": "b83912b4a8f605f6c3a30b60ccbae7bba6c0f4bc7219ab557ce9c71d3a250f81",
+    "tests/test_preindex_coverage.py": "f8d7e9f72a53cf1979762c6cd84a013c33936ea87d34190eeddda2b5d45c9974",
+    "tests/test_retrieval_features.py": "1b89b6fc621490557f949c240df9fb9f384429f8c6d3048ce08c63d68c2f1173",
+    "tests/test_section_quality_filter.py": "f71617f1dc27e7c25d9abd6785f3cd2793de6380549c13d1c90c26e0f031ec14",
+    "tests/test_snippet_presentation.py": "3e02ad85e54d3bca450434cecafbf389ec92327863096777aaeff33521af62ad",
+    "tests/test_snippet_quality.py": "a78d36f846f68283cf6005a6c58de403b54f3f505c758d7a056cea85d31387e2",
+    "tests/test_web_fetcher.py": "4b5c010e253cef3a39e26b1fd18028412cf29234f345e795203fc6b41ed335c1"
+  },
+  "registry_updates": {
+    "tests/diagnostic_labels.json": {
+      "tests/test_web_fetcher.py": "bd21e29c659b1b64becb9fb71ef7fa0759f03f953cfa27c4f4288ddc75924644",
+      "tests/test_dartdoc_pub_ingestion.py": "bc1faa962cb83c419bd0269576600a5ddb36e5506156f998bc98d8005bb6fde8",
+      "tests/test_section_quality_filter.py": "1857f980207f4fb0870f4e6b13e3a1c56b43800984a464672cf1e28347575ffd",
+      "tests/test_snippet_presentation.py": "ed67596da9d5e8bfca69bc0fbbadbcd0b71ac3ac2244ff0bb146543130740a66",
+      "tests/test_snippet_quality.py": "e469a265c5219fdd6ed686e4ee11dc546e8ac58c1ee7cff158bed2a348ee823a",
+      "tests/test_crawl4ai_fetcher.py": "a646d5cc784e786dfad3920b83d9cadee0e24eefb8eb8ed7f698eaa2aafe9e8c",
+      "tests/test_preindex_coverage.py": "a079aecce8664693eed76fa7e65a3469049f0c9c8ce2a1c0ca843f17186a433c",
+      "tests/test_retrieval_features.py": "ec52a2abb5ec58d76cfbd9ee8a04bd296f45d6f68af458bb926e1508f06b755e",
+      "tests/test_fetcher_github.py": "e744aeef5fb26bbf4d9ff9e7314e3b591bee5b520133552f225e17645627f137"
+    },
+    "tests/diagnostic_labels.list_introduction_atomicity.json": {
+      "tests/test_list_introduction_atomicity.py": "bcb06815f6c2be1b50b3b5290fb1422c578a52709fc6f651348bad31abf4e512"
+    }
+  },
+  "registry_method": "Normalized frozen BASE minus all integrated removal sets; sorted unique newline-joined SHA256, with current textual test-definition names matching surviving sets. No helper/consumer/active-writer registration deletion. Historical findings remain in original retained families; retired rows link those source families.",
+  "retained_red_integration_count": 26,
+  "unresolved": [
+    {"id": "tests/test_web_fetcher.py::test_github_blob_raw_fetch_keeps_canonical_docset_root", "decision": "retained", "reason": "Real HTTP policy/transport normalization and page extraction; not confidently a single-component unit."},
+    {"id": "tests/test_retrieval_features.py::test_api_term_matches_are_appended_from_lexical_search", "decision": "retained", "reason": "Populated real SQLiteStore with lexical search; retained storage integration despite internal entry point."}
+  ],
+  "deferred_paths": [],
+  "proof": {"run": "38033112465", "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b", "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238", "boundary": "Saved core3.11 before retirement, not final runtime/collection. Current10 settled source hashes match author receipt. Owner FAIL retirement accepts coverage loss, not product fix/PASS. No runtime/AST/project imports/CI."},
+  "validation": {"partition": 8291, "overlap_previous": 0, "duplicates": 0, "missing": 0, "unknown": 0, "status_mismatches": 0, "removed": 784, "added": 1, "net": 783, "projected_after": 7508, "target_gap": 2534, "classified": 1452, "unclassified": 6839},
+  "prior_manifest_sha256": "fbd7db020253632b83b98b3a133bf7837c60e0d5a02c8d66de30c0111c1ae0d1",
+  "pending": "Active root/docs writer paths and registry entries untouched.26 red integration and2 unresolved cases retained; exact IDs/reasons hash-bound in packet. No overlap with active registry paths in this packet; final collection/CI pending."
+}

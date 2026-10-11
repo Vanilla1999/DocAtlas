@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_installed_mcp_bootstrap_contract.py": "6ee7be323a23dfd1b73eb0ee01b7fd83e18b989888e98990fcc0d7fbd1fcdfd7"
+    "tests/test_installed_mcp_bootstrap_contract.py": "6363cd0f04ca7bbdea54e0a1b113a046f2cf2ed48b3eda2edffcf2524896924b"
   }
 }

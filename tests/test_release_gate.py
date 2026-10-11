@@ -354,297 +354,32 @@ def _assert_self_host_positive_passed_count(self_host_payload_runner):
     assert report["passed_count"] == 15
 
 
-def test_publish_workflow_is_manual_build_once_and_oidc() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    trigger_block = text.split("\non:\n", 1)[1].split("\npermissions:\n", 1)[0]
-    trigger_events = {
-        line.strip()[:-1]
-        for line in trigger_block.splitlines()
-        if line.startswith("  ")
-        and not line.startswith("    ")
-        and line.strip().endswith(":")
-    }
-    assert trigger_events == {"workflow_dispatch", "pull_request"}
-    assert "    tags:" not in trigger_block
-    assert text.count("python -m build") == 1
-    assert 'python: ["3.11", "3.12", "3.13"]' in text
-    assert "id-token: write" in text
-    assert "PYPI_API_TOKEN" not in text
-    assert "environment: release" in text
-    assert "if: github.event_name == 'workflow_dispatch'" in text
-    assert "refs/tags/${{ inputs.tag }}" in text
-    for line in text.splitlines():
-        if "uses:" in line:
-            ref = line.split("@", 1)[1].split()[0]
-            assert len(ref) == 40 and all(c in "0123456789abcdef" for c in ref)
 
 
-def test_dispatched_release_source_must_be_on_protected_main() -> None:
-    # Historical node id retained for the diagnostic inventory. The release
-    # policy now requires main ancestry while branch protection is an explicit
-    # accepted risk rather than a hidden or falsely-green control.
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    build = text[text.index("  build:"):text.index("  wheel:")]
-    assert "fetch-depth: 0" in build
-    assert "if: github.event_name == 'workflow_dispatch'" in build
-    assert "git fetch --no-tags origin main:refs/remotes/origin/main" in build
-    assert "git merge-base --is-ancestor HEAD refs/remotes/origin/main" in build
-    assert 'branch.get("protected")' not in build
-    assert "remote main is not protected" not in build
-    assert "Release source ancestry: PASS" in build
-
-    roadmap = (ROOT / "roadmap" / "README.md").read_text(encoding="utf-8")
-    scorecard = (ROOT / "docs" / "public-truth-scorecard.md").read_text(encoding="utf-8")
-    assert "P0.1 — Remote `main` ruleset: accepted risk" in roadmap
-    assert "| Branch protection | `accepted_risk` |" in scorecard
-    assert "Status: **INCOMPLETE**" in scorecard
 
 
-def test_installer_smoke_passes_an_existing_wheel_path() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    assert 'DOCATLAS_INSTALL_SOURCE="$(find "$PWD/dist" -name \'*.whl\' -print -quit)"' in text
 
 
-def test_publish_excludes_release_manifest_from_pypi_upload() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    remove_manifest = text.index("rm dist/release-manifest.json")
-    publish_action = text.index("pypa/gh-action-pypi-publish@")
-    assert remove_manifest < publish_action
 
 
-def test_sdist_gate_builds_and_smokes_its_own_wheel() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    assert "python -m pip wheel --no-deps --wheel-dir sdist-wheel dist/*.tar.gz" in text
-    assert "python -m pip install --force-reinstall sdist-wheel/*.whl" in text
-    assert "python scripts/release_gate.py --dist sdist-wheel" in text
 
 
-def test_publish_runs_exact_public_version_smoke() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    publish = text[text.index("  publish:"):text.index("  public-platform-smoke:")]
-    assert "RELEASE_TAG: ${{ inputs.tag }}" in publish
-    assert 'RELEASE_VERSION="${RELEASE_TAG#v}"' in publish
-    assert 'RELEASE_VERSION="${{ inputs.tag }}"' not in publish
-    assert "DOCATLAS_INSTALL_VERSION=\"$RELEASE_VERSION\"" in publish
-    assert "for attempt in 1 2 3 4 5" in publish
-    assert "PIP_NO_CACHE_DIR=1" in publish
-    assert "scripts/docs_mcp_stdio_smoke.py" in publish
 
 
-def test_publish_verifies_exact_public_release_on_all_primary_platforms() -> None:
-    text = (ROOT / ".github/workflows/publish.yml").read_text()
-    public = text[text.index("  public-platform-smoke:"):]
-    assert "if: github.event_name == 'workflow_dispatch'" in public
-    assert "needs: [publish]" in public
-    assert "os: [ubuntu-latest, macos-latest, windows-latest]" in public
-    assert "ref: refs/tags/${{ inputs.tag }}" in public
-    assert 'run: python scripts/public_release_smoke.py --tag "${{ inputs.tag }}"' in public
 
 
-def test_public_release_smoke_is_exact_public_and_no_cache() -> None:
-    text = (ROOT / "scripts/public_release_smoke.py").read_text()
-    assert 'PYPI_INDEX = "https://pypi.org/simple"' in text
-    assert '"--isolated"' in text
-    assert '"--no-cache-dir"' in text
-    assert 'f"doc-atlas=={version}"' in text
-    assert "source_version() != version" in text
-    assert 'expected = f"doc-atlas {version}"' in text
-    assert 'ROOT / "scripts" / "docs_mcp_stdio_smoke.py"' in text
 
 
-def test_stdio_smoke_requires_cited_content() -> None:
-    from scripts.docs_mcp_stdio_smoke import NEEDLE, validate_context_payload
-
-    payload = {"status": "ok", "kind": "docs_context", "support_status": "retrieval_only",
-        "context_status": "ready", "answer_supported": False, "answer_available": False,
-        "sources": [{"path_or_url": "README.md", "snippet": NEEDLE,
-            "content_sha256": "a" * 64}]}
-    validate_context_payload(payload, required_fragment=NEEDLE)
-    for source in ({"path_or_url": "README.md", "snippet": "unrelated", "content_sha256": "a" * 64},
-                   {"path_or_url": "README.md", "snippet": NEEDLE, "content_sha256": "forged"},
-                   {"snippet": NEEDLE, "content_sha256": "a" * 64}):
-        with pytest.raises(AssertionError):
-            validate_context_payload({**payload, "sources": [source]}, required_fragment=NEEDLE)
 
 
-def test_stdio_smoke_uses_primary_docatlas_home_without_legacy_writes(tmp_path) -> None:
-    from scripts.docs_mcp_stdio_smoke import isolated_environment
-
-    environment = isolated_environment(tmp_path)
-    assert environment["HOME"] == environment["USERPROFILE"] == str(tmp_path / "user-home")
-    assert environment["DOCATLAS_HOME"] == str(tmp_path / "docatlas-home")
-    assert not (Path(environment["HOME"]) / ".docmancer").exists()
-    assert "PYTHONPATH" not in environment
 
 
-@pytest.mark.parametrize("self_host_check,args", [
-    *[(check, ()) for check in (
-        _assert_self_host_payload_baseline,
-        _assert_self_host_metadata_is_not_top1_fact,
-        _assert_self_host_measures_cost_without_fixed_ceilings,
-        _assert_self_host_missing_payload_preserves_case_partitions,
-        _assert_self_host_attribution_rejects_same_path_different_identity,
-        _assert_self_host_cost_has_no_fixed_token_ceiling,
-        _assert_self_host_expected_public_inventory,
-        _assert_self_host_attribution_rejects_changed_snapshot,
-        _assert_self_host_private_qualification_projection,
-        _assert_self_host_exact_public_source_keys,
-        _assert_self_host_abstention_safety,
-        _assert_self_host_nonmapping_payloads,
-        _assert_self_host_positive_passed_count,
-    )],
-    *[(_assert_self_host_rejects_bad_payloads, values) for values in _SELF_HOST_BAD_PAYLOADS],
-    *[(_assert_self_host_packs_content_is_intent_scoped, values) for values in (
-        ("How do Docs work?", 15), ("Compare Docs and Packs", 0),
-        ("How do Docs work, not Packs?", 15), ("How do I get started?", 0),
-    )],
-    *[(_assert_self_host_negative_cannot_authorize, (flag,)) for flag in (
-        "answer_supported", "answer_available", "edit_ready",
-    )],
-    *[(_assert_self_host_attribution_uses_same_call_qualified_snapshot, (kinds,)) for kinds in (
-        ("direct",), ("derived",), ("direct", "derived"), (),
-    )],
-])
-def test_stdio_smoke_accepts_structured_content_and_legacy_json_text(self_host_payload_runner, self_host_check, args) -> None:
-    self_host_check(self_host_payload_runner, *args)
-    from scripts.docs_mcp_stdio_smoke import payload, text_payload, validate_context_payload
-    from scripts.run_project_docs_self_host_gate import (
-        GOLD_CASES,
-        _threshold_failures,
-        _validate_context_result,
-    )
-
-    class Text:
-        def __init__(self, text: str) -> None:
-            self.text = text
-
-    class Result:
-        def __init__(self, *, structured=None, text: str = "") -> None:
-            if structured is not None:
-                self.structuredContent = structured
-            self.content = [Text(text)]
-
-    expected = {"status": "ok", "kind": "docs_answer"}
-    assert payload(Result(structured=expected, text="not JSON")) is expected
-    assert payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
-    assert text_payload(Result(text='{"status": "ok", "kind": "docs_answer"}')) == expected
-    with pytest.raises(AssertionError, match="included structuredContent"):
-        text_payload(Result(structured=expected, text='{"status": "ok"}'))
-    validate_context_payload({
-        "status": "ok",
-        "kind": "docs_context",
-        "support_status": "retrieval_only",
-        "context_status": "ready",
-        "answer_supported": False,
-        "answer_available": False,
-        "sources": [{
-            "path_or_url": "README.md",
-            "snippet": "needle",
-            "content_sha256": "a" * 64,
-        }],
-    }, required_fragment="needle")
-    assert len(GOLD_CASES) == 15
-    assert all(case.expected_kind == "docs_context" for case in GOLD_CASES)
-    assert all(
-        case.relevant_paths or case.expected_kind == "insufficient_evidence"
-        for case in GOLD_CASES
-    )
-    invalid_citation = {
-        "kind": "docs_context",
-        "context_status": "ready",
-            "answer_supported": False,
-            "answer_available": False,
-            "edit_ready": False,
-            "answer_policy": "cite_only",
-            "facets": [],
-        "sources": [{"snippet": "grounded", "content_sha256": "z" * 64}],
-    }
-    assert _validate_context_result(invalid_citation) == "source lacks a grounded snippet or content hash"
-
-    passing_metrics = {
-        "false_supported_count": 0,
-        "operational_contamination_count": 0,
-        "useful_result_count": 13,
-        "top1_fact_bearing_count": 12,
-        "top3_relevant_count": 15,
-        "original_query_covered_count": 12,
-        "metadata_only_evidence_count": 0,
-        "packs_contamination_count": 0,
-        "docs_analysis_contamination_count": 0,
-        "false_docs_answer_count": 0,
-        "max_source_count": 99,
-        "max_estimated_tokens": 4000,
-    }
-    assert _threshold_failures(passing_metrics, 20) == []
-    for key, value in (
-        ("false_supported_count", 1),
-        ("operational_contamination_count", 1),
-        ("useful_result_count", 12),
-        ("top1_fact_bearing_count", 11),
-        ("top3_relevant_count", 14),
-        ("original_query_covered_count", 11),
-        ("metadata_only_evidence_count", 1),
-        ("packs_contamination_count", 1),
-        ("docs_analysis_contamination_count", 1),
-        ("false_docs_answer_count", 1),
-    ):
-        assert _threshold_failures({**passing_metrics, key: value}, 20)
-
-    maintained_contracts = (
-        ROOT / "README.md",
-        ROOT / "CONTRIBUTING.md",
-        ROOT / "docs/mcp-docs-server.md",
-        ROOT / "docs/project-docs-mcp-workflow.md",
-        ROOT / "docs/project-docs-demo.md",
-        ROOT / "docs/INDEX.md",
-        ROOT / "wiki/Architecture.md",
-    )
-    for contract_path in maintained_contracts:
-        contract_text = contract_path.read_text(encoding="utf-8")
-        for result_kind in (
-            "docs_answer", "docs_context", "patch_context", "insufficient_evidence",
-        ):
-            assert result_kind in contract_text, (contract_path, result_kind)
-
-    # The short MCP resources describe the workflow; result variants are the
-    # delivered schema contract, not required literal words in a Python file.
-    from docmancer.mcp.docs_server import current_tools, read_docs_resource
-
-    context = next(tool for tool in current_tools({}) if tool["name"] == "get_docs_context")
-    output = context["outputSchema"]
-    assert output["properties"]["kind"]["enum"] == ["docs_answer", "docs_context"]
-    assert "insufficient_evidence" in output["properties"]["status"]["enum"]
-    assert "oneOf" not in output
-    assert "context_format" not in context["inputSchema"]["properties"]
-    advanced = next(tool for tool in current_tools({"DOCATLAS_MCP_ADVANCED_TOOLS": "1"})
-                    if tool["name"] == "get_docs_context")
-    assert advanced["outputSchema"]["oneOf"][0] == output
-    assert advanced["outputSchema"]["oneOf"][1]["properties"]["kind"]["const"] == "patch_context"
-    resource = read_docs_resource("docmancer://agent/quickstart")
-    assert resource and resource["uri"] == "docmancer://agent/quickstart"
-    for guard in ("get_docs_context", "recommended_next_action", "hard_stop=true",
-                  "hard_stop=false", "is not permission", "DOCATLAS_MCP_ADVANCED_TOOLS=1",
-                  "does not enable this setting or load tools automatically"):
-        assert guard in resource["text"], guard
 
 
-def test_opencode_installer_enables_text_fallback_without_overwriting_other_environment() -> None:
-    text = (ROOT / "scripts/install.sh").read_text()
-    assert '"DOCATLAS_MCP_TEXT_FALLBACK": "1"' in text
-    assert '"environment": {**environment, **desired["environment"]}' in text
-    assert "has a different command; refusing to overwrite it" in text
 
 
-def test_installer_compares_exact_version_output() -> None:
-    text = (ROOT / "scripts/install.sh").read_text()
-    assert '[ "$INSTALLED_VERSION" = "doc-atlas $EXPECTED_VERSION" ]' in text
 
 
-def test_installer_accepts_pinned_and_local_sources() -> None:
-    text = (ROOT / "scripts/install.sh").read_text()
-    assert "DOCATLAS_INSTALL_SOURCE" in text
-    assert "DOCATLAS_INSTALL_VERSION" in text
-    assert "DOCATLAS_EXPECT_VERSION" in text
 
 
 def _assert_main_ruleset_contract(monkeypatch, capsys) -> None:

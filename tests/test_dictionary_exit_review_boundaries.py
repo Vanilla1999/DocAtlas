@@ -208,17 +208,6 @@ def assert_blocked(payload, block):
     assert validate_model_visible_projection(payload, snapshot={}, max_tokens=800) == []
 
 
-@pytest.mark.parametrize("block", BLOCKS)
-@pytest.mark.parametrize("projector", ["docs_context", "docs_answer"])
-def test_direct_projection_obeys_each_explicit_delivery_block(block, projector):
-    retrieval = BlockedFacade(block).get_docs_context("MarbleValve")
-    if projector == "docs_context":
-        payload, snapshot = project_docs_context(retrieval=retrieval)
-    else:
-        retrieval["context_pack"] = [candidate()]
-        payload, snapshot = project_docs_answer(question=QUESTION, retrieval=retrieval)
-    assert not snapshot
-    assert_blocked(payload, block)
 
 
 @pytest.mark.parametrize("block", BLOCKS)

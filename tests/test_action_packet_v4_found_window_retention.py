@@ -162,26 +162,8 @@ def test_explicit_public_patch_retains_windows_with_live_validation(pipeline, mo
     assert set(reads) == {str(p.root)}
 
 
-def test_omitted_null_and_prose_do_not_enable_retention():
-    calls = []
-    class Facade:
-        def get_docs_context(self, question, **kwargs):
-            calls.append(kwargs)
-            return {'status': 'success', 'context_pack': []}
-    for args in ({}, {'context_format': None}):
-        handle_context_tool('get_docs_context', {'question': 'patch edit code', **args}, Facade())
-    assert calls[0] == calls[1]
-    assert 'retain_found_windows' not in calls[0]
-    handle_context_tool('get_docs_context', {'question': 'docs', 'context_format': 'patch_context'}, Facade())
-    assert calls[-1]['retain_found_windows'] is True
 
 
-def test_unsupported_facade_rejects_without_retry():
-    class Facade:
-        def get_docs_context(self, question):
-            pytest.fail('unsupported facade must not be invoked')
-    result = handle_context_tool('get_docs_context', {'question': 'binding', 'context_format': 'patch_context'}, Facade())
-    assert result['error']['reason_code'] == 'unsupported_found_window_retention'
 
 
 def test_ranking_retains_only_independently_qualified_eligible_windows(pipeline):
@@ -303,33 +285,8 @@ def test_exact_document_fallback_schedule_unchanged(pipeline, monkeypatch):
     assert calls == baseline and len(calls) == 1
 
 
-@pytest.mark.parametrize('mode', ['project', 'mixed', 'dependency'])
-def test_unified_project_branches_forward_explicit_flag(pipeline, mode):
-    p = pipeline
-    calls = []
-    def project(*args, **kwargs):
-        calls.append(kwargs)
-        raise RuntimeError('delegation observed')
-    p.unified.service.get_project_context = project
-    p.unified._dependency_prefetch_needed = lambda *args: False
-    with pytest.raises(RuntimeError, match='delegation observed'):
-        p.unified.get_docs_context('validate_binding', project_path=str(p.root),
-            mode=mode, prepare_project_docs=False, retain_found_windows=True)
-    assert calls[0]['retain_found_windows'] is True
 
 
-def test_unsupported_project_facade_never_retries_bounded(pipeline):
-    p = pipeline
-    calls = []
-    def legacy(root, query, *, tokens=None, limit=None, expand=None, module=None,
-               module_path=None, scope=None, requirements=None, documentation_query_plan=None):
-        calls.append(query)
-        pytest.fail('legacy body must not run or be retried without retention')
-    p.context.facade.get_project_docs = legacy
-    with pytest.raises(_UnsupportedFoundWindowRetention, match='completion interface'):
-        p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only',
-            retain_found_windows=True)
-    assert calls == []
 
 
 def test_generic_kwargs_is_not_retention_support(pipeline):
@@ -524,32 +481,6 @@ def test_real_generation_duplicate_lookup_bindings_survive(stored_generation):
         assert row.metadata['_reference_evidence']['source']['scope']['snapshot_id'] == f.generation
 
 
-def test_real_generation_context_retention_preserves_control_and_read_traces(stored_generation):
-    f, p = stored_generation, stored_generation.p
-    bounded = p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only')
-    baseline = (deepcopy(f.statements), list(f.content_reads), list(f.loads),
-                deepcopy(p.acquisitions), list(f.file_reads), list(p.controls))
-    f.statements.clear()
-    f.content_reads.clear()
-    f.loads.clear()
-    p.acquisitions.clear()
-    f.file_reads.clear()
-    p.controls.clear()
-    retained = p.context.get_project_context(str(p.root), 'validate_binding', mode='project-only',
-        retain_found_windows=True)
-    assert (f.statements, f.content_reads, f.loads, p.acquisitions, f.file_reads, p.controls) == baseline
-    assert retained.selection_decision == bounded.selection_decision
-    assert retained.project_docs == bounded.project_docs
-    assert retained.diagnostics['retrieval_routing'] == bounded.diagnostics['retrieval_routing']
-    expected = {row.metadata['stable_chunk_id']: row.text for row in p.chunks}
-    assert expected
-    for result in (bounded, retained):
-        assert len(result.context_pack) == len(expected)
-        assert {row['stable_chunk_id']: row['content'] for row in result.context_pack} == expected
-    assert all(row['_reference_evidence']['source']['scope']['snapshot_id'] == f.generation
-               for row in retained.context_pack)
-
-
 def test_real_generation_unresolved_admission_is_not_uncapped(stored_generation):
     p = stored_generation.p
     control = []
@@ -628,56 +559,8 @@ def test_unrelated_service_cannot_complete_the_call(pipeline, unrelated):
     assert result['error']['reason_code'] == 'unsupported_found_window_retention'
 
 
-def test_closed_completion_cannot_be_replayed_after_success_or_exception():
-    escaped = []
-    class Producer:
-        @_found_window_retention_producer
-        def get_docs_context(self, question, *, retain_found_windows=False, _retention_ack=None, **kwargs):
-            escaped.append(_retention_ack)
-            if question == 'raise':
-                raise RuntimeError('producer failed')
-            return {'status': 'success', 'context_pack': []}
-    producer = Producer()
-    _invoke_found_window_retention(producer.get_docs_context, 'success', retain_found_windows=True)
-    with pytest.raises(RuntimeError, match='producer failed'):
-        _invoke_found_window_retention(producer.get_docs_context, 'raise', retain_found_windows=True)
-    assert len(escaped) == 2 and escaped[0] is not escaped[1]
-    for token in escaped:
-        assert token.active is False
-        with pytest.raises(_UnsupportedFoundWindowRetention, match='closed'):
-            producer.get_docs_context('success', retain_found_windows=True, _retention_ack=token)
-        with pytest.raises(_UnsupportedFoundWindowRetention, match='closed'):
-            _invoke_found_window_retention(producer.get_docs_context, 'success',
-                retain_found_windows=True, _retention_ack=token)
-        with pytest.raises(_UnsupportedFoundWindowRetention, match='closed'):
-            token.complete({}, None, None, token.binding, ())
-    assert len(escaped) == 2  # Invalid tokens reject before producer execution.
 
 
-def test_interleaved_calls_have_distinct_completion_lifetimes_and_bindings():
-    observed = []
-    class Producer:
-        @_found_window_retention_producer
-        def get_docs_context(self, question, *, project_path=None, lookup_queries=(),
-                             retain_found_windows=False, _retention_ack=None):
-            observed.append((question, _retention_ack))
-            if question == 'outer':
-                for changes in ({'question': 'inner'}, {'project_path': '/other'}, {'lookup_queries': ('other',)}):
-                    values = {'question': question, 'project_path': project_path, 'lookup_queries': lookup_queries}
-                    values.update(changes)
-                    with pytest.raises(_UnsupportedFoundWindowRetention, match='different'):
-                        self.get_docs_context(**values, retain_found_windows=True, _retention_ack=_retention_ack)
-                _invoke_found_window_retention(self.get_docs_context, 'inner', project_path=project_path,
-                    lookup_queries=lookup_queries, retain_found_windows=True)
-                assert _retention_ack.active is True and observed[-1][1].active is False
-            return {'question': question, 'context_pack': []}
-    producer = Producer()
-    result = _invoke_found_window_retention(producer.get_docs_context, 'outer', project_path='/fixture',
-        lookup_queries=('binding',), retain_found_windows=True)
-    assert result['question'] == 'outer'
-    assert [question for question, _ in observed] == ['outer', 'inner']
-    assert observed[0][1] is not observed[1][1]
-    assert all(token.active is False for _, token in observed)
 
 
 def test_supported_project_docs_delegate_completes_actual_result_and_sink(pipeline):

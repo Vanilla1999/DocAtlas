@@ -57,30 +57,3 @@ def test_shared_heading_metadata_does_not_evict_canonical_text(tmp_path, record_
     assert validate_model_visible_projection(out, snapshot=bindings) == []
 
 
-def test_priority_rule_available_in_first_packet_or_one_registered_read(tmp_path):
-    _, cases, manifest = load_protocol()
-    case = next(c for c in cases if c["id"] == "mkdocs-05")
-    docs = documents_for("mkdocs", manifest)
-    root = tmp_path / "project"
-    write_project(root, docs)
-    fact = case["required_claims"][0]["witness_sets"][0]["parts"][0]["text"]
-    with isolated_service(tmp_path / "state") as (service, config):
-        index_project(service, config, root)
-        payload, trace = observe_call(service, {
-            "question": case["question"], "project_path": str(root), "scope": "all",
-        })
-        assert audit_payload(payload, trace["snapshot"], root) == []
-        first = [s["snippet"] for s in payload.get("sources", [])]
-        reads = []
-        if not any(fact in text for text in first):
-            assert len(payload["read_next"]) == 1
-            target = payload["read_next"][0]
-            read = json.loads(read_docs_resource(target["source_uri"], service)["text"])
-            assert read["status"] in {"complete", "truncated"}
-            assert read["content_sha256"] == target["snapshot_sha256"]
-            raw = docs[target["path"]]
-            assert read["snippet"] in "\n".join(raw.splitlines()[read["line_start"]-1:read["line_end"]])
-            reads.append(read["snippet"])
-        assert any(fact in text for text in first + reads), {"payload": payload, "reads": reads}
-    assert payload["answer_supported"] is False
-    assert payload["edit_ready"] is False

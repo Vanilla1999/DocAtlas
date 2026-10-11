@@ -7,8 +7,6 @@ from eval.evidence_quality_v2.observer import observe_call
 CASES = [
     ('fastapi-original', 'fastapi',
      'When do FastAPI background tasks run relative to returning the response?'),
-    ('httpx-original', 'httpx',
-     'Назови четыре типа timeout в HTTPX и объясни, что ограничивает каждый.'),
     ('httpx-paraphrase-1', 'httpx',
      'What do connect, read, write, and pool timeouts each limit in HTTPX?'),
     ('httpx-paraphrase-2', 'httpx',

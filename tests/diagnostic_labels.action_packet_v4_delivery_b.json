@@ -5,13 +5,10 @@
     "tests/test_action_packet_v4_workflow_surface.py": "schema",
     "tests/test_action_packet_v4_projection_split.py": "behavioral"
   },
-  "node_overrides": {
-    "tests/test_action_packet_v4_workflow_surface.py::test_omitted_null_and_prose_never_change_docs_routing": "behavioral",
-    "tests/test_action_packet_v4_projection_split.py::test_projection_split_modules_and_context_handler_are_below_line_limit": "artifact"
-  },
+  "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_action_packet_v4_delivery_consumers.py": "2edb54ff17b742bbbe855582e0b9a36cdf141b24ac0b2144dd1bf88cc786f9d7",
-    "tests/test_action_packet_v4_workflow_surface.py": "6738551ca73ee6ff1a2b8a57481d88ec383b0de9948c5edce54e40f6951a9ee5",
-    "tests/test_action_packet_v4_projection_split.py": "1cbb033d6d3b768e2131ff1fc9d95eea1cafcf4930151f77ffc338230d8ff4ca"
+    "tests/test_action_packet_v4_delivery_consumers.py": "656ecd9c08b6f8d679cc333ff0442dba5020a58018bc69f55d3d8c0abbee7245",
+    "tests/test_action_packet_v4_workflow_surface.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tests/test_action_packet_v4_projection_split.py": "bf0a3ee2d5238810579f4c69bcea21c16a3a4594333938c476b601118087dab1"
   }
 }

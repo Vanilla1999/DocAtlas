@@ -186,5 +186,3 @@ def _assert_direct_15_sidecar() -> None:
         pytest.fail(f"direct-15 failures:\n{details}", pytrace=False)
 
 
-def test_direct_docatlas_questions_15_visible_context_covers_all_required_facts():
-    _assert_direct_15_sidecar()

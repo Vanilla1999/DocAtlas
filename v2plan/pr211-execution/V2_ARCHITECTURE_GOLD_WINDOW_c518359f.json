@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "base_sha": "c518359fbf09f3a7c7457d686682bf3e12eecfae",
+  "baseline_run": "38030248861",
+  "baseline_attempt": 1,
+  "artifact": "project-docs-quality-38030248861/project-context-quality-v2-live.json",
+  "case_id": "v2-natural-architecture",
+  "original_question": "Как устроена архитектура проекта и где проходят основные границы модулей?",
+  "scope": "all",
+  "lookup_id": "query-lookup-3",
+  "lookup_text": "Which responsibilities belong to storage rather than evidence qualification?",
+  "independent_oracle": {
+    "path": "eval/project_context_quality_v2/cases.json",
+    "obligation_id": "infrastructure_boundary",
+    "source_path": "docs/modules/project-context-retrieval.md",
+    "required_text": "SQLite owns persistence and candidate generation; metadata-only matching may discover a candidate but cannot qualify public evidence"
+  },
+  "observed_candidate": {
+    "stable_chunk_id": "child-22cd41ddcb2bffbbe73cd47912121ea137fd1064",
+    "parent_logical_id": "parent-e2a0aa5fa84b93ba8a576e1bbb8ce7f3",
+    "source_sha256": "6e4d1c68ffd94154f03d1d346de9a2bb144511502e3ca22f43f203dbada864bc",
+    "char_start": 2053,
+    "char_end": 2526,
+    "window_characters": 473,
+    "window_sha256": "dab07db4b53375f545671704afb37e224e5feb6ccbf419120933dc079e274faf",
+    "member_scope": "module",
+    "module_path": "docmancer/docs",
+    "acquisition_query_terms": ["how", "are", "application", "workflows", "separated", "from", "domain", "rules"]
+  },
+  "observed_qualification": {
+    "outcome": "rejected",
+    "reason": "insufficient_visible_match",
+    "qualification_route": "cross_lane_body",
+    "context_only": true,
+    "matched_terms": ["evidence", "qualification"],
+    "matched_term_count": 2,
+    "query_term_count": 9,
+    "match_ratio": 0.2222,
+    "reference_visible_span": [2053, 2524]
+  },
+  "independent_verification": {
+    "method": "Stdlib SHA-256 of git show BASE source bytes and source[2053:2526], with whitespace-normalized frozen oracle comparison; no production matcher/import/runtime used.",
+    "source_hash_matches": true,
+    "window_hash_matches": true,
+    "whole_required_text_in_window": true,
+    "sqlite_char_offset": 2324,
+    "public_required_fact": false,
+    "public_verified_obligations": "3/4",
+    "public_source_count": 1
+  },
+  "causal_boundary": "Earliest observed rejection of this exact retrieved gold-bearing window is qualification, before ranking/projection. Unknown upstream omissions do not negate this positive observation, but prevent claiming a complete producer history. No product fix or fresh runtime PASS is claimed."
+}

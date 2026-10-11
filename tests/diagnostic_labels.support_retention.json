@@ -2,13 +2,11 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_visible_support_units.py": "behavioral",
-    "tests/docs/test_support_preserving_selection.py": "behavioral",
     "tests/docs/test_support_retention_integration.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_visible_support_units.py": "c1757302fa782beac23e207a461e45602096a35adf93c6bc95a8c5d02f395b39",
-    "tests/docs/test_support_preserving_selection.py": "fdde2ea012951e063dba9841847638100ff20a56d98f32919debe613d1b2fdf7",
-    "tests/docs/test_support_retention_integration.py": "3650f428b31509c76aeb2be71376ed0f7db957252090070b4adbd13dafb78f0f"
+    "tests/docs/test_visible_support_units.py": "dabee7123da0e8a6a393de55f4c4a18c6bfa3190badfe4c45d0b5fe49d6d0212",
+    "tests/docs/test_support_retention_integration.py": "225f1bba4ca11db2fbfdd6bada56755aabb3aae51891845f84338ae9fdbcd850"
   },
   "node_overrides": {}
 }

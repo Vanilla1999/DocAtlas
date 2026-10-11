@@ -4,7 +4,7 @@
     "tests/test_dictionary_exit_local_entry_closure.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_dictionary_exit_local_entry_closure.py": "2a3b1f6921972d5d981bca58c57e60aed1677efb2615369fedb5e585c3c19a53"
+    "tests/test_dictionary_exit_local_entry_closure.py": "ddeb5087c481f00e98e333866de29ea83e2f55d9e9e66ff4c8ddf2403f784988"
   },
   "node_overrides": {}
 }

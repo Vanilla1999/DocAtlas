@@ -16,46 +16,6 @@ from tests._shared_test_docs_service import _flutter_project
 from tests.docs._scope_guidance_contract import assert_public_scope_guidance
 
 
-def test_host_policy_distinguishes_onboarding_from_repo_policy():
-    # Historical node name retained; prose topics no longer select scope.
-    policy = public_agent_contract()["workflow"]["scope_planning"]
-    assert not {"repository_overview_scope", "repo_level_policy_scope", "known_module_scope"} & policy.keys()
-    assert policy["module_path_implies_scope"] == "module"
-    assert policy["all_requires_no_module_filter"] is True
-    assert policy["explicit_scope_is_authoritative"] is True
-    assert policy["all_is_repository_local"] is True
-    assert policy["never_widen_project_to_all"] is True
-
-
-def test_host_examples_validate_and_keep_distinct_scope_intents():
-    contract = public_agent_contract()
-    tools = {tool["name"]: tool for tool in runtime_public_tool_dicts()}
-    examples = {row["id"]: row for row in contract["examples"]}
-    for key, scope in (("repository-overview", "all"), ("repository-policy", "project"),
-                       ("known-module", "module")):
-        example = examples[key]
-        args = example["arguments"]
-        jsonschema.validate(args, tools["get_docs_context"]["inputSchema"])
-        assert args["scope"] == scope
-        assert args["project_path"] == "/repo"
-        assert ("module_path" in args) == (scope == "module")
-        assert args["question"]
-        if scope != "module":
-            assert "caller explicitly requests" in example["condition"]
-
-
-def test_advertised_scope_explains_all_without_adding_a_default():
-    tool = next(tool for tool in runtime_public_tool_dicts() if tool["name"] == "get_docs_context")
-    assert_public_scope_guidance(tool)
-
-
-@pytest.mark.parametrize("template", ["skill.md", "claude_code_skill.md", "claude_desktop_skill.md",
-                                      "cursor_agents_md.md", "copilot_instructions.md", "project_bootstrap.md"])
-def test_generated_host_guides_include_the_scope_decision(template):
-    rendered = _get_template_content(template)
-    for phrase in ('scope="all"', 'scope="project"', 'scope="module"', 'project_path',
-                   'Preserve project/library/version/path bindings', 'Never infer or widen scope from question wording'):
-        assert phrase in rendered
 
 
 @pytest.mark.parametrize("scope,module_path,question,expected", [

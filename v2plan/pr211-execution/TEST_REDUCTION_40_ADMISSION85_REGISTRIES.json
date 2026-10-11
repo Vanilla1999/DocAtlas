@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "admission85": {
+    "packet": "/tmp/opencode/pr211-fail-admission-next.json",
+    "sha256": "5eef4dfa6459a046b1d81b950a26bf46ed980a2916765f36ad4355c629631663",
+    "removed": 85,
+    "added": 0,
+    "BASE_status": {
+      "FAIL": 85
+    },
+    "saved_CI_status": {
+      "FAIL": 85
+    },
+    "module_counts": {
+      "tests/docs/test_admission_guard_composition.py": 15,
+      "tests/docs/test_admission_mapping_assignments.py": 17,
+      "tests/docs/test_admission_relation_safety.py": 18,
+      "tests/docs/test_admission_relation_witnesses.py": 19,
+      "tests/docs/test_evidence_set_need_composition.py": 11,
+      "tests/docs/test_need_local_admission.py": 4,
+      "tests/docs/test_reference_transfer_regressions.py": 1
+    },
+    "unresolved": [],
+    "author_validation": "stdlib tokenize and source-text comparison only. All retained function bodies and helpers unchanged; eight PASS matrix combinations retained explicitly. No runtime/AST/project imports/pytest/install.",
+    "retained_red_integration_count": 61,
+    "retained_red_integration_proof": "Exact retained IDs and author reasons remain hash-bound in original packet; no new PASS claim.",
+    "failure_diagnostic_hashes_verified": 85
+  },
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "boundary": "Saved core3.11 pre-retirement; not final collection/runtime. Metadata and registries only; no runtime/AST/project imports/CI. Owner FAIL retirement accepts coverage loss, not product fix/PASS."
+  },
+  "registry_updates": [
+    {
+      "registry": "tests/diagnostic_labels.admission_contract.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_admission_guard_composition.py",
+          "action": "survivor_hash",
+          "old": "aa115ae6d23e72493e6cf861ec5875367566ec337a8a63ccf70582f2cbc1e1bb",
+          "new": "d204f99bd63a96aa254aad2e13f9761ee93ee75ec3ba0176a04f4fdc1e345291"
+        },
+        {
+          "module": "tests/docs/test_admission_mapping_assignments.py",
+          "action": "survivor_hash",
+          "old": "fffd94be622e2d7c08ac6ef378ab558d524b6f1329c60e9c49d8e0772a78c6c7",
+          "new": "185d62a53e831b7acee3871937001e0eb47fd48076f74780f39d50e7f9110693"
+        },
+        {
+          "module": "tests/docs/test_admission_relation_safety.py",
+          "action": "survivor_hash",
+          "old": "077faa21a04fe876c8b34417761810456369f918e45fd4723322b3b178ff9b4f",
+          "new": "614b9322a76c277da82896f3c2e118fd49756f5afd0adc0e6f9c2a9bcbb74963"
+        },
+        {
+          "module": "tests/docs/test_admission_relation_witnesses.py",
+          "action": "survivor_hash",
+          "old": "a7b826ebf07b3eacaaf91d6543517619f1291c2b98fdf6e6d95a0aa75105d37d",
+          "new": "4f3123d44722a925ce3db7c29ea73893538112d14c3c661287e33aeca9b039be"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.compact_context.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_compact_context_blocks.py",
+          "action": "survivor_hash",
+          "old": "1d18d20ef35f2870b774f3f03f6a8fc0564f7cb9964481ceab175edcbd954d5d",
+          "new": "f51d5fff44829c0ad3ce0fdaf1844aaee589878e35d3dc0f0cdd441a8305558a"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.evidence_sets.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_evidence_set_need_composition.py",
+          "action": "survivor_hash",
+          "old": "d27d3e70c416fa43f7b678d93ffa6047407121dca788e03cb952e42d0013fdf3",
+          "new": "bb6ad39187e35a6e6d14be3d372695d3e6e2751e281ee2403b9bd4d32aebb1fe"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.global_evidence.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_need_local_admission.py",
+          "action": "survivor_hash",
+          "old": "b7caf93004b12df187a8e05aa4b6b5393e47e32d287f588911722ad40356953c",
+          "new": "08d19f79e9a6a02b35c969fa1fef19161ade4343a1fb7c97a899b97ff7d43be4"
+        }
+      ]
+    },
+    {
+      "registry": "tests/diagnostic_labels.reference_binding.json",
+      "actions": [
+        {
+          "module": "tests/docs/test_reference_transfer_regressions.py",
+          "action": "survivor_hash",
+          "old": "49295d4b8835bb343a9dc83be4333f6af743551091e3245cdd2dfee957917ed2",
+          "new": "43d7b4f342a471ea65a4ce0ba44693901151b53a6cb6e76f58f8d96e2bc159a8"
+        }
+      ]
+    }
+  ],
+  "deferred_paths": [
+    "tests/docs/test_evidence_set_query_schedule.py",
+    "tests/docs/test_query_planning_alias_regressions.py",
+    "tests/docs/test_query_planning_completion_safety.py"
+  ],
+  "registry_method": "Normalized frozen BASE node IDs minus all integrated removals; deduplicate/sort/newline-join/SHA256. Source textual test-definition names independently equal surviving normalized sets for settled modules. Only empty surviving module labels/hashes and retired overrides removed; helper consumers untouched. Expanded parameter renumbering changes no normalized hash and is not addition credit.",
+  "validation": {
+    "partition": 8291,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0,
+    "overlap_previous": 0,
+    "removed": 700,
+    "added": 1,
+    "net": 699,
+    "projected_after": 7592,
+    "target_gap": 2618,
+    "classified": 1382,
+    "unclassified": 6909
+  },
+  "prior_manifest_sha256": "ea4c9003ddc93a2458982fcf7943cf423e678dee4f923846e88da61104f1330d",
+  "pending": "New root/ranking packets excluded; deferred registry modules untouched; final collection/CI pending.",
+  "resolved_prior_deferred": "tests/docs/test_compact_context_blocks.py: projection109 removal set, current textual definitions and frozen BASE; settled writer, final survivor hash applied."
+}

@@ -4,7 +4,7 @@
     "tests/test_dictionary_exit_local_membership.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/test_dictionary_exit_local_membership.py": "42997b5b0123cf43c5609bcd23740537e800f6092ae7b76afa9e1e9bbe0f4e5e"
+    "tests/test_dictionary_exit_local_membership.py": "e027cc31f526c9d011710b00ece9aceeae79cf86f53d4ea4cf2e6f8b462c3a0a"
   },
   "node_overrides": {}
 }

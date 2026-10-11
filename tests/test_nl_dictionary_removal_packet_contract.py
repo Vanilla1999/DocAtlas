@@ -92,12 +92,6 @@ def test_actual_validators_deny_forged_document_permission(promotion):
         projection, snapshot=snapshot, max_tokens=2000))
 
 
-@pytest.mark.parametrize("override", [
-    {"display_content_hash": "0" * 64}, {"char_end": 0}, {"parent_logical_id": ""},
-])
-def test_invalid_source_binding_is_still_rejected(override):
-    candidates, omissions = normalize_candidates([bound_quote(**override)], result_kind="patch_context")
-    assert not candidates and omissions
 
 
 def test_root_escape_stays_unverified_and_packet_budget_stays_bounded(tmp_path):

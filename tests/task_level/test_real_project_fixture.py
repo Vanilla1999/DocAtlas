@@ -52,32 +52,6 @@ def test_real_project_fixture_base_fails_gold_passes(tmp_path: Path):
     assert hidden.returncode == 0, hidden.stdout + hidden.stderr
 
 
-def test_real_project_fixture_excludes_secrets(tmp_path: Path):
-    workspace = tmp_path / "workspace"
-    materialize_fixture(_task(), workspace)
-
-    forbidden_names = {".env", "credentials", "node_modules", ".venv", "build", "dist", "coverage"}
-    paths = [path.relative_to(workspace).as_posix() for path in workspace.rglob("*")]
-
-    assert not any(part in forbidden_names for path in paths for part in path.split("/"))
-    assert "coderepo.corp" not in (workspace / "pubspec.yaml").read_text(encoding="utf-8")
-    assert "coderepo.corp" not in (workspace / "pubspec.lock").read_text(encoding="utf-8")
 
 
-def test_real_project_fixture_excludes_git_history(tmp_path: Path):
-    workspace = tmp_path / "workspace"
-    materialize_fixture(_task(), workspace)
 
-    assert (workspace / ".git").exists()
-    assert not (workspace / ".git/modules").exists()
-    assert workspace_has_no_oracles(workspace)
-
-
-def test_real_project_artifact_integrity(tmp_path: Path):
-    results = [{"task_id": TASK_ID, "condition_id": "repo_only", "repeat": 0, "status": "completed", "resolved": True}]
-
-    write_run_progress(tmp_path, results, total_runs=1, current=None, finished=True)
-    status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
-
-    assert status["artifact_integrity"]["ok"] is True
-    assert run_artifact_integrity(tmp_path, in_memory_results=1, total_runs=1, finished=True)["ok"] is True

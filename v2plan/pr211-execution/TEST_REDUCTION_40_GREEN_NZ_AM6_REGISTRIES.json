@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "packets": {
+    "nz5": {
+      "packet": "/tmp/opencode/pr211-green-root-nz.json",
+      "sha256": "852f98fa5653fad150f713b9796b7f85719819b2b6566c15049ac6d7c1f3eb26",
+      "removed": 5,
+      "BASE_status": {
+        "PASS": 5
+      },
+      "saved_CI_status": {
+        "PASS": 5
+      },
+      "final_source_hashes": {
+        "tests/test_network_guard.py": "23e93e724110bbc82bd600322e48e439299948acb2e7756a79bef657c1103f3c",
+        "tests/test_nl_dictionary_removal_literal_contract.py": "c38200cbb5ccd5ec2e4a74a327e64c8ae5b09d869b38982fb0bb1c722c0c0a93",
+        "tests/test_public_vector_retrieval.py": "9b359ff2e1489915f5985728d3981d6f777a38c2be382364afb16c2abe3e34de"
+      }
+    },
+    "am1": {
+      "packet": "/tmp/opencode/pr211-green-root-am.json",
+      "sha256": "41839dc851192bce493866a58c935def5931fceae71618bcf8da41526e1e2c9a",
+      "removed": 1,
+      "BASE_status": {
+        "PASS": 1
+      },
+      "saved_CI_status": {
+        "PASS": 1
+      },
+      "final_source_hashes": {
+        "tests/test_dictionary_exit_admission.py": "23f43a667518cfaaa4f90a36e15ace54f69cb132209a9f2ac76bd7ea9e863bb6"
+      }
+    }
+  },
+  "removed": 6,
+  "added": 0,
+  "prior_manifest_sha256": "0aecc8891e8ee5fa9d9f8f9a061dd8b7b822ace159294253470496dd1ce49dd1",
+  "integrated_manifest_sha256": "f448089ebf52b820969e6ea8e8515027b2aa913f46b667e6012cab8b18b469c9",
+  "deferred_source_paths": {},
+  "remaining": {
+    "nz5": {
+      "author_counts": {
+        "owned_candidate_bases": 176,
+        "owned_saved_pass_ids": 213,
+        "owned_candidate_files": 32,
+        "new_retired_pass_ids": 5,
+        "removed_functions": 5,
+        "changed_files": 3,
+        "prior_nonambiguous_integration_receipts_reused_bases": 149,
+        "prior_nonambiguous_integration_receipts_reused_pass_ids": 183,
+        "previously_ambiguous_bases_resolved_as_storage_integration": 22,
+        "previously_ambiguous_pass_ids_resolved_as_storage_integration": 25,
+        "remaining_integration_bases": 171,
+        "remaining_integration_pass_ids": 208,
+        "remaining_confirmed_unit_bases": 0,
+        "remaining_ambiguous_ids": 0,
+        "added_tests": 0,
+        "removed_skip_ids": 0
+      },
+      "limit": "Only owned frozen N-Z candidates; reused earlier integration boundary receipts, not global completion or production runtime proof."
+    },
+    "am1": {
+      "author_counts": {
+        "owned_candidate_definitions": 624,
+        "owned_saved_pass_ids": 1288,
+        "new_retired_pass_ids": 1,
+        "removed_definitions": 1,
+        "remaining_confirmed_unit_ids": 0,
+        "remaining_confirmed_integration_ids": 0,
+        "remaining_ambiguous_or_unfinalized_ids": 1287,
+        "remaining_ambiguous_or_unfinalized_definitions": 623,
+        "owned_candidates_exhausted": false
+      },
+      "limit": "INCOMPLETE; /tmp/opencode/pr211-am-classify.py is draft, not finalized evidence; do not use for bulk deletion. Coverage loss is not product correctness."
+    }
+  },
+  "source_observed_at_preparation": {
+    "tests/test_network_guard.py": "23e93e724110bbc82bd600322e48e439299948acb2e7756a79bef657c1103f3c",
+    "tests/test_nl_dictionary_removal_literal_contract.py": "c38200cbb5ccd5ec2e4a74a327e64c8ae5b09d869b38982fb0bb1c722c0c0a93",
+    "tests/test_public_vector_retrieval.py": "9b359ff2e1489915f5985728d3981d6f777a38c2be382364afb16c2abe3e34de",
+    "tests/test_dictionary_exit_admission.py": "23f43a667518cfaaa4f90a36e15ace54f69cb132209a9f2ac76bd7ea9e863bb6"
+  },
+  "helper_labels_preserved": [
+    "tests/test_dictionary_exit_admission.py",
+    "tests/test_network_guard.py"
+  ],
+  "registry_actions": {
+    "HASH": 4
+  },
+  "registry_files": 3,
+  "validation": {
+    "partition": 8291,
+    "removed": 6177,
+    "added": 1,
+    "net": 6176,
+    "projected_after": 2115,
+    "target_gap": 0,
+    "reduction_percent": 74.49041128934991,
+    "classified": 6302,
+    "unclassified": 1989,
+    "overlap": 0,
+    "duplicates": 0,
+    "missing": 0,
+    "unknown": 0,
+    "status_mismatches": 0
+  },
+  "limits": "Metadata/registries only. Prior history/policies/8ROOT deferrals unchanged. Only completed6 PASS IDs credited. Active DOCSfinal/AMfinal excluded. Preserve helper labels/SKIP; no runtime/AST/project imports/CI/commit/push/nestedagents. Target projected, not collection/product-quality proof.",
+  "registry_final_sha256": {
+    "tests/diagnostic_labels.dictionary_exit_admission.json": "d0b6485ce7b373ca8289bd7e67131b289ae9dc01e4aba3f951c074f36709e3ae",
+    "tests/diagnostic_labels.json": "2572e78c6123e094ad5de402e874b565a53e899190603d12af161b344404eec4",
+    "tests/diagnostic_labels.nl_dictionary_removal_literal_contract.json": "66e2711bf73f5a7930c843f4159022dd6bd1cf8951973d662208d4ef8423e6c0"
+  },
+  "registry_method": "Only four packet final source SHA matched current at preparation and immediately before registry application. Survivor normalized frozen BASE minus all6177 integrated removals plus sole existing addition, sorted unique newline-joined SHA256. Other active DOCS/AMfinal entries preserved. Helper/module labels unchanged, SKIP not retired.",
+  "exact_ids_binding": "Manifest green-followup::retired-nz5/am1 equals authoritative NEWPASSBASE_retiredIDs exactly;6 unique PASS IDs disjoint from6171 prior. No quotas or additional pending packet credits.",
+  "classification_limit": "N-Z boundary review limited to176 frozen owned candidate bases:171 integrations/208PASS retained, no remaining confirmed unit/ambiguous in that scoped inventory. A-M packet explicitly INCOMPLETE:623defs/1287PASS ambiguous or unfinalized. Do not use draft AM classification for bulk deletion; no global exhaustive completion claim.",
+  "proof": {
+    "run": "38033112465",
+    "sha": "a4844dfcdaca94f5faf36a6779bd887185215b5b",
+    "core3.11_junit_sha256": "b2744f851e88a71681a4b4b2a6697e38c9898ff4310c567ed83dcd08845d8238",
+    "advanced3.12_junit_sha256": "bcd105d7025c49ba68ce0131ad57ed10792c43fd0a52b20d3f83d0994b7612cc",
+    "boundary": "Saved/frozen PASS retirement only; accepted coverage loss, not runtime/collection/product quality."
+  }
+}

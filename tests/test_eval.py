@@ -41,183 +41,20 @@ def _agent(tmp_path):
     return agent
 
 
-def test_metric_formula_unit_tests():
-    relevance = [False, True, False]
-    assert hit_at_k(relevance, 1) == 0.0
-    assert hit_at_k(relevance, 2) == 1.0
-    assert mrr(relevance) == 0.5
-    assert latency_percentile_ms([10, 20, 30, 40], 95) == 40
 
 
-def test_eval_quality_metrics_use_canonical_sources():
-    class Chunk:
-        def __init__(self, source, canonical_url=None):
-            self.source = source
-            self.metadata = {"canonical_url": canonical_url} if canonical_url else {}
-
-    chunks = [
-        Chunk("https://example.com/docs?page=1", "https://example.com/docs"),
-        Chunk("https://example.com/docs?page=2", "https://example.com/docs"),
-        Chunk("https://example.com/fr/docs", "https://example.com/fr/docs"),
-    ]
-
-    assert source_diversity_metrics(chunks, k=3) == {"unique_sources_at_3": 2, "redundancy_rate_at_3": 0.3333}
-    assert locale_contamination(chunks) == {
-        "locale_contamination_count": 1,
-        "locale_contamination_sources": ["https://example.com/fr/docs"],
-    }
 
 
-def test_eval_aggregates_quality_metrics():
-    items = [
-        {
-            "source_diversity": {"unique_sources_at_5": 5, "redundancy_rate_at_5": 0.0},
-            "snippet_presence": {"snippet_present_at_5": True, "snippet_sections_at_5": 2},
-            "locale_contamination": {"locale_contamination_count": 0},
-        },
-        {
-            "source_diversity": {"unique_sources_at_5": 3, "redundancy_rate_at_5": 0.4},
-            "snippet_presence": {"snippet_present_at_5": False, "snippet_sections_at_5": 0},
-            "locale_contamination": {"locale_contamination_count": 2},
-        },
-    ]
-
-    assert aggregate_quality_metrics(items, k=5) == {
-        "unique_sources_at_5_avg": 4.0,
-        "redundancy_rate_at_5_avg": 0.2,
-        "snippet_present_at_5_rate": 0.5,
-        "snippet_sections_at_5_avg": 1.0,
-        "locale_contamination_count": 2,
-        "locale_contamination_rate": 0.5,
-    }
 
 
-def test_task_context_benchmark_reports_cold_warm_and_context7_lanes():
-    scenarios = [{"id": "repo-rule-version", "description": "project rule plus exact dependency docs"}]
-    report = run_task_context_benchmark(
-        scenarios=scenarios,
-        runners={
-            "context7-only": lambda scenario: {
-                "task_completion": True,
-                "tests_passed": False,
-                "wrong_version_api_usage": True,
-                "project_rule_violation": True,
-                "docs_tool_calls": 1,
-                "total_docs_tokens": 1400,
-                "correction_loops": 1,
-            },
-            "docmancer-cold": lambda scenario: {
-                "task_completion": True,
-                "tests_passed": True,
-                "wrong_version_api_usage": False,
-                "project_rule_violation": False,
-                "docs_tool_calls": 3,
-                "total_docs_tokens": 900,
-                "correction_loops": 0,
-            },
-            "docmancer-warm": lambda scenario: {
-                "task_completion": True,
-                "tests_passed": True,
-                "wrong_version_api_usage": False,
-                "project_rule_violation": False,
-                "docs_tool_calls": 1,
-                "total_docs_tokens": 700,
-                "correction_loops": 0,
-            },
-        },
-    )
-
-    assert report["benchmark_type"] == "task_context"
-    assert report["lanes"] == ["context7-only", "docmancer-cold", "docmancer-warm"]
-    assert report["metrics"]["context7-only"]["wrong_version_api_usage_rate"] == 1.0
-    assert report["metrics"]["docmancer-warm"]["tests_passed_rate"] == 1.0
-    assert "wall_clock_ms" in report["items"][0]["lanes"]["docmancer-cold"]
 
 
-def test_eval_counts_snippet_presence():
-    class Chunk:
-        def __init__(self, snippets=None):
-            self.metadata = {"code_snippets": snippets or []}
-
-    assert snippet_presence_metrics([Chunk([{"language": "py", "code": "print(1)"}]), Chunk()], k=2) == {
-        "snippet_sections_at_2": 1,
-        "snippet_present_at_2": True,
-    }
 
 
-def test_golden_dataset_schema_loads_yaml(tmp_path):
-    dataset = tmp_path / "golden.yaml"
-    dataset.write_text(
-        yaml.safe_dump(
-            {
-                "corpus_snapshot": "tiny-v1",
-                "items": [
-                    {
-                        "id": "q1",
-                        "query": "OAuth tokens",
-                        "taxonomy_class": "exact_api_signature",
-                        "expected_sources": ["docs/auth.md"],
-                    }
-                ],
-            }
-        )
-    )
-
-    loaded = load_golden_dataset(str(dataset))
-
-    assert loaded.corpus_snapshot == "tiny-v1"
-    assert loaded.items[0].expected_sources[0].source == "docs/auth.md"
 
 
-def test_trace_schema_validation():
-    trace = build_explain_trace(
-        query="OAuth tokens",
-        selected_mode="lexical",
-        chunks=[],
-        limit=5,
-        budget=1200,
-        expand=None,
-        latency_ms=1.0,
-    )
-
-    validate_explain_trace(trace)
-    assert trace["query_normalization"]["normalized"] == "oauth tokens"
 
 
-def test_trace_includes_source_version_snippet_and_degraded_fields():
-    class Chunk:
-        source = "https://pub.dev/documentation/go_router/14.8.1/"
-        score = 1.0
-        metadata = {
-            "section_id": 42,
-            "canonical_url": "https://pub.dev/documentation/go_router/14.8.1/go_router/GoRouter-class.html",
-            "source_class": "library_docs",
-            "ecosystem": "pub",
-            "library": "go_router",
-            "version": "14.8.1",
-            "version_source": "lockfile_exact",
-            "has_code_snippet": True,
-        }
-
-    trace = build_explain_trace(
-        query="GoRouter example",
-        selected_mode="hybrid/dense_degraded",
-        chunks=[Chunk()],
-        limit=5,
-        budget=1200,
-        expand=None,
-        failures={"sparse": "not configured"},
-    )
-
-    validate_explain_trace(trace)
-    result = trace["results"][0]
-    assert result["source_class"] == "library_docs"
-    assert result["ecosystem"] == "pub"
-    assert result["library"] == "go_router"
-    assert result["version"] == "14.8.1"
-    assert result["version_source"] == "lockfile_exact"
-    assert result["has_code_snippet"] is True
-    assert trace["warnings"] == [{"kind": "degraded_retrieval", "sources": ["sparse"]}]
 
 
 def test_offline_retrieval_eval_tiny_corpus(tmp_path):

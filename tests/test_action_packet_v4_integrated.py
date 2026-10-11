@@ -82,39 +82,10 @@ def test_mixed_evidence_partial_result_keeps_supplied_obligations_and_unicode():
     assert projected["estimated_tokens"] == max(1, (len(encoded) + 3) // 4)
 
 
-def test_unique_witnesses_survive_permutation_and_exact_input_duplicates():
-    texts = [f"Component {i} retains the independent binding for operation {i}." for i in range(4)]
-    items = [_window(i, text) for i, text in enumerate(texts)]
-    kwargs = {"question": "reference", "public_requirements": texts}
-    packet = build_action_packet(context_pack=items, **kwargs)
-    permuted = build_action_packet(context_pack=list(reversed(items)), **kwargs)
-    repeated = build_action_packet(context_pack=[*items, deepcopy(items[1])], **kwargs)
-    assert packet == permuted == repeated
-    assert {row["text"] for row in packet["sources"]} == set(texts)
-    assert packet["estimated_tokens"] == estimate_action_packet_tokens(packet)
-    assert validate_action_packet(packet, evidence_items=items) == []
 
 
-def test_removed_budget_arguments_are_not_silently_ignored():
-    with pytest.raises(TypeError):
-        build_action_packet(question="reference", context_pack=[], max_tokens=128)
-    packet = build_action_packet(question="reference", context_pack=[])
-    with pytest.raises(TypeError):
-        validate_action_packet(packet, max_tokens=2000)
-    with pytest.raises(TypeError):
-        project_patch_context(packet=packet, evidence_items=[], max_tokens=2000)
 
 
-def test_distinct_explicit_literal_requirements_are_not_casefolded_away():
-    texts = ["Cache enabled.", "cache enabled."]
-    evidence = [_window(index, text) for index, text in enumerate(texts)]
-    packet = build_action_packet(
-        question="reference", context_pack=evidence, public_requirements=texts,
-    )
-    assert {row["value"] for row in packet["requirements"]} == set(texts)
-    assert packet["completeness"] == "complete"
-    assert len(packet["assignments"]) == len(texts)
-    assert validate_action_packet(packet, evidence_items=evidence) == []
 
 
 def test_distinct_indexed_character_windows_have_unambiguous_snapshot_ids():

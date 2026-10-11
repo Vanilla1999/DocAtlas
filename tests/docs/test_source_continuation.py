@@ -30,62 +30,6 @@ def reference(raw):
                            'source_of_truth', 'project', None, 2)
 
 
-def test_next_range_contains_missing_scope_table_without_repeating_intro():
-    raw = b'# Scope\nIntroduction\nproject: repository rules only\nall: repository and modules\n'
-    gateway = Gateway(raw)
-    reader = SourceContinuationReader(gateway)
-    uri = reader.issue(reference(raw))
-    assert gateway.reads == 0
-    result = reader.read(uri)
-    assert result['snippet'] == 'project: repository rules only\nall: repository and modules'
-    assert result['line_start'] == 3
-    assert result['status'] == 'complete'
-    assert reader.read(uri)['status'] == 'source_unavailable'
-    assert gateway.reads == 1
-
-
-def test_policy_revocation_and_forged_cursor_reject_before_hydration():
-    gateway = Gateway(b'intro\nintro\npoll until terminal\n')
-    reader = SourceContinuationReader(gateway)
-    uri = reader.issue(reference(gateway.raw))
-    assert reader.read(uri + '?start=1&budget=99999')['status'] == 'source_unavailable'
-    gateway.failure = 'source_unavailable'
-    assert reader.read(uri)['status'] == 'source_unavailable'
-    assert gateway.reads == 0
-
-
-def test_changed_snapshot_never_returns_latest_text():
-    gateway = Gateway(b'intro\nintro\nold polling\n')
-    reader = SourceContinuationReader(gateway)
-    uri = reader.issue(reference(gateway.raw))
-    gateway.raw = b'intro\nintro\nnew polling\n'
-    result = reader.read(uri)
-    assert result['status'] == 'source_changed'
-    assert 'snippet' not in result
-
-
-def test_total_json_budget_two_reads_and_monotonic_ranges():
-    raw = ('intro\nintro\n' + '\n'.join(f'Poll job {i} until terminal status.' for i in range(300))).encode()
-    gateway = Gateway(raw)
-    reader = SourceContinuationReader(gateway)
-    first = reader.read(reader.issue(reference(raw)))
-    second = reader.read(first['continuation'])
-    assert second['line_start'] == first['line_end'] + 1
-    assert second['continuation'] is None
-    assert second['reason_code'] == 'read_limit_reached'
-    assert all(docs_context_budget_tokens(result) <= 600 for result in (first, second))
-
-
-def test_giant_line_and_expiry_do_not_create_a_loop():
-    gateway = Gateway(b'intro\nintro\n' + b'identifier_1234 ' * 1000)
-    now = [0]
-    reader = SourceContinuationReader(gateway, clock=lambda: now[0])
-    uri = reader.issue(reference(gateway.raw))
-    assert reader.read(uri)['reason_code'] == 'line_exceeds_read_budget'
-    uri = reader.issue(reference(gateway.raw))
-    now[0] = 601
-    assert reader.read(uri)['status'] == 'source_unavailable'
-    assert gateway.reads == 1
 
 
 @pytest.fixture
@@ -234,43 +178,3 @@ def _range_reference(raw):
                            'sha256:' + hashlib.sha256(raw).hexdigest(), 'catalog:range',
                            'source_of_truth', 'project', None, 168)
 
-
-def test_targeted_range_can_precede_selected_quote():
-    raw = _range_raw()
-    reader = SourceContinuationReader(Gateway(raw))
-    uri = reader.issue_range(_range_reference(raw), line_start=156, line_end=172)
-    result = reader.read(uri)
-    assert result['line_start'] == 156
-    assert result['line_end'] == 172
-    assert 'rule begins here\nrule continues here\nrule ends here' in result['snippet']
-    assert result['status'] == 'complete'
-
-
-def test_range_read_stops_at_target_end():
-    raw = _range_raw()
-    reader = SourceContinuationReader(Gateway(raw))
-    result = reader.read(reader.issue_range(_range_reference(raw), line_start=156, line_end=172))
-    assert result['line_end'] == 172
-    assert 'line 173' not in result['snippet']
-    assert result['continuation'] is None
-
-
-def test_legacy_continuation_still_reads_forward():
-    raw = _range_raw()
-    reader = SourceContinuationReader(Gateway(raw))
-    result = reader.read(reader.issue(_range_reference(raw)))
-    assert result['line_start'] == 169
-
-
-def test_range_registration_rejects_invalid_or_conflicting_bounds_before_io():
-    raw = _range_raw()
-    gateway = Gateway(raw)
-    reader = SourceContinuationReader(gateway)
-    ref = _range_reference(raw)
-    assert reader.issue_range(ref, line_start=True, line_end=172) is None
-    assert reader.issue_range(ref, line_start=173, line_end=172) is None
-    uri = reader.uri_prefix + 'a' * 24
-    assert reader.issue_range(ref, line_start=156, line_end=172, uri=uri) == uri
-    assert reader.issue_range(ref, line_start=156, line_end=172, uri=uri) == uri
-    assert reader.issue_range(ref, line_start=155, line_end=172, uri=uri) is None
-    assert gateway.reads == 0
