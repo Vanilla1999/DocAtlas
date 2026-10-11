@@ -235,23 +235,30 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
         options, _ = source_options(row, source)
         for alt, original, kind in options:
             if kind == "complete_atom":
-                closures[row["evidence_id"]] = alt["snippet"]
+                closures[row["evidence_id"]] = _occurrence(
+                    alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
+                )
             elif kind == "containing_section":
                 sections[row["evidence_id"]] = _occurrence(
                     alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
                 )
     candidates = []
     for p, b, r, kinds, intro in packet_alternatives(payload, snapshot, retrieval, max_tokens=max_tokens):
-        by_id = {s["evidence_id"]: s["snippet"] for s in p["sources"]}
         mapping = retained_seed_mapping(payload, snapshot, p, b)
-        occurrences = {s["evidence_id"]: _occurrence(s, b) for s in p["sources"]}
-        closed_sections = 0
-        for eid, section in sections.items():
-            current = occurrences.get(mapping.get(eid, ""))
-            if (section is not None and current is not None and section[0] == current[0]
-                and current[1] <= section[1] < section[2] <= current[2]):
-                closed_sections += 1
-        closed = sum(text in by_id.get(mapping.get(eid, ""), "") for eid, text in closures.items())
+        occurrences = [_occurrence(s, b) for s in p["sources"]]
+
+        # A verified containing section covers the old atom for every seed
+        # from that same immutable source, regardless of retained evidence ID.
+        # Never award closure for matching text in another version or document.
+        def contained(target):
+            return target is not None and any(
+                current is not None and target[0] == current[0]
+                and current[1] <= target[1] < target[2] <= current[2]
+                for current in occurrences
+            )
+
+        closed_sections = sum(contained(section) for section in sections.values())
+        closed = sum(contained(atom) for atom in closures.values())
         coalesced = len(mapping) - len(set(mapping.values()))
         gain = (closed_sections, closed, coalesced, int(intro))
         fallback = any(k in {"containing_section", "seed_envelope"} for k in kinds)

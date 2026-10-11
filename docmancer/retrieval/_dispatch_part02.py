@@ -158,7 +158,10 @@ class _RetrievalDispatcherPart02:
             return limit
         max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
         if not max_per_source:
-            return limit
+            # Keep a bounded acquisition reserve for exclusions applied after
+            # backend search (e.g. forbidden_sources). No per-source quota is
+            # imposed on the candidates retained for final ranking.
+            return max(limit * 3, limit + 6)
         return max(limit * 3, limit + int(max_per_source) * 3)
 
     def _limit_sections_per_source(

@@ -12,6 +12,8 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping
 
+from docmancer.core.structured_chunking import _atom_spans
+
 from .context_blocks import source_block_alternatives
 from .original_body_discovery import original_body_discovery_binding
 from .query_reference_binding import query_mentions
@@ -25,6 +27,7 @@ _TERM = re.compile(r"[\w.:/\\+-]+")
 # grammar only stops a phrase; it does not supply accepted words or query roles.
 _BOUNDARY = re.compile(r"[.!?;:,|–—]+|(?<!\w)-|-(?!\w)|\b(?:and|but|or|yet|whereas|although|though)\b", re.I)
 _TABLE_SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
+_SETEXT_HEADING = re.compile(r"(?m)^ {0,3}\S[^\r\n]*\r?\n {0,3}(?:=+|-+)[ \t]*(?=\r?$)")
 _NONBODY = re.compile(
     r"<!--.*?-->|!?\[[^\]]*\](?:\([^)]*\)|\[[^\]]*\])|https?://\S+"
     r"|^[ \t]*\[[^\]]+\]:[^\n]*|^ {0,3}(?:`{3,}|~{3,})[^\n]*",
@@ -69,6 +72,18 @@ def _masked_body(text: str) -> str:
 
 
 def _body_blocks(text: str):
+    # Setext headings are prose-shaped to the child splitter. Blank their title
+    # and underline only inside prose atoms, never in fenced code or list items.
+    # Keep every original character offset unchanged for source-bound witnesses.
+    masked = list(text)
+    for atom in _atom_spans(text, 0, len(text)):
+        if atom.atom_type != "prose":
+            continue
+        for heading in _SETEXT_HEADING.finditer(text, atom.start, atom.end):
+            for index in range(heading.start(), heading.end()):
+                if text[index] not in "\r\n":
+                    masked[index] = " "
+    body = "".join(masked)
     # Keep the smallest structural alternatives. A union of distinct list items
     # cannot lend two unrelated occurrences to a new topical witness.
     pending = None
@@ -89,10 +104,10 @@ def _body_blocks(text: str):
             offset = start + len(lines[0]) + len(lines[1])
             for line in lines[2:]:
                 if "|" in line and not _TABLE_SEPARATOR.fullmatch(line.strip()):
-                    yield offset, _masked_body(line)
+                    yield offset, _masked_body(body[offset:offset + len(line)])
                 offset += len(line)
         else:
-            yield start, _masked_body(raw)
+            yield start, _masked_body(body[start:end])
 
 
 def _phrase_witness(question: str, block: str, source_offset: int):
@@ -222,7 +237,7 @@ def ordinary_body_context_witness(
     ):
         return None
     numeric_terms = {value for value, _, _ in _literal_terms(question)
-                     if re.fullmatch(r"[+-]?\d+(?:\.\d+)*", value)}
+                     if any(char.isdigit() for char in value)}
     for offset, block in _body_blocks(evidence_text):
         block_terms = {value for value, _, _ in _literal_terms(block)}
         if not numeric_terms <= block_terms:
