@@ -464,7 +464,7 @@ def test_frozen_main_flow_questions_deliver_source_bound_facts(tmp_path, record_
 
 
 def test_public_partial_context_preserves_short_facts_without_cross_owner_or_numeric_credit(tmp_path):
-    """Four reviewed defects through one preparation and real public reads."""
+    """Source-qualification controls through real preparation and public reads."""
     from contextlib import closing
     import hashlib
 
@@ -480,6 +480,10 @@ def test_public_partial_context_preserves_short_facts_without_cross_owner_or_num
             "# DeliveryEngine\n\nPacket delivery resumes after each request.\n"
         ),
         "docs/packets.md": "# Packet transport\n\nPackets are delivered after each request.\n",
+        "docs/setext.md": (
+            "# Pulse notes\n\nTelemetry pulses serialize\n--------------------------\n\n"
+            "Read the handbook for background.\n"
+        ),
         "docs/compounds.md": (
             "# DocAtlas\n\nDocAtlas combines batch/queue and batch\\queue labels before startup.\n"
         ),
@@ -503,6 +507,14 @@ def test_public_partial_context_preserves_short_facts_without_cross_owner_or_num
         "question": "How does DocAtlas combine batch queue during recovery?",
         "project_path": str(root), "scope": "project",
     }
+    numeric_range_request = {
+        "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+        "project_path": str(root), "scope": "project",
+    }
+    setext_request = {
+        "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+        "project_path": str(root), "scope": "project",
+    }
     report_path = tmp_path / "qualification-review-proof.json"
 
     with isolated_service(tmp_path / "state") as (service, config):
@@ -523,13 +535,15 @@ def test_public_partial_context_preserves_short_facts_without_cross_owner_or_num
         assert prepared["indexed_paths"] == sorted(documents)
 
         # This observer only reads the real same-call validation operands. All
-        # four public results are captured before checking their behavior.
+        # six public results are captured before checking their behavior.
         ordinary, ordinary_snapshot = runner._call_with_snapshot(ordinary_request, service)
         owner, owner_snapshot = runner._call_with_snapshot(owner_request, service)
         numeric, numeric_snapshot = runner._call_with_snapshot(numeric_request, service)
         compound, compound_snapshot = runner._call_with_snapshot(compound_request, service)
+        numeric_range, numeric_range_snapshot = runner._call_with_snapshot(numeric_range_request, service)
+        setext, setext_snapshot = runner._call_with_snapshot(setext_request, service)
         report_path.write_text(json.dumps({
-            "product_calls": {"prepare_docs": 1, "get_docs_context": 4},
+            "product_calls": {"prepare_docs": 1, "get_docs_context": 6},
             "documents": documents, "stored_sources": stored,
             "generation_id": generation, "project_identity": project_identity,
             "ordinary": {"request": ordinary_request, "payload": ordinary,
@@ -540,6 +554,10 @@ def test_public_partial_context_preserves_short_facts_without_cross_owner_or_num
                         "validation_snapshot": numeric_snapshot},
             "compound": {"request": compound_request, "payload": compound,
                          "validation_snapshot": compound_snapshot},
+            "numeric_range": {"request": numeric_range_request, "payload": numeric_range,
+                              "validation_snapshot": numeric_range_snapshot},
+            "setext": {"request": setext_request, "payload": setext,
+                       "validation_snapshot": setext_snapshot},
         }, ensure_ascii=False, indent=2, default=str) + "\n", encoding="utf-8")
 
         assert ordinary["kind"] == "docs_context" and ordinary["context_available"] is True
@@ -595,7 +613,9 @@ def test_public_partial_context_preserves_short_facts_without_cross_owner_or_num
         ).encode("utf-8")).hexdigest()
 
         for label, payload in (("different section owner", owner), ("missing numeric condition", numeric),
-                               ("words inside composed identifiers", compound)):
+                               ("words inside composed identifiers", compound),
+                               ("missing numeric range", numeric_range),
+                               ("Setext heading only", setext)):
             assert payload["status"] == "insufficient_evidence", (label, str(report_path))
             assert not payload.get("sources") and payload["context_available"] is False
             assert payload["answer_supported"] is payload["answer_available"] is payload["edit_ready"] is False

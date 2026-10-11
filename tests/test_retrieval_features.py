@@ -386,6 +386,18 @@ def test_lexical_and_supplemental_paths_enforce_forbidden_sources(tmp_path):
     assert {chunk.source for chunk in result.chunks} == {"allowed"}
     assert all("final_rank" in chunk.metadata["retrieval_trace"] for chunk in result.chunks)
 
+    # Exercise the real lexical store at the smallest public limit: removing a
+    # denied top-ranked source must still expose the next permitted source.
+    question = "How do I call `Client.open`?"
+    ranked = store.query(question, limit=10, budget=config.query.default_budget)
+    assert {chunk.source for chunk in ranked} == {"allowed", "forbidden"}
+    denied = ranked[0].source
+    remaining = ({"allowed", "forbidden"} - {denied}).pop()
+    limited = RetrievalDispatcher(store=store, config=config).run(
+        question, mode="lexical", limit=1, filters={"forbidden_sources": [denied]},
+    )
+    assert [chunk.source for chunk in limited.chunks] == [remaining]
+
 
 @pytest.mark.parametrize("mode", ["lexical", "dense", "sparse", "hybrid"])
 def test_named_document_filter_is_hard_across_retrieval_modes(tmp_path, mode):

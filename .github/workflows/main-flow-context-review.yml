@@ -37,6 +37,7 @@ jobs:
           python -m pytest -q --tb=short -o junit_family=legacy \
             tests/test_project_context_quality_v2_protocol.py \
             tests/test_main_flow_logging_integration.py \
+            tests/test_retrieval_features.py::test_lexical_and_supplemental_paths_enforce_forbidden_sources \
             tests/test_retrieval_features.py::test_lexical_compact_results_limit_sections_per_source_when_configured \
             tests/test_retrieval_features.py::test_expand_bypasses_sections_per_source_cap \
             tests/docs/test_host_scope_contract.py \
