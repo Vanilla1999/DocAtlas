@@ -82,6 +82,12 @@ seed, then minimizes the packet among equally complete alternatives. Every
 expansion must retain the original occurrence and rebind its exact source
 bytes, hash and coordinates. Already visible canonical spans are excluded
 before spending optional work on additional document-local blocks.
+For an existing nonempty read-context packet, a selected inspection range can
+be delivered immediately when its entire text is still unread and already
+present in the verified snapshot. The same source checks, exact occurrence
+retention and final validation apply; no additional source read is performed.
+Otherwise the selected `read_next` remains available. This does not promote
+empty results or consume a requested-part recovery obligation.
 Qualification remains false, original-query coverage remains missing, and
 answer/edit authority remains false. A question mentioning an unknown ordinary
 modifier may still receive partial context when a real literal phrase matches.

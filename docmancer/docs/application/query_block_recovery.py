@@ -1,4 +1,4 @@
-"""Choose a useful unissued inspection range, without crediting unread facts.
+"""Deliver selected inspection context or retain its unissued continuation.
 
 Only authenticated snapshots of already-admitted documents are inspected. This
 changes an exploratory draft target, never a requested-part obligation or an
@@ -8,9 +8,10 @@ from copy import deepcopy
 
 from docmancer.docs.domain.query_reference_binding import prepare_reference_probe
 from .joint_context_candidates import _context_row, _verified_document
-from .joint_context_selection import unread_lines
+from .joint_context_lineage import retained_seed_mapping
+from .joint_context_selection import _finish, unread_lines
 from .model_visible_projection import (
-    docs_context_budget_tokens, validate_model_visible_projection,
+    _snapshot_entry, docs_context_budget_tokens, validate_model_visible_projection,
 )
 from .query_block_context import MAX_OPTIONS, ranked_blocks
 from .source_continuation import (
@@ -100,13 +101,39 @@ def select_query_block_recovery(payload: dict, snapshot: dict, retrieval: dict, 
                 bindings["__read_next__"] = {"source": deepcopy(candidate)}
                 if validate_model_visible_projection(trial, snapshot=bindings, max_tokens=budget):
                     continue
-                proposals.append((rank, start, trial, bindings))
+                fully_unread = unseen == [(row["line_start"], row["line_end"])]
+                proposals.append((rank, start, trial, bindings, row, candidate, fully_unread))
     if not proposals:
         return payload, snapshot
     best = min(proposals, key=lambda c: (-c[0][0], -c[0][1], c[1]))
-    _, _, result, bindings = best
+    _, _, result, bindings, row, candidate, fully_unread = best
+    kind = "unissued_inspection_only"
+    if payload.get("sources") and payload.get("support_status") == "retrieval_only" and fully_unread:
+        # The selected range already passed source, owner and policy checks.
+        # Deliver its exact loaded bytes as supplementary context; never expand
+        # a partially visible range or turn an empty result into admitted facts.
+        draft, draft_bindings = deepcopy(result), deepcopy(bindings)
+        draft["sources"].append(deepcopy(row))
+        draft_bindings[row["evidence_id"]] = _snapshot_entry(candidate, row)
+        finished = _finish(draft, draft_bindings, retrieval, root, budget)
+        if finished is not None:
+            p, b, r = finished
+            # Include the new range in retention: removing its continuation is
+            # valid only if these same canonical bytes actually survive.
+            mapping = retained_seed_mapping(draft, draft_bindings, p, b)
+            surviving = {source["evidence_id"]: source for source in p["sources"]}
+            if (mapping and not p.get("read_next")
+                and p.get("covered_query_ids") == result.get("covered_query_ids")
+                and not any(old.get("source_uri")
+                    and surviving[mapping[old["evidence_id"]]].get("source_uri") != old["source_uri"]
+                    for old in result["sources"])
+                and not validate_model_visible_projection(p, snapshot=b, max_tokens=budget)):
+                result, bindings = p, b
+                retrieval.clear()
+                retrieval.update(r)
+                kind = "materialized_inspection"
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["block_recovery"] = {
-        "kind": "unissued_inspection_only", "eligible_ranges": len(proposals),
+        "kind": kind, "eligible_ranges": len(proposals),
         "budget_tokens": docs_context_budget_tokens(result),
     }
     return result, bindings
