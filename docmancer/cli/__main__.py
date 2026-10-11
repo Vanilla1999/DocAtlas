@@ -31,6 +31,7 @@ from docmancer.cli.mcp_commands import (
 )
 from docmancer.cli.qdrant_commands import qdrant_group
 from docmancer.support_policy import label_cli_commands
+from docmancer.docs.application.query_trace import query_trace
 
 
 def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> None:
@@ -64,11 +65,14 @@ def _show_version(ctx: click.Context, param: click.Parameter, value: bool) -> No
     help="Show the version and exit.",
 )
 @click.option("--config", "config_path", default=None, hidden=True, help="Path to docatlas.yaml.")
+@click.option("--trace/--no-trace", default=None, help="Enable/disable host trace logs on stderr; overrides DOCATLAS_TRACE for this invocation.")
 @click.pass_context
-def cli(ctx, config_path: str | None):
+def cli(ctx, config_path: str | None, trace: bool | None = None):
     """Compress documentation context so agents spend tokens on code."""
     ctx.ensure_object(dict)
     ctx.obj["config_path"] = config_path
+    if trace is not None:
+        ctx.with_resource(query_trace(trace))
 
 
 cli.add_command(setup_cmd, "setup")

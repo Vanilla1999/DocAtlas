@@ -113,15 +113,19 @@ def test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls(tmp_p
         assert not hasattr(service, "_same_call_diagnostics_observer")
 
         # Three new processes read the same committed fixture: startup OFF/ON/OFF,
-        # even after their environment changes. Each executes one public call.
+        # even after their environment changes. Each executes one genuine read
+        # and one public schema rejection (no retrieval for the latter).
         code = """
 import json, os, sys
-from docmancer.docs.application.query_trace import query_trace_enabled
 from docmancer.mcp._docs_server_part01 import create_local_mcp_service, call_docs_tool_payload
 os.environ['DOCATLAS_TRACE'] = '0' if os.environ.get('DOCATLAS_TRACE') == '1' else '1'
-result = call_docs_tool_payload('get_docs_context', json.loads(sys.argv[1]), create_local_mcp_service())
-print(json.dumps(result, ensure_ascii=False))
+service = create_local_mcp_service()
+request = json.loads(sys.argv[1])
+result = call_docs_tool_payload('get_docs_context', request, service)
+invalid = call_docs_tool_payload('get_docs_context', {**request, 'question': 17}, service)
+print(json.dumps({'result': result, 'invalid': invalid}, ensure_ascii=False))
 """
+        child_outputs = []
         for startup in (None, "1", "0"):
             env = dict(os.environ)
             env.pop("DOCATLAS_TRACE", None)
@@ -129,12 +133,46 @@ print(json.dumps(result, ensure_ascii=False))
                 env["DOCATLAS_TRACE"] = startup
             child = subprocess.run([sys.executable, "-c", code, json.dumps(request)], env=env,
                                    text=True, capture_output=True, timeout=60, check=True)
-            assert json.loads(child.stdout) == off_first
+            payload = json.loads(child.stdout)
+            assert payload["result"] == off_first
+            assert fact in "\n".join(source["snippet"] for source in payload["result"]["sources"])
+            assert {source["path_or_url"] for source in payload["result"]["sources"]} == {"docs/store.md"}
+            assert all(source["snippet"].strip() in text for source in payload["result"]["sources"])
+            assert runner._citation_integrity(payload["result"], snapshot_first)
+            assert payload["invalid"]["status"] == "failed"
+            assert payload["invalid"]["error"]["reason_code"] == "validation_error"
+            assert payload["invalid"]["error"]["where"] == {
+                "tool": "get_docs_context", "handler": None, "phase": "validation",
+            }
+            assert payload["invalid"]["error"]["retryable"] is False
+            child_outputs.append(child.stdout)
             events = [json.loads(line) for line in child.stderr.splitlines()
                       if line.startswith('{"event": "docatlas_query_trace"')]
             assert bool(events) is (startup == "1")
             if events:
                 assert events[0]["request_id"] and fact not in json.dumps(events)
+            records = [json.loads(line) for line in child.stderr.splitlines() if line.startswith("{")]
+            records = [record for record in records if record.get("event", "").startswith("docatlas_")]
+            if startup != "1":
+                assert records == []
+            else:
+                lifecycle = [record for record in records if record["event"] != "docatlas_query_trace"]
+                assert [record["event"] for record in lifecycle] == [
+                    "docatlas_request_start", "docatlas_request_end",
+                    "docatlas_request_start", "docatlas_request_end",
+                ]
+                assert all(record["interface"] == "mcp" and
+                           record["operation"] == "call_docs_tool_payload" for record in lifecycle)
+                read_start, read_end, invalid_start, invalid_end = lifecycle
+                assert read_start["request_id"] == read_end["request_id"] == events[0]["request_id"]
+                assert invalid_start["request_id"] == invalid_end["request_id"]
+                assert read_start["request_id"] != invalid_start["request_id"]
+                assert read_start["status"] == invalid_start["status"] == "started"
+                assert read_end["status"] == "success" and invalid_end["status"] == "error"
+                assert all(record["duration_ms"] >= 0 and record["trace_incomplete"] is False
+                           for record in (read_end, invalid_end))
+                assert fact not in json.dumps(lifecycle) and str(root) not in json.dumps(lifecycle)
+        assert child_outputs[0] == child_outputs[1] == child_outputs[2]
 
         # Diagnostic-only failures must not change the genuine public operation.
         def broken_observer(value):
@@ -201,6 +239,3 @@ def test_delivery_veto_observer_distinguishes_rejected_candidates_from_empty_acq
             assert call_docs_tool_payload("get_docs_context", request, service) == plain
         finally:
             del service._same_call_diagnostics_observer
-
-
-

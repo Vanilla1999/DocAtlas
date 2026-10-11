@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from ._docs_server_shared import *  # noqa: F401,F403
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, is_v4_patch_projection
+from docmancer.docs.application.query_trace import traced_request
 
 
 class LocalMemberService:
@@ -159,6 +160,7 @@ def _destructive_project_scope_error(name: str, arguments: dict[str, Any]) -> st
     return None
 
 
+@traced_request("mcp", "call_docs_tool_payload")
 def call_docs_tool_payload(
     name: str,
     arguments: dict[str, Any] | None,

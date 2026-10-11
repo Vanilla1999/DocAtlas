@@ -2,6 +2,22 @@ schema_version: 1
 # Literal read membership only; routing metadata is not action permission.
 code_files: []
 documents:
+  - path: docs/main-flow-logging.md
+    role: runbook
+    scope: project
+    module_path: null
+    description: Optional CLI and MCP tracing, switches, events, and verification boundaries.
+    authority: source_of_truth
+    status: active
+    impact: track
+  - path: docs/main-flow-evaluation.md
+    role: development
+    scope: project
+    module_path: null
+    description: Outcome-based integration evaluation strategy and research limitations.
+    authority: source_of_truth
+    status: active
+    impact: track
   - path: README.md
     role: overview
     scope: project

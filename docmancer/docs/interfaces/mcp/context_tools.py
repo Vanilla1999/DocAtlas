@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from docmancer.docs.application.docs_context_projection import project_docs_context
 from docmancer.docs.application.projection_decision_trace import same_call_projection_observation
-from docmancer.docs.application.query_trace import query_trace_enabled
+from docmancer.docs.application.query_trace import current_request_id, query_trace_enabled
 from docmancer.docs.application.source_continuation import (
     bind_project_source_continuations,
 )
@@ -608,7 +608,7 @@ def _observe_same_call_diagnostics(
         try:
             observation = same_call_projection_observation(raw, projection, delivery_blocked=delivery_blocked)
             sys.stderr.write(json.dumps({
-                "event": "docatlas_query_trace", "request_id": uuid4().hex,
+                "event": "docatlas_query_trace", "request_id": current_request_id() or uuid4().hex,
                 "projection_observation": observation,
             }, ensure_ascii=False) + "\n")
         except Exception:
