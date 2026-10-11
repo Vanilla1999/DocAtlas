@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from itertools import product, combinations, islice
+from itertools import chain, product, combinations, islice
 
 from .joint_context_candidates import source_options
 from docmancer.docs.domain.evidence_qualification import evidence_policy_rejection_reason
-from .joint_context_lineage import retained_seed_mapping
+from .joint_context_lineage import _occurrence, retained_seed_mapping
 from .model_visible_projection import (
     _refresh_estimate, _snapshot_entry,
     docs_context_budget_tokens, validate_model_visible_projection,
@@ -168,8 +168,13 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
         .get("_component_coverage") or {}).get("covered_component_ids") or ())
     # Optional optimization work, not a representation limit. Exhaustion leaves
     # the admitted baseline intact; larger packets never widen Cartesian work.
+    # Try the actual containing sections before bounded Cartesian enumeration
+    # can exhaust its work on original-first combinations. Keep the previous
+    # order for the remaining alternatives, including smaller budget fallbacks.
+    section_choices = tuple(next((option for option in group if option[2] == "containing_section"), group[0])
+                            for group in groups)
     drafts = 0
-    for choices in islice(product(*groups), 180):
+    for choices in islice(chain((section_choices,), product(*groups)), 180):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
             bound = deepcopy(snapshot)
@@ -212,36 +217,47 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
 def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
     """Close admitted seed units, not maximize a count of arbitrary paragraphs.
 
-    First prefer closure of incomplete seed atoms and explicit ancestor subject
-    introductions; then the cheapest feasible packet at that gain. Only when
-    neither improvement exists consider a containing-section fallback. These are
-    structural preferences, NOT an oracle of semantic answer completeness.
+    First prefer the verified containing section for each admitted seed, then
+    closure of incomplete atoms, coalescing and explicit ancestor introductions.
+    Choose the cheapest feasible packet at that structural gain. These are
+    source-unit preferences, NOT an oracle of semantic answer completeness.
     """
     # This experiment addresses direct questions only. Explicit host lookups
     # carry a separate recovery/coverage contract; keep that producer unchanged.
     plan = retrieval.get("documentation_query_plan") or {}
     if any(q.get("origin") == "host_lookup" for q in plan.get("queries") or () if isinstance(q, dict)):
         return payload, snapshot
-    closures = {}
+    closures, sections = {}, {}
     for row in payload.get("sources") or ():
         source = (snapshot.get(row.get("evidence_id")) or {}).get("source")
         if not isinstance(source, dict):
             continue
         options, _ = source_options(row, source)
-        for alt, _, kind in options:
+        for alt, original, kind in options:
             if kind == "complete_atom":
                 closures[row["evidence_id"]] = alt["snippet"]
+            elif kind == "containing_section":
+                sections[row["evidence_id"]] = _occurrence(
+                    alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
+                )
     candidates = []
     for p, b, r, kinds, intro in packet_alternatives(payload, snapshot, retrieval, max_tokens=max_tokens):
         by_id = {s["evidence_id"]: s["snippet"] for s in p["sources"]}
         mapping = retained_seed_mapping(payload, snapshot, p, b)
+        occurrences = {s["evidence_id"]: _occurrence(s, b) for s in p["sources"]}
+        closed_sections = 0
+        for eid, section in sections.items():
+            current = occurrences.get(mapping.get(eid, ""))
+            if (section is not None and current is not None and section[0] == current[0]
+                and current[1] <= section[1] < section[2] <= current[2]):
+                closed_sections += 1
         closed = sum(text in by_id.get(mapping.get(eid, ""), "") for eid, text in closures.items())
         coalesced = len(mapping) - len(set(mapping.values()))
-        gain = (closed, coalesced, int(intro))
+        gain = (closed_sections, closed, coalesced, int(intro))
         fallback = any(k in {"containing_section", "seed_envelope"} for k in kinds)
-        if gain != (0, 0, 0) or fallback:
+        if gain != (0, 0, 0, 0) or fallback:
             candidates.append((gain, docs_context_budget_tokens(p), p, b, r, kinds, fallback))
-    useful = [c for c in candidates if c[0] != (0, 0, 0)]
+    useful = [c for c in candidates if c[0] != (0, 0, 0, 0)]
     if useful:
         best_gain = max(c[0] for c in useful)
         viable = [c for c in useful if c[0] == best_gain]
@@ -255,8 +271,9 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
     retrieval.clear()
     retrieval.update(r)
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_structural"] = {
-        "candidates": len(candidates), "closed_seed_atoms": chosen[0][0],
+        "candidates": len(candidates), "closed_seed_sections": chosen[0][0],
+        "closed_seed_atoms": chosen[0][1],
         "coalesced_seed_ids": {a: b for a, b in mapping.items() if a != b},
-        "ancestor_introduction": bool(chosen[0][2]), "kinds": list(kinds), "budget_tokens": cost,
+        "ancestor_introduction": bool(chosen[0][3]), "kinds": list(kinds), "budget_tokens": cost,
     }
     return result, bindings

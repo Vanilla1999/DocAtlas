@@ -77,6 +77,11 @@ deactivate it, including copied contexts. This process-local ledger guards
 normal consumer replay; it is not a capability against arbitrary Python code.
 
 Admission retains the whole acquired source window and its provenance.
+Projection prefers a complete verified containing section around each admitted
+seed, then minimizes the packet among equally complete alternatives. Every
+expansion must retain the original occurrence and rebind its exact source
+bytes, hash and coordinates. Already visible canonical spans are excluded
+before spending optional work on additional document-local blocks.
 Qualification remains false, original-query coverage remains missing, and
 answer/edit authority remains false. A question mentioning an unknown ordinary
 modifier may still receive partial context when a real literal phrase matches.

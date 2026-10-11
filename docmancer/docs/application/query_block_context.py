@@ -18,7 +18,7 @@ from docmancer.docs.domain.query_reference_binding import prepare_reference_prob
 from .joint_context_candidates import (
     MAX_PARENT_SECTIONS, _context_row, _verified_document, structural_spans,
 )
-from .joint_context_lineage import retained_seed_mapping
+from .joint_context_lineage import _occurrence, retained_seed_mapping
 from .query_block_bridge import bridge_options
 from .joint_context_selection import _finish
 from .model_visible_projection import (
@@ -100,9 +100,11 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
     candidates = []
     seen_documents = set()
     drafts = 0
+    visible_occurrences = {row["evidence_id"]: _occurrence(row, snapshot) for row in payload["sources"]}
     for seed in payload["sources"]:
         original = (snapshot.get(seed["evidence_id"]) or {}).get("source")
-        if not isinstance(original, dict):
+        occurrence = visible_occurrences[seed["evidence_id"]]
+        if not isinstance(original, dict) or occurrence is None:
             continue
         raw = _verified_document(original, seed)
         if raw is None:
@@ -115,6 +117,13 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
             break
         seen_documents.add(key)
         ranked = ranked_blocks(raw, ref["source"]["document_id"], question)
+        # Spend optional enumeration work on unread canonical spans. Matching
+        # text in another source, version or occurrence is not visible coverage.
+        ranked = [block for block in ranked if not any(
+            visible is not None and visible[0] == occurrence[0]
+            and visible[1] <= block[1] < block[2] <= visible[2]
+            for visible in visible_occurrences.values()
+        )]
         for rank, start, end, parent in ranked[:MAX_OPTIONS]:
             proposal = _context_row(original, seed, raw, parent, start, end, supplementary=True)
             if proposal is None:
@@ -130,9 +139,6 @@ def select_query_block_context(payload: dict, snapshot: dict, retrieval: dict, *
             bound_subjects = {ref["mention_id"] for ref in probe.get("reference_bindings", ())
                 if ref.get("role") == "semantic_subject"}
             if reason is not None or not required_subjects <= bound_subjects:
-                continue
-            if any(s["path_or_url"] == row["path_or_url"] and row["snippet"] in s["snippet"]
-                   for s in payload["sources"]):
                 continue
             proposals = [(row, source, None)]
             for other in islice(payload["sources"], MAX_DOCUMENTS):
