@@ -1,0 +1,198 @@
+{
+  "method": "Read-only analysis of saved artifacts, no repeat queries. Candidate counts are recorded occurrences, NOT number of product retrieval calls. Character counts are not tokenizer counts.",
+  "rows": [
+    {
+      "id": 1,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "b6e725f9e6cb4b12bc7b11c1d2e4ea98",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 14157,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 3,
+      "grounded_duplicate_body_count": 2
+    },
+    {
+      "id": 2,
+      "docatlas_status": "ok",
+      "request_id": "4792a9ad7a384904a244e52100a59108",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": false,
+      "final_sources": 1,
+      "docatlas_source_chars": 636,
+      "docatlas_payload_chars": 1777,
+      "grounded_returned_chars": 13910,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 4,
+      "grounded_duplicate_body_count": 1
+    },
+    {
+      "id": 3,
+      "docatlas_status": "ok",
+      "request_id": "ddb8242a87134eac85d3f3f1ce7d86bc",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": false,
+      "final_sources": 2,
+      "docatlas_source_chars": 910,
+      "docatlas_payload_chars": 2565,
+      "grounded_returned_chars": 11755,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 4,
+      "grounded_duplicate_body_count": 1
+    },
+    {
+      "id": 4,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "7da7339ae8304dd1a5a72060cb959955",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 14157,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 3,
+      "grounded_duplicate_body_count": 2
+    },
+    {
+      "id": 5,
+      "docatlas_status": "ok",
+      "request_id": "f98478b3d5314b8d9d4e0ef82dc9cf75",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "visible_fields": 2,
+        "insufficient_visible_match": 4
+      },
+      "delivery_blocked": false,
+      "final_sources": 2,
+      "docatlas_source_chars": 1350,
+      "docatlas_payload_chars": 3361,
+      "grounded_returned_chars": 12749,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 3,
+      "grounded_duplicate_body_count": 2
+    },
+    {
+      "id": 6,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "1db76a1a1998454baf9a03a89421fe00",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 4,
+        "metadata_only_evidence": 2
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 12295,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 4,
+      "grounded_duplicate_body_count": 1
+    },
+    {
+      "id": 7,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "8a77be84a0d64b9e804945f87f1b4125",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 13289,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 3,
+      "grounded_duplicate_body_count": 2
+    },
+    {
+      "id": 8,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "4632831daaec4a47b3c81de401d4c9bf",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 4,
+        "metadata_only_evidence": 2
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 13181,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 4,
+      "grounded_duplicate_body_count": 1
+    },
+    {
+      "id": 9,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "520a02ba37ba450d9807c43528c29d1a",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 9056,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 5,
+      "grounded_duplicate_body_count": 0
+    },
+    {
+      "id": 10,
+      "docatlas_status": "insufficient_evidence",
+      "request_id": "ee83edbdea7247f9a93221ed54ba2601",
+      "lifecycle_status": "success",
+      "recorded_candidate_occurrences": 6,
+      "unique_recorded_candidate_ids": 3,
+      "qualification_reasons": {
+        "insufficient_visible_match": 6
+      },
+      "delivery_blocked": true,
+      "final_sources": 0,
+      "docatlas_source_chars": 0,
+      "docatlas_payload_chars": 570,
+      "grounded_returned_chars": 13262,
+      "grounded_result_count": 5,
+      "grounded_unique_body_count": 4,
+      "grounded_duplicate_body_count": 1
+    }
+  ]
+}

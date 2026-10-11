@@ -1,0 +1,106 @@
+{
+  "kind": "static_reconstruction_from_saved_artifacts",
+  "runtime_qualification_operands": false,
+  "product_rerun": false,
+  "method": "Previously obtained stdlib-only literal regex comparison of saved retrieval_children.display_text against reconstructed effective query terms; no production imports or qualifier execution. Markdown headings excluded and inline-link URLs removed. All inspected display_text values equalled corpus character slices.",
+  "limitations": [
+    "These are reconstructed body matches, not saved runtime matched_terms or match_ratio.",
+    "This records the already obtained analysis output, not a new execution.",
+    "It does not reproduce every qualification, source-policy, reference-binding, fallback or delivery operand.",
+    "Heading-only windows have no substantive-body ratio; their recorded rejection is metadata_only_evidence.",
+    "The recorded trace contains each listed window twice; this file lists unique windows per request."
+  ],
+  "sqlite_path": "/home/viadmin/.docatlas-main-flow-comparison-20261011/docatlas-home/mcp-members/members.db",
+  "sqlite_access": "mode=ro",
+  "table": "retrieval_children",
+  "corpus": "corpus.md",
+  "effective_terms_source": "docmancer/docs/domain/query_reference_binding.py:437-462 -> docmancer/docs/domain/query_terms.py:93-100",
+  "matching_source": "docmancer/docs/domain/technical_tokens.py:7-16",
+  "threshold_source": "docmancer/docs/domain/evidence_qualification.py:418-425",
+  "results": [
+    {
+      "id": 1,
+      "trace_line": 4,
+      "effective_query_terms": ["как", "включить", "и", "выключить", "подробные", "логи", "основного", "потока", "docatlas", "через", "cli"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["как", "и", "через", "cli"], "ratio_fraction": "4/11", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-29ab9d8358047a7185790de7f4c74cac0a292414", "line_span": [78, 79], "char_span": [5848, 6128], "body_matched_terms": ["и", "через", "cli"], "ratio_fraction": "3/11", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-21dbda0a38140bf1e94eca82757506f54385e90d", "line_span": [81, 81], "char_span": [6694, 6723], "body_matched_terms": ["как"], "ratio_fraction": "1/11", "recorded_reason": "insufficient_visible_match"}
+      ]
+    },
+    {
+      "id": 4,
+      "trace_line": 13,
+      "effective_query_terms": ["куда", "docatlas", "выводит", "трассу", "и", "как", "она", "отделяется", "от", "ответов", "cli", "протокола", "mcp"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["и", "как", "cli", "mcp"], "ratio_fraction": "4/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-6e9a993617ed9a222c65877984ef1cb3b54dbdfc", "line_span": [19, 26], "char_span": [671, 1002], "body_matched_terms": ["и", "от", "cli", "mcp"], "ratio_fraction": "4/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-d79731dfd6ce3fc08e58ceae1bc9aab348b473d6", "line_span": [14, 18], "char_span": [366, 671], "body_matched_terms": ["трассу"], "ratio_fraction": "1/13", "recorded_reason": "insufficient_visible_match"}
+      ]
+    },
+    {
+      "id": 6,
+      "trace_line": 19,
+      "effective_query_terms": ["какие", "публичные", "пути", "docatlas", "покрывает", "lifecycle-логирование", "и", "ли", "оно", "ошибки", "разбора", "аргументов", "cli"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["и", "ошибки", "разбора", "cli"], "ratio_fraction": "4/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-6e9a993617ed9a222c65877984ef1cb3b54dbdfc", "line_span": [19, 26], "char_span": [671, 1002], "body_matched_terms": ["и", "ошибки", "cli"], "ratio_fraction": "3/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-14351b36d269548aa21f155f66ef89f5e020417c", "line_span": [27, 28], "char_span": [1002, 1024], "body_matched_terms": [], "ratio_fraction": null, "recorded_reason": "metadata_only_evidence"}
+      ]
+    },
+    {
+      "id": 7,
+      "trace_line": 22,
+      "effective_query_terms": ["означает", "ли", "status", "success", "в", "трассе", "docatlas", "что", "найденных", "доказательств", "достаточно", "для", "ответа"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["означает", "status", "success", "в", "найденных", "доказательств"], "ratio_fraction": "6/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-6e9a993617ed9a222c65877984ef1cb3b54dbdfc", "line_span": [19, 26], "char_span": [671, 1002], "body_matched_terms": ["в", "для", "ответа"], "ratio_fraction": "3/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-e6256df7f100c358e1b3016f609673e87ae2a453", "line_span": [3, 13], "char_span": [44, 366], "body_matched_terms": ["ответа"], "ratio_fraction": "1/13", "recorded_reason": "insufficient_visible_match"}
+      ]
+    },
+    {
+      "id": 8,
+      "trace_line": 25,
+      "effective_query_terms": ["как", "docatlas", "ведёт", "себя", "при", "ошибке", "записи", "диагностики", "и", "сообщает", "о", "пропусках", "трассы"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["как", "при", "записи", "диагностики", "и", "о"], "ratio_fraction": "6/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-9a8cb20e3e4439965350a8a888ab5c14250c0841", "line_span": [89, 95], "char_span": [7770, 8589], "body_matched_terms": ["записи", "диагностики", "и", "о"], "ratio_fraction": "4/13", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-14351b36d269548aa21f155f66ef89f5e020417c", "line_span": [27, 28], "char_span": [1002, 1024], "body_matched_terms": [], "ratio_fraction": null, "recorded_reason": "metadata_only_evidence"}
+      ]
+    },
+    {
+      "id": 9,
+      "trace_line": 28,
+      "effective_query_terms": ["какие", "новые", "тесты", "разрешены", "в", "docatlas", "и", "чем", "нужно", "проверять", "корректность", "результата", "помимо", "логов"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-55bd80c5c419cd8c57fec5108bfd8adaa5d93d17", "line_span": [71, 71], "char_span": [4685, 4948], "body_matched_terms": ["и", "корректность", "результата"], "ratio_fraction": "3/14", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-8120800dfa4350a683724f8cd4ff9b67f0b84661", "line_span": [29, 45], "char_span": [1024, 2100], "body_matched_terms": ["новые", "в", "и"], "ratio_fraction": "3/14", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-8a9d5db5905016f0bb2b80a6dee7fed6d3d879b4", "line_span": [71, 71], "char_span": [4948, 5148], "body_matched_terms": ["и", "проверять"], "ratio_fraction": "2/14", "recorded_reason": "insufficient_visible_match"}
+      ]
+    },
+    {
+      "id": 10,
+      "trace_line": 31,
+      "effective_query_terms": ["доказывает", "ли", "статья", "countdown-code", "что", "unit-тесты", "хуже", "интеграционных", "тестов"],
+      "hard_exact_terms": [],
+      "required_ratio": 0.5,
+      "windows": [
+        {"stable_chunk_id": "child-a2ed086fab6e6a226aa11fb42b8d1b54578c73aa", "line_span": [69, 69], "char_span": [4000, 4198], "body_matched_terms": ["доказывает", "что", "тестов"], "ratio_fraction": "3/9", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-8a60f814dbd7e3e74c37be5dda21ab3979d5c63a", "line_span": [69, 69], "char_span": [3770, 4000], "body_matched_terms": ["countdown-code", "тестов"], "ratio_fraction": "2/9", "recorded_reason": "insufficient_visible_match"},
+        {"stable_chunk_id": "child-e734e8023d49691954e33dc92200355a202c482e", "line_span": [70, 70], "char_span": [4470, 4685], "body_matched_terms": ["статья", "unit-тесты"], "ratio_fraction": "2/9", "recorded_reason": "insufficient_visible_match"}
+      ]
+    }
+  ]
+}

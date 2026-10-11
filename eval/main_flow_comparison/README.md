@@ -15,3 +15,16 @@ MCP `search_docs` tool against the same publicly pinned corpus URL. Questions
 are identical, with no paraphrased lookup hints or retries to improve scores.
 Returned evidence is assessed separately from the answers synthesized from it.
 Latency includes tool/transport overhead and is not a controlled performance test.
+
+## Post-run loss analysis
+
+- [Independent review prompt](INDEPENDENT_REVIEW_PROMPT_RU.md)
+- [Causal summary](LOSS_ANALYSIS_RU.md)
+- [Per-question source/chunk evidence](LOSS_EVIDENCE_RU.md)
+- [Qualification and delivery source paths](LOSS_ROOT_CAUSE_RU.md)
+- [Logging limitations and comparison boundaries](LOSS_OBSERVABILITY_RU.md)
+
+Original experiment artifacts are hash-bound in `analysis-inputs.json` and were
+not changed or rerun during this analysis. Numeric qualification operands in
+`root-cause-reconstructed-matches.json` are static reconstructions, not captured
+runtime measurements.
