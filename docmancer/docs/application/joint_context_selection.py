@@ -222,13 +222,17 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
 
 
 def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
-    """Complete admitted source units, then minimize the whole public packet.
+    """Close source dependencies, then minimize the whole public packet.
 
-    Section size, extra introductions and citation merging earn no independent
-    gain. Lookup closure retains its existing query coverage and read-only status.
+    Standalone bullet items need no sibling expansion. Mixed sections keep the
+    prior conservative closure; structure alone cannot prove their prose/rules
+    unnecessary. Lookup closure never imports surrounding section dependencies.
     Canonical seed bytes, source policies and explicit budgets remain mandatory.
     """
-    closures = []
+    plan = retrieval.get("documentation_query_plan") or {}
+    lookup = any(q.get("origin") == "host_lookup" for q in plan.get("queries") or ()
+                 if isinstance(q, dict))
+    closures, sections = [], []
     for row in payload.get("sources") or ():
         source = (snapshot.get(row.get("evidence_id")) or {}).get("source")
         if not isinstance(source, dict):
@@ -239,28 +243,36 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
                 closures.append(_occurrence(
                     alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
                 ))
+            elif kind == "containing_section" and not lookup:
+                sections.append(_occurrence(
+                    alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
+                ))
     best = None
     count = 0
     for p, b, r, kinds, intro in packet_alternatives(payload, snapshot, retrieval, max_tokens=max_tokens):
         occurrences = [_occurrence(row, b) for row in p["sources"]]
-        closed = sum(target is not None and any(
-            current is not None and current[0] == target[0]
-            and current[1] <= target[1] < target[2] <= current[2]
-            for current in occurrences
-        ) for target in closures)
+        def contained(target):
+            return target is not None and any(
+                current is not None and current[0] == target[0]
+                and current[1] <= target[1] < target[2] <= current[2]
+                for current in occurrences
+            )
+        closed = sum(contained(target) for target in closures)
+        closed_sections = sum(contained(target) for target in sections)
         cost = docs_context_budget_tokens(p)
-        rank = (-closed, cost, kinds)
+        rank = (-closed_sections, -closed, cost, kinds)
         count += 1
         if best is None or rank < best[0]:
             best = (rank, p, b, r, intro)
     if best is None:
         return payload, snapshot
-    (negative_closed, cost, kinds), result, bindings, r, intro = best
+    (negative_sections, negative_closed, cost, kinds), result, bindings, r, intro = best
     mapping = retained_seed_mapping(payload, snapshot, result, bindings)
     retrieval.clear()
     retrieval.update(r)
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_structural"] = {
-        "candidates": count, "closed_seed_atoms": -negative_closed,
+        "candidates": count, "closed_seed_sections": -negative_sections,
+        "closed_seed_atoms": -negative_closed,
         "coalesced_seed_ids": {a: b for a, b in mapping.items() if a != b},
         "ancestor_introduction": bool(intro), "kinds": list(kinds), "budget_tokens": cost,
     }

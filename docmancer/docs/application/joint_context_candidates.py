@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import hashlib
+import re
 from typing import Any
 
 from docmancer.core.structured_chunking import _atom_spans, parse_markdown_parents
@@ -14,6 +15,7 @@ from .model_visible_projection import (
 
 MAX_SNAPSHOT_CHARS = 262_144
 MAX_PARENT_SECTIONS = 4096
+_BULLET_ITEM = re.compile(r"^([ \t]*)[-+*][ \t]+")
 
 
 def _verified_document(original: dict, public: dict) -> str | None:
@@ -87,8 +89,9 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
 def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, str], ...]:
     """Coalesce lazy list continuations without changing index chunking.
 
-    A continuation directly after a list marker belongs to that item. A prose
-    paragraph after a blank line terminates it. Consecutive items stay one run.
+    Keep lazy continuations and nested bullets with their item. Only plain,
+    unintroduced bullet runs may split: numbered steps, introduced lists and
+    fenced content retain their original structural dependency.
     """
     out: list[tuple[int, int, str]] = []
     for atom in _atom_spans(raw, start, end):
@@ -101,7 +104,23 @@ def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, st
                 out[-1] = (a, atom.end, kind)
                 continue
         out.append((atom.start, atom.end, atom.atom_type))
-    return tuple(out)
+    result = []
+    for a, b, kind in out:
+        lines = raw[a:b].splitlines(keepends=True)
+        first = _BULLET_ITEM.match(lines[0]) if kind == "list" and lines else None
+        if first is None or re.search(r"`{3,}|~{3,}", raw[a:b]):
+            result.append((a, b, kind))
+            continue
+        indent = len(first[1].expandtabs(4))
+        cursor, item_start = a, a
+        for line in lines:
+            marker = _BULLET_ITEM.match(line)
+            if marker and len(marker[1].expandtabs(4)) == indent and cursor > item_start:
+                result.append((item_start, cursor, "list_item"))
+                item_start = cursor
+            cursor += len(line)
+        result.append((item_start, b, "list_item"))
+    return tuple(result)
 
 
 def source_options(public: dict, original: dict) -> tuple[list[tuple[dict, dict, str]], tuple[dict, dict] | None]:
@@ -124,7 +143,12 @@ def source_options(public: dict, original: dict) -> tuple[list[tuple[dict, dict,
     bounds = []
     if hits:
         bounds.append((min(start, hits[0][0]), max(end, hits[-1][1]), "complete_atom"))
-    bounds.append((owner.char_start, owner.char_end, "containing_section"))
+    # A plain bullet-only section has no surrounding prose/code dependency.
+    # Other sections remain conservative: structural closure is not a semantic
+    # proof that nearby rules or examples are dispensable.
+    body = [kind for _, _, kind in spans if kind not in {"heading", "whitespace"}]
+    if not body or any(kind != "list_item" for kind in body):
+        bounds.append((owner.char_start, owner.char_end, "containing_section"))
     seen = {public["snippet"]}
     for a, b, kind in bounds:
         proposal = _context_row(original, public, raw, owner, a, b, supplementary=False)
