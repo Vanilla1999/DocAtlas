@@ -2,7 +2,7 @@ name: Main flow context integration
 
 on:
   pull_request:
-    branches: [feature/main-flow-logging]
+    branches: [feature/main-flow-logging, fix/main-flow-context-delivery]
 
 permissions:
   contents: read
@@ -44,6 +44,10 @@ jobs:
             tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content \
             --basetemp="$RUNNER_TEMP/main-flow-proof/pytest" \
             --junitxml="$RUNNER_TEMP/main-flow-proof/integration.xml"
+      - name: Forty new public MCP questions (read-only development evaluation)
+        env:
+          EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/main-flow-proof
+        run: PYTHONPATH=. python eval/main_flow_comparison/run_extra40.py
       - name: Preserve exact-commit integration evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
