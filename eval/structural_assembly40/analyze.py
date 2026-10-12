@@ -14,8 +14,15 @@ def get(path): return json.loads(path.read_text(encoding="utf-8"))
 def returned_spans(payload,root,docs):
     spans={};errors=[]
     for row in payload.get("sources") or ():
-        try: path=Path(row["path_or_url"]).relative_to(root).as_posix()
-        except (KeyError,ValueError): errors.append("source_path_not_bound");continue
+        try:
+            supplied = Path(row["path_or_url"])
+            if ".." in supplied.parts:
+                raise ValueError("source path traversal")
+            path = (supplied.relative_to(root).as_posix() if supplied.is_absolute()
+                    else supplied.as_posix())
+        except (KeyError, ValueError):
+            errors.append("source_path_not_bound")
+            continue
         raw=docs.get(path);text=row.get("snippet") or ""
         if raw is None or not text: errors.append("source_or_text_missing");continue
         lines=raw.splitlines(keepends=True); offsets=[0]
