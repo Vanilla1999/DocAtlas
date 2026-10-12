@@ -5,6 +5,10 @@
 
 ## Основные результаты
 
+- [Повторное review, исправление отказа и проверка подстройки](prepared-retrieval/review-20261012/RESULT_RU.md)
+  — публичный FAIL до фикса и пять PASS после, доказанный prepared reuse/fallback,
+  усиленные negative/checklist assertions и новый нечисловой пример без прироста
+  относительно контроля; модели не вызывались.
 - [Реализация prepared retrieval и интеграционные проверки до модели](prepared-retrieval/implementation-20261012/RESULT_RU.md)
   — новый opt-in путь, четыре новые и две существующие публичные проверки,
   исправленный по независимому review budget-attribution defect; моделей не запускали.

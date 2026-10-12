@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "frozen_at_utc": "2026-10-12T17:32:21.914425+00:00",
+  "base_commit": "47a636e73268f1c39495b83cda82c7a0a0c9674e",
+  "files_sha256": {
+    "tests/test_context_budget_refusal_integration.py": "8bba9d86ff4a976775d3a78ce5e6e5752f9ddaaa1eef495ed23d04255ac597df",
+    "tests/test_prepared_retrieval_review_integration.py": "31fa8b09bd18f504be95a9c719ecda19ba9a55490b895c12a653ac451bdfa353",
+    "tests/test_source_valid_transfer_integration.py": "1c898fd5910bad4f9c810cdf18ff8ce6d565c3d244728a3a940590d3bd1cb2bd",
+    "tests/test_prepared_retrieval_integration.py": "3945ebad4193795fabbe4cb737395d375cd25b641cf4c4e651704e7833a8d549",
+    "docmancer/docs/application/experimental_context_finalization.py": "8c961291388981bf8c4a91744c7b6cada646fda8dce26eca373431b6441b2254",
+    "docmancer/core/prepared_parent_sections.py": "d2edc2551f55113dfcf5233be56804380ee08bc9cc2aa2e35267928b08301632"
+  },
+  "run_01": {
+    "purpose": "Reproduce loss of typed delivery veto before product fix",
+    "nodes": [
+      "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation"
+    ],
+    "max_public_prepare": 1,
+    "max_public_context": 2,
+    "max_public_resource": 0,
+    "max_model_calls": 0,
+    "expected_outcome": "FAIL on retained confirmation_reason/delivery_decision or context_quality"
+  },
+  "run_02": {
+    "purpose": "Fixed refusal + prepared hit/revision fallback + matched-cap nonnumeric transfer + strengthened existing guards",
+    "nodes": [
+      "tests/test_context_budget_refusal_integration.py::test_final_budget_preserves_stale_source_denial_and_confirmation",
+      "tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+      "tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+      "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+      "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet"
+    ],
+    "max_public_prepare": 6,
+    "max_public_context": 24,
+    "max_public_resource": 1,
+    "max_model_calls": 0
+  },
+  "frozen_caps": {
+    "refusal": 150,
+    "context_small": 900,
+    "context_wide_and_transfer": 12000
+  },
+  "oracle_policy": "No fixture question/document/required fact/cap changes after runtime. Any verifier correction or extra run must be separately documented. No model calls. Root alone runs runtime."
+}

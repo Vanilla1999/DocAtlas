@@ -83,6 +83,18 @@ def capture_experimental_context(retrieval: dict, payload: dict, snapshot: dict)
 def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *,
              reason: str) -> tuple[dict, dict]:
     """Recompute attribution after choosing whole source rows; never copy proof."""
+    if not rows and not payload.get("sources"):
+        # An existing operational refusal is not a failed source selection.
+        # Preserve its typed delivery/confirmation veto and original cause;
+        # a smaller envelope must not turn them into a generic budget failure.
+        result = deepcopy(payload)
+        result["read_next"] = []
+        result.pop("recommended_next_action", None)
+        if result.get("reason_code") and result.get("missing") == [result["reason_code"]]:
+            result.pop("missing")  # The same reason remains in its typed field.
+        _refresh_estimate(result)
+        return result, {}
+
     from .docs_context_projection import _requalify_visible_source
 
     bound = {row["evidence_id"]: deepcopy(snapshot[row["evidence_id"]]) for row in rows}
@@ -133,13 +145,6 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
             "No source context survived the final source and request checks."
         ]
         result["context_quality"] = {"status": "unavailable", "reasons": [reason]}
-        # An operational refusal must retain its denial semantics even when
-        # verbose recovery instructions cannot fit the experiment's envelope.
-        if not payload.get("sources"):
-            for key in ("reason_code", "operational_reason_code", "operational_status",
-                        "hard_stop", "requires_confirmation", "disposition"):
-                if key in payload:
-                    result[key] = deepcopy(payload[key])
     _refresh_estimate(result)
     return result, bound
 

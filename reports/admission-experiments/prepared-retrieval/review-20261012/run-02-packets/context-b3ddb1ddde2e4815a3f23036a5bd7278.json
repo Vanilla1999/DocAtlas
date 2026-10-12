@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+  "pytest_current_test": "tests/test_prepared_retrieval_review_integration.py::test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change (call)",
+  "arguments": {
+    "question": "For an observation trip with 11 lenses, how must the lenses be packed and who receives and signs the issue record?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-review-run02/test_prepared_reader_reuses_ro0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-5d08f9e187e258dd",
+        "path_or_url": "docs/issue.md",
+        "section": "Field optics issue record",
+        "snippet": "# Field optics issue record\n\nThe issue record for an observation trip goes to the collection custodian.\nThe collection custodian checks completeness and signs before departure.\nA courier may carry the packed cases but may not sign the issue record.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "a416de6a4bd19fdd8bc19850f7dbfae1e63bc4138a74b5b6d48de7a453e15588",
+        "project_identity": "local:8fbcd07099a3f88e43c7e7d573fa5b52b81247b04a05b68049ea00ce3e6a4e46",
+        "line_start": 1,
+        "line_end": 6,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/947a6d0dfa71ab71b8c3d3d6"
+      },
+      {
+        "evidence_id": "ev-d1a3ba7aa53f363b",
+        "path_or_url": "docs/packing.md",
+        "section": "Field optics packing",
+        "snippet": "# Field optics packing\n\nFor an observation trip, lenses travel in rigid cases.\nA rigid case holds at most 4 lenses.\nFoam dividers separate every pair of lenses.\nTake the case inventory with the equipment.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "efba0293356e2096fb563233ea92706bbf3607764389f39ea1aec2eff4731491",
+        "project_identity": "local:8fbcd07099a3f88e43c7e7d573fa5b52b81247b04a05b68049ea00ce3e6a4e46",
+        "line_start": 1,
+        "line_end": 7,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/c8e7e7eef0b36b499fcf4d9b"
+      },
+      {
+        "evidence_id": "ev-b6b7bed7cf10ddcf",
+        "path_or_url": "docs/issue.md",
+        "section": "Field optics issue record > Archive shelf",
+        "snippet": "## Archive shelf\n\nStore completed folders with the tab marked «optique».\n",
+        "version_binding": "unversioned",
+        "content_sha256": "4364b54f521aa640994e0f25197b497c678b3443197a76ba47f8fed149981c84",
+        "project_identity": "local:8fbcd07099a3f88e43c7e7d573fa5b52b81247b04a05b68049ea00ce3e6a4e46",
+        "line_start": 7,
+        "line_end": 9,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/ce7ffc611883436869d62a14"
+      },
+      {
+        "evidence_id": "ev-ea7d10e3b7d64a4c",
+        "path_or_url": "docs/packing.md",
+        "section": "Field optics packing > Storage after return",
+        "snippet": "## Storage after return\n\nRemove the blue transport tags before putting empty cases into storage.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "e30c59f14f1e438b023ee8b0670f0fc89c88d2e612fc456c6b7e472ca5e4c428",
+        "project_identity": "local:8fbcd07099a3f88e43c7e7d573fa5b52b81247b04a05b68049ea00ce3e6a4e46",
+        "line_start": 8,
+        "line_end": 10,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/bc1e76400952b0d81b21959c"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 781
+  },
+  "utf8_quarter_proxy": 816,
+  "public_source_count": 4
+}

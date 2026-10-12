@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+  "pytest_current_test": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries (call)",
+  "arguments": {
+    "question": "What configures `SHUTTER_DELAY_EXTRA`?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-review-run02/test_prepared_retrieval_preser0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found"
+  },
+  "utf8_quarter_proxy": 143,
+  "public_source_count": 0
+}

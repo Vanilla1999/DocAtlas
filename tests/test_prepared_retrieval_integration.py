@@ -407,6 +407,7 @@ def test_prepared_retrieval_preserves_default_and_scope_boundaries(
         record_property("negative_empty_source_current_contract",
                         "FAIL" if unassessed_negative.get("sources") else "PASS")
         record_property("unassessed_negative_source_count", len(unassessed_negative.get("sources") or ()))
+        assert not unassessed_negative.get("sources"), unassessed_negative
         all_scope = _context(service, project, MODULE_QUESTION, scope="all")
         project_scope = _context(service, project, MODULE_QUESTION)
         module_scope = _context(service, project, MODULE_QUESTION, scope="module", module_path="modules/imaging")
@@ -529,6 +530,7 @@ def test_final_experimental_budget_preserves_facts_and_bounds_full_packet(
         env.setenv(CAP_ENV, str(SMALL_CAP))
         bounded = _context(service, project, CHECKLIST_QUESTION)
         _assert_packet_sources(bounded, project, CHECKLIST_DOCUMENTS)
+        _assert_facts(bounded, project, CHECKLIST_FACTS)
         assert _packet_proxy(bounded) <= SMALL_CAP, bounded
         assert bounded.get("answer_supported") is False
         assert bounded.get("answer_available") is False

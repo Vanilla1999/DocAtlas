@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "base_commit": "47a636e73268f1c39495b83cda82c7a0a0c9674e",
+  "product_fix": "Preserve full typed refusal when compacting an already-empty context; only remove optional recovery hints and a duplicate textual reason.",
+  "runtime_boundary": "Installed editable package, public in-process MCP, real isolated member SQLite/lexical retrieval/selection/validation, no models",
+  "runtime_totals": {
+    "public_prepare": 7,
+    "public_context": 26,
+    "public_resource": 1,
+    "model": 0
+  },
+  "before_fix": {
+    "test_outcome": "FAIL",
+    "wide_mcp_json_bytes": 618,
+    "wide_utf8_quarter_proxy": 155,
+    "bounded_mcp_json_bytes": 517,
+    "bounded_utf8_quarter_proxy": 130,
+    "cap": 150,
+    "lost_fields": [
+      "confirmation_reason",
+      "delivery_decision"
+    ],
+    "changed_original_cause": {
+      "from": "source_unavailable",
+      "to": "budget_limited"
+    },
+    "sources": 0,
+    "source_leak_observed": false
+  },
+  "after_fix": {
+    "tests_passed": 5,
+    "tests_failed": 0,
+    "pytest_seconds": 4.34,
+    "wide_mcp_json_bytes": 618,
+    "bounded_mcp_json_bytes": 576,
+    "bounded_utf8_quarter_proxy": 144,
+    "cap": 150,
+    "typed_refusal_preserved": true
+  },
+  "prepared_reader": {
+    "documents": 2,
+    "prepared_hits": 2,
+    "canonical_parser_calls_in_consumer": 0,
+    "prepared_parent_rows": 4,
+    "parent_selects": 2,
+    "invalid_revision_prepared_hits": 0,
+    "invalid_revision_canonical_parser_calls": 2,
+    "full_stable_dto_parity": true,
+    "source_facts_delivered_all_four_calls": 4,
+    "trace_does_not_change_dto": true,
+    "whole_pipeline_latency_claim": false
+  },
+  "transfer": {
+    "blind_holdout": false,
+    "numeric_question": false,
+    "cap_both_modes": 12000,
+    "prepared_both_modes": true,
+    "original": {
+      "baseline_facts": 4,
+      "broad_facts": 4,
+      "required_facts": 4
+    },
+    "renamed_files_reordered_question": {
+      "baseline_facts": 4,
+      "broad_facts": 4,
+      "required_facts": 4
+    },
+    "incremental_admission_gain_observed": false,
+    "inputs_changed_after_run": false
+  },
+  "strengthened_existing_guards": {
+    "exact_negative_empty_sources": "PASS",
+    "bounded_checklist_facts": 16,
+    "required_checklist_facts": 16,
+    "bounded_checklist_utf8_quarter_proxy": 758,
+    "checklist_cap": 900,
+    "wide_checklist_utf8_quarter_proxy": 906,
+    "no_new_coverage_credit": true
+  },
+  "limitations": [
+    "Only one negative question family was checked, not general relevance.",
+    "Prepared reuse is certified in one consumer, not zero parsing across all finalizers.",
+    "No generated-answer/sufficiency or model cost evaluation.",
+    "The fresh transfer check saw code; it is not a blind held-out quality estimate.",
+    "Old verification criteria were amended openly; full historical pre-amendment source snapshots are not in the archive.",
+    "No entire-repository test rerun or production/stdio smoke."
+  ],
+  "artifacts": {
+    "frozen_inputs": "frozen_review_inputs.json",
+    "execution_ledger": "execution_ledger.json",
+    "before_packets": "run-01-packet-summary.json",
+    "after_packets": "run-02-packet-summary.json",
+    "independent_reviews": [
+      "BOUNDARY_REVIEW.md",
+      "PREPARED_REVIEW.md",
+      "TAILORING_REVIEW.md"
+    ]
+  }
+}

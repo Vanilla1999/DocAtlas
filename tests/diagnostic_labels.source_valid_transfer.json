@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_source_valid_transfer_integration.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_source_valid_transfer_integration.py": "0d26abb25e2dbc24f938b513767c61ed8e65a6462a83e09796a80378fdf207fa"
+  },
+  "node_overrides": {}
+}

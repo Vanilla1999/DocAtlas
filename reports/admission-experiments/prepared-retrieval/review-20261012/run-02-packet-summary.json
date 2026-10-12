@@ -1,0 +1,459 @@
+[
+  {
+    "file": "run-02-packets/context-18a48e9adb56482d92415631a5d94a26.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 570,
+    "proxy": 143,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-18f53486f35b4f30ab765150249e390b.json",
+    "test": "test_final_budget_preserves_stale_source_denial_and_confirmation",
+    "project": "project",
+    "wire_bytes": 618,
+    "proxy": 155,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "no_docs_context_available"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-2931a72f45c040e9b86c31d120f70de8.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 570,
+    "proxy": 143,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-48849c9b6fb546c59df655422faeef7e.json",
+    "test": "test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+    "project": "project",
+    "wire_bytes": 3262,
+    "proxy": 816,
+    "sources": 4,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-4b3e8f8439bd4c08a91c656f93210ea7.json",
+    "test": "test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+    "project": "project",
+    "wire_bytes": 3262,
+    "proxy": 816,
+    "sources": 4,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-576ed15f463b4a45af0dfe454841693c.json",
+    "test": "test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+    "project": "project",
+    "wire_bytes": 3262,
+    "proxy": 816,
+    "sources": 4,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-603b2cdf4f0c491994de20628d5693cc.json",
+    "test": "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+    "project": "project-original",
+    "wire_bytes": 1935,
+    "proxy": 484,
+    "sources": 2,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-70686824b79942948dd65f3e31571ebc.json",
+    "test": "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+    "project": "project-renamed_reordered",
+    "wire_bytes": 1936,
+    "proxy": 484,
+    "sources": 2,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-7435a9b173f54762a2e9cac2d6b77a2c.json",
+    "test": "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+    "project": "project-renamed_reordered",
+    "wire_bytes": 1936,
+    "proxy": 484,
+    "sources": 2,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-7503561d75834d46939d6a0553162186.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "foreign-project",
+    "wire_bytes": 570,
+    "proxy": 143,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-7e5a0b19c23a4d90babe24ef0dee029e.json",
+    "test": "test_final_budget_preserves_stale_source_denial_and_confirmation",
+    "project": "project",
+    "wire_bytes": 576,
+    "proxy": 144,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "no_docs_context_available"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-8c5a8280a98c4fa1a6d1c3db4438c1d1.json",
+    "test": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+    "project": "project",
+    "wire_bytes": 3103,
+    "proxy": 776,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-93a4534137534d37a391223b5ec5c867.json",
+    "test": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+    "project": "project",
+    "wire_bytes": 3103,
+    "proxy": 776,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-9ca4a86218354317a36f8956bd18a091.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 1271,
+    "proxy": 318,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-a538a6a04dd548b4a444410bfc5e5bcf.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 555,
+    "proxy": 139,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "document_not_indexed"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-b3ddb1ddde2e4815a3f23036a5bd7278.json",
+    "test": "test_prepared_reader_reuses_rows_and_revision_falls_back_without_public_change",
+    "project": "project",
+    "wire_bytes": 3262,
+    "proxy": 816,
+    "sources": 4,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-c7f6e0fd62804d90b748ed63d747134b.json",
+    "test": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+    "project": "project",
+    "wire_bytes": 3032,
+    "proxy": 758,
+    "sources": 1,
+    "status": "truncated",
+    "delivery_decision": null,
+    "covered_query_ids": [],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "budget_limited"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-ce4f1d99f742410fadb11c71c27c5e58.json",
+    "test": "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+    "project": "project-original",
+    "wire_bytes": 1935,
+    "proxy": 484,
+    "sources": 2,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-d9a5dd08ced7454c85f089c9f6cd19db.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 570,
+    "proxy": 143,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-da3ebfec75db44b4973b31d4bbb6fb6a.json",
+    "test": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+    "project": "project",
+    "wire_bytes": 3622,
+    "proxy": 906,
+    "sources": 2,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-de0be446a63841ddb7c9ba339d6f1509.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 1278,
+    "proxy": 320,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-e78978dd123a4733a6fe1ac62d3eee1c.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 570,
+    "proxy": 143,
+    "sources": 0,
+    "status": "insufficient_evidence",
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "covered_query_ids": null,
+    "quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-ef2690095e2a4c8b84a1b77d0b89e39d.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 1271,
+    "proxy": 318,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  },
+  {
+    "file": "run-02-packets/context-f1ab438ba97946968050a8aaea9f9205.json",
+    "test": "test_prepared_retrieval_preserves_default_and_scope_boundaries",
+    "project": "project",
+    "wire_bytes": 1278,
+    "proxy": 320,
+    "sources": 1,
+    "status": "ok",
+    "delivery_decision": null,
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    }
+  }
+]

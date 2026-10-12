@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+  "pytest_current_test": "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet (call)",
+  "arguments": {
+    "question": "What are all the optical case dispatch checklist steps?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-review-run02/test_final_experimental_budget0/project",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "truncated",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "partial",
+    "retrieval_coverage": "partial",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [],
+    "missing_query_ids": [
+      "query-original"
+    ],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-6d8b6526a16b94ff",
+        "path_or_url": "docs/dispatch.md",
+        "section": "Optical case dispatch checklist",
+        "snippet": "# Optical case dispatch checklist\n\nComplete every dispatch checklist step before handing over an optical case.\n- Record the serial number from each lens barrel in the case inventory before closing the case.\n- Inspect every foam divider for torn edges and replace a divider if the tear exposes its rigid insert.\n- Fit both protective caps to every lens so that neither optical surface can touch the divider during transport.\n- Keep the cleaning cloth in the separate mesh pocket so that it cannot move between the packed lenses.\n- Check that the case gasket sits continuously in its groove, including the corners beside both hinges.\n- Remove sand from each latch recess with the soft brush before engaging the latch over its retaining hook.\n- Close the latches on opposite sides in turn and inspect the lid for an uneven gap around its entire rim.\n- Write the destination and the equipment custodian on a blue transport tag fixed to the main carrying handle.\n- Place the paper case inventory in the clear external sleeve with its identifying heading facing outward.\n- Leave the pressure equalisation valve closed during loading and keep its protective cover firmly attached.\n- Secure the case upright with the broad restraint strap and route the strap through both vehicle anchor loops.\n- Keep the case clear of the vehicle heater outlet so that hot air cannot flow directly across the lid gasket.\n- Ask the driver to inspect the restraint strap after loading and to report any contact with a sharp metal edge.\n- Photograph the closed case and its transport tag after loading so that the receiving custodian can compare them.\n- Count the packed cases against the dispatch sheet before the vehicle leaves the equipment collection point.\n- Give the receiving custodian the dispatch sheet together with the case inventory when the vehicle arrives.\n\n",
+        "version_binding": "unversioned",
+        "content_sha256": "40f39dc911ef18e021e58dce244edabcb81102c09d2100b219b4e1798c652802",
+        "project_identity": "local:d71fc2cd5f3daa42a2691f046a26c259dc7fed0da50de1f1bc4baaa3a0a01f14",
+        "line_start": 1,
+        "line_end": 20,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/e6eb8efb52729e060ca4a614"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified",
+        "budget_limited"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 741
+  },
+  "utf8_quarter_proxy": 758,
+  "public_source_count": 1
+}
