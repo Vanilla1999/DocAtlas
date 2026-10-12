@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+  "pytest_current_test": "tests/test_source_valid_transfer_integration.py::test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering (call)",
+  "arguments": {
+    "question": "For a relief shipment, how must sealed parcels be labelled and who receives and signs the custody sheet?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-03-integration-guards/test_source_valid_transfer_pre0/project-original",
+    "scope": "project"
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-5c4a3ca6cf53d1df",
+        "path_or_url": "docs/beta.md",
+        "section": "Custody sheet handling",
+        "snippet": "# Custody sheet handling\n\nThe depot steward receives the custody sheet for a relief shipment.\nThe depot steward signs the custody sheet after checking the parcel seals.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "893735c18b54a89b8aea550b48c0eba729805ef254683e3bf5c89c940c84fbf0",
+        "project_identity": "local:a413d0faf8e45fa0bb05de6fef17092afeaac67261bb12d1c3f2632e8847ff56",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/49f3da0997a3e24b51a8ff7d"
+      },
+      {
+        "evidence_id": "ev-981097b10e333dfe",
+        "path_or_url": "docs/alpha.md",
+        "section": "Sealed parcel labelling",
+        "snippet": "# Sealed parcel labelling\n\nFor a relief shipment, sealed parcels carry a violet custody tag.\nWrite the destination on the tag using water-resistant ink.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "5defc628fa3f0e4ccdb2ab784908b6ede7465eaf88481241fd2e8291b0239bf6",
+        "project_identity": "local:a413d0faf8e45fa0bb05de6fef17092afeaac67261bb12d1c3f2632e8847ff56",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "project",
+        "source_uri": "docatlas://source/f48b35a94a37094ab4dc9efb"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 461
+  },
+  "utf8_quarter_proxy": 484,
+  "public_source_count": 2
+}

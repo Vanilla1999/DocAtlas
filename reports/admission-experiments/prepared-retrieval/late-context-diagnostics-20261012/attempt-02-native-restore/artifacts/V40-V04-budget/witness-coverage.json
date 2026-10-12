@@ -1,0 +1,22 @@
+{
+  "trace-off": {
+    "complete": true,
+    "required_char_start": 3278,
+    "required_char_end": 3428,
+    "missing_character_count": 0,
+    "first_missing_character": null,
+    "contributing_evidence_ids": [
+      "ev-c66b14aafe987977"
+    ]
+  },
+  "trace-on": {
+    "complete": true,
+    "required_char_start": 3278,
+    "required_char_end": 3428,
+    "missing_character_count": 0,
+    "first_missing_character": null,
+    "contributing_evidence_ids": [
+      "ev-c66b14aafe987977"
+    ]
+  }
+}

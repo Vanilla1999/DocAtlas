@@ -1,0 +1,123 @@
+{
+  "frozen_inputs_sha256": "c4b367fd4889ffe069e190ed00527fab3d5ed82e7ffafb8a887abfc915f0d971",
+  "inputs": {
+    "schema_version": 1,
+    "purpose": "Known-failure integration regression for preservation of selected native source context; not a holdout, model comparison, or generator test.",
+    "base_commit": "62e36f8052f528ddf3033dbf546ece686ac48a65",
+    "historical_run": "reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01",
+    "case_id": "V40-V04",
+    "project_group": "vite",
+    "mode": "budget",
+    "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+    "answerability": "within_budget",
+    "upstream_repository": "vitejs/vite",
+    "upstream_commit": "e9078f865cdff6bed77cd729214a7e2868f126b5",
+    "frozen_corpus_inputs": [
+      {
+        "path": "eval/prepared_model_comparison40/questions.json",
+        "bytes": 12613,
+        "sha256": "67afaaa42ad71d0036d2cde4f5a7da1b4e9c9b836b53b62ef2658ffdb8af80b5"
+      },
+      {
+        "path": "eval/prepared_model_comparison40/gold_spans.json",
+        "bytes": 21511,
+        "sha256": "3a78745249900056d98870850add167e9cc0ceaeb284e0db759b78b94303eacc"
+      },
+      {
+        "path": "eval/prepared_model_comparison40/source_plan.json",
+        "bytes": 1951,
+        "sha256": "8ec8b19323f4bc4f7d0737aced62527b210ee4ba1c50cf77b62ccafc38594e9a"
+      },
+      {
+        "path": "eval/prepared_model_comparison40/source-manifest.json",
+        "bytes": 17709,
+        "sha256": "4622d2f4ccaf6669900ee40af04272620d7641d0a5af23213e03a5ba3b76d9a8"
+      }
+    ],
+    "sources": [
+      {
+        "path": "docs/guide/env-and-mode.md",
+        "repo_path": "eval/prepared_model_comparison40/sources/vite/docs/guide/env-and-mode.md",
+        "bytes": 10856,
+        "sha256": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31"
+      },
+      {
+        "path": "docs/config/server-options.md",
+        "repo_path": "eval/prepared_model_comparison40/sources/vite/docs/config/server-options.md",
+        "bytes": 20831,
+        "sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e"
+      },
+      {
+        "path": "docs/guide/assets.md",
+        "repo_path": "eval/prepared_model_comparison40/sources/vite/docs/guide/assets.md",
+        "bytes": 6547,
+        "sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b"
+      }
+    ],
+    "expected_final": {
+      "kind": "docs_context",
+      "scope": "project",
+      "version_binding": "unversioned",
+      "authority": "source_of_truth",
+      "context_available": true,
+      "answer_supported": false,
+      "answer_available": false,
+      "edit_ready": false,
+      "required_fact": "Set to `true` to exit if port is already in use, instead of automatically trying the next available port.",
+      "gold_witness": {
+        "path": "docs/config/server-options.md",
+        "line_start": 70,
+        "line_end": 74,
+        "raw_text": "## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n",
+        "raw_sha256": "19338f093410684065efefac4d33b0d44892b605a34f97415df20810acbde612",
+        "outer_trimmed_sha256": "7e85a813df5f979207e546bc61d0711ce2ec1e992dbd04dd0ad547f5210af55f"
+      },
+      "coverage_rule": "Cover all characters of the original witness after edge whitespace trimming with the union of verified same-source public snippet intervals; no changed source, question, witness or textual inference.",
+      "forbidden_credit": "Mentioning server.strictPort=true in a WebSocket proxy workaround does not establish exit instead of trying the next port."
+    },
+    "configuration": {
+      "DOCATLAS_EXPERIMENT_ADMISSION": "source_valid_candidates_v1",
+      "DOCATLAS_EXPERIMENT_PREPARED_PARENTS": "1",
+      "DOCATLAS_EXPERIMENT_SELECTOR": "budget",
+      "DOCATLAS_EXPERIMENT_SELECTOR_TOP_K": "2",
+      "DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS": "12000"
+    },
+    "execution": {
+      "scenarios": 1,
+      "prepare_calls": 1,
+      "context_calls": 2,
+      "trace_modes": [
+        false,
+        true
+      ],
+      "observer": "copied receipt sink active identically for both calls; observational only",
+      "source_continuation_calls": 0,
+      "model_forwards": 0,
+      "answer_generator_calls": 0,
+      "automatic_retries": 0,
+      "final_wire_cap": 12000,
+      "wire_measures": [
+        "ceil(UTF8 bytes of json.dumps(payload, ensure_ascii=False)/4)",
+        "o200k_base"
+      ],
+      "stable_public_dto_exclusions": [
+        "estimated_tokens",
+        "sources[*].source_uri",
+        "read_next[*].source_uri"
+      ],
+      "state_rule": "All SQL table contents/schema and every project file unchanged after each returned call, and both calls start from that initial state.",
+      "save_before_completeness_assertion": true
+    },
+    "interpretation": {
+      "baseline_expected": "The diagnostic-only revision should reproduce the known missing strictPort rule; a genuine task FAIL is expected and must not be marked xfail, skipped or inverted to PASS.",
+      "trace_parity": "Turning trace on must not alter the complete stable public DTO, candidate inputs/selection or persisted state.",
+      "future_replacement": "Only after saved diagnostic evidence identifies the failure; repeat the exact same scenario/fixtures/oracle under a general reviewed fix in a new attempt directory.",
+      "limits": [
+        "No new blind holdout.",
+        "No generated-answer/citation-quality inference.",
+        "This single positive does not demonstrate general relevance or all negative contracts.",
+        "Public projection hash shape/parity is separate from raw file SHA; no independent projection-fingerprint recomputation is claimed."
+      ]
+    }
+  }
+}

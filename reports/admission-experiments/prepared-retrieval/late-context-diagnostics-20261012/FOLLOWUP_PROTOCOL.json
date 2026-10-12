@@ -1,0 +1,50 @@
+{
+  "phase": "After the observed late-derivation failure; before replacement validation",
+  "frozen_native_test_unchanged": true,
+  "reason": "Revalidate and restore missing core native windows after rejected optional rewrites; retain valid supplements; budget trials cannot restore extra rows.",
+  "runs": [
+    {
+      "directory": "attempt-02-native-restore",
+      "nodes": [
+        "tests/test_native_context_preservation_integration.py"
+      ],
+      "prepare_calls": 1,
+      "context_calls": 2,
+      "trace": "off/on",
+      "source_reads": 0,
+      "model_calls": 0
+    },
+    {
+      "directory": "attempt-03-integration-guards",
+      "nodes": [
+        "tests/test_source_valid_transfer_integration.py",
+        "tests/test_context_budget_refusal_integration.py",
+        "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet"
+      ],
+      "prepare_calls": 4,
+      "context_calls": 10,
+      "trace": "on",
+      "source_reads": 0,
+      "model_calls": 0
+    }
+  ],
+  "risks_checked": [
+    "Same unchanged source witness and trace parity",
+    "Two-document facts after path/clause reordering",
+    "Real stale-source refusal with unchanged confirmation and no recovered context",
+    "Wide/small final budgets and default parity, no hidden coverage promotion"
+  ],
+  "automatic_retries": 0,
+  "limits": [
+    "Known regression, not blind holdout",
+    "No new complete 40-question benchmark",
+    "No generator or Grounded arm",
+    "Stale-source gate is an operational refusal, not an adversarial within-call provenance test"
+  ],
+  "test_files_sha256": {
+    "tests/test_native_context_preservation_integration.py": "b01db2f7b3851a6899a3a190c77b21a4cd265a5980b4f403f8e4db8ee02928ea",
+    "tests/test_source_valid_transfer_integration.py": "1c898fd5910bad4f9c810cdf18ff8ce6d565c3d244728a3a940590d3bd1cb2bd",
+    "tests/test_context_budget_refusal_integration.py": "8bba9d86ff4a976775d3a78ce5e6e5752f9ddaaa1eef495ed23d04255ac597df",
+    "tests/test_prepared_retrieval_integration.py": "3945ebad4193795fabbe4cb737395d375cd25b641cf4c4e651704e7833a8d549"
+  }
+}

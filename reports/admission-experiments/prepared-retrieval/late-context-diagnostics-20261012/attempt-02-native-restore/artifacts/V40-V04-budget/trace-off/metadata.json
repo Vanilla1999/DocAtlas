@@ -1,0 +1,26 @@
+{
+  "case_id": "V40-V04",
+  "mode": "budget",
+  "trace_enabled": false,
+  "arguments": {
+    "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-02-native-restore/test_selected_native_context_s0/projects/vite",
+    "scope": "project"
+  },
+  "status": "returned",
+  "same_initial_state": true,
+  "database_sha256_before": "e888d6addd37a88ef7e01ff8f28f80834d8c2813d031b28386f42866163340e3",
+  "files_sha256_before": "95db27ec0cadf16e4668ecd3bc6ce99019939e69a02ea0c9c4a8527c2c861ab8",
+  "elapsed_seconds": 0.7821224950021133,
+  "process_cpu_seconds": 0.779796693,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "database_unchanged": true,
+  "files_unchanged": true,
+  "database_sha256_after": "e888d6addd37a88ef7e01ff8f28f80834d8c2813d031b28386f42866163340e3",
+  "files_sha256_after": "95db27ec0cadf16e4668ecd3bc6ce99019939e69a02ea0c9c4a8527c2c861ab8",
+  "wire_sha256": "9dcc7f432b975aea4d9404d4ac7df79acbfa455dc826259e9fc724ef76e422e5",
+  "wire_utf8_bytes": 3980,
+  "utf8_quarter_proxy": 995,
+  "codec_o200k_base": 1125
+}

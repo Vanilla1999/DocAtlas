@@ -55,3 +55,8 @@ eval/task_level/.cache/
 # Original selection receipts are losslessly published in the adjacent tar.xz
 # with a byte/hash manifest and restore utility; avoid 119 MB of repeated JSON.
 /reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/calls/*/*/selection.json
+
+# Four diagnostic receipts are stored losslessly in selection-receipts.tar.xz
+# in the same report root, with per-entry byte counts and SHA256 verification.
+/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-01-logging-baseline/artifacts/V40-V04-budget/trace-*/selection.json
+/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-02-native-restore/artifacts/V40-V04-budget/trace-*/selection.json

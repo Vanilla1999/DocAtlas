@@ -1,0 +1,276 @@
+{
+  "baseline": {
+    "attempt": "attempt-01-logging-baseline",
+    "pytest_exit_code": 1,
+    "runtime_inputs_unchanged": true,
+    "operations": {
+      "scenarios": 1,
+      "prepare_calls_attempted": 1,
+      "context_calls_attempted": 2,
+      "context_calls_returned": 2,
+      "source_continuation_calls": 0,
+      "answer_generator_calls": 0,
+      "model_forwards": 0,
+      "optional_model_modules_before": {
+        "torch": false,
+        "transformers": false,
+        "safetensors": false
+      },
+      "optional_model_modules_after": {
+        "torch": false,
+        "transformers": false,
+        "safetensors": false
+      }
+    },
+    "modes": {
+      "trace-off": {
+        "complete_witness": false,
+        "missing_witness_characters": 150,
+        "source_count": 1,
+        "ranges": [
+          [
+            202,
+            247
+          ]
+        ],
+        "elapsed_seconds": 1.0685001370002283,
+        "utf8_bytes": 3374,
+        "o200k_base": 916,
+        "utf8_quarter_proxy": 844,
+        "database_unchanged": true,
+        "files_unchanged": true
+      },
+      "trace-on": {
+        "complete_witness": false,
+        "missing_witness_characters": 150,
+        "source_count": 1,
+        "ranges": [
+          [
+            202,
+            247
+          ]
+        ],
+        "elapsed_seconds": 0.7147232800016354,
+        "utf8_bytes": 3374,
+        "o200k_base": 916,
+        "utf8_quarter_proxy": 844,
+        "database_unchanged": true,
+        "files_unchanged": true
+      }
+    },
+    "full_public_wire_trace_parity": true,
+    "flow_event_count": 24,
+    "omitted_events": 0,
+    "diagnostic_errors": 0,
+    "budget": {
+      "limit": 12000,
+      "input_cost": 916,
+      "output_cost": 916,
+      "measure": "max(o200k_base,utf8_bytes_div4)_mcp_json",
+      "attempts": 0,
+      "native_fallbacks": 0,
+      "source_count": 1
+    },
+    "native_restore": null
+  },
+  "replacement": {
+    "attempt": "attempt-02-native-restore",
+    "pytest_exit_code": 0,
+    "runtime_inputs_unchanged": true,
+    "operations": {
+      "scenarios": 1,
+      "prepare_calls_attempted": 1,
+      "context_calls_attempted": 2,
+      "context_calls_returned": 2,
+      "source_continuation_calls": 0,
+      "answer_generator_calls": 0,
+      "model_forwards": 0,
+      "optional_model_modules_before": {
+        "torch": false,
+        "transformers": false,
+        "safetensors": false
+      },
+      "optional_model_modules_after": {
+        "torch": false,
+        "transformers": false,
+        "safetensors": false
+      }
+    },
+    "modes": {
+      "trace-off": {
+        "complete_witness": true,
+        "missing_witness_characters": 0,
+        "source_count": 2,
+        "ranges": [
+          [
+            70,
+            74
+          ],
+          [
+            202,
+            247
+          ]
+        ],
+        "elapsed_seconds": 0.7821224950021133,
+        "utf8_bytes": 3980,
+        "o200k_base": 1125,
+        "utf8_quarter_proxy": 995,
+        "database_unchanged": true,
+        "files_unchanged": true
+      },
+      "trace-on": {
+        "complete_witness": true,
+        "missing_witness_characters": 0,
+        "source_count": 2,
+        "ranges": [
+          [
+            70,
+            74
+          ],
+          [
+            202,
+            247
+          ]
+        ],
+        "elapsed_seconds": 0.6204186649993062,
+        "utf8_bytes": 3980,
+        "o200k_base": 1125,
+        "utf8_quarter_proxy": 995,
+        "database_unchanged": true,
+        "files_unchanged": true
+      }
+    },
+    "full_public_wire_trace_parity": true,
+    "flow_event_count": 28,
+    "omitted_events": 0,
+    "diagnostic_errors": 0,
+    "budget": {
+      "limit": 12000,
+      "input_cost": 1125,
+      "output_cost": 1125,
+      "measure": "max(o200k_base,utf8_bytes_div4)_mcp_json",
+      "attempts": 0,
+      "native_fallbacks": 0,
+      "source_count": 2
+    },
+    "native_restore": {
+      "checked": 2,
+      "restored": 1,
+      "already_covered": 1,
+      "rejected": 0
+    }
+  },
+  "guards": {
+    "attempt": "attempt-03-integration-guards",
+    "execution": {
+      "attempt": "attempt-03-integration-guards",
+      "base_commit": "62e36f8052f528ddf3033dbf546ece686ac48a65",
+      "started_at_utc": "2026-10-12T20:18:02.186766+00:00",
+      "command": [
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-s",
+        "-ra",
+        "tests/test_source_valid_transfer_integration.py",
+        "tests/test_context_budget_refusal_integration.py",
+        "tests/test_prepared_retrieval_integration.py::test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+        "--basetemp",
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/late-attempt-03-integration-guards",
+        "--junitxml",
+        "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-03-integration-guards/junit.xml",
+        "-o",
+        "junit_family=legacy"
+      ],
+      "status": "completed",
+      "automatic_retries": 0,
+      "timeout_seconds": 180,
+      "environment": {
+        "DOCATLAS_AUTO_VECTORS": "0",
+        "DOCATLAS_TRACE": "1",
+        "PYTEST_DOCATLAS_ARTIFACT_DIR": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/late-context-diagnostics-20261012/attempt-03-integration-guards/artifacts",
+        "PYTHONHASHSEED": "0",
+        "TMPDIR": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 2.922479288001341,
+      "finished_at_utc": "2026-10-12T20:18:05.109488+00:00",
+      "runtime_inputs_unchanged": true
+    },
+    "test_cases": [
+      {
+        "name": "test_source_valid_transfer_preserves_facts_after_path_and_clause_reordering",
+        "passed": true,
+        "properties": {
+          "original_baseline_facts": "4",
+          "original_broad_facts": "4",
+          "renamed_reordered_baseline_facts": "4",
+          "renamed_reordered_broad_facts": "4"
+        }
+      },
+      {
+        "name": "test_final_budget_preserves_stale_source_denial_and_confirmation",
+        "passed": true,
+        "properties": {
+          "wide_refusal_utf8_quarter_proxy": "155",
+          "bounded_refusal_utf8_quarter_proxy": "144"
+        }
+      },
+      {
+        "name": "test_final_experimental_budget_preserves_facts_and_bounds_full_packet",
+        "passed": true,
+        "properties": {
+          "wide_packet_utf8_quarter_proxy": "906",
+          "small_packet_utf8_quarter_proxy": "758",
+          "small_cap_delivered_source_count": "1"
+        }
+      }
+    ],
+    "diagnostic_event_counts": {
+      "docatlas_request_start": 14,
+      "docatlas_request_end": 14,
+      "docatlas_query_trace": 10
+    },
+    "context_payload_files": 10,
+    "prepare_calls": 4,
+    "context_calls": 10,
+    "source_reads": 0,
+    "model_forwards": 0,
+    "trace_flow_omitted_events": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "known_limits": [
+    "Known V40 regression, not a blind holdout.",
+    "No generator or new Grounded comparison.",
+    "No comprehensive negative/relevance benchmark rerun."
+  ],
+  "total_actual_operations": {
+    "preparations": 6,
+    "context_calls": 14,
+    "source_continuations": 0,
+    "model_forwards": 0,
+    "generator_calls": 0,
+    "pytest_executions": 3,
+    "distinct_test_nodes": 4,
+    "test_node_executions": 5,
+    "expected_baseline_failures": 1,
+    "replacement_and_guard_passes": 4
+  },
+  "cost_delta": {
+    "o200k_tokens": 209,
+    "o200k_percent": 22.81659388646289,
+    "speedup_claimed": false,
+    "reason": "Two calls per revision, cold/cache effects and tracing/observer overhead; not a timing experiment."
+  }
+}

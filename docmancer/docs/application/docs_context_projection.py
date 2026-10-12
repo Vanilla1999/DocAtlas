@@ -30,6 +30,7 @@ from .visible_evidence_retention import retains_visible_sources as _retains_visi
 from .experimental_context_finalization import (
     capture_experimental_context, recheck_experimental_context,
 )
+from .projection_decision_trace import ProjectionFlowTrace
 from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
 
 # Preserve the established helper surface used by focused production tests.
@@ -226,6 +227,8 @@ def project_docs_context(
         retrieval=retrieval, max_tokens=packet_max,
         selection_diagnostics=selection_diagnostics, allow_context_hints=_allow_context_hints,
     )
+    flow = ProjectionFlowTrace(retrieval)
+    flow.boundary("core.output", payload, snapshot)
     _strip_legacy_locators(payload, snapshot)
     _finalize_quality(retrieval, payload, snapshot)
     capture_experimental_context(retrieval, payload, snapshot)
@@ -242,12 +245,16 @@ def project_docs_context(
 
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
+    flow.boundary("decoration.output", payload, snapshot)
     from .joint_context_selection import select_joint_context
     payload, snapshot = select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
+    flow.boundary("joint.output", payload, snapshot)
     from .query_block_context import select_query_block_context
     payload, snapshot = select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
+    flow.boundary("query_block.output", payload, snapshot)
     from .query_block_recovery import select_query_block_recovery
     payload, snapshot = select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
+    flow.boundary("recovery.output", payload, snapshot)
     return recheck_experimental_context(payload, snapshot, retrieval)
 
 

@@ -515,10 +515,11 @@ def recheck_source_valid_candidate(
     """
     if rejection_diagnostics is not None:
         rejection_diagnostics.clear()
+    checkpoint = "native_reference"
 
     def reject(axis: str, reason: str):
         if rejection_diagnostics is not None:
-            rejection_diagnostics.update(axis=axis, reason=reason)
+            rejection_diagnostics.update(checkpoint=checkpoint, axis=axis, reason=reason)
         return None
 
     def qualification_axis(reason: str) -> str:
@@ -534,9 +535,11 @@ def recheck_source_valid_candidate(
     if not isinstance(seed_evidence, dict) or not isinstance(seed_evidence.get("text"), str):
         return reject("source_admissible", "missing_native_source_reference")
     seed_text = seed_evidence["text"]
+    checkpoint = "native_discovery"
     native_binding = original_body_discovery_binding(question=question, body=seed_text, candidate=seed)
     if native_binding is None:
         return reject("source_admissible", "missing_current_native_discovery")
+    checkpoint = "native_source_qualification"
     seed_checked = _checked_original_candidate(
         question=question, evidence_text=seed_text, candidate=seed,
         expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
@@ -548,6 +551,7 @@ def recheck_source_valid_candidate(
     if not seed_qualification.qualified:
         if seed_qualification.reason != "insufficient_visible_match":
             return reject(qualification_axis(seed_qualification.reason), seed_qualification.reason)
+        checkpoint = "native_admission"
         seed_admission = admit_original_literal_context(
             question=question, evidence_text=seed_text, candidate=seed,
             expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
@@ -557,6 +561,7 @@ def recheck_source_valid_candidate(
                 return reject("request_constraints", "missing_exact_terms")
             name_reason = body_request_constraint_rejection(question=question, evidence_text=seed_text, candidate=seed)
             return reject("request_constraints" if name_reason else "contribution", name_reason or "native_admission_rejected")
+    checkpoint = "visible_source_qualification"
     checked = _checked_original_candidate(
         question=question, evidence_text=evidence_text, candidate=candidate,
         expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
@@ -564,13 +569,16 @@ def recheck_source_valid_candidate(
     if checked is None:
         return reject("source_admissible", "source_binding_rejected")
     qualification, evidence, identity, scope = checked
+    checkpoint = "source_lineage"
     if (candidate.get("_reference_root_plan") != seed.get("_reference_root_plan")
         or any(evidence.get(key) != seed_evidence.get(key) for key in (
             "source", "member_binding", "project_doc_content_hash", "raw_document",
         ))):
         return reject("source_admissible", "derived_source_mismatch")
+    checkpoint = "visible_source_qualification"
     if not qualification.qualified and qualification.reason != "insufficient_visible_match":
         return reject(qualification_axis(qualification.reason), qualification.reason)
+    checkpoint = "visible_raw_window"
     window = _checked_raw_body_window(
         evidence_text, candidate, evidence, qualification.trace.get("reference_visible_span"),
     )
@@ -579,6 +587,7 @@ def recheck_source_valid_candidate(
     raw = evidence["raw_document"]
     seed_span = (seed_evidence["char_start"], seed_evidence["char_end"])
     visible_span = (window["char_start"], window["char_end"])
+    checkpoint = "structural_derivation"
     edge = _checked_context_derivation(
         raw=raw, document_id=identity["document_id"], seed_span=seed_span,
         visible_span=visible_span, derivation=derivation,
@@ -595,6 +604,7 @@ def recheck_source_valid_candidate(
     route = "existing_qualified" if qualification.qualified else None
     admission = None
     if route is None:
+        checkpoint = "visible_admission"
         admission = admit_original_literal_context(
             question=question, evidence_text=evidence_text, candidate=candidate,
             expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
@@ -611,6 +621,7 @@ def recheck_source_valid_candidate(
             route = ("source_valid_unassessed" if admission["reason"] == "source_valid_original_candidate_v1"
                      else "existing_literal")
     if route is None:
+        checkpoint = "visible_request_constraints"
         if qualification.trace.get("missing_exact_terms"):
             return reject("request_constraints", "missing_exact_terms")
         name_reason = body_request_constraint_rejection(question=question, evidence_text=evidence_text, candidate=candidate)
@@ -621,6 +632,7 @@ def recheck_source_valid_candidate(
         visible_candidate = {**candidate, **window, "_reference_evidence": {
             **evidence, "char_start": window["char_start"], "char_end": window["char_end"], "text": evidence_text,
         }}
+        checkpoint = "derived_body_admission"
         witness = source_valid_original_candidate_witness(
             question=question, evidence_text=evidence_text, candidate=visible_candidate, native_candidate=seed,
         )

@@ -1,0 +1,573 @@
+diff --git a/docmancer/docs/application/docs_context_projection.py b/docmancer/docs/application/docs_context_projection.py
+index f7c9aeeb..70c4e017 100644
+--- a/docmancer/docs/application/docs_context_projection.py
++++ b/docmancer/docs/application/docs_context_projection.py
+@@ -30,6 +30,7 @@ from .visible_evidence_retention import retains_visible_sources as _retains_visi
+ from .experimental_context_finalization import (
+     capture_experimental_context, recheck_experimental_context,
+ )
++from .projection_decision_trace import ProjectionFlowTrace
+ from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
+ 
+ # Preserve the established helper surface used by focused production tests.
+@@ -226,6 +227,8 @@ def project_docs_context(
+         retrieval=retrieval, max_tokens=packet_max,
+         selection_diagnostics=selection_diagnostics, allow_context_hints=_allow_context_hints,
+     )
++    flow = ProjectionFlowTrace(retrieval)
++    flow.boundary("core.output", payload, snapshot)
+     _strip_legacy_locators(payload, snapshot)
+     _finalize_quality(retrieval, payload, snapshot)
+     capture_experimental_context(retrieval, payload, snapshot)
+@@ -242,12 +245,16 @@ def project_docs_context(
+ 
+     if root:
+         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
++    flow.boundary("decoration.output", payload, snapshot)
+     from .joint_context_selection import select_joint_context
+     payload, snapshot = select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
++    flow.boundary("joint.output", payload, snapshot)
+     from .query_block_context import select_query_block_context
+     payload, snapshot = select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
++    flow.boundary("query_block.output", payload, snapshot)
+     from .query_block_recovery import select_query_block_recovery
+     payload, snapshot = select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
++    flow.boundary("recovery.output", payload, snapshot)
+     return recheck_experimental_context(payload, snapshot, retrieval)
+ 
+ 
+diff --git a/docmancer/docs/application/experimental_context_finalization.py b/docmancer/docs/application/experimental_context_finalization.py
+index fd7e01cc..932166ed 100644
+--- a/docmancer/docs/application/experimental_context_finalization.py
++++ b/docmancer/docs/application/experimental_context_finalization.py
+@@ -19,6 +19,7 @@ from docmancer.docs.domain.original_body_discovery import (
+ from ._docs_context_payload import _payload
+ from .context_selection import context_selection_decision
+ from .model_visible_projection import _refresh_estimate, validate_model_visible_projection
++from .projection_decision_trace import ProjectionFlowTrace
+ from .projection_tokenizer import projection_token_count
+ 
+ 
+@@ -149,9 +150,14 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
+     return result, bound
+ 
+ 
+-def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict) -> tuple[dict, dict]:
++def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict, *,
++                                 _trace_stage: str = "recheck") -> tuple[dict, dict]:
+     """Validate native/derived source lineage after the last structural rewrite."""
+-    if not source_valid_candidate_admission_active():
++    active = source_valid_candidate_admission_active()
++    flow = ProjectionFlowTrace(retrieval)
++    call_sequence = flow.boundary(_trace_stage + ".input", payload, snapshot, active=active)
++    if not active:
++        flow.boundary(_trace_stage + ".output", payload, snapshot, active=False, call_sequence=call_sequence)
+         return payload, snapshot
+     from docmancer.docs.domain.literal_context_admission import recheck_source_valid_candidate
+     from .joint_context_lineage import _occurrence
+@@ -164,37 +170,78 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict)
+     kept = []
+     rejected = []
+     routes: dict[str, int] = {}
+-    for row in payload.get("sources") or ():
++    for row_ordinal, row in enumerate(payload.get("sources") or ()):
+         original = (snapshot.get(row.get("evidence_id")) or {}).get("source")
+         if not isinstance(original, dict):
+             rejected.append({"evidence_id": row.get("evidence_id"), "reason": "missing_snapshot"})
++            flow.row_outcome(_trace_stage + ".row", row=row, candidate=original,
++                             call_sequence=call_sequence, row_ordinal=row_ordinal, attempts=0,
++                             outcome="rejected", axis="source_admissible", reason="missing_snapshot")
+             continue
+         params = {
+             "question": question, "evidence_text": row["snippet"], "candidate": original,
+             "expected_project_identity": expected,
+             "lifecycle_intent": original.get("_lifecycle_intent", "current"),
+         }
+-        receipt = recheck_source_valid_candidate(**params)
++        attempts = 0
++
++        def attempt(*, native_candidate=None, derivation=None, seed_ordinal=None):
++            # This wraps the same single check at each existing call site.
++            # Trace-off creates no rejection carrier, source copy or span hash.
++            nonlocal attempts
++            rejection = {} if flow.enabled else None
++            if flow.enabled:
++                attempts += 1
++            try:
++                result = recheck_source_valid_candidate(
++                    **params, native_candidate=native_candidate, derivation=derivation,
++                    rejection_diagnostics=rejection,
++                )
++            except Exception as exc:
++                flow.recheck(_trace_stage + ".attempt", row=row, candidate=original,
++                             native=native_candidate if native_candidate is not None else original,
++                             receipt=None, rejection=rejection, call_sequence=call_sequence,
++                             row_ordinal=row_ordinal, attempt_ordinal=attempts,
++                             derivation=derivation or "native", seed_ordinal=seed_ordinal,
++                             error_type=type(exc).__name__)
++                raise
++            flow.recheck(_trace_stage + ".attempt", row=row, candidate=original,
++                         native=native_candidate if native_candidate is not None else original,
++                         receipt=result, rejection=rejection, call_sequence=call_sequence,
++                         row_ordinal=row_ordinal, attempt_ordinal=attempts,
++                         derivation=derivation or "native", seed_ordinal=seed_ordinal)
++            return result
++
++        receipt = attempt()
+         if receipt is None:
+             # A native crop needs no structural expansion or document-size
+             # allowance. In particular, do not inherit the joint expander's
+             # 256 Ki-character limit for this already-admitted core operation.
+-            receipt = recheck_source_valid_candidate(**params, derivation="contained_span")
++            receipt = attempt(derivation="contained_span")
++        seed_source_mismatches = seed_span_unavailable = seed_bounds_invalid = 0
++        occurrence_available = None
+         if receipt is None:
+             # Core crops can keep the native reference envelope in their
+             # snapshot. Classify the verified visible occurrence, not that
+             # wider reference; A still independently validates the relation.
+             occurrence = _occurrence(row, snapshot)
+             a, z = occurrence[1:] if occurrence is not None else (None, None)
+-            for seed in originals:
++            occurrence_available = occurrence is not None
++            for seed_ordinal, seed in enumerate(originals):
+                 if _source_key(seed) != _source_key(original):
++                    if flow.enabled:
++                        seed_source_mismatches += 1
+                     continue
+                 seed_ref = seed.get("_reference_evidence") or {}
+                 x, y = seed_ref.get("char_start"), seed_ref.get("char_end")
+                 if not all(type(v) is int for v in (a, z, x, y)):
++                    if flow.enabled:
++                        seed_span_unavailable += 1
+                     continue
+                 raw = seed_ref.get("raw_document") or ""
+                 if not 0 <= x < y <= len(raw):
++                    if flow.enabled:
++                        seed_bounds_invalid += 1
+                     continue
+                 seed_start, seed_end = x, y
+                 while x < y and raw[x].isspace():
+@@ -205,8 +252,7 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict)
+                     "containing_span" if a <= x < y <= z else
+                     "contained_span" if seed_start <= a < z <= seed_end else "supplementary_block"
+                 )
+-                receipt = recheck_source_valid_candidate(
+-                    **params, native_candidate=seed, derivation=derivation)
++                receipt = attempt(native_candidate=seed, derivation=derivation, seed_ordinal=seed_ordinal)
+                 if receipt is not None:
+                     break
+         if receipt is not None:
+@@ -216,6 +262,13 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict)
+         else:
+             rejected.append({"evidence_id": row.get("evidence_id"),
+                              "reason": "source_or_request_lineage_rejected"})
++        flow.row_outcome(_trace_stage + ".row", row=row, candidate=original,
++                         call_sequence=call_sequence, row_ordinal=row_ordinal, attempts=attempts,
++                         outcome="retained" if receipt is not None else "rejected",
++                         reason=(receipt.get("route") if receipt is not None else "source_or_request_lineage_rejected"),
++                         seed_count=len(originals), seed_source_mismatches=seed_source_mismatches,
++                         seed_span_unavailable=seed_span_unavailable, seed_bounds_invalid=seed_bounds_invalid,
++                         occurrence_available=occurrence_available)
+     diagnostics = retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+         "docs_context_projection", {})
+     diagnostics["experimental_source_recheck"] = {
+@@ -223,11 +276,13 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict)
+         "rejected": rejected[:64], "routes": routes,
+     }
+     if not rejected:
++        flow.boundary(_trace_stage + ".output", payload, snapshot, active=True, call_sequence=call_sequence)
+         return payload, snapshot
+     result, bindings = _rebuild(payload, snapshot, retrieval, kept, reason="structure_unverified")
+     errors = validate_model_visible_projection(result, snapshot=bindings)
+     if errors:
+         raise ValueError("experimental source recheck produced an invalid projection: " + "; ".join(errors))
++    flow.boundary(_trace_stage + ".output", result, bindings, active=True, call_sequence=call_sequence)
+     return result, bindings
+ 
+ 
+@@ -252,7 +307,11 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+     recursive finalization, arbitrary text crop, or model call.
+     """
+     cap = experimental_context_max_tokens()
++    flow = ProjectionFlowTrace(retrieval)
++    active = cap is not None and payload.get("kind") == "docs_context"
++    flow.boundary("budget.input", payload, snapshot, active=active)
+     if cap is None or payload.get("kind") != "docs_context":
++        flow.boundary("budget.output", payload, snapshot, active=False)
+         return payload, snapshot
+     diagnostics = retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+         "docs_context_projection", {})
+@@ -262,6 +321,7 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+                   attempts=0, omitted_evidence_ids=[], native_fallbacks=0)
+     if before <= cap:
+         ledger.update(output_cost=before, source_count=len(payload.get("sources") or ()))
++        flow.boundary("budget.output", payload, snapshot, active=True)
+         return payload, snapshot
+ 
+     rows = list(payload.get("sources") or ())
+@@ -288,7 +348,8 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+                 continue
+             # Native alternatives were admitted before finalizers, but broad
+             # mode must still recheck their active request-bound provenance.
+-            checked, checked_bound = recheck_experimental_context(trial, trial_bound, retrieval)
++            checked, checked_bound = recheck_experimental_context(
++                trial, trial_bound, retrieval, _trace_stage="budget_trial_recheck")
+             if len(checked.get("sources") or ()) != len(trial.get("sources") or ()):
+                 continue
+             selected.append(option)
+@@ -312,6 +373,7 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
+     ledger.update(output_cost=cost, omitted_evidence_ids=omitted[:64],
+                   omitted_source_count=len(omitted), source_count=len(selected),
+                   read_next_omitted=bool(payload.get("read_next")))
++    flow.boundary("budget.output", current, current_bound, active=True)
+     return current, current_bound
+ 
+ 
+diff --git a/docmancer/docs/application/projection_decision_trace.py b/docmancer/docs/application/projection_decision_trace.py
+index a75f03ce..2fe66a67 100644
+--- a/docmancer/docs/application/projection_decision_trace.py
++++ b/docmancer/docs/application/projection_decision_trace.py
+@@ -8,6 +8,9 @@ from typing import Any
+ from .query_trace import query_trace_enabled
+ 
+ MAX_DECISION_EVENTS = 128
++MAX_CONTEXT_FLOW_EVENTS = 256
++MAX_CONTEXT_FLOW_SOURCES = 64
++MAX_CONTEXT_FLOW_CHARS = 262_144
+ 
+ 
+ def _key(*parts: Any) -> str:
+@@ -119,6 +122,230 @@ def record_core_sources(diagnostics: dict[str, Any], sources: list[dict[str, Any
+     diagnostics["core_source_observation"] = {"count": len(sources), "ids": ids}
+ 
+ 
++_FLOW_ROW_FIELDS = (
++    "evidence_id", "source_key", "source_sha256", "candidate_key",
++    "reference_char_start", "reference_char_end", "line_start", "line_end",
++    "visible_char_start", "visible_char_end", "visible_span_observation",
++    "snippet_sha256", "snippet_characters", "snippet_hash_observation",
++)
++
++
++def _flow_source(candidate: Any) -> dict[str, Any]:
++    """Describe declared binding fields, without rereading or authorizing them."""
++    if not isinstance(candidate, dict):
++        return {"observation": "missing_snapshot"}
++    ref = candidate.get("_reference_evidence")
++    if not isinstance(ref, dict) or not isinstance(ref.get("source"), dict):
++        return {"observation": "missing_reference"}
++    identity = ref["source"]
++    scope = identity.get("scope") or {}
++    if not isinstance(scope, dict):
++        return {"observation": "malformed_scope"}
++    digest = identity.get("content_sha256")
++    digest = digest if (isinstance(digest, str) and len(digest) == 64
++                        and all(c in "0123456789abcdef" for c in digest)) else None
++    return {
++        "source_key": _key(identity.get("document_id"), identity.get("canonical_path"),
++                           digest, scope.get("project_id"), scope.get("snapshot_id"), scope.get("version")),
++        "source_sha256": digest,
++        "candidate_key": _key(candidate.get("project_identity"),
++                              candidate.get("stable_id") or candidate.get("stable_chunk_id")
++                              or candidate.get("evidence_id") or candidate.get("path") or candidate.get("source")),
++        "reference_char_start": ref.get("char_start") if type(ref.get("char_start")) is int else None,
++        "reference_char_end": ref.get("char_end") if type(ref.get("char_end")) is int else None,
++    }
++
++
++def _flow_row(row: Any, candidate: Any) -> dict[str, Any]:
++    """Locate only a unique exact visible occurrence in the held reference window.
++
++    A reference envelope is never reported as the visible snippet. These are
++    diagnostic coordinates, not another source validation or discovery receipt.
++    Large or ambiguous windows are explicitly unavailable, not normalized.
++    """
++    result = _flow_source(candidate)
++    row = row if isinstance(row, dict) else {}
++    result.update(
++        evidence_id=_scalar(row.get("evidence_id")),
++        line_start=row.get("line_start") if type(row.get("line_start")) is int else None,
++        line_end=row.get("line_end") if type(row.get("line_end")) is int else None,
++        visible_char_start=None, visible_char_end=None,
++        visible_span_observation="unavailable", snippet_sha256=None,
++        snippet_characters=None, snippet_hash_observation="unavailable",
++    )
++    snippet = row.get("snippet")
++    if not isinstance(snippet, str) or not snippet:
++        result["visible_span_observation"] = "missing_snippet"
++        return result
++    result["snippet_characters"] = len(snippet)
++    if len(snippet) > MAX_CONTEXT_FLOW_CHARS:
++        result.update(visible_span_observation="diagnostic_character_limit",
++                      snippet_hash_observation="diagnostic_character_limit")
++        return result
++    result.update(snippet_sha256=hashlib.sha256(snippet.encode("utf-8")).hexdigest(),
++                  snippet_hash_observation="recorded")
++    ref = candidate.get("_reference_evidence") if isinstance(candidate, dict) else None
++    if not isinstance(ref, dict):
++        return result
++    raw, start, end = ref.get("raw_document"), ref.get("char_start"), ref.get("char_end")
++    if (not isinstance(raw, str) or type(start) is not int or type(end) is not int
++            or not 0 <= start < end <= len(raw)):
++        result["visible_span_observation"] = "invalid_reference_bounds"
++        return result
++    if end - start > MAX_CONTEXT_FLOW_CHARS:
++        result["visible_span_observation"] = "diagnostic_character_limit"
++        return result
++    position = raw.find(snippet, start, end)
++    if position < 0:
++        result["visible_span_observation"] = "no_exact_occurrence"
++    elif raw.find(snippet, position + 1, end) >= 0:
++        result["visible_span_observation"] = "ambiguous_occurrence"
++    else:
++        result.update(visible_char_start=position, visible_char_end=position + len(snippet),
++                      visible_span_observation="exact_occurrence")
++    return result
++
++
++class ProjectionFlowTrace:
++    """Bounded observations of executed finalizers; never an input to decisions."""
++
++    def __init__(self, retrieval: dict[str, Any]) -> None:
++        self.enabled = query_trace_enabled()
++        self.retrieval = retrieval if self.enabled else None
++
++    def _event(self, stage: str, kind: str, **fields: Any) -> dict[str, Any] | None:
++        if not self.enabled:
++            return None
++        state = None
++        try:
++            diagnostics = self.retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
++                "docs_context_projection", {})
++            state = diagnostics.setdefault("context_flow", {
++                "schema_version": 1, "event_count": 0, "omitted_events": 0,
++                "event_limit": MAX_CONTEXT_FLOW_EVENTS, "source_limit": MAX_CONTEXT_FLOW_SOURCES,
++                "diagnostic_character_limit": MAX_CONTEXT_FLOW_CHARS,
++                "diagnostic_error_count": 0, "events": [],
++            })
++            state["event_count"] += 1
++            if len(state["events"]) >= MAX_CONTEXT_FLOW_EVENTS:
++                state["omitted_events"] += 1
++                return None
++            event = {"sequence": state["event_count"], "stage": stage, "event": kind, **fields}
++            state["events"].append(event)
++            return event
++        except Exception as exc:
++            # Malformed/missing carriers remain explicit in the serializer;
++            # diagnostic allocation must never change a delivery decision.
++            try:
++                if isinstance(state, dict):
++                    state["diagnostic_error_count"] = state.get("diagnostic_error_count", 0) + 1
++                    state["last_diagnostic_error_type"] = type(exc).__name__
++                    if isinstance(state.get("events"), list) and type(state.get("event_count")) is int:
++                        state["omitted_events"] = max(0, state["event_count"] - len(state["events"]))
++            except Exception:
++                pass
++            return None
++
++    def _failure(self, event: dict[str, Any], exc: Exception) -> None:
++        event.update(observation="diagnostic_error", error_type=type(exc).__name__)
++        try:
++            state = self.retrieval["retrieval_diagnostics"]["docs_context_projection"]["context_flow"]
++            state["diagnostic_error_count"] += 1
++            state["last_diagnostic_error_type"] = type(exc).__name__
++        except Exception:
++            pass
++
++    def boundary(self, stage: str, payload: dict, snapshot: dict, **fields: Any) -> int | None:
++        event = self._event(stage, "boundary", **fields)
++        if event is None:
++            return None
++        try:
++            rows = payload.get("sources")
++            if not isinstance(rows, (list, tuple)):
++                event["observation"] = "missing_sources" if rows is None else "malformed_sources"
++            else:
++                event.update(observation="recorded", source_count=len(rows),
++                             source_rows_omitted=max(0, len(rows) - MAX_CONTEXT_FLOW_SOURCES), rows=[])
++                for row in rows[:MAX_CONTEXT_FLOW_SOURCES]:
++                    bound = snapshot.get(row.get("evidence_id")) if isinstance(row, dict) else None
++                    source = bound.get("source") if isinstance(bound, dict) else None
++                    event["rows"].append(_flow_row(row, source))
++        except Exception as exc:
++            self._failure(event, exc)
++        return event["sequence"]
++
++    def recheck(self, stage: str, *, row: dict, candidate: Any, native: Any,
++                receipt: dict | None, rejection: dict | None, **fields: Any) -> None:
++        event = self._event(stage, "recheck_attempt", **fields)
++        if event is None:
++            return
++        try:
++            event.update(observation="recorded", target=_flow_row(row, candidate), native=_flow_source(native))
++            if receipt is not None:
++                window = receipt.get("body_window") or {}
++                native_span = receipt.get("native_span") or ()
++                event.update(outcome="accepted", checkpoint="complete", axis=None,
++                             reason=receipt.get("route"), route=receipt.get("route"),
++                             accepted_derivation=receipt.get("derivation"),
++                             checked_visible_char_start=window.get("char_start"),
++                             checked_visible_char_end=window.get("char_end"),
++                             checked_native_char_start=native_span[0] if len(native_span) == 2 else None,
++                             checked_native_char_end=native_span[1] if len(native_span) == 2 else None)
++            else:
++                event.update(outcome="error" if event.get("error_type") else "rejected",
++                             **_fields(rejection or {}, ("checkpoint", "axis", "reason")))
++                if not (rejection or {}).get("reason"):
++                    event["reason"] = "rejection_diagnostics_unavailable"
++        except Exception as exc:
++            self._failure(event, exc)
++
++    def row_outcome(self, stage: str, *, row: dict, candidate: Any, **fields: Any) -> None:
++        event = self._event(stage, "recheck_row", **fields)
++        if event is None:
++            return
++        try:
++            event.update(observation="recorded", target=_flow_row(row, candidate))
++        except Exception as exc:
++            self._failure(event, exc)
++
++
++def _context_flow_observation(value: Any) -> dict[str, Any]:
++    """Only known bounded identity/coordinate fields cross the diagnostic sink."""
++    if not isinstance(value, dict):
++        return _preview(value)
++    events = value.get("events")
++    if not isinstance(events, list):
++        return {"observation": "malformed", "reason": "missing_flow_events"}
++    result = {
++        "observation": "recorded",
++        **_fields(value, ("schema_version", "event_count", "omitted_events", "event_limit",
++                          "source_limit", "diagnostic_character_limit", "diagnostic_error_count",
++                          "last_diagnostic_error_type")),
++        "recorded_events": len(events),
++        "serialization_omitted_events": max(0, len(events) - MAX_CONTEXT_FLOW_EVENTS), "events": [],
++    }
++    event_fields = (
++        "sequence", "stage", "event", "observation", "error_type", "source_count", "source_rows_omitted",
++        "call_sequence", "row_ordinal", "attempt_ordinal", "derivation", "seed_ordinal", "active",
++        "outcome", "checkpoint", "axis", "reason", "route", "accepted_derivation",
++        "checked_visible_char_start", "checked_visible_char_end", "checked_native_char_start",
++        "checked_native_char_end", "attempts", "seed_count",
++        "seed_source_mismatches", "seed_span_unavailable", "seed_bounds_invalid", "occurrence_available",
++    )
++    for event in events[:MAX_CONTEXT_FLOW_EVENTS]:
++        item = _fields(event, event_fields)
++        if isinstance(event, dict):
++            for name in ("target", "native"):
++                if name in event:
++                    item[name] = _fields(event[name], ("observation", *_FLOW_ROW_FIELDS))
++            if isinstance(event.get("rows"), list):
++                item["rows"] = [_fields(row, ("observation", *_FLOW_ROW_FIELDS))
++                                for row in event["rows"][:MAX_CONTEXT_FLOW_SOURCES]]
++                item["serialization_omitted_source_rows"] = max(0, len(event["rows"]) - MAX_CONTEXT_FLOW_SOURCES)
++        result["events"].append(item)
++    return result
++
++
+ def _recorded_ids(value: Any) -> dict[str, Any]:
+     if not isinstance(value, dict):
+         return _preview(value)
+@@ -195,6 +422,7 @@ def _attempt_observation(value: Any) -> dict[str, Any]:
+             "native_fallbacks", "omitted_source_count", "source_count", "read_next_omitted")),
+         "experimental_source_recheck": _work_observation(value.get("experimental_source_recheck", _MISSING), (
+             "checked", "retained"), counts=("routes",)),
++        "context_flow": _context_flow_observation(value.get("context_flow", _MISSING)),
+     }
+ 
+ 
+diff --git a/docmancer/docs/domain/literal_context_admission.py b/docmancer/docs/domain/literal_context_admission.py
+index 9627f089..b461996e 100644
+--- a/docmancer/docs/domain/literal_context_admission.py
++++ b/docmancer/docs/domain/literal_context_admission.py
+@@ -515,10 +515,11 @@ def recheck_source_valid_candidate(
+     """
+     if rejection_diagnostics is not None:
+         rejection_diagnostics.clear()
++    checkpoint = "native_reference"
+ 
+     def reject(axis: str, reason: str):
+         if rejection_diagnostics is not None:
+-            rejection_diagnostics.update(axis=axis, reason=reason)
++            rejection_diagnostics.update(checkpoint=checkpoint, axis=axis, reason=reason)
+         return None
+ 
+     def qualification_axis(reason: str) -> str:
+@@ -534,9 +535,11 @@ def recheck_source_valid_candidate(
+     if not isinstance(seed_evidence, dict) or not isinstance(seed_evidence.get("text"), str):
+         return reject("source_admissible", "missing_native_source_reference")
+     seed_text = seed_evidence["text"]
++    checkpoint = "native_discovery"
+     native_binding = original_body_discovery_binding(question=question, body=seed_text, candidate=seed)
+     if native_binding is None:
+         return reject("source_admissible", "missing_current_native_discovery")
++    checkpoint = "native_source_qualification"
+     seed_checked = _checked_original_candidate(
+         question=question, evidence_text=seed_text, candidate=seed,
+         expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+@@ -548,6 +551,7 @@ def recheck_source_valid_candidate(
+     if not seed_qualification.qualified:
+         if seed_qualification.reason != "insufficient_visible_match":
+             return reject(qualification_axis(seed_qualification.reason), seed_qualification.reason)
++        checkpoint = "native_admission"
+         seed_admission = admit_original_literal_context(
+             question=question, evidence_text=seed_text, candidate=seed,
+             expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+@@ -557,6 +561,7 @@ def recheck_source_valid_candidate(
+                 return reject("request_constraints", "missing_exact_terms")
+             name_reason = body_request_constraint_rejection(question=question, evidence_text=seed_text, candidate=seed)
+             return reject("request_constraints" if name_reason else "contribution", name_reason or "native_admission_rejected")
++    checkpoint = "visible_source_qualification"
+     checked = _checked_original_candidate(
+         question=question, evidence_text=evidence_text, candidate=candidate,
+         expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+@@ -564,13 +569,16 @@ def recheck_source_valid_candidate(
+     if checked is None:
+         return reject("source_admissible", "source_binding_rejected")
+     qualification, evidence, identity, scope = checked
++    checkpoint = "source_lineage"
+     if (candidate.get("_reference_root_plan") != seed.get("_reference_root_plan")
+         or any(evidence.get(key) != seed_evidence.get(key) for key in (
+             "source", "member_binding", "project_doc_content_hash", "raw_document",
+         ))):
+         return reject("source_admissible", "derived_source_mismatch")
++    checkpoint = "visible_source_qualification"
+     if not qualification.qualified and qualification.reason != "insufficient_visible_match":
+         return reject(qualification_axis(qualification.reason), qualification.reason)
++    checkpoint = "visible_raw_window"
+     window = _checked_raw_body_window(
+         evidence_text, candidate, evidence, qualification.trace.get("reference_visible_span"),
+     )
+@@ -579,6 +587,7 @@ def recheck_source_valid_candidate(
+     raw = evidence["raw_document"]
+     seed_span = (seed_evidence["char_start"], seed_evidence["char_end"])
+     visible_span = (window["char_start"], window["char_end"])
++    checkpoint = "structural_derivation"
+     edge = _checked_context_derivation(
+         raw=raw, document_id=identity["document_id"], seed_span=seed_span,
+         visible_span=visible_span, derivation=derivation,
+@@ -595,6 +604,7 @@ def recheck_source_valid_candidate(
+     route = "existing_qualified" if qualification.qualified else None
+     admission = None
+     if route is None:
++        checkpoint = "visible_admission"
+         admission = admit_original_literal_context(
+             question=question, evidence_text=evidence_text, candidate=candidate,
+             expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+@@ -611,6 +621,7 @@ def recheck_source_valid_candidate(
+             route = ("source_valid_unassessed" if admission["reason"] == "source_valid_original_candidate_v1"
+                      else "existing_literal")
+     if route is None:
++        checkpoint = "visible_request_constraints"
+         if qualification.trace.get("missing_exact_terms"):
+             return reject("request_constraints", "missing_exact_terms")
+         name_reason = body_request_constraint_rejection(question=question, evidence_text=evidence_text, candidate=candidate)
+@@ -621,6 +632,7 @@ def recheck_source_valid_candidate(
+         visible_candidate = {**candidate, **window, "_reference_evidence": {
+             **evidence, "char_start": window["char_start"], "char_end": window["char_end"], "text": evidence_text,
+         }}
++        checkpoint = "derived_body_admission"
+         witness = source_valid_original_candidate_witness(
+             question=question, evidence_text=evidence_text, candidate=visible_candidate, native_candidate=seed,
+         )

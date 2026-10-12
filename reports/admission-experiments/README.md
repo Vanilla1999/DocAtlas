@@ -5,6 +5,11 @@
 
 ## Основные результаты
 
+- [Логи поздней потери, её причина и интеграционно проверенное восстановление](prepared-retrieval/late-context-diagnostics-20261012/RESULT_RU.md)
+  — исходный V40-V04 дал FAIL до и PASS после общего возврата заново проверенного
+  native; три дополнительные интеграционные проверки прошли. 6 prepare / 14 context,
+  ноль моделей; новый тест/gold неизменны. Цена пакета 916→1125 токенов;
+  смысловая релевантность и общее сравнение с Grounded этим не доказаны.
 - [Mini / budget после prepared retrieval: 40 вопросов](prepared-retrieval/model-comparison-40-20261012/RESULT_RU.md)
   — два opt-in режима, 40 пар / 80 публичных context calls, 450 реальных Mini forwards;
   strict positive 17→20/24, partial 4→3/8, negative 1→1/8. Независимый смысловой

@@ -1,0 +1,871 @@
+{
+  "seconds": 0.1018162049986131,
+  "expected_paths": [
+    "docs/config/server-options.md",
+    "docs/guide/assets.md",
+    "docs/guide/env-and-mode.md"
+  ],
+  "indexed_paths": [
+    "docs/config/server-options.md",
+    "docs/guide/assets.md",
+    "docs/guide/env-and-mode.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-6d90aa5e46cd43b77db1f8b7a70d468c84df5edd",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "# Server Options\n\nUnless noted, the options in this section are only applied to dev.\n\n",
+      "line_start": 1,
+      "line_end": 4
+    },
+    {
+      "stable_chunk_id": "child-b20a5ed5f410c350ebfadd8cd615997325f221c7",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.host\n\n- **Type:** `string | boolean`\n- **Default:** `'localhost'`\n\nSpecify which IP addresses the server should listen on.\nSet this to `0.0.0.0` or `true` to listen on all addresses, including LAN and public addresses.\n\nThis can be set via the CLI using `--host 0.0.0.0` or `--host`.\n\n::: tip NOTE\n\nThere are cases when other servers might respond instead of Vite.\n\n",
+      "line_start": 5,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-a91ba1bf4241f982ec5ead5e9e4bc9b5ac1f1cb5",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "The first case is when `localhost` is used. Node.js's [`dns.setDefaultResultOrder`](https://nodejs.org/docs/latest-v24.x/api/dns.html#dnssetdefaultresultorderorder) changes how DNS-resolved addresses are ordered, and browsers may use a different resolved address than the one Vite is listening to. Vite prints the resolved address when it differs.\n\n",
+      "line_start": 19,
+      "line_end": 20
+    },
+    {
+      "stable_chunk_id": "child-e4bef092f30a44f85caf8db83496c2ea01ee3fef",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "The second case is when wildcard hosts (e.g. `0.0.0.0`) are used. This is because servers listening on non-wildcard hosts take priority over those listening on wildcard hosts.\n\n:::\n\n::: tip Accessing the server on WSL2 from your LAN\n\n",
+      "line_start": 21,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-3256a12cd58899a59cef30bc3a97bc66839ac1ae",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When running Vite on WSL2, it is not sufficient to set `host: true` to access the server from your LAN.\nSee [the WSL document](https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan) for more details.\n\n:::\n\n",
+      "line_start": 27,
+      "line_end": 31
+    },
+    {
+      "stable_chunk_id": "child-77a646bc807d455c1d7f7a0fc103989e102f4899",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.allowedHosts\n\n- **Type:** `string[] | true`\n- **Default:** `[]`\n\nThe hostnames that Vite is allowed to respond to.\n`localhost` and domains under `.localhost` and all IP addresses are allowed by default.\nWhen using HTTPS, this check is skipped.\n\n",
+      "line_start": 32,
+      "line_end": 40
+    },
+    {
+      "stable_chunk_id": "child-740dd56dd144fe82f2c4a564f41f52e03c44e4e0",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "If a string starts with `.`, it will allow that hostname without the `.` and all subdomains under the hostname. For example, `.example.com` will allow `example.com`, `foo.example.com`, and `foo.bar.example.com`. If set to `true`, the server is allowed to respond to requests for any hosts.\n\n::: details What hosts are safe to be added?\n\nHosts that you have control over which IP addresses they resolve to are safe to add to the list of allowed hosts.\n\n",
+      "line_start": 41,
+      "line_end": 46
+    },
+    {
+      "stable_chunk_id": "child-2fbd86660c96248f07597b0442a39cd14994e453",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "For example, if you own a domain `vite.dev`, you can add `vite.dev` and `.vite.dev` to the list. If you don't own that domain and you cannot trust the owner of that domain, you should not add it.\n\nEspecially, you should never add Top-Level Domains like `.com` to the list. This is because anyone can purchase a domain like `example.com` and control the IP address it resolves to.\n\n:::\n\n::: danger\n\n",
+      "line_start": 47,
+      "line_end": 54
+    },
+    {
+      "stable_chunk_id": "child-cec0d1525ccb745e94520ff78b496b46da98459f",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Setting `server.allowedHosts` to `true` allows any website to send requests to your dev server through DNS rebinding attacks, allowing them to download your source code and content. We recommend always using an explicit list of allowed hosts. See [GHSA-vg6x-rcgg-rjx6](https://github.com/vitejs/vite/security/advisories/GHSA-vg6x-rcgg-rjx6) for more details.\n\n:::\n\n",
+      "line_start": 55,
+      "line_end": 58
+    },
+    {
+      "stable_chunk_id": "child-c6bdb96c1d78c701cb01902ed98ce16aedd4cb0e",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "::: details Configure via environment variable\nYou can set the environment variable `__VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS` to add additional allowed hosts. Use commas to separate multiple hosts (e.g., `host1.example.com,host2.example.com`).\n:::\n\n",
+      "line_start": 59,
+      "line_end": 62
+    },
+    {
+      "stable_chunk_id": "child-bb945629d376b3235a9b7d3cab02c7d14db538a0",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.port\n\n- **Type:** `number`\n- **Default:** `5173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n\n",
+      "line_start": 63,
+      "line_end": 69
+    },
+    {
+      "stable_chunk_id": "child-5ecf970d9f495c27f3a8f9e1defb85dd355e57f5",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n\n",
+      "line_start": 70,
+      "line_end": 75
+    },
+    {
+      "stable_chunk_id": "child-139509fdc0f0b5957b9926c4869e9fc0e05124ab",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.https\n\n- **Type:** `https.ServerOptions`\n\nEnable TLS + HTTP/2. The value is an [options object](https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener) passed to `https.createServer()`.\n\n",
+      "line_start": 76,
+      "line_end": 81
+    },
+    {
+      "stable_chunk_id": "child-1e6e95837c20386f4828e6c99debcfa8869d5fd3",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "A valid certificate is needed. For a basic setup, you can add [@vitejs/plugin-basic-ssl](https://github.com/vitejs/vite-plugin-basic-ssl) to the project plugins, which will automatically create and cache a self-signed certificate. But we recommend creating your own certificates.\n\n",
+      "line_start": 82,
+      "line_end": 83
+    },
+    {
+      "stable_chunk_id": "child-9b3fc6d8af7e08a6814bb163539f3645fabb4694",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.open\n\n- **Type:** `boolean | string`\n\nAutomatically open the app in the browser on server start. When the value is a string, it will be used as the URL's pathname. If you want to open the server in a specific browser you like, you can set the env `process.env.BROWSER` (e.g. `firefox`). You can also set `process.env.BROWSER_ARGS` to pass additional arguments (e.g. `--incognito`).\n\n",
+      "line_start": 84,
+      "line_end": 89
+    },
+    {
+      "stable_chunk_id": "child-5c24d090cb3294185beea4e88de6a22e8eb1a439",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "`BROWSER` and `BROWSER_ARGS` are also special environment variables you can set in the `.env` file to configure it. See [the `open` package](https://github.com/sindresorhus/open#app) for more details.\n\n**Example:**\n\n```js\nexport default defineConfig({\n  server: {\n    open: '/docs/index.html',\n  },\n})\n```\n\n",
+      "line_start": 90,
+      "line_end": 101
+    },
+    {
+      "stable_chunk_id": "child-1f4ffb9ead37cd060243a10c32d05fc31cb7c856",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.proxy\n\n- **Type:** `Record<string, string | ProxyOptions>`\n\n",
+      "line_start": 102,
+      "line_end": 105
+    },
+    {
+      "stable_chunk_id": "child-7e6fffe7d09726ecc8ddeb741f87d73ccf4ffb05",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Configure custom proxy rules for the dev server. Expects an object of `{ key: options }` pairs. Any requests whose request path starts with that key will be proxied to the specified target. If the key starts with `^`, it will be interpreted as a `RegExp`. The `configure` option can be used to access the proxy instance. If a request matches any of the configured proxy rules, the request won't be transformed by Vite.\n\n",
+      "line_start": 106,
+      "line_end": 107
+    },
+    {
+      "stable_chunk_id": "child-539ecdf62e9f4ae3b6a93f58c71c9718eae24a17",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Note that if you are using non-relative [`base`](/config/shared-options.md#base), you must prefix each key with that `base`.\n\nExtends [`http-proxy-3`](https://github.com/sagemathinc/http-proxy-3#options). Additional options are [here](https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/middlewares/proxy.ts#L13).\n\n",
+      "line_start": 108,
+      "line_end": 111
+    },
+    {
+      "stable_chunk_id": "child-bd59228fd853caf3550acc6cfdbd7f2adeb84155",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "In some cases, you might also want to configure the underlying dev server (e.g. to add custom middlewares to the internal [connect](https://github.com/senchalabs/connect) app). In order to do that, you need to write your own [plugin](/guide/using-plugins.html) and use [configureServer](/guide/api-plugin.html#configureserver) function.\n\n**Example:**\n\n",
+      "line_start": 112,
+      "line_end": 115
+    },
+    {
+      "stable_chunk_id": "child-8d38593ecbc9b4a91de2b908fb87a80a804e7cc7",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js\nexport default defineConfig({\n  server: {\n    proxy: {\n      // string shorthand:\n      // http://localhost:5173/foo\n      //   -> http://localhost:4567/foo\n      '/foo': 'http://localhost:4567',\n      // with options:\n      // http://localhost:5173/api/bar\n      //   -> http://jsonplaceholder.typicode.com/bar\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/api/, ''),\n      },\n      // with RegExp:\n      // http://localhost:5173/fallback/\n      //   -> http://jsonplaceholder.typicode.com/\n      '^/fallback/.*': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        rewrite: (path) => path.replace(/^\\/fallback/, ''),\n      },\n      // Using the proxy instance\n      '/api': {\n        target: 'http://jsonplaceholder.typicode.com',\n        changeOrigin: true,\n        configure: (proxy, options) => {\n          // proxy will be an instance of 'http-proxy-3'\n        },\n      },\n      // Proxying websockets or socket.io:\n      // ws://localhost:5173/socket.io\n      //   -> ws://localhost:5174/socket.io\n      // Exercise caution using `rewriteWsOrigin` as it can leave the\n      // proxying open to CSRF attacks.\n      '/socket.io': {\n        target: 'ws://localhost:5174',\n        ws: true,\n        rewriteWsOrigin: true,\n      },\n    },\n  },\n})\n```\n\n",
+      "line_start": 116,
+      "line_end": 162
+    },
+    {
+      "stable_chunk_id": "child-8b97106699f5a434da3d9a34840dbe286d059224",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "::: warning Origin check for WebSockets\n\nVite does not check the origin of WebSocket requests before proxying. The proxy target is expected to check the `Origin` header or other checks. Note that the `rewriteWsOrigin` option will rewrite the origin to the target origin and will cause the origin check to be bypassed.\n\n:::\n\n",
+      "line_start": 163,
+      "line_end": 168
+    },
+    {
+      "stable_chunk_id": "child-6e2026cacf04e9e087024468b385829fed1be30f",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.cors\n\n- **Type:** `boolean | CorsOptions`\n- **Default:** `{ origin: /^https?:\\/\\/(?:(?:[^:]+\\.)?localhost|127\\.0\\.0\\.1|\\[::1\\])(?::\\d+)?$/ }` (allows localhost, `127.0.0.1` and `::1`)\n\nConfigure CORS for the dev server. Pass an [options object](https://github.com/expressjs/cors#configuration-options) to fine tune the behavior or `true` to allow any origin.\n\n::: danger\n\n",
+      "line_start": 169,
+      "line_end": 177
+    },
+    {
+      "stable_chunk_id": "child-77a40eeb489f39f8670c0b759fedd60521a4d504",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Setting `server.cors` to `true` allows any website to send requests to your dev server and download your source code and content. We recommend always using an explicit list of allowed origins.\n\n:::\n\n",
+      "line_start": 178,
+      "line_end": 181
+    },
+    {
+      "stable_chunk_id": "child-8b03bcf5b38743cb0997a3117c1b061eda71197f",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.headers\n\n- **Type:** `OutgoingHttpHeaders`\n\nSpecify server response headers.\n\n",
+      "line_start": 182,
+      "line_end": 187
+    },
+    {
+      "stable_chunk_id": "child-1ab064d6db92d65c6dc9f4c84714aebb8acb37d3",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.hmr\n\n- **Type:** `boolean | { overlay?: boolean }`\n\nDisable or configure HMR behavior.\n\nSet `server.hmr.overlay` to `false` to disable the server error overlay.\n\n::: warning Deprecated Options\n\nThe WebSocket-related options (`protocol`, `host`, `port`, `path`, `clientPort`, `timeout`, `server`) are deprecated. Use [`server.ws`](#server-ws) instead. These options are automatically synced, so existing configurations will continue to work.\n\n:::\n\n",
+      "line_start": 188,
+      "line_end": 201
+    },
+    {
+      "stable_chunk_id": "child-dc41b2f03cf06df7f1dc35578ade10c1b045541b",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.ws\n\n- **Type:** `false | { protocol?: string, host?: string, port?: number, path?: string, timeout?: number, clientPort?: number, server?: Server }`\n\nConfigure WebSocket connection options. Set to `false` to disable the WebSocket connection entirely.\n\n",
+      "line_start": 202,
+      "line_end": 207
+    },
+    {
+      "stable_chunk_id": "child-6a8d7e9640f72823e306701ded40c0410f426dec",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "- `protocol` - WebSocket protocol (`ws` or `wss`)\n- `host` - WebSocket server host\n- `port` - WebSocket server port\n- `path` - WebSocket path\n- `clientPort` - Override the port on the client side, allowing you to serve the websocket on a different port than the client code looks for it on\n- `timeout` - Connection timeout in milliseconds (default: 30000)\n- `server` - Use a custom HTTP server for WebSocket connections\n\n",
+      "line_start": 208,
+      "line_end": 215
+    },
+    {
+      "stable_chunk_id": "child-0d7e1f7a88174603c7e0aea6a09c3a5329eb70cf",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When `server.ws.server` is defined, Vite will process the WebSocket connection requests through the provided server. If not in middleware mode, Vite will attempt to process WebSocket connection requests through the existing server. This can be helpful when using self-signed certificates or when you want to expose Vite over a network on a single port.\n\n",
+      "line_start": 216,
+      "line_end": 217
+    },
+    {
+      "stable_chunk_id": "child-7e477bf9ecd341ceb56fed05f0f320e80c1d1043",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js\nexport default defineConfig({\n  server: {\n    ws: {\n      protocol: 'wss',\n      host: 'localhost',\n      port: 3001,\n    },\n  },\n})\n```\n\nCheck out [`vite-setup-catalogue`](https://github.com/sapphi-red/vite-setup-catalogue) for some examples.\n\n::: tip NOTE\n\n",
+      "line_start": 218,
+      "line_end": 233
+    },
+    {
+      "stable_chunk_id": "child-f87f20148bfab587cf4bc4b74708fa48dcd87ce1",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "With the default configuration, reverse proxies in front of Vite are expected to support proxying WebSocket. If the Vite HMR client fails to connect WebSocket, the client will fall back to connecting the WebSocket directly to the Vite HMR server bypassing the reverse proxies:\n\n```\nDirect websocket connection fallback. Check out https://vite.dev/config/server-options.html#server-ws to remove the previous connection error.\n```\n\n",
+      "line_start": 234,
+      "line_end": 239
+    },
+    {
+      "stable_chunk_id": "child-e01940746dec9603427a7700c87ba64f12bca001",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "The error that appears in the Browser when the fallback happens can be ignored. To avoid the error by directly bypassing reverse proxies, you could either:\n\n- configure the reverse proxy to proxy WebSocket too\n- set [`server.strictPort = true`](#server-strictport) and set `server.ws.clientPort` to the same value with `server.port`\n- set `server.ws.port` to a different value from [`server.port`](#server-port)\n\n:::\n\n",
+      "line_start": 240,
+      "line_end": 247
+    },
+    {
+      "stable_chunk_id": "child-cbb7163060013d308c2b5a2e8af4f61c4c6c4df4",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.forwardConsole\n\n- **Type:** `boolean | { unhandledErrors?: boolean, logLevels?: ('error' | 'warn' | 'info' | 'log' | 'debug')[] }`\n- **Default:** auto (`true` when an AI coding agent is detected based on [`@vercel/detect-agent`](https://www.npmjs.com/package/@vercel/detect-agent), otherwise `false`)\n\nForward browser runtime events to the Vite server console during development.\n\n",
+      "line_start": 248,
+      "line_end": 254
+    },
+    {
+      "stable_chunk_id": "child-c2b4844ec66311d8f4cdab13f15e6739c49b860b",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "- `true` enables forwarding unhandled errors and `console.error` / `console.warn` logs.\n- `unhandledErrors` controls forwarding uncaught exceptions and unhandled promise rejections.\n- `logLevels` controls which `console.*` calls are forwarded.\n\nFor example:\n\n```js\nexport default defineConfig({\n  server: {\n    forwardConsole: {\n      unhandledErrors: true,\n      logLevels: ['warn', 'error'],\n    },\n  },\n})\n```\n\n",
+      "line_start": 255,
+      "line_end": 271
+    },
+    {
+      "stable_chunk_id": "child-f4198cac4757acb17aaebe3f5b45858d756c45e6",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When unhandled errors are forwarded, they are logged in the server terminal with enhanced formatting, for example:\n\n```log\n1:18:38 AM [vite] (client) [Unhandled error] Error: this is test error\n > testError src/main.ts:20:8\n     18|\n     19| function testError() {\n     20|   throw new Error('this is test error')\n       |        ^\n     21| }\n     22|\n > HTMLButtonElement.<anonymous> src/main.ts:6:2\n```\n\n",
+      "line_start": 272,
+      "line_end": 285
+    },
+    {
+      "stable_chunk_id": "child-ccb9b3f672857c3b5025becdfd423a6d1b0ab026",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.warmup\n\n- **Type:** `{ clientFiles?: string[], ssrFiles?: string[] }`\n- **Related:** [Warm Up Frequently Used Files](/guide/performance.html#warm-up-frequently-used-files)\n\nWarm up files to transform and cache the results in advance. This improves the initial page load during server starts and prevents transform waterfalls.\n\n",
+      "line_start": 286,
+      "line_end": 292
+    },
+    {
+      "stable_chunk_id": "child-a36cefdf1a135bae609f41ec61e5fa0a48d0d764",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "`clientFiles` are files that are used in the client only, while `ssrFiles` are files that are used in SSR only. They accept an array of file paths or [`tinyglobby` patterns](https://superchupu.dev/tinyglobby/comparison) relative to the `root`.\n\nMake sure to only add files that are frequently used to not overload the Vite dev server on startup.\n\n",
+      "line_start": 293,
+      "line_end": 296
+    },
+    {
+      "stable_chunk_id": "child-e248d54ca042944b02f7ffb6ccf9a0cb996027cc",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js\nexport default defineConfig({\n  server: {\n    warmup: {\n      clientFiles: ['./src/components/*.vue', './src/utils/big-utils.js'],\n      ssrFiles: ['./src/server/modules/*.js'],\n    },\n  },\n})\n```\n\n",
+      "line_start": 297,
+      "line_end": 307
+    },
+    {
+      "stable_chunk_id": "child-ca9bda97f11adc316bb2a4ecf36e7ef64ff0f873",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.watch\n\n- **Type:** `object | null`\n\nFile system watcher options to pass on to [chokidar](https://github.com/paulmillr/chokidar/tree/3.6.0#api).\n\n",
+      "line_start": 308,
+      "line_end": 313
+    },
+    {
+      "stable_chunk_id": "child-62c1620d316123070cfa85d0688c6d6cb7c60c50",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When bundled-dev mode is enabled, [Rolldown watch options](https://rolldown.rs/reference/InputOptions.watch) (for example, `usePolling`, `pollInterval`, `useDebounce`, `debounceDuration`, `include`, `exclude`) are also accepted. The chokidar-only options are still used by the chokidar watcher, which keeps watching files outside the module graph, such as config file dependencies and env files.\n\n",
+      "line_start": 314,
+      "line_end": 315
+    },
+    {
+      "stable_chunk_id": "child-7d6196033c4260bdf2ffd8f0bd574cd669131557",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "The Vite server watcher watches the `root` and skips the `.git/`, `node_modules/`, `test-results/`, and Vite's `cacheDir` and `build.outDir` directories by default. When updating a watched file, Vite will apply HMR and update the page only if needed.\n\nIf set to `null`, no files will be watched. [`server.watcher`](/guide/api-javascript.html#vitedevserver) will provide a compatible event emitter, but calling `add` or `unwatch` will have no effect.\n\n",
+      "line_start": 316,
+      "line_end": 319
+    },
+    {
+      "stable_chunk_id": "child-8cc93ca985592aaf903b7c1ce06964c6f12791f0",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "::: warning Watching files in `node_modules`\n\nIt's currently not possible to watch files and packages in `node_modules`. For further progress and workarounds, you can follow [issue #8619](https://github.com/vitejs/vite/issues/8619).\n\n:::\n\n::: warning Using Vite on Windows Subsystem for Linux (WSL) 2\n\n",
+      "line_start": 320,
+      "line_end": 327
+    },
+    {
+      "stable_chunk_id": "child-7951a3f6f49e1773825a48f9b8accd29c57b9b70",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When running Vite on WSL2, file system watching does not work when a file is edited by Windows applications (non-WSL2 process). This is due to [a WSL2 limitation](https://github.com/microsoft/WSL/issues/4739). This also applies to running on Docker with a WSL2 backend.\n\n",
+      "line_start": 328,
+      "line_end": 329
+    },
+    {
+      "stable_chunk_id": "child-435708b61fa34bb14a58e5ef300bd89849435b6f",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "To fix it, you could either:\n\n- **Recommended**: Use WSL2 applications to edit your files.\n  - It is also recommended to move the project folder outside of a Windows filesystem. Accessing Windows filesystem from WSL2 is slow. Removing that overhead will improve performance.\n- Set `{ usePolling: true }`.\n  - Note that [`usePolling` leads to high CPU utilization](https://github.com/paulmillr/chokidar/tree/3.6.0#performance).\n\n:::\n\n",
+      "line_start": 330,
+      "line_end": 338
+    },
+    {
+      "stable_chunk_id": "child-1d1a96648f748adb4a742d5d7167d3bee5302808",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n",
+      "line_start": 339,
+      "line_end": 351
+    },
+    {
+      "stable_chunk_id": "child-dbeb1713d4cfbf1c41c75ec5598a3d1bf12a2683",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```\n\n",
+      "line_start": 352,
+      "line_end": 378
+    },
+    {
+      "stable_chunk_id": "child-fe468186389cee190412f1ae02f39dbbf9320fd3",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.fs.strict\n\n- **Type:** `boolean`\n- **Default:** `true` (enabled by default since Vite 2.7)\n\nRestrict serving files outside of workspace root.\n\n",
+      "line_start": 379,
+      "line_end": 385
+    },
+    {
+      "stable_chunk_id": "child-b161b6621aad0b55f422689a789eb1bf94e3c3f3",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.fs.allow\n\n- **Type:** `string[]`\n\nRestrict files that could be served via `/@fs/`. When `server.fs.strict` is set to `true`, accessing files outside this directory list that aren't imported from an allowed file will result in a 403.\n\nBoth directories and files can be provided.\n\n",
+      "line_start": 386,
+      "line_end": 393
+    },
+    {
+      "stable_chunk_id": "child-17e733b2214fb8965306f22a5ea4c81961953239",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Vite will search for the root of the potential workspace and use it as default. A valid workspace met the following conditions, otherwise will fall back to the [project root](/guide/#index-html-and-project-root).\n\n- contains `workspaces` field in `package.json`\n- contains one of the following file\n  - `lerna.json`\n  - `pnpm-workspace.yaml`\n\n",
+      "line_start": 394,
+      "line_end": 400
+    },
+    {
+      "stable_chunk_id": "child-6c358f4e60a7cf256e0d3ef3579bf7d095c9038a",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "Accepts a path to specify the custom workspace root. Could be a absolute path or a path relative to [project root](/guide/#index-html-and-project-root). For example:\n\n```js\nexport default defineConfig({\n  server: {\n    fs: {\n      // Allow serving files from one level up to the project root\n      allow: ['..'],\n    },\n  },\n})\n```\n\n",
+      "line_start": 401,
+      "line_end": 413
+    },
+    {
+      "stable_chunk_id": "child-4acb73ca50d63ac26982fa7333a88757702184dd",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "When `server.fs.allow` is specified, the auto workspace root detection will be disabled. To extend the original behavior, a utility `searchForWorkspaceRoot` is exposed:\n\n",
+      "line_start": 414,
+      "line_end": 415
+    },
+    {
+      "stable_chunk_id": "child-0778dbe40e0d7e7002730657211fc9970ca52048",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js\nimport { defineConfig, searchForWorkspaceRoot } from 'vite'\n\nexport default defineConfig({\n  server: {\n    fs: {\n      allow: [\n        // search up for workspace root\n        searchForWorkspaceRoot(process.cwd()),\n        // your custom rules\n        '/path/to/custom/allow_directory',\n        '/path/to/custom/allow_file.demo',\n      ],\n    },\n  },\n})\n```\n\n",
+      "line_start": 416,
+      "line_end": 433
+    },
+    {
+      "stable_chunk_id": "child-1ed1e1db82e1fa4b0c912e2bb704e664e65d0466",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.fs.deny\n\n- **Type:** `string[]`\n- **Default:** `['.env', '.env.*', '*.{crt,pem,key,p12,pfx,cer,der}', '.npmrc', '.yarnrc.yml', '**/.git/**']`\n\nBlocklist for sensitive files being restricted to be served by Vite dev server. This will have higher priority than [`server.fs.allow`](#server-fs-allow). [picomatch patterns](https://github.com/micromatch/picomatch#globbing-features) are supported.\n\n::: tip NOTE\n\n",
+      "line_start": 434,
+      "line_end": 442
+    },
+    {
+      "stable_chunk_id": "child-9b61c5b95df41ca474827313097f380d2d146093",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "This blocklist does not apply to [the public directory](/guide/assets.md#the-public-directory). All files in the public directory are served without any filtering, since they are copied directly to the output directory during build.\n\n:::\n\n::: tip NOTE\n\n",
+      "line_start": 443,
+      "line_end": 448
+    },
+    {
+      "stable_chunk_id": "child-2f746eece32f59199e0fe9a2e3b5bf2e96e95486",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "The deny filter is applied against the module id and the id with query parameters stripped. Since a plugin can read files from any files in its load hook (including resolving symlinks to denied paths), Vite cannot guarantee that a denied file is inaccessible through an alternative path. If you have an alternative path, include it in the deny list as well.\n\n:::\n\n",
+      "line_start": 449,
+      "line_end": 452
+    },
+    {
+      "stable_chunk_id": "child-c84d8dfa383b1bac468831d0143a638f83c39e4d",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.origin\n\n- **Type:** `string`\n\nDefines the origin of the generated asset URLs during development.\n\n```js\nexport default defineConfig({\n  server: {\n    origin: 'http://127.0.0.1:8080',\n  },\n})\n```\n\n",
+      "line_start": 453,
+      "line_end": 466
+    },
+    {
+      "stable_chunk_id": "child-2aacd8ec84e9742c25d3bd75bd1ab4c532bf86de",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "## server.sourcemapIgnoreList\n\n- **Type:** `false | (sourcePath: string, sourcemapPath: string) => boolean`\n- **Default:** `(sourcePath) => sourcePath.includes('node_modules')`\n\nWhether or not to ignore source files in the server sourcemap, used to populate the [`x_google_ignoreList` source map extension](https://developer.chrome.com/articles/x-google-ignore-list/).\n\n",
+      "line_start": 467,
+      "line_end": 473
+    },
+    {
+      "stable_chunk_id": "child-fecf96286b169504f9213af2f6bbc312139399de",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "`server.sourcemapIgnoreList` is the equivalent of [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) for the dev server. A difference between the two config options is that the Rolldown function is called with a relative path for `sourcePath` while `server.sourcemapIgnoreList` is called with an absolute path. During dev, most modules have the map and the source in the same folder, so the relative path for `sourcePath` is the file name itself. In these cases, absolute paths make it convenient to be used instead.\n\n",
+      "line_start": 474,
+      "line_end": 475
+    },
+    {
+      "stable_chunk_id": "child-c7e5dc4cb442c4e8664f003f06154e9100537a3d",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "By default, it excludes all paths containing `node_modules`. You can pass `false` to disable this behavior, or, for full control, a function that takes the source path and sourcemap path and returns whether to ignore the source path.\n\n",
+      "line_start": 476,
+      "line_end": 477
+    },
+    {
+      "stable_chunk_id": "child-3da6c08a3f31fa173d8e5d54b58780e9d5dc5a5f",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "```js\nexport default defineConfig({\n  server: {\n    // This is the default value, and will add all files with node_modules\n    // in their paths to the ignore list.\n    sourcemapIgnoreList(sourcePath, sourcemapPath) {\n      return sourcePath.includes('node_modules')\n    },\n  },\n})\n```\n\n",
+      "line_start": 478,
+      "line_end": 489
+    },
+    {
+      "stable_chunk_id": "child-e0e13232a75a9a7be03a5c7f15e3567fbeb75e00",
+      "source_path": "docs/config/server-options.md",
+      "display_text": "::: tip Note\n[`server.sourcemapIgnoreList`](#server-sourcemapignorelist) and [`build.rolldownOptions.output.sourcemapIgnoreList`](https://rolldown.rs/reference/OutputOptions.sourcemapIgnoreList) need to be set independently. `server.sourcemapIgnoreList` is a server only config and doesn't get its default value from the defined Rolldown options.\n:::\n",
+      "line_start": 490,
+      "line_end": 492
+    },
+    {
+      "stable_chunk_id": "child-86c5f81a9b517ac628f4ba80b6e714d2a4b9cf55",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "# Static Asset Handling\n\n- Related: [Public Base Path](./build#public-base-path)\n- Related: [`assetsInclude` config option](/config/shared-options.md#assetsinclude)\n\n",
+      "line_start": 1,
+      "line_end": 5
+    },
+    {
+      "stable_chunk_id": "child-3e2cf1b391d411cd8034b1deaec1f55c22c07929",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "## Importing Asset as URL\n\nImporting a static asset will return the resolved public URL when it is served:\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport imgUrl from './img.png'\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nFor example, `imgUrl` will be `/src/img.png` during development, and become `/assets/img.2d8efhg.png` in the production build.\n\n",
+      "line_start": 6,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-1234aee8a94380cf106397abd8c3a416a0715968",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "The behavior is similar to webpack's `file-loader`. The difference is that the import can be either using absolute public paths (based on project root during dev) or relative paths.\n\n- `url()` references in CSS are handled the same way.\n\n- If using the Vue plugin, asset references in Vue SFC templates are automatically converted into imports.\n\n",
+      "line_start": 19,
+      "line_end": 24
+    },
+    {
+      "stable_chunk_id": "child-16eb36685b9ffc5c54d1f5289dbe9d22975fc76f",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "- Common image, media, and font filetypes are detected as assets automatically. You can extend the internal list using the [`assetsInclude` option](/config/shared-options.md#assetsinclude).\n\n- Referenced assets are included as part of the build assets graph, will get hashed file names, and can be processed by plugins for optimization.\n\n",
+      "line_start": 25,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-b3a315e9297e96ce4010fd8eb38bc5338db46946",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "- Assets smaller in bytes than the [`assetsInlineLimit` option](/config/build-options.md#build-assetsinlinelimit) will be inlined as base64 data URLs.\n\n- Git LFS placeholders are automatically excluded from inlining because they do not contain the content of the file they represent. To get inlining, make sure to download the file contents via Git LFS before building.\n\n",
+      "line_start": 29,
+      "line_end": 32
+    },
+    {
+      "stable_chunk_id": "child-809854c4039e2de64acfba918c9cb41f060a9ca8",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "- TypeScript, by default, does not recognize static asset imports as valid modules. To fix this, include [`vite/client`](./features#client-types).\n\n::: tip Inlining SVGs through `url()`\nWhen passing a URL of SVG to a manually constructed `url()` by JS, the variable should be wrapped within double quotes.\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport imgUrl from './img.svg'\ndocument.getElementById('hero-img').style.background = `url(\"${imgUrl}\")`\n```\n\n",
+      "line_start": 33,
+      "line_end": 44
+    },
+    {
+      "stable_chunk_id": "child-96463b36a7412fd10c0ebd854c1f1bf6f997dff3",
+      "source_path": "docs/guide/assets.md",
+      "display_text": ":::\n\n",
+      "line_start": 45,
+      "line_end": 46
+    },
+    {
+      "stable_chunk_id": "child-e52e406a488028ca3fb7944ce0e07f7635490d07",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "### Explicit URL Imports\n\nAssets that are not included in the internal list or in `assetsInclude` can be explicitly imported as a URL using the `?url` suffix. This is useful, for example, to import [Houdini Paint Worklets](https://developer.mozilla.org/en-US/docs/Web/API/CSS/paintWorklet_static).\n\n",
+      "line_start": 47,
+      "line_end": 50
+    },
+    {
+      "stable_chunk_id": "child-a85b5666c858d9318f5e4ec1792c07cca7be882d",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "```js twoslash\nimport 'vite/client'\n// ---cut---\nimport workletURL from 'extra-scalloped-border/worklet.js?url'\nCSS.paintWorklet.addModule(workletURL)\n```\n\n",
+      "line_start": 51,
+      "line_end": 57
+    },
+    {
+      "stable_chunk_id": "child-1aeda0118bbf58d945c328b51e801c286c76ca4d",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "### Explicit Inline Handling\n\nAssets can be explicitly imported with inlining or no inlining using the `?inline` or `?no-inline` suffix respectively.\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport imgUrl1 from './img.svg?no-inline'\nimport imgUrl2 from './img.png?inline'\n```\n\n",
+      "line_start": 58,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-2b30949a9ceeec1645eaf2c7a393a0f2989e2840",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "### Importing Asset as String\n\nAssets can be imported as strings using the `?raw` suffix.\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\nimport shaderString from './shader.glsl?raw'\n```\n\n",
+      "line_start": 69,
+      "line_end": 78
+    },
+    {
+      "stable_chunk_id": "child-05e06ad9039ae83ca81db99dfb2a85ca4be9e339",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "### Importing Script as a Worker\n\nScripts can be imported as web workers with the `?worker` or `?sharedworker` suffix.\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\n// Separate chunk in the production build\nimport Worker from './shader.js?worker'\nconst worker = new Worker()\n```\n\n",
+      "line_start": 79,
+      "line_end": 90
+    },
+    {
+      "stable_chunk_id": "child-f459923a1af77065d96365995dad9ec373621e56",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "```js twoslash\nimport 'vite/client'\n// ---cut---\n// sharedworker\nimport SharedWorker from './shader.js?sharedworker'\nconst sharedWorker = new SharedWorker()\n```\n\n```js twoslash\nimport 'vite/client'\n// ---cut---\n// Inlined as base64 strings\nimport InlineWorker from './shader.js?worker&inline'\n```\n\nCheck out the [Web Worker section](./features.md#web-workers) for more details.\n\n",
+      "line_start": 91,
+      "line_end": 107
+    },
+    {
+      "stable_chunk_id": "child-5379ca0011dc0d475861b20fb4a2691c1c7bdee0",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "## The `public` Directory\n\nIf you have assets that are:\n\n- Never referenced in source code (e.g. `robots.txt`)\n- Must retain the exact same file name (without hashing)\n- ...or you simply don't want to have to import an asset first just to get its URL\n\nThen you can place the asset in a special `public` directory under your project root. Assets in this directory will be served at root path `/` during dev, and copied to the root of the dist directory as-is.\n\n",
+      "line_start": 108,
+      "line_end": 117
+    },
+    {
+      "stable_chunk_id": "child-42815d236b3a8294f001c1b61670056900f656a5",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "The directory defaults to `<root>/public`, but can be configured via the [`publicDir` option](/config/shared-options.md#publicdir).\n\nNote that you should always reference `public` assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`.\n\n::: tip Choosing between imports and the `public` directory\n\n",
+      "line_start": 118,
+      "line_end": 123
+    },
+    {
+      "stable_chunk_id": "child-d599cdc23ca2fb164d220600521971568183629b",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "In general, prefer **importing assets** unless you specifically need the guarantees provided by the `public` directory.\n\n:::\n\n",
+      "line_start": 124,
+      "line_end": 127
+    },
+    {
+      "stable_chunk_id": "child-54a969d5369c409729bb841c30cc03347ee4bf32",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "## new URL(url, import.meta.url)\n\n[import.meta.url](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import.meta) is a native ESM feature that exposes the current module's URL. Combining it with the native [URL constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL), we can obtain the full, resolved URL of a static asset using relative path from a JavaScript module:\n\n",
+      "line_start": 128,
+      "line_end": 131
+    },
+    {
+      "stable_chunk_id": "child-72158447f71ebb86c1b3b6e73adc31ad9fd8cd30",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "```js\nconst imgUrl = new URL('./img.png', import.meta.url).href\n\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nThis works natively in modern browsers - in fact, Vite doesn't need to process this code at all during development!\n\nThis pattern also supports dynamic URLs via template literals:\n\n",
+      "line_start": 132,
+      "line_end": 141
+    },
+    {
+      "stable_chunk_id": "child-3feb69a3dbb0be44d948453bae190ac72b0c6489",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "```js\nfunction getImageUrl(name) {\n  // note that this does not include files in subdirectories\n  return new URL(`./dir/${name}.png`, import.meta.url).href\n}\n```\n\n",
+      "line_start": 142,
+      "line_end": 148
+    },
+    {
+      "stable_chunk_id": "child-c836e4b5d2756d169b8a610a06ba5c307ad84dcc",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "During the production build, Vite will perform necessary transforms so that the URLs still point to the correct location even after bundling and asset hashing. However, the URL string must be static so it can be analyzed, otherwise the code will be left as is, which can cause runtime errors if `build.target` does not support `import.meta.url`.\n\n```js\n// Vite will not transform this\nconst imgUrl = new URL(imagePath, import.meta.url).href\n```\n\n",
+      "line_start": 149,
+      "line_end": 155
+    },
+    {
+      "stable_chunk_id": "child-55242a60a25a59a9ee53a0ac94775f01c8828cc8",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "::: details How it works\n\nVite will transform the `getImageUrl` function to:\n\n```js\nimport __img0png from './dir/img0.png'\nimport __img1png from './dir/img1.png'\n\nfunction getImageUrl(name) {\n  const modules = {\n    './dir/img0.png': __img0png,\n    './dir/img1.png': __img1png,\n  }\n  return new URL(modules[`./dir/${name}.png`], import.meta.url).href\n}\n```\n\n:::\n\n",
+      "line_start": 156,
+      "line_end": 174
+    },
+    {
+      "stable_chunk_id": "child-0705a4b314c72c3f35a47d057bb2f5b88ccee56b",
+      "source_path": "docs/guide/assets.md",
+      "display_text": "::: warning Does not work with SSR\nThis pattern does not work if you are using Vite for Server-Side Rendering, because `import.meta.url` has different semantics in browsers vs. Node.js. The server bundle also cannot determine the client host URL ahead of time.\n:::\n",
+      "line_start": 175,
+      "line_end": 177
+    },
+    {
+      "stable_chunk_id": "child-7d3b18f8799eb892a5ec747865eeabaab3918e17",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "# Env Variables and Modes\n\nVite exposes certain constants under the special `import.meta.env` object. These constants are defined as global variables during dev and statically replaced at build time to make tree-shaking effective.\n\n:::details Example\n\n```js\nif (import.meta.env.DEV) {\n  // code inside here will be tree-shaken in production builds\n  console.log('Dev mode')\n}\n```\n\n:::\n\n",
+      "line_start": 1,
+      "line_end": 15
+    },
+    {
+      "stable_chunk_id": "child-7aafb0c0ddeb9fe53dc90ee3a3ea78c8c73c8bff",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "<ScrimbaLink href=\"https://scrimba.com/intro-to-vite-c03p6pbbdq/~05an?via=vite\" title=\"Env Variables in Vite\">Watch an interactive lesson on Scrimba</ScrimbaLink>\n\n",
+      "line_start": 16,
+      "line_end": 17
+    },
+    {
+      "stable_chunk_id": "child-17fb929ddc04947b030c4c9e34c574d3cf4d2fbe",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "## Built-in Constants\n\nSome built-in constants are available in all cases:\n\n- **`import.meta.env.MODE`**: {string} the [mode](#modes) the app is running in.\n\n- **`import.meta.env.BASE_URL`**: {string} the base url the app is being served from. This is determined by the [`base` config option](/config/shared-options.md#base).\n\n",
+      "line_start": 18,
+      "line_end": 25
+    },
+    {
+      "stable_chunk_id": "child-576b51e8efec816fd6318aa9e4203bf5499496cf",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "- **`import.meta.env.PROD`**: {boolean} whether the app is running in production (running the dev server with `NODE_ENV='production'` or running an app built with `NODE_ENV='production'`).\n\n- **`import.meta.env.DEV`**: {boolean} whether the app is running in development (always the opposite of `import.meta.env.PROD`)\n\n- **`import.meta.env.SSR`**: {boolean} whether the app is running in the [server](./ssr.md#conditional-logic).\n\n",
+      "line_start": 26,
+      "line_end": 31
+    },
+    {
+      "stable_chunk_id": "child-bd0492ae7381f7e158178c2c8e2fb9a83fe3222a",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\n",
+      "line_start": 32,
+      "line_end": 42
+    },
+    {
+      "stable_chunk_id": "child-969a976c7ca2beaff14673aa8f596f97ad76669d",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "The parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n",
+      "line_start": 43,
+      "line_end": 51
+    },
+    {
+      "stable_chunk_id": "child-aca1bc3e909faa07dbcdb86252b268d6972d8a0a",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": ":::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n\n:::warning Protecting secrets\n\n",
+      "line_start": 52,
+      "line_end": 57
+    },
+    {
+      "stable_chunk_id": "child-c2cb1c4ae96f6665e0d7d6847f391bafb8c8093e",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "`VITE_*` variables should _not_ contain sensitive information such as API keys. The values of these variables are bundled into your source code at build time. For production deployments, consider a backend server or serverless/edge functions to properly secure secrets.\n\n:::\n\n",
+      "line_start": 58,
+      "line_end": 61
+    },
+    {
+      "stable_chunk_id": "child-e8f5d167ec4b2089097b80313d4313a3adab2c08",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "### `.env` Files\n\nVite uses [dotenv](https://github.com/motdotla/dotenv) to load additional environment variables from the following files in your [environment directory](/config/shared-options.md#envdir):\n\n```\n.env                # loaded in all cases\n.env.local          # loaded in all cases, ignored by git\n.env.[mode]         # only loaded in specified mode\n.env.[mode].local   # only loaded in specified mode, ignored by git\n```\n\n",
+      "line_start": 62,
+      "line_end": 72
+    },
+    {
+      "stable_chunk_id": "child-72c971205e52e90a3432d2f5fb997d2e73879d43",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": ":::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\n",
+      "line_start": 73,
+      "line_end": 78
+    },
+    {
+      "stable_chunk_id": "child-ed7a7c3d82dcaf755f5d3a9e1018d1989ff2463f",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "In addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n\n:::\n\n:::warning Bun users\n\n",
+      "line_start": 79,
+      "line_end": 86
+    },
+    {
+      "stable_chunk_id": "child-9a9becb90bbb6884b3ccd2e53566d9c811cf1bab",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "When using [Bun](https://bun.sh), be aware that Bun automatically loads `.env` files before your script runs. This built-in behavior loads environment variables directly into `process.env` and can interfere with Vite's feature, as it respects existing `process.env` values. See [oven-sh/bun#5515](https://github.com/oven-sh/bun/issues/5515) for workarounds.\n\n:::\n\n",
+      "line_start": 87,
+      "line_end": 90
+    },
+    {
+      "stable_chunk_id": "child-57aa35d17e3933b16e549377d79fbcad30dca22c",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "Also, Vite uses [dotenv-expand](https://github.com/motdotla/dotenv-expand) to expand variables written in env files out of the box. To learn more about the syntax, check out [their docs](https://github.com/motdotla/dotenv-expand#what-rules-does-the-expansion-engine-follow).\n\nNote that if you want to use `$` inside your environment value, you have to escape it with `\\`.\n\n",
+      "line_start": 91,
+      "line_end": 94
+    },
+    {
+      "stable_chunk_id": "child-c30b6c994956dcd3647bdf0428afe7d0e928e6a9",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "```[.env]\nKEY=123\nNEW_KEY1=test$foo   # test\nNEW_KEY2=test\\$foo  # test$foo\nNEW_KEY3=test$KEY   # test123\n```\n\n::: details Expanding variables in reverse order\n\nVite supports expanding variables in reverse order.\nFor example, the `.env` below will be evaluated as `VITE_FOO=foobar`, `VITE_BAR=bar`.\n\n```[.env]\nVITE_FOO=foo${VITE_BAR}\nVITE_BAR=bar\n```\n\n",
+      "line_start": 95,
+      "line_end": 111
+    },
+    {
+      "stable_chunk_id": "child-aabc1d121df526ad0ab725ddff49d4b6a2815224",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "This does not work in shell scripts and other tools like `docker compose`.\nThat said, Vite supports this behavior as this has been supported by `dotenv-expand` for a long time and other tools in JavaScript ecosystem use older versions that support this behavior.\n\nTo avoid interop issues, it is recommended to avoid relying on this behavior. Vite may start emitting warnings for this behavior in the future.\n\n:::\n\n:::warning Ignoring local `.env` files\n\n",
+      "line_start": 112,
+      "line_end": 120
+    },
+    {
+      "stable_chunk_id": "child-34039ca0b7960a8cbd0f1d5cb0c388bed209f924",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "`.env.*.local` files are local-only and can contain sensitive variables. You should add `*.local` to your `.gitignore` to avoid them being checked into git.\n\n:::\n\n",
+      "line_start": 121,
+      "line_end": 124
+    },
+    {
+      "stable_chunk_id": "child-f86754c09de04d8d3a9c35330ca8cd313112f1f2",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "## IntelliSense for TypeScript\n\nBy default, Vite provides type definitions for `import.meta.env` in [`vite/client.d.ts`](https://github.com/vitejs/vite/blob/main/packages/vite/client.d.ts). While you can define more custom env variables in `.env.[mode]` files, you may want to get TypeScript IntelliSense for user-defined env variables that are prefixed with `VITE_`.\n\n",
+      "line_start": 125,
+      "line_end": 128
+    },
+    {
+      "stable_chunk_id": "child-4283ce1049eba4211d11b95fe64fd68f4d0dd966",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "To achieve this, you can create an `vite-env.d.ts` in `src` directory, then augment `ImportMetaEnv` like this:\n\n",
+      "line_start": 129,
+      "line_end": 130
+    },
+    {
+      "stable_chunk_id": "child-58c8581641afb3140517e60644f9b5d12c99e185",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "```typescript [vite-env.d.ts]\ninterface ViteTypeOptions {\n  // By adding this line, you can make the type of ImportMetaEnv strict\n  // to disallow unknown keys.\n  // strictImportMetaEnv: unknown\n}\n\ninterface ImportMetaEnv {\n  readonly VITE_APP_TITLE: string\n  // more env variables...\n}\n\ninterface ImportMeta {\n  readonly env: ImportMetaEnv\n}\n```\n\n",
+      "line_start": 131,
+      "line_end": 147
+    },
+    {
+      "stable_chunk_id": "child-e913d494ab16548f4c41ca9d73c5de386ba1aa5a",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "If your code relies on types from browser environments such as [DOM](https://github.com/microsoft/TypeScript/blob/main/src/lib/dom.generated.d.ts) and [WebWorker](https://github.com/microsoft/TypeScript/blob/main/src/lib/webworker.generated.d.ts), you can update the [lib](https://www.typescriptlang.org/tsconfig#lib) field in `tsconfig.json`.\n\n```json [tsconfig.json]\n{\n  \"lib\": [\"WebWorker\"]\n}\n```\n\n:::warning Imports will break type augmentation\n\n",
+      "line_start": 148,
+      "line_end": 157
+    },
+    {
+      "stable_chunk_id": "child-01d80fe5933710136995e5e930dd7b35be0bffb3",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "If the `ImportMetaEnv` augmentation does not work, make sure you do not have any `import` statements in `vite-env.d.ts`. See the [TypeScript documentation](https://www.typescriptlang.org/docs/handbook/2/modules.html#how-javascript-modules-are-defined) for more information.\n\n:::\n\n",
+      "line_start": 158,
+      "line_end": 161
+    },
+    {
+      "stable_chunk_id": "child-a03d1aacc4ad03cb0a4efecbd15309acb9810aeb",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "## HTML Constant Replacement\n\nVite also supports replacing constants in HTML files. Any properties in `import.meta.env` can be used in HTML files with a special `%CONST_NAME%` syntax:\n\n```html\n<h1>Vite is running in %MODE%</h1>\n<p>Using data from %VITE_API_URL%</p>\n```\n\n",
+      "line_start": 162,
+      "line_end": 170
+    },
+    {
+      "stable_chunk_id": "child-97beac39dfc7fdfcbd61dfd428089176c7b69da5",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "If the env doesn't exist in `import.meta.env`, e.g. `%NON_EXISTENT%`, it will be ignored and not replaced, unlike `import.meta.env.NON_EXISTENT` in JS where it's replaced as `undefined`.\n\n",
+      "line_start": 171,
+      "line_end": 172
+    },
+    {
+      "stable_chunk_id": "child-a8378f1314a4133b5f88f764b33267e395b0fe2d",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "Given that Vite is used by many frameworks, it is intentionally unopinionated about complex replacements like conditionals. Vite can be extended using [an existing userland plugin](https://github.com/vitejs/awesome-vite#transformers) or a custom plugin that implements the [`transformIndexHtml` hook](./api-plugin#transformindexhtml).\n\n",
+      "line_start": 173,
+      "line_end": 174
+    },
+    {
+      "stable_chunk_id": "child-de3aac2c852d87bb90f89fc0880eee5fb4c31ce6",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "## Modes\n\nBy default, the dev server (`dev` command) runs in `development` mode and the `build` command runs in `production` mode.\n\nThis means when running `vite build`, it will load the env variables from `.env.production` if there is one:\n\n```[.env.production]\nVITE_APP_TITLE=My App\n```\n\nIn your app, you can render the title using `import.meta.env.VITE_APP_TITLE`.\n\n",
+      "line_start": 175,
+      "line_end": 186
+    },
+    {
+      "stable_chunk_id": "child-b5b5188a9325af41255489587d50a30f6011f084",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "In some cases, you may want to run `vite build` with a different mode to render a different title. You can overwrite the default mode used for a command by passing the `--mode` option flag. For example, if you want to build your app for a staging mode:\n\n```bash\nvite build --mode staging\n```\n\nAnd create a `.env.staging` file:\n\n```[.env.staging]\nVITE_APP_TITLE=My App (staging)\n```\n\n",
+      "line_start": 187,
+      "line_end": 198
+    },
+    {
+      "stable_chunk_id": "child-f77b0ec13f532cbd8a3e8b1fb34f0ca373b7a903",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "As `vite build` runs a production build by default, you can also change this and run a development build by using a different mode and `.env` file configuration:\n\n```[.env.testing]\nNODE_ENV=development\n```\n\n",
+      "line_start": 199,
+      "line_end": 204
+    },
+    {
+      "stable_chunk_id": "child-e048eeac5f944c481bb30cc1358d670a1654be51",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "### NODE_ENV and Modes\n\nIt's important to note that `NODE_ENV` (`process.env.NODE_ENV`) and modes are two different concepts. Here's how different commands affect the `NODE_ENV` and mode:\n\n",
+      "line_start": 205,
+      "line_end": 208
+    },
+    {
+      "stable_chunk_id": "child-e10430da277860418d9fa24c6b901c56fa49e8c8",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "| Command                                              | NODE_ENV        | Mode            |\n| ---------------------------------------------------- | --------------- | --------------- |\n| `vite build`                                         | `\"production\"`  | `\"production\"`  |\n| `vite build --mode development`                      | `\"production\"`  | `\"development\"` |\n| `NODE_ENV=development vite build`                    | `\"development\"` | `\"production\"`  |\n| `NODE_ENV=development vite build --mode development` | `\"development\"` | `\"development\"` |\n\n",
+      "line_start": 209,
+      "line_end": 215
+    },
+    {
+      "stable_chunk_id": "child-d150ad77ea911b3734d014af94a7c8101c2ba109",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "The different values of `NODE_ENV` and mode also reflect on its corresponding `import.meta.env` properties:\n\n",
+      "line_start": 216,
+      "line_end": 217
+    },
+    {
+      "stable_chunk_id": "child-7d93f6ca1f08ac6d4788932da9dcc5ca8e79adc6",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "| Command                | `import.meta.env.PROD` | `import.meta.env.DEV` |\n| ---------------------- | ---------------------- | --------------------- |\n| `NODE_ENV=production`  | `true`                 | `false`               |\n| `NODE_ENV=development` | `false`                | `true`                |\n| `NODE_ENV=other`       | `false`                | `true`                |\n\n",
+      "line_start": 218,
+      "line_end": 223
+    },
+    {
+      "stable_chunk_id": "child-6fae7d5ed9e4adfc789702451a617d71fee80611",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "| Command              | `import.meta.env.MODE` |\n| -------------------- | ---------------------- |\n| `--mode production`  | `\"production\"`         |\n| `--mode development` | `\"development\"`        |\n| `--mode staging`     | `\"staging\"`            |\n\n:::tip `NODE_ENV` in `.env` files\n\n",
+      "line_start": 224,
+      "line_end": 231
+    },
+    {
+      "stable_chunk_id": "child-8d0cfd8ddc225eef614c76c1ebe9567df84a7a9a",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "`NODE_ENV=...` can be set in the command, and also in your `.env` file. If `NODE_ENV` is specified in a `.env.[mode]` file, the mode can be used to control its value. However, both `NODE_ENV` and modes remain as two different concepts.\n\n",
+      "line_start": 232,
+      "line_end": 233
+    },
+    {
+      "stable_chunk_id": "child-49a68f2442bf5346d03ccd9b358cd2d25768070f",
+      "source_path": "docs/guide/env-and-mode.md",
+      "display_text": "The main benefit with `NODE_ENV=...` in the command is that it allows Vite to detect the value early. It also allows you to read `process.env.NODE_ENV` in your Vite config as Vite can only load the env files once the config is evaluated.\n:::\n",
+      "line_start": 234,
+      "line_end": 235
+    }
+  ],
+  "sqlite_version": "3.53.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "cf6f6d9a4cf0f4a2a94159cc56adc9d7861e8c26136f8a9d953c8fb9fc00ee5f",
+  "storage_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/docatlas-evidence-gqnkr1jr/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-a97e9f47834e44a79a4f020f3c7315be",
+  "catalog_sha256": "3d23e9d0126aa13e48f01c061b68f1f7a0877b88b62b580e499443bd71f8f1d1",
+  "documents": [
+    {
+      "path": "docs/config/server-options.md",
+      "content_sha256": "0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+      "catalog_entry_hash": "sha256:d9e57b79cb86889254f86d8b0484a035cfcd6f1b01f98f6ab5ea6299ec706d29"
+    },
+    {
+      "path": "docs/guide/assets.md",
+      "content_sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+      "catalog_entry_hash": "sha256:e3f5296a68306f690a0e58a20f44e20a30e685afb52d739a787fdf2a4a2e7bae"
+    },
+    {
+      "path": "docs/guide/env-and-mode.md",
+      "content_sha256": "945fa3bdeba86b0fff142fb462effeb4ff2f2cb3ecdbe8c08ab32e959a4b1f31",
+      "catalog_entry_hash": "sha256:e0ca3576753da91057a053cd7699003469850eda5d6dba89ab7eabc9fd7eadfc"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-a97e9f47834e44a79a4f020f3c7315be",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 37,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 37
+  }
+}
