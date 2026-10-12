@@ -2,7 +2,7 @@ name: Main flow context integration
 
 on:
   pull_request:
-    branches: [feature/main-flow-logging, fix/main-flow-context-delivery]
+    branches: [feature/main-flow-logging, fix/main-flow-context-delivery, eval/main-flow-extra40-20261012]
 
 permissions:
   contents: read
@@ -44,11 +44,45 @@ jobs:
             tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content \
             --basetemp="$RUNNER_TEMP/main-flow-proof/pytest" \
             --junitxml="$RUNNER_TEMP/main-flow-proof/integration.xml"
+      - name: Forty unchanged public MCP questions
+        if: ${{ !cancelled() }}
+        env:
+          EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/main-flow-proof
+        run: PYTHONPATH=. python eval/main_flow_comparison/run_extra40.py
       - name: Paired lookup calls for twelve failed public MCP questions
+        if: ${{ !cancelled() }}
         env:
           EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/main-flow-proof
           EXTRA40_LOOKUP_ONLY: "1"
         run: PYTHONPATH=. python eval/main_flow_comparison/run_extra40.py
+      - name: Summarize actual visible tokens
+        if: ${{ !cancelled() }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          from docmancer.docs.application.projection_tokenizer import projection_token_count
+          root = Path(os.environ['RUNNER_TEMP']) / 'main-flow-proof'
+          result = []
+          paths = [root / 'pytest/test_frozen_main_flow_question0/main-flow-proof.json',
+                   root / 'extra40-results.json', root / 'extra40-lookup-results.json']
+          for path in paths:
+              if not path.exists():
+                  continue
+              report = json.loads(path.read_text())
+              rows = []
+              for row in report['results']:
+                  public = {k: v for k, v in row.get('payload', {}).items() if k != 'diagnostics'}
+                  snippets = '\n\n'.join(s['snippet'] for s in public.get('sources', []))
+                  rows.append({'id': row['id'], 'variant': row.get('lookup_variant', 'no_lookup'),
+                               'snippet_tokens': projection_token_count(snippets.encode()),
+                               'public_tokens': projection_token_count(json.dumps(public, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode())})
+              result.append({'file': str(path.relative_to(root)), 'rows': rows})
+              for variant in sorted({r['variant'] for r in rows}):
+                  group = [r for r in rows if r['variant'] == variant]
+                  print(path.name, variant, 'calls', len(group), 'snippet_tokens', sum(r['snippet_tokens'] for r in group), 'public_tokens', sum(r['public_tokens'] for r in group))
+          (root / 'visible-tokens.json').write_text(json.dumps(result, indent=2))
+          PY
       - name: Preserve exact-commit integration evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

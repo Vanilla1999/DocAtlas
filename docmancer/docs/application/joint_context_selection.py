@@ -148,18 +148,26 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
     if validate_model_visible_projection(payload, snapshot=snapshot):
         return
     budget = max_tokens
+    plan = retrieval.get("documentation_query_plan") or {}
+    lookup = any(q.get("origin") == "host_lookup" for q in plan.get("queries") or ()
+                 if isinstance(q, dict))
     groups, intros = [], {}
     for row in payload["sources"]:
         original = (snapshot.get(row["evidence_id"]) or {}).get("source")
         if not isinstance(original, dict):
             return
         options, intro = source_options(row, original)
+        if lookup:
+            # Repair clipped lookup units without importing unrelated sections.
+            options = [option for option in options if option[2] in {"original", "complete_atom"}]
+            intro = None
         groups.append(options)
         if intro is not None:
             intros[intro[0]["evidence_id"]] = intro
     from .joint_seed_envelopes import seed_envelopes
-    for index, option in seed_envelopes(payload, snapshot):
-        groups[index].append(option)
+    if not lookup:
+        for index, option in seed_envelopes(payload, snapshot):
+            groups[index].append(option)
     root = str(retrieval.get("_source_continuation_project_root") or "")
     from .docs_context_projection import _finalize_quality
     baseline_retrieval, baseline_payload = deepcopy(retrieval), deepcopy(payload)
@@ -168,13 +176,12 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
         .get("_component_coverage") or {}).get("covered_component_ids") or ())
     # Optional optimization work, not a representation limit. Exhaustion leaves
     # the admitted baseline intact; larger packets never widen Cartesian work.
-    # Try the actual containing sections before bounded Cartesian enumeration
-    # can exhaust its work on original-first combinations. Keep the previous
-    # order for the remaining alternatives, including smaller budget fallbacks.
-    section_choices = tuple(next((option for option in group if option[2] == "containing_section"), group[0])
-                            for group in groups)
+    # Try narrow closure first, so optional work exhaustion cannot privilege
+    # a whole section merely because it was enumerated before complete atoms.
+    atom_choices = tuple(next((option for option in group if option[2] == "complete_atom"), group[0])
+                         for group in groups)
     drafts = 0
-    for choices in islice(chain((section_choices,), product(*groups)), 180):
+    for choices in islice(chain((atom_choices,), product(*groups)), 180):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
             bound = deepcopy(snapshot)
@@ -215,19 +222,13 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
 
 
 def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_tokens: int | None):
-    """Close admitted seed units, not maximize a count of arbitrary paragraphs.
+    """Complete admitted source units, then minimize the whole public packet.
 
-    First prefer the verified containing section for each admitted seed, then
-    closure of incomplete atoms, coalescing and explicit ancestor introductions.
-    Choose the cheapest feasible packet at that structural gain. These are
-    source-unit preferences, NOT an oracle of semantic answer completeness.
+    Section size, extra introductions and citation merging earn no independent
+    gain. Lookup closure retains its existing query coverage and read-only status.
+    Canonical seed bytes, source policies and explicit budgets remain mandatory.
     """
-    # This experiment addresses direct questions only. Explicit host lookups
-    # carry a separate recovery/coverage contract; keep that producer unchanged.
-    plan = retrieval.get("documentation_query_plan") or {}
-    if any(q.get("origin") == "host_lookup" for q in plan.get("queries") or () if isinstance(q, dict)):
-        return payload, snapshot
-    closures, sections = {}, {}
+    closures = []
     for row in payload.get("sources") or ():
         source = (snapshot.get(row.get("evidence_id")) or {}).get("source")
         if not isinstance(source, dict):
@@ -235,52 +236,32 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
         options, _ = source_options(row, source)
         for alt, original, kind in options:
             if kind == "complete_atom":
-                closures[row["evidence_id"]] = _occurrence(
+                closures.append(_occurrence(
                     alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
-                )
-            elif kind == "containing_section":
-                sections[row["evidence_id"]] = _occurrence(
-                    alt, {alt["evidence_id"]: _snapshot_entry(original, alt)},
-                )
-    candidates = []
+                ))
+    best = None
+    count = 0
     for p, b, r, kinds, intro in packet_alternatives(payload, snapshot, retrieval, max_tokens=max_tokens):
-        mapping = retained_seed_mapping(payload, snapshot, p, b)
-        occurrences = [_occurrence(s, b) for s in p["sources"]]
-
-        # A verified containing section covers the old atom for every seed
-        # from that same immutable source, regardless of retained evidence ID.
-        # Never award closure for matching text in another version or document.
-        def contained(target):
-            return target is not None and any(
-                current is not None and target[0] == current[0]
-                and current[1] <= target[1] < target[2] <= current[2]
-                for current in occurrences
-            )
-
-        closed_sections = sum(contained(section) for section in sections.values())
-        closed = sum(contained(atom) for atom in closures.values())
-        coalesced = len(mapping) - len(set(mapping.values()))
-        gain = (closed_sections, closed, coalesced, int(intro))
-        fallback = any(k in {"containing_section", "seed_envelope"} for k in kinds)
-        if gain != (0, 0, 0, 0) or fallback:
-            candidates.append((gain, docs_context_budget_tokens(p), p, b, r, kinds, fallback))
-    useful = [c for c in candidates if c[0] != (0, 0, 0, 0)]
-    if useful:
-        best_gain = max(c[0] for c in useful)
-        viable = [c for c in useful if c[0] == best_gain]
-    else:
-        viable = [c for c in candidates if c[6]]
-    if not viable:
+        occurrences = [_occurrence(row, b) for row in p["sources"]]
+        closed = sum(target is not None and any(
+            current is not None and current[0] == target[0]
+            and current[1] <= target[1] < target[2] <= current[2]
+            for current in occurrences
+        ) for target in closures)
+        cost = docs_context_budget_tokens(p)
+        rank = (-closed, cost, kinds)
+        count += 1
+        if best is None or rank < best[0]:
+            best = (rank, p, b, r, intro)
+    if best is None:
         return payload, snapshot
-    chosen = min(viable, key=lambda c: (c[1], c[5]))
-    _, cost, result, bindings, r, kinds, _ = chosen
+    (negative_closed, cost, kinds), result, bindings, r, intro = best
     mapping = retained_seed_mapping(payload, snapshot, result, bindings)
     retrieval.clear()
     retrieval.update(r)
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_structural"] = {
-        "candidates": len(candidates), "closed_seed_sections": chosen[0][0],
-        "closed_seed_atoms": chosen[0][1],
+        "candidates": count, "closed_seed_atoms": -negative_closed,
         "coalesced_seed_ids": {a: b for a, b in mapping.items() if a != b},
-        "ancestor_introduction": bool(chosen[0][3]), "kinds": list(kinds), "budget_tokens": cost,
+        "ancestor_introduction": bool(intro), "kinds": list(kinds), "budget_tokens": cost,
     }
     return result, bindings
