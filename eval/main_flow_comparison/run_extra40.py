@@ -96,7 +96,7 @@ def main():
             for idx, (question, facts) in enumerate(cases, 11):
                 started = perf_counter()
                 row = {"id": idx, "question": question, "required_facts": [
-                    {"start": a, "end": b, "quote": corpus[a:b]} for a, b in facts,
+                    {"start": a, "end": b, "quote": corpus[a:b]} for a, b in facts
                 ]}
                 try:
                     payload, snapshot = runner._call_with_snapshot({
