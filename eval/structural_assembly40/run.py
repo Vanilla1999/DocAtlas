@@ -27,7 +27,7 @@ import traceback
 
 
 REPO = Path(__file__).resolve().parents[2]
-CORPUS = Path(__file__).resolve().parent
+CORPUS = Path(__file__).resolve().parents[1] / "prepared_model_comparison40"
 ADMISSION = "source_valid_candidates_v1"
 TOP_K = 2
 FINAL_CAP = 12000
