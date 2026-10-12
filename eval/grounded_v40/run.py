@@ -28,8 +28,15 @@ def write_json(path, value):
 def cli_call(cli, conf, *cmd, max_seconds=120):
     begin=time.monotonic()
     try:
+        environment=os.environ.copy()
+        environment["DOCS_MCP_CONFIG"]=str(conf)
+        environment["DOCS_MCP_APP_STORE_PATH"]=str(conf.parent/"grounded-store")
+        environment["DOCS_MCP_APP_TELEMETRY_ENABLED"]="false"
+        environment["DOCS_MCP_SCRAPER_SECURITY_FILE_ACCESS_ALLOWED_ROOTS"]=json.dumps(
+            [str(conf.parent/"docs")])
         process=subprocess.run([str(cli), "--config", str(conf), *cmd],
-            capture_output=True, text=True, timeout=max_seconds, check=False)
+            capture_output=True, text=True, timeout=max_seconds, check=False,
+            env=environment)
         return {"argv":["--config",str(conf),*cmd],"returncode":process.returncode,
             "seconds":round(time.monotonic()-begin,4),
             "stdout":process.stdout, "stderr":process.stderr[-12000:]}
