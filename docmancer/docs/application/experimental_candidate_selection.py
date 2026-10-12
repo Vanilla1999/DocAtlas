@@ -9,6 +9,7 @@ from contextvars import ContextVar
 from docmancer.docs.domain.original_body_discovery import (
     original_body_discovery_binding,
     policy_candidate_admission_active,
+    source_valid_candidate_admission_active,
 )
 
 _SELECTOR = ContextVar("experimental_native_candidate_selector", default=None)
@@ -26,7 +27,7 @@ def experimental_candidate_selector(selector):
 
 def select_experimental_candidates(candidates, *, question):
     selector = _SELECTOR.get()
-    if selector is None or not policy_candidate_admission_active():
+    if selector is None or not (policy_candidate_admission_active() or source_valid_candidate_admission_active()):
         return candidates
     pool, excluded, seen = [], [], set()
     for ordinal, chunk in enumerate(candidates):

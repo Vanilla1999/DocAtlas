@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "tool": "get_docs_context",
+  "test_nodeid": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries",
+  "pytest_current_test": "tests/test_prepared_retrieval_integration.py::test_prepared_retrieval_preserves_default_and_scope_boundaries (call)",
+  "arguments": {
+    "question": "Explain `SENSOR_GAIN` and sensor gain.",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-pytest-run03/test_prepared_retrieval_preser0/project",
+    "scope": "all"
+  },
+  "public_payload": {
+    "status": "ok",
+    "kind": "docs_context",
+    "context_status": "ready",
+    "context_available": true,
+    "answer_supported": false,
+    "answer_available": false,
+    "support_status": "retrieval_only",
+    "answer_policy": "cite_only",
+    "coverage_policy": "retrieval_attribution_only",
+    "query_coverage": "full",
+    "retrieval_coverage": "full",
+    "facet_coverage": "unverified",
+    "covered_query_ids": [
+      "query-original"
+    ],
+    "missing_query_ids": [],
+    "missing_facets": [],
+    "facets": [],
+    "sources": [
+      {
+        "evidence_id": "ev-8bbb8d5549de2a6e",
+        "path_or_url": "modules/imaging/guide.md",
+        "section": "Sensor gain",
+        "snippet": "# Sensor gain\n\n`SENSOR_GAIN` controls sensor gain for flat-field calibration.\nApply the gain after the sensor reaches its operating temperature.\n",
+        "version_binding": "unversioned",
+        "content_sha256": "48380ac9919c020aa909e2aa2009227ee1be697bdbca7586d79593fa9c220947",
+        "project_identity": "local:5fae4e2b32c4e5f1474e83a04f45735ed90fadd8eb6c3a2db81720d534f2c6c5",
+        "line_start": 1,
+        "line_end": 4,
+        "authority": "source_of_truth",
+        "scope": "module",
+        "source_uri": "docatlas://source/4f63fca2e13c8402f8126dd9"
+      }
+    ],
+    "context_quality": {
+      "status": "unverified",
+      "reasons": [
+        "coverage_unverified"
+      ]
+    },
+    "read_next": [],
+    "edit_ready": false,
+    "investigation_allowed": true,
+    "estimated_tokens": 301
+  },
+  "utf8_quarter_proxy": 318,
+  "public_source_count": 1
+}

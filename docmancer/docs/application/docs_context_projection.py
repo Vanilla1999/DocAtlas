@@ -27,6 +27,10 @@ from .source_continuation import (
     prepare_docs_context_read_next,
 )
 from .visible_evidence_retention import retains_visible_sources as _retains_visible_sources
+from .experimental_context_finalization import (
+    capture_experimental_context, recheck_experimental_context,
+)
+from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
 
 # Preserve the established helper surface used by focused production tests.
 _expand_selected_snippets = _core._expand_selected_snippets
@@ -215,13 +219,16 @@ def project_docs_context(
     _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Finalize visible evidence, quality and at most one registered recovery target."""
-    packet_max = max_tokens
+    experiment_max = experimental_context_max_tokens()
+    packet_max = (min(max_tokens, experiment_max) if max_tokens is not None and experiment_max is not None
+                  else experiment_max if experiment_max is not None else max_tokens)
     payload, snapshot = _run_core(
         retrieval=retrieval, max_tokens=packet_max,
         selection_diagnostics=selection_diagnostics, allow_context_hints=_allow_context_hints,
     )
     _strip_legacy_locators(payload, snapshot)
     _finalize_quality(retrieval, payload, snapshot)
+    capture_experimental_context(retrieval, payload, snapshot)
 
     root = str(retrieval.get("_source_continuation_project_root") or "")
     target: dict[str, Any] | None = None
@@ -240,7 +247,8 @@ def project_docs_context(
     from .query_block_context import select_query_block_context
     payload, snapshot = select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
     from .query_block_recovery import select_query_block_recovery
-    return select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
+    payload, snapshot = select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
+    return recheck_experimental_context(payload, snapshot, retrieval)
 
 
 __all__ = [

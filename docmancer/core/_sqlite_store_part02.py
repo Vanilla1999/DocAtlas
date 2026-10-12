@@ -2,6 +2,11 @@
 from __future__ import annotations
 
 from ._sqlite_store_shared import *  # noqa: F401,F403
+from .prepared_parent_sections import (
+    certify_prepared_parent_sections,
+    prepared_parents_enabled,
+)
+from .structured_chunking import ParentSection
 
 
 class _SQLiteStorePart02:
@@ -12,6 +17,9 @@ class _SQLiteStorePart02:
         *,
         recreate: bool,
     ) -> str:
+        prepared_parent_candidates: dict[str, list[ParentSection]] | None = (
+            {} if prepared_parents_enabled() else None
+        )
         configs = {
             ChunkingConfig(
                 target_tokens=int((doc.metadata or {}).get("child_target_tokens") or 160),
@@ -190,6 +198,8 @@ class _SQLiteStorePart02:
             parents, children = chunk_markdown_parent_child(
                 doc.content, source_identity, config
             )
+            if prepared_parent_candidates is not None:
+                prepared_parent_candidates[doc.source] = parents
             parent_by_id = {parent.logical_id: parent for parent in parents}
             for parent in parents:
                 conn.execute(
@@ -350,7 +360,8 @@ class _SQLiteStorePart02:
                 )
 
         validation = self._validate_generation(
-            conn, generation_id, config, context_config
+            conn, generation_id, config, context_config,
+            prepared_parent_candidates=prepared_parent_candidates,
         )
         conn.execute(
             """
@@ -409,6 +420,8 @@ class _SQLiteStorePart02:
         generation_id: str,
         config: ChunkingConfig,
         context_config: ContextConfig,
+        *,
+        prepared_parent_candidates: dict[str, list[ParentSection]] | None = None,
     ) -> dict[str, Any]:
         child_count = int(conn.execute(
             "SELECT COUNT(*) AS count FROM retrieval_children WHERE generation_id = ?",
@@ -553,7 +566,7 @@ class _SQLiteStorePart02:
         accepted_profile_status = (
             "MATCH" if config.config_hash == accepted_config.config_hash else "UNVALIDATED"
         )
-        return {
+        validation = {
             "status": "PASS",
             "children": child_count,
             "fts_rows": fts_count,
@@ -571,6 +584,26 @@ class _SQLiteStorePart02:
                 "evidence_revision": "task40-parent-child-grid-v1",
             },
         }
+        if prepared_parents_enabled():
+            generation = conn.execute(
+                "SELECT status FROM index_generations WHERE generation_id=?",
+                (generation_id,),
+            ).fetchone()
+            if generation is not None and generation["status"] == "building":
+                # Optional certification only accompanies a new candidate. In
+                # particular, preflight validation of an active legacy snapshot
+                # neither reparses its parents nor adds a new reason to refuse
+                # an unchanged member sync. Source certification misses preserve
+                # the old parser fallback and the existing generation PASS.
+                # Deletion candidates use this same path without writer results;
+                # their copied sources are checked by the canonical parser.
+                certificate = certify_prepared_parent_sections(
+                    conn, generation_id,
+                    canonical_by_source=prepared_parent_candidates,
+                )
+                if certificate is not None:
+                    validation["prepared_parents"] = certificate
+        return validation
 
     @staticmethod
     def _active_generation_id(conn: sqlite3.Connection) -> str | None:

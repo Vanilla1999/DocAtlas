@@ -1,10 +1,15 @@
-# Admission experiments — V1–V3
+# Admission experiments — V1–V3 и prepared retrieval
 
 Архив завершённых исследований от 2026-10-12. Код экспериментов:
 `6adc8e655fa69b5475adf613c8c446dd3a604b98`. Поведение V3 остаётся opt-in.
 
 ## Основные результаты
 
+- [Реализация prepared retrieval и интеграционные проверки до модели](prepared-retrieval/implementation-20261012/RESULT_RU.md)
+  — новый opt-in путь, четыре новые и две существующие публичные проверки,
+  исправленный по независимому review budget-attribution defect; моделей не запускали.
+- [Независимое review реализации](prepared-retrieval/implementation-20261012/INDEPENDENT_REVIEW_RU.md)
+  и [полный ledger новых исполнений](prepared-retrieval/implementation-20261012/execution_ledger.json).
 - [Разбор фильтра DocAtlas и сравнение с Grounded](FILTER_ROOT_CAUSE_AND_GROUNDED_RU.md)
   — последующий анализ кода и сохранённых данных, без новых прогонов.
 - [Подготовленный retrieval: анализ исследований и текущей архитектуры](prepared-retrieval/ANALYSIS_RU.md).

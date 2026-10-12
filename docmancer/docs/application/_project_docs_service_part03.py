@@ -339,6 +339,7 @@ class _ProjectDocsServicePart03:
             internal_diagnostics.update(
                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
             )
+            internal_diagnostics["prepared_parents"] = dict(reference_context.structure_diagnostics)
         selected = []
         seen: set[tuple[str, int]] = set()
         token_total = 0

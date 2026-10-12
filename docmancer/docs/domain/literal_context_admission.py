@@ -10,11 +10,20 @@ from __future__ import annotations
 import re
 from typing import Any, Mapping
 
+from docmancer.core.structured_chunking import _atom_spans, parse_markdown_parents
+
+from .context_blocks import source_block_alternatives
 from .evidence_qualification import _relation_units, qualify_evidence
+from .original_body_discovery import original_body_discovery_binding
 from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
 from .query_terms import documentation_query_terms, query_constraint_roles
 from .technical_tokens import technical_term_pattern
-from .ordinary_body_context import ordinary_body_context_witness, policy_valid_original_candidate_witness
+from .ordinary_body_context import (
+    body_request_constraint_rejection,
+    ordinary_body_context_witness,
+    policy_valid_original_candidate_witness,
+    source_valid_original_candidate_witness,
+)
 
 
 def _closed_context_literal(question: str) -> QueryMention | None:
@@ -245,19 +254,11 @@ def _checked_raw_body_window(
         "line_start": raw[:start].count("\n") + 1, "line_end": raw[:end - 1].count("\n") + 1,
     }
 
-def admit_original_literal_context(
+def _checked_original_candidate(
     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
     expected_project_identity: str | None = None, lifecycle_intent: str = "current",
-) -> dict[str, Any] | None:
-    """Recompute a read-only admission; incoming scores/flags confer no trust.
-
-    A title, path or link-only occurrence cannot establish this route. By default
-    unrelated body and repeated bare names cannot establish it either. The
-    isolated host experiment additionally permits source-valid body candidates
-    with unassessed relevance, never query or answer authority. It returns
-    source-bound diagnostic spans only; the caller must retain the failed
-    full-question qualification and missing ID.
-    """
+) -> tuple | None:
+    """Share canonical source/request qualification, without changing its result."""
     root = candidate.get("_reference_root_plan")
     evidence = candidate.get("_reference_evidence")
     if (not isinstance(root, dict) or root.get("question") != question
@@ -293,6 +294,29 @@ def admit_original_literal_context(
         candidate=candidate, expected_project_identity=expected_project_identity or scope["project_id"],
         catalog_role=str(candidate.get("catalog_role") or candidate.get("project_doc_reason") or ""),
         lifecycle_intent=lifecycle_intent, authoritative_query=query)
+    return qualification, evidence, identity, scope
+
+
+def admit_original_literal_context(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+    expected_project_identity: str | None = None, lifecycle_intent: str = "current",
+) -> dict[str, Any] | None:
+    """Recompute a read-only admission; incoming scores/flags confer no trust.
+
+    A title, path or link-only occurrence cannot establish this route. By default
+    unrelated body and repeated bare names cannot establish it either. The
+    isolated host experiment additionally permits source-valid body candidates
+    with unassessed relevance, never query or answer authority. It returns
+    source-bound diagnostic spans only; the caller must retain the failed
+    full-question qualification and missing ID.
+    """
+    checked = _checked_original_candidate(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+        expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+    )
+    if checked is None:
+        return None
+    qualification, evidence, identity, scope = checked
     # The canonical qualifier rechecks raw-document SHA, body/window/owner,
     # project/generation and lifecycle. Any such rejection is not a relevance
     # fallback. Qualified windows retain the existing qualification path.
@@ -374,6 +398,10 @@ def admit_original_literal_context(
             question=question, evidence_text=evidence_text, candidate=candidate,
         )
         if ordinary is None:
+            ordinary = source_valid_original_candidate_witness(
+                question=question, evidence_text=evidence_text, candidate=candidate,
+            )
+        if ordinary is None:
             ordinary = policy_valid_original_candidate_witness(
                 question=question, evidence_text=evidence_text, candidate=candidate,
             )
@@ -388,4 +416,225 @@ def admit_original_literal_context(
         "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),
         "body_witnesses": witnesses,
         **({"body_window": body_window} if body_window is not None else {}),
+    }
+
+
+def _trimmed_span(raw: str, start: int, end: int) -> tuple[int, int]:
+    while start < end and raw[start].isspace():
+        start += 1
+    while end > start and raw[end - 1].isspace():
+        end -= 1
+    return start, end
+
+
+def _checked_context_derivation(
+    *, raw: str, document_id: str, seed_span: tuple[int, int],
+    visible_span: tuple[int, int], derivation: str | None,
+) -> str | None:
+    """Validate structural provenance, never infer semantic contribution.
+
+    Contained spans preserve the existing canonical-unit projection path. New
+    supplements are limited to the existing document-intro or colon lead-in
+    dependencies; an arbitrary nearby/query-ranked block is not such an edge.
+    """
+    seed_start, seed_end = _trimmed_span(raw, *seed_span)
+    start, end = _trimmed_span(raw, *visible_span)
+    if derivation is None:
+        return "native" if (start, end) == (seed_start, seed_end) else None
+    if derivation == "contained_span":
+        return derivation if seed_span[0] <= start < end <= seed_span[1] else None
+    if derivation == "containing_span":
+        if not start <= seed_start < seed_end <= end:
+            return None
+        if (start, end) == (seed_start, seed_end):
+            return derivation
+        parents = parse_markdown_parents(raw, document_id)
+        if len(parents) > 4096:
+            return None
+        owners = [parent for parent in parents
+                  if parent.char_start <= start < end <= parent.char_end]
+        if len(owners) != 1:
+            return None
+        owner = owners[0]
+        if _trimmed_span(raw, owner.char_start, owner.char_end) == (start, end):
+            return derivation
+        alternatives = source_block_alternatives(raw[owner.char_start:owner.char_end])
+        if (start - owner.char_start, end - owner.char_start) in alternatives.spans:
+            return derivation
+        atoms = [atom for atom in _atom_spans(raw, owner.char_start, owner.char_end)
+                 if atom.atom_type != "whitespace" and atom.start < seed_end and seed_start < atom.end]
+        if atoms and _trimmed_span(raw, min(seed_start, atoms[0].start), max(seed_end, atoms[-1].end)) == (start, end):
+            return derivation
+        return None
+    if derivation != "supplementary_block" or not (end <= seed_start or seed_end <= start):
+        return None
+    parents = parse_markdown_parents(raw, document_id)
+    if not parents or len(parents) > 4096:
+        return None
+    seed_owners = [parent for parent in parents
+                   if parent.char_start <= seed_start < seed_end <= parent.char_end]
+    if len(seed_owners) != 1:
+        return None
+    owner = seed_owners[0]
+    first = parents[0]
+    if (first.char_start == 0 and first.logical_id != owner.logical_id and first.level == 1
+        and len(owner.heading_path) > len(first.heading_path)
+        and owner.heading_path[:len(first.heading_path)] == first.heading_path):
+        intro = next((atom for atom in _atom_spans(raw, first.char_start, first.char_end)
+                      if atom.atom_type not in {"heading", "whitespace"}
+                      and raw[atom.start:atom.end].strip()), None)
+        if (intro is not None and intro.atom_type == "prose"
+            and _trimmed_span(raw, intro.start, intro.end) == (start, end)):
+            return "document_intro"
+    atoms = [atom for atom in _atom_spans(raw, owner.char_start, owner.char_end)
+             if atom.atom_type != "whitespace" and raw[atom.start:atom.end].strip()]
+    for lead, following in zip(atoms, atoms[1:]):
+        if (lead.atom_type == "prose" and following.atom_type in {"code", "list", "table"}
+            and raw[lead.start:lead.end].rstrip().endswith(":")
+            and _trimmed_span(raw, lead.start, lead.end) == (start, end)
+            and following.start <= seed_start < seed_end <= following.end):
+            return "structured_block_lead_in"
+    return None
+
+
+def recheck_source_valid_candidate(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+    native_candidate: Mapping[str, Any] | None = None, derivation: str | None = None,
+    expected_project_identity: str | None = None, lifecycle_intent: str = "current",
+    rejection_diagnostics: dict[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Recheck an experimental packet entry against a live canonical native seed.
+
+    C retains the original application-owned native candidate before projection
+    changes its span. Both it and the final candidate are freshly checked. The
+    result describes native/derived provenance and the surviving existing or
+    unassessed route; it grants no new qualification, coverage or edit authority.
+    Serialized results cannot replace the current native receipt or raw source.
+    Existing qualified/literal routes keep their own request constraints: the
+    broad route's missing-exact/unresolved-name guard must not tighten them.
+    """
+    if rejection_diagnostics is not None:
+        rejection_diagnostics.clear()
+
+    def reject(axis: str, reason: str):
+        if rejection_diagnostics is not None:
+            rejection_diagnostics.update(axis=axis, reason=reason)
+        return None
+
+    def qualification_axis(reason: str) -> str:
+        if ("locator" in reason or reason.startswith("structural_source_") or reason in {
+            "query_contract_mismatch", "nonliteral_retrieval_lane", "missing_bound_subject",
+            "missing_visible_exact_path", "missing_visible_query_terms", "unsupported_relation_qualification",
+        }):
+            return "request_constraints"
+        return "source_admissible"
+
+    seed = native_candidate if native_candidate is not None else candidate
+    seed_evidence = seed.get("_reference_evidence")
+    if not isinstance(seed_evidence, dict) or not isinstance(seed_evidence.get("text"), str):
+        return reject("source_admissible", "missing_native_source_reference")
+    seed_text = seed_evidence["text"]
+    native_binding = original_body_discovery_binding(question=question, body=seed_text, candidate=seed)
+    if native_binding is None:
+        return reject("source_admissible", "missing_current_native_discovery")
+    seed_checked = _checked_original_candidate(
+        question=question, evidence_text=seed_text, candidate=seed,
+        expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+    )
+    if seed_checked is None:
+        return reject("source_admissible", "native_source_binding_rejected")
+    seed_qualification = seed_checked[0]
+    seed_admission = None
+    if not seed_qualification.qualified:
+        if seed_qualification.reason != "insufficient_visible_match":
+            return reject(qualification_axis(seed_qualification.reason), seed_qualification.reason)
+        seed_admission = admit_original_literal_context(
+            question=question, evidence_text=seed_text, candidate=seed,
+            expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+        )
+        if seed_admission is None:
+            if seed_qualification.trace.get("missing_exact_terms"):
+                return reject("request_constraints", "missing_exact_terms")
+            name_reason = body_request_constraint_rejection(question=question, evidence_text=seed_text, candidate=seed)
+            return reject("request_constraints" if name_reason else "contribution", name_reason or "native_admission_rejected")
+    checked = _checked_original_candidate(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+        expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+    )
+    if checked is None:
+        return reject("source_admissible", "source_binding_rejected")
+    qualification, evidence, identity, scope = checked
+    if (candidate.get("_reference_root_plan") != seed.get("_reference_root_plan")
+        or any(evidence.get(key) != seed_evidence.get(key) for key in (
+            "source", "member_binding", "project_doc_content_hash", "raw_document",
+        ))):
+        return reject("source_admissible", "derived_source_mismatch")
+    if not qualification.qualified and qualification.reason != "insufficient_visible_match":
+        return reject(qualification_axis(qualification.reason), qualification.reason)
+    window = _checked_raw_body_window(
+        evidence_text, candidate, evidence, qualification.trace.get("reference_visible_span"),
+    )
+    if window is None:
+        return reject("source_admissible", "raw_visible_span_mismatch")
+    raw = evidence["raw_document"]
+    seed_span = (seed_evidence["char_start"], seed_evidence["char_end"])
+    visible_span = (window["char_start"], window["char_end"])
+    edge = _checked_context_derivation(
+        raw=raw, document_id=identity["document_id"], seed_span=seed_span,
+        visible_span=visible_span, derivation=derivation,
+    )
+    # A separately acquired block may keep its own native provenance. A seed
+    # merely in the same file must not authorize that otherwise unrelated span.
+    own_binding = original_body_discovery_binding(
+        question=question, body=evidence_text, candidate=candidate,
+    )
+    if edge is None and derivation == "supplementary_block" and own_binding is not None:
+        edge, native_binding = "native", own_binding
+    if edge is None:
+        return reject("source_admissible", "unverified_structural_derivation")
+    route = "existing_qualified" if qualification.qualified else None
+    admission = None
+    if route is None:
+        admission = admit_original_literal_context(
+            question=question, evidence_text=evidence_text, candidate=candidate,
+            expected_project_identity=expected_project_identity, lifecycle_intent=lifecycle_intent,
+        )
+        # Keeping every original body byte also preserves its checked literal
+        # witnesses. Do not tighten a special partial-identity route by applying
+        # the new broad branch's blanket missing-exact guard to this superset.
+        seed_start, seed_end = _trimmed_span(raw, *seed_span)
+        seed_retained = window["char_start"] <= seed_start < seed_end <= window["char_end"]
+        if (admission is None and seed_admission is not None and seed_retained
+            and edge in {"native", "containing_span"}):
+            admission = seed_admission
+        if admission is not None:
+            route = ("source_valid_unassessed" if admission["reason"] == "source_valid_original_candidate_v1"
+                     else "existing_literal")
+    if route is None:
+        if qualification.trace.get("missing_exact_terms"):
+            return reject("request_constraints", "missing_exact_terms")
+        name_reason = body_request_constraint_rejection(question=question, evidence_text=evidence_text, candidate=candidate)
+        if name_reason is not None:
+            return reject("request_constraints", name_reason)
+        # Normalize only the already verified visible occurrence. Its new span
+        # receives no native receipt; the witness rechecks the original seed.
+        visible_candidate = {**candidate, **window, "_reference_evidence": {
+            **evidence, "char_start": window["char_start"], "char_end": window["char_end"], "text": evidence_text,
+        }}
+        witness = source_valid_original_candidate_witness(
+            question=question, evidence_text=evidence_text, candidate=visible_candidate, native_candidate=seed,
+        )
+        if witness is None:
+            return reject("contribution", "no_admitted_body_route")
+        route = "source_valid_unassessed"
+    return {
+        "schema_version": 1, "route": route, "derivation": edge,
+        "native_discovery_binding_sha256": native_binding,
+        "native_span": (list((evidence["char_start"], evidence["char_end"]))
+                        if own_binding is not None and native_binding == own_binding else list(seed_span)),
+        "body_window": window,
+        "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
+        "source_id": identity["document_id"], "source_sha256": identity["content_sha256"],
+        "qualification_reason": qualification.reason, "coverage_credit": False,
+        "relevance_unassessed": True,
     }

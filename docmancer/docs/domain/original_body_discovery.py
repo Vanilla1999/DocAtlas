@@ -25,6 +25,7 @@ class _BodyRead:
     receipts: set[str] = field(default_factory=set)
     active: bool = True
     experiment_admission: str | None = None
+    experiment_context_max_tokens: int | None = None
 
 
 _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
@@ -60,8 +61,16 @@ def original_body_read_scope(handler):
         # Explicit lookups retain the default admission contract.
         if state is not None and not args.get("lookup_queries"):
             mode = os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION")
-            if mode in {"policy_candidates_v1", "scalar_label_candidates_v3"}:
+            if mode in {"policy_candidates_v1", "scalar_label_candidates_v3", "source_valid_candidates_v1"}:
                 state.experiment_admission = mode
+            # The common experimental packet cap is independent of admission.
+            # Capture it once, including for the unchanged V3/default control.
+            raw_cap = os.environ.get("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS")
+            if raw_cap is not None:
+                value = raw_cap.strip()
+                if not value.isascii() or not value.isdecimal() or int(value) <= 0:
+                    raise ValueError("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS must be a positive integer")
+                state.experiment_context_max_tokens = int(value)
         token = _BODY_READ.set(state)
         try:
             return handler(name, args, service)
@@ -85,6 +94,19 @@ def scalar_label_candidate_admission_active() -> bool:
     state = _BODY_READ.get()
     return bool(state is not None and state.active
                 and state.experiment_admission == "scalar_label_candidates_v3")
+
+
+def source_valid_candidate_admission_active() -> bool:
+    """Only the captured host mode permits unassessed source-valid candidates."""
+    state = _BODY_READ.get()
+    return bool(state is not None and state.active
+                and state.experiment_admission == "source_valid_candidates_v1")
+
+
+def experimental_context_max_tokens() -> int | None:
+    """Return the common host cap captured for this live original project read."""
+    state = _BODY_READ.get()
+    return state.experiment_context_max_tokens if state is not None and state.active else None
 
 
 def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -> str | None:
@@ -170,3 +192,32 @@ def original_body_discovery_binding(
     key = _window_binding(question=question, body=body, candidate=candidate)
     state = _BODY_READ.get()
     return key if key is not None and state is not None and key in state.receipts else None
+
+
+def original_body_derivation_binding(
+    *, question: str, body: str, candidate: Mapping[str, Any], native_candidate: Mapping[str, Any],
+) -> str | None:
+    """Recheck a derived window's native provenance, without minting a receipt.
+
+    This checks only same-call/source/window identity. The admission caller must
+    also recheck source policy, request constraints and the structural edge.
+    An incoming seed dictionary works only while its exact native receipt lives.
+    """
+    native = native_candidate.get("_reference_evidence")
+    derived = candidate.get("_reference_evidence")
+    if not isinstance(native, dict) or not isinstance(derived, dict):
+        return None
+    native_body = native.get("text")
+    if not isinstance(native_body, str):
+        return None
+    binding = original_body_discovery_binding(
+        question=question, body=native_body, candidate=native_candidate,
+    )
+    if binding is None or _window_binding(question=question, body=body, candidate=candidate) is None:
+        return None
+    if (candidate.get("_reference_root_plan") != native_candidate.get("_reference_root_plan")
+        or any(derived.get(key) != native.get(key) for key in (
+            "source", "member_binding", "project_doc_content_hash", "raw_document",
+        ))):
+        return None
+    return binding

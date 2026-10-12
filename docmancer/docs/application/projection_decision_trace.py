@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from typing import Any
 from .query_trace import query_trace_enabled
 
@@ -154,6 +155,25 @@ def _child(value: Any, name: str) -> Any:
     return value.get(name, _MISSING) if isinstance(value, dict) else value
 
 
+def _work_observation(value: Any, names: tuple[str, ...], *,
+                      counts: tuple[str, ...] = ()) -> dict[str, Any]:
+    """Copy bounded counters/timings only; never execute a measurement here."""
+    if not isinstance(value, dict):
+        return _preview(value)
+    result = _fields(value, names)
+    for name in names:
+        number = value.get(name)
+        if type(number) is float:
+            result[name] = number if math.isfinite(number) else None
+    for name in counts:
+        values = value.get(name, _MISSING)
+        rows = ([{"reason": key, "count": count} for key, count in values.items()]
+                if isinstance(values, dict) else values)
+        result[name] = _preview(rows, names=("reason", "count"),
+                               producer_count=len(rows) if isinstance(rows, list) else _MISSING)
+    return result
+
+
 def _attempt_observation(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         return _preview(value)
@@ -167,6 +187,14 @@ def _attempt_observation(value: Any) -> dict[str, Any]:
             names=("reason", "query_id", "source_id", "coverage_credit", "qualification_reason")),
         "core_payload_sources": _recorded_ids(value.get("core_source_observation", _MISSING)),
         "decision_trace": _decision_observation(value.get("decision_trace", _MISSING)),
+        "joint_work": _work_observation(value.get("joint_work", _MISSING), (
+            "draft_attempts", "finish_rejections", "lineage_rejections",
+            "validation_rejections", "coverage_rejections", "yielded")),
+        "experimental_budget": _work_observation(value.get("experimental_budget", _MISSING), (
+            "limit", "input_cost", "output_cost", "measure", "attempts",
+            "native_fallbacks", "omitted_source_count", "source_count", "read_next_omitted")),
+        "experimental_source_recheck": _work_observation(value.get("experimental_source_recheck", _MISSING), (
+            "checked", "retained"), counts=("routes",)),
     }
 
 
@@ -186,6 +214,10 @@ def same_call_projection_observation(
                                 producer_count=len(sources) if isinstance(sources, list) else _MISSING),
         },
         "upstream_received": {
+            "prepared_parents": _work_observation(_child(service_trace, "prepared_parents"), (
+                "prepared_enabled", "documents", "prepared_hits", "parser_calls", "parser_ms",
+                "parent_rows", "parent_selects", "prepared_read_ms", "prepared_verification_ms"),
+                counts=("miss_reasons",)),
             "retrieved_candidates": _preview(_child(service_trace, "retrieved_candidates"),
                 names=("stable_chunk_id", "document_id", "source_id", "query_id")),
             "qualification_outcomes": _preview(_child(service_trace, "qualification_outcomes"),

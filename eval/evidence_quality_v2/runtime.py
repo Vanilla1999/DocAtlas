@@ -78,9 +78,10 @@ def isolated_service(state: Path):
     state.mkdir(parents=True, exist_ok=True)
     with _ENV_LOCK:
         if state not in _FIXTURE_HOMES:
-            # Artifact directories can have group-writable ancestors. They must
-            # never be storage ancestors; /tmp is sticky and mkdtemp is private.
-            _FIXTURE_HOMES[state] = TemporaryDirectory(prefix='docatlas-evidence-', dir='/tmp')
+            # Use the platform/TMPDIR-selected private temporary directory.
+            # Sandboxed hosts may have no /tmp; the real member-storage policy
+            # still validates ownership and ancestor permissions on this path.
+            _FIXTURE_HOMES[state] = TemporaryDirectory(prefix='docatlas-evidence-')
         home = Path(_FIXTURE_HOMES[state].name)
         env = {key: value for key, value in os.environ.items() if not key.startswith('DOCATLAS_')}
         env.update({key: str(home / key.lower()) for key in (

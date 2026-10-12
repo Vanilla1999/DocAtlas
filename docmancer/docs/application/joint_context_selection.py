@@ -16,6 +16,7 @@ from .source_continuation import (
     attach_source_continuation_locators, _read_next_row,
 )
 from .context_selection import attributable_query_ids, merge_query_matches
+from .query_trace import query_trace_enabled
 
 
 def unread_lines(start: int, end: int, visible: list[tuple[int, int]]) -> list[tuple[int, int]]:
@@ -184,6 +185,12 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
         next((option for option in group if option[2] == "complete_atom"), group[0]),
     ) for group in groups)
     drafts = 0
+    work = None
+    if query_trace_enabled():
+        work = {"draft_attempts": 0, "finish_rejections": 0, "lineage_rejections": 0,
+                "validation_rejections": 0, "coverage_rejections": 0, "yielded": 0}
+        retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
+            "docs_context_projection", {})["joint_work"] = work
     for choices in islice(chain((closed_choices,), product(*groups)), 180):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
@@ -203,24 +210,38 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
                 if drafts >= 1260:
                     return
                 drafts += 1
+                if work is not None:
+                    work["draft_attempts"] += 1
                 finished = _finish(draft, draft_bound, retrieval, root, budget)
                 if finished is None:
+                    if work is not None:
+                        work["finish_rejections"] += 1
                     continue
                 p, b, r = finished
                 mapping = retained_seed_mapping(payload, snapshot, p, b)
                 if not mapping:
+                    if work is not None:
+                        work["lineage_rejections"] += 1
                     continue
                 if validate_model_visible_projection(p, snapshot=b, max_tokens=budget):
+                    if work is not None:
+                        work["validation_rejections"] += 1
                     continue
                 if not set(payload.get("covered_query_ids", [])) <= set(p.get("covered_query_ids", [])):
+                    if work is not None:
+                        work["coverage_rejections"] += 1
                     continue
                 components = set(((r.get("documentation_query_plan") or {})
                     .get("_component_coverage") or {}).get("covered_component_ids") or ())
                 if not old_components <= components:
+                    if work is not None:
+                        work["coverage_rejections"] += 1
                     continue
                 live_ids = {row["evidence_id"] for row in p["sources"]}
                 kinds = tuple(kind for row, _, kind in choices if row["evidence_id"] in live_ids)
                 has_intro = intro is not None and intro[0]["evidence_id"] in live_ids
+                if work is not None:
+                    work["yielded"] += 1
                 yield p, b, r, kinds, has_intro
 
 
@@ -271,8 +292,11 @@ def select_joint_context(payload: dict, snapshot: dict, retrieval: dict, *, max_
         return payload, snapshot
     (negative_sections, negative_closed, cost, kinds), result, bindings, r, intro = best
     mapping = retained_seed_mapping(payload, snapshot, result, bindings)
+    work = ((retrieval.get("retrieval_diagnostics") or {}).get("docs_context_projection") or {}).get("joint_work")
     retrieval.clear()
     retrieval.update(r)
+    if work is not None:
+        retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_work"] = work
     retrieval.setdefault("retrieval_diagnostics", {}).setdefault("docs_context_projection", {})["joint_structural"] = {
         "candidates": count, "closed_seed_sections": -negative_sections,
         "closed_seed_atoms": -negative_closed,

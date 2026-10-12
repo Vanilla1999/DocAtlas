@@ -17,8 +17,10 @@ from docmancer.core.structured_chunking import _atom_spans
 from .context_blocks import source_block_alternatives
 from .original_body_discovery import (
     original_body_discovery_binding,
+    original_body_derivation_binding,
     policy_candidate_admission_active,
     scalar_label_candidate_admission_active,
+    source_valid_candidate_admission_active,
 )
 from .query_reference_binding import query_mentions
 from .query_terms import documentation_technical_anchors
@@ -212,18 +214,15 @@ def _technical_block_witness(question: str, block: str, source_offset: int):
     }
 
 
-def _source_valid_body_blocks(
+def body_request_constraint_rejection(
     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
-):
-    """Share native receipt and owner constraints, without numeric inference."""
-    binding = original_body_discovery_binding(
-        question=question, body=evidence_text, candidate=candidate,
-    )
-    if binding is None:
-        return
+) -> str | None:
+    """Keep the existing unresolved-name constraint separate from source checks.
+
+    The caller must already have checked the canonical owner. Its structural
+    scope can bind a literal name; it does not certify the actor of an action.
+    """
     evidence = candidate["_reference_evidence"]
-    if prepared_owner_rejection(evidence) is not None:
-        return
     owner = evidence.get("owner")
     subject_text = (evidence["raw_document"][owner["scope_start"]:owner["scope_end"]]
                     if owner is not None else evidence_text)
@@ -235,6 +234,35 @@ def _source_valid_body_blocks(
         for mention in query_mentions(question)
         if not mention.explicit and mention.syntax_role == "unresolved"
     ):
+        return "unresolved_name_absent"
+    return None
+
+
+def _source_valid_body_blocks(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+    native_candidate: Mapping[str, Any] | None = None,
+):
+    """Share live native provenance, owner and request checks, without numerics.
+
+    A derived caller also has to validate its structural edge. The provenance
+    helper never adds the derived window to the native receipt ledger.
+    """
+    if native_candidate is None:
+        binding = original_body_discovery_binding(
+            question=question, body=evidence_text, candidate=candidate,
+        )
+    else:
+        binding = original_body_derivation_binding(
+            question=question, body=evidence_text, candidate=candidate, native_candidate=native_candidate,
+        )
+    if binding is None:
+        return
+    evidence = candidate["_reference_evidence"]
+    if prepared_owner_rejection(evidence) is not None:
+        return
+    if body_request_constraint_rejection(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    ) is not None:
         return
     for offset, block in _body_blocks(evidence_text):
         source_offset = evidence["char_start"] + offset
@@ -392,3 +420,32 @@ def policy_valid_original_candidate_witness(
     return _scalar_label_candidate_witness(
         question=question, evidence_text=evidence_text, candidate=candidate,
     )
+
+
+def source_valid_original_candidate_witness(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+    native_candidate: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Opt-in substantive body delivery without ratio, numeric or label tests.
+
+    Canonical source policy and hard-exact checks belong to the admission
+    caller. Provenance, owner and unresolved names are rechecked here. The
+    witness is a body occurrence, never evidence of semantic contribution.
+    """
+    if not source_valid_candidate_admission_active():
+        return None
+    for binding, source_offset, block in _source_valid_body_blocks(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+        native_candidate=native_candidate,
+    ):
+        if not re.search(r"[^\W_]", block):
+            continue
+        end = source_offset + len(block)
+        return {
+            "kind": "source_valid_original_candidate_v1", "relevance_unassessed": True,
+            "text": candidate["_reference_evidence"]["raw_document"][source_offset:end],
+            "char_start": source_offset, "char_end": end,
+            "block_char_start": source_offset, "block_char_end": end,
+            "native_discovery_binding_sha256": binding,
+        }
+    return None

@@ -9,8 +9,12 @@ from dataclasses import asdict
 from copy import deepcopy
 import hashlib
 import json
+from time import perf_counter
 from typing import Any, Mapping
 
+from docmancer.core.prepared_parent_sections import (
+    load_prepared_parent_manifest, prepared_parents_enabled, read_prepared_parent_sections,
+)
 from docmancer.core.structured_chunking import parse_markdown_parents
 from docmancer.docs.domain.lifecycle_policy import lifecycle_allows
 from docmancer.docs.domain.query_reference_binding import (
@@ -30,6 +34,16 @@ class SourceReferenceContext:
         self.source_file_hashes: dict[str, str] = {}
         self.source_member_bindings: dict[str, dict[str, str]] = {}
         self.documents: dict[str, Any] = {}
+        # Capture the host setting once; neither source metadata nor query text
+        # can opt into a different reader halfway through this context.
+        self._prepared_parents_enabled = prepared_parents_enabled()
+        self._prepared_parent_manifest = None
+        self.structure_diagnostics: dict[str, Any] = {
+            "prepared_enabled": self._prepared_parents_enabled,
+            "documents": 0, "prepared_hits": 0, "parser_calls": 0,
+            "parser_ms": 0.0, "parent_rows": 0, "miss_reasons": {},
+            "parent_selects": 0, "prepared_read_ms": 0.0, "prepared_verification_ms": 0.0,
+        }
         self.complete = False
         self.naming_catalog: dict[str, Any] | None = None
         self.naming_catalog_sha256: str | None = None
@@ -115,14 +129,48 @@ class SourceReferenceContext:
                     row = conn.execute("SELECT content FROM generation_sources WHERE generation_id=? AND source=?",
                         (self.scope.snapshot_id, source)).fetchone()
                     children = conn.execute(
-                        "SELECT stable_chunk_id, json_extract(metadata_json, '$.generation_id') AS embedded_generation "
+                        "SELECT stable_chunk_id, source_id, json_extract(metadata_json, '$.generation_id') AS embedded_generation "
                         "FROM retrieval_children WHERE generation_id=? AND source=?",
                         (self.scope.snapshot_id, source),
                     ).fetchall()
-                if row is not None and hashlib.sha256(row["content"].encode("utf-8")).hexdigest() == identity.content_sha256:
-                    content = row["content"]
-                    value = content, parse_markdown_parents(content, identity.document_id), {
-                        str(child["stable_chunk_id"]): child["embedded_generation"] for child in children}
+                    if row is not None and hashlib.sha256(row["content"].encode("utf-8")).hexdigest() == identity.content_sha256:
+                        content = row["content"]
+                        parents = None
+                        self.structure_diagnostics["documents"] += 1
+                        if self._prepared_parents_enabled:
+                            if self._prepared_parent_manifest is None:
+                                self._prepared_parent_manifest = load_prepared_parent_manifest(
+                                    conn, self.scope.snapshot_id)
+                                self.structure_diagnostics.update(
+                                    manifest_bytes=self._prepared_parent_manifest.bytes_read,
+                                    manifest_ms=self._prepared_parent_manifest.elapsed_ms,
+                                )
+                            source_ids = {child["source_id"] for child in children}
+                            source_id = next(iter(source_ids)) if len(source_ids) == 1 else None
+                            prepared = read_prepared_parent_sections(
+                                conn, manifest=self._prepared_parent_manifest,
+                                generation_id=self.scope.snapshot_id, source=source,
+                                source_identity=identity.document_id, content=content,
+                                content_sha256=identity.content_sha256, source_id=source_id,
+                            )
+                            parents = prepared.parents
+                            self.structure_diagnostics["parent_rows"] += prepared.diagnostics.get("parent_rows", 0)
+                            self.structure_diagnostics["parent_selects"] += prepared.diagnostics.get("parent_selects", 0)
+                            self.structure_diagnostics["prepared_read_ms"] += prepared.diagnostics.get("read_ms", 0.0)
+                            self.structure_diagnostics["prepared_verification_ms"] += prepared.diagnostics.get("verification_ms", 0.0)
+                            if parents is not None:
+                                self.structure_diagnostics["prepared_hits"] += 1
+                            else:
+                                reason = prepared.miss_reason or "prepared_unavailable"
+                                reasons = self.structure_diagnostics["miss_reasons"]
+                                reasons[reason] = reasons.get(reason, 0) + 1
+                        if parents is None:
+                            started = perf_counter()
+                            parents = parse_markdown_parents(content, identity.document_id)
+                            self.structure_diagnostics["parser_calls"] += 1
+                            self.structure_diagnostics["parser_ms"] += (perf_counter() - started) * 1000
+                        value = content, parents, {
+                            str(child["stable_chunk_id"]): child["embedded_generation"] for child in children}
 
             self.documents[source] = value
         return self.documents[source]
