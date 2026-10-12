@@ -19,6 +19,25 @@ from scripts import run_project_docs_self_host_gate as runner
 CORPUS_SHA = "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
 OLD_QUESTIONS_SHA = "2b88e653b4726747d4ee55682d159744bc1b7dcfc8ac525ee830a688ec401f67"
 
+# Fixed before this follow-up, from the archival, exact-head 40-question run.
+# Lookups are either the unchanged question or a literal substring of that
+# question. No term, source name or expected answer is obtained from the corpus.
+FAILED_BASELINE_IDS = (11, 16, 22, 24, 31, 34, 36, 39, 42, 44, 46, 47)
+LITERAL_SAME_QUESTION_LOOKUPS = {
+    11: "примерами команд",
+    16: "события завершения",
+    22: "завершить трассировку",
+    24: "интеграционные проверки",
+    31: "reward hacking",
+    34: "Demystifying evals",
+    36: "multi-agent research system Anthropic",
+    39: "Building effective agents",
+    42: "подмена внешнего транспорта",
+    44: "независимом эталоне",
+    46: "оба режима логирования",
+    47: "exit 0",
+}
+
 
 def _covered(corpus, ranges, fact):
     merged = []
@@ -46,11 +65,34 @@ def main():
     assert all(f and all(type(a) is int and type(b) is int and
                          0 <= a < b <= len(corpus) for a, b in f)
                for _, f in cases)
+    lookup_only = os.environ.get("EXTRA40_LOOKUP_ONLY") == "1"
+    if lookup_only:
+        assert set(FAILED_BASELINE_IDS) == set(LITERAL_SAME_QUESTION_LOOKUPS)
+        questions_by_id = dict(enumerate((question for question, _ in cases), 11))
+        assert all(fragment in questions_by_id[index] and fragment != questions_by_id[index]
+                   for index, fragment in LITERAL_SAME_QUESTION_LOOKUPS.items())
+        workload = [
+            (idx, question, facts, variant, [lookup])
+            for idx, (question, facts) in enumerate(cases, 11)
+            if idx in FAILED_BASELINE_IDS
+            for variant, lookup in (
+                ("exact_question_lookup", question),
+                ("literal_question_excerpt", LITERAL_SAME_QUESTION_LOOKUPS[idx]),
+            )
+        ]
+        assert len(workload) == 24
+    else:
+        workload = [(idx, question, facts, "no_lookup", [])
+                    for idx, (question, facts) in enumerate(cases, 11)]
     destination = Path(os.environ["EXTRA40_ARTIFACT_DIR"]).resolve()
     destination.mkdir(parents=True, exist_ok=True)
-    report_path = destination / "extra40-results.json"
+    report_path = destination / ("extra40-lookup-results.json" if lookup_only
+                                 else "extra40-results.json")
     record = {
         "boundary": "real public Docs MCP dispatcher / SQLite; not Grounded or installed client",
+        "experiment": ("12 previously failed questions x two explicit lookup variants"
+                       if lookup_only else "40 unchanged original requests"),
+        "lookup_fragments": LITERAL_SAME_QUESTION_LOOKUPS if lookup_only else {},
         "corpus_sha256": CORPUS_SHA,
         "original_questions_sha256": OLD_QUESTIONS_SHA,
         "new_questions_sha256": sha256(extra).hexdigest(),
@@ -93,15 +135,19 @@ def main():
             assert [tuple(row)[:3] for row in stored] == [
                 (str(project / "README.md"), corpus, CORPUS_SHA),
             ]
-            for idx, (question, facts) in enumerate(cases, 11):
+            for idx, question, facts, variant, lookups in workload:
                 started = perf_counter()
-                row = {"id": idx, "question": question, "required_facts": [
-                    {"start": a, "end": b, "quote": corpus[a:b]} for a, b in facts
-                ]}
+                request = {
+                    "question": question, "project_path": str(project), "scope": "project",
+                    **({"lookup_queries": lookups} if lookups else {}),
+                }
+                row = {"id": idx, "question": question,
+                       "lookup_variant": variant, "lookup_queries": lookups,
+                       "required_facts": [
+                           {"start": a, "end": b, "quote": corpus[a:b]} for a, b in facts
+                       ]}
                 try:
-                    payload, snapshot = runner._call_with_snapshot({
-                        "question": question, "project_path": str(project), "scope": "project",
-                    }, service)
+                    payload, snapshot = runner._call_with_snapshot(request, service)
                     row["elapsed_ms"] = round(1000 * (perf_counter() - started), 2)
                     row["payload"] = payload
                     row["validation_snapshot"] = snapshot
@@ -153,6 +199,7 @@ def main():
                         "status": payload.get("status"),
                         "support_status": payload.get("support_status"),
                         "answer_supported": payload.get("answer_supported"),
+                        "covered_query_ids": payload.get("covered_query_ids") or [],
                         "source_count": len(sources),
                         "valid_source_ranges": ranges,
                         "errors": errors,
@@ -165,7 +212,7 @@ def main():
                                     "facts_delivered": False}
                 record["results"].append(row)
                 record["product_calls"]["get_docs_context"] += 1
-                if idx % 10 == 0:
+                if len(record["results"]) % 6 == 0:
                     save()
             assert policy.generation() == generation
             with closing(policy.connect()) as connection:
@@ -179,13 +226,26 @@ def main():
     delivered = sum(bool(row["audit"]["facts_delivered"]) for row in record["results"])
     failures = [row["id"] for row in record["results"] if not row["audit"]["facts_delivered"]]
     record["summary"] = {
-        "questions": len(cases), "full_facts": delivered, "failed_ids": failures,
+        "unique_original_questions": len(FAILED_BASELINE_IDS) if lookup_only else len(cases),
+        "public_context_calls": len(workload), "full_facts": delivered, "failed_ids": failures,
         "runtime_errors": sum("execution_error" in row["audit"] for row in record["results"]),
         "source_integrity_errors": sum(bool(row["audit"].get("errors")) for row in record["results"]),
+        "by_variant": {
+            variant: {
+                "fact_complete": sum(bool(row["audit"].get("facts_delivered"))
+                                     for row in record["results"]
+                                     if row["lookup_variant"] == variant),
+                "with_sources": sum(bool((row.get("payload") or {}).get("sources"))
+                                    for row in record["results"]
+                                    if row["lookup_variant"] == variant),
+                "total": sum(row["lookup_variant"] == variant for row in record["results"]),
+            }
+            for variant in sorted({row["lookup_variant"] for row in record["results"]})
+        },
     }
     save()
-    print("Extra40 public MCP factual source delivery:", json.dumps(record["summary"]))
-    assert len(record["results"]) == 40
+    print("Extra40 public MCP lookup evaluation:", json.dumps(record["summary"]))
+    assert len(record["results"]) == len(workload)
     assert record["summary"]["runtime_errors"] == 0
     assert record["summary"]["source_integrity_errors"] == 0
 
