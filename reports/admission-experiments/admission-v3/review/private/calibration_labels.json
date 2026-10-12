@@ -1,0 +1,126 @@
+{
+  "cases": [
+    {
+      "id": "V3CAL01",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "38 рублей: первые 10 страниц дают 30 рублей, оставшиеся 4 дают 8 рублей; суммы складываются."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "691d6b27f2888fd2cd4659fca7b57daf4505547b4f5bfb6da8bf5ea40208422e",
+          "char_start": 80,
+          "char_end": 134,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "e74a198b7b0601e7f26ef4e737508f32e5a86ffa025f26e7db6f72b6d7f0986f",
+          "char_start": 135,
+          "char_end": 190,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "c8b1c741f35536cf1ddea3b6ae1cfc63e5bc18fd476697887e774f6f9a0a1154",
+          "char_start": 191,
+          "char_end": 272,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "10*3+(14-10)*2=38; query 14 отсутствует в tariff; source breakpoint 10, не query literal.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3CAL02",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "Счёт за один заказ из 14 страниц: 38 рублей.",
+        "Спор принимает бухгалтер кооператива.",
+        "Заказчик передаёт исходный заказ и выданный счёт."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "691d6b27f2888fd2cd4659fca7b57daf4505547b4f5bfb6da8bf5ea40208422e",
+          "char_start": 80,
+          "char_end": 134,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "e74a198b7b0601e7f26ef4e737508f32e5a86ffa025f26e7db6f72b6d7f0986f",
+          "char_start": 135,
+          "char_end": 190,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "c8b1c741f35536cf1ddea3b6ae1cfc63e5bc18fd476697887e774f6f9a0a1154",
+          "char_start": 191,
+          "char_end": 272,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Спор о сумме печатного счёта принимает бухгалтер кооператива.",
+          "document_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+          "quote_sha256": "40a35cc72a6e8aba9fd2daea7ee0ba68aee7638af368ce142c74d2a502d87156",
+          "char_start": 31,
+          "char_end": 92,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт.",
+          "document_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+          "quote_sha256": "0d0f6d9b6861f4c96bad527b197e8bf268499736c0b4985d7ee7a0ba5762aa06",
+          "char_start": 93,
+          "char_end": 197,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "10*3+(14-10)*2=38; спор и documents facet не содержат numeric literals.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3CAL03",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Отказ назначать очередь для priority 14: тариф страниц не задаёт priority/очередь. Объяснение пробела допустимо, выдуманная очередь нет.",
+      "unsupported_relation": "priority=14 -> printing queue; ни такой атрибут, ни mapping не определены. Не путать размер заказа и приоритет.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    }
+  ]
+}

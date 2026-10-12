@@ -1,0 +1,1059 @@
+{
+  "errors": [],
+  "checks": {
+    "execution_corpus_hash": 9,
+    "execution_freeze_hash": 40,
+    "independent_freeze_hash": 17,
+    "frozen_oracle_witness_coordinates_hashes": 19,
+    "product_after_run_hash": 397,
+    "config_identity": 1,
+    "complete_raw_hash_inventory": 1,
+    "raw_artifact_hash": 315,
+    "prepare_finite_generation": 7,
+    "binding_allowlist": 7,
+    "prepared_file_hashes": 7,
+    "public_execution_question": 57,
+    "public_request": 57,
+    "state_read_unchanged": 57,
+    "stored_rows_expected_bytes": 57,
+    "catalog_source_files_saved_state": 57,
+    "public_false_authority": 57,
+    "observer_no_selection": 38,
+    "raw_span": 422,
+    "full_source_hash": 422,
+    "document_identity": 422,
+    "scope_generation": 422,
+    "file_content_hash": 422,
+    "catalog_member": 422,
+    "catalog_metadata": 422,
+    "source_class": 422,
+    "metadata_project": 422,
+    "metadata_generation": 422,
+    "structural_owner_bounds": 420,
+    "candidate_window_identity": 357,
+    "candidate_id": 357,
+    "original_root_receipt_operands": 357,
+    "original_query_trace": 357,
+    "excluded_ordinals_identity": 38,
+    "complete_universe_partition": 38,
+    "pool_dedup": 38,
+    "same_family_state_all_cases_arms": 50,
+    "public_retrieval_only_context_contract": 30,
+    "unique_public_id": 65,
+    "snapshot_projected_equality": 65,
+    "canonical_envelope": 65,
+    "public_source_authority_scope": 65,
+    "unique_exact_snippet_line_span": 65,
+    "admission_no_coverage_authority": 177,
+    "native_fingerprint": 177,
+    "scalar_witness_bound_unassessed": 21,
+    "complete_query_digit_tokens": 21,
+    "scalar_pair_exact_spans": 69,
+    "scalar_pair_shape": 69,
+    "maximal_scalar_start": 69,
+    "maximal_label_end": 69,
+    "whole_original_scalar_token": 69,
+    "original_neighbor_operator_veto": 69,
+    "local_scalar_pair_label_containment": 21,
+    "admission_observation_boundary": 19,
+    "B1_V3_complete_original_universe": 19,
+    "default_observer_inactive": 19,
+    "single_host_execution": 28,
+    "frozen_host_model": 28,
+    "raw_transport_parse_equality": 28,
+    "host_transport_wrapper": 28,
+    "host_request_parent_hash": 28,
+    "host_prompt_hash": 28,
+    "host_original_question": 28,
+    "base_answer_json_schema": 24,
+    "base_host_public_sources_only": 24,
+    "base_host_same_prompt": 24,
+    "citation_same_frozen_prompt": 4,
+    "citation_packet_binding": 4,
+    "citation_packet_hash": 4,
+    "citation_original_claims_input_raw": 4,
+    "citation_extraction_shape": 4,
+    "citation_cost_parent": 4,
+    "citation_same_parent_public_content": 4,
+    "citation_lines_exact_cover": 20,
+    "citation_line_offsets": 160,
+    "citation_fragment_raw": 20,
+    "citation_fragment_envelope": 20,
+    "citation_claim_count": 4,
+    "citation_claim_unchanged": 4,
+    "citation_coordinates": 4,
+    "citation_quote_literal": 4,
+    "citation_absolute_coordinates": 4,
+    "citation_saved_raw_unchanged": 4,
+    "run_config_unchanged": 1,
+    "actual_saved_counts": 1,
+    "actual_ledger": 1,
+    "context_cost_arithmetic": 57,
+    "prepare_cost_arithmetic": 7,
+    "host_actual_submitted_cost": 28,
+    "citation_reconstruction_cost": 4,
+    "cost_total": 1
+  },
+  "public": [
+    {
+      "case_id": "DIAG_HOLD03",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "arm": "V3",
+      "source_count": 2,
+      "ranges": {
+        "holdout/ceramic_firing/loading.md": [
+          [
+            0,
+            335
+          ]
+        ],
+        "holdout/ceramic_firing/cooling.md": [
+          [
+            0,
+            422
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "holdout/tidal_ferry/sailing.md": [
+          [
+            0,
+            341
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "holdout/tidal_ferry/sailing.md": [
+          [
+            0,
+            341
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "holdout/tidal_ferry/sailing.md": [
+          [
+            0,
+            341
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/compounds.md": [
+          [
+            0,
+            81
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/compounds.md": [
+          [
+            0,
+            81
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/owners.md": [
+          [
+            0,
+            130
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/owners.md": [
+          [
+            0,
+            130
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "arm": "V3",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "arm": "V3",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/setext.md": [
+          [
+            0,
+            104
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/setext.md": [
+          [
+            0,
+            104
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/logs.md": [
+          [
+            0,
+            49
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "arm": "DefaultOff",
+      "source_count": 1,
+      "ranges": {
+        "docs/logs.md": [
+          [
+            0,
+            49
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/logs.md": [
+          [
+            0,
+            49
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/store.md": [
+          [
+            0,
+            71
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/store.md": [
+          [
+            0,
+            71
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "Q16",
+      "arm": "B1",
+      "source_count": 10,
+      "ranges": {
+        "README.md": [
+          [
+            1024,
+            2100
+          ],
+          [
+            7726,
+            8783
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            44,
+            1002
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            8783,
+            9305
+          ],
+          [
+            2100,
+            2648
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "Q16",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "Q16",
+      "arm": "V3",
+      "source_count": 10,
+      "ranges": {
+        "README.md": [
+          [
+            1024,
+            2100
+          ],
+          [
+            7726,
+            8783
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            44,
+            1002
+          ],
+          [
+            3117,
+            5797
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            8783,
+            9305
+          ],
+          [
+            2100,
+            2648
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "Q46",
+      "arm": "B1",
+      "source_count": 7,
+      "ranges": {
+        "README.md": [
+          [
+            7543,
+            7726
+          ],
+          [
+            2648,
+            3117
+          ],
+          [
+            6327,
+            6495
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            6723,
+            6919
+          ],
+          [
+            6694,
+            6723
+          ],
+          [
+            756,
+            1002
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "Q46",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "Q46",
+      "arm": "V3",
+      "source_count": 7,
+      "ranges": {
+        "README.md": [
+          [
+            7543,
+            7726
+          ],
+          [
+            2648,
+            3117
+          ],
+          [
+            6327,
+            6495
+          ],
+          [
+            5797,
+            7726
+          ],
+          [
+            6723,
+            6919
+          ],
+          [
+            6694,
+            6723
+          ],
+          [
+            756,
+            1002
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/tariff.md": [
+          [
+            0,
+            273
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3CAL02",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL02",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL02",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/tariff.md": [
+          [
+            0,
+            273
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3CAL03",
+      "arm": "B1",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL03",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3CAL03",
+      "arm": "V3",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "B1",
+      "source_count": 2,
+      "ranges": {
+        "docs/routes.md": [
+          [
+            0,
+            521
+          ]
+        ],
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "DefaultOff",
+      "source_count": 1,
+      "ranges": {
+        "docs/routes.md": [
+          [
+            0,
+            521
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "V3",
+      "source_count": 2,
+      "ranges": {
+        "docs/routes.md": [
+          [
+            0,
+            521
+          ]
+        ],
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H02",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H02",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3H02",
+      "arm": "V3",
+      "source_count": 2,
+      "ranges": {
+        "docs/routes.md": [
+          [
+            0,
+            521
+          ]
+        ],
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H03",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H03",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3H03",
+      "arm": "V3",
+      "source_count": 1,
+      "ranges": {
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H04",
+      "arm": "B1",
+      "source_count": 1,
+      "ranges": {
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    },
+    {
+      "case_id": "V3H04",
+      "arm": "DefaultOff",
+      "source_count": 0,
+      "ranges": {}
+    },
+    {
+      "case_id": "V3H04",
+      "arm": "V3",
+      "source_count": 2,
+      "ranges": {
+        "docs/routes.md": [
+          [
+            0,
+            521
+          ]
+        ],
+        "docs/roles.md": [
+          [
+            0,
+            275
+          ]
+        ]
+      }
+    }
+  ],
+  "host": [
+    {
+      "case_id": "DIAG_HOLD03",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial"
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial"
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial"
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "Q16",
+      "arm": "B1",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-e2fee8fbbe2755c6",
+          "quote": "Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms` и `trace_incomplete`.",
+          "supports": "Указывает диагностические поля, добавляемые в событие завершения относительно начала запроса."
+        }
+      ],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "Q16",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "coordinate_extraction": "PASS"
+    },
+    {
+      "case_id": "Q46",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "Q46",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "coordinate_extraction": "PASS"
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "coordinate_extraction": "PASS"
+    },
+    {
+      "case_id": "V3CAL01",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "V3CAL02",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3CAL02",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial"
+    },
+    {
+      "case_id": "V3CAL03",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3CAL03",
+      "arm": "V3",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "B1",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-fc27ab709d57a0cd",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Расход последовательного пути равен сумме расходов переходов.",
+          "supports": "Расход пути через весы равен 4 + 6 = 10 единиц заряда."
+        }
+      ],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "coordinate_extraction": "PASS"
+    },
+    {
+      "case_id": "V3H01",
+      "arm": "V3",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-fc27ab709d57a0cd",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.",
+          "supports": "Подтверждает состав маршрута, расходы переходов, суммирование и условие соблюдения бюджета."
+        }
+      ],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "V3H02",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial"
+    },
+    {
+      "case_id": "V3H02",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete"
+    },
+    {
+      "case_id": "V3H03",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3H03",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3H04",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient"
+    },
+    {
+      "case_id": "V3H04",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete"
+    }
+  ],
+  "costs": {
+    "context": {
+      "rows": 57,
+      "seconds": 17.37290680199294
+    },
+    "prepare": {
+      "rows": 7,
+      "seconds": 0.8357785309999599
+    },
+    "host": {
+      "rows": 28,
+      "seconds": 117.57135099999999
+    },
+    "citation_reconstruction": {
+      "rows": 4,
+      "seconds": 0.051683309000509325
+    }
+  },
+  "observed_seconds_sum_lower_bound": 135.8317196419934,
+  "whole_run_seconds": 136.94634569900154,
+  "execution_freeze_count": 40,
+  "independent_freeze_count": 17,
+  "product_source_count": 397,
+  "raw_hash_count": 315,
+  "live_receipts_reexecuted": false,
+  "supplementary_ledger_fields": {
+    "documentation_context_attempts": 1,
+    "documentation_context_status": "insufficient_evidence/source_unavailable",
+    "total_context_attempts_including_documentation_lookup": 58,
+    "setup_command_errors": [
+      {
+        "command": "python stdlib baseline snapshot",
+        "exit_code": 127,
+        "reason": "python alias missing; no public/model/host request consumed; used python3"
+      }
+    ]
+  },
+  "default_complete_universe_observer": "NOT_AVAILABLE: inactive by design"
+}

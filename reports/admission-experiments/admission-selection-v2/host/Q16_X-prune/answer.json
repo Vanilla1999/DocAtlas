@@ -1,0 +1,12 @@
+{
+  "status": "complete",
+  "answer": "В событии завершения есть диагностические поля `duration_ms` и `trace_incomplete`, которых нет в начале запроса.",
+  "evidence": [
+    {
+      "source_id": "excerpt-f649e2c7ddb8efb9",
+      "quote": "завершение содержит `duration_ms` и `trace_incomplete`.",
+      "supports": "Событие завершения содержит диагностическую информацию о длительности и полноте трассы."
+    }
+  ],
+  "missing": []
+}

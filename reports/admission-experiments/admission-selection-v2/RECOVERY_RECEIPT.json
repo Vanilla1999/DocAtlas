@@ -1,0 +1,14 @@
+{
+  "reason": "foreground shell tool killed process after120s; research budget2h not exceeded",
+  "consumed_unknown": [
+    {
+      "case_arm": "HOLD07_Budget",
+      "status": "INTERRUPTED_COMPLETION_UNKNOWN",
+      "runner_retry": false,
+      "receipt_sha256": "f4a396fcfc8db6f199f09e13aa5b7c34ffbd410151bc02df64788c27f153db98"
+    }
+  ],
+  "new_prepares": 0,
+  "new_model_forwards": 0,
+  "only_missing_requests": true
+}

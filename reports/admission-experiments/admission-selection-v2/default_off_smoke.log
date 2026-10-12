@@ -1,0 +1,4 @@
+{"event":"docatlas_request_start","request_id":"7b5990f3370744c69f22031e3e9d304e","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"7b5990f3370744c69f22031e3e9d304e","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":130.801,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"5d3196427dec43bdbff7b37f17293744","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"5d3196427dec43bdbff7b37f17293744","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":97.788,"trace_incomplete":false}

@@ -1,0 +1,10 @@
+{
+  "project": "/tmp/docatlas-selection-v2-awsnykhu/project",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "domain_version": null,
+  "document_hashes": {
+    "docs/fixture.md": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314"
+  },
+  "generation": "gen-622560fa489b463e9a26696bb5e9d02a"
+}

@@ -1,0 +1,45 @@
+{
+  "seconds": 0.11348645399993984,
+  "expected_paths": [
+    "docs/fixture.md"
+  ],
+  "indexed_paths": [
+    "docs/fixture.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-fdf311bea093fcf39f95a07198e0e82ec249810b",
+      "source_path": "docs/fixture.md",
+      "display_text": "# Fixture store\n\nDocAtlas stores fixture records for local inspection.\n",
+      "line_start": 1,
+      "line_end": 3
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "ad2c8d2415a2d574cd0b7e129f493a36c11bc60c6a3912f83d6c115c61e714c7",
+  "storage_path": "/tmp/docatlas-evidence-mf3ps413/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+  "catalog_sha256": "803d7348885a737d4a4b7a195b7e94fa7734676859d565dac0b079b51090273c",
+  "documents": [
+    {
+      "path": "docs/fixture.md",
+      "content_sha256": "2bb6f3af143490aa01dcbb6c52a4affb95737015b6e62bdb63f29f238e9d2314",
+      "catalog_entry_hash": "sha256:c2d52e1a08cf2f8ec07dbc9198a4cc8cc15422787a046383070f0fdf0cea38d1"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-622560fa489b463e9a26696bb5e9d02a",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 1,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 1
+  }
+}

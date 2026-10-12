@@ -1,0 +1,94 @@
+{
+  "seconds": 0.11372712499724003,
+  "expected_paths": [
+    "holdout/tidal_ferry/cargo.md",
+    "holdout/tidal_ferry/refunds.md",
+    "holdout/tidal_ferry/sailing.md"
+  ],
+  "indexed_paths": [
+    "holdout/tidal_ferry/cargo.md",
+    "holdout/tidal_ferry/refunds.md",
+    "holdout/tidal_ferry/sailing.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-abe3641f0ab6ee845ae0c95005ff708cb82f1b67",
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "display_text": "# Грузы на пароме\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+      "source_path": "holdout/tidal_ferry/cargo.md",
+      "display_text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-7d66677b46ff5d323227c8fcf51cc944a593000f",
+      "source_path": "holdout/tidal_ferry/refunds.md",
+      "display_text": "# Возврат билетов\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-ff7846d5d4e46d2198f281fbc152bb67939c7d4c",
+      "source_path": "holdout/tidal_ferry/refunds.md",
+      "display_text": "Если рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-d76f5b525ac422b2692ff7679768ac5545a395e2",
+      "source_path": "holdout/tidal_ferry/sailing.md",
+      "display_text": "# Разрешение рейса\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+      "source_path": "holdout/tidal_ferry/sailing.md",
+      "display_text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+      "line_start": 3,
+      "line_end": 6
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "2f5d88bfc6dc6dc615c79b0766fca2a5f5f0fcf47ba7ee0391276300f6bf7a16",
+  "storage_path": "/tmp/docatlas-evidence-tjhcuhnd/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+  "catalog_sha256": "7db0d10d380daf47ac79f967bee70d45f12fcd1ca4d3a87c69bfbeb1c67325b4",
+  "documents": [
+    {
+      "path": "holdout/tidal_ferry/cargo.md",
+      "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+    },
+    {
+      "path": "holdout/tidal_ferry/refunds.md",
+      "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "catalog_entry_hash": "sha256:a1afc01b255628ae85c5c32f96fc99e1c7a89e7960fbc0612b30524a3af70075"
+    },
+    {
+      "path": "holdout/tidal_ferry/sailing.md",
+      "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+      "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

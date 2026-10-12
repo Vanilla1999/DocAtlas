@@ -1,0 +1,333 @@
+{
+  "seconds": 0.1354176519998873,
+  "expected_paths": [
+    "README.md"
+  ],
+  "indexed_paths": [
+    "README.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-51fdff8f3010b2667665b5c3cf59d77727ad70d1",
+      "source_path": "README.md",
+      "display_text": "<!-- Source: docs/main-flow-logging.md -->\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-eb723d4da394371631719cdae8d2d8f45fa685c0",
+      "source_path": "README.md",
+      "display_text": "# Логи основного потока\n\nПодробная диагностика по умолчанию выключена. Включение не меняет формат\nответа, источники или число продуктовых запросов.\n\n```sh\ndoc-atlas --trace query \"OAuth tokens\" --mode lexical --format json 2>trace.jsonl\ndoc-atlas --trace context --help\ndoc-atlas --trace mcp docs-serve 2>trace.jsonl\n```\n\n",
+      "line_start": 3,
+      "line_end": 13
+    },
+    {
+      "stable_chunk_id": "child-7834f154129e35b72241b012e8e5ba1b06e0eb1f",
+      "source_path": "README.md",
+      "display_text": "Глобальные `--trace` / `--no-trace` указываются **перед подкомандой**.\nОни переопределяют `DOCATLAS_TRACE` на время вызова. Без флага используется\nсуществующая настройка: только `DOCATLAS_TRACE=1` включает трассу; значение\nокружения читается при загрузке модуля, поэтому задайте его до запуска процесса.\n\n",
+      "line_start": 14,
+      "line_end": 18
+    },
+    {
+      "stable_chunk_id": "child-eeb56a43f52863d3c72bea90a65ffb0c720eba1f",
+      "source_path": "README.md",
+      "display_text": "```sh\nDOCATLAS_TRACE=1 doc-atlas --no-trace query \"OAuth tokens\" --mode lexical\n```\n\nДля MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n",
+      "line_start": 19,
+      "line_end": 26
+    },
+    {
+      "stable_chunk_id": "child-6bb8bfe1a92c285db8bb59119dab6f8c5dbfb30f",
+      "source_path": "README.md",
+      "display_text": "## События и границы\n\n",
+      "line_start": 27,
+      "line_end": 28
+    },
+    {
+      "stable_chunk_id": "child-fe93b2312d805583ece001aef4850504fff96c8a",
+      "source_path": "README.md",
+      "display_text": "- `docatlas_request_start` и `docatlas_request_end` связываются через `request_id`.\n  Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms`\n  и `trace_incomplete`.\n- Покрыты CLI `query`, `context` и публичный диспетчер Docs MCP\n  (`operation=call_docs_tool_payload`). Ошибки разбора CLI до входа в callback\n  не имеют lifecycle-событий.\n- Существующий `docatlas_query_trace` содержит подробную диагностику проекции\n  MCP и использует тот же `request_id`. Его previews могут включать данные\n  документов; новые lifecycle-события не содержат текст вопроса или документов.\n- `success` означает завершение границы вызова, а не достаточность найденных\n  доказательств. Возвращённые статусы `error`/`failed` и исключения отмечаются\n  как `error`; результат запроса остаётся источником продуктового статуса.\n- Ошибка записи диагностики не должна менять ответ. Пропущенное начало\n  отмечается `trace_incomplete`; при сбое завершения предпринимается запись\n  `docatlas_trace_gap`. Полностью недоступный stderr не позволяет доставить\n  даже сообщение о пропуске.\n\n",
+      "line_start": 29,
+      "line_end": 45
+    },
+    {
+      "stable_chunk_id": "child-0dfd6474f1c35076200078297df7e8bde61bd6ba",
+      "source_path": "README.md",
+      "display_text": "## Проверка\n\n",
+      "line_start": 46,
+      "line_end": 47
+    },
+    {
+      "stable_chunk_id": "child-524d41891c21e3e6ce541b8ace4231be10f21dc4",
+      "source_path": "README.md",
+      "display_text": "Интеграционные сценарии находятся в\n`tests/test_project_context_quality_v2_protocol.py` и\n`tests/test_main_flow_logging_integration.py`: реальные документы и SQLite,\nпубличный MCP-dispatcher и CLI subprocess, OFF/ON/OFF, независимый исходный факт,\nсохранение выдачи и корреляция событий. Это не проверка установленного MCP stdio\nили production-клиента. Выполнение новых проверок ожидает разрешённого CI.\n\n",
+      "line_start": 48,
+      "line_end": 54
+    },
+    {
+      "stable_chunk_id": "child-f1824d3788bb4f38ee1a672e6ef3b168658195d1",
+      "source_path": "README.md",
+      "display_text": "Обоснование стратегии: [результат, источники и трасса](main-flow-evaluation.md).\n\n\n<!-- Source: docs/main-flow-evaluation.md -->\n\n",
+      "line_start": 55,
+      "line_end": 59
+    },
+    {
+      "stable_chunk_id": "child-36f24870fc2f6bc5facd193cf28b315d3177a9d5",
+      "source_path": "README.md",
+      "display_text": "# Оценка основного потока: результат, источники и трасса\n\nИсследовательская записка, 11 октября 2026 года. Ниже — предложение проверки, а не отчёт о реализованных сценариях или полученном PASS.\n\n",
+      "line_start": 60,
+      "line_end": 63
+    },
+    {
+      "stable_chunk_id": "child-5071b6e07c5664b3893b1dbbab5242dbe98e5f0f",
+      "source_path": "README.md",
+      "display_text": "**Главный вывод:** прохождение проверки-прокси не доказывает решение исходной задачи. Для DocAtlas критерием служат независимо заданные факты документов, допустимые источники и фактическое состояние. Логи помогают объяснить результат, но не являются оракулом корректности.\n\n",
+      "line_start": 64,
+      "line_end": 65
+    },
+    {
+      "stable_chunk_id": "child-0663cf32464e1d482aa4fc7dc37db265bdf16b64",
+      "source_path": "README.md",
+      "display_text": "## Что подтверждают источники\n\n",
+      "line_start": 66,
+      "line_end": 67
+    },
+    {
+      "stable_chunk_id": "child-f1885b68de4321146ac81f71f1251511291f5e34",
+      "source_path": "README.md",
+      "display_text": "- **[Countdown-Code, arXiv:2603.07084v3](https://arxiv.org/html/2603.07084v3), §§2–4.** В эксперименте модель может менять как условие в `solution.py`, так и верификатор `test.py`. Поэтому `Rproxy=1` (проверка прошла) совместимо с `Rtrue=0` (исходная ",
+      "line_start": 68,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-ba87e6da643366ea12731710ef4fb59b4a752610",
+      "source_path": "README.md",
+      "display_text": "арифметическая задача не решена). Истинная оценка использует исходное условие и скрыта от модели при обучении. Около 1% загрязнённых SFT-примеров — фактически 1,2% в отфильтрованном наборе — оказалось ",
+      "line_start": 68,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-e1985f3cb441a8dbbf901f1db36270da05f1bf63",
+      "source_path": "README.md",
+      "display_text": "достаточно, чтобы у ряда исследованных моделей последующее RL резко усилило reward hacking. Это результат конкретной среды, моделей и обучения, а не универсальный порог.\n",
+      "line_start": 68,
+      "line_end": 68
+    },
+    {
+      "stable_chunk_id": "child-1a01f1e1ef9c8b37d9100b9fff9d5dd68479f085",
+      "source_path": "README.md",
+      "display_text": "- **Граница Countdown-Code.** Это исследование обхода награды при доступном для записи верификаторе, а не сравнение unit- и integration-тестов. Перенос на HumanEval/LeetCode (§5) оценивали отдельным монитором; прохождение видимых ",
+      "line_start": 69,
+      "line_end": 69
+    },
+    {
+      "stable_chunk_id": "child-dcdbc3e62b19e6f56b4e95923c16bb6ebeee0fa7",
+      "source_path": "README.md",
+      "display_text": "тестов при провале скрытых само по себе не объявляется reward hacking. Работа не доказывает, что интеграционный тест автоматически надёжен или что любой ошибочный ответ является намеренным обходом.\n",
+      "line_start": 69,
+      "line_end": 69
+    },
+    {
+      "stable_chunk_id": "child-dc017e575e7b933f7d318f4f1a7f70b742335ec7",
+      "source_path": "README.md",
+      "display_text": "- **[Anthropic: Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents), 09.01.2026.** Разделены transcript и outcome: сообщение об успешном действии не заменяет проверку конечного состояния. Рекомендованы реальные задачи,",
+      "line_start": 70,
+      "line_end": 70
+    },
+    {
+      "stable_chunk_id": "child-3691ae8aa24a018bca2104fa82706c9e10bc4ee9",
+      "source_path": "README.md",
+      "display_text": " изоляция попыток, устойчивые к обходу graders, проверка фактов, полноты и качества источников, чтение трасс для разбора сбоев. Статья прямо допускает unit-тесты для coding agents; запрета на них из неё не следует.\n",
+      "line_start": 70,
+      "line_end": 70
+    },
+    {
+      "stable_chunk_id": "child-5550f32fa6fbb33559cbc52b7f1e04f847118605",
+      "source_path": "README.md",
+      "display_text": "- **[Anthropic: How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system), 13.06.2025.** Оценка исследовательского результата включает фактическую точность, корректность цитат, полноту и качество источников; ",
+      "line_start": 71,
+      "line_end": 71
+    },
+    {
+      "stable_chunk_id": "child-008e9358fc3de3263a4a9e0062972470714c2666",
+      "source_path": "README.md",
+      "display_text": "приложение рекомендует проверять конечное состояние. Production tracing помогал различать плохой запрос, выбор источника и отказ инструмента. Это инженерный опыт конкретной системы, не доказательство ",
+      "line_start": 71,
+      "line_end": 71
+    },
+    {
+      "stable_chunk_id": "child-3b5a33bb6f472257e1a6b6cd0df28da8d9505406",
+      "source_path": "README.md",
+      "display_text": "качества DocAtlas и не требование фиксировать единственную последовательность вызовов.\n",
+      "line_start": 71,
+      "line_end": 71
+    },
+    {
+      "stable_chunk_id": "child-8ce616323dd04dd7adfafe8fb3bb4e3059077814",
+      "source_path": "README.md",
+      "display_text": "- **[Anthropic: Building effective agents](https://www.anthropic.com/engineering/building-effective-agents), 19.12.2024.** Рекомендованы простые решения, обратная связь от реальной среды, ясные интерфейсы инструментов и усложнение только при измеримом ",
+      "line_start": 72,
+      "line_end": 72
+    },
+    {
+      "stable_chunk_id": "child-84e151379ba03ae70ee65b07a8efae7ec6d1ecb6",
+      "source_path": "README.md",
+      "display_text": "улучшении результата. Прозрачность исполнения полезна, но сама по себе не подтверждает выполнение требований.\n\n",
+      "line_start": 72,
+      "line_end": 73
+    },
+    {
+      "stable_chunk_id": "child-bb8535046bfbd36be22ac4a30fcb2f4dba38eb6f",
+      "source_path": "README.md",
+      "display_text": "**Решение проекта:** новые проверки только интеграционного уровня и выше, согласно [AGENTS.md](../AGENTS.md). Это локальная стратегия проекта, а не экспериментальный вывод перечисленных публикаций.\n\n",
+      "line_start": 74,
+      "line_end": 75
+    },
+    {
+      "stable_chunk_id": "child-c2452f53198dafeae573c625c63ee88d6f22b379",
+      "source_path": "README.md",
+      "display_text": "## Предлагаемый публичный сценарий logging off/on\n\n",
+      "line_start": 76,
+      "line_end": 77
+    },
+    {
+      "stable_chunk_id": "child-e48da276b3e0267f6e7126cf07bbf645a8ece0f5",
+      "source_path": "README.md",
+      "display_text": "Сначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n",
+      "line_start": 78,
+      "line_end": 79
+    },
+    {
+      "stable_chunk_id": "child-c7b09d51d1d9e93019d0ebfc634f079daef89df6",
+      "source_path": "README.md",
+      "display_text": "1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения ",
+      "line_start": 80,
+      "line_end": 80
+    },
+    {
+      "stable_chunk_id": "child-c07e6671190879ff90f9dcba2e0404b9ee2246b4",
+      "source_path": "README.md",
+      "display_text": "состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n",
+      "line_start": 80,
+      "line_end": 80
+    },
+    {
+      "stable_chunk_id": "child-ec3e11d4f08834f434673a237ca3b8922154804c",
+      "source_path": "README.md",
+      "display_text": "2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска ",
+      "line_start": 81,
+      "line_end": 81
+    },
+    {
+      "stable_chunk_id": "child-15a227c99189568fd47a55b0881448cddecbe302",
+      "source_path": "README.md",
+      "display_text": "как ожидаемый ответ второго.\n",
+      "line_start": 81,
+      "line_end": 81
+    },
+    {
+      "stable_chunk_id": "child-88180a765f0eb77bcb33df25db534f1b662bcfda",
+      "source_path": "README.md",
+      "display_text": "3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый ",
+      "line_start": 82,
+      "line_end": 82
+    },
+    {
+      "stable_chunk_id": "child-57dd2b67006d04f4eecaa2de2afe66840b4660b9",
+      "source_path": "README.md",
+      "display_text": "результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов.",
+      "line_start": 82,
+      "line_end": 82
+    },
+    {
+      "stable_chunk_id": "child-b44f5880d953a521e91bc763b153b2f54e005e94",
+      "source_path": "README.md",
+      "display_text": " Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n",
+      "line_start": 82,
+      "line_end": 82
+    },
+    {
+      "stable_chunk_id": "child-957dc9e1c47cfc0226fba0e5cbd6f8bb7e90fe33",
+      "source_path": "README.md",
+      "display_text": "4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса ",
+      "line_start": 83,
+      "line_end": 83
+    },
+    {
+      "stable_chunk_id": "child-37e5b163b275bf94cdaa8aa9d52c4d9441846a2e",
+      "source_path": "README.md",
+      "display_text": "отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\n",
+      "line_start": 83,
+      "line_end": 84
+    },
+    {
+      "stable_chunk_id": "child-44a1b1958ddfada52f8c205d226fc2f3c994a62a",
+      "source_path": "README.md",
+      "display_text": "Внутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n",
+      "line_start": 85,
+      "line_end": 86
+    },
+    {
+      "stable_chunk_id": "child-22536aadf512b833ece81c6812d5c149fc9633d3",
+      "source_path": "README.md",
+      "display_text": "## Репрезентативные отрицательные проверки\n\n",
+      "line_start": 87,
+      "line_end": 88
+    },
+    {
+      "stable_chunk_id": "child-4c5fe4e9edb9fbae9b88ac88efba5ac03922f0d2",
+      "source_path": "README.md",
+      "display_text": "Использовать небольшое число публичных сценариев с контролируемыми данными, без матриц строковых вариантов:\n\n- **Неверная версия/scope:** добавить похожий документ с конфликтующим фактом вне разрешённой области; ответ обязан опираться на допустимый оригинал.\n- **Нет достаточного основания:** убрать подтверждающий документ; ожидается предусмотренное контрактом сообщение о нехватке данных, без выдуманного факта или цитаты.\n- **Нет доступа/consent:** обратиться к недоступному источнику; проверить отсутствие утечки и неразрешённых изменений состояния в обоих режимах.\n- **Ошибка зависимости или записи логов:** создать отказ на внешней границе; проверить контракт ошибки/восстановления и фактическое состояние. Отказ диагностики не должен менять продуктовый исход относительно такого же запуска без подробных логов.\n\n",
+      "line_start": 89,
+      "line_end": 95
+    },
+    {
+      "stable_chunk_id": "child-dfae5f4325166017f725828e72bacbc3ef2f1215",
+      "source_path": "README.md",
+      "display_text": "Для каждого случая заранее задать ожидаемый исход и существенный дефект, который проверка должна обнаружить. Сбой разбирать по трассе исходного вопроса, сохраняя неизменными вопрос и критерии.\n\n",
+      "line_start": 96,
+      "line_end": 97
+    },
+    {
+      "stable_chunk_id": "child-0fbf226c981776a1af034daa69a65a72b4921828",
+      "source_path": "README.md",
+      "display_text": "## Границы доказательства\n\n",
+      "line_start": 98,
+      "line_end": 99
+    },
+    {
+      "stable_chunk_id": "child-4599bc220c8ec940a55534e7be9b6204611108bf",
+      "source_path": "README.md",
+      "display_text": "Интеграционный вызов публичного API подтверждает только проверенный поток и данные; installed stdio дополнительно проверяет упаковку и протокол. Реальный клиент и production smoke — отдельные уровни, их успех нельзя приписывать интеграционному запуску. Одна пара off/on не доказывает общую надёжность недетерминированного агента. В отчёте фиксировать сценарии, реальные вызовы, время, обнаруженные дефекты и непроверенные границы; количество assertions и объём логов не являются мерой качества.\n",
+      "line_start": 100,
+      "line_end": 100
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "fd2fc673c229c93072fafbc8a8f60168b815647a8c233be6c494a5185f03e87b",
+  "storage_path": "/tmp/docatlas-evidence-nrblohsr/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+  "catalog_sha256": "b32229216f39ef41711f6d82e35ad3e1fadc5435ba889b4836e220be1e75249f",
+  "documents": [
+    {
+      "path": "README.md",
+      "content_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+      "catalog_entry_hash": "sha256:9af90e652c0d976cfc36e8b4a5f32ac3902db1855a7a6a0eae1e8d2679c0dd04"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-49cab6d01db94af6b5782d2551f0a206",
+    "members": 1,
+    "new_count": 1,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 9,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 9
+  },
+  "status": "EXECUTED"
+}

@@ -1,0 +1,35 @@
+{
+  "status": "STARTED",
+  "frozen_inputs": {
+    "corpus.json": "b3d50b4d26433ed428fcbdc4409048a419cfa390a69f2f0d3fb5fedce0685b30",
+    "cases.json": "27fb9085e282c6467db1ffcfda8bf64ecf35a9257cc40d90b67fb93577b52f8b",
+    "calibration_labels.json": "5a1026c15a47e77aaf23e202829c54ae84781bc3c7dd8adec0d9f21f345afa6a",
+    "frozen_manifest.json": "c28fecae894569ff3a4574607c24c311c4282b72a32a7dd1d8880aa4a8045a24"
+  },
+  "manifest": {
+    "corpus.json": {
+      "sha256": "b3d50b4d26433ed428fcbdc4409048a419cfa390a69f2f0d3fb5fedce0685b30",
+      "bytes": 10969
+    },
+    "cases.json": {
+      "sha256": "27fb9085e282c6467db1ffcfda8bf64ecf35a9257cc40d90b67fb93577b52f8b",
+      "bytes": 7171
+    },
+    "oracle.json": {
+      "sha256": "3f602bb76b7f9966cd60106fb63bdd8e9e40778e3fff83462ceb1f3facdd2a37",
+      "bytes": 24082
+    },
+    "calibration_labels.json": {
+      "sha256": "5a1026c15a47e77aaf23e202829c54ae84781bc3c7dd8adec0d9f21f345afa6a",
+      "bytes": 13720
+    },
+    "REVIEW_PREFLIGHT_RU.md": {
+      "sha256": "46412cf1209163a162bcc56f04b05a4170291e1c11c2e9ac0782dfc7c0d28f0c",
+      "bytes": 10390
+    }
+  },
+  "product_sha256": {
+    "docmancer/docs/application/experimental_candidate_selection.py": "f6961f3f8df68e4fcdf0944fadbeda20e5fc118bc7081002331d68f02e89c2f6",
+    "docmancer/docs/application/_project_docs_service_part03.py": "5e158284d8516796a977fddf56fb5afaf08c2d2bc8618ca3ba9178f9310e84bb"
+  }
+}

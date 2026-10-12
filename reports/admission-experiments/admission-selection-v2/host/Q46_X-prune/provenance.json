@@ -1,0 +1,10 @@
+{
+  "case_id": "Q46",
+  "arm": "X-prune",
+  "client_pruning": true,
+  "parent_public_sha256": "b4f07a53e6637d7113a35bfb939eec9acf1816c6f6a430942f6961f1c51c0c1e",
+  "native_selected_ids": [
+    "29ca211cabaf533be72ac15917b5e265d612fa496a3e196941caf22f15dabf1c",
+    "3ef5b423b4e0c43a75af795c5bf0c21e79d099b928db3323b823f1017652ecbe"
+  ]
+}

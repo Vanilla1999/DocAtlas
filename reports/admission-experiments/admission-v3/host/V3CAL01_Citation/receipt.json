@@ -1,0 +1,38 @@
+{
+  "execution": "EXECUTED",
+  "requested_model": {
+    "providerID": "openai",
+    "id": "gpt-5.6-luna",
+    "variant": "medium"
+  },
+  "transport": "OpenCode V2 stateless /api/experimental/generate through existing authenticated local service",
+  "actual_model_revision": null,
+  "revision_status": "NOT EXPOSED",
+  "attempts": 1,
+  "runner_retries": 0,
+  "format_repairs": 0,
+  "provider_http_calls": null,
+  "provider_http_calls_status": "not exposed; one endpoint invocation, not a measured transport-level call count",
+  "tool_access": "stateless text-only endpoint; no tool schema or tool loop requested",
+  "input_tokens": null,
+  "output_tokens": null,
+  "reasoning_tokens": null,
+  "tokens_status": "NOT EXPOSED by endpoint; never estimated as measured billing",
+  "max_output_tokens": null,
+  "temperature": null,
+  "seed": null,
+  "sampling_status": "endpoint exposes model variant only; remaining effective settings not exposed",
+  "request_sha256": "47dedd6b46789dbf5a198920d0479216649d7e68da87ae7f9f1b30d0f363c123",
+  "runner_sha256": "c47072e828d0f13c1cd377ab0b83ef2895a43714a9f03f38c9daf0007ddd3152",
+  "started_unix": 1791813045.95982,
+  "timeout_seconds": 180,
+  "provenance": {
+    "case_id": "V3CAL01",
+    "arm": "Citation",
+    "public_result_sha256": "484d02ea7aa9775f9fbea39fe162da97ef2746ce21acd629d87737f4a2b80f9c",
+    "system_prompt_sha256": "beb8cdb134734322bf1e9893e6cc094d472deb57390accefb304bfddbb79fa82"
+  },
+  "exit_code": 0,
+  "latency_seconds": 3.22177,
+  "json_valid": true
+}

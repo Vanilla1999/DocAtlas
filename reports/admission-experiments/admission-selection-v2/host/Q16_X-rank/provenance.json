@@ -1,0 +1,10 @@
+{
+  "case_id": "Q16",
+  "arm": "X-rank",
+  "client_pruning": false,
+  "parent_public_sha256": "5c410de64597313d6a7507170398ae93a81ea2fe68310c90d1ba462971a3da9a",
+  "native_selected_ids": [
+    "671de117332febed9692de35e04f3163e8b5b127aaabd07825ed17a42f67a987",
+    "d792458dc7258fe670c96b8d58372dca2773ddb3068b73daac4e5ddb1af086d2"
+  ]
+}

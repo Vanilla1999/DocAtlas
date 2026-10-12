@@ -1,0 +1,168 @@
+{
+  "status": "SCORED",
+  "model_id": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+  "revision": "1427fd652930e4ba29e8149678df786c240d8825",
+  "device": "cpu",
+  "dtype": "FP32",
+  "forwards": 11,
+  "threads": 8,
+  "input_sha256": "36d3b0e7aa35434fb67405f1b368defbe4369bec9f027b98a459d6dbb42451e5",
+  "cases": [
+    {
+      "id": "CAL01",
+      "pool_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": [],
+      "status": "SCORED",
+      "order": []
+    },
+    {
+      "id": "CAL02",
+      "pool_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "rows": [],
+      "status": "SCORED",
+      "order": []
+    },
+    {
+      "id": "CAL03",
+      "pool_sha256": "44c1e2426124b92be9ac0017601ccd41aa0bcf2e7895d2538cb86562852e2f99",
+      "rows": [
+        {
+          "index": 0,
+          "id": "189946c1655a831ce86395e7f2b56121b644d5e017a2ed067293197ee2d78119",
+          "tokens": 123,
+          "score": -6.52052640914917,
+          "status": "SCORED",
+          "seconds": 0.024768980998487677
+        },
+        {
+          "index": 1,
+          "id": "4255b60bb6223378e6191743736e15b9af46b903ddc9c3655d224e90842d5298",
+          "tokens": 122,
+          "score": -5.968740940093994,
+          "status": "SCORED",
+          "seconds": 0.022194377997948322
+        },
+        {
+          "index": 2,
+          "id": "4e6477fdca42e0c7adb4a2f3e357506f7b0082a845afd19207fd61e5affeb23c",
+          "tokens": 138,
+          "score": -5.598211765289307,
+          "status": "SCORED",
+          "seconds": 0.02394189800179447
+        }
+      ],
+      "status": "SCORED",
+      "order": [
+        2,
+        1,
+        0
+      ]
+    },
+    {
+      "id": "CAL04",
+      "pool_sha256": "92070b5f0c173c588fd9ade8588d23e46c593dad6d5093d9538d853a61205967",
+      "rows": [
+        {
+          "index": 0,
+          "id": "a8da6855d76f92b50e48046404ffac94702e8ea1e4c641c6da93f79d46239f75",
+          "tokens": 139,
+          "score": 9.916666984558105,
+          "status": "SCORED",
+          "seconds": 0.024072752999927616
+        },
+        {
+          "index": 1,
+          "id": "61b0403a9638728f1339170e81e492b589a116f8ec2917b24c31ccc14f2509f6",
+          "tokens": 135,
+          "score": -2.90360689163208,
+          "status": "SCORED",
+          "seconds": 0.023255831001733895
+        },
+        {
+          "index": 2,
+          "id": "8fe21db819d354a0d8dc23614db670a8e1e1e010f11582f8916fc13dcd9e30df",
+          "tokens": 155,
+          "score": -4.402970314025879,
+          "status": "SCORED",
+          "seconds": 0.026396864999696845
+        }
+      ],
+      "status": "SCORED",
+      "order": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "CAL05",
+      "pool_sha256": "c91008e3562e1d20749f3b0d84788b967c627075f4efeb8ecf69a08a76a5abd0",
+      "rows": [
+        {
+          "index": 0,
+          "id": "61b0403a9638728f1339170e81e492b589a116f8ec2917b24c31ccc14f2509f6",
+          "tokens": 145,
+          "score": 8.492606163024902,
+          "status": "SCORED",
+          "seconds": 0.024436208997940412
+        },
+        {
+          "index": 1,
+          "id": "8fe21db819d354a0d8dc23614db670a8e1e1e010f11582f8916fc13dcd9e30df",
+          "tokens": 165,
+          "score": 5.873220443725586,
+          "status": "SCORED",
+          "seconds": 0.027673657998093404
+        },
+        {
+          "index": 2,
+          "id": "a8da6855d76f92b50e48046404ffac94702e8ea1e4c641c6da93f79d46239f75",
+          "tokens": 149,
+          "score": 0.7108963131904602,
+          "status": "SCORED",
+          "seconds": 0.02473369500148692
+        }
+      ],
+      "status": "SCORED",
+      "order": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "CAL06",
+      "pool_sha256": "bddb2119fa17023537a9b4ea2bd7f446797de52158b61c242212b803f3daf2c1",
+      "rows": [
+        {
+          "index": 0,
+          "id": "61b0403a9638728f1339170e81e492b589a116f8ec2917b24c31ccc14f2509f6",
+          "tokens": 106,
+          "score": -9.337464332580566,
+          "status": "SCORED",
+          "seconds": 0.017959721000806894
+        },
+        {
+          "index": 1,
+          "id": "8fe21db819d354a0d8dc23614db670a8e1e1e010f11582f8916fc13dcd9e30df",
+          "tokens": 126,
+          "score": -7.190840721130371,
+          "status": "SCORED",
+          "seconds": 0.02146053300020867
+        }
+      ],
+      "status": "SCORED",
+      "order": [
+        1,
+        0
+      ]
+    }
+  ],
+  "transformers": "4.57.1",
+  "torch": "2.10.0+cpu",
+  "truncation": false,
+  "max_length": 512,
+  "cold_load_seconds": 0.6477431720013556,
+  "wall_seconds": 1.4755571790010436,
+  "rss_bytes": 805666816
+}

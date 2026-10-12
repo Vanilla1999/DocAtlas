@@ -1,0 +1,252 @@
+diff --git a/docmancer/docs/application/_project_docs_service_part03.py b/docmancer/docs/application/_project_docs_service_part03.py
+index df78178f..d4a5b4d0 100644
+--- a/docmancer/docs/application/_project_docs_service_part03.py
++++ b/docmancer/docs/application/_project_docs_service_part03.py
+@@ -333,6 +333,8 @@ class _ProjectDocsServicePart03:
+             discovery_records=discovery_records,
+         )
+         candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
++        from .experimental_candidate_selection import select_experimental_candidates
++        candidates = select_experimental_candidates(candidates, question=query)
+         if internal_diagnostics is not None:
+             internal_diagnostics.update(
+                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
+diff --git a/docmancer/docs/domain/literal_context_admission.py b/docmancer/docs/domain/literal_context_admission.py
+index 1338d392..3190f18f 100644
+--- a/docmancer/docs/domain/literal_context_admission.py
++++ b/docmancer/docs/domain/literal_context_admission.py
+@@ -14,7 +14,7 @@ from .evidence_qualification import _relation_units, qualify_evidence
+ from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
+ from .query_terms import documentation_query_terms, query_constraint_roles
+ from .technical_tokens import technical_term_pattern
+-from .ordinary_body_context import ordinary_body_context_witness
++from .ordinary_body_context import ordinary_body_context_witness, policy_valid_original_candidate_witness
+ 
+ 
+ def _closed_context_literal(question: str) -> QueryMention | None:
+@@ -251,9 +251,12 @@ def admit_original_literal_context(
+ ) -> dict[str, Any] | None:
+     """Recompute a read-only admission; incoming scores/flags confer no trust.
+ 
+-    A title, path, link-only occurrence, repeated bare name, or unrelated body
+-    cannot establish this route. It returns source-bound diagnostic spans only;
+-    the caller must retain the failed full-question qualification and missing ID.
++    A title, path or link-only occurrence cannot establish this route. By default
++    unrelated body and repeated bare names cannot establish it either. The
++    isolated host experiment additionally permits source-valid body candidates
++    with unassessed relevance, never query or answer authority. It returns
++    source-bound diagnostic spans only; the caller must retain the failed
++    full-question qualification and missing ID.
+     """
+     root = candidate.get("_reference_root_plan")
+     evidence = candidate.get("_reference_evidence")
+@@ -370,6 +373,10 @@ def admit_original_literal_context(
+         ordinary = ordinary_body_context_witness(
+             question=question, evidence_text=evidence_text, candidate=candidate,
+         )
++        if ordinary is None:
++            ordinary = policy_valid_original_candidate_witness(
++                question=question, evidence_text=evidence_text, candidate=candidate,
++            )
+         if ordinary is None:
+             return None
+         witnesses = [ordinary]
+diff --git a/docmancer/docs/domain/ordinary_body_context.py b/docmancer/docs/domain/ordinary_body_context.py
+index 7df72376..69735d33 100644
+--- a/docmancer/docs/domain/ordinary_body_context.py
++++ b/docmancer/docs/domain/ordinary_body_context.py
+@@ -15,7 +15,7 @@ from typing import Any, Mapping
+ from docmancer.core.structured_chunking import _atom_spans
+ 
+ from .context_blocks import source_block_alternatives
+-from .original_body_discovery import original_body_discovery_binding
++from .original_body_discovery import original_body_discovery_binding, policy_candidate_admission_active
+ from .query_reference_binding import query_mentions
+ from .query_terms import documentation_technical_anchors
+ from .source_subject_binding import prepared_owner_rejection
+@@ -205,25 +205,18 @@ def _technical_block_witness(question: str, block: str, source_offset: int):
+     }
+ 
+ 
+-def ordinary_body_context_witness(
++def _policy_valid_body_blocks(
+     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+-) -> dict[str, Any] | None:
+-    """Recompute a source-local relevance witness after canonical source checks.
+-
+-    Unresolved names must occur in the current verified structural owner (or
+-    current body when it has no owner). A bare name may be the first underscore
+-    namespace segment; this is lexical context, never exact symbol identity or
+-    a subject relation. A separate body witness remains mandatory. The whole
+-    question and all answer/edit authority stay unverified.
+-    """
++):
++    """Share native receipt, owner and numeric constraints, not topical proof."""
+     binding = original_body_discovery_binding(
+         question=question, body=evidence_text, candidate=candidate,
+     )
+     if binding is None:
+-        return None
++        return
+     evidence = candidate["_reference_evidence"]
+     if prepared_owner_rejection(evidence) is not None:
+-        return None
++        return
+     owner = evidence.get("owner")
+     subject_text = (evidence["raw_document"][owner["scope_start"]:owner["scope_end"]]
+                     if owner is not None else evidence_text)
+@@ -235,7 +228,7 @@ def ordinary_body_context_witness(
+         for mention in query_mentions(question)
+         if not mention.explicit and mention.syntax_role == "unresolved"
+     ):
+-        return None
++        return
+     numeric_terms = {value for value, _, _ in _literal_terms(question)
+                      if any(char.isdigit() for char in value)}
+     for offset, block in _body_blocks(evidence_text):
+@@ -243,8 +236,53 @@ def ordinary_body_context_witness(
+         if not numeric_terms <= block_terms:
+             continue
+         source_offset = evidence["char_start"] + offset
++        yield binding, source_offset, block
++
++
++def ordinary_body_context_witness(
++    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
++) -> dict[str, Any] | None:
++    """Recompute a source-local relevance witness after canonical source checks.
++
++    Unresolved names must occur in the current verified structural owner (or
++    current body when it has no owner). A bare name may be the first underscore
++    namespace segment; this is lexical context, never exact symbol identity or
++    a subject relation. A separate body witness remains mandatory. The whole
++    question and all answer/edit authority stay unverified.
++    """
++    for binding, source_offset, block in _policy_valid_body_blocks(
++        question=question, evidence_text=evidence_text, candidate=candidate,
++    ):
+         witness = (_phrase_witness(question, block, source_offset)
+                    or _technical_block_witness(question, block, source_offset))
+         if witness is not None:
+             return {**witness, "native_discovery_binding_sha256": binding}
+     return None
++
++
++def policy_valid_original_candidate_witness(
++    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
++) -> dict[str, Any] | None:
++    """Experimental source-valid body candidate; relevance remains unassessed.
++
++    Canonical source/window and hard-exact checks belong to the admission caller.
++    The host mode does not mint a receipt or relax owner/numeric constraints.
++    Structural body content is not support for the question's relation.
++    """
++    if not policy_candidate_admission_active():
++        return None
++    for binding, source_offset, block in _policy_valid_body_blocks(
++        question=question, evidence_text=evidence_text, candidate=candidate,
++    ):
++        if not re.search(r"[^\W_]", block):
++            continue
++        end = source_offset + len(block)
++        return {
++            "kind": "policy_valid_original_candidate_v1",
++            "relevance_unassessed": True,
++            "text": candidate["_reference_evidence"]["raw_document"][source_offset:end],
++            "char_start": source_offset, "char_end": end,
++            "block_char_start": source_offset, "block_char_end": end,
++            "native_discovery_binding_sha256": binding,
++        }
++    return None
+diff --git a/docmancer/docs/domain/original_body_discovery.py b/docmancer/docs/domain/original_body_discovery.py
+index fb239b56..c8628b7f 100644
+--- a/docmancer/docs/domain/original_body_discovery.py
++++ b/docmancer/docs/domain/original_body_discovery.py
+@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
+ from functools import wraps
+ import hashlib
+ import json
++import os
+ from pathlib import Path
+ from typing import Any, Mapping
+ 
+@@ -23,6 +24,7 @@ class _BodyRead:
+     project_identity: str
+     receipts: set[str] = field(default_factory=set)
+     active: bool = True
++    experiment_admission: str | None = None
+ 
+ 
+ _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
+@@ -53,6 +55,12 @@ def original_body_read_scope(handler):
+         # existing literal and qualified paths keep their established behavior.
+         state = _BodyRead(question, project_path,
+                           "local:" + hashlib.sha256(str(root).encode("utf-8")).hexdigest()) if eligible else None
++        # Host-only, original-read experiment. Capture once for this invocation;
++        # request/candidate metadata and later environment changes cannot opt in.
++        # Explicit lookups retain the default admission contract.
++        if (state is not None and not args.get("lookup_queries")
++            and os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION") == "policy_candidates_v1"):
++            state.experiment_admission = "policy_candidates_v1"
+         token = _BODY_READ.set(state)
+         try:
+             return handler(name, args, service)
+@@ -64,6 +72,13 @@ def original_body_read_scope(handler):
+     return scoped
+ 
+ 
++def policy_candidate_admission_active() -> bool:
++    """Experimental host mode is usable only inside its live public read scope."""
++    state = _BODY_READ.get()
++    return bool(state is not None and state.active
++                and state.experiment_admission == "policy_candidates_v1")
++
++
+ def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -> str | None:
+     state = _BODY_READ.get()
+     if state is None or not state.active or question != state.question:
+diff --git a/eval/main_flow_comparison/run_extra40.py b/eval/main_flow_comparison/run_extra40.py
+index 9c565d4d..41e00bb6 100644
+--- a/eval/main_flow_comparison/run_extra40.py
++++ b/eval/main_flow_comparison/run_extra40.py
+@@ -84,6 +84,11 @@ def main():
+     else:
+         workload = [(idx, question, facts, "no_lookup", [])
+                     for idx, (question, facts) in enumerate(cases, 11)]
++    selected_ids = os.environ.get("EXTRA40_SELECTED_IDS")
++    if selected_ids:
++        selected = {int(value) for value in selected_ids.split(",")}
++        assert selected and selected <= {row[0] for row in workload}
++        workload = [row for row in workload if row[0] in selected]
+     destination = Path(os.environ["EXTRA40_ARTIFACT_DIR"]).resolve()
+     destination.mkdir(parents=True, exist_ok=True)
+     report_path = destination / ("extra40-lookup-results.json" if lookup_only
+@@ -93,6 +98,7 @@ def main():
+         "experiment": ("12 previously failed questions x two explicit lookup variants"
+                        if lookup_only else "40 unchanged original requests"),
+         "lookup_fragments": LITERAL_SAME_QUESTION_LOOKUPS if lookup_only else {},
++        "selected_ids": sorted({row[0] for row in workload}) if selected_ids else None,
+         "corpus_sha256": CORPUS_SHA,
+         "original_questions_sha256": OLD_QUESTIONS_SHA,
+         "new_questions_sha256": sha256(extra).hexdigest(),
+@@ -212,8 +218,9 @@ def main():
+                                     "facts_delivered": False}
+                 record["results"].append(row)
+                 record["product_calls"]["get_docs_context"] += 1
+-                if len(record["results"]) % 6 == 0:
+-                    save()
++                # Persist every completed public call so a timeout does not
++                # force successful calls to be repeated just to recover data.
++                save()
+             assert policy.generation() == generation
+             with closing(policy.connect()) as connection:
+                 now = connection.execute(
+@@ -226,7 +233,7 @@ def main():
+     delivered = sum(bool(row["audit"]["facts_delivered"]) for row in record["results"])
+     failures = [row["id"] for row in record["results"] if not row["audit"]["facts_delivered"]]
+     record["summary"] = {
+-        "unique_original_questions": len(FAILED_BASELINE_IDS) if lookup_only else len(cases),
++        "unique_original_questions": len({row[0] for row in workload}),
+         "public_context_calls": len(workload), "full_facts": delivered, "failed_ids": failures,
+         "runtime_errors": sum("execution_error" in row["audit"] for row in record["results"]),
+         "source_integrity_errors": sum(bool(row["audit"].get("errors")) for row in record["results"]),

@@ -1,0 +1,95 @@
+{
+  "boundary": "client exact excerpts, not new public DTO",
+  "selected_native_ids": [
+    "29ca211cabaf533be72ac15917b5e265d612fa496a3e196941caf22f15dabf1c",
+    "3ef5b423b4e0c43a75af795c5bf0c21e79d099b928db3323b823f1017652ecbe"
+  ],
+  "parent_public_sha256": "b4f07a53e6637d7113a35bfb939eec9acf1816c6f6a430942f6961f1c51c0c1e",
+  "excerpts": [
+    {
+      "source_id": "excerpt-6d679b7f97c4144e",
+      "parent_source_id": "ev-435c4129d5f616b2",
+      "path": "README.md",
+      "char_start": 5797,
+      "char_end": 6723,
+      "text": "## Предлагаемый публичный сценарий logging off/on\n\nСначала расширить подходящий существующий интеграционный сценарий. Воспроизвести один исходный пользовательский вопрос через настоящий публичный API/CLI/MCP, предпочтительно установленного пакета, на изолированных данных и с реальными retrieval, selection, storage и validation.\n\n1. **Независимый эталон.** До запуска зафиксировать исходный вопрос, corpus и его версии, обязательные факты, дословные опорные фрагменты, допустимые источники/hash/span, scope и ожидаемые изменения состояния. Получить эталон из исходных документов и требований, не из выдачи проверяемого кода. Проверяемый поток не должен переписывать эталон или критерии ради PASS.\n2. **Две сопоставимые попытки.** Запустить поток с подробными логами off и on из двух одинаковых исходных состояний, включая индекс, cache, права и consent. Не использовать результат первого запуска как ожидаемый ответ второго.\n",
+      "text_sha256": "4d51cabc3adcb662ed57c24b0ec4702b103b876f284fdf04a14cc388fafa8db5",
+      "parent_span": [
+        5797,
+        7726
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    },
+    {
+      "source_id": "excerpt-073df080d475e28e",
+      "parent_source_id": "ev-435c4129d5f616b2",
+      "path": "README.md",
+      "char_start": 6760,
+      "char_end": 6761,
+      "text": "*",
+      "text_sha256": "684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1",
+      "parent_span": [
+        5797,
+        7726
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    },
+    {
+      "source_id": "excerpt-3be674da6b42ed4e",
+      "parent_source_id": "ev-435c4129d5f616b2",
+      "path": "README.md",
+      "char_start": 6762,
+      "char_end": 6918,
+      "text": "В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый",
+      "text_sha256": "90a15e263dd47ba1d5e3783799964f2514b42e7f2fe75b7a051a32d380335a16",
+      "parent_span": [
+        5797,
+        7726
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    },
+    {
+      "source_id": "excerpt-3982181389ad967a",
+      "parent_source_id": "ev-435c4129d5f616b2",
+      "path": "README.md",
+      "char_start": 6952,
+      "char_end": 6996,
+      "text": "Одинаковые неправильные ответы не дают PASS.",
+      "text_sha256": "a350254b068a5f9027d8f738f73365df210d7750e03b93e46f2663fe649b5fe3",
+      "parent_span": [
+        5797,
+        7726
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    },
+    {
+      "source_id": "excerpt-9c09c426b35f89c8",
+      "parent_source_id": "ev-435c4129d5f616b2",
+      "path": "README.md",
+      "char_start": 7107,
+      "char_end": 7726,
+      "text": " Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n4. **Диагностический контракт.** При on трасса должна позволять связать этапы одного вопроса и локализовать причину сбоя; пропуски трассы должны быть явными. При off подробная трасса отключена. В MCP диагностический канал отделён от protocol stdout. Наличие события, внутреннего флага или exit 0 не заменяет проверку результата и состояния.\n\nВнутренние mocks не использовать. Если для воспроизводимости подменяется внешний транспорт, явно указать эту границу: такой запуск не доказывает работоспособность живого провайдера.\n\n",
+      "text_sha256": "b4a5b551cd529f1a03ce168fbdbf29a0fc1380e47f28e54e2d6f072f17e7b734",
+      "parent_span": [
+        5797,
+        7726
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    },
+    {
+      "source_id": "excerpt-4b221a25871fe56a",
+      "parent_source_id": "ev-ee6b0cb2b986ca99",
+      "path": "README.md",
+      "char_start": 756,
+      "char_end": 1002,
+      "text": "Для MCP-клиента можно задать `DOCATLAS_TRACE=1` в окружении серверного процесса.\nДиагностика идёт в **stderr**, отдельно от JSON/текстового ответа CLI и MCP stdout.\nОбычные ошибки и сторонние сообщения stderr не отключаются флагом `--no-trace`.\n\n",
+      "text_sha256": "bb0d8361e47e974cf7b259fab608c050e583e45ef819af2ac38506942a48c4ec",
+      "parent_span": [
+        756,
+        1002
+      ],
+      "source_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+    }
+  ],
+  "view_build_seconds": 0.007236200002807891
+}

@@ -1,0 +1,92 @@
+{
+  "summaries": [
+    {
+      "split": "holdout",
+      "arm": "B1",
+      "cases": 8,
+      "host_completed": 8,
+      "submitted_prompt_proxy_tokens": 5860,
+      "context_seconds": 0.9173784040031023,
+      "host_completed_seconds": 33.911752,
+      "turn_completed_seconds_lower_bound": 34.8291304040031,
+      "snippet_proxy_tokens": 1132,
+      "public_dto_proxy_tokens": 4184
+    },
+    {
+      "split": "holdout",
+      "arm": "Budget",
+      "cases": 8,
+      "host_completed": 7,
+      "submitted_prompt_proxy_tokens": 5212,
+      "context_seconds": 0.6804588639970461,
+      "host_completed_seconds": 40.822252,
+      "turn_completed_seconds_lower_bound": 42.25501331300081,
+      "snippet_proxy_tokens": 841,
+      "public_dto_proxy_tokens": 3347
+    },
+    {
+      "split": "holdout",
+      "arm": "Mini",
+      "cases": 8,
+      "host_completed": 8,
+      "submitted_prompt_proxy_tokens": 5180,
+      "context_seconds": 0.662785624001117,
+      "host_completed_seconds": 33.957104,
+      "turn_completed_seconds_lower_bound": 35.790468111000266,
+      "snippet_proxy_tokens": 817,
+      "public_dto_proxy_tokens": 3315
+    },
+    {
+      "split": "diagnostic",
+      "arm": "B1",
+      "cases": 4,
+      "host_completed": 4,
+      "submitted_prompt_proxy_tokens": 8559,
+      "context_seconds": 7.0739465019942145,
+      "host_completed_seconds": 17.223882,
+      "turn_completed_seconds_lower_bound": 24.297828501994214,
+      "snippet_proxy_tokens": 4801,
+      "public_dto_proxy_tokens": 8884
+    },
+    {
+      "split": "diagnostic",
+      "arm": "Budget",
+      "cases": 4,
+      "host_completed": 4,
+      "submitted_prompt_proxy_tokens": 3821,
+      "context_seconds": 0.6067515390022891,
+      "host_completed_seconds": 18.628719,
+      "turn_completed_seconds_lower_bound": 26.309417040996504,
+      "snippet_proxy_tokens": 1362,
+      "public_dto_proxy_tokens": 3502
+    },
+    {
+      "split": "diagnostic",
+      "arm": "Mini",
+      "cases": 4,
+      "host_completed": 4,
+      "submitted_prompt_proxy_tokens": 3814,
+      "context_seconds": 0.6408184749998327,
+      "host_completed_seconds": 14.390609,
+      "turn_completed_seconds_lower_bound": 22.331176671990722,
+      "snippet_proxy_tokens": 1466,
+      "public_dto_proxy_tokens": 3430
+    }
+  ],
+  "model_stages": [
+    {
+      "stage": "evaluation_receipt",
+      "cold_load_seconds": 0.6308762439985003,
+      "rss_bytes": 843902976,
+      "forwards": 29,
+      "wall_seconds": 1.5054276549999486
+    },
+    {
+      "stage": "calibration_receipt",
+      "cold_load_seconds": 0.6477431720013556,
+      "rss_bytes": 805666816,
+      "forwards": 11,
+      "wall_seconds": 1.4755571790010436
+    }
+  ]
+}

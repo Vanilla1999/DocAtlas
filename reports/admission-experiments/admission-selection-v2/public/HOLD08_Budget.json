@@ -1,0 +1,3584 @@
+{
+  "case_id": "HOLD08",
+  "split": "holdout",
+  "arm": "Budget",
+  "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+  "request": {
+    "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+    "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [],
+      "retrieved_candidate_ids": [],
+      "qualification_outcomes": [],
+      "qualification_rejections": [],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 0,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 0,
+            "preview_omitted": 0,
+            "items": []
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "no_results",
+              "reason": "no_project_docs_results",
+              "reason_code": "no_project_docs_results",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+                "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "no_results",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "no_results",
+              "reason": "no_project_docs_results",
+              "reason_code": "no_project_docs_results",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+                "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "no_results",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [
+    {
+      "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+      "pool": [],
+      "pool_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "complete_candidates": [
+        {
+          "id": "dfbd2239ed772cfb2d4a324da770bc4d6b9e6eb0be6b3184bee41416ddbda327",
+          "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+          "text_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+          "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+          "chunk_index": 1,
+          "score": 1.0,
+          "path": "holdout/tidal_ferry/sailing.md",
+          "span": [
+            20,
+            341
+          ],
+          "binding": {
+            "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+            "scope": {
+              "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "version": "",
+              "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+            },
+            "canonical_path": "holdout/tidal_ferry/sailing.md",
+            "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+            "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "holdout/tidal_ferry/sailing.md",
+            "source_path": "holdout/tidal_ferry/sailing.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+            "project_doc_catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809089624799546,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Разрешение рейса",
+            "section_level": 1,
+            "document_title": "sailing",
+            "document_title_hash": "a4bb44eb9667ae0f",
+            "anchor": "Разрешение рейса",
+            "content_hash": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "retrieval_content_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+              "token_estimate": 59,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "sailing",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "holdout/tidal_ferry/sailing.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Разрешение рейса",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+            "stable_chunk_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+            "vector_id": "711c0077-8f58-5b8a-a83e-1c380d84c164",
+            "parent_logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb",
+            "atom_type": "prose",
+            "atom_id": "atom-7394f9c360937ce0fc373e41105720be",
+            "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+            "source_content_hash": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+            "heading_path": [
+              "Разрешение рейса"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              20,
+              341
+            ],
+            "byte_span": [
+              35,
+              623
+            ],
+            "line_span": [
+              3,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 147,
+            "retrieval_token_estimate": 214,
+            "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+            "title": "Разрешение рейса",
+            "section_id": 8510778013574182075,
+            "token_estimate": 147,
+            "docmancer_tokens": 290,
+            "raw_tokens": 168,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.58,
+            "ranking": {
+              "stable_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+              "section_id": 8510778013574182075,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -3.733935309677
+              },
+              "base_utility": 3.733935309677,
+              "feature_contributions": {},
+              "final_utility": 3.733935309677,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какую",
+                "мощность",
+                "двигателя",
+                "и",
+                "шаг",
+                "винта",
+                "следует",
+                "выбрать",
+                "для",
+                "парома",
+                "чтобы",
+                "он",
+                "проходил",
+                "участок",
+                "со",
+                "встречным",
+                "течением",
+                "3",
+                "метра",
+                "в",
+                "секунду"
+              ],
+              "matched_terms": [
+                "парома",
+                "метра"
+              ],
+              "exact_terms": [
+                "какую"
+              ],
+              "missing_exact_terms": [
+                "какую"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 2,
+              "match_ratio": 0.0952,
+              "bm25_cost": -3.733935309677105,
+              "lexical_score": 3.733935309677105,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "парома",
+                  "метра"
+                ],
+                "retrieval_text": [
+                  "парома",
+                  "метра"
+                ]
+              }
+            },
+            "query_plan_hash": "6437e0babc3a9cb61d7bb4f792184ebe7ade2adcec3cfbd3bc56f242738ae16b",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "references": [],
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "canonical_path": "holdout/tidal_ferry/sailing.md",
+                "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+              },
+              "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+              },
+              "char_start": 20,
+              "char_end": 341,
+              "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+              "raw_document": "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+              "owner": {
+                "text": "# Разрешение рейса\n",
+                "char_start": 0,
+                "char_end": 19,
+                "scope_start": 0,
+                "scope_end": 341,
+                "logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:d929d157183bcb8f251eb5235287a96e290f140684b831fa0a1308825d090d15",
+                "member_spans": [
+                  [
+                    0,
+                    18,
+                    "67d5985eebd4933cca82299e49db638d13473ca575c824e58f21a1d099a40d41"
+                  ],
+                  [
+                    20,
+                    340,
+                    "b2f7d9c3b60620154c916d63510fd2f71eb1a81ebfbc6b12561e535ed006a1ea"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "bound_subject_context": "# Разрешение рейса\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  20,
+                  340
+                ],
+                "matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "body_matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 2,
+                "match_ratio": 0.0952,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "dc9c57fd71743330df86426ee85a29b35113d6bb864fd61f4717fef7cd264ca4",
+          "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+          "text_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+          "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+          "chunk_index": 1,
+          "score": 0.95,
+          "path": "holdout/tidal_ferry/cargo.md",
+          "span": [
+            19,
+            328
+          ],
+          "binding": {
+            "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+            "scope": {
+              "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "version": "",
+              "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+            },
+            "canonical_path": "holdout/tidal_ferry/cargo.md",
+            "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+            "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "holdout/tidal_ferry/cargo.md",
+            "source_path": "holdout/tidal_ferry/cargo.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+            "project_doc_catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809089624610048,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Грузы на пароме",
+            "section_level": 1,
+            "document_title": "cargo",
+            "document_title_hash": "e0d6ae5cf2a2d0c1",
+            "anchor": "Грузы на пароме",
+            "content_hash": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "retrieval_content_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+              "token_estimate": 58,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "cargo",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "holdout/tidal_ferry/cargo.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Грузы на пароме",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+            "stable_chunk_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+            "vector_id": "05adbe66-5885-5e0f-b175-0bf49b34c47e",
+            "parent_logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60",
+            "atom_type": "prose",
+            "atom_id": "atom-9bde23d72e72efe8ffe3b3cc2d29a74e",
+            "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+            "source_content_hash": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+            "heading_path": [
+              "Грузы на пароме"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              19,
+              328
+            ],
+            "byte_span": [
+              32,
+              604
+            ],
+            "line_span": [
+              3,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 143,
+            "retrieval_token_estimate": 208,
+            "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+            "title": "Грузы на пароме",
+            "section_id": 5237986034943065367,
+            "token_estimate": 143,
+            "docmancer_tokens": 290,
+            "raw_tokens": 168,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.58,
+            "ranking": {
+              "stable_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+              "section_id": 5237986034943065367,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.657567681173
+              },
+              "base_utility": 1.657567681173,
+              "feature_contributions": {},
+              "final_utility": 1.657567681173,
+              "raw_rank": 2,
+              "final_rank": 2,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какую",
+                "мощность",
+                "двигателя",
+                "и",
+                "шаг",
+                "винта",
+                "следует",
+                "выбрать",
+                "для",
+                "парома",
+                "чтобы",
+                "он",
+                "проходил",
+                "участок",
+                "со",
+                "встречным",
+                "течением",
+                "3",
+                "метра",
+                "в",
+                "секунду"
+              ],
+              "matched_terms": [
+                "и"
+              ],
+              "exact_terms": [
+                "какую"
+              ],
+              "missing_exact_terms": [
+                "какую"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 1,
+              "match_ratio": 0.0476,
+              "bm25_cost": -1.657567681172967,
+              "lexical_score": 1.657567681172967,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "и"
+                ],
+                "retrieval_text": [
+                  "и"
+                ]
+              }
+            },
+            "query_plan_hash": "6437e0babc3a9cb61d7bb4f792184ebe7ade2adcec3cfbd3bc56f242738ae16b",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 2
+              },
+              "pre_post_rank": 2,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 2
+            },
+            "_reference_root_plan": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "references": [],
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "canonical_path": "holdout/tidal_ferry/cargo.md",
+                "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+              },
+              "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+              },
+              "char_start": 19,
+              "char_end": 328,
+              "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+              "raw_document": "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+              "owner": {
+                "text": "# Грузы на пароме\n",
+                "char_start": 0,
+                "char_end": 18,
+                "scope_start": 0,
+                "scope_end": 328,
+                "logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:136c938ea85ab2cbf0b773ab07bdc1f4e0c286fa10470ef2fa13f057815af357",
+                "member_spans": [
+                  [
+                    0,
+                    17,
+                    "9a75340c623282ca33f075769f6c23978fdd4a408d54929bfcf761452962b607"
+                  ],
+                  [
+                    19,
+                    327,
+                    "e729168f7a9b6e13e95d3ed81149ba5188c2841da1c8a8383ac2f08f0ef4deec"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 0.95,
+                "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "bound_subject_context": "# Грузы на пароме\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  19,
+                  327
+                ],
+                "matched_terms": [
+                  "и"
+                ],
+                "body_matched_terms": [
+                  "и"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 1,
+                "match_ratio": 0.0476,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "dfbd2239ed772cfb2d4a324da770bc4d6b9e6eb0be6b3184bee41416ddbda327",
+          "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+          "text_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+          "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+          "chunk_index": 1,
+          "score": 1.0,
+          "path": "holdout/tidal_ferry/sailing.md",
+          "span": [
+            20,
+            341
+          ],
+          "binding": {
+            "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+            "scope": {
+              "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "version": "",
+              "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+            },
+            "canonical_path": "holdout/tidal_ferry/sailing.md",
+            "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+            "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "holdout/tidal_ferry/sailing.md",
+            "source_path": "holdout/tidal_ferry/sailing.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+            "project_doc_catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809089624799546,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Разрешение рейса",
+            "section_level": 1,
+            "document_title": "sailing",
+            "document_title_hash": "a4bb44eb9667ae0f",
+            "anchor": "Разрешение рейса",
+            "content_hash": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "retrieval_content_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+              "token_estimate": 59,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "sailing",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "holdout/tidal_ferry/sailing.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Разрешение рейса",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+            "stable_chunk_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+            "vector_id": "711c0077-8f58-5b8a-a83e-1c380d84c164",
+            "parent_logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb",
+            "atom_type": "prose",
+            "atom_id": "atom-7394f9c360937ce0fc373e41105720be",
+            "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+            "source_content_hash": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+            "heading_path": [
+              "Разрешение рейса"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              20,
+              341
+            ],
+            "byte_span": [
+              35,
+              623
+            ],
+            "line_span": [
+              3,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 147,
+            "retrieval_token_estimate": 214,
+            "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+            "title": "Разрешение рейса",
+            "section_id": 8510778013574182075,
+            "token_estimate": 147,
+            "docmancer_tokens": 290,
+            "raw_tokens": 168,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.58,
+            "ranking": {
+              "stable_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+              "section_id": 8510778013574182075,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -3.733935309677
+              },
+              "base_utility": 3.733935309677,
+              "feature_contributions": {},
+              "final_utility": 3.733935309677,
+              "raw_rank": 1,
+              "final_rank": 1,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какую",
+                "мощность",
+                "двигателя",
+                "и",
+                "шаг",
+                "винта",
+                "следует",
+                "выбрать",
+                "для",
+                "парома",
+                "чтобы",
+                "он",
+                "проходил",
+                "участок",
+                "со",
+                "встречным",
+                "течением",
+                "3",
+                "метра",
+                "в",
+                "секунду"
+              ],
+              "matched_terms": [
+                "парома",
+                "метра"
+              ],
+              "exact_terms": [
+                "какую"
+              ],
+              "missing_exact_terms": [
+                "какую"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 2,
+              "match_ratio": 0.0952,
+              "bm25_cost": -3.733935309677105,
+              "lexical_score": 3.733935309677105,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "парома",
+                  "метра"
+                ],
+                "retrieval_text": [
+                  "парома",
+                  "метра"
+                ]
+              }
+            },
+            "query_plan_hash": "a7ae8d315ff5eb78c7b6cf7e0764b796804be3c2a7ca0280f8481f4a640c2642",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 1
+              },
+              "pre_post_rank": 1,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 1
+            },
+            "_reference_root_plan": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "references": [],
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "canonical_path": "holdout/tidal_ferry/sailing.md",
+                "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+              },
+              "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+              },
+              "char_start": 20,
+              "char_end": 341,
+              "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+              "raw_document": "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+              "owner": {
+                "text": "# Разрешение рейса\n",
+                "char_start": 0,
+                "char_end": 19,
+                "scope_start": 0,
+                "scope_end": 341,
+                "logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:d929d157183bcb8f251eb5235287a96e290f140684b831fa0a1308825d090d15",
+                "member_spans": [
+                  [
+                    0,
+                    18,
+                    "67d5985eebd4933cca82299e49db638d13473ca575c824e58f21a1d099a40d41"
+                  ],
+                  [
+                    20,
+                    340,
+                    "b2f7d9c3b60620154c916d63510fd2f71eb1a81ebfbc6b12561e535ed006a1ea"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 1.0,
+                "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "bound_subject_context": "# Разрешение рейса\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  20,
+                  340
+                ],
+                "matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "body_matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 2,
+                "match_ratio": 0.0952,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        },
+        {
+          "id": "dc9c57fd71743330df86426ee85a29b35113d6bb864fd61f4717fef7cd264ca4",
+          "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+          "text_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+          "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+          "chunk_index": 1,
+          "score": 0.95,
+          "path": "holdout/tidal_ferry/cargo.md",
+          "span": [
+            19,
+            328
+          ],
+          "binding": {
+            "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+            "scope": {
+              "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "version": "",
+              "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+            },
+            "canonical_path": "holdout/tidal_ferry/cargo.md",
+            "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+          },
+          "metadata": {
+            "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+            "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+            "source_class": "project_file",
+            "project_docs": true,
+            "project_doc_path": "holdout/tidal_ferry/cargo.md",
+            "source_path": "holdout/tidal_ferry/cargo.md",
+            "format": "md",
+            "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+            "project_doc_catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954",
+            "project_doc_reason": "other",
+            "doc_scope": "project",
+            "module_path": null,
+            "module_id": "",
+            "project_doc_description": "Pinned documentation source",
+            "project_doc_authority": "source_of_truth",
+            "project_doc_lifecycle_status": "active",
+            "lifecycle_status": "active",
+            "project_doc_impact_policy": "track",
+            "index_freshness": "synchronized",
+            "project_doc_mtime_ns": 1791809089624610048,
+            "chunking_schema": "parent-child-v1",
+            "child_target_tokens": 160,
+            "child_hard_max_tokens": 512,
+            "library_id": "",
+            "resolved_version": "",
+            "version_family": "",
+            "authority": "source_of_truth",
+            "temporal_relevance": "current",
+            "docs_snapshot_exact": null,
+            "section_title": "Грузы на пароме",
+            "section_level": 1,
+            "document_title": "cargo",
+            "document_title_hash": "e0d6ae5cf2a2d0c1",
+            "anchor": "Грузы на пароме",
+            "content_hash": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "retrieval_content_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+            "context_schema_version": "deterministic-context-v2",
+            "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+            "context_content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+            "context_manifest": {
+              "schema_version": "deterministic-context-v2",
+              "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+              "token_estimate": 58,
+              "truncated": false,
+              "fields": [
+                {
+                  "name": "document_title",
+                  "value": "cargo",
+                  "provenance": "source.metadata.title",
+                  "priority": 10
+                },
+                {
+                  "name": "canonical_location",
+                  "value": "holdout/tidal_ferry/cargo.md",
+                  "provenance": "source.metadata.relative_path",
+                  "priority": 20
+                },
+                {
+                  "name": "heading_path",
+                  "value": "Грузы на пароме",
+                  "provenance": "source.markdown.heading_path",
+                  "priority": 30
+                },
+                {
+                  "name": "project_scope",
+                  "value": "project",
+                  "provenance": "source.metadata.doc_scope",
+                  "priority": 80
+                },
+                {
+                  "name": "source_class",
+                  "value": "project_file",
+                  "provenance": "source.metadata.source_class",
+                  "priority": 90
+                },
+                {
+                  "name": "authority",
+                  "value": "source_of_truth",
+                  "provenance": "source.metadata.authority",
+                  "priority": 100
+                },
+                {
+                  "name": "catalog_description",
+                  "value": "Pinned documentation source",
+                  "provenance": "project.catalog.description",
+                  "priority": 120
+                }
+              ]
+            },
+            "embedding_input_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+            "stable_chunk_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+            "vector_id": "05adbe66-5885-5e0f-b175-0bf49b34c47e",
+            "parent_logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60",
+            "atom_type": "prose",
+            "atom_id": "atom-9bde23d72e72efe8ffe3b3cc2d29a74e",
+            "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+            "source_content_hash": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+            "heading_path": [
+              "Грузы на пароме"
+            ],
+            "heading_levels": [
+              1
+            ],
+            "char_span": [
+              19,
+              328
+            ],
+            "byte_span": [
+              32,
+              604
+            ],
+            "line_span": [
+              3,
+              6
+            ],
+            "chunk_schema_version": "parent-child-v1",
+            "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+            "token_estimator_version": "utf8-bytes-div4-v1",
+            "display_token_estimate": 143,
+            "retrieval_token_estimate": 208,
+            "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+            "title": "Грузы на пароме",
+            "section_id": 5237986034943065367,
+            "token_estimate": 143,
+            "docmancer_tokens": 290,
+            "raw_tokens": 168,
+            "savings_percent": 0.0,
+            "runway_multiplier": 0.58,
+            "ranking": {
+              "stable_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+              "section_id": 5237986034943065367,
+              "score_direction": "higher_is_better",
+              "raw_component_ranks": {
+                "fts5_bm25_cost": -1.657567681173
+              },
+              "base_utility": 1.657567681173,
+              "feature_contributions": {},
+              "final_utility": 1.657567681173,
+              "raw_rank": 2,
+              "final_rank": 2,
+              "rank_delta": 0,
+              "candidate_pool_size": 2
+            },
+            "lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "какую",
+                "мощность",
+                "двигателя",
+                "и",
+                "шаг",
+                "винта",
+                "следует",
+                "выбрать",
+                "для",
+                "парома",
+                "чтобы",
+                "он",
+                "проходил",
+                "участок",
+                "со",
+                "встречным",
+                "течением",
+                "3",
+                "метра",
+                "в",
+                "секунду"
+              ],
+              "matched_terms": [
+                "и"
+              ],
+              "exact_terms": [
+                "какую"
+              ],
+              "missing_exact_terms": [
+                "какую"
+              ],
+              "query_term_count": 21,
+              "matched_term_count": 1,
+              "match_ratio": 0.0476,
+              "bm25_cost": -1.657567681172967,
+              "lexical_score": 1.657567681172967,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "и"
+                ],
+                "retrieval_text": [
+                  "и"
+                ]
+              }
+            },
+            "query_plan_hash": "a7ae8d315ff5eb78c7b6cf7e0764b796804be3c2a7ca0280f8481f4a640c2642",
+            "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+            "retrieval_trace": {
+              "requested_mode": "lexical",
+              "mode_used": "lexical",
+              "component_ranks": {
+                "lexical": 2
+              },
+              "pre_post_rank": 2,
+              "intent_boost": 0.0,
+              "supplemental_rank": null,
+              "final_rank": 2
+            },
+            "_reference_root_plan": {
+              "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+              "references": [],
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "catalog_complete": true
+            },
+            "_reference_plans": {
+              "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              }
+            },
+            "_reference_evidence": {
+              "schema_version": 1,
+              "source": {
+                "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "canonical_path": "holdout/tidal_ferry/cargo.md",
+                "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+              },
+              "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+              },
+              "char_start": 19,
+              "char_end": 328,
+              "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+              "raw_document": "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+              "owner": {
+                "text": "# Грузы на пароме\n",
+                "char_start": 0,
+                "char_end": 18,
+                "scope_start": 0,
+                "scope_end": 328,
+                "logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60"
+              }
+            },
+            "_evidence_sets": [
+              {
+                "schema_version": "source-dependency-proposal-v1",
+                "set_id": "evidence-set:136c938ea85ab2cbf0b773ab07bdc1f4e0c286fa10470ef2fa13f057815af357",
+                "member_spans": [
+                  [
+                    0,
+                    17,
+                    "9a75340c623282ca33f075769f6c23978fdd4a408d54929bfcf761452962b607"
+                  ],
+                  [
+                    19,
+                    327,
+                    "e729168f7a9b6e13e95d3ed81149ba5188c2841da1c8a8383ac2f08f0ef4deec"
+                  ]
+                ],
+                "edges": [
+                  [
+                    "heading",
+                    0,
+                    1,
+                    "markdown-owning-heading-v1"
+                  ]
+                ],
+                "proposed_need_ids": [
+                  "sentence-1"
+                ]
+              }
+            ],
+            "retrieval_query_matches": {
+              "query-original": {
+                "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "query_origin": "original",
+                "relation": "direct",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "exact_terms": [],
+                "bound_subjects": [],
+                "retrieval_anchors": [],
+                "forbidden_catalog_roles": [],
+                "forbidden_evidence_terms": [],
+                "lexical_score": 0.95,
+                "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "bound_subject_context": "# Грузы на пароме\n",
+                "reference_bindings": [],
+                "reference_visible_span": [
+                  19,
+                  327
+                ],
+                "matched_terms": [
+                  "и"
+                ],
+                "body_matched_terms": [
+                  "и"
+                ],
+                "heading_context_used": false,
+                "table_context_used": false,
+                "missing_exact_terms": [],
+                "missing_parent_exact_terms": [],
+                "matched_term_count": 1,
+                "match_ratio": 0.0476,
+                "qualified": false,
+                "qualification_reason": "insufficient_visible_match",
+                "context_only": true
+              }
+            },
+            "retrieval_query_ids": []
+          }
+        }
+      ],
+      "complete_sha256": "dd0d03defc624fcf9d415590a791f3f534eb22097479a5bccdfaa139c70da7ca",
+      "excluded": [
+        {
+          "candidate": {
+            "id": "dfbd2239ed772cfb2d4a324da770bc4d6b9e6eb0be6b3184bee41416ddbda327",
+            "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+            "text_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+            "chunk_index": 1,
+            "score": 1.0,
+            "path": "holdout/tidal_ferry/sailing.md",
+            "span": [
+              20,
+              341
+            ],
+            "binding": {
+              "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "canonical_path": "holdout/tidal_ferry/sailing.md",
+              "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "holdout/tidal_ferry/sailing.md",
+              "source_path": "holdout/tidal_ferry/sailing.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "project_doc_catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791809089624799546,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Разрешение рейса",
+              "section_level": 1,
+              "document_title": "sailing",
+              "document_title_hash": "a4bb44eb9667ae0f",
+              "anchor": "Разрешение рейса",
+              "content_hash": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+              "retrieval_content_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+                "token_estimate": 59,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "sailing",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "holdout/tidal_ferry/sailing.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Разрешение рейса",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+              "stable_chunk_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+              "vector_id": "711c0077-8f58-5b8a-a83e-1c380d84c164",
+              "parent_logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb",
+              "atom_type": "prose",
+              "atom_id": "atom-7394f9c360937ce0fc373e41105720be",
+              "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+              "source_content_hash": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "heading_path": [
+                "Разрешение рейса"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                20,
+                341
+              ],
+              "byte_span": [
+                35,
+                623
+              ],
+              "line_span": [
+                3,
+                6
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 147,
+              "retrieval_token_estimate": 214,
+              "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+              "title": "Разрешение рейса",
+              "section_id": 8510778013574182075,
+              "token_estimate": 147,
+              "docmancer_tokens": 290,
+              "raw_tokens": 168,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.58,
+              "ranking": {
+                "stable_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+                "section_id": 8510778013574182075,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -3.733935309677
+                },
+                "base_utility": 3.733935309677,
+                "feature_contributions": {},
+                "final_utility": 3.733935309677,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "exact_terms": [
+                  "какую"
+                ],
+                "missing_exact_terms": [
+                  "какую"
+                ],
+                "query_term_count": 21,
+                "matched_term_count": 2,
+                "match_ratio": 0.0952,
+                "bm25_cost": -3.733935309677105,
+                "lexical_score": 3.733935309677105,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "парома",
+                    "метра"
+                  ],
+                  "retrieval_text": [
+                    "парома",
+                    "метра"
+                  ]
+                }
+              },
+              "query_plan_hash": "6437e0babc3a9cb61d7bb4f792184ebe7ade2adcec3cfbd3bc56f242738ae16b",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                  "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "canonical_path": "holdout/tidal_ferry/sailing.md",
+                  "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+                },
+                "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+                },
+                "char_start": 20,
+                "char_end": 341,
+                "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+                "raw_document": "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+                "owner": {
+                  "text": "# Разрешение рейса\n",
+                  "char_start": 0,
+                  "char_end": 19,
+                  "scope_start": 0,
+                  "scope_end": 341,
+                  "logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:d929d157183bcb8f251eb5235287a96e290f140684b831fa0a1308825d090d15",
+                  "member_spans": [
+                    [
+                      0,
+                      18,
+                      "67d5985eebd4933cca82299e49db638d13473ca575c824e58f21a1d099a40d41"
+                    ],
+                    [
+                      20,
+                      340,
+                      "b2f7d9c3b60620154c916d63510fd2f71eb1a81ebfbc6b12561e535ed006a1ea"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "какую",
+                    "мощность",
+                    "двигателя",
+                    "и",
+                    "шаг",
+                    "винта",
+                    "следует",
+                    "выбрать",
+                    "для",
+                    "парома",
+                    "чтобы",
+                    "он",
+                    "проходил",
+                    "участок",
+                    "со",
+                    "встречным",
+                    "течением",
+                    "3",
+                    "метра",
+                    "в",
+                    "секунду"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "bound_subject_context": "# Разрешение рейса\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    20,
+                    340
+                  ],
+                  "matched_terms": [
+                    "парома",
+                    "метра"
+                  ],
+                  "body_matched_terms": [
+                    "парома",
+                    "метра"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 2,
+                  "match_ratio": 0.0952,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 0
+        },
+        {
+          "candidate": {
+            "id": "dc9c57fd71743330df86426ee85a29b35113d6bb864fd61f4717fef7cd264ca4",
+            "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+            "text_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+            "chunk_index": 1,
+            "score": 0.95,
+            "path": "holdout/tidal_ferry/cargo.md",
+            "span": [
+              19,
+              328
+            ],
+            "binding": {
+              "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "canonical_path": "holdout/tidal_ferry/cargo.md",
+              "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "holdout/tidal_ferry/cargo.md",
+              "source_path": "holdout/tidal_ferry/cargo.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "project_doc_catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791809089624610048,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Грузы на пароме",
+              "section_level": 1,
+              "document_title": "cargo",
+              "document_title_hash": "e0d6ae5cf2a2d0c1",
+              "anchor": "Грузы на пароме",
+              "content_hash": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+              "retrieval_content_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+                "token_estimate": 58,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "cargo",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "holdout/tidal_ferry/cargo.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Грузы на пароме",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+              "stable_chunk_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+              "vector_id": "05adbe66-5885-5e0f-b175-0bf49b34c47e",
+              "parent_logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60",
+              "atom_type": "prose",
+              "atom_id": "atom-9bde23d72e72efe8ffe3b3cc2d29a74e",
+              "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+              "source_content_hash": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "heading_path": [
+                "Грузы на пароме"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                19,
+                328
+              ],
+              "byte_span": [
+                32,
+                604
+              ],
+              "line_span": [
+                3,
+                6
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 143,
+              "retrieval_token_estimate": 208,
+              "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+              "title": "Грузы на пароме",
+              "section_id": 5237986034943065367,
+              "token_estimate": 143,
+              "docmancer_tokens": 290,
+              "raw_tokens": 168,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.58,
+              "ranking": {
+                "stable_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+                "section_id": 5237986034943065367,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -1.657567681173
+                },
+                "base_utility": 1.657567681173,
+                "feature_contributions": {},
+                "final_utility": 1.657567681173,
+                "raw_rank": 2,
+                "final_rank": 2,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "matched_terms": [
+                  "и"
+                ],
+                "exact_terms": [
+                  "какую"
+                ],
+                "missing_exact_terms": [
+                  "какую"
+                ],
+                "query_term_count": 21,
+                "matched_term_count": 1,
+                "match_ratio": 0.0476,
+                "bm25_cost": -1.657567681172967,
+                "lexical_score": 1.657567681172967,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "и"
+                  ],
+                  "retrieval_text": [
+                    "и"
+                  ]
+                }
+              },
+              "query_plan_hash": "6437e0babc3a9cb61d7bb4f792184ebe7ade2adcec3cfbd3bc56f242738ae16b",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 2
+                },
+                "pre_post_rank": 2,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 2
+              },
+              "_reference_root_plan": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                  "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "canonical_path": "holdout/tidal_ferry/cargo.md",
+                  "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+                },
+                "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+                },
+                "char_start": 19,
+                "char_end": 328,
+                "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+                "raw_document": "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+                "owner": {
+                  "text": "# Грузы на пароме\n",
+                  "char_start": 0,
+                  "char_end": 18,
+                  "scope_start": 0,
+                  "scope_end": 328,
+                  "logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:136c938ea85ab2cbf0b773ab07bdc1f4e0c286fa10470ef2fa13f057815af357",
+                  "member_spans": [
+                    [
+                      0,
+                      17,
+                      "9a75340c623282ca33f075769f6c23978fdd4a408d54929bfcf761452962b607"
+                    ],
+                    [
+                      19,
+                      327,
+                      "e729168f7a9b6e13e95d3ed81149ba5188c2841da1c8a8383ac2f08f0ef4deec"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "какую",
+                    "мощность",
+                    "двигателя",
+                    "и",
+                    "шаг",
+                    "винта",
+                    "следует",
+                    "выбрать",
+                    "для",
+                    "парома",
+                    "чтобы",
+                    "он",
+                    "проходил",
+                    "участок",
+                    "со",
+                    "встречным",
+                    "течением",
+                    "3",
+                    "метра",
+                    "в",
+                    "секунду"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 0.95,
+                  "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "bound_subject_context": "# Грузы на пароме\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    19,
+                    327
+                  ],
+                  "matched_terms": [
+                    "и"
+                  ],
+                  "body_matched_terms": [
+                    "и"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 1,
+                  "match_ratio": 0.0476,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 1
+        },
+        {
+          "candidate": {
+            "id": "dfbd2239ed772cfb2d4a324da770bc4d6b9e6eb0be6b3184bee41416ddbda327",
+            "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+            "text_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+            "chunk_index": 1,
+            "score": 1.0,
+            "path": "holdout/tidal_ferry/sailing.md",
+            "span": [
+              20,
+              341
+            ],
+            "binding": {
+              "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "canonical_path": "holdout/tidal_ferry/sailing.md",
+              "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "holdout/tidal_ferry/sailing.md",
+              "source_path": "holdout/tidal_ferry/sailing.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "project_doc_catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791809089624799546,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Разрешение рейса",
+              "section_level": 1,
+              "document_title": "sailing",
+              "document_title_hash": "a4bb44eb9667ae0f",
+              "anchor": "Разрешение рейса",
+              "content_hash": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+              "retrieval_content_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "9b2bebf3bbc6db5775dc012694ec950f732c0f0b11faa30161d487a36c28e085",
+                "token_estimate": 59,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "sailing",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "holdout/tidal_ferry/sailing.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Разрешение рейса",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "c7a1bff4305eb6173bc3e50a6b6010f5474c4618dafb4399a39eaf37f6de82d9",
+              "stable_chunk_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+              "vector_id": "711c0077-8f58-5b8a-a83e-1c380d84c164",
+              "parent_logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb",
+              "atom_type": "prose",
+              "atom_id": "atom-7394f9c360937ce0fc373e41105720be",
+              "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+              "source_content_hash": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+              "heading_path": [
+                "Разрешение рейса"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                20,
+                341
+              ],
+              "byte_span": [
+                35,
+                623
+              ],
+              "line_span": [
+                3,
+                6
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 147,
+              "retrieval_token_estimate": 214,
+              "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+              "title": "Разрешение рейса",
+              "section_id": 8510778013574182075,
+              "token_estimate": 147,
+              "docmancer_tokens": 290,
+              "raw_tokens": 168,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.58,
+              "ranking": {
+                "stable_id": "child-af2f517298f73b0cdf1d7485e6a27e2d06612422",
+                "section_id": 8510778013574182075,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -3.733935309677
+                },
+                "base_utility": 3.733935309677,
+                "feature_contributions": {},
+                "final_utility": 3.733935309677,
+                "raw_rank": 1,
+                "final_rank": 1,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "matched_terms": [
+                  "парома",
+                  "метра"
+                ],
+                "exact_terms": [
+                  "какую"
+                ],
+                "missing_exact_terms": [
+                  "какую"
+                ],
+                "query_term_count": 21,
+                "matched_term_count": 2,
+                "match_ratio": 0.0952,
+                "bm25_cost": -3.733935309677105,
+                "lexical_score": 3.733935309677105,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "парома",
+                    "метра"
+                  ],
+                  "retrieval_text": [
+                    "парома",
+                    "метра"
+                  ]
+                }
+              },
+              "query_plan_hash": "a7ae8d315ff5eb78c7b6cf7e0764b796804be3c2a7ca0280f8481f4a640c2642",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 1
+                },
+                "pre_post_rank": 1,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 1
+              },
+              "_reference_root_plan": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                  "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md",
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "canonical_path": "holdout/tidal_ferry/sailing.md",
+                  "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+                },
+                "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+                },
+                "char_start": 20,
+                "char_end": 341,
+                "text": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+                "raw_document": "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+                "owner": {
+                  "text": "# Разрешение рейса\n",
+                  "char_start": 0,
+                  "char_end": 19,
+                  "scope_start": 0,
+                  "scope_end": 341,
+                  "logical_id": "parent-173aa63bf6dbc55def80c0fe919144cb"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:d929d157183bcb8f251eb5235287a96e290f140684b831fa0a1308825d090d15",
+                  "member_spans": [
+                    [
+                      0,
+                      18,
+                      "67d5985eebd4933cca82299e49db638d13473ca575c824e58f21a1d099a40d41"
+                    ],
+                    [
+                      20,
+                      340,
+                      "b2f7d9c3b60620154c916d63510fd2f71eb1a81ebfbc6b12561e535ed006a1ea"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "какую",
+                    "мощность",
+                    "двигателя",
+                    "и",
+                    "шаг",
+                    "винта",
+                    "следует",
+                    "выбрать",
+                    "для",
+                    "парома",
+                    "чтобы",
+                    "он",
+                    "проходил",
+                    "участок",
+                    "со",
+                    "встречным",
+                    "течением",
+                    "3",
+                    "метра",
+                    "в",
+                    "секунду"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 1.0,
+                  "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "bound_subject_context": "# Разрешение рейса\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    20,
+                    340
+                  ],
+                  "matched_terms": [
+                    "парома",
+                    "метра"
+                  ],
+                  "body_matched_terms": [
+                    "парома",
+                    "метра"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 2,
+                  "match_ratio": 0.0952,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 2
+        },
+        {
+          "candidate": {
+            "id": "dc9c57fd71743330df86426ee85a29b35113d6bb864fd61f4717fef7cd264ca4",
+            "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+            "text_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "source": "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+            "chunk_index": 1,
+            "score": 0.95,
+            "path": "holdout/tidal_ferry/cargo.md",
+            "span": [
+              19,
+              328
+            ],
+            "binding": {
+              "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+              "scope": {
+                "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                "version": "",
+                "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+              },
+              "canonical_path": "holdout/tidal_ferry/cargo.md",
+              "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+            },
+            "metadata": {
+              "project_path": "/tmp/docatlas-selection-v2-4icagk_h/project",
+              "project_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "repository_identity": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+              "source_class": "project_file",
+              "project_docs": true,
+              "project_doc_path": "holdout/tidal_ferry/cargo.md",
+              "source_path": "holdout/tidal_ferry/cargo.md",
+              "format": "md",
+              "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "project_doc_catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954",
+              "project_doc_reason": "other",
+              "doc_scope": "project",
+              "module_path": null,
+              "module_id": "",
+              "project_doc_description": "Pinned documentation source",
+              "project_doc_authority": "source_of_truth",
+              "project_doc_lifecycle_status": "active",
+              "lifecycle_status": "active",
+              "project_doc_impact_policy": "track",
+              "index_freshness": "synchronized",
+              "project_doc_mtime_ns": 1791809089624610048,
+              "chunking_schema": "parent-child-v1",
+              "child_target_tokens": 160,
+              "child_hard_max_tokens": 512,
+              "library_id": "",
+              "resolved_version": "",
+              "version_family": "",
+              "authority": "source_of_truth",
+              "temporal_relevance": "current",
+              "docs_snapshot_exact": null,
+              "section_title": "Грузы на пароме",
+              "section_level": 1,
+              "document_title": "cargo",
+              "document_title_hash": "e0d6ae5cf2a2d0c1",
+              "anchor": "Грузы на пароме",
+              "content_hash": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+              "retrieval_content_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+              "context_schema_version": "deterministic-context-v2",
+              "context_config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+              "context_content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+              "context_manifest": {
+                "schema_version": "deterministic-context-v2",
+                "config_hash": "3c6f50edf28b9ac18d1ba2ea8abb46296651397b744cd434d29135c04a2d3b07",
+                "content_hash": "38e4a2aba6bf64514f90f2b3ce286b3ab598c4d43db6221454f4e4164f339b33",
+                "token_estimate": 58,
+                "truncated": false,
+                "fields": [
+                  {
+                    "name": "document_title",
+                    "value": "cargo",
+                    "provenance": "source.metadata.title",
+                    "priority": 10
+                  },
+                  {
+                    "name": "canonical_location",
+                    "value": "holdout/tidal_ferry/cargo.md",
+                    "provenance": "source.metadata.relative_path",
+                    "priority": 20
+                  },
+                  {
+                    "name": "heading_path",
+                    "value": "Грузы на пароме",
+                    "provenance": "source.markdown.heading_path",
+                    "priority": 30
+                  },
+                  {
+                    "name": "project_scope",
+                    "value": "project",
+                    "provenance": "source.metadata.doc_scope",
+                    "priority": 80
+                  },
+                  {
+                    "name": "source_class",
+                    "value": "project_file",
+                    "provenance": "source.metadata.source_class",
+                    "priority": 90
+                  },
+                  {
+                    "name": "authority",
+                    "value": "source_of_truth",
+                    "provenance": "source.metadata.authority",
+                    "priority": 100
+                  },
+                  {
+                    "name": "catalog_description",
+                    "value": "Pinned documentation source",
+                    "provenance": "project.catalog.description",
+                    "priority": 120
+                  }
+                ]
+              },
+              "embedding_input_hash": "3fee8d164753d2f00f21a34b7bc4b1fc7f8d40bc8d81d1de83cf3443b7a768be",
+              "stable_chunk_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+              "vector_id": "05adbe66-5885-5e0f-b175-0bf49b34c47e",
+              "parent_logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60",
+              "atom_type": "prose",
+              "atom_id": "atom-9bde23d72e72efe8ffe3b3cc2d29a74e",
+              "source_identity": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+              "source_content_hash": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+              "heading_path": [
+                "Грузы на пароме"
+              ],
+              "heading_levels": [
+                1
+              ],
+              "char_span": [
+                19,
+                328
+              ],
+              "byte_span": [
+                32,
+                604
+              ],
+              "line_span": [
+                3,
+                6
+              ],
+              "chunk_schema_version": "parent-child-v1",
+              "chunk_config_hash": "6b14dfe3522150abe6744c0691d312762bb749d9ec60afd9e73230b8f85a7823",
+              "token_estimator_version": "utf8-bytes-div4-v1",
+              "display_token_estimate": 143,
+              "retrieval_token_estimate": 208,
+              "generation_id": "gen-b1287a357a8b44b186be34ba1405f704",
+              "title": "Грузы на пароме",
+              "section_id": 5237986034943065367,
+              "token_estimate": 143,
+              "docmancer_tokens": 290,
+              "raw_tokens": 168,
+              "savings_percent": 0.0,
+              "runway_multiplier": 0.58,
+              "ranking": {
+                "stable_id": "child-ef0c92e3216c8e19d282aa0c7e69e6cf6d5bd985",
+                "section_id": 5237986034943065367,
+                "score_direction": "higher_is_better",
+                "raw_component_ranks": {
+                  "fts5_bm25_cost": -1.657567681173
+                },
+                "base_utility": 1.657567681173,
+                "feature_contributions": {},
+                "final_utility": 1.657567681173,
+                "raw_rank": 2,
+                "final_rank": 2,
+                "rank_delta": 0,
+                "candidate_pool_size": 2
+              },
+              "lexical_match": {
+                "mode": "or_fallback",
+                "query_terms": [
+                  "какую",
+                  "мощность",
+                  "двигателя",
+                  "и",
+                  "шаг",
+                  "винта",
+                  "следует",
+                  "выбрать",
+                  "для",
+                  "парома",
+                  "чтобы",
+                  "он",
+                  "проходил",
+                  "участок",
+                  "со",
+                  "встречным",
+                  "течением",
+                  "3",
+                  "метра",
+                  "в",
+                  "секунду"
+                ],
+                "matched_terms": [
+                  "и"
+                ],
+                "exact_terms": [
+                  "какую"
+                ],
+                "missing_exact_terms": [
+                  "какую"
+                ],
+                "query_term_count": 21,
+                "matched_term_count": 1,
+                "match_ratio": 0.0476,
+                "bm25_cost": -1.657567681172967,
+                "lexical_score": 1.657567681172967,
+                "field_matches": {
+                  "title": [],
+                  "body": [
+                    "и"
+                  ],
+                  "retrieval_text": [
+                    "и"
+                  ]
+                }
+              },
+              "query_plan_hash": "a7ae8d315ff5eb78c7b6cf7e0764b796804be3c2a7ca0280f8481f4a640c2642",
+              "fusion_config_hash": "60d22589bb9c8c34408e45e3a4109ccae4a0a6f8967962185cd6ee200befab05",
+              "retrieval_trace": {
+                "requested_mode": "lexical",
+                "mode_used": "lexical",
+                "component_ranks": {
+                  "lexical": 2
+                },
+                "pre_post_rank": 2,
+                "intent_boost": 0.0,
+                "supplemental_rank": null,
+                "final_rank": 2
+              },
+              "_reference_root_plan": {
+                "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                "references": [],
+                "scope": {
+                  "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                  "version": "",
+                  "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                },
+                "catalog_complete": true
+              },
+              "_reference_plans": {
+                "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?": {
+                  "question": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "references": [],
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "catalog_complete": true
+                }
+              },
+              "_reference_evidence": {
+                "schema_version": 1,
+                "source": {
+                  "document_id": "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md",
+                  "scope": {
+                    "project_id": "local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d",
+                    "version": "",
+                    "snapshot_id": "gen-b1287a357a8b44b186be34ba1405f704"
+                  },
+                  "canonical_path": "holdout/tidal_ferry/cargo.md",
+                  "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+                },
+                "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+                "member_binding": {
+                  "doc_scope": "project",
+                  "module_path": "",
+                  "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+                },
+                "char_start": 19,
+                "char_end": 328,
+                "text": "Незакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+                "raw_document": "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+                "owner": {
+                  "text": "# Грузы на пароме\n",
+                  "char_start": 0,
+                  "char_end": 18,
+                  "scope_start": 0,
+                  "scope_end": 328,
+                  "logical_id": "parent-8af52a956fcfe4b50df48a59f9993d60"
+                }
+              },
+              "_evidence_sets": [
+                {
+                  "schema_version": "source-dependency-proposal-v1",
+                  "set_id": "evidence-set:136c938ea85ab2cbf0b773ab07bdc1f4e0c286fa10470ef2fa13f057815af357",
+                  "member_spans": [
+                    [
+                      0,
+                      17,
+                      "9a75340c623282ca33f075769f6c23978fdd4a408d54929bfcf761452962b607"
+                    ],
+                    [
+                      19,
+                      327,
+                      "e729168f7a9b6e13e95d3ed81149ba5188c2841da1c8a8383ac2f08f0ef4deec"
+                    ]
+                  ],
+                  "edges": [
+                    [
+                      "heading",
+                      0,
+                      1,
+                      "markdown-owning-heading-v1"
+                    ]
+                  ],
+                  "proposed_need_ids": [
+                    "sentence-1"
+                  ]
+                }
+              ],
+              "retrieval_query_matches": {
+                "query-original": {
+                  "query_text": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "query_origin": "original",
+                  "relation": "direct",
+                  "query_terms": [
+                    "какую",
+                    "мощность",
+                    "двигателя",
+                    "и",
+                    "шаг",
+                    "винта",
+                    "следует",
+                    "выбрать",
+                    "для",
+                    "парома",
+                    "чтобы",
+                    "он",
+                    "проходил",
+                    "участок",
+                    "со",
+                    "встречным",
+                    "течением",
+                    "3",
+                    "метра",
+                    "в",
+                    "секунду"
+                  ],
+                  "exact_terms": [],
+                  "bound_subjects": [],
+                  "retrieval_anchors": [],
+                  "forbidden_catalog_roles": [],
+                  "forbidden_evidence_terms": [],
+                  "lexical_score": 0.95,
+                  "reference_body_query": "Какую мощность двигателя и шаг винта следует выбрать для парома, чтобы он проходил участок со встречным течением 3 метра в секунду?",
+                  "bound_subject_context": "# Грузы на пароме\n",
+                  "reference_bindings": [],
+                  "reference_visible_span": [
+                    19,
+                    327
+                  ],
+                  "matched_terms": [
+                    "и"
+                  ],
+                  "body_matched_terms": [
+                    "и"
+                  ],
+                  "heading_context_used": false,
+                  "table_context_used": false,
+                  "missing_exact_terms": [],
+                  "missing_parent_exact_terms": [],
+                  "matched_term_count": 1,
+                  "match_ratio": 0.0476,
+                  "qualified": false,
+                  "qualification_reason": "insufficient_visible_match",
+                  "context_only": true
+                }
+              },
+              "retrieval_query_ids": []
+            }
+          },
+          "reason": "no_checked_original_admission",
+          "original_ordinal": 3
+        }
+      ],
+      "selected_indices": []
+    }
+  ],
+  "elapsed_seconds": 0.05078670700095245,
+  "state_before": {
+    "generation": "gen-b1287a357a8b44b186be34ba1405f704",
+    "rows": [
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+        "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+        "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md"
+      ],
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/refunds.md",
+        "# Возврат билетов\n\nЕсли рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n",
+        "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/refunds.md"
+      ],
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+        "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+        "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-selection-v2-4icagk_h/project/docatlas.project-docs.yaml": "7db0d10d380daf47ac79f967bee70d45f12fcd1ca4d3a87c69bfbeb1c67325b4",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/refunds.md": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+    }
+  },
+  "state_after": {
+    "generation": "gen-b1287a357a8b44b186be34ba1405f704",
+    "rows": [
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md",
+        "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+        "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/cargo.md"
+      ],
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/refunds.md",
+        "# Возврат билетов\n\nЕсли рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n",
+        "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/refunds.md"
+      ],
+      [
+        "gen-b1287a357a8b44b186be34ba1405f704",
+        "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md",
+        "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+        "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+        "project_file:local:ff299071c93338f1a36cf47404b027be57883202c1c72b9bdea99eb002d2829d:holdout/tidal_ferry/sailing.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-selection-v2-4icagk_h/project/docatlas.project-docs.yaml": "7db0d10d380daf47ac79f967bee70d45f12fcd1ca4d3a87c69bfbeb1c67325b4",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/cargo.md": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/refunds.md": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "/tmp/docatlas-selection-v2-4icagk_h/project/holdout/tidal_ferry/sailing.md": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+    }
+  },
+  "integrity_errors": []
+}

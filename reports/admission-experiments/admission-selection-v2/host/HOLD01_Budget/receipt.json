@@ -1,0 +1,38 @@
+{
+  "execution": "EXECUTED",
+  "requested_model": {
+    "providerID": "openai",
+    "id": "gpt-5.6-luna",
+    "variant": "medium"
+  },
+  "transport": "OpenCode V2 stateless /api/experimental/generate through existing authenticated local service",
+  "actual_model_revision": null,
+  "revision_status": "NOT EXPOSED",
+  "attempts": 1,
+  "runner_retries": 0,
+  "format_repairs": 0,
+  "provider_http_calls": null,
+  "provider_http_calls_status": "not exposed; one endpoint invocation, not a measured transport-level call count",
+  "tool_access": "stateless text-only endpoint; no tool schema or tool loop requested",
+  "input_tokens": null,
+  "output_tokens": null,
+  "reasoning_tokens": null,
+  "tokens_status": "NOT EXPOSED by endpoint; never estimated as measured billing",
+  "max_output_tokens": null,
+  "temperature": null,
+  "seed": null,
+  "sampling_status": "endpoint exposes model variant only; remaining effective settings not exposed",
+  "request_sha256": "77e892759920fe4f4b1cba7b9c87101d3f168246fed33fc3022a9369d1a44749",
+  "runner_sha256": "c47072e828d0f13c1cd377ab0b83ef2895a43714a9f03f38c9daf0007ddd3152",
+  "started_unix": 1791809113.6369724,
+  "timeout_seconds": 60,
+  "provenance": {
+    "case_id": "HOLD01",
+    "arm": "Budget",
+    "public_result_sha256": "bef27bf8354aac06eabd90d51b4ddb55d2e89fc4bce71d090453a038abefb815",
+    "presentation": "source_id,text,real-public-provenance"
+  },
+  "exit_code": 0,
+  "latency_seconds": 5.002761,
+  "json_valid": true
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "v3-independent-freeze-1",
+  "frozen_at_utc": "2026-10-12T13:34:29.203940+00:00",
+  "stage": "PRE_V3_OUTPUTS",
+  "product_runtime_tests_models_host_executed": false,
+  "execution_inputs": "inputs/",
+  "private_oracle": "private/oracle.json",
+  "calibration_labels_separate": "private/calibration_labels.json",
+  "sha256": {
+    "CONTROL_PROVENANCE.json": "dcc574a98057e2cdfc5a2ac8bb7daa127e9385c3f11f1d97af8d5b92c7a17b8e",
+    "CRITERIA_RU.md": "1090cbe692b0b68a02f1b98956f4d5d081d75938d2ee170a90affa45da584d04",
+    "freeze_saved_inputs.py": "7cd5ca549b295e33ff8a32d77bdff79a497bf8cd073bcb4b72f1d3a7461ce1a7",
+    "inputs/EXECUTION_RU.md": "c90f4cd42232ec9b1a96ceba8e073796bbfc8c139def29f255c7ac343442bd9a",
+    "inputs/cases.json": "d5fa6155f0c41af71222145278a635c79122cf5761f2d705524850626b15a0bb",
+    "inputs/corpus/directed_routes/docs/roles.md": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+    "inputs/corpus/directed_routes/docs/routes.md": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+    "inputs/corpus/legacy_priority/docs/compounds.md": "b191b6930c370a2367d718c1ed326ce92865d1c261d1aa0a7af13ce49b63fe49",
+    "inputs/corpus/legacy_priority/docs/logs.md": "94a807c6f5a7da4ff776e196d020bb8c58535d4ff0ce8dd32c75b0a5047e6fed",
+    "inputs/corpus/legacy_priority/docs/owners.md": "86798351b24312fb93c29d02dcfd31669e10bf822adb377bceeacf9c44c872a4",
+    "inputs/corpus/legacy_priority/docs/packets.md": "3f8107da7ded2d3226fc71280e43ec6ab61ed31f0fad1d7c001fdc08d2b5b29c",
+    "inputs/corpus/legacy_priority/docs/setext.md": "1551edf5b88f0362c6a241f1a6bb35ffb9bcf1a8cc4ef61f7096f6729d76f7ae",
+    "inputs/corpus/print_billing/docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+    "inputs/corpus/print_billing/docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+    "private/calibration_labels.json": "2d2b1763987eb920cba808237076f04708caabd284d99c1ad6ceafefafa06af8",
+    "private/oracle.json": "9559a681f5e5c1ce6b68d641d4a2d66aa92f6f77c7582df6e3dabee82260043e",
+    "private/oracle_spec.json": "2e4057e2e3dc4614b8d19df525f07e6fd06b5f1df2e9dc00787160caed2f29f1"
+  },
+  "counts": {
+    "calibration": 3,
+    "holdout": 4,
+    "legacy_controls": 2,
+    "new_documents": 4,
+    "legacy_documents": 5
+  },
+  "freeze_manifest_excludes_self": true,
+  "contract_A_B_review": "PENDING_COORDINATOR_REQUEST",
+  "outputs_review": "NOT_RUN"
+}

@@ -1,0 +1,11 @@
+[
+  {"id":"V3CAL01","split":"calibration","project":"print_billing","question":"Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?"},
+  {"id":"V3CAL02","split":"calibration","project":"print_billing","question":"Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?"},
+  {"id":"V3CAL03","split":"calibration","project":"print_billing","question":"В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?"},
+  {"id":"V3H01","split":"holdout","project":"directed_routes","question":"Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?"},
+  {"id":"V3H02","split":"holdout","project":"directed_routes","question":"При бюджете 12 единиц заряда какой из путей складской тележки от ворот к упаковке допустим: прямой или через весы; кто утверждает выбранный маршрут и что проверяет перед выпуском?"},
+  {"id":"V3H03","split":"holdout","project":"directed_routes","question":"На сколько единиц заряда приоритет 12 уменьшает расход пути складской тележки от ворот к упаковке через весы?"},
+  {"id":"V3H04","split":"holdout","project":"directed_routes","question":"Какая подпись Контролёра батарей даёт ему полномочие утверждать маршрут складской тележки от ворот к упаковке через весы при бюджете 12 единиц заряда?"},
+  {"id":"OLD_PRIORITY7","split":"control","project":"legacy_priority","question":"How are packets delivered with priority 7."},
+  {"id":"OLD_PRIORITY7_9","split":"control","project":"legacy_priority","question":"How are packets delivered with priority 7-9 during concurrent recovery?"}
+]

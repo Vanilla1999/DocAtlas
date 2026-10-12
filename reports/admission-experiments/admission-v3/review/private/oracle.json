@@ -1,0 +1,320 @@
+{
+  "schema": "v3-independent-oracle-1",
+  "char_units": "Unicode code points",
+  "span_convention": "[start,end)",
+  "lines": "1-based inclusive",
+  "cases": [
+    {
+      "id": "V3CAL01",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "38 рублей: первые 10 страниц дают 30 рублей, оставшиеся 4 дают 8 рублей; суммы складываются."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "691d6b27f2888fd2cd4659fca7b57daf4505547b4f5bfb6da8bf5ea40208422e",
+          "char_start": 80,
+          "char_end": 134,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "e74a198b7b0601e7f26ef4e737508f32e5a86ffa025f26e7db6f72b6d7f0986f",
+          "char_start": 135,
+          "char_end": 190,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "c8b1c741f35536cf1ddea3b6ae1cfc63e5bc18fd476697887e774f6f9a0a1154",
+          "char_start": 191,
+          "char_end": 272,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "10*3+(14-10)*2=38; query 14 отсутствует в tariff; source breakpoint 10, не query literal.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3CAL02",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "Счёт за один заказ из 14 страниц: 38 рублей.",
+        "Спор принимает бухгалтер кооператива.",
+        "Заказчик передаёт исходный заказ и выданный счёт."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "691d6b27f2888fd2cd4659fca7b57daf4505547b4f5bfb6da8bf5ea40208422e",
+          "char_start": 80,
+          "char_end": 134,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "e74a198b7b0601e7f26ef4e737508f32e5a86ffa025f26e7db6f72b6d7f0986f",
+          "char_start": 135,
+          "char_end": 190,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.",
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "quote_sha256": "c8b1c741f35536cf1ddea3b6ae1cfc63e5bc18fd476697887e774f6f9a0a1154",
+          "char_start": 191,
+          "char_end": 272,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Спор о сумме печатного счёта принимает бухгалтер кооператива.",
+          "document_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+          "quote_sha256": "40a35cc72a6e8aba9fd2daea7ee0ba68aee7638af368ce142c74d2a502d87156",
+          "char_start": 31,
+          "char_end": 92,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт.",
+          "document_sha256": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+          "quote_sha256": "0d0f6d9b6861f4c96bad527b197e8bf268499736c0b4985d7ee7a0ba5762aa06",
+          "char_start": 93,
+          "char_end": 197,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "10*3+(14-10)*2=38; спор и documents facet не содержат numeric literals.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3CAL03",
+      "split": "calibration",
+      "project": "print_billing",
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Отказ назначать очередь для priority 14: тариф страниц не задаёт priority/очередь. Объяснение пробела допустимо, выдуманная очередь нет.",
+      "unsupported_relation": "priority=14 -> printing queue; ни такой атрибут, ни mapping не определены. Не путать размер заказа и приоритет.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3H01",
+      "split": "holdout",
+      "project": "directed_routes",
+      "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "Расход пути ворота→весы→упаковка равен 4+6=10 единиц заряда.",
+        "10<=12: указанный направленный путь укладывается в бюджет."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "ce0700e4672a5b908344d8e4290ac576bffe07905ec78e2f48ee37144d9eba51",
+          "char_start": 97,
+          "char_end": 149,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от весов к упаковке расходует 6 единиц заряда.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "29d68af5f130872856a3ab650c1d00023d42b46fd8610718cbdee468ae296062",
+          "char_start": 150,
+          "char_end": 204,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Расход последовательного пути равен сумме расходов переходов.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "e0c669c7e4c855d22e4d52c4856d00f8564ba143afbb0481c1be022de6bebabf",
+          "char_start": 268,
+          "char_end": 329,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Путь укладывается в бюджет, если суммарный расход не превышает бюджет.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "d4613e04a8e75189dbce3a8ef9a005a5da0e0f61ba534a4b7573814a5290298d",
+          "char_start": 330,
+          "char_end": 400,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "4+6=10<=12; 12 в roles означает стеллаж и не поддерживает бюджетный вывод.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3H02",
+      "split": "holdout",
+      "project": "directed_routes",
+      "question": "При бюджете 12 единиц заряда какой из путей складской тележки от ворот к упаковке допустим: прямой или через весы; кто утверждает выбранный маршрут и что проверяет перед выпуском?",
+      "expected_source_contract": "sufficient_nonempty",
+      "required_semantic_facts": [
+        "Через весы: 4+6=10<=12, допустим.",
+        "Прямой путь: 15>12, недопустим при этом бюджете.",
+        "Утверждает диспетчер движения.",
+        "Перед выпуском проверяет направленные переходы и суммарный расход заряда выбранного пути."
+      ],
+      "witnesses": [
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "ce0700e4672a5b908344d8e4290ac576bffe07905ec78e2f48ee37144d9eba51",
+          "char_start": 97,
+          "char_end": 149,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от весов к упаковке расходует 6 единиц заряда.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "29d68af5f130872856a3ab650c1d00023d42b46fd8610718cbdee468ae296062",
+          "char_start": 150,
+          "char_end": 204,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Прямой переход от ворот к упаковке расходует 15 единиц заряда.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "0493b81957d073de14db120ce8eef4651d134f4dbb5523658fd8cedbb6a039c8",
+          "char_start": 205,
+          "char_end": 267,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Расход последовательного пути равен сумме расходов переходов.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "e0c669c7e4c855d22e4d52c4856d00f8564ba143afbb0481c1be022de6bebabf",
+          "char_start": 268,
+          "char_end": 329,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Путь укладывается в бюджет, если суммарный расход не превышает бюджет.",
+          "document_sha256": "82aba37636912bd59fbb3cb7238b39907d7115839b32fda00ec734b68e870e4b",
+          "quote_sha256": "d4613e04a8e75189dbce3a8ef9a005a5da0e0f61ba534a4b7573814a5290298d",
+          "char_start": 330,
+          "char_end": 400,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/roles.md",
+          "quote": "Маршрут складской тележки утверждает диспетчер движения.",
+          "document_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+          "quote_sha256": "e810d0090b9c53f68c945bf51efe43b1cee55e0412d2a4ba2c2c33b5bb69ed89",
+          "char_start": 24,
+          "char_end": 80,
+          "line_start": 3,
+          "line_end": 3
+        },
+        {
+          "path": "docs/roles.md",
+          "quote": "Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути.",
+          "document_sha256": "e9db65242431ffdf30bb42f0a28b2d43d2549b089e5b4a9871a4379b510aee34",
+          "quote_sha256": "03ee1e9a417908d50f88d239d4e78bd81cb67025e3e9fdad954b2750c04451dd",
+          "char_start": 81,
+          "char_end": 200,
+          "line_start": 3,
+          "line_end": 3
+        }
+      ],
+      "numeric_derivation": "via=4+6=10<=12; direct=15>12; approval relation отдельная ненумерическая часть.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3H03",
+      "split": "holdout",
+      "project": "directed_routes",
+      "question": "На сколько единиц заряда приоритет 12 уменьшает расход пути складской тележки от ворот к упаковке через весы?",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Не выдавать экономию/ускорение по priority 12; priority и его влияние на расход не определены. Базовый расход не доказывает приоритетную скидку. Не утверждать нулевую скидку как задокументированное правило.",
+      "unsupported_relation": "priority 12 -> снижение расхода. Число 12 принадлежит стеллажу, а не priority; в route graph нет priority атрибута.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "V3H04",
+      "split": "holdout",
+      "project": "directed_routes",
+      "question": "Какая подпись Контролёра батарей даёт ему полномочие утверждать маршрут складской тележки от ворот к упаковке через весы при бюджете 12 единиц заряда?",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Отказ от ложной premise о полномочии Контролёра батарей; его подпись относится к ведомости батарей. Диспетчер — иной субъект. Не выдавать подпись контролёра за route approval.",
+      "unsupported_relation": "Контролёр батарей -> утверждение маршрута. Тот же документ содержит dispatcher approval и controller inventory, а 12 — shelf, не grant/budget.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "OLD_PRIORITY7",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "How are packets delivered with priority 7.",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Не придумывать packet delivery с priority 7.",
+      "unsupported_relation": "Общий packet delivery не задаёт priority 7.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    },
+    {
+      "id": "OLD_PRIORITY7_9",
+      "split": "control",
+      "project": "legacy_priority",
+      "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+      "expected_source_contract": "empty_sources",
+      "required_semantic_facts": [],
+      "witnesses": [],
+      "host_expectation": "Не придумывать packet delivery с priority 7-9 при concurrent recovery.",
+      "unsupported_relation": "Общий packet delivery не задаёт ни range 7-9, ни concurrent recovery condition.",
+      "host_verdict_before_outputs": "NOT_RUN"
+    }
+  ]
+}

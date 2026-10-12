@@ -1,0 +1,12 @@
+{
+  "project": "/tmp/docatlas-selection-v2-v0qmiy6r/project",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "domain_version": "2026.1",
+  "document_hashes": {
+    "calibration/seed_bank/intake.md": "48bdd39afbc2f42a99f3139fb228f41ef2a74f3507bc1864cfc6ed6e3a8598a9",
+    "calibration/seed_bank/storage.md": "e29e237345a37e4ef9ef921cdf618234d1c9ffb1ca6fff84727bb8f96e9b2a80",
+    "calibration/seed_bank/quarantine.md": "90c583e48d1893626e237a66512ad16038d2826cb80fbf01e78142584f3a8478"
+  },
+  "generation": "gen-e572dddf09ff45d0af6d40d419ad4457"
+}

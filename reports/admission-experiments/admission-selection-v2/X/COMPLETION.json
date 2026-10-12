@@ -1,0 +1,9 @@
+{
+  "status": "COMPLETED_DIAGNOSTIC_PAIR",
+  "ledger": {
+    "prepares": 7,
+    "context_attempts": 56,
+    "host_requests": 40,
+    "model_forwards": 56
+  }
+}

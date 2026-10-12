@@ -1,0 +1,2660 @@
+{
+  "case_id": "DIAG_HOLD03",
+  "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+  "split": "diagnostic",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+    "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-7f938858f88b4755be8372d89743cc20",
+    "rows": [
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+        "# Охлаждение и выгрузка\n\nПосле обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже.\nДля неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже.\nПриоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже.\nПри неисправном термодатчике дверцу не открывают по расчётному времени охлаждения.\n",
+        "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md"
+      ],
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+        "# Неисправность печи\n\nЕсли термодатчик перестал показывать температуру, печник отключает нагрев и отмечает неисправность в журнале.\nВозобновить работу печи разрешает электромеханик после замены датчика и контрольного измерения температуры.\nПосле восстановления датчика дверцу открывают по температурным правилам для соответствующего вида партии, а не по времени простоя.\nТрещины на упаковочном ящике фиксируют отдельно от неисправностей печи.\n",
+        "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/incident.md"
+      ],
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+        "# Подготовка обжига\n\nСосуд с непросохшим дном нельзя ставить в печь даже для короткого пробного обжига.\nГотовность дна проверяет мастер формовки по контрольному взвешиванию.\nЕсли два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим.\nЭтикетка с номером партии не подтверждает готовность сосуда к обжигу.\n",
+        "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-nzq3j3mg/project/docatlas.project-docs.yaml": "2d2f73ab57329d11c9e43d6fe974ef81a94bed7a04a2e0e50553cd75843464dd",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d"
+        },
+        {
+          "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0"
+        },
+        {
+          "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+          "parent_logical_id": "parent-39496f6b0b2688bf941ab50ee1c79f50"
+        },
+        {
+          "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0"
+        },
+        {
+          "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d"
+        },
+        {
+          "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d"
+        },
+        {
+          "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0"
+        },
+        {
+          "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+          "parent_logical_id": "parent-39496f6b0b2688bf941ab50ee1c79f50"
+        },
+        {
+          "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0"
+        },
+        {
+          "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+        "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+        "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+        "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+        "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+        "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+        "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+        "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+        "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+        "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "4fb127c449388da047824e8317a623724c743e8e305b54976ef2a9563cc4028c",
+            "window_characters": 314,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "мастер",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "12",
+                "часов",
+                "обжига",
+                "партии",
+                "в",
+                "для"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 10,
+              "match_ratio": 0.303,
+              "bm25_cost": -10.775049964469783,
+              "lexical_score": 10.775049964469783,
+              "field_matches": {
+                "title": [
+                  "обжига"
+                ],
+                "body": [
+                  "мастер",
+                  "одинаковую",
+                  "массу",
+                  "сосуда",
+                  "12",
+                  "часов",
+                  "обжига",
+                  "партии",
+                  "в",
+                  "для"
+                ],
+                "retrieval_text": [
+                  "мастер",
+                  "одинаковую",
+                  "массу",
+                  "сосуда",
+                  "12",
+                  "часов",
+                  "обжига",
+                  "партии",
+                  "в",
+                  "для"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/loading.md",
+                "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98"
+              },
+              "char_start": 21,
+              "char_end": 335
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "мастер",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "12",
+              "обжига",
+              "партии",
+              "в",
+              "для"
+            ],
+            "body_matched_terms": [
+              "мастер",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "12",
+              "обжига",
+              "партии",
+              "в",
+              "для"
+            ],
+            "matched_term_count": 9,
+            "match_ratio": 0.2812,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              21,
+              334
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "466ddff4b0cb785c5656e7807100a9881979935613cedc908f4c12e16c6de2b8",
+            "window_characters": 397,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "при",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "градусов",
+                "и",
+                "для",
+                "глазурованной"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 9,
+              "match_ratio": 0.2727,
+              "bm25_cost": -8.46884724656505,
+              "lexical_score": 8.46884724656505,
+              "field_matches": {
+                "title": [
+                  "и"
+                ],
+                "body": [
+                  "при",
+                  "после",
+                  "обжига",
+                  "неглазурованной",
+                  "партии",
+                  "градусов",
+                  "для",
+                  "глазурованной"
+                ],
+                "retrieval_text": [
+                  "при",
+                  "после",
+                  "обжига",
+                  "неглазурованной",
+                  "партии",
+                  "градусов",
+                  "и",
+                  "для",
+                  "глазурованной"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/cooling.md",
+                "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337"
+              },
+              "char_start": 25,
+              "char_end": 422
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "при",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "для"
+            ],
+            "body_matched_terms": [
+              "при",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "для"
+            ],
+            "matched_term_count": 6,
+            "match_ratio": 0.1875,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              25,
+              421
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+          "parent_logical_id": "parent-39496f6b0b2688bf941ab50ee1c79f50",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "d55653e48d9109d2e383a89bf8e0e2d557a86d2714d2b594ed24fb55e88733ab",
+            "window_characters": 421,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "после",
+                "партии",
+                "в",
+                "и",
+                "для"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 5,
+              "match_ratio": 0.1515,
+              "bm25_cost": -1.6745341963617277,
+              "lexical_score": 1.6745341963617277,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "после",
+                  "партии",
+                  "в",
+                  "и",
+                  "для"
+                ],
+                "retrieval_text": [
+                  "после",
+                  "партии",
+                  "в",
+                  "и",
+                  "для"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/incident.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/incident.md",
+                "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:ea8e9945681bad9bc4faed06ddf1bee7c3c44ab0cff6d549702db83f4662e281"
+              },
+              "char_start": 22,
+              "char_end": 443
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "после",
+              "партии",
+              "в",
+              "и",
+              "для"
+            ],
+            "body_matched_terms": [
+              "после",
+              "партии",
+              "в",
+              "и",
+              "для"
+            ],
+            "matched_term_count": 5,
+            "match_ratio": 0.1562,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              22,
+              442
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "960fd03bb4f1434a08ba29d23448b20e660aa98ccb97fa5f4f7b197763af8791",
+            "window_characters": 25,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "и"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 1,
+              "match_ratio": 0.0303,
+              "bm25_cost": -4.027263875365141e-06,
+              "lexical_score": 4.027263875365141e-06,
+              "field_matches": {
+                "title": [
+                  "и"
+                ],
+                "body": [
+                  "и"
+                ],
+                "retrieval_text": [
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/cooling.md",
+                "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337"
+              },
+              "char_start": 0,
+              "char_end": 25
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              23
+            ],
+            "lexical_score": 0.85
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "a446bc921ab8b1bfee922daa1dc4ea14cf56ac53131eb4edce038e32e7943d69",
+            "window_characters": 21,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "обжига"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 1,
+              "match_ratio": 0.0303,
+              "bm25_cost": -2.020715262849326e-06,
+              "lexical_score": 2.020715262849326e-06,
+              "field_matches": {
+                "title": [
+                  "обжига"
+                ],
+                "body": [
+                  "обжига"
+                ],
+                "retrieval_text": [
+                  "обжига"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/loading.md",
+                "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98"
+              },
+              "char_start": 0,
+              "char_end": 21
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              19
+            ],
+            "lexical_score": 0.8
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "4fb127c449388da047824e8317a623724c743e8e305b54976ef2a9563cc4028c",
+            "window_characters": 314,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "мастер",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "12",
+                "часов",
+                "обжига",
+                "партии",
+                "в",
+                "для"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 10,
+              "match_ratio": 0.303,
+              "bm25_cost": -10.775049964469783,
+              "lexical_score": 10.775049964469783,
+              "field_matches": {
+                "title": [
+                  "обжига"
+                ],
+                "body": [
+                  "мастер",
+                  "одинаковую",
+                  "массу",
+                  "сосуда",
+                  "12",
+                  "часов",
+                  "обжига",
+                  "партии",
+                  "в",
+                  "для"
+                ],
+                "retrieval_text": [
+                  "мастер",
+                  "одинаковую",
+                  "массу",
+                  "сосуда",
+                  "12",
+                  "часов",
+                  "обжига",
+                  "партии",
+                  "в",
+                  "для"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/loading.md",
+                "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98"
+              },
+              "char_start": 21,
+              "char_end": 335
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "мастер",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "12",
+              "обжига",
+              "партии",
+              "в",
+              "для"
+            ],
+            "body_matched_terms": [
+              "мастер",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "12",
+              "обжига",
+              "партии",
+              "в",
+              "для"
+            ],
+            "matched_term_count": 9,
+            "match_ratio": 0.2812,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              21,
+              334
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "466ddff4b0cb785c5656e7807100a9881979935613cedc908f4c12e16c6de2b8",
+            "window_characters": 397,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "при",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "градусов",
+                "и",
+                "для",
+                "глазурованной"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 9,
+              "match_ratio": 0.2727,
+              "bm25_cost": -8.46884724656505,
+              "lexical_score": 8.46884724656505,
+              "field_matches": {
+                "title": [
+                  "и"
+                ],
+                "body": [
+                  "при",
+                  "после",
+                  "обжига",
+                  "неглазурованной",
+                  "партии",
+                  "градусов",
+                  "для",
+                  "глазурованной"
+                ],
+                "retrieval_text": [
+                  "при",
+                  "после",
+                  "обжига",
+                  "неглазурованной",
+                  "партии",
+                  "градусов",
+                  "и",
+                  "для",
+                  "глазурованной"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/cooling.md",
+                "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337"
+              },
+              "char_start": 25,
+              "char_end": 422
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "при",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "для"
+            ],
+            "body_matched_terms": [
+              "при",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "для"
+            ],
+            "matched_term_count": 6,
+            "match_ratio": 0.1875,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              25,
+              421
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+          "parent_logical_id": "parent-39496f6b0b2688bf941ab50ee1c79f50",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "d55653e48d9109d2e383a89bf8e0e2d557a86d2714d2b594ed24fb55e88733ab",
+            "window_characters": 421,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "после",
+                "партии",
+                "в",
+                "и",
+                "для"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 5,
+              "match_ratio": 0.1515,
+              "bm25_cost": -1.6745341963617277,
+              "lexical_score": 1.6745341963617277,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "после",
+                  "партии",
+                  "в",
+                  "и",
+                  "для"
+                ],
+                "retrieval_text": [
+                  "после",
+                  "партии",
+                  "в",
+                  "и",
+                  "для"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/incident.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/incident.md",
+                "content_sha256": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:ea8e9945681bad9bc4faed06ddf1bee7c3c44ab0cff6d549702db83f4662e281"
+              },
+              "char_start": 22,
+              "char_end": 443
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "после",
+              "партии",
+              "в",
+              "и",
+              "для"
+            ],
+            "body_matched_terms": [
+              "после",
+              "партии",
+              "в",
+              "и",
+              "для"
+            ],
+            "matched_term_count": 5,
+            "match_ratio": 0.1562,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              22,
+              442
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+          "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "960fd03bb4f1434a08ba29d23448b20e660aa98ccb97fa5f4f7b197763af8791",
+            "window_characters": 25,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "и"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 1,
+              "match_ratio": 0.0303,
+              "bm25_cost": -4.027263875365141e-06,
+              "lexical_score": 4.027263875365141e-06,
+              "field_matches": {
+                "title": [
+                  "и"
+                ],
+                "body": [
+                  "и"
+                ],
+                "retrieval_text": [
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/cooling.md",
+                "content_sha256": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337"
+              },
+              "char_start": 0,
+              "char_end": 25
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              23
+            ],
+            "lexical_score": 0.85
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+          "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+          "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "metadata_only_evidence",
+          "observed_candidate": {
+            "window_sha256": "a446bc921ab8b1bfee922daa1dc4ea14cf56ac53131eb4edce038e32e7943d69",
+            "window_characters": 21,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "мастер",
+                "получил",
+                "одинаковую",
+                "массу",
+                "сосуда",
+                "при",
+                "двух",
+                "взвешиваниях",
+                "через",
+                "12",
+                "часов",
+                "после",
+                "обжига",
+                "неглазурованной",
+                "партии",
+                "температура",
+                "100",
+                "градусов",
+                "что",
+                "эти",
+                "наблюдения",
+                "разрешают",
+                "в",
+                "отношении",
+                "просыхания",
+                "дверцы",
+                "и",
+                "выгрузки",
+                "чем",
+                "отличается",
+                "правило",
+                "для",
+                "глазурованной"
+              ],
+              "matched_terms": [
+                "обжига"
+              ],
+              "exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "missing_exact_terms": [
+                "мастер",
+                "часов.",
+                "после",
+                "градусов.",
+                "что"
+              ],
+              "query_term_count": 33,
+              "matched_term_count": 1,
+              "match_ratio": 0.0303,
+              "bm25_cost": -2.020715262849326e-06,
+              "lexical_score": 2.020715262849326e-06,
+              "field_matches": {
+                "title": [
+                  "обжига"
+                ],
+                "body": [
+                  "обжига"
+                ],
+                "retrieval_text": [
+                  "обжига"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md",
+                "scope": {
+                  "project_id": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                  "version": "",
+                  "snapshot_id": "gen-7f938858f88b4755be8372d89743cc20"
+                },
+                "canonical_path": "holdout/ceramic_firing/loading.md",
+                "content_sha256": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98"
+              },
+              "char_start": 0,
+              "char_end": 21
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+            "query_terms": [
+              "мастер",
+              "получил",
+              "одинаковую",
+              "массу",
+              "сосуда",
+              "при",
+              "двух",
+              "взвешиваниях",
+              "через",
+              "12",
+              "часов.",
+              "после",
+              "обжига",
+              "неглазурованной",
+              "партии",
+              "температура",
+              "100",
+              "градусов.",
+              "что",
+              "эти",
+              "наблюдения",
+              "разрешают",
+              "в",
+              "отношении",
+              "просыхания",
+              "дверцы",
+              "и",
+              "выгрузки",
+              "чем",
+              "отличается",
+              "правило",
+              "для"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "reference_visible_span": [
+              0,
+              19
+            ],
+            "lexical_score": 0.8
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+        "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+        "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+        "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+        "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+        "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+        "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+        "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+        "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+        "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 10,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 10,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md"
+              },
+              {
+                "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md"
+              },
+              {
+                "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md"
+              },
+              {
+                "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md"
+              },
+              {
+                "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md"
+              },
+              {
+                "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md"
+              },
+              {
+                "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md"
+              },
+              {
+                "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md"
+              },
+              {
+                "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md"
+              },
+              {
+                "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 10,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 10,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              },
+              {
+                "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+                "document_id": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "metadata_only_evidence"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+              "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 5,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                    "stable_chunk_id": "child-ed003ed0cf1a8063e41f37fcd30a94c804ee3b90",
+                    "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+                    "path": "holdout/ceramic_firing/loading.md",
+                    "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 21,
+                    "char_end": 335,
+                    "display_content_hash": "4fb127c449388da047824e8317a623724c743e8e305b54976ef2a9563cc4028c",
+                    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+                    "project_doc_catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98",
+                    "project_doc_content_hash": "sha256:75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                    "stable_chunk_id": "child-3cd460f94914f3f8c7beed69b70eef145d3ec6a3",
+                    "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+                    "path": "holdout/ceramic_firing/cooling.md",
+                    "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 25,
+                    "char_end": 422,
+                    "display_content_hash": "466ddff4b0cb785c5656e7807100a9881979935613cedc908f4c12e16c6de2b8",
+                    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+                    "project_doc_catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337",
+                    "project_doc_content_hash": "sha256:aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+                    "stable_chunk_id": "child-987d27f8acbe4619dd025a7172d0902e08635dc9",
+                    "parent_logical_id": "parent-39496f6b0b2688bf941ab50ee1c79f50",
+                    "path": "holdout/ceramic_firing/incident.md",
+                    "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 22,
+                    "char_end": 443,
+                    "display_content_hash": "d55653e48d9109d2e383a89bf8e0e2d557a86d2714d2b594ed24fb55e88733ab",
+                    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+                    "project_doc_catalog_entry_hash": "sha256:ea8e9945681bad9bc4faed06ddf1bee7c3c44ab0cff6d549702db83f4662e281",
+                    "project_doc_content_hash": "sha256:59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+                    "stable_chunk_id": "child-c6be117cc78b88406a479570f6e61c20a7d114fc",
+                    "parent_logical_id": "parent-3852330a727fe3c78a2eb499e84529b0",
+                    "path": "holdout/ceramic_firing/cooling.md",
+                    "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 25,
+                    "display_content_hash": "960fd03bb4f1434a08ba29d23448b20e660aa98ccb97fa5f4f7b197763af8791",
+                    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+                    "project_doc_catalog_entry_hash": "sha256:f412e33760b8e342f2ee14ec52180f2855f6f7ccdbc9302117ac7b8d1d0cb337",
+                    "project_doc_content_hash": "sha256:aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+                    "stable_chunk_id": "child-c165cfbb70123c2ab9d0622d3eb7129b2d2de5ed",
+                    "parent_logical_id": "parent-3615fc0956dfb6a7a908149a0ded7b6d",
+                    "path": "holdout/ceramic_firing/loading.md",
+                    "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 0,
+                    "char_end": 21,
+                    "display_content_hash": "a446bc921ab8b1bfee922daa1dc4ea14cf56ac53131eb4edce038e32e7943d69",
+                    "generation_id": "gen-7f938858f88b4755be8372d89743cc20",
+                    "project_doc_catalog_entry_hash": "sha256:f83841d2a8f25585a7f4a01972aacb80a1aac37323dbe6d23c921ed86587ad98",
+                    "project_doc_content_hash": "sha256:75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+                "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+                "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+              "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+                "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+                "project_identity": "local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+              "project_path": "/tmp/docatlas-v3-nzq3j3mg/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [],
+  "state_after": {
+    "generation": "gen-7f938858f88b4755be8372d89743cc20",
+    "rows": [
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md",
+        "# Охлаждение и выгрузка\n\nПосле обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже.\nДля неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже.\nПриоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже.\nПри неисправном термодатчике дверцу не открывают по расчётному времени охлаждения.\n",
+        "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/cooling.md"
+      ],
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md",
+        "# Неисправность печи\n\nЕсли термодатчик перестал показывать температуру, печник отключает нагрев и отмечает неисправность в журнале.\nВозобновить работу печи разрешает электромеханик после замены датчика и контрольного измерения температуры.\nПосле восстановления датчика дверцу открывают по температурным правилам для соответствующего вида партии, а не по времени простоя.\nТрещины на упаковочном ящике фиксируют отдельно от неисправностей печи.\n",
+        "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/incident.md"
+      ],
+      [
+        "gen-7f938858f88b4755be8372d89743cc20",
+        "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md",
+        "# Подготовка обжига\n\nСосуд с непросохшим дном нельзя ставить в печь даже для короткого пробного обжига.\nГотовность дна проверяет мастер формовки по контрольному взвешиванию.\nЕсли два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим.\nЭтикетка с номером партии не подтверждает готовность сосуда к обжигу.\n",
+        "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84",
+        "project_file:local:665c1677161b20b0f2d09c4d2c1e89002db65807cc5b8c66cdaadb568f0cd4a4:holdout/ceramic_firing/loading.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-nzq3j3mg/project/docatlas.project-docs.yaml": "2d2f73ab57329d11c9e43d6fe974ef81a94bed7a04a2e0e50553cd75843464dd",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/cooling.md": "aad551b71c1ed5582aa5a2ed12f9af4334c5f609ac61de152c2816beff141e6f",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/incident.md": "59a1d6a5e487cbb4c5b47ceb2c6a961dfedbd2e7dd86973f683dfd6c86738c59",
+      "/tmp/docatlas-v3-nzq3j3mg/project/holdout/ceramic_firing/loading.md": "75ca1bbc0fa9bbc62e8018967fd53d4b4aae8cd0283f01bc88e5ae3b2eb61b84"
+    }
+  },
+  "elapsed_seconds": 0.06873890299902996,
+  "integrity_errors": []
+}

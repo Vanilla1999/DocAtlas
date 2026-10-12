@@ -1,0 +1,1744 @@
+{
+  "case_id": "DIAG_HOLD05",
+  "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+  "split": "diagnostic",
+  "arm": "DefaultOff",
+  "request": {
+    "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+    "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+    "scope": "project"
+  },
+  "status": "EXECUTED",
+  "state_before": {
+    "generation": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+    "rows": [
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+        "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+        "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/cargo.md"
+      ],
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+        "# Возврат билетов\n\nЕсли рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n",
+        "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/refunds.md"
+      ],
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+        "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+        "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/sailing.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-16pfemaa/project/docatlas.project-docs.yaml": "7db0d10d380daf47ac79f967bee70d45f12fcd1ca4d3a87c69bfbeb1c67325b4",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+    }
+  },
+  "admission_environment": {},
+  "payload": {
+    "status": "insufficient_evidence",
+    "kind": "docs_context",
+    "missing": [
+      "required_evidence_missing"
+    ],
+    "estimated_tokens": 134,
+    "context_quality": {
+      "status": "unavailable",
+      "reasons": [
+        "source_unavailable"
+      ]
+    },
+    "read_next": [],
+    "reason_code": "required_evidence_missing",
+    "context_available": false,
+    "answer_supported": false,
+    "answer_available": false,
+    "edit_ready": false,
+    "support_status": "insufficient_evidence",
+    "requires_confirmation": false,
+    "delivery_decision": {
+      "deliverable": false,
+      "reason_code": "required_evidence_missing"
+    },
+    "operational_status": "not_found",
+    "diagnostics": {
+      "runtime_component_coverage": {
+        "status": "unclassified"
+      },
+      "stage_status": {
+        "planning": "observed",
+        "retrieval": "observed",
+        "qualification": "observed",
+        "ranking": "not_reached",
+        "projection": "not_reached",
+        "coverage": "not_reached",
+        "delivery": "blocked_before_projection"
+      },
+      "delivery_decision": {
+        "deliverable": false,
+        "reason_code": "required_evidence_missing"
+      },
+      "planned_query_ids": [
+        "query-original"
+      ],
+      "retrieved_candidates": [
+        {
+          "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+          "parent_logical_id": "parent-028f40a1cc9229563acde4778ba86ef5"
+        },
+        {
+          "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+          "parent_logical_id": "parent-328febad3dcbe5f07dd3cfaebecfcf8e"
+        },
+        {
+          "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+          "parent_logical_id": "parent-24e8927b527086b1485614720d831b39"
+        },
+        {
+          "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+          "parent_logical_id": "parent-028f40a1cc9229563acde4778ba86ef5"
+        },
+        {
+          "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+          "parent_logical_id": "parent-328febad3dcbe5f07dd3cfaebecfcf8e"
+        },
+        {
+          "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+          "parent_logical_id": "parent-24e8927b527086b1485614720d831b39"
+        }
+      ],
+      "retrieved_candidate_ids": [
+        "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+        "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+        "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+        "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+        "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+        "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f"
+      ],
+      "qualification_outcomes": [
+        {
+          "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+          "parent_logical_id": "parent-028f40a1cc9229563acde4778ba86ef5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "window_characters": 309,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "пассажиров",
+                "рейс",
+                "и"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 4,
+              "match_ratio": 0.1379,
+              "bm25_cost": -5.910255762244889,
+              "lexical_score": 5.910255762244889,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "пассажиров",
+                  "рейс",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "пассажиров",
+                  "рейс",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/cargo.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/cargo.md",
+                "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+              },
+              "char_start": 19,
+              "char_end": 328
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "пассажиров",
+              "рейс",
+              "и"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "пассажиров",
+              "рейс",
+              "и"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.1379,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              19,
+              327
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+          "parent_logical_id": "parent-328febad3dcbe5f07dd3cfaebecfcf8e",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "window_characters": 321,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "1",
+                "метра",
+                "пассажиров",
+                "рейс"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 5,
+              "match_ratio": 0.1724,
+              "bm25_cost": -4.913642514555052,
+              "lexical_score": 4.913642514555052,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "1",
+                  "метра",
+                  "пассажиров",
+                  "рейс"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "1",
+                  "метра",
+                  "пассажиров",
+                  "рейс"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/sailing.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/sailing.md",
+                "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+              },
+              "char_start": 20,
+              "char_end": 341
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "1",
+              "метра",
+              "пассажиров",
+              "рейс"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "1",
+              "метра",
+              "пассажиров",
+              "рейс"
+            ],
+            "matched_term_count": 5,
+            "match_ratio": 0.1724,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              20,
+              340
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+          "parent_logical_id": "parent-24e8927b527086b1485614720d831b39",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c5aea746be80c77d3076bfd3dadd15851c75261afd9e64f4782ddae2b6418efe",
+            "window_characters": 340,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "рейс"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 2,
+              "match_ratio": 0.069,
+              "bm25_cost": -2.8514605194177513e-06,
+              "lexical_score": 2.8514605194177513e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "рейс"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "рейс"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/refunds.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/refunds.md",
+                "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:a1afc01b255628ae85c5c32f96fc99e1c7a89e7960fbc0612b30524a3af70075"
+              },
+              "char_start": 19,
+              "char_end": 359
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "рейс"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "рейс"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.069,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              19,
+              358
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+          "parent_logical_id": "parent-028f40a1cc9229563acde4778ba86ef5",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+            "window_characters": 309,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "пассажиров",
+                "рейс",
+                "и"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 4,
+              "match_ratio": 0.1379,
+              "bm25_cost": -5.910255762244889,
+              "lexical_score": 5.910255762244889,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "пассажиров",
+                  "рейс",
+                  "и"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "пассажиров",
+                  "рейс",
+                  "и"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/cargo.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/cargo.md",
+                "content_sha256": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954"
+              },
+              "char_start": 19,
+              "char_end": 328
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "пассажиров",
+              "рейс",
+              "и"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "пассажиров",
+              "рейс",
+              "и"
+            ],
+            "matched_term_count": 4,
+            "match_ratio": 0.1379,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              19,
+              327
+            ],
+            "lexical_score": 1.0,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+          "parent_logical_id": "parent-328febad3dcbe5f07dd3cfaebecfcf8e",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+            "window_characters": 321,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "1",
+                "метра",
+                "пассажиров",
+                "рейс"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 5,
+              "match_ratio": 0.1724,
+              "bm25_cost": -4.913642514555052,
+              "lexical_score": 4.913642514555052,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "1",
+                  "метра",
+                  "пассажиров",
+                  "рейс"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "1",
+                  "метра",
+                  "пассажиров",
+                  "рейс"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/sailing.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/sailing.md",
+                "content_sha256": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a"
+              },
+              "char_start": 20,
+              "char_end": 341
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "1",
+              "метра",
+              "пассажиров",
+              "рейс"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "1",
+              "метра",
+              "пассажиров",
+              "рейс"
+            ],
+            "matched_term_count": 5,
+            "match_ratio": 0.1724,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              20,
+              340
+            ],
+            "lexical_score": 0.95,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        },
+        {
+          "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+          "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+          "parent_logical_id": "parent-24e8927b527086b1485614720d831b39",
+          "query_id": "query-original",
+          "outcome": "rejected",
+          "reason": "insufficient_visible_match",
+          "observed_candidate": {
+            "window_sha256": "c5aea746be80c77d3076bfd3dadd15851c75261afd9e64f4782ddae2b6418efe",
+            "window_characters": 340,
+            "candidate_lexical_match": {
+              "mode": "or_fallback",
+              "query_terms": [
+                "уровень",
+                "воды",
+                "1",
+                "3",
+                "метра",
+                "пассажиры",
+                "уже",
+                "купили",
+                "билеты",
+                "может",
+                "ли",
+                "число",
+                "пассажиров",
+                "позволить",
+                "рейс",
+                "кто",
+                "и",
+                "что",
+                "должен",
+                "передать",
+                "для",
+                "возврата",
+                "требуется",
+                "пассажиру",
+                "получения",
+                "денег",
+                "в",
+                "каком",
+                "размере"
+              ],
+              "matched_terms": [
+                "воды",
+                "рейс"
+              ],
+              "exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "missing_exact_terms": [
+                "уровень",
+                "билеты.",
+                "может"
+              ],
+              "query_term_count": 29,
+              "matched_term_count": 2,
+              "match_ratio": 0.069,
+              "bm25_cost": -2.8514605194177513e-06,
+              "lexical_score": 2.8514605194177513e-06,
+              "field_matches": {
+                "title": [],
+                "body": [
+                  "воды",
+                  "рейс"
+                ],
+                "retrieval_text": [
+                  "воды",
+                  "рейс"
+                ]
+              }
+            },
+            "source_reference": {
+              "source": {
+                "document_id": "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/refunds.md",
+                "scope": {
+                  "project_id": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                  "version": "",
+                  "snapshot_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd"
+                },
+                "canonical_path": "holdout/tidal_ferry/refunds.md",
+                "content_sha256": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1"
+              },
+              "member_binding": {
+                "doc_scope": "project",
+                "module_path": "",
+                "catalog_entry_hash": "sha256:a1afc01b255628ae85c5c32f96fc99e1c7a89e7960fbc0612b30524a3af70075"
+              },
+              "char_start": 19,
+              "char_end": 359
+            },
+            "root_catalog_complete": true,
+            "root_reference_count": 0,
+            "root_references": []
+          },
+          "observed_qualification": {
+            "query_text": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_origin": "original",
+            "relation": "direct",
+            "reference_body_query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+            "query_terms": [
+              "уровень",
+              "воды",
+              "1",
+              "3",
+              "метра",
+              "пассажиры",
+              "уже",
+              "купили",
+              "билеты.",
+              "может",
+              "ли",
+              "число",
+              "пассажиров",
+              "позволить",
+              "рейс",
+              "кто",
+              "и",
+              "что",
+              "должен",
+              "передать",
+              "для",
+              "возврата",
+              "требуется",
+              "пассажиру",
+              "получения",
+              "денег",
+              "в",
+              "каком",
+              "размере"
+            ],
+            "exact_terms": [],
+            "bound_subjects": [],
+            "retrieval_anchors": [],
+            "matched_terms": [
+              "воды",
+              "рейс"
+            ],
+            "body_matched_terms": [
+              "воды",
+              "рейс"
+            ],
+            "matched_term_count": 2,
+            "match_ratio": 0.069,
+            "missing_exact_terms": [],
+            "missing_parent_exact_terms": [],
+            "heading_context_used": false,
+            "table_context_used": false,
+            "reference_visible_span": [
+              19,
+              358
+            ],
+            "lexical_score": 0.9,
+            "context_only": true
+          },
+          "literal_context_admission": null
+        }
+      ],
+      "qualification_rejections": [
+        "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+        "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+        "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+        "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+        "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+        "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f"
+      ],
+      "pre_projection_qualified_ids": [],
+      "projection_observation": {
+        "schema_version": 1,
+        "callback_stage": "after_model_visible_validation",
+        "delivery_blocked": true,
+        "final_callback": {
+          "kind": "docs_context",
+          "status": "insufficient_evidence",
+          "context_available": false,
+          "answer_supported": false,
+          "answer_available": false,
+          "edit_ready": false,
+          "sources": {
+            "observation": "missing"
+          }
+        },
+        "upstream_received": {
+          "retrieved_candidates": {
+            "observation": "recorded",
+            "recorded_count": 6,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 6,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md"
+              },
+              {
+                "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md"
+              },
+              {
+                "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md"
+              },
+              {
+                "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md"
+              },
+              {
+                "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md"
+              },
+              {
+                "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md"
+              }
+            ]
+          },
+          "qualification_outcomes": {
+            "observation": "recorded",
+            "recorded_count": 6,
+            "producer_count": null,
+            "producer_omitted": null,
+            "preview_count": 6,
+            "preview_omitted": 0,
+            "items": [
+              {
+                "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              },
+              {
+                "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+                "document_id": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+                "query_id": "query-original",
+                "outcome": "rejected",
+                "reason": "insufficient_visible_match"
+              }
+            ]
+          }
+        },
+        "returned_core_diagnostics": {
+          "observation": "missing"
+        },
+        "primary_attempt": {
+          "observation": "missing"
+        },
+        "hint_attempt": {
+          "observation": "missing"
+        },
+        "claim_boundary": "Core payloads precede facade finalizers; prepared variants are not accepted sources. Event keys identify recorded branches, not source text. Unknown upstream omissions stay unknown; previews and decision-log omissions cannot prove an absent first loss."
+      },
+      "component_evidence_bindings": [],
+      "observer_counts": {
+        "retrieval_calls": 1,
+        "validation_calls": 1
+      },
+      "delivery_observations": {
+        "return_counts": {
+          "member_read": 1,
+          "project_context": 1,
+          "unified": 1
+        },
+        "returns": [
+          {
+            "stage": "member_read",
+            "request": {
+              "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+              "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": 12,
+              "tokens": null,
+              "expand": null,
+              "lookup_queries": null
+            },
+            "result": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 3,
+                "items": [
+                  {
+                    "source": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+                    "stable_chunk_id": "child-52417fdf5e53ff9374166da6b452a4c664c23546",
+                    "parent_logical_id": "parent-028f40a1cc9229563acde4778ba86ef5",
+                    "path": "holdout/tidal_ferry/cargo.md",
+                    "project_identity": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 19,
+                    "char_end": 328,
+                    "display_content_hash": "bd3a589bbf9270d12e1efc5689527fe51b7ab35f3b3e18c4f49ff26a9805c187",
+                    "generation_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+                    "project_doc_catalog_entry_hash": "sha256:391b7163d9afa4f736646ca97c50b577ded40faa11d6c25eb75872f8472ed954",
+                    "project_doc_content_hash": "sha256:9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+                    "stable_chunk_id": "child-a5a0f551e6a4a85b9f9dd8e5f3cf4baf8ea0c328",
+                    "parent_logical_id": "parent-328febad3dcbe5f07dd3cfaebecfcf8e",
+                    "path": "holdout/tidal_ferry/sailing.md",
+                    "project_identity": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 20,
+                    "char_end": 341,
+                    "display_content_hash": "8c967a01a33057cf467d656fa0852d0df7a26bc707f215aafeeb4f26fccf5f97",
+                    "generation_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+                    "project_doc_catalog_entry_hash": "sha256:35d78d59cf7bb7c4e07467fbb3bbc3f44e62afb4b7a398606a4297ba68cc665a",
+                    "project_doc_content_hash": "sha256:d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  },
+                  {
+                    "source": "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+                    "stable_chunk_id": "child-4d6a4e593cc8255d46a3841ca81ad4cf29cf262f",
+                    "parent_logical_id": "parent-24e8927b527086b1485614720d831b39",
+                    "path": "holdout/tidal_ferry/refunds.md",
+                    "project_identity": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                    "doc_scope": "project",
+                    "module_path": null,
+                    "source_class": "project_file",
+                    "stale": false,
+                    "lifecycle_status": "active",
+                    "freshness": "current",
+                    "char_start": 19,
+                    "char_end": 359,
+                    "display_content_hash": "c5aea746be80c77d3076bfd3dadd15851c75261afd9e64f4782ddae2b6418efe",
+                    "generation_id": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+                    "project_doc_catalog_entry_hash": "sha256:a1afc01b255628ae85c5c32f96fc99e1c7a89e7960fbc0612b30524a3af70075",
+                    "project_doc_content_hash": "sha256:be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+                    "qualified_query_ids": {
+                      "count": 0,
+                      "items": [],
+                      "omitted": 0
+                    }
+                  }
+                ],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+                "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+                "project_identity": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "routing": {},
+            "project_trust_decision": {}
+          },
+          {
+            "stage": "project_context",
+            "request": {
+              "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+              "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "success",
+              "reason": "no_reliable_context",
+              "mode": "auto",
+              "answer_available": false,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "no_reliable_context"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "project_docs": {
+              "status": "success",
+              "reason": null,
+              "reason_code": "project_docs_ready",
+              "answer_available": true,
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "request_scope": {
+                "schema_version": 1,
+                "query": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+                "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+                "project_identity": "local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94",
+                "requested_scope": "project",
+                "requested_module": null,
+                "requested_module_path": null,
+                "doc_scope": "project",
+                "module_path": null,
+                "evidence_path": null
+              },
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "dependency_docs": null,
+            "routing": {},
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          },
+          {
+            "stage": "unified",
+            "request": {
+              "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+              "project_path": "/tmp/docatlas-v3-16pfemaa/project",
+              "scope": "project",
+              "module": null,
+              "module_path": null,
+              "limit": null,
+              "tokens": null,
+              "expand": null,
+              "allow_network": false,
+              "prepare_project_docs": false,
+              "lookup_queries": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              }
+            },
+            "result": {
+              "status": "not_found",
+              "reason_code": "required_evidence_missing",
+              "mode_requested": "auto",
+              "mode_selected": "project",
+              "context_available": false,
+              "answer_available": false,
+              "answer_supported": false,
+              "support_status": "insufficient_evidence",
+              "requires_confirmation": false,
+              "confirmation_reason": null,
+              "delivery_decision": {
+                "deliverable": false,
+                "reason_code": "required_evidence_missing"
+              },
+              "context_windows": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": {
+                "count": 0,
+                "items": [],
+                "omitted": 0
+              },
+              "support_decision": {
+                "answer_supported": false,
+                "support_status": "insufficient_evidence",
+                "reason_code": "required_evidence_missing",
+                "missing_requirement_ids": {
+                  "count": 1,
+                  "items": [
+                    "unsupported_answer_authorization:context_only"
+                  ],
+                  "omitted": 0
+                },
+                "mandatory_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                },
+                "satisfied_requirement_ids": {
+                  "count": 0,
+                  "items": [],
+                  "omitted": 0
+                }
+              }
+            },
+            "dependency_docs": {
+              "delivery_decision": {},
+              "context_windows": null,
+              "result_windows": null,
+              "request_scope": {},
+              "requirements": null,
+              "support_decision": {
+                "missing_requirement_ids": null,
+                "mandatory_requirement_ids": null,
+                "satisfied_requirement_ids": null
+              }
+            },
+            "lanes": {
+              "project": {
+                "status": "not_found",
+                "reason_code": "no_reliable_context",
+                "source_count": 0
+              },
+              "dependency": {
+                "status": "not_requested",
+                "source_count": 0
+              },
+              "library": {
+                "status": "not_requested",
+                "source_count": 0
+              }
+            },
+            "routing": {
+              "reason_code": "project_context_auto",
+              "project_path_used": true,
+              "dependency_detected": false,
+              "delegated_mode": "auto"
+            },
+            "project_trust_decision": {
+              "reason": "no_reliable_context",
+              "confidence": "low",
+              "answer_available": false,
+              "passed_relevance_gate": false
+            },
+            "routing_stages": {
+              "project_docs": {
+                "status": "used",
+                "reason": "selected project documentation mode",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "dependency_docs": {
+                "status": "skipped",
+                "reason": "dependency documentation not selected or not available",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "source_evidence": {
+                "status": "skipped",
+                "reason": "source stages require explicit source-bound targets; prose is not authorization",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "repo_map": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded authoring evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              },
+              "code_graph": {
+                "status": "insufficient",
+                "reason": "missing project documentation requires bounded module evidence",
+                "item_count": 0,
+                "observed_item_count": 0,
+                "budget_projection_bytes": 0,
+                "observed_budget_projection_bytes": 0,
+                "budget_exceeded": false
+              }
+            }
+          }
+        ],
+        "omitted": 0
+      }
+    }
+  },
+  "validation_snapshot": {},
+  "pools": [],
+  "state_after": {
+    "generation": "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+    "rows": [
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md",
+        "# Грузы на пароме\n\nНезакреплённый груз не принимают на паром даже при свободной палубе.\nЗакрепление груза проверяет матрос погрузки до посадки пассажиров.\nБаллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления.\nГрузовой рейс без пассажиров не освобождает от проверки уровня воды и причала.\n",
+        "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/cargo.md"
+      ],
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md",
+        "# Возврат билетов\n\nЕсли рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета.\nЕсли пассажир не явился на состоявшийся рейс, возврат по правилу отмены не производится.\nЗапись капитана об отмене рейса передаётся кассиру до начала возвратов.\nВозврат платы за экскурсионный катер этими правилами не установлен.\n",
+        "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/refunds.md"
+      ],
+      [
+        "gen-e0a9fc1af4a14b3bb776cf23715b3dbd",
+        "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md",
+        "# Разрешение рейса\n\nПри уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров.\nПри уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала.\nПроверка причала не заменяет проверку спасательных средств.\nРасписание экскурсионного катера не определяет время рейса парома.\n",
+        "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+        "project_file:local:15e4faf52f42432177730ebccc8c36c4da8b2b727f828f38e7f8daa6f21d8a94:holdout/tidal_ferry/sailing.md"
+      ]
+    ],
+    "files": {
+      "/tmp/docatlas-v3-16pfemaa/project/docatlas.project-docs.yaml": "7db0d10d380daf47ac79f967bee70d45f12fcd1ca4d3a87c69bfbeb1c67325b4",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/cargo.md": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/refunds.md": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1",
+      "/tmp/docatlas-v3-16pfemaa/project/holdout/tidal_ferry/sailing.md": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547"
+    }
+  },
+  "elapsed_seconds": 0.06002570599957835,
+  "integrity_errors": []
+}

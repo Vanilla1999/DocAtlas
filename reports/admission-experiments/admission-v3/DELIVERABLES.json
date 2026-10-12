@@ -1,0 +1,17 @@
+{
+  "status": "COMPLETED_WITH_INDEPENDENT_REVIEW_DEFAULT_OFF",
+  "files": {
+    "RESULT_V3_RU.md": "fb27c922c5e7565cb2776c6cb118788da829fcb57a628d42a59acda8792d79b1",
+    "RESULTS_V3.json": "7f47bd314a2fb8045aa3751dd5434e62bcee79fd03140ba6743ba60dac132bc9",
+    "INDEPENDENT_REVIEW_RU.md": "d393c47af9549e5a04710252f00386f952f2cff138eb58f238d0e29ec3f86d35",
+    "COSTS_V3.json": "ab0ab03a93932ede9acbcc6045c99a476742c61159cfe2a1d707e2b1f47f3e94",
+    "LEDGER.json": "129311998797a5b99041b8347b6361cec1f40606977e8ba1e23f4c84a246e0b3",
+    "V3_PRODUCT.patch": "6bf646832abfa7e9ae225504565a0377c6235322a5818f6684f054dc642d2d54",
+    "SOURCE_IDENTITY.json": "1bef777aaba22195cc6d3de0ae1777a7f9f761a3bd37e17c2f43c4288fe83df8",
+    "COMPACT_CHECKPOINT_RU.md": "a2d192d0e071fca11cfa38bbc75fec5aae1982b6e9c66aef39ce9fb253df067f"
+  },
+  "new_runtime_planned": false,
+  "note": "Final artifact inventory only; not a product/compile/unit check.",
+  "subsequent_owner_authorized_commit": "6adc8e655fa69b5475adf613c8c446dd3a604b98",
+  "push": false
+}

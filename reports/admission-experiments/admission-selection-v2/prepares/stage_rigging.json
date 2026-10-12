@@ -1,0 +1,94 @@
+{
+  "seconds": 0.10902767500010668,
+  "expected_paths": [
+    "calibration/stage_rigging/inspection.md",
+    "calibration/stage_rigging/rehearsal.md",
+    "calibration/stage_rigging/release.md"
+  ],
+  "indexed_paths": [
+    "calibration/stage_rigging/inspection.md",
+    "calibration/stage_rigging/rehearsal.md",
+    "calibration/stage_rigging/release.md"
+  ],
+  "excluded_or_failed_paths": [],
+  "unexpected_paths": [],
+  "rows": [
+    {
+      "stable_chunk_id": "child-3bac3ef3d9cc2337b04da0b3357a50a8d79e945f",
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "display_text": "# Осмотр подвесного оборудования\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-80d74e97c1ec0b7324aedb38f679520eab1a77c2",
+      "source_path": "calibration/stage_rigging/inspection.md",
+      "display_text": "Если на страховочном тросе обнаружен разрыв хотя бы одной проволоки, световую балку запрещено поднимать.\nОбнаруженный дефект записывает в журнал дежурный осветитель.\nИсправный трос не освобождает от проверки креплений балки перед подъёмом.\nВысота декоративной арки не является допустимой высотой подъёма балки.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-96d14af89d98e49288e0e18bfa4e2bbc2b89a26f",
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "display_text": "# Организация репетиции\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-b10c6f1d2b3a22f5d1d81d4b8750b310b9597cb4",
+      "source_path": "calibration/stage_rigging/rehearsal.md",
+      "display_text": "Перед нагрузочной проверкой дежурный осветитель освобождает площадку под балкой и выставляет ограждение.\nВо время проверки ограждение не снимают даже по просьбе постановщика.\nПосле завершённой нагрузочной проверки ограждение снимает дежурный осветитель, но подъём балки по-прежнему требует подписи заведующего сценой.\nАренда костюмов не относится к обслуживанию подвесного оборудования.\n",
+      "line_start": 3,
+      "line_end": 6
+    },
+    {
+      "stable_chunk_id": "child-7280626b1eecb18ae32125d953ea3663010765ef",
+      "source_path": "calibration/stage_rigging/release.md",
+      "display_text": "# Допуск после ремонта\n\n",
+      "line_start": 1,
+      "line_end": 2
+    },
+    {
+      "stable_chunk_id": "child-a42750fbf3085934b762f6beb8640213720950cf",
+      "source_path": "calibration/stage_rigging/release.md",
+      "display_text": "Замену дефектного страховочного троса выполняет механик сцены.\nПосле замены троса подъём балки разрешается только после нагрузочной проверки и подписи заведующего сценой в журнале.\nУстное согласие постановщика не заменяет подпись заведующего сценой.\nНагрузочную проверку нельзя проводить при людях под балкой.\n",
+      "line_start": 3,
+      "line_end": 6
+    }
+  ],
+  "sqlite_version": "3.45.1",
+  "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+  "config_sha256": "7a75d2f08d69147c0921d9e4d5b850eeafbb9143a45a8f5cfc6463f60024f9da",
+  "storage_path": "/tmp/docatlas-evidence-g5aighgk/docatlas_home/mcp-members/members.db",
+  "generation_id": "gen-d659116b46de46ec85bce34efe2547ce",
+  "catalog_sha256": "5e71a621c45087a693309c57e8d8ae4efbdd7a4ca2617ad0bb37055afb587e56",
+  "documents": [
+    {
+      "path": "calibration/stage_rigging/inspection.md",
+      "content_sha256": "391829439c63ce844ab284cb3d58f302e4f9e1a9c454315196a3c44c305854b7",
+      "catalog_entry_hash": "sha256:bfc12edf6331f29f4acb1b4b3b673b201cc20e7072fcbb0902689c1d471b983e"
+    },
+    {
+      "path": "calibration/stage_rigging/rehearsal.md",
+      "content_sha256": "2cd090ef13a7dea07b658512d8aedd85ad40614facac346e27ae6889f4fc2cee",
+      "catalog_entry_hash": "sha256:1bc0f923ad1eaa55f94db17d7c8d196868cd9d3a18e2b9e548eaddf32fc9840f"
+    },
+    {
+      "path": "calibration/stage_rigging/release.md",
+      "content_sha256": "04b8a0005b68df43f468257db230c4cfcedfa2a50925121055c608ad30730c86",
+      "catalog_entry_hash": "sha256:02b329a15704ea551ff1781397709d79a1fec8dcab8d53216e40af197a3f4a82"
+    }
+  ],
+  "transaction_metrics": {
+    "transaction": "committed",
+    "generation_id": "gen-d659116b46de46ec85bce34efe2547ce",
+    "members": 3,
+    "new_count": 3,
+    "changed_count": 0,
+    "unchanged_files": 0,
+    "derived_writes": 3,
+    "derived_deletes": 0,
+    "sources_deleted": 0,
+    "sections_indexed": 3
+  }
+}

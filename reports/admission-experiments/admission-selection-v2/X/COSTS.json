@@ -1,0 +1,67 @@
+{
+  "rows": [
+    {
+      "id": "Q16",
+      "arm": "X-rank",
+      "snippet_proxy_tokens": 911,
+      "submitted_prompt_proxy_tokens": 1653,
+      "source_count": 3,
+      "host_seconds": 6.186256,
+      "resident_joint_forward_seconds": 2.105666322993784,
+      "actual_public_requests": 2,
+      "public_seconds": 4.408577362999495,
+      "observed_turn_seconds_lower_bound": 12.700499685993279,
+      "view_build_seconds": 0,
+      "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+    },
+    {
+      "id": "Q16",
+      "arm": "X-prune",
+      "snippet_proxy_tokens": 659,
+      "submitted_prompt_proxy_tokens": 1479,
+      "source_count": 4,
+      "host_seconds": 3.220084,
+      "resident_joint_forward_seconds": 2.105666322993784,
+      "actual_public_requests": 2,
+      "public_seconds": 4.408577362999495,
+      "observed_turn_seconds_lower_bound": 9.743359434992684,
+      "view_build_seconds": 0.009031748999404954,
+      "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+    },
+    {
+      "id": "Q46",
+      "arm": "X-rank",
+      "snippet_proxy_tokens": 519,
+      "submitted_prompt_proxy_tokens": 1141,
+      "source_count": 2,
+      "host_seconds": 3.520278,
+      "resident_joint_forward_seconds": 0.5930971240013605,
+      "actual_public_requests": 2,
+      "public_seconds": 3.179126130999066,
+      "observed_turn_seconds_lower_bound": 7.292501255000426,
+      "view_build_seconds": 0,
+      "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+    },
+    {
+      "id": "Q46",
+      "arm": "X-prune",
+      "snippet_proxy_tokens": 476,
+      "submitted_prompt_proxy_tokens": 1506,
+      "source_count": 6,
+      "host_seconds": 2.678837,
+      "resident_joint_forward_seconds": 0.5930971240013605,
+      "actual_public_requests": 2,
+      "public_seconds": 3.179126130999066,
+      "observed_turn_seconds_lower_bound": 6.458296455003234,
+      "view_build_seconds": 0.007236200002807891,
+      "reconstruction_cost": "combined span reconstruction/provenance view assembly charged conservatively to pruning arm"
+    }
+  ],
+  "codec": "o200k_base proxy NOT billing",
+  "cold_load_seconds": 2.9039846129999205,
+  "forwards": 16,
+  "rss_bytes": 2230779904,
+  "pairing": "same joint scores/retained masks, same native selected IDs, same actual parent public packet",
+  "boundary": "product-integrated ranking + client exact-span pruning; no native pruned public DTO claim",
+  "timing_limit": "Per-case sums are lower bounds: author tokenization/mapping, process startup/import, JSON/storage overhead not allocated. Joint runner total_seconds and cold_load_seconds remain in raw receipt. Do not claim complete latency/speedup."
+}

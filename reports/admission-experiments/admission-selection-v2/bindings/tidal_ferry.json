@@ -1,0 +1,12 @@
+{
+  "project": "/tmp/docatlas-selection-v2-4icagk_h/project",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "domain_version": "2026.1",
+  "document_hashes": {
+    "holdout/tidal_ferry/sailing.md": "d017b91a991734eec747d4c83f39f6a86ba2f23db4be43e81e708ac02dda2547",
+    "holdout/tidal_ferry/cargo.md": "9d8cb012ed6c730d8d2a6b5ebdb0fbbb5acf047bafd46cb388d7129fb8c6597e",
+    "holdout/tidal_ferry/refunds.md": "be5d3cb8a89a89072a8db45beef954761f40dea501cc8d7c1b2a852a40b18bc1"
+  },
+  "generation": "gen-b1287a357a8b44b186be34ba1405f704"
+}

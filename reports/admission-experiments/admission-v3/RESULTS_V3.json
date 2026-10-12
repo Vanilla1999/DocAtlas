@@ -1,0 +1,2205 @@
+{
+  "schema": "docatlas-independent-final-review-v3-1",
+  "verdict": "NARROW_ADMISSION_GAIN_CONFIRMED_DEFAULT_NOT_READY",
+  "execution": {
+    "status": "COMPLETED",
+    "ledger": {
+      "prepares": 7,
+      "context_attempts": 57,
+      "host_requests": 28,
+      "model_forwards": 0,
+      "errors": []
+    },
+    "runtime_seconds": 136.94634569900154
+  },
+  "audit": {
+    "errors": [],
+    "execution_freeze": 40,
+    "independent_freeze": 17,
+    "product_python_after_run": 397,
+    "raw_hashes": 315,
+    "public_saved_operands": {
+      "PASS": 57
+    },
+    "complete_B1_V3_original_universe_cases": 19,
+    "default_universe_observer": "NOT_AVAILABLE_INACTIVE_BY_DESIGN"
+  },
+  "summary_by_arm": {
+    "DefaultOff": {
+      "base_host_execution": "NOT_RUN",
+      "new_positive_exact_witness_cases": {
+        "FAIL": 3,
+        "PASS": 1
+      },
+      "new_positive_semantic_public_cases": {
+        "FAIL": 3,
+        "PASS": 1
+      },
+      "new_positive_witnesses": {
+        "delivered": 4,
+        "required": 19
+      },
+      "new_positive_fact_groups": {
+        "delivered": 2,
+        "required": 10
+      },
+      "new_negative_source_contract": {
+        "PASS": 3
+      },
+      "all_nine_negative_source_contract": {
+        "PASS": 9
+      },
+      "old_priority_controls": {
+        "PASS": 2
+      },
+      "known_numeric_diagnostics_public_complete": {
+        "FAIL": 3
+      },
+      "all_ten_positive_public_complete": {
+        "FAIL": 8,
+        "PASS": 2
+      },
+      "base_host_complete_positive": {},
+      "base_host_honest_negative_refusal": {},
+      "calibration_positive_full_public": {
+        "FAIL": 2
+      },
+      "holdout_positive_full_public": {
+        "PASS": 1,
+        "FAIL": 1
+      },
+      "matched_seven_positive_base_host_complete": {},
+      "historical_default_expectation_matches": {
+        "PASS": 12
+      }
+    },
+    "B1": {
+      "base_host_execution": "EXECUTED_FIXED_SUBSET",
+      "new_positive_exact_witness_cases": {
+        "FAIL": 3,
+        "PASS": 1
+      },
+      "new_positive_semantic_public_cases": {
+        "FAIL": 3,
+        "PASS": 1
+      },
+      "new_positive_witnesses": {
+        "delivered": 6,
+        "required": 19
+      },
+      "new_positive_fact_groups": {
+        "delivered": 4,
+        "required": 10
+      },
+      "new_negative_source_contract": {
+        "PASS": 1,
+        "FAIL": 2
+      },
+      "all_nine_negative_source_contract": {
+        "PASS": 3,
+        "FAIL": 6
+      },
+      "old_priority_controls": {
+        "PASS": 2
+      },
+      "known_numeric_diagnostics_public_complete": {
+        "FAIL": 3
+      },
+      "all_ten_positive_public_complete": {
+        "FAIL": 6,
+        "PASS": 4
+      },
+      "base_host_complete_positive": {
+        "FAIL": 6,
+        "PASS": 3
+      },
+      "base_host_honest_negative_refusal": {
+        "PASS": 3
+      },
+      "calibration_positive_full_public": {
+        "FAIL": 2
+      },
+      "holdout_positive_full_public": {
+        "PASS": 1,
+        "FAIL": 1
+      },
+      "matched_seven_positive_base_host_complete": {
+        "FAIL": 6,
+        "PASS": 1
+      },
+      "historical_default_expectation_matches": {}
+    },
+    "V3": {
+      "base_host_execution": "EXECUTED_FIXED_SUBSET",
+      "new_positive_exact_witness_cases": {
+        "PASS": 3,
+        "FAIL": 1
+      },
+      "new_positive_semantic_public_cases": {
+        "PASS": 3,
+        "FAIL": 1
+      },
+      "new_positive_witnesses": {
+        "delivered": 17,
+        "required": 19
+      },
+      "new_positive_fact_groups": {
+        "delivered": 8,
+        "required": 10
+      },
+      "new_negative_source_contract": {
+        "PASS": 1,
+        "FAIL": 2
+      },
+      "all_nine_negative_source_contract": {
+        "PASS": 3,
+        "FAIL": 6
+      },
+      "old_priority_controls": {
+        "PASS": 2
+      },
+      "known_numeric_diagnostics_public_complete": {
+        "PASS": 1,
+        "FAIL": 2
+      },
+      "all_ten_positive_public_complete": {
+        "PASS": 7,
+        "FAIL": 3
+      },
+      "base_host_complete_positive": {
+        "PASS": 4,
+        "FAIL": 3
+      },
+      "base_host_honest_negative_refusal": {
+        "PASS": 5
+      },
+      "calibration_positive_full_public": {
+        "PASS": 1,
+        "FAIL": 1
+      },
+      "holdout_positive_full_public": {
+        "PASS": 2
+      },
+      "matched_seven_positive_base_host_complete": {
+        "PASS": 4,
+        "FAIL": 3
+      },
+      "historical_default_expectation_matches": {}
+    }
+  },
+  "public_cases": [
+    {
+      "case_id": "V3CAL01",
+      "split": "calibration",
+      "arm": "DefaultOff",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 3,
+      "missing_witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 1
+    },
+    {
+      "case_id": "V3CAL01",
+      "split": "calibration",
+      "arm": "B1",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 0,
+      "required_witnesses": 3,
+      "missing_witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 1
+    },
+    {
+      "case_id": "V3CAL01",
+      "split": "calibration",
+      "arm": "V3",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц и как получается эта сумма?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/tariff.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 3,
+      "required_witnesses": 3,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 1,
+      "required_fact_groups": 1
+    },
+    {
+      "case_id": "V3CAL02",
+      "split": "calibration",
+      "arm": "DefaultOff",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 5,
+      "missing_witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Спор о сумме печатного счёта принимает бухгалтер кооператива."
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 3
+    },
+    {
+      "case_id": "V3CAL02",
+      "split": "calibration",
+      "arm": "B1",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 0,
+      "required_witnesses": 5,
+      "missing_witnesses": [
+        {
+          "path": "docs/tariff.md",
+          "quote": "Первые 10 страниц заказа стоят по 3 рубля за страницу."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Каждая следующая страница того же заказа стоит 2 рубля."
+        },
+        {
+          "path": "docs/tariff.md",
+          "quote": "Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет."
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Спор о сумме печатного счёта принимает бухгалтер кооператива."
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 3
+    },
+    {
+      "case_id": "V3CAL02",
+      "split": "calibration",
+      "arm": "V3",
+      "question": "Сколько рублей составляет печатный счёт за один заказ из 14 страниц; кто принимает спор о сумме и какие документы ему передать?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/tariff.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 3,
+      "required_witnesses": 5,
+      "missing_witnesses": [
+        {
+          "path": "docs/disputes.md",
+          "quote": "Спор о сумме печатного счёта принимает бухгалтер кооператива."
+        },
+        {
+          "path": "docs/disputes.md",
+          "quote": "Заказчик передаёт бухгалтеру исходный заказ и выданный счёт; оператор принтера не утверждает перерасчёт."
+        }
+      ],
+      "delivered_fact_groups": 1,
+      "required_fact_groups": 3
+    },
+    {
+      "case_id": "V3CAL03",
+      "split": "calibration",
+      "arm": "DefaultOff",
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "V3CAL03",
+      "split": "calibration",
+      "arm": "B1",
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "V3CAL03",
+      "split": "calibration",
+      "arm": "V3",
+      "question": "В какую очередь печати попадает заказ с приоритетом 14 по правилу кооператива?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "V3H01",
+      "split": "holdout",
+      "arm": "DefaultOff",
+      "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/routes.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 4,
+      "required_witnesses": 4,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 2,
+      "required_fact_groups": 2
+    },
+    {
+      "case_id": "V3H01",
+      "split": "holdout",
+      "arm": "B1",
+      "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 2,
+      "paths": [
+        "docs/routes.md",
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 4,
+      "required_witnesses": 4,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 2,
+      "required_fact_groups": 2
+    },
+    {
+      "case_id": "V3H01",
+      "split": "holdout",
+      "arm": "V3",
+      "question": "Укладывается ли путь складской тележки от ворот к упаковке через весы в бюджет 12 единиц заряда и каков суммарный расход этого пути?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 2,
+      "paths": [
+        "docs/routes.md",
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 4,
+      "required_witnesses": 4,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 2,
+      "required_fact_groups": 2
+    },
+    {
+      "case_id": "V3H02",
+      "split": "holdout",
+      "arm": "DefaultOff",
+      "question": "При бюджете 12 единиц заряда какой из путей складской тележки от ворот к упаковке допустим: прямой или через весы; кто утверждает выбранный маршрут и что проверяет перед выпуском?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 7,
+      "missing_witnesses": [
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от весов к упаковке расходует 6 единиц заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Прямой переход от ворот к упаковке расходует 15 единиц заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Расход последовательного пути равен сумме расходов переходов."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Путь укладывается в бюджет, если суммарный расход не превышает бюджет."
+        },
+        {
+          "path": "docs/roles.md",
+          "quote": "Маршрут складской тележки утверждает диспетчер движения."
+        },
+        {
+          "path": "docs/roles.md",
+          "quote": "Перед выпуском тележки диспетчер движения проверяет направленные переходы и суммарный расход заряда по выбранному пути."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "V3H02",
+      "split": "holdout",
+      "arm": "B1",
+      "question": "При бюджете 12 единиц заряда какой из путей складской тележки от ворот к упаковке допустим: прямой или через весы; кто утверждает выбранный маршрут и что проверяет перед выпуском?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 2,
+      "required_witnesses": 7,
+      "missing_witnesses": [
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Переход от весов к упаковке расходует 6 единиц заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Прямой переход от ворот к упаковке расходует 15 единиц заряда."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Расход последовательного пути равен сумме расходов переходов."
+        },
+        {
+          "path": "docs/routes.md",
+          "quote": "Путь укладывается в бюджет, если суммарный расход не превышает бюджет."
+        }
+      ],
+      "delivered_fact_groups": 2,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "V3H02",
+      "split": "holdout",
+      "arm": "V3",
+      "question": "При бюджете 12 единиц заряда какой из путей складской тележки от ворот к упаковке допустим: прямой или через весы; кто утверждает выбранный маршрут и что проверяет перед выпуском?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 2,
+      "paths": [
+        "docs/routes.md",
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 7,
+      "required_witnesses": 7,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 4,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "V3H03",
+      "split": "holdout",
+      "arm": "DefaultOff",
+      "question": "На сколько единиц заряда приоритет 12 уменьшает расход пути складской тележки от ворот к упаковке через весы?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "V3H03",
+      "split": "holdout",
+      "arm": "B1",
+      "question": "На сколько единиц заряда приоритет 12 уменьшает расход пути складской тележки от ворот к упаковке через весы?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "V3H03",
+      "split": "holdout",
+      "arm": "V3",
+      "question": "На сколько единиц заряда приоритет 12 уменьшает расход пути складской тележки от ворот к упаковке через весы?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "V3H04",
+      "split": "holdout",
+      "arm": "DefaultOff",
+      "question": "Какая подпись Контролёра батарей даёт ему полномочие утверждать маршрут складской тележки от ворот к упаковке через весы при бюджете 12 единиц заряда?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "V3H04",
+      "split": "holdout",
+      "arm": "B1",
+      "question": "Какая подпись Контролёра батарей даёт ему полномочие утверждать маршрут складской тележки от ворот к упаковке через весы при бюджете 12 единиц заряда?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "V3H04",
+      "split": "holdout",
+      "arm": "V3",
+      "question": "Какая подпись Контролёра батарей даёт ему полномочие утверждать маршрут складской тележки от ворот к упаковке через весы при бюджете 12 единиц заряда?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 2,
+      "paths": [
+        "docs/routes.md",
+        "docs/roles.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "How are packets delivered with priority 7.",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "split": "control",
+      "arm": "B1",
+      "question": "How are packets delivered with priority 7.",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_PRIORITY7",
+      "split": "control",
+      "arm": "V3",
+      "question": "How are packets delivered with priority 7.",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "split": "control",
+      "arm": "B1",
+      "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_PRIORITY7_9",
+      "split": "control",
+      "arm": "V3",
+      "question": "How are packets delivered with priority 7-9 during concurrent recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "split": "diagnostic",
+      "arm": "DefaultOff",
+      "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 4,
+      "missing_witnesses": [
+        {
+          "path": "holdout/ceramic_firing/loading.md",
+          "quote": "Если два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "Для неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "Приоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "После обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 4,
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "split": "diagnostic",
+      "arm": "B1",
+      "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 0,
+      "required_witnesses": 4,
+      "missing_witnesses": [
+        {
+          "path": "holdout/ceramic_firing/loading.md",
+          "quote": "Если два взвешивания с интервалом 12 часов дают одинаковую массу, сосуд считают просохшим."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "Для неглазурованной партии дверцу разрешено приоткрыть при температуре 120 градусов или ниже."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "Приоткрытая дверца ещё не разрешает выгрузку: любую партию выгружает печник только при температуре 40 градусов или ниже."
+        },
+        {
+          "path": "holdout/ceramic_firing/cooling.md",
+          "quote": "После обжига глазурованной партии дверцу печи держат закрытой до температуры 80 градусов или ниже."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "DIAG_HOLD03",
+      "split": "diagnostic",
+      "arm": "V3",
+      "question": "Мастер получил одинаковую массу сосуда при двух взвешиваниях через 12 часов. После обжига неглазурованной партии температура 100 градусов. Что эти наблюдения разрешают в отношении просыхания, дверцы и выгрузки, и чем отличается правило дверцы для глазурованной партии?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 2,
+      "paths": [
+        "holdout/ceramic_firing/loading.md",
+        "holdout/ceramic_firing/cooling.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 4,
+      "required_witnesses": 4,
+      "missing_witnesses": [],
+      "delivered_fact_groups": 4,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "split": "diagnostic",
+      "arm": "DefaultOff",
+      "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 3,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/sailing.md",
+          "quote": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров."
+        },
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Запись капитана об отмене рейса передаётся кассиру до начала возвратов."
+        },
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Если рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 3,
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "split": "diagnostic",
+      "arm": "B1",
+      "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 0,
+      "required_witnesses": 3,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/sailing.md",
+          "quote": "При уровне воды ниже отметки 1,4 метра паромный рейс отменяют независимо от числа пассажиров."
+        },
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Запись капитана об отмене рейса передаётся кассиру до начала возвратов."
+        },
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Если рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 3
+    },
+    {
+      "case_id": "DIAG_HOLD05",
+      "split": "diagnostic",
+      "arm": "V3",
+      "question": "Уровень воды 1,3 метра, пассажиры уже купили билеты. Может ли число пассажиров позволить рейс, кто и что должен передать для возврата и что требуется пассажиру для получения денег и в каком размере?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "holdout/tidal_ferry/sailing.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 1,
+      "required_witnesses": 3,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Запись капитана об отмене рейса передаётся кассиру до начала возвратов."
+        },
+        {
+          "path": "holdout/tidal_ferry/refunds.md",
+          "quote": "Если рейс отменён из-за низкого уровня воды, кассир возвращает полную стоимость билета по предъявлении билета."
+        }
+      ],
+      "delivered_fact_groups": 1,
+      "required_fact_groups": 3
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "split": "diagnostic",
+      "arm": "DefaultOff",
+      "question": "Вода на отметке 1,4 метра, причал проверен, на палубе есть место. Кто решает вопрос рейса, можно ли принять незакреплённый груз, кто и когда проверяет закрепление, а достаточно ли закрепления для баллонов с горючим газом на пассажирском рейсе?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "delivered_witnesses": 0,
+      "required_witnesses": 4,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/sailing.md",
+          "quote": "При уровне воды от 1,4 метра включительно решение о рейсе принимает капитан после проверки причала."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Незакреплённый груз не принимают на паром даже при свободной палубе."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Закрепление груза проверяет матрос погрузки до посадки пассажиров."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Баллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления."
+        }
+      ],
+      "delivered_fact_groups": 0,
+      "required_fact_groups": 4,
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "split": "diagnostic",
+      "arm": "B1",
+      "question": "Вода на отметке 1,4 метра, причал проверен, на палубе есть место. Кто решает вопрос рейса, можно ли принять незакреплённый груз, кто и когда проверяет закрепление, а достаточно ли закрепления для баллонов с горючим газом на пассажирском рейсе?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "holdout/tidal_ferry/sailing.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 1,
+      "required_witnesses": 4,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Незакреплённый груз не принимают на паром даже при свободной палубе."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Закрепление груза проверяет матрос погрузки до посадки пассажиров."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Баллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления."
+        }
+      ],
+      "delivered_fact_groups": 1,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "DIAG_HOLD06",
+      "split": "diagnostic",
+      "arm": "V3",
+      "question": "Вода на отметке 1,4 метра, причал проверен, на палубе есть место. Кто решает вопрос рейса, можно ли принять незакреплённый груз, кто и когда проверяет закрепление, а достаточно ли закрепления для баллонов с горючим газом на пассажирском рейсе?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "holdout/tidal_ferry/sailing.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "EXECUTED",
+      "delivered_witnesses": 1,
+      "required_witnesses": 4,
+      "missing_witnesses": [
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Незакреплённый груз не принимают на паром даже при свободной палубе."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Закрепление груза проверяет матрос погрузки до посадки пассажиров."
+        },
+        {
+          "path": "holdout/tidal_ferry/cargo.md",
+          "quote": "Баллоны с горючим газом перевозить на пассажирском рейсе запрещено независимо от закрепления."
+        }
+      ],
+      "delivered_fact_groups": 1,
+      "required_fact_groups": 4
+    },
+    {
+      "case_id": "Q16",
+      "split": "diagnostic",
+      "arm": "DefaultOff",
+      "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "Q16",
+      "split": "diagnostic",
+      "arm": "B1",
+      "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 10,
+      "paths": [
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "Q16",
+      "split": "diagnostic",
+      "arm": "V3",
+      "question": "Какая диагностическая информация у события завершения, которой нет в начале запроса?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 10,
+      "paths": [
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "Q46",
+      "split": "diagnostic",
+      "arm": "DefaultOff",
+      "question": "Можно ли признать PASS, если оба режима логирования дали одинаковый неправильный ответ?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "FAIL",
+      "public_semantic_sufficiency": "FAIL",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "Q46",
+      "split": "diagnostic",
+      "arm": "B1",
+      "question": "Можно ли признать PASS, если оба режима логирования дали одинаковый неправильный ответ?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 7,
+      "paths": [
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "Q46",
+      "split": "diagnostic",
+      "arm": "V3",
+      "question": "Можно ли признать PASS, если оба режима логирования дали одинаковый неправильный ответ?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 7,
+      "paths": [
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md",
+        "README.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "How does OtherAPI handle packet delivery during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "split": "control",
+      "arm": "B1",
+      "question": "How does OtherAPI handle packet delivery during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/owners.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_OWNER",
+      "split": "control",
+      "arm": "V3",
+      "question": "How does OtherAPI handle packet delivery during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/owners.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "How does DocAtlas combine batch queue during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "split": "control",
+      "arm": "B1",
+      "question": "How does DocAtlas combine batch queue during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/compounds.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_COMPOUND",
+      "split": "control",
+      "arm": "V3",
+      "question": "How does DocAtlas combine batch queue during recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/compounds.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "split": "control",
+      "arm": "B1",
+      "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/setext.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_SETEXT",
+      "split": "control",
+      "arm": "V3",
+      "question": "When do telemetry pulses serialize during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/setext.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/logs.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "split": "control",
+      "arm": "B1",
+      "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/logs.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_SHORTFACT",
+      "split": "control",
+      "arm": "V3",
+      "question": "When do logs flow to disk during concurrent checkpoint recovery?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/logs.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "N/A",
+      "exact_witness_delivery": "PASS",
+      "public_semantic_sufficiency": "PASS",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "split": "control",
+      "arm": "DefaultOff",
+      "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 0,
+      "paths": [],
+      "same_family_state": "PASS",
+      "source_empty_contract": "PASS",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN",
+      "limited_historical_default_expectation": "PASS"
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "split": "control",
+      "arm": "B1",
+      "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/store.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "NOT_RUN"
+    },
+    {
+      "case_id": "OLD_UNRELATED",
+      "split": "control",
+      "arm": "V3",
+      "question": "Как DocAtlas отправляет сообщения через квантовый канал?",
+      "source_policy_saved_operands": "PASS",
+      "source_count": 1,
+      "paths": [
+        "docs/store.md"
+      ],
+      "same_family_state": "PASS",
+      "source_empty_contract": "FAIL",
+      "exact_witness_delivery": "N/A",
+      "public_semantic_sufficiency": "N/A",
+      "host_execution": "EXECUTED"
+    }
+  ],
+  "host_answers": [
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD03",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [],
+      "note": "Честный source-empty отказ; исходная answerable задача не решена.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD03",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "note": "Одинаковая масса через12 -> просох;100<=120 приоткрыть неглазурованную;100>40 не выгрузить;100>80 глазурованная закрыта. Доставленные условия поддерживают вывод. Указание печника не спрашивалось, отсутствие его имени в answer не вводит новый semantic FAIL.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD05",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [],
+      "note": "Честный отказ без sources; нет ответа ни на water, ни на refund.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD05",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Верно1,3<1,4 и независимость от пассажиров. Captain record/cashier/full cost/ticket отсутствуют в packet и явно missing.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD06",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Верно captain after pier at inclusive1,4; missing unsecured cargo/sailor before boarding/gas ban. Unasked rescue equipment поддержано, не заменяет missing cargo.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "DIAG_HOLD06",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Captain facet сохранён; три cargo obligations отсутствуют. Нет нового full-answer gain.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "OLD_OWNER",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "DeliveryEngine packet rule не выдано за OtherAPI recovery relation. Отказ supported affirmative корректен, irrelevant nonempty packet остаётся independent FAIL.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "OLD_UNRELATED",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Fixture storage не выдано за quantum transport. Корректный отказ, source-empty FAIL отдельно.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "Q16",
+      "arm": "B1",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-e2fee8fbbe2755c6",
+          "quote": "Поля: `interface`, `operation`, `status`; завершение содержит `duration_ms` и `trace_incomplete`.",
+          "supports": "Указывает диагностические поля, добавляемые в событие завершения относительно начала запроса."
+        }
+      ],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1
+      ],
+      "note": "duration_ms и trace_incomplete корректны; quote удаляет newline+indent и mechanical literal FAIL.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "PASS",
+      "claim_entailment": "PASS",
+      "status_consistency": "PASS",
+      "case_id": "Q16",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1
+      ],
+      "note": "Один claim поддержан exact quoted full completion/start paragraph; newline+indent сохранены extractor-ом.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "Q46",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Одинаковые неверные ответы не PASS; независимая correctness проверка поддержана всеми тремя literal quotes.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "PASS",
+      "claim_entailment": "PASS",
+      "status_consistency": "PASS",
+      "case_id": "Q46",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Exact span включает Markdown bold, независимые проверки и явно no PASS; claim корректно сохраняет отрицание.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL01",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [],
+      "note": "Неизобретённый empty-source отказ, но answerable расчёт не решён.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "PASS",
+      "claim_entailment": "PASS",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL01",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "Claim38=10*3+4*2 поддержан whole tariff quote и query14; нет source-fabricated numeric14.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL01",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "38 рублей с обеими частями тарифа, без fixedfee/discount. Literal quote содержит все расчётные условия.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL02",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [],
+      "note": "Честный отказ; отсутствуют все три requested facts.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL02",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0
+      ],
+      "note": "38 рублей правильно, но бухгалтер/заказ+счёт отсутствуют. Partial answer не является full multifacet PASS.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL03",
+      "arm": "B1",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Не задаёт очередь priority14 без rule.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "PASS",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3CAL03",
+      "arm": "V3",
+      "literal_citations": "N/A",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Не задаёт очередь priority14; сохраняет empty-source expectation.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "PASS",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H01",
+      "arm": "B1",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-fc27ab709d57a0cd",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Расход последовательного пути равен сумме расходов переходов.",
+          "supports": "Расход пути через весы равен 4 + 6 = 10 единиц заряда."
+        }
+      ],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1
+      ],
+      "note": "4+6=10<=12; answer complete уже в B1. Первая quote склеивает несмежные source предложения, пропустив direct-path clause: literal FAIL, semantics поддержана actual source.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "PASS",
+      "claim_entailment": "PASS",
+      "status_consistency": "PASS",
+      "case_id": "V3H01",
+      "arm": "Citation",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1
+      ],
+      "note": "Exact contiguous paragraph включает directed edges, sum/budget;4+6=10<=12. Нет implied reverse route или owner grant.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H01",
+      "arm": "V3",
+      "literal_citations": "FAIL",
+      "citation_failures": [
+        {
+          "source_id": "ev-fc27ab709d57a0cd",
+          "quote": "Переход от ворот к весам расходует 4 единицы заряда. Переход от весов к упаковке расходует 6 единиц заряда. Расход последовательного пути равен сумме расходов переходов. Путь укладывается в бюджет, если суммарный расход не превышает бюджет.",
+          "supports": "Подтверждает состав маршрута, расходы переходов, суммирование и условие соблюдения бюджета."
+        }
+      ],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1
+      ],
+      "note": "Same B1 packet, не admission gain. Quote опять пропускает direct-path sentence и склеивает remaining source: literal FAIL.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "FAIL",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H02",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "partial",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        2,
+        3
+      ],
+      "note": "Dispatcher/checks верно; routes/budget comparison нет. Нужная numeric часть потеряна.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "PASS",
+      "honest_refusal": "N/A",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H02",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "supported_requested_fact_groups": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "note": "via10<=12/direct15>12 и dispatcher/checks объединены по источникам. Новый complete gain: numeric source добавлен при unchanged original universe и preserved roles facet.",
+      "execution": "EXECUTED",
+      "positive": true,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "N/A",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H03",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Не выдумывает priority12 savings, не утверждает zero-discount rule; incidental shelf12 не достаточная relation.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H03",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Не выводит savings из generic checking rule; source-empty contract FAIL не исправлен.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "PASS",
+      "case_id": "V3H04",
+      "arm": "B1",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "insufficient",
+      "soundness": "PASS",
+      "note": "Отвергает unsupported controller approval premise; distinguishes dispatcher route vs inventory signature. Не требуем unasked dispatcher signature или route feasibility.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "B1",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    },
+    {
+      "semantic_complete": "N/A",
+      "honest_refusal": "PASS",
+      "coordinate_extraction": "N/A",
+      "claim_entailment": "N/A",
+      "status_consistency": "WARNING_COMPLETE_WITH_UNASKED_MISSING",
+      "case_id": "V3H04",
+      "arm": "V3",
+      "literal_citations": "PASS",
+      "citation_failures": [],
+      "parsed_status": "complete",
+      "soundness": "PASS",
+      "note": "Корректно не выдаёт controller inventory signature за route authority. Дополнительный путь10<=12 опирается на фактически отправленные routes. Complete+missing unasked dispatcher form — status/reporting inconsistency, не grant hallucination и не новая обязанность oracle; source-empty FAIL и расширение irrelevant delivery отдельно.",
+      "execution": "EXECUTED",
+      "positive": false,
+      "public_parent_arm": "V3",
+      "source_policy_saved_operands": "PASS",
+      "source_empty_contract": "FAIL",
+      "host_complete_status_is_not_quality_verdict": true
+    }
+  ],
+  "citation_pairs": [
+    {
+      "case_id": "V3CAL01",
+      "parent": "V3",
+      "same_public_content": "PASS",
+      "base_prompt_chars": 2229,
+      "citation_prompt_chars": 2758,
+      "base_prompt_utf8_bytes": 3404,
+      "citation_prompt_utf8_bytes": 3910,
+      "base_literal": "PASS",
+      "citation_literal": "PASS",
+      "citation_entailment": "PASS"
+    },
+    {
+      "case_id": "V3H01",
+      "parent": "V3",
+      "same_public_content": "PASS",
+      "base_prompt_chars": 3128,
+      "citation_prompt_chars": 4793,
+      "base_prompt_utf8_bytes": 4780,
+      "citation_prompt_utf8_bytes": 6868,
+      "base_literal": "FAIL",
+      "citation_literal": "PASS",
+      "citation_entailment": "PASS"
+    },
+    {
+      "case_id": "Q16",
+      "parent": "B1",
+      "same_public_content": "PASS",
+      "base_prompt_chars": 21156,
+      "citation_prompt_chars": 46517,
+      "base_prompt_utf8_bytes": 32477,
+      "citation_prompt_utf8_bytes": 67966,
+      "base_literal": "FAIL",
+      "citation_literal": "PASS",
+      "citation_entailment": "PASS"
+    },
+    {
+      "case_id": "Q46",
+      "parent": "B1",
+      "same_public_content": "PASS",
+      "base_prompt_chars": 7147,
+      "citation_prompt_chars": 13149,
+      "base_prompt_utf8_bytes": 10510,
+      "citation_prompt_utf8_bytes": 18684,
+      "base_literal": "PASS",
+      "citation_literal": "PASS",
+      "citation_entailment": "PASS"
+    }
+  ],
+  "base_literal_citations": {
+    "N/A": 6,
+    "PASS": 15,
+    "FAIL": 3
+  },
+  "coordinate_literal_citations": {
+    "PASS": 4
+  },
+  "coordinate_claim_entailment": {
+    "PASS": 4
+  },
+  "all_base_negative_honest_refusal": {
+    "PASS": 8
+  },
+  "all_host_soundness": {
+    "PASS": 28
+  },
+  "unsupported_affirmative_answers": 0,
+  "unknown_host_answers": 0,
+  "costs": {
+    "independently_recomputed": {
+      "context": {
+        "rows": 57,
+        "seconds": 17.37290680199294
+      },
+      "prepare": {
+        "rows": 7,
+        "seconds": 0.8357785309999599
+      },
+      "host": {
+        "rows": 28,
+        "seconds": 117.57135099999999
+      },
+      "citation_reconstruction": {
+        "rows": 4,
+        "seconds": 0.051683309000509325
+      }
+    },
+    "lower_bound_sum": 135.8317196419934,
+    "whole_run_seconds": 136.94634569900154,
+    "citation_pair_base_chars": 33660,
+    "citation_pair_coordinate_chars": 67217,
+    "citation_pair_base_utf8_bytes": 51171,
+    "citation_pair_coordinate_utf8_bytes": 97428,
+    "billing_backend_sampling_provider_HTTP_count": "UNKNOWN",
+    "citation_reconstruction_accounted_once": true
+  },
+  "supplementary_ledger": {
+    "documentation_context_attempts": 1,
+    "documentation_context_status": "insufficient_evidence/source_unavailable",
+    "total_context_attempts_including_documentation_lookup": 58,
+    "setup_command_errors": [
+      {
+        "command": "python stdlib baseline snapshot",
+        "exit_code": 127,
+        "reason": "python alias missing; no public/model/host request consumed; used python3"
+      }
+    ]
+  },
+  "limitations": [
+    "Saved operands audit is not live receipt/validator replay.",
+    "No arbitrary ACL/consent/requested-version denial assurance.",
+    "DefaultOff only historical limited slice, not paired baseline runtime/full40/50.",
+    "Known V2 diagnostics are not independent holdout.",
+    "Base B1/V3 host totals have different diagnostic cases; not directly comparable aggregate cost.",
+    "Coordinate generator+presentation/extraction is a changed contract, not repair of old raw outputs.",
+    "Numeric-label relevance remains unassessed; nonnumeric facets not generally restored."
+  ],
+  "source_identity_sha256": "1bef777aaba22195cc6d3de0ae1777a7f9f761a3bd37e17c2f43c4288fe83df8",
+  "raw_hash_manifest_sha256": "08fbc6c27796fe6e5a28600aa35ef19f4fc4809c5071d6fff4e1905676890fff"
+}

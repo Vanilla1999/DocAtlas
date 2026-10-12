@@ -1,0 +1,8 @@
+{"event":"docatlas_request_start","request_id":"43d65455d04e4913853bb21fb888b038","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"43d65455d04e4913853bb21fb888b038","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":321.893,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"7d318391b9fe4f66a02414c24075597d","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"7d318391b9fe4f66a02414c24075597d","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":323.791,"trace_incomplete":false}
+{"execution":"EXECUTED","latency_seconds":6.186256,"path":"/tmp/opencode/docatlas-review-evidence/admission-selection-v2/host/Q16_X-rank"}
+{"execution":"EXECUTED","latency_seconds":3.220084,"path":"/tmp/opencode/docatlas-review-evidence/admission-selection-v2/host/Q16_X-prune"}
+{"execution":"EXECUTED","latency_seconds":3.520278,"path":"/tmp/opencode/docatlas-review-evidence/admission-selection-v2/host/Q46_X-rank"}
+{"execution":"EXECUTED","latency_seconds":2.678837,"path":"/tmp/opencode/docatlas-review-evidence/admission-selection-v2/host/Q46_X-prune"}

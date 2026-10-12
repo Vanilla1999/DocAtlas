@@ -1,0 +1,10 @@
+{
+  "project": "/tmp/docatlas-v3-3rggox8o/project",
+  "generation": "gen-1a8bee8eb16a40d7be7bb18a78500804",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "document_hashes": {
+    "docs/disputes.md": "e1c82e1542f974b8fab57f8b619307b82b13d402dcaf2e304777b5bfd0a1f18f",
+    "docs/tariff.md": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c"
+  }
+}

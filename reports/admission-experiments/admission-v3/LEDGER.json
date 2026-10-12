@@ -1,0 +1,17 @@
+{
+  "prepares": 7,
+  "context_attempts": 57,
+  "host_requests": 28,
+  "model_forwards": 0,
+  "errors": [],
+  "documentation_context_attempts": 1,
+  "documentation_context_status": "insufficient_evidence/source_unavailable",
+  "total_context_attempts_including_documentation_lookup": 58,
+  "setup_command_errors": [
+    {
+      "command": "python stdlib baseline snapshot",
+      "exit_code": 127,
+      "reason": "python alias missing; no public/model/host request consumed; used python3"
+    }
+  ]
+}

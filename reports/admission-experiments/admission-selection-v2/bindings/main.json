@@ -1,0 +1,10 @@
+{
+  "project": "/tmp/docatlas-selection-v2-r586bcie/project",
+  "source_scope": "project",
+  "source_version": "unversioned",
+  "domain_version": null,
+  "document_hashes": {
+    "README.md": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"
+  },
+  "generation": "gen-c146d0e67f2a4f96979f5fd18e36713b"
+}

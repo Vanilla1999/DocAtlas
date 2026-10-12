@@ -1,0 +1,63 @@
+{
+  "contract": "citation-coordinates-v3-2",
+  "adapter_id": "citation-adaptation-v3-2-envelope-authority-empty",
+  "raw_answer_sha256": "32090b8742c4a2349c6e3787576f51c136db79bb6d37ed7b58a0d6451e18e32c",
+  "prepared_sha256": "471781dfd10f859f568e39a5d44159b42158d00d799cba7eef5c9553b0f10e34",
+  "semantic_entailment": "INDEPENDENT_REVIEW_REQUIRED",
+  "status": "EXTRACTED",
+  "generator_output": {
+    "status": "complete",
+    "claims": [
+      {
+        "claim": "Нет. Одинаковые неправильные ответы не дают PASS; в обоих режимах необходимо независимо проверить обязательные факты, исходный текст и соответствие цитат документам.",
+        "citations": [
+          {
+            "source_id": "ev-435c4129d5f616b2",
+            "start": 926,
+            "end": 1404
+          }
+        ]
+      }
+    ],
+    "missing": []
+  },
+  "claims": [
+    {
+      "claim": "Нет. Одинаковые неправильные ответы не дают PASS; в обоих режимах необходимо независимо проверить обязательные факты, исходный текст и соответствие цитат документам.",
+      "citations": [
+        {
+          "source_id": "ev-435c4129d5f616b2",
+          "start": 926,
+          "end": 1404,
+          "quote": "3. **Два независимых PASS и паритет.** В обоих режимах проверить обязательные факты, исходный текст и соответствие цитат документам; затем сравнить выбранные источники, scope/version, продуктовый результат и изменения состояния. Одинаковые неправильные ответы не дают PASS. Переключатель логов не должен менять права, выбор источников, побочные действия или число продуктовых вызовов. Технические timestamps/trace IDs исключать из сравнения только по заранее заданному правилу.\n",
+          "quote_sha256": "36b29cbbbafcd653b36263776a3d99ca33599b39e475cf765c1de7aa6d2c9c1e",
+          "document_char_range": [
+            6723,
+            7201
+          ],
+          "document_utf8_byte_range": [
+            10724,
+            11564
+          ],
+          "document_lf_line_range": [
+            82,
+            82
+          ],
+          "document_sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00",
+          "provenance": {
+            "path_or_url": "README.md",
+            "scope": "project",
+            "version_binding": "unversioned",
+            "line_start": 76,
+            "line_end": 86,
+            "project_identity": "local:c4db303667cae74016df77f9cf73c318464410b8a735181b931abb28d189ef65",
+            "authority": "source_of_truth",
+            "source_uri": "docatlas://source/c9618e6a549db1b4fd73b8da"
+          },
+          "resolvable": true,
+          "verbatim": true
+        }
+      ]
+    }
+  ]
+}

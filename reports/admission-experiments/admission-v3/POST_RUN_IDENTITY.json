@@ -1,0 +1,17 @@
+{
+  "head": "4849b8f796d9e3e25e2c49e58562ec6859978411",
+  "branch": "fix/main-flow-compact-evidence",
+  "status": " M docmancer/docs/application/_project_docs_service_part03.py\n M docmancer/docs/domain/literal_context_admission.py\n M docmancer/docs/domain/ordinary_body_context.py\n M docmancer/docs/domain/original_body_discovery.py\n M eval/main_flow_comparison/run_extra40.py\n?? docmancer/docs/application/experimental_candidate_selection.py\n",
+  "V3_changed_from_saved_baseline": [
+    "docmancer/docs/domain/original_body_discovery.py",
+    "docmancer/docs/domain/ordinary_body_context.py"
+  ],
+  "unchanged_previous_files": [
+    "docmancer/docs/domain/literal_context_admission.py",
+    "eval/main_flow_comparison/run_extra40.py",
+    "docmancer/docs/application/_project_docs_service_part03.py",
+    "docmancer/docs/application/experimental_candidate_selection.py"
+  ],
+  "execution_hash_differences": [],
+  "note": "Saved identities only, not runtime validation or semantic PASS. No commit/push/default change."
+}

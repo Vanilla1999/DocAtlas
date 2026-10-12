@@ -1,0 +1,16 @@
+# Решения исполнения после разрешения владельца
+
+Владелец: «забей на лимит 600 и продолжи, запускай и доделай, нужен финальный отчет».
+
+1. Лимит 600M отменён для этого эксперимента. CRAG T5-large и SWE-Pruner допускаются, но происхождение весов, совместимость, scope и precision остаются отдельными проверками.
+2. Разрешены необходимые isolated install/download/product/model execution. No unit tests, no default deployment, no изменения frozen questions/corpus/oracle, no merge/release/force-push. Платные новые providers не вводятся. Уже настроенный host transport может обработать только синтетические evaluation question/public context после проверки его фактической доступности, не произвольный приватный corpus.
+3. Общий процесс не ждёт «разрешения на продолжение» повторно. Реальный технический blocker сохраняется как FAILED/NOT RUN с причиной, не подменяется fake output.
+4. C — единственный installer shared model-runtime; product-runtime устанавливает координатор. D/E/F готовят отдельные assets/adapters, не устанавливают shared пакеты и не исполняют модели одновременно.
+5. Model GPU forwards сериализуются координатором. CPU setup/downloads и public integration могут идти параллельно. FullCUDA stack не устанавливать автоматически только из-за наличия GPU: первоначальная CPU-конфигурация, SWE backend adaptation явно маркируется.
+6. A назначены ровно три product-файла; G frozen oracle готов до patch. B1 только host opt-in, source-policy/native receipt/hard-exact/numeric/owner не ослабляются. Старые empty-source negatives могут стать CURRENT_CONTRACT FAIL — это измеряемый экспериментальный tradeoff, не новый default.
+7. Baseline direct40 уже выполнен на immutable исходном snapshot; повторять его на этом snapshot не нужно. Default-off на изменённом продукте — отдельная проверка отсутствия регрессии, не лишний повтор baseline.
+8. Existing controls используют реальный public API/SQLite. Шесть setup errors первого controls запуска были из-за group-writable storage ancestor; повторены только эти шесть после переноса private runtime state под sticky /tmp, без bypass policy. Первоначальные ошибки сохраняются.
+9. Archived candidate replay — diagnostic, не product-integrated neural selection. Допустим client-side experiment: реальные B1 public sources → модельный selector/compressor → одинаковый host, с явным обозначением client orchestration. Не выдавать это за нейросетевую product integration до её реальной реализации.
+10. Pinned runtime metadata, hashes, actual calls, cold/warm timings и scores должны существовать до заявлений об улучшении. Model-visible input не включает required facts/private diagnostics/чужие результаты. Source IDs/quotes должны относиться к реально выданным документам.
+11. Матрица не раздувается: сначала Q46/Q16 и negative controls, потом только необходимая regression. Calibration/holdout не генерируются сотнями ради threshold; без calibration score остаётся rank preference, не probability/admission certification.
+12. Финальный отчёт включает все исследованные методы, реальные испытания и точные неисполненные компоненты. «ADAPTED specification» не означает «ADAPTED executed». Отмена лимита не отменяет необходимость подходящего code-сценария SWE или запрет CRAG web widening.

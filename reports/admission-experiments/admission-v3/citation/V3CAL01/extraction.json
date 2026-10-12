@@ -1,0 +1,63 @@
+{
+  "contract": "citation-coordinates-v3-2",
+  "adapter_id": "citation-adaptation-v3-2-envelope-authority-empty",
+  "raw_answer_sha256": "3f1f052de1040412563671bd5b95ceb66de9cf640cb2c6b888a07d655fb7810c",
+  "prepared_sha256": "2633ccbcf3a7259dcc4206aafc9173a71efa2d4a662bf612c62eb3afd5a1c211",
+  "semantic_entailment": "INDEPENDENT_REVIEW_REQUIRED",
+  "status": "EXTRACTED",
+  "generator_output": {
+    "status": "complete",
+    "claims": [
+      {
+        "claim": "Печатный счёт за один заказ из 14 страниц составляет 38 рублей: первые 10 страниц по 3 рубля — 30 рублей, следующие 4 страницы по 2 рубля — 8 рублей; 30 + 8 = 38 рублей.",
+        "citations": [
+          {
+            "source_id": "ev-f19abd72ff2ace27",
+            "start": 26,
+            "end": 273
+          }
+        ]
+      }
+    ],
+    "missing": []
+  },
+  "claims": [
+    {
+      "claim": "Печатный счёт за один заказ из 14 страниц составляет 38 рублей: первые 10 страниц по 3 рубля — 30 рублей, следующие 4 страницы по 2 рубля — 8 рублей; 30 + 8 = 38 рублей.",
+      "citations": [
+        {
+          "source_id": "ev-f19abd72ff2ace27",
+          "start": 26,
+          "end": 273,
+          "quote": "Кооператив считает страницы отдельно в каждом заказе. Первые 10 страниц заказа стоят по 3 рубля за страницу. Каждая следующая страница того же заказа стоит 2 рубля. Итог счёта равен сумме стоимости обеих частей; скидок и фиксированного сбора нет.\n",
+          "quote_sha256": "8356270c446831c4b31b20843cab37b0350a15a9f17c16f3ce021feae893c619",
+          "document_char_range": [
+            26,
+            273
+          ],
+          "document_utf8_byte_range": [
+            46,
+            493
+          ],
+          "document_lf_line_range": [
+            3,
+            3
+          ],
+          "document_sha256": "441960a6cea8c30650e93e180ed158a76faee8920933409271f53c5d5f13382c",
+          "provenance": {
+            "path_or_url": "docs/tariff.md",
+            "scope": "project",
+            "version_binding": "unversioned",
+            "line_start": 1,
+            "line_end": 3,
+            "project_identity": "local:7491e42feb94d3034e4c6c7c94ccf6d98d108d4fc56587b992b349581851cc1f",
+            "authority": "source_of_truth",
+            "source_uri": "docatlas://source/f7a3c9b9a47727fb279a76a0"
+          },
+          "resolvable": true,
+          "verbatim": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+[
+  "/tmp/opencode/docatlas-review-evidence/admission-full-20261012/model-runtime/bin/python",
+  "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/score_mini.py",
+  "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/scores/evaluation_input.json",
+  "/tmp/opencode/docatlas-review-evidence/admission-selection-v2/scores/evaluation_receipt.json"
+]

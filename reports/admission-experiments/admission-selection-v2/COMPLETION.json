@@ -1,0 +1,19 @@
+{
+  "status": "COMPLETED_PRIMARY_WITH_ONE_INTERRUPTED_HOST",
+  "ledger": {
+    "prepares": 7,
+    "context_attempts": 54,
+    "host_requests": 36,
+    "model_forwards": 40
+  },
+  "interrupted_unknown": [
+    {
+      "case_arm": "HOLD07_Budget",
+      "status": "INTERRUPTED_COMPLETION_UNKNOWN",
+      "runner_retry": false,
+      "receipt_sha256": "f4a396fcfc8db6f199f09e13aa5b7c34ffbd410151bc02df64788c27f153db98"
+    }
+  ],
+  "recovery_prepares": 0,
+  "recovery_model_forwards": 0
+}
