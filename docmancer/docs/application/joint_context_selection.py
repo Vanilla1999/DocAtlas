@@ -176,12 +176,15 @@ def packet_alternatives(payload: dict, snapshot: dict, retrieval: dict, *, max_t
         .get("_component_coverage") or {}).get("covered_component_ids") or ())
     # Optional optimization work, not a representation limit. Exhaustion leaves
     # the admitted baseline intact; larger packets never widen Cartesian work.
-    # Try narrow closure first, so optional work exhaustion cannot privilege
-    # a whole section merely because it was enumerated before complete atoms.
-    atom_choices = tuple(next((option for option in group if option[2] == "complete_atom"), group[0])
-                         for group in groups)
+    # Try the preferred closure for every seed before optional combinations.
+    # Mixed sections retain dependencies; plain list/lookup groups have only
+    # narrow atom alternatives. Work exhaustion must not hide this full draft.
+    closed_choices = tuple(next(
+        (option for option in group if option[2] == "containing_section"),
+        next((option for option in group if option[2] == "complete_atom"), group[0]),
+    ) for group in groups)
     drafts = 0
-    for choices in islice(chain((atom_choices,), product(*groups)), 180):
+    for choices in islice(chain((closed_choices,), product(*groups)), 180):
         for intro in (None, *intros.values()):
             rows = [deepcopy(c[0]) for c in choices]
             bound = deepcopy(snapshot)

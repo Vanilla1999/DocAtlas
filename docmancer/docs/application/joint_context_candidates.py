@@ -15,7 +15,7 @@ from .model_visible_projection import (
 
 MAX_SNAPSHOT_CHARS = 262_144
 MAX_PARENT_SECTIONS = 4096
-_BULLET_ITEM = re.compile(r"^([ \t]*)[-+*][ \t]+")
+_LIST_ITEM = re.compile(r"^([ \t]*)([-+*]|\d+[.)])[ \t]+")
 
 
 def _verified_document(original: dict, public: dict) -> str | None:
@@ -86,12 +86,12 @@ def _context_row(original: dict, public: dict, raw: str, parent: Any,
     # The seed ID is opaque and retained; its digest and snapshot are recomputed.
     return row, new
 
-def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, str], ...]:
+def structural_spans(raw: str, start: int, end: int, *, split_ordered_items: bool = False) -> tuple[tuple[int, int, str], ...]:
     """Coalesce lazy list continuations without changing index chunking.
 
-    Keep lazy continuations and nested bullets with their item. Only plain,
-    unintroduced bullet runs may split: numbered steps, introduced lists and
-    fenced content retain their original structural dependency.
+    Keep lazy continuations and nested items with their item. Introduced lists
+    and fenced content stay intact. Numbered sequences remain ranking blocks;
+    callers closing one cited item may request their individual boundaries.
     """
     out: list[tuple[int, int, str]] = []
     for atom in _atom_spans(raw, start, end):
@@ -107,19 +107,21 @@ def structural_spans(raw: str, start: int, end: int) -> tuple[tuple[int, int, st
     result = []
     for a, b, kind in out:
         lines = raw[a:b].splitlines(keepends=True)
-        first = _BULLET_ITEM.match(lines[0]) if kind == "list" and lines else None
-        if first is None or re.search(r"`{3,}|~{3,}", raw[a:b]):
+        first = _LIST_ITEM.match(lines[0]) if kind == "list" and lines else None
+        ordered = first is not None and first[2][0].isdigit()
+        if first is None or ordered and not split_ordered_items or re.search(r"`{3,}|~{3,}", raw[a:b]):
             result.append((a, b, kind))
             continue
+        item_kind = "list" if ordered else "list_item"
         indent = len(first[1].expandtabs(4))
         cursor, item_start = a, a
         for line in lines:
-            marker = _BULLET_ITEM.match(line)
+            marker = _LIST_ITEM.match(line)
             if marker and len(marker[1].expandtabs(4)) == indent and cursor > item_start:
-                result.append((item_start, cursor, "list_item"))
+                result.append((item_start, cursor, item_kind))
                 item_start = cursor
             cursor += len(line)
-        result.append((item_start, b, "list_item"))
+        result.append((item_start, b, item_kind))
     return tuple(result)
 
 
@@ -138,7 +140,7 @@ def source_options(public: dict, original: dict) -> tuple[list[tuple[dict, dict,
     owner = next((p for p in parents if p.char_start <= start < end <= p.char_end), None)
     if owner is None:
         return options, None
-    spans = structural_spans(raw, owner.char_start, owner.char_end)
+    spans = structural_spans(raw, owner.char_start, owner.char_end, split_ordered_items=True)
     hits = [(a, b) for a, b, kind in spans if a < end and start < b and kind != "whitespace"]
     bounds = []
     if hits:
