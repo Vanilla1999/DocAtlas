@@ -333,6 +333,8 @@ class _ProjectDocsServicePart03:
             discovery_records=discovery_records,
         )
         candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
+        from .experimental_candidate_selection import select_experimental_candidates
+        candidates = select_experimental_candidates(candidates, question=query)
         if internal_diagnostics is not None:
             internal_diagnostics.update(
                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)

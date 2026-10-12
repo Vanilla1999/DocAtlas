@@ -1,0 +1,54 @@
+"""Host-only opt-in selection of native candidates, before presentation packing.
+
+An experiment may select existing objects but cannot mint source bindings,
+qualification, or authority. Downstream validators remain unchanged.
+"""
+from contextlib import contextmanager
+from contextvars import ContextVar
+
+from docmancer.docs.domain.original_body_discovery import (
+    original_body_discovery_binding,
+    policy_candidate_admission_active,
+)
+
+_SELECTOR = ContextVar("experimental_native_candidate_selector", default=None)
+
+
+@contextmanager
+def experimental_candidate_selector(selector):
+    """Set a synchronous host experiment callback; never populated from wire data."""
+    token = _SELECTOR.set(selector)
+    try:
+        yield
+    finally:
+        _SELECTOR.reset(token)
+
+
+def select_experimental_candidates(candidates, *, question):
+    selector = _SELECTOR.get()
+    if selector is None or not policy_candidate_admission_active():
+        return candidates
+    pool, excluded, seen = [], [], set()
+    for ordinal, chunk in enumerate(candidates):
+        metadata = chunk.metadata or {}
+        trace = (metadata.get("retrieval_query_matches") or {}).get("query-original") or {}
+        binding = original_body_discovery_binding(
+            question=question, body=chunk.text, candidate=metadata,
+        )
+        key = (chunk.source, chunk.chunk_index)
+        if binding is None or not (trace.get("qualified") is True or trace.get("literal_context_admission")):
+            excluded.append((chunk, "no_checked_original_admission", ordinal))
+        elif key in seen:
+            excluded.append((chunk, "duplicate_source_chunk", ordinal))
+        else:
+            seen.add(key)
+            pool.append(chunk)
+    indices = selector(question, tuple(pool), tuple(excluded), tuple(candidates))
+    if indices is None:
+        # Observation/control preserves B1's original downstream behavior.
+        return candidates
+    indices = tuple(indices)
+    if (any(type(index) is not int or not 0 <= index < len(pool) for index in indices)
+            or len(set(indices)) != len(indices)):
+        raise ValueError("experimental selector returned invalid candidate indices")
+    return [pool[index] for index in indices]

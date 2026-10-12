@@ -15,7 +15,11 @@ from typing import Any, Mapping
 from docmancer.core.structured_chunking import _atom_spans
 
 from .context_blocks import source_block_alternatives
-from .original_body_discovery import original_body_discovery_binding
+from .original_body_discovery import (
+    original_body_discovery_binding,
+    policy_candidate_admission_active,
+    scalar_label_candidate_admission_active,
+)
 from .query_reference_binding import query_mentions
 from .query_terms import documentation_technical_anchors
 from .source_subject_binding import prepared_owner_rejection
@@ -23,6 +27,9 @@ from .source_subject_binding import prepared_owner_rejection
 
 _WORD = re.compile(r"(?<!\w)[^\W\d_]+(?:[-'][^\W\d_]+)*(?!\w)")
 _TERM = re.compile(r"[\w.:/\\+-]+")
+_SCALAR = re.compile(r"[0-9]+(?:[.,][0-9]+)?")
+_SCALAR_LABEL = re.compile(r"(?P<label>[^\W\d_]+)[.!?;:,]?")
+_SCALAR_OPERATOR = re.compile(r"[=<>+*/\\^~\-−–—±×÷≤≥≠]")
 # Keep the existing conservative clause boundaries for phrase witnesses. This
 # grammar only stops a phrase; it does not supply accepted words or query roles.
 _BOUNDARY = re.compile(r"[.!?;:,|–—]+|(?<!\w)-|-(?!\w)|\b(?:and|but|or|yet|whereas|although|though)\b", re.I)
@@ -205,25 +212,18 @@ def _technical_block_witness(question: str, block: str, source_offset: int):
     }
 
 
-def ordinary_body_context_witness(
+def _source_valid_body_blocks(
     *, question: str, evidence_text: str, candidate: Mapping[str, Any],
-) -> dict[str, Any] | None:
-    """Recompute a source-local relevance witness after canonical source checks.
-
-    Unresolved names must occur in the current verified structural owner (or
-    current body when it has no owner). A bare name may be the first underscore
-    namespace segment; this is lexical context, never exact symbol identity or
-    a subject relation. A separate body witness remains mandatory. The whole
-    question and all answer/edit authority stay unverified.
-    """
+):
+    """Share native receipt and owner constraints, without numeric inference."""
     binding = original_body_discovery_binding(
         question=question, body=evidence_text, candidate=candidate,
     )
     if binding is None:
-        return None
+        return
     evidence = candidate["_reference_evidence"]
     if prepared_owner_rejection(evidence) is not None:
-        return None
+        return
     owner = evidence.get("owner")
     subject_text = (evidence["raw_document"][owner["scope_start"]:owner["scope_end"]]
                     if owner is not None else evidence_text)
@@ -235,16 +235,160 @@ def ordinary_body_context_witness(
         for mention in query_mentions(question)
         if not mention.explicit and mention.syntax_role == "unresolved"
     ):
-        return None
+        return
+    for offset, block in _body_blocks(evidence_text):
+        source_offset = evidence["char_start"] + offset
+        yield binding, source_offset, block
+
+
+def _policy_valid_body_blocks(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+):
+    """Keep the original same-block numeric veto for ordinary and B1 routes."""
     numeric_terms = {value for value, _, _ in _literal_terms(question)
                      if any(char.isdigit() for char in value)}
-    for offset, block in _body_blocks(evidence_text):
+    for binding, source_offset, block in _source_valid_body_blocks(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    ):
         block_terms = {value for value, _, _ in _literal_terms(block)}
-        if not numeric_terms <= block_terms:
+        if numeric_terms <= block_terms:
+            yield binding, source_offset, block
+
+
+def _scalar_label_pairs(text: str):
+    """Bind whole whitespace tokens; never lend digits from a composed token.
+
+    Labels are lexical alphabetic words, not a dictionary of units. Deliberately
+    reject decorated scalars and adjacent operator tokens, including spaced
+    signs/ranges. A decimal comma belongs to the single complete scalar token.
+    """
+    tokens = list(re.finditer(r"\S+", text))
+    for index, scalar in enumerate(tokens[:-1]):
+        if _SCALAR.fullmatch(scalar[0]) is None:
             continue
-        source_offset = evidence["char_start"] + offset
+        label_token = tokens[index + 1]
+        label = _SCALAR_LABEL.fullmatch(label_token[0])
+        if label is None or not label["label"].isalpha():
+            continue
+        neighbors = tokens[max(0, index - 1):index] + tokens[index + 2:index + 3]
+        if any(_SCALAR_OPERATOR.search(token[0]) for token in neighbors):
+            continue
+        label_start = label_token.start()
+        label_end = label_start + len(label["label"])
+        yield {
+            "text": text[scalar.start():label_end],
+            "scalar": scalar[0], "label": label["label"],
+            "char_start": scalar.start(), "char_end": label_end,
+            "scalar_char_start": scalar.start(), "scalar_char_end": scalar.end(),
+            "label_char_start": label_start, "label_char_end": label_end,
+        }
+
+
+def _scalar_label_candidate_witness(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    if not scalar_label_candidate_admission_active():
+        return None
+    query_pairs = list(_scalar_label_pairs(question))
+    digit_tokens = {token.span() for token in re.finditer(r"\S+", question)
+                    if any(char.isdigit() for char in token[0])}
+    scalar_spans = {(pair["scalar_char_start"], pair["scalar_char_end"])
+                    for pair in query_pairs}
+    # Every query digit occurrence must belong to an accepted complete scalar,
+    # not just one convenient value among a version/range/identifier request.
+    if not digit_tokens or digit_tokens != scalar_spans:
+        return None
+    queries_by_label = {}
+    for pair in query_pairs:
+        queries_by_label.setdefault(pair["label"].casefold(), pair)
+    raw = candidate["_reference_evidence"]["raw_document"]
+    if not isinstance(raw, str):
+        return None
+    # Syntax context is the complete immutable document, not the acquired slice.
+    # Adjacent maximal sign/operator tokens can sit just outside that slice.
+    # This index is only a veto/check; no outside pair may become evidence.
+    raw_pairs = {(pair["char_start"], pair["char_end"]): pair
+                 for pair in _scalar_label_pairs(raw)}
+    for binding, source_offset, block in _source_valid_body_blocks(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    ):
+        end = source_offset + len(block)
+        for pair in _scalar_label_pairs(block):
+            query_pair = queries_by_label.get(pair["label"].casefold())
+            if query_pair is None:
+                continue
+            source_pair = {
+                key: source_offset + value if key.endswith(("char_start", "char_end")) else value
+                for key, value in pair.items()
+            }
+            if not 0 <= source_offset <= source_pair["char_start"] < source_pair["char_end"] <= end <= len(raw):
+                continue
+            if raw_pairs.get((source_pair["char_start"], source_pair["char_end"])) != source_pair:
+                continue
+            # Masking may leave whitespace between originally unrelated tokens.
+            # The complete pair, not only its endpoints, must be original bytes.
+            if raw[source_pair["char_start"]:source_pair["char_end"]] != pair["text"]:
+                continue
+            return {
+                "kind": "scalar_label_original_candidate_v3",
+                "relevance_unassessed": True, "numeric_condition_unassessed": True,
+                "text": raw[source_offset:end],
+                "char_start": source_offset, "char_end": end,
+                "block_char_start": source_offset, "block_char_end": end,
+                "native_discovery_binding_sha256": binding,
+                "query_scalar_label_pairs": query_pairs,
+                "scalar_label_pairs": [{"query": query_pair, "source": source_pair}],
+            }
+    return None
+
+
+def ordinary_body_context_witness(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Recompute a source-local relevance witness after canonical source checks.
+
+    Unresolved names must occur in the current verified structural owner (or
+    current body when it has no owner). A bare name may be the first underscore
+    namespace segment; this is lexical context, never exact symbol identity or
+    a subject relation. A separate body witness remains mandatory. The whole
+    question and all answer/edit authority stay unverified.
+    """
+    for binding, source_offset, block in _policy_valid_body_blocks(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    ):
         witness = (_phrase_witness(question, block, source_offset)
                    or _technical_block_witness(question, block, source_offset))
         if witness is not None:
             return {**witness, "native_discovery_binding_sha256": binding}
     return None
+
+
+def policy_valid_original_candidate_witness(
+    *, question: str, evidence_text: str, candidate: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Experimental source-valid body candidate; relevance remains unassessed.
+
+    Canonical source/window and hard-exact checks belong to the admission caller.
+    The host mode does not mint a receipt or relax owner constraints. B1 keeps
+    its numeric veto; V3 alone can additionally return scalar-label candidates.
+    Structural body content is not support for the question's relation.
+    """
+    if not policy_candidate_admission_active():
+        return None
+    for binding, source_offset, block in _policy_valid_body_blocks(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    ):
+        if not re.search(r"[^\W_]", block):
+            continue
+        end = source_offset + len(block)
+        return {
+            "kind": "policy_valid_original_candidate_v1",
+            "relevance_unassessed": True,
+            "text": candidate["_reference_evidence"]["raw_document"][source_offset:end],
+            "char_start": source_offset, "char_end": end,
+            "block_char_start": source_offset, "block_char_end": end,
+            "native_discovery_binding_sha256": binding,
+        }
+    return _scalar_label_candidate_witness(
+        question=question, evidence_text=evidence_text, candidate=candidate,
+    )

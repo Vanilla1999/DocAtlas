@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from functools import wraps
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -23,6 +24,7 @@ class _BodyRead:
     project_identity: str
     receipts: set[str] = field(default_factory=set)
     active: bool = True
+    experiment_admission: str | None = None
 
 
 _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
@@ -53,6 +55,13 @@ def original_body_read_scope(handler):
         # existing literal and qualified paths keep their established behavior.
         state = _BodyRead(question, project_path,
                           "local:" + hashlib.sha256(str(root).encode("utf-8")).hexdigest()) if eligible else None
+        # Host-only, original-read experiment. Capture once for this invocation;
+        # request/candidate metadata and later environment changes cannot opt in.
+        # Explicit lookups retain the default admission contract.
+        if state is not None and not args.get("lookup_queries"):
+            mode = os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION")
+            if mode in {"policy_candidates_v1", "scalar_label_candidates_v3"}:
+                state.experiment_admission = mode
         token = _BODY_READ.set(state)
         try:
             return handler(name, args, service)
@@ -62,6 +71,20 @@ def original_body_read_scope(handler):
                 state.receipts.clear()
             _BODY_READ.reset(token)
     return scoped
+
+
+def policy_candidate_admission_active() -> bool:
+    """Experimental host mode is usable only inside its live public read scope."""
+    state = _BODY_READ.get()
+    return bool(state is not None and state.active
+                and state.experiment_admission in {"policy_candidates_v1", "scalar_label_candidates_v3"})
+
+
+def scalar_label_candidate_admission_active() -> bool:
+    """Only the separately captured V3 mode may use scalar-label fallback."""
+    state = _BODY_READ.get()
+    return bool(state is not None and state.active
+                and state.experiment_admission == "scalar_label_candidates_v3")
 
 
 def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -> str | None:

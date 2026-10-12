@@ -84,6 +84,11 @@ def main():
     else:
         workload = [(idx, question, facts, "no_lookup", [])
                     for idx, (question, facts) in enumerate(cases, 11)]
+    selected_ids = os.environ.get("EXTRA40_SELECTED_IDS")
+    if selected_ids:
+        selected = {int(value) for value in selected_ids.split(",")}
+        assert selected and selected <= {row[0] for row in workload}
+        workload = [row for row in workload if row[0] in selected]
     destination = Path(os.environ["EXTRA40_ARTIFACT_DIR"]).resolve()
     destination.mkdir(parents=True, exist_ok=True)
     report_path = destination / ("extra40-lookup-results.json" if lookup_only
@@ -93,6 +98,7 @@ def main():
         "experiment": ("12 previously failed questions x two explicit lookup variants"
                        if lookup_only else "40 unchanged original requests"),
         "lookup_fragments": LITERAL_SAME_QUESTION_LOOKUPS if lookup_only else {},
+        "selected_ids": sorted({row[0] for row in workload}) if selected_ids else None,
         "corpus_sha256": CORPUS_SHA,
         "original_questions_sha256": OLD_QUESTIONS_SHA,
         "new_questions_sha256": sha256(extra).hexdigest(),
@@ -212,8 +218,9 @@ def main():
                                     "facts_delivered": False}
                 record["results"].append(row)
                 record["product_calls"]["get_docs_context"] += 1
-                if len(record["results"]) % 6 == 0:
-                    save()
+                # Persist every completed public call so a timeout does not
+                # force successful calls to be repeated just to recover data.
+                save()
             assert policy.generation() == generation
             with closing(policy.connect()) as connection:
                 now = connection.execute(
@@ -226,7 +233,7 @@ def main():
     delivered = sum(bool(row["audit"]["facts_delivered"]) for row in record["results"])
     failures = [row["id"] for row in record["results"] if not row["audit"]["facts_delivered"]]
     record["summary"] = {
-        "unique_original_questions": len(FAILED_BASELINE_IDS) if lookup_only else len(cases),
+        "unique_original_questions": len({row[0] for row in workload}),
         "public_context_calls": len(workload), "full_facts": delivered, "failed_ids": failures,
         "runtime_errors": sum("execution_error" in row["audit"] for row in record["results"]),
         "source_integrity_errors": sum(bool(row["audit"].get("errors")) for row in record["results"]),

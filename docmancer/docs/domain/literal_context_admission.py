@@ -14,7 +14,7 @@ from .evidence_qualification import _relation_units, qualify_evidence
 from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
 from .query_terms import documentation_query_terms, query_constraint_roles
 from .technical_tokens import technical_term_pattern
-from .ordinary_body_context import ordinary_body_context_witness
+from .ordinary_body_context import ordinary_body_context_witness, policy_valid_original_candidate_witness
 
 
 def _closed_context_literal(question: str) -> QueryMention | None:
@@ -251,9 +251,12 @@ def admit_original_literal_context(
 ) -> dict[str, Any] | None:
     """Recompute a read-only admission; incoming scores/flags confer no trust.
 
-    A title, path, link-only occurrence, repeated bare name, or unrelated body
-    cannot establish this route. It returns source-bound diagnostic spans only;
-    the caller must retain the failed full-question qualification and missing ID.
+    A title, path or link-only occurrence cannot establish this route. By default
+    unrelated body and repeated bare names cannot establish it either. The
+    isolated host experiment additionally permits source-valid body candidates
+    with unassessed relevance, never query or answer authority. It returns
+    source-bound diagnostic spans only; the caller must retain the failed
+    full-question qualification and missing ID.
     """
     root = candidate.get("_reference_root_plan")
     evidence = candidate.get("_reference_evidence")
@@ -370,6 +373,10 @@ def admit_original_literal_context(
         ordinary = ordinary_body_context_witness(
             question=question, evidence_text=evidence_text, candidate=candidate,
         )
+        if ordinary is None:
+            ordinary = policy_valid_original_candidate_witness(
+                question=question, evidence_text=evidence_text, candidate=candidate,
+            )
         if ordinary is None:
             return None
         witnesses = [ordinary]
