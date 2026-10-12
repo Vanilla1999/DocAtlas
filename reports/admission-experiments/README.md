@@ -5,6 +5,12 @@
 
 ## Основные результаты
 
+- [Разбор фильтра DocAtlas и сравнение с Grounded](FILTER_ROOT_CAUSE_AND_GROUNDED_RU.md)
+  — последующий анализ кода и сохранённых данных, без новых прогонов.
+- [Подготовленный retrieval: анализ исследований и текущей архитектуры](prepared-retrieval/ANALYSIS_RU.md).
+- [План для нескольких агентов](prepared-retrieval/MULTI_AGENT_PLAN_RU.md)
+  — роли, ownership, этапы, контракт, эксперимент и критерии решения.
+
 | Этап | Итог | Независимый review | Учёт стоимости |
 | --- | --- | --- | --- |
 | V2 | [RESULT_V2_RU.md](admission-selection-v2/RESULT_V2_RU.md) | [FINAL_REVIEW_V2_RU.md](admission-selection-v2/review/FINAL_REVIEW_V2_RU.md) | [COSTS_V2.json](admission-selection-v2/COSTS_V2.json) |
