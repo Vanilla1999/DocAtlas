@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P06",
+  "mode": "mini",
+  "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+  "public_request": {
+    "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:10.173571+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5033709150011418,
+  "process_cpu_seconds": 0.4990253189999976,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 940460,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "035ebf88fc79809184704185e5c76ae99145a14d336e75190db5a001633ac71f",
+  "wire_utf8_bytes": 570,
+  "utf8_quarter_proxy": 143,
+  "codec_o200k_base": 138,
+  "public_source_count": 0,
+  "within_wire_budget": true
+}

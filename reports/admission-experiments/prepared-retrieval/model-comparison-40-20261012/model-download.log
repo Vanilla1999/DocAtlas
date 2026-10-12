@@ -1,0 +1,64 @@
+Hint: The `hf-cli` skill is not installed. Run `hf skills add -g` to teach your AI agents how to use the `hf` CLI.
+Traceback (most recent call last):
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/bin/hf", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/cli/hf.py", line 173, in main
+    app()
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/click/core.py", line 1631, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/click/core.py", line 1552, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/cli/_cli_utils.py", line 132, in invoke
+    return super().invoke(ctx)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/click/core.py", line 2032, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/click/core.py", line 1415, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/click/core.py", line 910, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/cli/_framework.py", line 365, in handler
+    return func(**call_kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/cli/download.py", line 228, in download
+    _print_result(run_download())
+                  ^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/cli/download.py", line 187, in run_download
+    return snapshot_download(
+           ^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 89, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 266, in _inner
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/_snapshot_download.py", line 403, in snapshot_download
+    for f in api.list_repo_tree(repo_id=repo_id, recursive=True, revision=commit_hash, repo_type=repo_type)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/hf_api.py", line 4103, in list_repo_tree
+    for path_info in paginate(path=tree_url, headers=headers, params={"recursive": recursive, "expand": expand}):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/utils/_pagination.py", line 35, in paginate
+    session = get_session()
+              ^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 407, in get_session
+    _GLOBAL_CLIENT = _GLOBAL_CLIENT_FACTORY()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/huggingface_hub/utils/_http.py", line 335, in default_client_factory
+    return httpx.Client(
+           ^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/httpx/_client.py", line 700, in __init__
+    else self._init_proxy_transport(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/httpx/_client.py", line 750, in _init_proxy_transport
+    return HTTPTransport(
+           ^^^^^^^^^^^^^^
+  File "/workspace/scratch/7ccc1a9e2e54/docatlas-venv/lib/python3.12/site-packages/httpx/_transports/default.py", line 191, in __init__
+    raise ImportError(
+ImportError: Using SOCKS proxy, but the 'socksio' package is not installed. Make sure to install httpx using `pip install httpx[socks]`.

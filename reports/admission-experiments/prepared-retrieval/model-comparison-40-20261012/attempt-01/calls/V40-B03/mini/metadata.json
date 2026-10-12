@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-B03",
+  "mode": "mini",
+  "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+  "public_request": {
+    "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/black.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:12:47.466188+00:00",
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_before": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.1271466680009326,
+  "process_cpu_seconds": 2.011299571000002,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 892596,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_after": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "wire_sha256": "34d65fd8aebdd9fa8eecf9bd3e5222576348852476994de8ab7be077d1fd96ae",
+  "wire_utf8_bytes": 2118,
+  "utf8_quarter_proxy": 530,
+  "codec_o200k_base": 640,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

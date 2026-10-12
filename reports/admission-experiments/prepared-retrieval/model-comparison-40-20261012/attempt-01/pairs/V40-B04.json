@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B04",
+  "question": "What does Black --no-cache do to cache reads and writes?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "f7d0e997a7056f6ed80073081309f8acec2915974863729e30bd5ce5db6e4c88",
+      "mini_sha256": "f7d0e997a7056f6ed80073081309f8acec2915974863729e30bd5ce5db6e4c88"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "bf850bf6dc54e065b2b3d1d39030036ee9852c0b9019bb303f6b5886715bfa83",
+      "mini_sha256": "bf850bf6dc54e065b2b3d1d39030036ee9852c0b9019bb303f6b5886715bfa83"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "933f8c8970df1446b97f0eaeb9e5cb95f1ad9052df6d2c51f0b0dc5b37df891c",
+      "mini_sha256": "933f8c8970df1446b97f0eaeb9e5cb95f1ad9052df6d2c51f0b0dc5b37df891c"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      3
+    ],
+    "mini": [
+      3
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

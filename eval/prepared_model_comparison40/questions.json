@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "state": "frozen_unseen_validation",
+  "cases": [
+    {
+      "id": "V40-B01",
+      "project_group": "black",
+      "question": "What is Black's default line length?",
+      "answerability": "within_budget",
+      "family": "default",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B02",
+      "project_group": "black",
+      "question": "How does Black determine target Python versions when --target-version is not set?",
+      "answerability": "within_budget",
+      "family": "fallback",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B03",
+      "project_group": "black",
+      "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+      "answerability": "within_budget",
+      "family": "list",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B04",
+      "project_group": "black",
+      "question": "What does Black --no-cache do to cache reads and writes?",
+      "answerability": "within_budget",
+      "family": "polarity",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B05",
+      "project_group": "black",
+      "question": "How does --force-exclude differ from --exclude for files passed explicitly to Black?",
+      "answerability": "within_budget",
+      "family": "contrast",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B06",
+      "project_group": "black",
+      "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B07",
+      "project_group": "black",
+      "question": "Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-B08",
+      "project_group": "black",
+      "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P01",
+      "project_group": "poetry",
+      "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+      "answerability": "within_budget",
+      "family": "definition",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P02",
+      "project_group": "poetry",
+      "question": "What is Poetry's configuration precedence from highest to lowest?",
+      "answerability": "within_budget",
+      "family": "list",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P03",
+      "project_group": "poetry",
+      "question": "How are Poetry configuration setting names converted into environment variable names?",
+      "answerability": "within_budget",
+      "family": "transformation",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P04",
+      "project_group": "poetry",
+      "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+      "answerability": "within_budget",
+      "family": "workflow",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P05",
+      "project_group": "poetry",
+      "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+      "answerability": "within_budget",
+      "family": "range",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P06",
+      "project_group": "poetry",
+      "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P07",
+      "project_group": "poetry",
+      "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-P08",
+      "project_group": "poetry",
+      "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T01",
+      "project_group": "textual",
+      "question": "What does the first positional argument to Textual reactive specify?",
+      "answerability": "within_budget",
+      "family": "definition",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T02",
+      "project_group": "textual",
+      "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+      "answerability": "within_budget",
+      "family": "behavior",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T03",
+      "project_group": "textual",
+      "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+      "answerability": "within_budget",
+      "family": "api",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T04",
+      "project_group": "textual",
+      "question": "What arguments does a Textual watch method receive when it declares one positional argument versus two?",
+      "answerability": "within_budget",
+      "family": "arity",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T05",
+      "project_group": "textual",
+      "question": "What does exclusive=True do when Textual starts a new worker?",
+      "answerability": "within_budget",
+      "family": "concurrency",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T06",
+      "project_group": "textual",
+      "question": "What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T07",
+      "project_group": "textual",
+      "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-T08",
+      "project_group": "textual",
+      "question": "What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V01",
+      "project_group": "vite",
+      "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+      "answerability": "within_budget",
+      "family": "security",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V02",
+      "project_group": "vite",
+      "question": "What wins when the same Vite environment variable is defined by the process and by .env files?",
+      "answerability": "within_budget",
+      "family": "precedence",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V03",
+      "project_group": "vite",
+      "question": "What is Vite dev server's default port, and what happens when that port is already in use?",
+      "answerability": "within_budget",
+      "family": "default",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V04",
+      "project_group": "vite",
+      "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+      "answerability": "within_budget",
+      "family": "conditional",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V05",
+      "project_group": "vite",
+      "question": "How are files in Vite's public directory served and how should public/icon.png be referenced from source code?",
+      "answerability": "within_budget",
+      "family": "workflow",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V06",
+      "project_group": "vite",
+      "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V07",
+      "project_group": "vite",
+      "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-V08",
+      "project_group": "vite",
+      "question": "What exact CDN cache TTL does Vite guarantee for production build assets?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E01",
+      "project_group": "eslint",
+      "question": "Which filenames can ESLint use for its flat configuration file?",
+      "answerability": "within_budget",
+      "family": "list",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E02",
+      "project_group": "eslint",
+      "question": "How does ESLint search for a configuration file for each target file when run on the command line?",
+      "answerability": "within_budget",
+      "family": "workflow",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E03",
+      "project_group": "eslint",
+      "question": "How does --fix-dry-run differ from --fix, and can it be used with stdin?",
+      "answerability": "within_budget",
+      "family": "contrast",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E04",
+      "project_group": "eslint",
+      "question": "What are ESLint's default globally ignored paths and default JavaScript file patterns?",
+      "answerability": "within_budget",
+      "family": "defaults",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E05",
+      "project_group": "eslint",
+      "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E06",
+      "project_group": "eslint",
+      "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+      "answerability": "partial",
+      "family": "partial",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E07",
+      "project_group": "eslint",
+      "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    },
+    {
+      "id": "V40-E08",
+      "project_group": "eslint",
+      "question": "What production uptime SLA does ESLint guarantee for local linting?",
+      "answerability": "unanswerable",
+      "family": "unanswerable",
+      "split": "validation",
+      "source_kind": "real_upstream"
+    }
+  ]
+}

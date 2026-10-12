@@ -5,6 +5,11 @@
 
 ## Основные результаты
 
+- [Mini / budget после prepared retrieval: 40 вопросов](prepared-retrieval/model-comparison-40-20261012/RESULT_RU.md)
+  — два opt-in режима, 40 пар / 80 публичных context calls, 450 реальных Mini forwards;
+  strict positive 17→20/24, partial 4→3/8, negative 1→1/8. Независимый смысловой
+  review: positive 18→20/24, partial 5→4/8; готовый контекст, без генератора.
+  Все вопросы, исходные документы, raw результаты и затраты сохранены.
 - [Повторное review, исправление отказа и проверка подстройки](prepared-retrieval/review-20261012/RESULT_RU.md)
   — публичный FAIL до фикса и пять PASS после, доказанный prepared reuse/fallback,
   усиленные negative/checklist assertions и новый нечисловой пример без прироста
@@ -31,8 +36,9 @@
 - [V1: итоговый отчёт](admission-full-20261012/FINAL_REPORT_RU.md).
 - [Методический аудит](admission-full-20261012/RESEARCH_METHOD_AUDIT_RU.md).
 
-V2 подтвердил узкую пользу Mini, но его необходимость после V3 pool repair
-не проверялась. V3 повысил полноту новых positive задач с 1/4 до 3/4;
+V2 подтвердил узкую пользу Mini; в самих V2/V3 его необходимость после pool repair
+ещё не проверялась. Новый парный прогон после prepared retrieval приведён выше.
+V3 повысил полноту новых positive задач с 1/4 до 3/4;
 empty-source контракт нарушен в 6/9 negative сценариев. Это не основание
 для включения эксперимента по умолчанию. Coordinate citations дали 4/4
 точные поддержанные цитаты при росте submitted prompt примерно на 99,7%;

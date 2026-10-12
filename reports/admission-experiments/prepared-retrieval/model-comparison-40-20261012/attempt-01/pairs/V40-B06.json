@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B06",
+  "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "61438da14d8d5f55267d66019d33cafb8fa9d26de36f39bd2f843737a5164bf3",
+      "mini_sha256": "61438da14d8d5f55267d66019d33cafb8fa9d26de36f39bd2f843737a5164bf3"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "1b82cbbe654162869703657e769c579c45e04bf8685047e53f45cfc3776808da",
+      "mini_sha256": "1b82cbbe654162869703657e769c579c45e04bf8685047e53f45cfc3776808da"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "6db56292ffbb9ec3d07e177d1a6219477e2b6e05f68f04b9995e01837b467c72",
+      "mini_sha256": "6db56292ffbb9ec3d07e177d1a6219477e2b6e05f68f04b9995e01837b467c72"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      10
+    ],
+    "mini": [
+      10
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

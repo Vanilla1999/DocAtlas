@@ -26,6 +26,7 @@ class _BodyRead:
     active: bool = True
     experiment_admission: str | None = None
     experiment_context_max_tokens: int | None = None
+    experiment_selector_settings: tuple[str | None, str | None, str | None] | None = None
 
 
 _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
@@ -63,6 +64,10 @@ def original_body_read_scope(handler):
             mode = os.environ.get("DOCATLAS_EXPERIMENT_ADMISSION")
             if mode in {"policy_candidates_v1", "scalar_label_candidates_v3", "source_valid_candidates_v1"}:
                 state.experiment_admission = mode
+            state.experiment_selector_settings = tuple(os.environ.get(key) for key in (
+                "DOCATLAS_EXPERIMENT_SELECTOR", "DOCATLAS_EXPERIMENT_SELECTOR_TOP_K",
+                "DOCATLAS_EXPERIMENT_MINI_PATH",
+            ))
             # The common experimental packet cap is independent of admission.
             # Capture it once, including for the unchanged V3/default control.
             raw_cap = os.environ.get("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS")
@@ -107,6 +112,12 @@ def experimental_context_max_tokens() -> int | None:
     """Return the common host cap captured for this live original project read."""
     state = _BODY_READ.get()
     return state.experiment_context_max_tokens if state is not None and state.active else None
+
+
+def experimental_selector_settings() -> tuple[str | None, str | None, str | None] | None:
+    """Host configuration captured at the original read, never from wire data."""
+    state = _BODY_READ.get()
+    return state.experiment_selector_settings if state is not None and state.active else None
 
 
 def _window_binding(*, question: str, body: str, candidate: Mapping[str, Any]) -> str | None:

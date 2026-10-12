@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-E07",
+  "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "f470dad5066af39ca4651c7521c1ddb140e71b748479632a358e0048d7e907ea",
+      "mini_sha256": "f470dad5066af39ca4651c7521c1ddb140e71b748479632a358e0048d7e907ea"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "0b5f814c0660066b988cb3f78ae06320f4a5d7a6c5cc92666db4a0a3212b5445",
+      "mini_sha256": "0b5f814c0660066b988cb3f78ae06320f4a5d7a6c5cc92666db4a0a3212b5445"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "878cee464c76f4267b65597bb875ca81c16632c0ae1471f4dbfdb84847a2c8d0",
+      "mini_sha256": "878cee464c76f4267b65597bb875ca81c16632c0ae1471f4dbfdb84847a2c8d0"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      14
+    ],
+    "mini": [
+      14
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+}

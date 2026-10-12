@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-P08",
+  "mode": "budget",
+  "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+  "public_request": {
+    "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/poetry",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/poetry.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:14.674859+00:00",
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_before": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.8675868160025857,
+  "process_cpu_seconds": 0.8653485549999971,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 941596,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "source_files_sha256_after": "5adb502f75531f23680a8e41731d52e93a0c0aada4cc0494cf910132c1b10bbe",
+  "wire_sha256": "977ae91951774859fe470f77e195b7398e5978289275facf544f636f732dbfe2",
+  "wire_utf8_bytes": 2700,
+  "utf8_quarter_proxy": 675,
+  "codec_o200k_base": 742,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

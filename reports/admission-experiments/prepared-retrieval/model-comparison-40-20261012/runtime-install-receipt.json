@@ -1,0 +1,48 @@
+{
+  "stage": "isolated_model_runtime_install",
+  "started_at_utc": "2026-10-12T19:00:16.356637+00:00",
+  "status": "DONE",
+  "model_forwards": 0,
+  "steps": [
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/uv",
+        "venv",
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-model-venv",
+        "--python",
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 0.11506997200194746
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-model-venv/bin/python",
+        "torch==2.10.0+cpu",
+        "--index",
+        "https://download.pytorch.org/whl/cpu"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 24.20099986399873
+    },
+    {
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/uv",
+        "pip",
+        "install",
+        "--python",
+        "/workspace/scratch/7ccc1a9e2e54/docatlas-model-venv/bin/python",
+        "-e",
+        ".[dev]",
+        "transformers==4.57.1",
+        "safetensors>=0.4.3"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 13.161078907000046
+    }
+  ]
+}

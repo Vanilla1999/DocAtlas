@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-T03",
+  "mode": "mini",
+  "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+  "public_request": {
+    "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/textual.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:21.951724+00:00",
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_before": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "same_initial_state": true,
+  "elapsed_seconds": 2.070007058002375,
+  "process_cpu_seconds": 8.38666812000001,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 955136,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_after": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "wire_sha256": "732c913349ac4b9f750b24fd99d0d79d726a34f0f85e8050d9e132cdf2421408",
+  "wire_utf8_bytes": 1069,
+  "utf8_quarter_proxy": 268,
+  "codec_o200k_base": 252,
+  "public_source_count": 0,
+  "within_wire_budget": true
+}

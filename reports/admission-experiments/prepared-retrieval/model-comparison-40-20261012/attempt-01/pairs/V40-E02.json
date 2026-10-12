@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-E02",
+  "question": "How does ESLint search for a configuration file for each target file when run on the command line?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "8bf7baf86b6a020face8112c41fd7293a07ac90e1e9058f650f37c400ead5534",
+      "mini_sha256": "8bf7baf86b6a020face8112c41fd7293a07ac90e1e9058f650f37c400ead5534"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "c04292124e5e704ad6923e85fe18e976f57cc0679bbd4fa39588e345ce4d096a",
+      "mini_sha256": "c04292124e5e704ad6923e85fe18e976f57cc0679bbd4fa39588e345ce4d096a"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "83128eb3a500434d785d0849d14a8241a2df5511489c430b8ea98d009aa82a67",
+      "mini_sha256": "83128eb3a500434d785d0849d14a8241a2df5511489c430b8ea98d009aa82a67"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      15
+    ],
+    "mini": [
+      15
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+}

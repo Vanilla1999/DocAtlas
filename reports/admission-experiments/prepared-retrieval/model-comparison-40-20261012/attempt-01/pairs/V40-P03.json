@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P03",
+  "question": "How are Poetry configuration setting names converted into environment variable names?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "2dcf5d85d68830aa5f759c997d17dc377d0df7155273c7dd22a768801fc2a881",
+      "mini_sha256": "2dcf5d85d68830aa5f759c997d17dc377d0df7155273c7dd22a768801fc2a881"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "515f16a49bc23b671ef569d9fffbefca7b553fc0be9eb68f7e1a4bd79ade1401",
+      "mini_sha256": "515f16a49bc23b671ef569d9fffbefca7b553fc0be9eb68f7e1a4bd79ade1401"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "9aef91916772af010c6c74a55c26608611ee90504a2dd218836b0ce408ec6230",
+      "mini_sha256": "9aef91916772af010c6c74a55c26608611ee90504a2dd218836b0ce408ec6230"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

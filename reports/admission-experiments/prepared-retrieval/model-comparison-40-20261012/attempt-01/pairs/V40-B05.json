@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B05",
+  "question": "How does --force-exclude differ from --exclude for files passed explicitly to Black?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "1f99f5cd95d381e662deec16531030f0a0e0e7ee9b45026577c696c748ea5fdf",
+      "mini_sha256": "1f99f5cd95d381e662deec16531030f0a0e0e7ee9b45026577c696c748ea5fdf"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "c49f7b8213fa019422cfdbbe7a966fb3f7b890ab1b72b822e0b1f50203d23f85",
+      "mini_sha256": "c49f7b8213fa019422cfdbbe7a966fb3f7b890ab1b72b822e0b1f50203d23f85"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "f90cce3aff51c67e0afd4bd50c919b71ff6b5386d0a6e7e16b70a8d2781b7b72",
+      "mini_sha256": "f90cce3aff51c67e0afd4bd50c919b71ff6b5386d0a6e7e16b70a8d2781b7b72"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      6
+    ],
+    "mini": [
+      6
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

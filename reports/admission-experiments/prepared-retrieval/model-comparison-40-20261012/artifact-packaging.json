@@ -1,0 +1,29 @@
+{
+  "purpose": "Lossless repository packaging of full selection receipts; no product or model execution",
+  "raw_bytes": 119476171,
+  "raw_files": 80,
+  "gzip_attempt": {
+    "archive_bytes": 8208808,
+    "wall_seconds": 4.803498281999055,
+    "roundtrip_verified": true,
+    "retained": false,
+    "reason": "Replaced by a smaller independently roundtrip-verified xz archive of identical files"
+  },
+  "published_xz": {
+    "schema_version": 1,
+    "archive": "selection-receipts.tar.xz",
+    "archive_sha256": "b5c29b6e4ecec1c4968bf368c97866fa09075eedb160618829228f96e71bdcab",
+    "archive_bytes": 700096,
+    "raw_bytes": 119476171,
+    "file_count": 80,
+    "roundtrip_byte_hash_verified": true,
+    "wall_seconds": 12.36102979199859,
+    "compression": "xz preset9"
+  },
+  "restore_helper_check": {
+    "verified_original_files": 80,
+    "restored_files": 0,
+    "product_calls": 0,
+    "model_calls": 0
+  }
+}

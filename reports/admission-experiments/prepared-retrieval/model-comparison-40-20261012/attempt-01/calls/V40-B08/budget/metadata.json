@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-B08",
+  "mode": "budget",
+  "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+  "public_request": {
+    "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/black.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:12:58.629188+00:00",
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_before": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.7116734109986282,
+  "process_cpu_seconds": 0.7092684399999953,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 917204,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "source_files_sha256_after": "b5f296564f50a76a1aa8d647ecd8011baf2c7c1ec1b4dd060eb04a1b57aff3f8",
+  "wire_sha256": "b57e19c691a862b5b5b14181e26c7d51ae09899f3d5ea2ddeed1e0e817a76565",
+  "wire_utf8_bytes": 2847,
+  "utf8_quarter_proxy": 712,
+  "codec_o200k_base": 852,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

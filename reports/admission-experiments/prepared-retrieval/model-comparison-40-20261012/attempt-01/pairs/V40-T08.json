@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T08",
+  "question": "What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "b6d7c427323f71cc6b5c8d38aaacf2834f93cd02bf818e89a9453cd18736b8ae",
+      "mini_sha256": "b6d7c427323f71cc6b5c8d38aaacf2834f93cd02bf818e89a9453cd18736b8ae"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "621e30d98ace645665e1830da7a1ca716fffb1ca1cf05d287e29932e994ca341",
+      "mini_sha256": "621e30d98ace645665e1830da7a1ca716fffb1ca1cf05d287e29932e994ca341"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "f14b52d64b79ab8cad2be1676c9be1bbe9db7c6abadc616dff9d7b7ef85c3886",
+      "mini_sha256": "f14b52d64b79ab8cad2be1676c9be1bbe9db7c6abadc616dff9d7b7ef85c3886"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

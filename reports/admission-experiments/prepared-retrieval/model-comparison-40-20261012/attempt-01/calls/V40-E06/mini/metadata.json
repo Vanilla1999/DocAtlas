@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-E06",
+  "mode": "mini",
+  "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+  "public_request": {
+    "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/eslint.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:59.116654+00:00",
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_before": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.6089269030017022,
+  "process_cpu_seconds": 1.7479304430000013,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 980760,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_after": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "wire_sha256": "375253e7b70f38eb7af244625ffeb156895dd9845e6fc72dce298f666063d5f2",
+  "wire_utf8_bytes": 6457,
+  "utf8_quarter_proxy": 1615,
+  "codec_o200k_base": 1575,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

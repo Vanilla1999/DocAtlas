@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-T01",
+  "mode": "budget",
+  "question": "What does the first positional argument to Textual reactive specify?",
+  "public_request": {
+    "question": "What does the first positional argument to Textual reactive specify?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/textual.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:15.771731+00:00",
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_before": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.7614636299986159,
+  "process_cpu_seconds": 0.7560653999999971,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 941596,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_after": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "wire_sha256": "aeaa9dfd893778dd48d380003fb12d4cd01fc6545089b3d2106026c44f99029f",
+  "wire_utf8_bytes": 4218,
+  "utf8_quarter_proxy": 1055,
+  "codec_o200k_base": 1220,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

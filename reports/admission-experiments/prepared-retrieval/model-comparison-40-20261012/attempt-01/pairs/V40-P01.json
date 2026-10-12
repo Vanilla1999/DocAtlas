@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P01",
+  "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "eea4e948203463bb9aac8277d44bdffe71fa9f05c0ae4958fb65199ff6281e4a",
+      "mini_sha256": "eea4e948203463bb9aac8277d44bdffe71fa9f05c0ae4958fb65199ff6281e4a"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "5949283986372f75af8d17e01b34b9d38d037c51a7da81b519a15ec3b302e549",
+      "mini_sha256": "5949283986372f75af8d17e01b34b9d38d037c51a7da81b519a15ec3b302e549"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "f375831bd3af4143a4a6b0be33a2c990be06abc1c6f4f9e78a0801031e94999c",
+      "mini_sha256": "f375831bd3af4143a4a6b0be33a2c990be06abc1c6f4f9e78a0801031e94999c"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      5
+    ],
+    "mini": [
+      5
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

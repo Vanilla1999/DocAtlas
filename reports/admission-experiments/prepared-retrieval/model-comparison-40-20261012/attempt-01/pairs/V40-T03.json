@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T03",
+  "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "ee3a077c77c5a59ca20cc4186a37463cba2e4a92319051ebafc0a0fb2a0d3bc7",
+      "mini_sha256": "ee3a077c77c5a59ca20cc4186a37463cba2e4a92319051ebafc0a0fb2a0d3bc7"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "1428c32cf1cf62e8f6320118d3dfc01a143ff8ceb311e9c8c51b6835d5ba01ac",
+      "mini_sha256": "1428c32cf1cf62e8f6320118d3dfc01a143ff8ceb311e9c8c51b6835d5ba01ac"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "8988c1c4cba394d155bcb68de67f2a147348f078b8a5302e85f00bb876788627",
+      "mini_sha256": "8988c1c4cba394d155bcb68de67f2a147348f078b8a5302e85f00bb876788627"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-V02",
+  "question": "What wins when the same Vite environment variable is defined by the process and by .env files?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "c440b80dbdb35a75e4cff77e5e9365594701c4403e072da06e779c0e4a5411c3",
+      "mini_sha256": "c440b80dbdb35a75e4cff77e5e9365594701c4403e072da06e779c0e4a5411c3"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "ceb1c48394873c37cffb32df6b2ed4adf33b166fe9f8087c78bafe8bfa0e6e2f",
+      "mini_sha256": "ceb1c48394873c37cffb32df6b2ed4adf33b166fe9f8087c78bafe8bfa0e6e2f"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "03d0d9ec850d3d9575694439644620c5fcc8dc8cfbfa3c8590d76e98701fb999",
+      "mini_sha256": "03d0d9ec850d3d9575694439644620c5fcc8dc8cfbfa3c8590d76e98701fb999"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+}

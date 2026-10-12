@@ -51,3 +51,7 @@ eval/task_level/results/*
 eval/task_level/runtime/
 eval/task_level/workspaces/
 eval/task_level/.cache/
+
+# Original selection receipts are losslessly published in the adjacent tar.xz
+# with a byte/hash manifest and restore utility; avoid 119 MB of repeated JSON.
+/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/calls/*/*/selection.json

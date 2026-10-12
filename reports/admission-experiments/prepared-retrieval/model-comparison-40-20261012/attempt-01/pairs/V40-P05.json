@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-P05",
+  "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "c5445391f05e2ca16856ad7c2a294569ff2719326769b885dc659609ce25e6f2",
+      "mini_sha256": "c5445391f05e2ca16856ad7c2a294569ff2719326769b885dc659609ce25e6f2"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "8df16d070d092dc0e18a55a1f0f69dc5fd717e0763ab77d9a72f82ced444d7e2",
+      "mini_sha256": "8df16d070d092dc0e18a55a1f0f69dc5fd717e0763ab77d9a72f82ced444d7e2"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "ed6ecfb0ab1d86d4d35dd0d20e499094ee6524b253fc0ec72b719d944eb60eb8",
+      "mini_sha256": "ed6ecfb0ab1d86d4d35dd0d20e499094ee6524b253fc0ec72b719d944eb60eb8"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+  "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+}

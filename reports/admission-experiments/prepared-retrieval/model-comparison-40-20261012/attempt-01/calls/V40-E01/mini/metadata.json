@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-E01",
+  "mode": "mini",
+  "question": "Which filenames can ESLint use for its flat configuration file?",
+  "public_request": {
+    "question": "Which filenames can ESLint use for its flat configuration file?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/eslint",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/eslint.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:50.082030+00:00",
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_before": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.0232278080002288,
+  "process_cpu_seconds": 4.419499478999995,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 975252,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "source_files_sha256_after": "2e44d2f553588d21d1fbe8a30c2e7057fa8258938a4c86467fb38b6ce4c8d057",
+  "wire_sha256": "f5dbc7dfc016bc7b3c6d7185cc114b72993e97edc25b500010fb7ae71427338b",
+  "wire_utf8_bytes": 6216,
+  "utf8_quarter_proxy": 1554,
+  "codec_o200k_base": 1613,
+  "public_source_count": 2,
+  "within_wire_budget": true
+}

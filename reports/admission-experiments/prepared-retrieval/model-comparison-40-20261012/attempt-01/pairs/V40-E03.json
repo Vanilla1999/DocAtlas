@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-E03",
+  "question": "How does --fix-dry-run differ from --fix, and can it be used with stdin?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "04dbecb5d0f6e7bcc530f1f5af5b2289dbbb81fbf42c8e06a7c77e276b7a01dd",
+      "mini_sha256": "04dbecb5d0f6e7bcc530f1f5af5b2289dbbb81fbf42c8e06a7c77e276b7a01dd"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "953a431f9358523981eef5992cb5b5bab54ed7091b24778cf814931db5b63432",
+      "mini_sha256": "953a431f9358523981eef5992cb5b5bab54ed7091b24778cf814931db5b63432"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "64abf364d2cba57c4fab2d06e3ff78858f8a51d7021daefdd2d34bf1b60a98de",
+      "mini_sha256": "64abf364d2cba57c4fab2d06e3ff78858f8a51d7021daefdd2d34bf1b60a98de"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      6
+    ],
+    "mini": [
+      6
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": false,
+  "public_dto_changed": false,
+  "public_success_both": true,
+  "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+  "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+}

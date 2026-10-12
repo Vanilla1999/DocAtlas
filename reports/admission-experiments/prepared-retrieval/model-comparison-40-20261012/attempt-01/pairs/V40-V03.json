@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-V03",
+  "question": "What is Vite dev server's default port, and what happens when that port is already in use?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "175e9795ed8dff9c429164dd8039ef9eab254ca3189362c3b39818ad86b8458e",
+      "mini_sha256": "175e9795ed8dff9c429164dd8039ef9eab254ca3189362c3b39818ad86b8458e"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "132ab45e5f9a0f8013585cb595eafe4bd8e91ac937911567dd5535f7a7429bc4",
+      "mini_sha256": "132ab45e5f9a0f8013585cb595eafe4bd8e91ac937911567dd5535f7a7429bc4"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "cd34248e841826b747ef70cc9278c46a64a25812e905c482a0b5004de0ac8ac5",
+      "mini_sha256": "cd34248e841826b747ef70cc9278c46a64a25812e905c482a0b5004de0ac8ac5"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      20
+    ],
+    "mini": [
+      20
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+}

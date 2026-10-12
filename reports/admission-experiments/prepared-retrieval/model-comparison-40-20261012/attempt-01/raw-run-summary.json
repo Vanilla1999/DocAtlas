@@ -1,0 +1,1861 @@
+{
+  "status": "completed",
+  "started_at_utc": "2026-10-12T19:12:33.369614+00:00",
+  "preparations_attempted": 5,
+  "context_calls_attempted": 80,
+  "context_calls_returned": 80,
+  "model_forward_attempts": 450,
+  "model_forwards": 450,
+  "source_continuation_calls": 0,
+  "answer_generator_calls": 0,
+  "pairs": [
+    {
+      "case_id": "V40-B01",
+      "question": "What is Black's default line length?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "e6c7ee22a730980622daf93ecb105e2f0eb48274147f6df0c81a6218767f469a",
+          "mini_sha256": "e6c7ee22a730980622daf93ecb105e2f0eb48274147f6df0c81a6218767f469a"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "09943584c6d4eb89332f03e421fca360fd186f3d0a737c631682c768f7ac3b46",
+          "mini_sha256": "09943584c6d4eb89332f03e421fca360fd186f3d0a737c631682c768f7ac3b46"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "27dd1ce409688820ede3b8c82579d5b5764346aaac45b207aa7594f3a871a649",
+          "mini_sha256": "27dd1ce409688820ede3b8c82579d5b5764346aaac45b207aa7594f3a871a649"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          19
+        ],
+        "mini": [
+          19
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B02",
+      "question": "How does Black determine target Python versions when --target-version is not set?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "b0ffe1a88a780a03307f24c81136b1e48497b4a051d18b82d7d448f5aeee9a0b",
+          "mini_sha256": "b0ffe1a88a780a03307f24c81136b1e48497b4a051d18b82d7d448f5aeee9a0b"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "2c7b44a667e68eb6c8b0ebcebebd41ad9e381998200db0a4fbf9ce8c1b240209",
+          "mini_sha256": "2c7b44a667e68eb6c8b0ebcebebd41ad9e381998200db0a4fbf9ce8c1b240209"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "588bb1ab9f72893856777a7200cf2ce9844264d0370723553a30a8614e9cfaed",
+          "mini_sha256": "588bb1ab9f72893856777a7200cf2ce9844264d0370723553a30a8614e9cfaed"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          2
+        ],
+        "mini": [
+          2
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B03",
+      "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "e8377428dc2dd4c20a0eb38f965bf73c15ab945851b996b9653df32abbbcfb64",
+          "mini_sha256": "e8377428dc2dd4c20a0eb38f965bf73c15ab945851b996b9653df32abbbcfb64"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "7bc789f1c93e9239759f0abd74856267ab0932b3c7e9bb3906590af9f11abb99",
+          "mini_sha256": "7bc789f1c93e9239759f0abd74856267ab0932b3c7e9bb3906590af9f11abb99"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "42dc50f287ccd1016d0803f52a2289eb38c66c65780fb272a8ede559190243dc",
+          "mini_sha256": "42dc50f287ccd1016d0803f52a2289eb38c66c65780fb272a8ede559190243dc"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          3
+        ],
+        "mini": [
+          3
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B04",
+      "question": "What does Black --no-cache do to cache reads and writes?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "f7d0e997a7056f6ed80073081309f8acec2915974863729e30bd5ce5db6e4c88",
+          "mini_sha256": "f7d0e997a7056f6ed80073081309f8acec2915974863729e30bd5ce5db6e4c88"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "bf850bf6dc54e065b2b3d1d39030036ee9852c0b9019bb303f6b5886715bfa83",
+          "mini_sha256": "bf850bf6dc54e065b2b3d1d39030036ee9852c0b9019bb303f6b5886715bfa83"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "933f8c8970df1446b97f0eaeb9e5cb95f1ad9052df6d2c51f0b0dc5b37df891c",
+          "mini_sha256": "933f8c8970df1446b97f0eaeb9e5cb95f1ad9052df6d2c51f0b0dc5b37df891c"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          3
+        ],
+        "mini": [
+          3
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B05",
+      "question": "How does --force-exclude differ from --exclude for files passed explicitly to Black?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "1f99f5cd95d381e662deec16531030f0a0e0e7ee9b45026577c696c748ea5fdf",
+          "mini_sha256": "1f99f5cd95d381e662deec16531030f0a0e0e7ee9b45026577c696c748ea5fdf"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "c49f7b8213fa019422cfdbbe7a966fb3f7b890ab1b72b822e0b1f50203d23f85",
+          "mini_sha256": "c49f7b8213fa019422cfdbbe7a966fb3f7b890ab1b72b822e0b1f50203d23f85"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "f90cce3aff51c67e0afd4bd50c919b71ff6b5386d0a6e7e16b70a8d2781b7b72",
+          "mini_sha256": "f90cce3aff51c67e0afd4bd50c919b71ff6b5386d0a6e7e16b70a8d2781b7b72"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          6
+        ],
+        "mini": [
+          6
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B06",
+      "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "61438da14d8d5f55267d66019d33cafb8fa9d26de36f39bd2f843737a5164bf3",
+          "mini_sha256": "61438da14d8d5f55267d66019d33cafb8fa9d26de36f39bd2f843737a5164bf3"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "1b82cbbe654162869703657e769c579c45e04bf8685047e53f45cfc3776808da",
+          "mini_sha256": "1b82cbbe654162869703657e769c579c45e04bf8685047e53f45cfc3776808da"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "6db56292ffbb9ec3d07e177d1a6219477e2b6e05f68f04b9995e01837b467c72",
+          "mini_sha256": "6db56292ffbb9ec3d07e177d1a6219477e2b6e05f68f04b9995e01837b467c72"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          10
+        ],
+        "mini": [
+          10
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B07",
+      "question": "Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "14d69ee40ad191dc7e4f9c22a0025511aa590f4140be7b313ff7e749696e7756",
+          "mini_sha256": "14d69ee40ad191dc7e4f9c22a0025511aa590f4140be7b313ff7e749696e7756"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "a4710f99f3183fd3d1abf98f545b527f57499286306f7e0c1e9e0b041c9f15f1",
+          "mini_sha256": "a4710f99f3183fd3d1abf98f545b527f57499286306f7e0c1e9e0b041c9f15f1"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "cd84e6697d56a28706f77d24b166170f08de9af088594e905afbeec0428920ba",
+          "mini_sha256": "cd84e6697d56a28706f77d24b166170f08de9af088594e905afbeec0428920ba"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-B08",
+      "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "f0656711abf39ce7a75e832bdef024f9f9f2b721db6ce14a768664a27725a618",
+          "mini_sha256": "f0656711abf39ce7a75e832bdef024f9f9f2b721db6ce14a768664a27725a618"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "8d9d78f478344a54464546b03d350a061837af1b429e8ce9ecfefc39dcebcd0e",
+          "mini_sha256": "8d9d78f478344a54464546b03d350a061837af1b429e8ce9ecfefc39dcebcd0e"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "f5649c31f8455c939556fdd82a2d4f012f1f8333dfe145e1af8bcc35f8e36362",
+          "mini_sha256": "f5649c31f8455c939556fdd82a2d4f012f1f8333dfe145e1af8bcc35f8e36362"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          18
+        ],
+        "mini": [
+          18
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+      "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+    },
+    {
+      "case_id": "V40-P01",
+      "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "eea4e948203463bb9aac8277d44bdffe71fa9f05c0ae4958fb65199ff6281e4a",
+          "mini_sha256": "eea4e948203463bb9aac8277d44bdffe71fa9f05c0ae4958fb65199ff6281e4a"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "5949283986372f75af8d17e01b34b9d38d037c51a7da81b519a15ec3b302e549",
+          "mini_sha256": "5949283986372f75af8d17e01b34b9d38d037c51a7da81b519a15ec3b302e549"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "f375831bd3af4143a4a6b0be33a2c990be06abc1c6f4f9e78a0801031e94999c",
+          "mini_sha256": "f375831bd3af4143a4a6b0be33a2c990be06abc1c6f4f9e78a0801031e94999c"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          5
+        ],
+        "mini": [
+          5
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P02",
+      "question": "What is Poetry's configuration precedence from highest to lowest?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "8798e91ac6b197fca1b43a86d6a2f3cc0805c16f2e1bf6b13cabcc6c150582c6",
+          "mini_sha256": "8798e91ac6b197fca1b43a86d6a2f3cc0805c16f2e1bf6b13cabcc6c150582c6"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "caa3fc298939ef5af4fc3f92d4d137c59c58e780bedd486235a23ed8fc237265",
+          "mini_sha256": "caa3fc298939ef5af4fc3f92d4d137c59c58e780bedd486235a23ed8fc237265"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "37e0c827fe9de91afa2f6d52b6a209254f02a8de6532366697607ae009c48b87",
+          "mini_sha256": "37e0c827fe9de91afa2f6d52b6a209254f02a8de6532366697607ae009c48b87"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P03",
+      "question": "How are Poetry configuration setting names converted into environment variable names?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "2dcf5d85d68830aa5f759c997d17dc377d0df7155273c7dd22a768801fc2a881",
+          "mini_sha256": "2dcf5d85d68830aa5f759c997d17dc377d0df7155273c7dd22a768801fc2a881"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "515f16a49bc23b671ef569d9fffbefca7b553fc0be9eb68f7e1a4bd79ade1401",
+          "mini_sha256": "515f16a49bc23b671ef569d9fffbefca7b553fc0be9eb68f7e1a4bd79ade1401"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "9aef91916772af010c6c74a55c26608611ee90504a2dd218836b0ce408ec6230",
+          "mini_sha256": "9aef91916772af010c6c74a55c26608611ee90504a2dd218836b0ce408ec6230"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P04",
+      "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "d9c856fc159189bb43e47ea2f3ea7bb685a700470d478e1e4022cb9d821fca7c",
+          "mini_sha256": "d9c856fc159189bb43e47ea2f3ea7bb685a700470d478e1e4022cb9d821fca7c"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "5a404aadd651d0a620f95431496524ac9c31835b734370220f2f52ded63ccd61",
+          "mini_sha256": "5a404aadd651d0a620f95431496524ac9c31835b734370220f2f52ded63ccd61"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "1867ad88952342d2a85f742c806a95e0386e7ceac4c5c262f75a9f95e82c869e",
+          "mini_sha256": "1867ad88952342d2a85f742c806a95e0386e7ceac4c5c262f75a9f95e82c869e"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P05",
+      "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c5445391f05e2ca16856ad7c2a294569ff2719326769b885dc659609ce25e6f2",
+          "mini_sha256": "c5445391f05e2ca16856ad7c2a294569ff2719326769b885dc659609ce25e6f2"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "8df16d070d092dc0e18a55a1f0f69dc5fd717e0763ab77d9a72f82ced444d7e2",
+          "mini_sha256": "8df16d070d092dc0e18a55a1f0f69dc5fd717e0763ab77d9a72f82ced444d7e2"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "ed6ecfb0ab1d86d4d35dd0d20e499094ee6524b253fc0ec72b719d944eb60eb8",
+          "mini_sha256": "ed6ecfb0ab1d86d4d35dd0d20e499094ee6524b253fc0ec72b719d944eb60eb8"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P06",
+      "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+          "mini_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "1c776f161060bdd514b1185fce8260a3c8555cd2d107cef551a22e7c301605fc",
+          "mini_sha256": "1c776f161060bdd514b1185fce8260a3c8555cd2d107cef551a22e7c301605fc"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "6f9e908eab5a488b17be3f40ccf6f4424a2c0b05560fd40dd21e93754cdb6a9d",
+          "mini_sha256": "6f9e908eab5a488b17be3f40ccf6f4424a2c0b05560fd40dd21e93754cdb6a9d"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          0
+        ],
+        "mini": [
+          0
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P07",
+      "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "ea5034de8cef2b04e17373d5b2d5a7c6292136b044579c918fd6c608609ff8a7",
+          "mini_sha256": "ea5034de8cef2b04e17373d5b2d5a7c6292136b044579c918fd6c608609ff8a7"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "6c2923c88b3bbdca7f28a61bf819570dd6ec43860e1eadbd1acb89439b058983",
+          "mini_sha256": "6c2923c88b3bbdca7f28a61bf819570dd6ec43860e1eadbd1acb89439b058983"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "22f3a16874b944162d4bf48f78f486ed8cc517b700b4057b26635e4f3d08f707",
+          "mini_sha256": "22f3a16874b944162d4bf48f78f486ed8cc517b700b4057b26635e4f3d08f707"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-P08",
+      "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "a23cd3e3340913735530f4b067c03951894c03e2ff1833704ead7abf0fe21958",
+          "mini_sha256": "a23cd3e3340913735530f4b067c03951894c03e2ff1833704ead7abf0fe21958"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "94f3797f3d9b2c290399996453986598b476f791404ab5ace806e40c53e25257",
+          "mini_sha256": "94f3797f3d9b2c290399996453986598b476f791404ab5ace806e40c53e25257"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "ab04eec3b70e4ec36c0025a152dd67aa507703a1b821dc5172d8e5e900d7c78a",
+          "mini_sha256": "ab04eec3b70e4ec36c0025a152dd67aa507703a1b821dc5172d8e5e900d7c78a"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-7686561de3654ba5aca3b848c5828a74",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6",
+      "database_sha256_after": "885fadc08a8a8e06bcd8663b1d6948c946269dcd1c393306fde4584e37b80de6"
+    },
+    {
+      "case_id": "V40-T01",
+      "question": "What does the first positional argument to Textual reactive specify?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "7b5a74afa0664699199faf232dfe7d32e0a14498662ae0e2fcf7f8d16f2af870",
+          "mini_sha256": "7b5a74afa0664699199faf232dfe7d32e0a14498662ae0e2fcf7f8d16f2af870"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "be21e89d5d11cbb1fe2dd0ee797859a1370e28da71cdb19cb49be2407a674ff9",
+          "mini_sha256": "be21e89d5d11cbb1fe2dd0ee797859a1370e28da71cdb19cb49be2407a674ff9"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "7faa040f55e9c1c9b3b21e4feb344b32439aeb09c45feb7d41a282fe2e6b3d92",
+          "mini_sha256": "7faa040f55e9c1c9b3b21e4feb344b32439aeb09c45feb7d41a282fe2e6b3d92"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          19
+        ],
+        "mini": [
+          19
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T02",
+      "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "76d5e10ed1fa832bf7d860439ae8e8745630e550ba2323b0fdc93e054093332c",
+          "mini_sha256": "76d5e10ed1fa832bf7d860439ae8e8745630e550ba2323b0fdc93e054093332c"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "f85e670094cc122b0adfd7e63ed0d8d4c28a2e7cc112ed16ab6730484528273d",
+          "mini_sha256": "f85e670094cc122b0adfd7e63ed0d8d4c28a2e7cc112ed16ab6730484528273d"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "26ca5b781373c027ca95c09c7c6cae6ac703f7ddf0ca3a05467f754382d97294",
+          "mini_sha256": "26ca5b781373c027ca95c09c7c6cae6ac703f7ddf0ca3a05467f754382d97294"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          19
+        ],
+        "mini": [
+          19
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T03",
+      "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "ee3a077c77c5a59ca20cc4186a37463cba2e4a92319051ebafc0a0fb2a0d3bc7",
+          "mini_sha256": "ee3a077c77c5a59ca20cc4186a37463cba2e4a92319051ebafc0a0fb2a0d3bc7"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "1428c32cf1cf62e8f6320118d3dfc01a143ff8ceb311e9c8c51b6835d5ba01ac",
+          "mini_sha256": "1428c32cf1cf62e8f6320118d3dfc01a143ff8ceb311e9c8c51b6835d5ba01ac"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "8988c1c4cba394d155bcb68de67f2a147348f078b8a5302e85f00bb876788627",
+          "mini_sha256": "8988c1c4cba394d155bcb68de67f2a147348f078b8a5302e85f00bb876788627"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T04",
+      "question": "What arguments does a Textual watch method receive when it declares one positional argument versus two?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "785396266062c2f52d25fd83490b2ae342e4f2f19fa02c6846b29ec78b0d4482",
+          "mini_sha256": "785396266062c2f52d25fd83490b2ae342e4f2f19fa02c6846b29ec78b0d4482"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "770511d495cc7644b94d7ec63240b141e10caf1f570b0208c8120fa9816bae20",
+          "mini_sha256": "770511d495cc7644b94d7ec63240b141e10caf1f570b0208c8120fa9816bae20"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "39f0d80b74e5542becbebdabb2c35d243568e533ccb2f218f6ebbbc9a1b84049",
+          "mini_sha256": "39f0d80b74e5542becbebdabb2c35d243568e533ccb2f218f6ebbbc9a1b84049"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T05",
+      "question": "What does exclusive=True do when Textual starts a new worker?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c59f9da01cce0ce92b5d4f8a85c924e4f76344d5b92cc2359c891140ac556529",
+          "mini_sha256": "c59f9da01cce0ce92b5d4f8a85c924e4f76344d5b92cc2359c891140ac556529"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "c4336cf8db6c027ec7e6063c925a1d1ce2d0e6a50a4f282f7b61d213286b7d70",
+          "mini_sha256": "c4336cf8db6c027ec7e6063c925a1d1ce2d0e6a50a4f282f7b61d213286b7d70"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "e6efcbc3b3e49feb210ac38b3608887a35f2852aaef13ad8631140222752ef04",
+          "mini_sha256": "e6efcbc3b3e49feb210ac38b3608887a35f2852aaef13ad8631140222752ef04"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T06",
+      "question": "What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "2faf376286acd9cdf89e1493e1fee722c855940b4472393ecf92ca9584ac6040",
+          "mini_sha256": "2faf376286acd9cdf89e1493e1fee722c855940b4472393ecf92ca9584ac6040"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "5f54b58da27586af55c2454650b74f35714d49b4334b4dabb47a55fae49b7e04",
+          "mini_sha256": "5f54b58da27586af55c2454650b74f35714d49b4334b4dabb47a55fae49b7e04"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "a18f06640f56bf6ef42cd72228d39295f42c84cdf4335df080ea7dbb3070b8db",
+          "mini_sha256": "a18f06640f56bf6ef42cd72228d39295f42c84cdf4335df080ea7dbb3070b8db"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          1
+        ],
+        "mini": [
+          1
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T07",
+      "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c3772653c3256e807507ca75cbc031f0d8894548f0544ab6efbefb83da9712aa",
+          "mini_sha256": "c3772653c3256e807507ca75cbc031f0d8894548f0544ab6efbefb83da9712aa"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "d392a4119fcb9265b6a7c4c0b4f37a37c279c1fa4ba6663867d01c9e6e45871e",
+          "mini_sha256": "d392a4119fcb9265b6a7c4c0b4f37a37c279c1fa4ba6663867d01c9e6e45871e"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "307048795ab32644db160bb97e2c536a8967f462484209b5219eb41a05757874",
+          "mini_sha256": "307048795ab32644db160bb97e2c536a8967f462484209b5219eb41a05757874"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          1
+        ],
+        "mini": [
+          1
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-T08",
+      "question": "What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "b6d7c427323f71cc6b5c8d38aaacf2834f93cd02bf818e89a9453cd18736b8ae",
+          "mini_sha256": "b6d7c427323f71cc6b5c8d38aaacf2834f93cd02bf818e89a9453cd18736b8ae"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "621e30d98ace645665e1830da7a1ca716fffb1ca1cf05d287e29932e994ca341",
+          "mini_sha256": "621e30d98ace645665e1830da7a1ca716fffb1ca1cf05d287e29932e994ca341"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "f14b52d64b79ab8cad2be1676c9be1bbe9db7c6abadc616dff9d7b7ef85c3886",
+          "mini_sha256": "f14b52d64b79ab8cad2be1676c9be1bbe9db7c6abadc616dff9d7b7ef85c3886"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+      "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+    },
+    {
+      "case_id": "V40-V01",
+      "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "6744542dad5186a7c32d070f0a479e09f111d5f15dd134270dd638257f03a7c2",
+          "mini_sha256": "6744542dad5186a7c32d070f0a479e09f111d5f15dd134270dd638257f03a7c2"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "0a5913b6a237e7864e808c313bb9df42ae31c1ecb130c55f8d46f55406599959",
+          "mini_sha256": "0a5913b6a237e7864e808c313bb9df42ae31c1ecb130c55f8d46f55406599959"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "e014a48573cf84ac463dc94bcdd23f653143e12aad43360c3a341b78f8e18289",
+          "mini_sha256": "e014a48573cf84ac463dc94bcdd23f653143e12aad43360c3a341b78f8e18289"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          19
+        ],
+        "mini": [
+          19
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V02",
+      "question": "What wins when the same Vite environment variable is defined by the process and by .env files?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c440b80dbdb35a75e4cff77e5e9365594701c4403e072da06e779c0e4a5411c3",
+          "mini_sha256": "c440b80dbdb35a75e4cff77e5e9365594701c4403e072da06e779c0e4a5411c3"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "ceb1c48394873c37cffb32df6b2ed4adf33b166fe9f8087c78bafe8bfa0e6e2f",
+          "mini_sha256": "ceb1c48394873c37cffb32df6b2ed4adf33b166fe9f8087c78bafe8bfa0e6e2f"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "03d0d9ec850d3d9575694439644620c5fcc8dc8cfbfa3c8590d76e98701fb999",
+          "mini_sha256": "03d0d9ec850d3d9575694439644620c5fcc8dc8cfbfa3c8590d76e98701fb999"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V03",
+      "question": "What is Vite dev server's default port, and what happens when that port is already in use?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "175e9795ed8dff9c429164dd8039ef9eab254ca3189362c3b39818ad86b8458e",
+          "mini_sha256": "175e9795ed8dff9c429164dd8039ef9eab254ca3189362c3b39818ad86b8458e"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "132ab45e5f9a0f8013585cb595eafe4bd8e91ac937911567dd5535f7a7429bc4",
+          "mini_sha256": "132ab45e5f9a0f8013585cb595eafe4bd8e91ac937911567dd5535f7a7429bc4"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "cd34248e841826b747ef70cc9278c46a64a25812e905c482a0b5004de0ac8ac5",
+          "mini_sha256": "cd34248e841826b747ef70cc9278c46a64a25812e905c482a0b5004de0ac8ac5"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          20
+        ],
+        "mini": [
+          20
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V04",
+      "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c6a5a83a9217158404cdc6433a9bc2fe0f0e80d8b6887e77b445b9a80883edfc",
+          "mini_sha256": "c6a5a83a9217158404cdc6433a9bc2fe0f0e80d8b6887e77b445b9a80883edfc"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "116a3991b8932946170aa61618a32a12eacb4dab4dd156283872c05fb00d340d",
+          "mini_sha256": "116a3991b8932946170aa61618a32a12eacb4dab4dd156283872c05fb00d340d"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "5190b2a71ca9f81c90dbb8f2d80425fbeaddb3aef6fba7d3c6a93dfd67cfc692",
+          "mini_sha256": "5190b2a71ca9f81c90dbb8f2d80425fbeaddb3aef6fba7d3c6a93dfd67cfc692"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          2
+        ],
+        "mini": [
+          2
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V05",
+      "question": "How are files in Vite's public directory served and how should public/icon.png be referenced from source code?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "ab1ad43a7a261f30e9398db6b1cdd50802460658ea9ec768ace8cec6f0eec864",
+          "mini_sha256": "ab1ad43a7a261f30e9398db6b1cdd50802460658ea9ec768ace8cec6f0eec864"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "e7d5e14f395a767ceff2400b4db3ecb6e607a0785d221584518060d711c680b1",
+          "mini_sha256": "e7d5e14f395a767ceff2400b4db3ecb6e607a0785d221584518060d711c680b1"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "fab55d533da84f95ef9ee8b4d43b1216b1e48b2887acea265bac0a414ae53b6f",
+          "mini_sha256": "fab55d533da84f95ef9ee8b4d43b1216b1e48b2887acea265bac0a414ae53b6f"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          1
+        ],
+        "mini": [
+          1
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V06",
+      "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "c020628e56137a69c72a5b89484e8361e1ef98c351befd60ee74c3fd52f631f0",
+          "mini_sha256": "c020628e56137a69c72a5b89484e8361e1ef98c351befd60ee74c3fd52f631f0"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "470ca96f227227fc3368906509638cd25bc7b254cebd31efe9ed394f1bf5a044",
+          "mini_sha256": "470ca96f227227fc3368906509638cd25bc7b254cebd31efe9ed394f1bf5a044"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "eefbf977aa23cb4e8f05d36c2e7ddac0e1c59bf912db82c7057ad7cec66b9796",
+          "mini_sha256": "eefbf977aa23cb4e8f05d36c2e7ddac0e1c59bf912db82c7057ad7cec66b9796"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          1
+        ],
+        "mini": [
+          1
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V07",
+      "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "4eb0abe431a7fdad58b002493241fccf38095edb63691b86e61b9351a57f7331",
+          "mini_sha256": "4eb0abe431a7fdad58b002493241fccf38095edb63691b86e61b9351a57f7331"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "274482ed0a9e7e627362dd88f3572be40a74d020053f1861b2988b7ef5a97dfc",
+          "mini_sha256": "274482ed0a9e7e627362dd88f3572be40a74d020053f1861b2988b7ef5a97dfc"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "a3423ad1cd74bf2237b0084db983e5c61d329445dd09b448b2ed4b1ee4ca08c8",
+          "mini_sha256": "a3423ad1cd74bf2237b0084db983e5c61d329445dd09b448b2ed4b1ee4ca08c8"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          4
+        ],
+        "mini": [
+          4
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-V08",
+      "question": "What exact CDN cache TTL does Vite guarantee for production build assets?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+          "mini_sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "4e4994cf1fb644b7d64c1f2e4955dbe74e6a2dd3c3749810d0855394b17c2c2b",
+          "mini_sha256": "4e4994cf1fb644b7d64c1f2e4955dbe74e6a2dd3c3749810d0855394b17c2c2b"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "f07e620305bb0b53f3d70d5053d7f9cadcc6506268fef7cac6cf52e30b90de69",
+          "mini_sha256": "f07e620305bb0b53f3d70d5053d7f9cadcc6506268fef7cac6cf52e30b90de69"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          0
+        ],
+        "mini": [
+          0
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-82348ecaaea1406bae2ed3e6a14cea96",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+      "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a"
+    },
+    {
+      "case_id": "V40-E01",
+      "question": "Which filenames can ESLint use for its flat configuration file?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "38daef6819c06790aa76db469a66f7e20efc9347f14bfe5bc1b357c61348bde6",
+          "mini_sha256": "38daef6819c06790aa76db469a66f7e20efc9347f14bfe5bc1b357c61348bde6"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "a9a99e9c1a2c3170c51c2a377656de989e64360c357509093c941229d5c4598c",
+          "mini_sha256": "a9a99e9c1a2c3170c51c2a377656de989e64360c357509093c941229d5c4598c"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "d9a7c28893b9887ed47762140fef996bcb30d21e23c287f0faeca2ebb22080a9",
+          "mini_sha256": "d9a7c28893b9887ed47762140fef996bcb30d21e23c287f0faeca2ebb22080a9"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          14
+        ],
+        "mini": [
+          14
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E02",
+      "question": "How does ESLint search for a configuration file for each target file when run on the command line?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "8bf7baf86b6a020face8112c41fd7293a07ac90e1e9058f650f37c400ead5534",
+          "mini_sha256": "8bf7baf86b6a020face8112c41fd7293a07ac90e1e9058f650f37c400ead5534"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "c04292124e5e704ad6923e85fe18e976f57cc0679bbd4fa39588e345ce4d096a",
+          "mini_sha256": "c04292124e5e704ad6923e85fe18e976f57cc0679bbd4fa39588e345ce4d096a"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "83128eb3a500434d785d0849d14a8241a2df5511489c430b8ea98d009aa82a67",
+          "mini_sha256": "83128eb3a500434d785d0849d14a8241a2df5511489c430b8ea98d009aa82a67"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          15
+        ],
+        "mini": [
+          15
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E03",
+      "question": "How does --fix-dry-run differ from --fix, and can it be used with stdin?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "04dbecb5d0f6e7bcc530f1f5af5b2289dbbb81fbf42c8e06a7c77e276b7a01dd",
+          "mini_sha256": "04dbecb5d0f6e7bcc530f1f5af5b2289dbbb81fbf42c8e06a7c77e276b7a01dd"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "953a431f9358523981eef5992cb5b5bab54ed7091b24778cf814931db5b63432",
+          "mini_sha256": "953a431f9358523981eef5992cb5b5bab54ed7091b24778cf814931db5b63432"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "64abf364d2cba57c4fab2d06e3ff78858f8a51d7021daefdd2d34bf1b60a98de",
+          "mini_sha256": "64abf364d2cba57c4fab2d06e3ff78858f8a51d7021daefdd2d34bf1b60a98de"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          6
+        ],
+        "mini": [
+          6
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E04",
+      "question": "What are ESLint's default globally ignored paths and default JavaScript file patterns?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "84274a93413585a4a667a04f5f02b9487ef98213d3a30fa6c37a1a2487ee60ff",
+          "mini_sha256": "84274a93413585a4a667a04f5f02b9487ef98213d3a30fa6c37a1a2487ee60ff"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "aa46b4a1ee82e296ea68a70d6cc9cc59c33e44346b39fefeb70776ee1e0ea248",
+          "mini_sha256": "aa46b4a1ee82e296ea68a70d6cc9cc59c33e44346b39fefeb70776ee1e0ea248"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "1f55306cd94a7ba7ed41940cdf0a5ad9e4fb1b255ce527b846f1aa97193c8916",
+          "mini_sha256": "1f55306cd94a7ba7ed41940cdf0a5ad9e4fb1b255ce527b846f1aa97193c8916"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          10
+        ],
+        "mini": [
+          10
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E05",
+      "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "749fb0c627f011df6915e892b47b4c2f83d18bbecf1847abe8e0aa0a6d24ca4f",
+          "mini_sha256": "749fb0c627f011df6915e892b47b4c2f83d18bbecf1847abe8e0aa0a6d24ca4f"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "14d4f9684ca3dc785b2b787dd6c8e3bffe872606f5930936dcdd881119f5ebb9",
+          "mini_sha256": "14d4f9684ca3dc785b2b787dd6c8e3bffe872606f5930936dcdd881119f5ebb9"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "7df38b58a658a36f6555d6688a5efff2eca87ba82f7b5831b595cb1ae52cf8a5",
+          "mini_sha256": "7df38b58a658a36f6555d6688a5efff2eca87ba82f7b5831b595cb1ae52cf8a5"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          3
+        ],
+        "mini": [
+          3
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E06",
+      "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "a00b2be912beb8b186e60a05d3eced8686932e5d59e8275cffa28a2f2438b6a2",
+          "mini_sha256": "a00b2be912beb8b186e60a05d3eced8686932e5d59e8275cffa28a2f2438b6a2"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "e472856a4434a6225367330e0b6115e5e381452091a38c24c19b2c53f40a927d",
+          "mini_sha256": "e472856a4434a6225367330e0b6115e5e381452091a38c24c19b2c53f40a927d"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "3de6b17dbbaf0f9cf9b7a6106f5cab1d250d12a22f31c359dda0bdf7149d9e20",
+          "mini_sha256": "3de6b17dbbaf0f9cf9b7a6106f5cab1d250d12a22f31c359dda0bdf7149d9e20"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          3
+        ],
+        "mini": [
+          3
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E07",
+      "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "f470dad5066af39ca4651c7521c1ddb140e71b748479632a358e0048d7e907ea",
+          "mini_sha256": "f470dad5066af39ca4651c7521c1ddb140e71b748479632a358e0048d7e907ea"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "0b5f814c0660066b988cb3f78ae06320f4a5d7a6c5cc92666db4a0a3212b5445",
+          "mini_sha256": "0b5f814c0660066b988cb3f78ae06320f4a5d7a6c5cc92666db4a0a3212b5445"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "878cee464c76f4267b65597bb875ca81c16632c0ae1471f4dbfdb84847a2c8d0",
+          "mini_sha256": "878cee464c76f4267b65597bb875ca81c16632c0ae1471f4dbfdb84847a2c8d0"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          14
+        ],
+        "mini": [
+          14
+        ]
+      },
+      "over_budget_pool": true,
+      "selected_set_changed": true,
+      "public_dto_changed": true,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    },
+    {
+      "case_id": "V40-E08",
+      "question": "What production uptime SLA does ESLint guarantee for local linting?",
+      "status": "paired",
+      "receipt_count": {
+        "budget": 1,
+        "mini": 1
+      },
+      "observation_ok": true,
+      "receipt_cardinality_ok": true,
+      "same_preselection_inputs": true,
+      "inputs": {
+        "pool": {
+          "equal": true,
+          "budget_sha256": "68dbfd1f7a21ef2fefaad1b2a32ad23fada7ce79a2d06ed7e28b99883cfa5732",
+          "mini_sha256": "68dbfd1f7a21ef2fefaad1b2a32ad23fada7ce79a2d06ed7e28b99883cfa5732"
+        },
+        "complete_candidates": {
+          "equal": true,
+          "budget_sha256": "7c9ddbc7868a7231dcd65d459c26916e9943f6f1ee9344d4ad4a3656e5b5789b",
+          "mini_sha256": "7c9ddbc7868a7231dcd65d459c26916e9943f6f1ee9344d4ad4a3656e5b5789b"
+        },
+        "excluded": {
+          "equal": true,
+          "budget_sha256": "79919dde150b143697d95eaa3e1e8593e2932185230a0e716852085b21734afd",
+          "mini_sha256": "79919dde150b143697d95eaa3e1e8593e2932185230a0e716852085b21734afd"
+        }
+      },
+      "pool_sizes": {
+        "budget": [
+          1
+        ],
+        "mini": [
+          1
+        ]
+      },
+      "over_budget_pool": false,
+      "selected_set_changed": false,
+      "public_dto_changed": false,
+      "public_success_both": true,
+      "generation_id": "gen-df15d05f4629435aaad40c827f158d3d",
+      "database_unchanged": true,
+      "project_files_unchanged": true,
+      "database_sha256_before": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0",
+      "database_sha256_after": "fd3e5891395723072bf6650eb3daec10d639c92d63848b321ae927dd0b6ab6f0"
+    }
+  ],
+  "elapsed_seconds": 91.00256713000272,
+  "process_peak_rss_kib": 981488,
+  "frozen_inputs_unchanged": true,
+  "workload_completed": true,
+  "comparable_case_count": 40,
+  "comparable_selection_case_count": 40,
+  "public_boundary_valid": true,
+  "finished_at_utc": "2026-10-12T19:14:03.968297+00:00"
+}

@@ -1,0 +1,1040 @@
+{
+  "family": "black",
+  "root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+  "inventory": {
+    "seconds": 0.11186014700069791,
+    "expected_paths": [
+      "docs/faq.md",
+      "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "docs/usage_and_configuration/the_basics.md"
+    ],
+    "indexed_paths": [
+      "docs/faq.md",
+      "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "docs/usage_and_configuration/the_basics.md"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-c9c2e24f29743a4592dc26c9e3ecfe48e1212033",
+        "source_path": "docs/faq.md",
+        "display_text": "# Frequently Asked Questions\n\nThe most common questions and issues users face are aggregated into this FAQ.\n\n```{contents}\n:local:\n:backlinks: none\n:class: this-will-duplicate-information-and-it-is-still-useful-here\n```\n\n",
+        "line_start": 1,
+        "line_end": 10
+      },
+      {
+        "stable_chunk_id": "child-d6d094930fd7e15cea2aa720c92ba54d0850259f",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why spaces? I prefer tabs\n\nPEP 8 recommends spaces over tabs, and they are used by most of the Python community.\n_Black_ provides no options to configure the indentation style, and requests for such\noptions will not be considered.\n\n",
+        "line_start": 11,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-ff2597090c156039d4619b713476840927a484df",
+        "source_path": "docs/faq.md",
+        "display_text": "However, we recognise that using tabs is an accessibility issue as well. While the\noption will never be added to _Black_, visually impaired developers may find conversion\ntools such as `expand/unexpand` (for Linux) useful when contributing to Python projects.\nA workflow might consist of e.g. setting up appropriate pre-commit and post-merge git\nhooks, and scripting `unexpand` to run after applying _Black_.\n\n",
+        "line_start": 17,
+        "line_end": 22
+      },
+      {
+        "stable_chunk_id": "child-4d9c4b998b75790fae74dde61fd97f47dcf539b8",
+        "source_path": "docs/faq.md",
+        "display_text": "## Does Black have an API?\n\nNot yet. _Black_ is fundamentally a command line tool. Many\n[integrations](/integrations/index.md) are provided, but a Python interface is not one\nof them. A simple API is being [planned](https://github.com/psf/black/issues/779)\nthough.\n\n",
+        "line_start": 23,
+        "line_end": 29
+      },
+      {
+        "stable_chunk_id": "child-b253548e2ac2f10c92ee907b186971e7e527ffcc",
+        "source_path": "docs/faq.md",
+        "display_text": "## Is Black safe to use?\n\n",
+        "line_start": 30,
+        "line_end": 31
+      },
+      {
+        "stable_chunk_id": "child-606aad7d2c1a1f700c4098c4a430e0c089915d0c",
+        "source_path": "docs/faq.md",
+        "display_text": "Yes. _Black_ is strictly about formatting, nothing else. Black strives to ensure that\nafter formatting the AST is\n[checked](the_black_code_style/current_style.md#ast-before-and-after-formatting) with\nlimited special cases where the code is allowed to differ. If issues are found, an error\nis raised and the file is left untouched. Magical comments that influence linters and\nother tools, such as `# noqa`, may be moved by _Black_. See below for more details.\n\n",
+        "line_start": 32,
+        "line_end": 38
+      },
+      {
+        "stable_chunk_id": "child-e1843cfe5b6186ab5508c59f0e40dd8afb3b7748",
+        "source_path": "docs/faq.md",
+        "display_text": "## How stable is Black's style?\n\nStable. _Black_ aims to enforce one style and one style only, with some room for\npragmatism. See [The Black Code Style](the_black_code_style/index.md) for more details.\n\n",
+        "line_start": 39,
+        "line_end": 43
+      },
+      {
+        "stable_chunk_id": "child-cc89d290b9966afd703fc7e1c48fc58ea14fe139",
+        "source_path": "docs/faq.md",
+        "display_text": "Starting in 2022, the formatting output is stable for the releases made in the same year\n(other than unintentional bugs). At the beginning of every year, the first release will\nmake changes to the stable style. It is possible to opt in to the latest formatting\nstyles using the `--preview` flag.\n\n",
+        "line_start": 44,
+        "line_end": 48
+      },
+      {
+        "stable_chunk_id": "child-2e93c92ddb6dee9c99cb24c342213ab52e7b75da",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why is my file not formatted?\n\nMost likely because it is ignored in `.gitignore` or excluded with configuration. See\n[file collection and discovery](usage_and_configuration/file_collection_and_discovery.md)\nfor details.\n\n",
+        "line_start": 49,
+        "line_end": 54
+      },
+      {
+        "stable_chunk_id": "child-840fbedebbd207eb6c1bacc50540d482df40b925",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why is my Jupyter Notebook cell not formatted?\n\n_Black_ is timid about formatting Jupyter Notebooks. Cells containing any of the\nfollowing will not be formatted:\n\n- automagics (e.g. `pip install black`)\n- non-Python cell magics (e.g. `%%writefile`)\n- multiline magics\n- code which `IPython`'s `TransformerManager` would transform magics into\n- invalid syntax\n\n",
+        "line_start": 55,
+        "line_end": 65
+      },
+      {
+        "stable_chunk_id": "child-12ee723bd9e678c22381a9bc5bc7d861178aa7c4",
+        "source_path": "docs/faq.md",
+        "display_text": "See\n[Using _Black_ with Jupyter Notebooks](guides/using_black_with_jupyter_notebooks.md#cells-that-black-will-skip)\nfor details.\n\n",
+        "line_start": 66,
+        "line_end": 69
+      },
+      {
+        "stable_chunk_id": "child-4ae62c340a0b9b7f5532b1463db9f8d72fd886ee",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why does Flake8 report warnings?\n\nSome of Flake8's rules conflict with Black's style. We recommend disabling these rules.\nSee [Using _Black_ with other tools](labels/why-pycodestyle-warnings).\n\n",
+        "line_start": 70,
+        "line_end": 74
+      },
+      {
+        "stable_chunk_id": "child-78e75f7992b5389aef10f5c54b06d731b246194b",
+        "source_path": "docs/faq.md",
+        "display_text": "## Which Python versions does Black support?\n\n_Black_ generally supports all Python versions supported by CPython (see\n[the Python devguide](https://devguide.python.org/versions/) for current information).\nWe promise to support at least all Python versions that have not reached their end of\nlife. This is the case for both running _Black_ and formatting code.\n\n",
+        "line_start": 75,
+        "line_end": 81
+      },
+      {
+        "stable_chunk_id": "child-2f3b478a24006c49367f2a50eb29430dee387743",
+        "source_path": "docs/faq.md",
+        "display_text": "Support for formatting Python 2 code was removed in version 22.0. While we've made no\nplans to stop supporting older Python 3 minor versions immediately, their support might\nalso be removed some time in the future without a deprecation period.\n\n`await`/`async` as soft keywords/identifiers are no longer supported as of 25.9.0.\n\n",
+        "line_start": 82,
+        "line_end": 87
+      },
+      {
+        "stable_chunk_id": "child-7479e4c1c7dcaf3b01851787292451079e8a73fc",
+        "source_path": "docs/faq.md",
+        "display_text": "Runtime support for 3.6 was removed in version 22.10.0, for 3.7 in version 23.7.0, for\n3.8 in version 24.10.0, and for 3.9 in version 25.12.0.\n\n",
+        "line_start": 88,
+        "line_end": 90
+      },
+      {
+        "stable_chunk_id": "child-b5e9429a9bbc01a7ae8c801136810577cbc3af49",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why does my linter or typechecker complain after I format my code?\n\n",
+        "line_start": 91,
+        "line_end": 92
+      },
+      {
+        "stable_chunk_id": "child-ed7f72ef87b58829c47d2e55898615e5455226fc",
+        "source_path": "docs/faq.md",
+        "display_text": "Some linters and other tools use magical comments (e.g., `# noqa`, `# type: ignore`) to\ninfluence their behavior. While Black does its best to recognize such comments and leave\nthem in the right place, this detection is not and cannot be perfect. Therefore, you'll\nsometimes have to manually move these comments to the right place after you format your\ncodebase with _Black_.\n\n",
+        "line_start": 93,
+        "line_end": 98
+      },
+      {
+        "stable_chunk_id": "child-8c27fffc728b43bcd8dbc5bbc00de965edabd37f",
+        "source_path": "docs/faq.md",
+        "display_text": "## Can I run Black with PyPy?\n\nYes, there is support for PyPy 3.8 and higher.\n\n",
+        "line_start": 99,
+        "line_end": 102
+      },
+      {
+        "stable_chunk_id": "child-af8d6706c1c3ac2f790294607d5a61fe28f98592",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why does Black not detect syntax errors in my code?\n\n_Black_ is an autoformatter, not a Python linter or interpreter. Detecting all syntax\nerrors is not a goal. It can format all code accepted by CPython (if you find an example\nwhere that doesn't hold, please report a bug!), but it may also format some code that\nCPython doesn't accept.\n\n(labels/mypyc-support)=\n\n",
+        "line_start": 103,
+        "line_end": 111
+      },
+      {
+        "stable_chunk_id": "child-b0df50994ae85fd4886e29e1fa154535adea41be",
+        "source_path": "docs/faq.md",
+        "display_text": "## What is `compiled: yes/no` all about in the version output?\n\nWhile _Black_ is indeed a pure Python project, we use [mypyc] to compile _Black_ into a\nC Python extension, usually doubling performance. These compiled wheels are available\nfor 64-bit versions of Windows (both AMD and ARM), Linux (via the manylinux standard),\nand macOS across all supported CPython versions.\n\n",
+        "line_start": 112,
+        "line_end": 118
+      },
+      {
+        "stable_chunk_id": "child-9c066a24f804b105a70906466dca1271548ab1a1",
+        "source_path": "docs/faq.md",
+        "display_text": "Platforms including musl-based and/or ARM Linux distributions are currently **not**\nsupported. These platforms will fall back to the slower pure Python wheel available on\nPyPI.\n\nIf you are experiencing exceptionally weird issues or even segfaults, you can try\npassing `--no-binary black` to your pip install invocation. This flag excludes all\nwheels (including the pure Python wheel), so this command will use the [sdist].\n\n",
+        "line_start": 119,
+        "line_end": 126
+      },
+      {
+        "stable_chunk_id": "child-8f8ecdc42979d412723fbc46cab5aada8089cd36",
+        "source_path": "docs/faq.md",
+        "display_text": "[mypyc]: https://mypyc.readthedocs.io/en/stable/\n[sdist]:\n  https://packaging.python.org/en/latest/glossary/#term-Source-Distribution-or-sdist\n\n",
+        "line_start": 127,
+        "line_end": 130
+      },
+      {
+        "stable_chunk_id": "child-5bcd540399aae231b1b3c068305eb7bbd70eba22",
+        "source_path": "docs/faq.md",
+        "display_text": "## Why are emoji not displaying correctly on Windows?\n\nWhen using Windows, the emoji in _Black_'s output may not display correctly. This is not\nfixable from _Black_'s end.\n\nInstead, run your chosen command line/shell through [Windows Terminal], which will\nproperly handle rendering the emoji.\n\n[Windows Terminal]: https://aka.ms/terminal\n",
+        "line_start": 131,
+        "line_end": 139
+      },
+      {
+        "stable_chunk_id": "child-9267fa29bd09f204a4e9d3abdd1fdbda464a9e54",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "# File collection and discovery\n\nYou can directly pass _Black_ files, but you can also pass directories and _Black_ will\nwalk them, collecting files to format. It determines what files to format or skip\nautomatically using the inclusion and exclusion regexes and as well their modification\ntime.\n\n",
+        "line_start": 1,
+        "line_end": 7
+      },
+      {
+        "stable_chunk_id": "child-fde42e536965c1b6154310bea17baf11402f8148",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "## Ignoring unmodified files\n\n",
+        "line_start": 8,
+        "line_end": 9
+      },
+      {
+        "stable_chunk_id": "child-8fdefc1213bde56195a9596fef81619002fe8c9b",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "_Black_ remembers files it has already formatted, unless the `--diff` flag is used or\ncode is passed via standard input. This information is stored per-user. The exact\nlocation of the file depends on the _Black_ version and the system on which _Black_ is\nrun. The file is non-portable. The standard location on common operating systems is:\n\n- Windows:\n  `C:\\Users\\<username>\\AppData\\Local\\black\\black\\Cache\\<version>\\cache.<line-length>.<file-mode>.pickle`\n- macOS:\n  `/Users/<username>/Library/Caches/black/<version>/cache.<line-length>.<file-mode>.pickle`\n- Linux:\n  `/home/<username>/.cache/black/<version>/cache.<line-length>.<file-mode>.pickle`\n\n",
+        "line_start": 10,
+        "line_end": 21
+      },
+      {
+        "stable_chunk_id": "child-d099bbb7468819fa960cb864238f596284703af7",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "`file-mode` is an int flag that determines whether the file was formatted as 3.6+ only,\nas .pyi, and whether string normalization was omitted.\n\n",
+        "line_start": 22,
+        "line_end": 24
+      },
+      {
+        "stable_chunk_id": "child-35adf01cee4cc1dcce24fad414a7c4da5d5da8a3",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "To override the location of these files on all systems, set the environment variable\n`BLACK_CACHE_DIR` to the preferred location. Alternatively on macOS and Linux, set\n`XDG_CACHE_HOME` to your preferred location. For example, if you want to put the cache\nin the directory you're running _Black_ from, set `BLACK_CACHE_DIR=.cache/black`.\n_Black_ will then write the above files to `.cache/black`. Note that `BLACK_CACHE_DIR`\nwill take precedence over `XDG_CACHE_HOME` if both are set.\n\n",
+        "line_start": 25,
+        "line_end": 31
+      },
+      {
+        "stable_chunk_id": "child-961b6c1b3330252a663ba1a34825e28d72596fef",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "### Disabling the cache with --no-cache\n\nIf you need Black to always perform a fresh analysis and not consult or update the\non-disk cache, use the `--no-cache` flag. When provided, Black will neither read from\nnor write to the per-user cache. This is useful for debugging, for CI runs where you\nwant a deterministic fresh run, or when you suspect cache corruption.\n\nExample:\n\n",
+        "line_start": 32,
+        "line_end": 40
+      },
+      {
+        "stable_chunk_id": "child-9a0b87e381b2e24002d3700b5d655efb649a78e7",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "python -m black --no-cache .\n\n",
+        "line_start": 41,
+        "line_end": 42
+      },
+      {
+        "stable_chunk_id": "child-65cda6315b52f012b3977127eee4fed1223cf6cc",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "display_text": "## .gitignore\n\nIf `--exclude` is not set, _Black_ will automatically ignore files and directories in\n`.gitignore` file(s), if present.\n\nIf you want _Black_ to continue using `.gitignore` while also configuring the exclusion\nrules, please use `--extend-exclude`.\n",
+        "line_start": 43,
+        "line_end": 49
+      },
+      {
+        "stable_chunk_id": "child-b023e183aac537b313783cf50cdc064994596376",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "# The basics\n\nFoundational knowledge on using and configuring Black.\n\n_Black_ is a well-behaved Unix-style command-line tool:\n\n- it does nothing if it finds no sources to format;\n- it will read from standard input and write to standard output if `-` is used as the\n  filename;\n- it only outputs messages to users on standard error;\n- exits with code 0 unless an internal error occurred or a CLI option prompted it.\n\n",
+        "line_start": 1,
+        "line_end": 12
+      },
+      {
+        "stable_chunk_id": "child-2c8b88ed8c3bb885db77c8ae38594481b60189b6",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "## Usage\n\n_Black_ will reformat entire files in place. To get started right away with sensible\ndefaults:\n\n```sh\nblack {source_file_or_directory}\n```\n\nYou can run _Black_ as a package if running it as a script doesn't work:\n\n```sh\npython -m black {source_file_or_directory}\n```\n\n",
+        "line_start": 13,
+        "line_end": 27
+      },
+      {
+        "stable_chunk_id": "child-6abe004618b16fa57d39f00dd83d48e831d8765a",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Ignoring sections\n\n",
+        "line_start": 28,
+        "line_end": 29
+      },
+      {
+        "stable_chunk_id": "child-2123649923da87f8414a1e7cea733b4d92768c43",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Black will not reformat lines that contain `# fmt: skip` or blocks that start with\n`# fmt: off` and end with `# fmt: on`. `# fmt: skip` can be mixed with other\npragmas/comments either with multiple comments (e.g. `# fmt: skip # pylint # noqa`) or\nas a semicolon separated list (e.g. `# fmt: skip; pylint; noqa`). `# fmt: on/off` must\nbe on the same level of indentation and in the same block, meaning no unindents beyond\nthe initial indentation level between them. Black also recognizes\n[YAPF](https://github.com/google/yapf)'s block comments to the same effect, as a\ncourtesy for straddling code.\n\n",
+        "line_start": 30,
+        "line_end": 38
+      },
+      {
+        "stable_chunk_id": "child-9f0d2e4ea005deaa77dfc5205810c4d8cfceb9c2",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Command line options\n\nThe CLI options of _Black_ can be displayed by running `black --help`. All options are\nalso covered in more detail below.\n\nWhile _Black_ has quite a few knobs these days, it is still opinionated so style options\nare deliberately limited and rarely added.\n\nNote that all command-line options listed above can also be configured using a\n`pyproject.toml` file (more on that below).\n\n",
+        "line_start": 39,
+        "line_end": 49
+      },
+      {
+        "stable_chunk_id": "child-7a446834fd130774376c55cb24f93a5d5b29ab53",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-h`, `--help`\n\nShow available command-line options and exit.\n\n",
+        "line_start": 50,
+        "line_end": 53
+      },
+      {
+        "stable_chunk_id": "child-e433cd7846cd9abbe1b1af23b28ec62f4f6060f8",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-c`, `--code`\n\nFormat the code passed in as a string.\n\n```console\n$ black --code \"print ( 'hello, world' )\"\nprint(\"hello, world\")\n```\n\n",
+        "line_start": 54,
+        "line_end": 62
+      },
+      {
+        "stable_chunk_id": "child-a64f933fab9a2752f524fa31bc6613f0f61f511b",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-l`, `--line-length`\n\nHow many characters per line to allow. The default is 88.\n\nSee also [the style documentation](labels/line-length).\n\n",
+        "line_start": 63,
+        "line_end": 68
+      },
+      {
+        "stable_chunk_id": "child-b82f4db2b1aafc849da662dee0f9b4857c8809d5",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-t`, `--target-version`\n\nPython versions that should be supported by Black's output. You can run `black --help`\nand look for the `--target-version` option to see the full list of supported versions.\nYou should include all versions that your code supports. If you support Python 3.11\nthrough 3.13, you should write:\n\n```console\n$ black -t py311 -t py312 -t py313\n```\n\n",
+        "line_start": 69,
+        "line_end": 79
+      },
+      {
+        "stable_chunk_id": "child-b0be644215122b3093166fc665fe2b16d5bfa025",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "In a [configuration file](#configuration-via-a-file), you can write:\n\n```toml\ntarget-version = [\"py311\", \"py312\", \"py313\"]\n```\n\nBy default, Black will infer target versions from the project metadata in\n`pyproject.toml`, specifically the `[project.requires-python]` field. If this does not\nyield conclusive results, Black will use per-file auto-detection.\n\n",
+        "line_start": 80,
+        "line_end": 89
+      },
+      {
+        "stable_chunk_id": "child-29c8a47f249a58274412c79b99c22778492f3967",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "_Black_ uses this option to decide what grammar to use to parse your code. In addition,\nit may use it to decide what style to use. For example, support for a trailing comma\nafter `*args` in a function call was added in Python 3.5, so _Black_ will add this comma\nonly if the target versions are all Python 3.5 or higher:\n\n",
+        "line_start": 90,
+        "line_end": 94
+      },
+      {
+        "stable_chunk_id": "child-55d4a738757eb70fa6b13ab465a50de7eea31410",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black --line-length=10 --target-version=py35 -c 'f(a, *args)'\nf(\n    a,\n    *args,\n)\n$ black --line-length=10 --target-version=py34 -c 'f(a, *args)'\nf(\n    a,\n    *args\n)\n$ black --line-length=10 --target-version=py34 --target-version=py35 -c 'f(a, *args)'\nf(\n    a,\n    *args\n)\n```\n\n",
+        "line_start": 95,
+        "line_end": 112
+      },
+      {
+        "stable_chunk_id": "child-f169892b47ffc51ef1dc5748120ec42eb358dd47",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--pyi`\n\nFormat all input files like typing stubs regardless of file extension. This is useful\nwhen piping source on standard input.\n\n",
+        "line_start": 113,
+        "line_end": 117
+      },
+      {
+        "stable_chunk_id": "child-b480cf98808c7cbbabf8be827e58b74c50be716b",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--ipynb`\n\nFormat all input files like Jupyter Notebooks regardless of file extension. This is\nuseful when piping source on standard input.\n\n",
+        "line_start": 118,
+        "line_end": 122
+      },
+      {
+        "stable_chunk_id": "child-9c269ba89af417ae7790a29dba45e101694daac0",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--python-cell-magics`\n\nWhen processing Jupyter Notebooks, add the given magic to the list of known python-\nmagics. Useful for formatting cells with custom python magics. See the\n[Jupyter Notebooks guide](../guides/using_black_with_jupyter_notebooks.md) for more\ndetails.\n\n",
+        "line_start": 123,
+        "line_end": 129
+      },
+      {
+        "stable_chunk_id": "child-3e8ace7decfa73eee608b0e74af084d941387904",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-x, --skip-source-first-line`\n\nSkip the first line of the source code.\n\n",
+        "line_start": 130,
+        "line_end": 133
+      },
+      {
+        "stable_chunk_id": "child-91f907b4a1cb3208bbd468dec70a41097172a67c",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-S, --skip-string-normalization`\n\nBy default, _Black_ uses double quotes for all strings and normalizes string prefixes,\nas described in [the style documentation](labels/strings). If this option is given,\nstrings are left unchanged instead.\n\n",
+        "line_start": 134,
+        "line_end": 139
+      },
+      {
+        "stable_chunk_id": "child-4e20be44f706f5b6bfc38dbf37ad4195bdd170cc",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-C, --skip-magic-trailing-comma`\n\nBy default, _Black_ uses existing trailing commas as an indication that short lines\nshould be left separate, as described in\n[the style documentation](labels/magic-trailing-comma). If this option is given, the\nmagic trailing comma is ignored.\n\n",
+        "line_start": 140,
+        "line_end": 146
+      },
+      {
+        "stable_chunk_id": "child-bee184b2c68b53be7cb6a509b0a4e21b85a36f7b",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--preview`\n\nEnable potentially disruptive style changes that we expect to add to Black's main\nfunctionality in the next major release. Use this if you want a taste of what next\nyear's style will look like.\n\nRead more about [our preview style](labels/preview-style).\n\nThere is no guarantee on the code style produced by this flag across releases.\n\n",
+        "line_start": 147,
+        "line_end": 156
+      },
+      {
+        "stable_chunk_id": "child-bbc6119be5cba806c6269c00096a6854a890ee62",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--unstable`\n\nEnable all style changes in `--preview`, plus additional changes that we would like to\nmake eventually, but that have known issues that need to be fixed before they can move\nback to the `--preview` style. Use this if you want to experiment with these changes and\nhelp fix issues with them.\n\nThere is no guarantee on the code style produced by this flag across releases.\n\n",
+        "line_start": 157,
+        "line_end": 165
+      },
+      {
+        "stable_chunk_id": "child-75121fa2244c1e86ca5a7c22bd3c738700cd3cc8",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--enable-unstable-feature`\n\n",
+        "line_start": 166,
+        "line_end": 167
+      },
+      {
+        "stable_chunk_id": "child-ad79f8acb10fa4b101f6b43daaaadcec4975fcff",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Enable specific features from the `--unstable` style. See\n[the preview style documentation](labels/unstable-features) for the list of supported\nfeatures. This flag can only be used when `--preview` is enabled. Users are encouraged\nto use this flag if they use `--preview` style and a feature that affects their code is\nmoved from the `--preview` to the `--unstable` style, but they want to avoid the thrash\nfrom undoing this change.\n\n",
+        "line_start": 168,
+        "line_end": 174
+      },
+      {
+        "stable_chunk_id": "child-04db9feb345b917680c2297bf97f873e24b25516",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "There are no guarantees on the behavior of these features, or even their existence,\nacross releases.\n\n(labels/exit-code)=\n\n",
+        "line_start": 175,
+        "line_end": 179
+      },
+      {
+        "stable_chunk_id": "child-9a0a8808f546e0595cedc51d2a1810a2e1743ff1",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--check`\n\nDon't write the files back, just return the status. _Black_ will exit with:\n\n- code 0 if nothing would change;\n- code 1 if some files would be reformatted; or\n- code 123 if there was an internal error\n\nIf used in combination with `--quiet` then only the exit code will be returned, unless\nthere was an internal error.\n\n",
+        "line_start": 180,
+        "line_end": 190
+      },
+      {
+        "stable_chunk_id": "child-72b098c7df8111e918e6de9aad3bfbe3af2ceff8",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black test.py --check\nAll done! ✨ 🍰 ✨\n1 file would be left unchanged.\n$ echo $?\n0\n\n$ black test.py --check\nwould reformat test.py\nOh no! 💥 💔 💥\n1 file would be reformatted.\n$ echo $?\n1\n\n$ black test.py --check\nerror: cannot format test.py: INTERNAL ERROR: Black produced code that is not equivalent to the source.  Please report a bug on https://github.com/psf/black/issues.  This diff might be helpful: /tmp/blk_kjdr1oog.log\nOh no! 💥 💔 💥\n1 file would fail to reformat.\n$ echo $?\n123\n```\n\n",
+        "line_start": 191,
+        "line_end": 212
+      },
+      {
+        "stable_chunk_id": "child-db932d9dc53c65ef027ed9df151f00f58bddb8e7",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--diff`\n\nDon't write the files back, just output a diff to indicate what changes _Black_ would've\nmade. They are printed to stdout so capturing them is simple.\n\nIf you'd like colored diffs, you can enable them with `--color`.\n\n",
+        "line_start": 213,
+        "line_end": 219
+      },
+      {
+        "stable_chunk_id": "child-c1d58d6738f89003a55768f9e031960015cf1a31",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black test.py --diff\n--- test.py     2021-03-08 22:23:40.848954+00:00\n+++ test.py     2021-03-08 22:23:47.126319+00:00\n@@ -1 +1 @@\n-print ( 'hello, world' )\n+print(\"hello, world\")\nwould reformat test.py\nAll done! ✨ 🍰 ✨\n1 file would be reformatted.\n```\n\n",
+        "line_start": 220,
+        "line_end": 231
+      },
+      {
+        "stable_chunk_id": "child-a78bb6ffbe1a7625449745b493e156be9c1dd8cb",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--no-cache`\n\nDo not consult or update Black's per-user cache during this run. When `--no-cache` is\nspecified, Black will perform fresh analysis for all files and will neither read from\nnor write to the cache. This is helpful for reproducing formatting results from a clean\nrun, debugging cache-related issues, or ensuring CI executes a fresh formatting analysis\nevery time.\n\n",
+        "line_start": 232,
+        "line_end": 239
+      },
+      {
+        "stable_chunk_id": "child-3ca0e828b0133b3fb3cca9db8927189645553503",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--color` / `--no-color`\n\nShow (or do not show) colored diff. Only applies when `--diff` is given.\n\n",
+        "line_start": 240,
+        "line_end": 243
+      },
+      {
+        "stable_chunk_id": "child-9ddf25c7578aa0c05813ee75bc3331df644bfdb2",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--line-ranges`\n\nWhen specified, _Black_ will try its best to only format these lines.\n\nThis option can be specified multiple times, and a union of the lines will be formatted.\nEach range must be specified as two integers connected by a `-`: `<START>-<END>`. The\n`<START>` and `<END>` integer indices are 1-based and inclusive on both ends.\n\n",
+        "line_start": 244,
+        "line_end": 251
+      },
+      {
+        "stable_chunk_id": "child-028205cdbc4340e66ab9ffa1ec3fcb1129dcdd4b",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "_Black_ may still format lines outside of the ranges for multi-line statements.\nFormatting more than one file or any Jupyter Notebooks with this option is not\nsupported. This option cannot be specified in the `pyproject.toml` config.\n\nExample: `black --line-ranges=1-10 --line-ranges=21-30 test.py` will format lines from\n`1` to `10` and `21` to `30`.\n\nThis option is mainly for editor integrations, such as \"Format Selection\".\n\n",
+        "line_start": 252,
+        "line_end": 260
+      },
+      {
+        "stable_chunk_id": "child-0b49f11988e8f6a244adf52731e576338e299ddc",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```{note}\nDue to [#4052](https://github.com/psf/black/issues/4052), `--line-ranges` might format\nextra lines outside of the ranges when there are unformatted lines with the exact\nformatted content next to the requested lines. It also disables _Black_'s formatting\nstability check in `--safe` mode.\n```\n\n",
+        "line_start": 261,
+        "line_end": 267
+      },
+      {
+        "stable_chunk_id": "child-43d660f794ea0badeebb678c1d3b239ba6253a29",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--fast` / `--safe`\n\nBy default, _Black_ performs [an AST safety check](labels/ast-changes) after formatting\nyour code. The `--fast` flag turns off this check and the `--safe` flag explicitly\nenables it.\n\n",
+        "line_start": 268,
+        "line_end": 273
+      },
+      {
+        "stable_chunk_id": "child-1674b73db62a9daa15c0ac11591c393773b2e59d",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--required-version`\n\nRequire a specific version of _Black_ to be running. This is useful for ensuring that\nall contributors to your project are using the same version, because different versions\nof _Black_ may format code a little differently. This option can be set in a\nconfiguration file for consistent results across environments.\n\n",
+        "line_start": 274,
+        "line_end": 280
+      },
+      {
+        "stable_chunk_id": "child-61196d6be85560122992e104c2d868d72e90ecfc",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black --version\nblack, 26.5.1 (compiled: yes)\n$ black --required-version 26.5.1 -c \"format = 'this'\"\nformat = \"this\"\n$ black --required-version 31.5b2 -c \"still = 'beta?!'\"\nOh no! 💥 💔 💥 The required version does not match the running version!\n```\n\nYou can also pass just the major version:\n\n",
+        "line_start": 281,
+        "line_end": 291
+      },
+      {
+        "stable_chunk_id": "child-6e29fcd15953fe6e6fd21d6122b42b156023deaf",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black --required-version 22 -c \"format = 'this'\"\nformat = \"this\"\n$ black --required-version 31 -c \"still = 'beta?!'\"\nOh no! 💥 💔 💥 The required version does not match the running version!\n```\n\nBecause of our [stability policy](../the_black_code_style/index.md), this will guarantee\nstable formatting, but still allow you to take advantage of improvements that do not\naffect formatting.\n\n",
+        "line_start": 292,
+        "line_end": 302
+      },
+      {
+        "stable_chunk_id": "child-a6d3f5807210be49aa13d7b8ed9b3dc12db16dcf",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--exclude`\n\nA regular expression that matches files and directories that should be excluded on\nrecursive searches. An empty value means no paths are excluded. Use forward slashes for\ndirectories on all platforms (Windows, too). By default, Black also ignores all paths\nlisted in `.gitignore`. Changing this value will override all default exclusions.\n\n",
+        "line_start": 303,
+        "line_end": 309
+      },
+      {
+        "stable_chunk_id": "child-f4bcf0217ab5f6b54cdd5d82c44148f6bd42f36b",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Default Exclusions:\n`['.direnv', '.eggs', '.git', '.hg', '.ipynb_checkpoints',  '.mypy_cache', '.nox', '.pytest_cache', '.ruff_cache', '.tox', '.svn', '.venv', '.vscode',  '__pypackages__', '_build', 'buck-out', 'build', 'dist', 'venv'] `\n\n",
+        "line_start": 310,
+        "line_end": 312
+      },
+      {
+        "stable_chunk_id": "child-9bff4a8dfe3320ae5a40c0ae7fc1f8f00e6a9e22",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "If the regular expression contains newlines, it is treated as a\n[verbose regular expression](https://docs.python.org/3/library/re.html#re.VERBOSE). This\nis typically useful when setting these options in a `pyproject.toml` configuration file;\nsee [Configuration format](#configuration-format) for more information.\n\n",
+        "line_start": 313,
+        "line_end": 317
+      },
+      {
+        "stable_chunk_id": "child-a7b9548ffb4454db8b5ab39f08ab3a6ce9002f89",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "These options use regular expressions, not shell globs. Paths have a leading `/` and are\nrelative to the [project root](#where-black-looks-for-the-file) that _Black_ discovers.\nFor example, `^/foo\\.py$` matches only `foo.py` in that root. If no `pyproject.toml`,\n`.git`, or `.hg` is found, the project root may be the root of the file system; use\n`--verbose` to see which root _Black_ selected.\n\n",
+        "line_start": 318,
+        "line_end": 323
+      },
+      {
+        "stable_chunk_id": "child-13e698c160bdf51dd1a5b30c5c39a10703ab57ec",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--extend-exclude`\n\nLike `--exclude`, but adds additional files and directories on top of the default values\ninstead of overriding them.\n\n",
+        "line_start": 324,
+        "line_end": 328
+      },
+      {
+        "stable_chunk_id": "child-f88f3e8e7f1ddd38d5b03bdd5065bb4460251a88",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--force-exclude`\n\nLike `--exclude`, but files and directories matching this regex will be excluded even\nwhen they are passed explicitly as arguments. This is useful when invoking Black\nprogrammatically on changed files, such as in a pre-commit hook or editor plugin.\n\n",
+        "line_start": 329,
+        "line_end": 334
+      },
+      {
+        "stable_chunk_id": "child-53fb1c5482aa508b6ff57c885bb0dccc1725fe38",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--stdin-filename`\n\nThe name of the file when passing it through stdin. Useful to make sure Black will\nrespect the `--force-exclude` option on some editors that rely on using stdin.\n\n",
+        "line_start": 335,
+        "line_end": 339
+      },
+      {
+        "stable_chunk_id": "child-4d565ebd197cee3db5273c1bd4ff42320f930e65",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--include`\n\nA regular expression that matches files and directories that should be included on\nrecursive searches. An empty value means all files are included regardless of the name.\nUse forward slashes for directories on all platforms (Windows, too). Overrides all\nexclusions, including from `.gitignore` and command line options.\n\nDefault Inclusions: `['.pyi', '.ipynb']`\n\n",
+        "line_start": 340,
+        "line_end": 348
+      },
+      {
+        "stable_chunk_id": "child-48d73ee5640a4a4c246e70b7af0535ed2a0cdaa2",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-W`, `--workers`\n\nWhen _Black_ formats multiple files, it may use a process pool to speed up formatting.\nThis option controls the number of parallel workers. This can also be specified via the\n`BLACK_NUM_WORKERS` environment variable. Defaults to the number of CPUs in the system.\n\n",
+        "line_start": 349,
+        "line_end": 354
+      },
+      {
+        "stable_chunk_id": "child-6a13b0fcd8e42885be8132384d1c7bc76326bce7",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-q`, `--quiet`\n\nStop emitting all non-critical output. Error messages will still be emitted (which can\nsilenced by `2>/dev/null`).\n\n```console\n$ black src/ -q\nerror: cannot parse: src/black_primer/cli.py:5:6\n    mport asyncio\n         ^\nParseError: bad input\n```\n\n",
+        "line_start": 355,
+        "line_end": 367
+      },
+      {
+        "stable_chunk_id": "child-64253e8af7c1250cf5db323fe866076574281a56",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `-v`, `--verbose`\n\nEmit messages about files that were not changed or were ignored due to exclusion\npatterns. If _Black_ is using a configuration file, a message detailing which one it is\nusing will be emitted.\n\n",
+        "line_start": 368,
+        "line_end": 373
+      },
+      {
+        "stable_chunk_id": "child-858af3fa5422f447eaba2532d36928b8ccf872da",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black src/ -v\nUsing configuration from /tmp/pyproject.toml.\nsrc/blib2to3 ignored: matches the --extend-exclude regular expression\nsrc/_black_version.py wasn't modified on disk since last run.\nsrc/black/__main__.py wasn't modified on disk since last run.\nerror: cannot parse: src/black_primer/cli.py:5:6\n    mport asyncio\n         ^\nParseError: bad input\nreformatted src/black_primer/lib.py\nreformatted src/blackd/__init__.py\nreformatted src/black/__init__.py\nOh no! 💥 💔 💥\n3 files reformatted, 2 files left unchanged, 1 file failed to reformat\n```\n\n",
+        "line_start": 374,
+        "line_end": 390
+      },
+      {
+        "stable_chunk_id": "child-3c5100efdd002cfdb516edf116a5341d7bae66af",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--version`\n\nYou can check the version of _Black_ you have installed using the `--version` flag.\n\n```console\n$ black --version\nblack, 26.5.1\n```\n\n",
+        "line_start": 391,
+        "line_end": 399
+      },
+      {
+        "stable_chunk_id": "child-bbd369ca549d356bebea4098ce0fcfa7c73bd9fe",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `--config`\n\nRead configuration options from a configuration file. See\n[below](#configuration-via-a-file) for more details on the configuration file.\n\n",
+        "line_start": 400,
+        "line_end": 404
+      },
+      {
+        "stable_chunk_id": "child-453a2f9f73e3ac6cca055bb1d636a5eda4c5c28f",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Environment variable options\n\n_Black_ supports the following configuration via environment variables.\n\n",
+        "line_start": 405,
+        "line_end": 408
+      },
+      {
+        "stable_chunk_id": "child-473eba73b63297931765726411db50197de6d546",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `BLACK_CACHE_DIR`\n\nThe directory where _Black_ should store its cache.\n\n",
+        "line_start": 409,
+        "line_end": 412
+      },
+      {
+        "stable_chunk_id": "child-6516ba18c0cdc0cac3b94b7551f4ad0481f2d3ce",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "#### `BLACK_NUM_WORKERS`\n\nThe number of parallel workers _Black_ should use. The command line option `-W` /\n`--workers` takes precedence over this environment variable.\n\n",
+        "line_start": 413,
+        "line_end": 417
+      },
+      {
+        "stable_chunk_id": "child-87e170d4f49cfd78d94fbf9afc81cb180f286583",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Code input alternatives\n\n_Black_ supports formatting code via stdin, with the result being printed to stdout.\nJust let _Black_ know with `-` as the path.\n\n```console\n$ echo \"print ( 'hello, world' )\" | black -\nprint(\"hello, world\")\nreformatted -\nAll done! ✨ 🍰 ✨\n1 file reformatted.\n```\n\n",
+        "line_start": 418,
+        "line_end": 430
+      },
+      {
+        "stable_chunk_id": "child-b9594e7d3dec12eb4041119fec79dbbd644b22c3",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "**Tip:** if you need _Black_ to treat stdin input as a file passed directly via the CLI,\nuse `--stdin-filename`. Useful to make sure _Black_ will respect the `--force-exclude`\noption on some editors that rely on using stdin.\n\nYou can also pass code as a string using the `--code` option.\n\n",
+        "line_start": 431,
+        "line_end": 436
+      },
+      {
+        "stable_chunk_id": "child-69756a93f0a9062563a5cfe4e54280228be9d0bf",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Writeback and reporting\n\nBy default _Black_ reformats the files given and/or found in place. Sometimes you need\n_Black_ to just tell you what it _would_ do without actually rewriting the Python files.\n\nThere's two variations to this mode that are independently enabled by their respective\nflags:\n\n- `--check` (exit with code 1 if any file would be reformatted)\n- `--diff` (print a diff instead of reformatting files)\n\n",
+        "line_start": 437,
+        "line_end": 447
+      },
+      {
+        "stable_chunk_id": "child-41ec42546e1f4e61223e45c39de8979681e9371f",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Both variations can be enabled at once.\n\n",
+        "line_start": 448,
+        "line_end": 449
+      },
+      {
+        "stable_chunk_id": "child-c219e0e126699c88fd53439601bc614cf507ac18",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Output verbosity\n\n_Black_ in general tries to produce the right amount of output, balancing between\nusefulness and conciseness. By default, _Black_ emits files modified and error messages,\nplus a short summary.\n\n",
+        "line_start": 450,
+        "line_end": 455
+      },
+      {
+        "stable_chunk_id": "child-0e3abad5ab73c7bbcae2722555fcff47de028761",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```console\n$ black src/\nerror: cannot parse: src/black_primer/cli.py:5:6\n    mport asyncio\n         ^\nParseError: bad input\nreformatted src/black_primer/lib.py\nreformatted src/blackd/__init__.py\nreformatted src/black/__init__.py\nOh no! 💥 💔 💥\n3 files reformatted, 2 files left unchanged, 1 file failed to reformat.\n```\n\nThe `--quiet` and `--verbose` flags control output verbosity.\n\n",
+        "line_start": 456,
+        "line_end": 470
+      },
+      {
+        "stable_chunk_id": "child-0d6848efead6e1f2b92c0ef478dc1ae9145ff4be",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "## Configuration via a file\n\n_Black_ is able to read project-specific default values for its command line options\nfrom a `pyproject.toml` file. This is especially useful for specifying custom\n`--include` and `--exclude`/`--force-exclude`/`--extend-exclude` patterns for your\nproject.\n\n",
+        "line_start": 471,
+        "line_end": 477
+      },
+      {
+        "stable_chunk_id": "child-dcd238288785238df1f597b5251364894861b07e",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "**Pro-tip**: If you're asking yourself \"Do I need to configure anything?\" the answer is\n\"No\". _Black_ is all about sensible defaults. Applying those defaults will have your\ncode in compliance with many other _Black_ formatted projects.\n\n",
+        "line_start": 478,
+        "line_end": 481
+      },
+      {
+        "stable_chunk_id": "child-cd7b9babe1e2064b207ce1e6d9ee8c9402016918",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### What on Earth is a `pyproject.toml` file?\n\n[PEP 518](https://peps.python.org/pep-0518/) defines `pyproject.toml` as a configuration\nfile to store build system requirements for Python projects. With the help of tools like\n[Poetry](https://python-poetry.org/), [Flit](https://flit.pypa.io/), or\n[Hatch](https://hatch.pypa.io/) it can fully replace the need for `setup.py` and\n`setup.cfg` files.\n\n",
+        "line_start": 482,
+        "line_end": 489
+      },
+      {
+        "stable_chunk_id": "child-c38eac17c9567252de6c950ec36f678c24b99b3a",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Where _Black_ looks for the file\n\nBy default _Black_ looks for `pyproject.toml` containing a `[tool.black]` section\nstarting from the common base directory of all files and directories passed on the\ncommand line. If it's not there, it looks in parent directories. It stops looking when\nit finds the file, or a `.git` directory, or a `.hg` directory, or the root of the file\nsystem, whichever comes first.\n\n",
+        "line_start": 490,
+        "line_end": 497
+      },
+      {
+        "stable_chunk_id": "child-d5dc98f8497571fe587f1d9dc25c05220a017580",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "If you're formatting standard input, _Black_ will look for configuration starting from\nthe current working directory.\n\n",
+        "line_start": 498,
+        "line_end": 500
+      },
+      {
+        "stable_chunk_id": "child-105478701035e93191c5fdb4053bca6dd2c3b639",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "You can use a \"global\" configuration, stored in a specific location in your home\ndirectory. This will be used as a fallback configuration, that is, it will be used if\nand only if _Black_ doesn't find any configuration as mentioned above. Depending on your\noperating system, this configuration file should be stored as:\n\n- Windows: `~\\.black`\n- Unix-like (Linux, macOS, etc.): `$XDG_CONFIG_HOME/black` (`~/.config/black` if the\n  `XDG_CONFIG_HOME` environment variable is not set)\n\n",
+        "line_start": 501,
+        "line_end": 509
+      },
+      {
+        "stable_chunk_id": "child-2d522cb841edf09eee25fe9cb6ebfa2a4a571987",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Note that these are paths to the TOML file itself (meaning that they shouldn't be named\nas `pyproject.toml`), not directories where you store the configuration (i.e.,\n`black`/`.black` is the file to create and add your configuration options to, in the\n`~/.config/` directory). Here, `~` refers to the path to your home directory. On\nWindows, this will be something like `C:\\Users\\UserName` and stored in the environment\nvariable `%USERPROFILE%`.\n\n",
+        "line_start": 510,
+        "line_end": 516
+      },
+      {
+        "stable_chunk_id": "child-fabb7f3bae50ae3075e80eba9f6936e3025d4ce0",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "You can also explicitly specify the path to a particular file that you want with\n`--config`. In this situation _Black_ will not look for any other file.\n\nIf you're running with `--verbose`, you will see a message if a file was found and used.\n\nPlease note `blackd` will not use `pyproject.toml` configuration.\n\n",
+        "line_start": 517,
+        "line_end": 523
+      },
+      {
+        "stable_chunk_id": "child-89d5ab90c2ebd010dad469bfc74d2f557907ab12",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Configuration format\n\nAs the file extension suggests, `pyproject.toml` is a [TOML](https://toml.io) file. It\ncontains separate sections for different tools. _Black_ is using the `[tool.black]`\nsection. The option keys are the same as long names of options on the command line.\n\n",
+        "line_start": 524,
+        "line_end": 529
+      },
+      {
+        "stable_chunk_id": "child-6d39690f541adde6f53b4b831df2d8610b8374c4",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Most command-line options can be configured in `[tool.black]` by using their long name\nwithout the leading `--` (for example, `--line-length` becomes `line-length`). Options\nthat cannot be configured in `pyproject.toml` are called out explicitly in the option\nreference above.\n\n",
+        "line_start": 530,
+        "line_end": 534
+      },
+      {
+        "stable_chunk_id": "child-0a9387715d245b574268cea97f97ac5bfb2d8369",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "Note that you have to use single-quoted strings in TOML for regular expressions. It's\nthe equivalent of r-strings in Python. Multiline strings are treated as verbose regular\nexpressions by Black. Use `[ ]` to denote a significant space character.\n\n<details>\n<summary>Example <code>pyproject.toml</code></summary>\n\n",
+        "line_start": 535,
+        "line_end": 541
+      },
+      {
+        "stable_chunk_id": "child-8baee86fac1e0dcedff369a30cfc84be47bb6988",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```toml\n[tool.black]\nline-length = 88\ntarget-version = ['py37']\ninclude = '\\.pyi?$'\n# 'extend-exclude' excludes files or directories in addition to the defaults\nextend-exclude = '''\n# A regex preceded with ^/ will apply only to files and directories\n# in the root of the project.\n(\n  ^/foo\\.py$    # exclude a file named foo.py in the root of the project\n  | .*_pb2\\.py  # exclude autogenerated Protocol Buffer files anywhere in the project\n)\n'''\n```\n\n",
+        "line_start": 542,
+        "line_end": 557
+      },
+      {
+        "stable_chunk_id": "child-880c8bfe1cf2c285075d10931e9aff27a1e5b354",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "</details>\n\n<details>\n<summary>More complete <code>pyproject.toml</code> template</summary>\n\n",
+        "line_start": 558,
+        "line_end": 562
+      },
+      {
+        "stable_chunk_id": "child-76adb922e9c23db29c392ae8ed270d5e36153975",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "```toml\n[tool.black]\nline-length = 88\ntarget-version = [\"py311\"]\nrequired-version = \"26\"\ninclude = '\\.pyi?$'\n\n# Formatting behavior\nskip-string-normalization = false\nskip-magic-trailing-comma = false\npreview = false\nunstable = false\n\n# File collection\nextend-exclude = '''\n(\n  ^/foo\\.py$\n  | .*_pb2\\.py\n)\n'''\nforce-exclude = '''\n(\n  ^/generated/\n)\n'''\n```\n\n</details>\n\n",
+        "line_start": 563,
+        "line_end": 591
+      },
+      {
+        "stable_chunk_id": "child-c0e02b4201fc525c1a36c21d44062f7448cc0090",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "### Lookup hierarchy\n\nCommand-line options have defaults that you can see in `--help`. A `pyproject.toml` can\noverride those defaults. Finally, options provided by the user on the command line\noverride both.\n\n_Black_ will only ever use one `pyproject.toml` file during an entire run. It doesn't\nlook for multiple files, and doesn't compose configuration from different levels of the\nfile hierarchy.\n\n",
+        "line_start": 592,
+        "line_end": 601
+      },
+      {
+        "stable_chunk_id": "child-a0b95e4def6199f3084f1d8d3520a4a2009b8c2d",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "display_text": "## Next steps\n\nA good next step would be configuring auto-discovery so `black .` is all you need\ninstead of laboriously listing every file or directory. You can get started by heading\nover to [File collection and discovery](./file_collection_and_discovery.md).\n\nAnother good choice would be setting up an\n[integration with your editor](../integrations/editors.md) of choice or with\n[pre-commit for source version control](../integrations/source_version_control.md).\n",
+        "line_start": 602,
+        "line_end": 610
+      }
+    ],
+    "sqlite_version": "3.53.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "f3cb689255e5d9dc86befebe677f3ce5012f50484747042185f44091e16fc76a",
+    "storage_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-test-tmp/docatlas-evidence-i1_a7f7x/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+    "catalog_sha256": "a5726ebb9e5710c0fca0edd3d224181099fd88ba83c098f4f9bbc244e16f31e3",
+    "documents": [
+      {
+        "path": "docs/faq.md",
+        "content_sha256": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+        "catalog_entry_hash": "sha256:7a5131fa0830fdac9adaf265f1b920348ef110ccc0cd9edeca41c9bf2571b39d"
+      },
+      {
+        "path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "content_sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+        "catalog_entry_hash": "sha256:87f6f162b2655bac66a883730d7f97ac61aa6ffadca0fede08a62bad1617b2f4"
+      },
+      {
+        "path": "docs/usage_and_configuration/the_basics.md",
+        "content_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+        "catalog_entry_hash": "sha256:e7993c9b309fdd88b4536dfcef1304c015488a32894f3b4531a1dc18f88d48e3"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "members": 3,
+      "new_count": 3,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 69,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 69
+    }
+  },
+  "snapshot_sources": [
+    {
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/faq.md",
+      "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/faq.md",
+      "content_hash": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+      "path": "docs/faq.md",
+      "content_sha256": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+        "project_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "repository_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/faq.md",
+        "source_path": "docs/faq.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+        "project_doc_catalog_entry_hash": "sha256:7a5131fa0830fdac9adaf265f1b920348ef110ccc0cd9edeca41c9bf2571b39d",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832362119995415,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    },
+    {
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/usage_and_configuration/file_collection_and_discovery.md",
+      "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/usage_and_configuration/file_collection_and_discovery.md",
+      "content_hash": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+      "path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "content_sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+        "project_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "repository_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "source_path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+        "project_doc_catalog_entry_hash": "sha256:87f6f162b2655bac66a883730d7f97ac61aa6ffadca0fede08a62bad1617b2f4",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832362120125248,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    },
+    {
+      "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+      "source": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/usage_and_configuration/the_basics.md",
+      "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/usage_and_configuration/the_basics.md",
+      "content_hash": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "path": "docs/usage_and_configuration/the_basics.md",
+      "content_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "metadata": {
+        "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black",
+        "project_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "repository_identity": "local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7",
+        "source_class": "project_file",
+        "project_docs": true,
+        "project_doc_path": "docs/usage_and_configuration/the_basics.md",
+        "source_path": "docs/usage_and_configuration/the_basics.md",
+        "format": "md",
+        "project_doc_content_hash": "sha256:149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+        "project_doc_catalog_entry_hash": "sha256:e7993c9b309fdd88b4536dfcef1304c015488a32894f3b4531a1dc18f88d48e3",
+        "project_doc_reason": "other",
+        "doc_scope": "project",
+        "module_path": null,
+        "module_id": null,
+        "project_doc_description": "Pinned documentation source",
+        "project_doc_authority": "source_of_truth",
+        "project_doc_lifecycle_status": "active",
+        "lifecycle_status": "active",
+        "project_doc_impact_policy": "track",
+        "index_freshness": "synchronized",
+        "project_doc_mtime_ns": 1791832362120278324,
+        "chunking_schema": "parent-child-v1",
+        "child_target_tokens": 160,
+        "child_hard_max_tokens": 512
+      },
+      "matches_pinned_source": true
+    }
+  ],
+  "prepared_manifest": {
+    "certification": {
+      "canonical_parse_calls": 0,
+      "canonical_parse_ms": 0.0,
+      "certified_sources": 3,
+      "elapsed_ms": 1.5326899992942344,
+      "missed_sources": 0,
+      "sources_seen": 3,
+      "writer_results_reused": 3
+    },
+    "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+    "manifest_schema_version": 1,
+    "misses": {},
+    "parent_parser_revision": "markdown-parent-sections-v1",
+    "sources": {
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/faq.md": {
+        "canonical_rows_sha256": "935852f795833911d3257071f8d4a73216a5d0dad3cd2816c7fd7164b0097ae3",
+        "content_sha256": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+        "parent_count": 14,
+        "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/faq.md"
+      },
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/usage_and_configuration/file_collection_and_discovery.md": {
+        "canonical_rows_sha256": "2769270a0cea3715f758b6b5c6edd383dae91f279c3d995e73c7a83e1decfb32",
+        "content_sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+        "parent_count": 4,
+        "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/usage_and_configuration/file_collection_and_discovery.md"
+      },
+      "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/black/docs/usage_and_configuration/the_basics.md": {
+        "canonical_rows_sha256": "abf83ec54b37686a54efdc4e48e14bf0fa471fd648e2b7e34587df8abd18a0c9",
+        "content_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+        "parent_count": 46,
+        "source_identity": "project_file:local:026cf09ad3b73232ceaba6aa5cde8abbd45e71c51344cad0ffd1aefa60b8b1a7:docs/usage_and_configuration/the_basics.md"
+      }
+    }
+  },
+  "initial_database_state": {
+    "schema_sha256": "18f05c77686a61719f5f5338e087f7cce0aabd4d48163ceff4fef41b570e3d85",
+    "tables": {
+      "embedding_upserts": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "generation_sources": {
+        "rows": 3,
+        "sha256": "fff76ab34ef662ec138b566735a2d1b65a31c7a8d15542c70f26aa5f989a35fa"
+      },
+      "generation_vector_upserts": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "index_generations": {
+        "rows": 1,
+        "sha256": "184909843017a1457d15a2eb864f5044c33fb0a4f46a3000308db7cb77ec9d02"
+      },
+      "index_state": {
+        "rows": 1,
+        "sha256": "e12a7972d128a207739335d4176a70fb1b547c790e13273b05366ee7248e1574"
+      },
+      "parent_sections": {
+        "rows": 0,
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "retrieval_children": {
+        "rows": 106,
+        "sha256": "5baa85bfda73940461fbf753927f284472437180547c4af38eb7aaef324ca0ef"
+      },
+      "retrieval_children_fts": {
+        "rows": 106,
+        "sha256": "73b3c5f05e22c09da3f9e00035502f76fc1e38c0e4b8114f1004232bda56b22f"
+      },
+      "retrieval_children_fts_config": {
+        "rows": 1,
+        "sha256": "ada92526309f86a3a9ffe14c12a523763133e33caef1f59c210553e4cb604c81"
+      },
+      "retrieval_children_fts_data": {
+        "rows": 15,
+        "sha256": "3a01079656c9df8a401fc7473faa387d42e29c6565f300e4da6b3a3da55f2a2f"
+      },
+      "retrieval_children_fts_docsize": {
+        "rows": 106,
+        "sha256": "c375405259cd53c6d9179cf07fa60bc249271d094611142a5166235763e844e5"
+      },
+      "retrieval_children_fts_idx": {
+        "rows": 13,
+        "sha256": "16788a1a9e4461ab090cb4dc8418b0a6d299a38da7bb904d320bd0375b446298"
+      },
+      "retrieval_fts_projection_state": {
+        "rows": 1,
+        "sha256": "5aec3364d358d497e52223ee25ed98acc08ca501b025c789318616a924c8ec22"
+      },
+      "retrieval_parents": {
+        "rows": 64,
+        "sha256": "10e267326637e718bd718e7b5d7a718a88b0fa531165f33a127253b8496fbf01"
+      },
+      "sections": {
+        "rows": 69,
+        "sha256": "a39d9f9585344aa047314a5dd678f4ca0f4ecc2c2ab901021df65340d1bc1f4f"
+      },
+      "sections_fts": {
+        "rows": 69,
+        "sha256": "4976dd801c6630300ca90a2209ff4780ba0001ed6697bc727ae1a27fa3b4575c"
+      },
+      "sections_fts_config": {
+        "rows": 1,
+        "sha256": "ada92526309f86a3a9ffe14c12a523763133e33caef1f59c210553e4cb604c81"
+      },
+      "sections_fts_data": {
+        "rows": 10,
+        "sha256": "bf55d12155008f6d58161f7b473e06c77deb6e10cabcb4227c7ebe16a901ae0e"
+      },
+      "sections_fts_docsize": {
+        "rows": 69,
+        "sha256": "c741a280d0bab8031228678e8825eeed8d55cea0dc6aed6c65f448bf30f29691"
+      },
+      "sections_fts_idx": {
+        "rows": 8,
+        "sha256": "b4920ad863b6aa233a3f49734f349e893fd905feea8fbce34d0ad4873a472b5f"
+      },
+      "sources": {
+        "rows": 3,
+        "sha256": "6711c77c1e91e339232cea465a7e1da2d6bf320be0d3c25235b2e98adc333699"
+      },
+      "sqlite_sequence": {
+        "rows": 1,
+        "sha256": "e6e4ba6dc9ce8fc5375abfb6db366b4542b98c74ecb0b3e3e329589714e36525"
+      }
+    },
+    "sha256": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+  },
+  "initial_file_hashes": {
+    "docatlas.project-docs.yaml": "a5726ebb9e5710c0fca0edd3d224181099fd88ba83c098f4f9bbc244e16f31e3",
+    "docs/faq.md": "37bb6b0c4605f35ada2aa7dc979361e31f6581edbcd2c0615ddb6b5a01daf1cc",
+    "docs/usage_and_configuration/file_collection_and_discovery.md": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+    "docs/usage_and_configuration/the_basics.md": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796"
+  }
+}

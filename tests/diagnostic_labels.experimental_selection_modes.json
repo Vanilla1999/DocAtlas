@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_experimental_selection_modes_integration.py": "behavioral"
+  },
+  "module_node_hashes": {
+    "tests/test_experimental_selection_modes_integration.py": "d876598c7fde558c33503eefe8854d44259aa148b723a204185ec543b01cb4ec"
+  },
+  "node_overrides": {}
+}

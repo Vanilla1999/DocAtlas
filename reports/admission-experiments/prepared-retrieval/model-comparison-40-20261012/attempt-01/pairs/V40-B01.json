@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-B01",
+  "question": "What is Black's default line length?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "e6c7ee22a730980622daf93ecb105e2f0eb48274147f6df0c81a6218767f469a",
+      "mini_sha256": "e6c7ee22a730980622daf93ecb105e2f0eb48274147f6df0c81a6218767f469a"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "09943584c6d4eb89332f03e421fca360fd186f3d0a737c631682c768f7ac3b46",
+      "mini_sha256": "09943584c6d4eb89332f03e421fca360fd186f3d0a737c631682c768f7ac3b46"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "27dd1ce409688820ede3b8c82579d5b5764346aaac45b207aa7594f3a871a649",
+      "mini_sha256": "27dd1ce409688820ede3b8c82579d5b5764346aaac45b207aa7594f3a871a649"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      19
+    ],
+    "mini": [
+      19
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-e2d0370c835b4cc58b10c8ac29424601",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8",
+  "database_sha256_after": "b283b91c5b4b942bc194a1538ebc2021e72577df967f10b7943237edef5109a8"
+}

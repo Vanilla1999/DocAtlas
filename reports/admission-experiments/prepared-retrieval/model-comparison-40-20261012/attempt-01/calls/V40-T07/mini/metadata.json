@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-T07",
+  "mode": "mini",
+  "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+  "public_request": {
+    "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/textual",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/textual.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:30.163258+00:00",
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_before": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "same_initial_state": true,
+  "elapsed_seconds": 0.5721293999995396,
+  "process_cpu_seconds": 0.5699176910000006,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 959984,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "source_files_sha256_after": "183cd6c7e358d1c55f88c5dedc481d37cd4b4161a23a939197010a25fd6ce635",
+  "wire_sha256": "5ad8098f0c0054a37e8ca8b1931a753ee0bd5b329d2b6ecf93c69fcb9103ff6d",
+  "wire_utf8_bytes": 1655,
+  "utf8_quarter_proxy": 414,
+  "codec_o200k_base": 485,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}

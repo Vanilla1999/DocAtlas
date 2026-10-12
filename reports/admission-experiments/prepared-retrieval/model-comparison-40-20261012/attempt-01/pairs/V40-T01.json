@@ -1,0 +1,46 @@
+{
+  "case_id": "V40-T01",
+  "question": "What does the first positional argument to Textual reactive specify?",
+  "status": "paired",
+  "receipt_count": {
+    "budget": 1,
+    "mini": 1
+  },
+  "observation_ok": true,
+  "receipt_cardinality_ok": true,
+  "same_preselection_inputs": true,
+  "inputs": {
+    "pool": {
+      "equal": true,
+      "budget_sha256": "7b5a74afa0664699199faf232dfe7d32e0a14498662ae0e2fcf7f8d16f2af870",
+      "mini_sha256": "7b5a74afa0664699199faf232dfe7d32e0a14498662ae0e2fcf7f8d16f2af870"
+    },
+    "complete_candidates": {
+      "equal": true,
+      "budget_sha256": "be21e89d5d11cbb1fe2dd0ee797859a1370e28da71cdb19cb49be2407a674ff9",
+      "mini_sha256": "be21e89d5d11cbb1fe2dd0ee797859a1370e28da71cdb19cb49be2407a674ff9"
+    },
+    "excluded": {
+      "equal": true,
+      "budget_sha256": "7faa040f55e9c1c9b3b21e4feb344b32439aeb09c45feb7d41a282fe2e6b3d92",
+      "mini_sha256": "7faa040f55e9c1c9b3b21e4feb344b32439aeb09c45feb7d41a282fe2e6b3d92"
+    }
+  },
+  "pool_sizes": {
+    "budget": [
+      19
+    ],
+    "mini": [
+      19
+    ]
+  },
+  "over_budget_pool": true,
+  "selected_set_changed": true,
+  "public_dto_changed": true,
+  "public_success_both": true,
+  "generation_id": "gen-ff62831c9c254fd2950070a08731e799",
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_before": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0",
+  "database_sha256_after": "bbeabcceed3f3468fbea457e52c932dd6125659c771ad2c3cbe80e052b8eeed0"
+}

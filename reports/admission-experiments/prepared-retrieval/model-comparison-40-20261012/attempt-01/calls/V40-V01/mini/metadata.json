@@ -1,0 +1,32 @@
+{
+  "case_id": "V40-V01",
+  "mode": "mini",
+  "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+  "public_request": {
+    "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+    "project_path": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+    "scope": "project"
+  },
+  "project_root": "/workspace/scratch/7ccc1a9e2e54/docatlas-model-comparison40-attempt-01/projects/vite",
+  "inventory_path": "/workspace/scratch/7ccc1a9e2e54/DocAtlas/reports/admission-experiments/prepared-retrieval/model-comparison-40-20261012/attempt-01/preparation/vite.json",
+  "status": "returned",
+  "started_at_utc": "2026-10-12T19:13:34.204820+00:00",
+  "database_sha256_before": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_before": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "same_initial_state": true,
+  "elapsed_seconds": 1.992302644001029,
+  "process_cpu_seconds": 7.684556114000003,
+  "observation_calls": 1,
+  "observation_errors": [],
+  "process_peak_rss_kib": 966880,
+  "database_unchanged": true,
+  "project_files_unchanged": true,
+  "database_sha256_after": "b0c4356b663027768431b821608dedc24f3d1ad4e2ca04295afdf0621e2f566a",
+  "source_files_sha256_after": "9ecfb3ab36f89d6e538f9bb581e923fb65bfe52fafaab4bd45d2865c7dc54995",
+  "wire_sha256": "86b91e9d5669e4e8832bd7b4d4d76e508460e981cc3cacc8ade88cb1af3e9f50",
+  "wire_utf8_bytes": 2556,
+  "utf8_quarter_proxy": 639,
+  "codec_o200k_base": 697,
+  "public_source_count": 1,
+  "within_wire_budget": true
+}
