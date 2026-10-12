@@ -246,6 +246,17 @@ def project_docs_context(
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
     flow.boundary("decoration.output", payload, snapshot)
+    # Host-only paired structural-assembly alternative; native admission and
+    # final source/budget checks are identical to the legacy branch.
+    import os
+    from docmancer.docs.domain.original_body_discovery import source_valid_candidate_admission_active
+    if (source_valid_candidate_admission_active()
+            and os.environ.get("DOCATLAS_EXPERIMENT_ASSEMBLER") == "prepared_parent_v1"):
+        from .experimental_prepared_parent_assembler import assemble_prepared_parents
+        payload, snapshot = assemble_prepared_parents(
+            payload, snapshot, retrieval, max_tokens=packet_max)
+        flow.boundary("prepared_parent.output", payload, snapshot)
+        return recheck_experimental_context(payload, snapshot, retrieval)
     from .joint_context_selection import select_joint_context
     payload, snapshot = select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
     flow.boundary("joint.output", payload, snapshot)
