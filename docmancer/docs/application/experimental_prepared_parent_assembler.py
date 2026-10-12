@@ -47,6 +47,7 @@ def assemble_prepared_parents(payload: dict, snapshot: dict, retrieval: dict, *,
             path = tuple(path) if isinstance(path,(list,tuple)) else tuple(
                 item.strip() for item in str(path).split(" > ") if item.strip())
             parent=SimpleNamespace(char_start=a,char_end=b,heading_path=path,
+                logical_id=owner.get("logical_id"),
                 title=str(original.get("title") or original.get("section_title") or ""))
             proposal=_context_row(original,visible,raw,parent,a,b,supplementary=False)
             if proposal is None or visible.get("snippet","") not in raw[a:b]:
