@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "prepared_date": "2026-10-12",
+  "repository": "Vanilla1999/DocAtlas",
+  "review_branch": "fix/main-flow-compact-evidence",
+  "review_pr": 214,
+  "reviewed_product_sha": "d8af387de507007f2b8c83f04aac78feb9b6760c",
+  "reviewed_product_tree": "adee887303265f438cc924488eb4c91315629012",
+  "comparison_base_sha": "f2feacb5d960f26d77c0b6e838eee5e4e7620e53",
+  "baseline_product_sha": "087d4f22206cfd3db0b18af4a7c2a96e25ec1cec",
+  "original_investigation_sha": "3394695f77e72a7394ced2378dccb7bcdb7ce164",
+  "documentation_commit_note": "Review materials are committed after the reviewed product SHA. They do not retroactively change the head tested by CI.",
+  "frozen_inputs": [
+    {"path": "eval/main_flow_comparison/corpus.md", "sha256": "31da2449b89b3edc72f6f463a84144d256105a77f99bfe5c7bdeab9cdd3c1d00"},
+    {"path": "eval/main_flow_comparison/questions.json", "sha256": "2b88e653b4726747d4ee55682d159744bc1b7dcfc8ac525ee830a688ec401f67"},
+    {"path": "eval/main_flow_comparison/questions_extra40.json", "sha256": "5d0618db2bc1ddb18f65ac246b79ecb1adaadeef3a1618ed68d9f5a5784a12dc"}
+  ],
+  "final_product_blobs": {
+    "docmancer/docs/application/joint_context_candidates.py": "ccfb1f3c4732d241876458763d21d971b4c7f503",
+    "docmancer/docs/application/joint_context_selection.py": "d42cae19f69552c64229a9e083b1a859e933068f"
+  },
+  "archives": [
+    {
+      "role": "old10_baseline",
+      "local_file": "main-flow-fixed-087d4f2.zip",
+      "head_sha": "087d4f22206cfd3db0b18af4a7c2a96e25ec1cec",
+      "run_id": 38161642058,
+      "artifact_id": 11710517656,
+      "sha256": "afd354a964254e677df60ea954a25c7c0e7a75e8b391aa707f7a2dc34265ec2a"
+    },
+    {
+      "role": "extra40_direct_baseline",
+      "local_file": "main-flow-extra40-2bdeabd.zip",
+      "head_sha": "2bdeabdc7d355511c6229115e223510f2d43df4e",
+      "run_id": 38212644546,
+      "artifact_id": 11730291691,
+      "sha256": "423fb5154561839a28ad84838975e03f7edd5fdd8aec008b4f7a4c518121fb87"
+    },
+    {
+      "role": "paired_lookup_baseline",
+      "local_file": "extra40-lookup-f2feacb.zip",
+      "head_sha": "f2feacb5d960f26d77c0b6e838eee5e4e7620e53",
+      "run_id": 38217522078,
+      "artifact_id": 11733250567,
+      "sha256": "047854bec0fc3c2f2a96fc36c6a998f74838ca889b36fd6e6356e0b3bb4f50d9"
+    },
+    {
+      "role": "rejected_aggressive_compaction",
+      "local_file": "compact-first-f5131e2.zip",
+      "head_sha": "f5131e233c36322a3c47f153515eae0c44b54577",
+      "run_id": 38225847479,
+      "artifact_id": 11736467143,
+      "sha256": "8f843151a70619069b3ad1ca95bb9200223998c2fb1e9e7390c1fb8cd7ae653b"
+    },
+    {
+      "role": "intermediate_compaction",
+      "local_file": "compact-second-7bbb65c.zip",
+      "head_sha": "7bbb65c95b0f271dacb0546ba1d65b097e10144d",
+      "run_id": 38227202274,
+      "artifact_id": 11736759508,
+      "sha256": "d22e38b4d67e89b0b903ac09210b97bf72c871ab6875248f5c2b32b22bcc2610"
+    },
+    {
+      "role": "final_compaction",
+      "local_file": "docatlas-compact-d8af387.zip",
+      "head_sha": "d8af387de507007f2b8c83f04aac78feb9b6760c",
+      "run_id": 38227928058,
+      "artifact_id": 11735844893,
+      "sha256": "aa539f453e108bc0a2b25e5fd8011af528f294f337e39e94ee1092fe966c1485",
+      "github_expires_date": "2026-10-26"
+    }
+  ],
+  "archive_layout": {
+    "head": "head.txt",
+    "integration": "integration.xml",
+    "old10": "pytest/test_frozen_main_flow_question0/main-flow-proof.json",
+    "extra40": "extra40-results.json",
+    "lookup24": "extra40-lookup-results.json",
+    "final_token_rows": "visible-tokens.json",
+    "negative_controls": "pytest/test_public_partial_context_pr0/qualification-review-proof.json"
+  },
+  "artifact_retrieval": {
+    "run_url_template": "https://github.com/Vanilla1999/DocAtlas/actions/runs/{run_id}",
+    "download_api_template": "https://api.github.com/repos/Vanilla1999/DocAtlas/actions/artifacts/{artifact_id}/zip",
+    "note": "Retrieve via the authorized GitHub connector or authenticated GitHub client. Compare downloaded ZIP SHA-256 and head.txt. Raw archives are not committed in this small documentation directory; local copies are included in the separately supplied review bundle. An expired or missing archive means corresponding raw claims remain unverified without that bundle."
+  },
+  "declared_outcomes_to_verify": {
+    "old10_direct_before_after": [10, 10],
+    "extra40_direct_before_after": [28, 28],
+    "short_lookup12_before_after": [4, 7],
+    "exact_lookup12_before_after": [0, 0],
+    "direct_failure_ids": [11, 16, 22, 24, 31, 34, 36, 39, 42, 44, 46, 47],
+    "new_complete_lookup_ids": [31, 34, 39],
+    "remaining_empty_short_lookup_ids": [11, 22, 42, 44, 46],
+    "final_public_source_rows": 114,
+    "final_integration_items_passed": 15,
+    "question_context_calls": 74,
+    "question_prepare_calls": 3,
+    "automated_retry_implemented": false,
+    "fresh_grounded_queries_performed": false,
+    "external_independent_reviewer_completed": false
+  },
+  "token_accounting": {
+    "codec": "o200k_base",
+    "json": {"ensure_ascii": false, "sort_keys": true, "separators": [",", ":"]},
+    "exclude_only_after_verifying_wrapper": ["runner-added payload.diagnostics", "private validation_snapshot"],
+    "snippet_separator": "\n\n",
+    "public_tokens_before_after": {
+      "old10_direct": [15700, 14350],
+      "extra40_direct": [45657, 40848],
+      "short_lookup12": [4838, 5470],
+      "exact_lookup12": [1356, 1356]
+    },
+    "not_measured": ["provider billing", "full host history", "MCP wire framing", "query and tool-schema tokens", "answer generation", "cache effects", "neural reranker cost"]
+  },
+  "grounded": {
+    "archived_responses_path": "eval/main_flow_comparison/grounded-results.json",
+    "inspected_public_repository": "arabold/docs-mcp-server",
+    "inspected_public_sha": "c180d7c2679d7886d14d42eed36a827d9befe5d3",
+    "historical_deployed_sha": null,
+    "caution": "Current public implementation is not proof of the configuration of the old Grounded run. Union coverage of old responses is not a forty-query rerun."
+  }
+}
