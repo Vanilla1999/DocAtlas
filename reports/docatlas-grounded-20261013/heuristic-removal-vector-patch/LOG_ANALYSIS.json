@@ -1,0 +1,97 @@
+{
+  "checks": [
+    {
+      "file": "vector-patch-final.xml",
+      "name": "vector_runtime_evidence",
+      "value": [
+        {
+          "mode": "dense",
+          "sources": [
+            "observatory.md",
+            "observatory.md",
+            "observatory.md"
+          ],
+          "texts": [
+            "# Observatory archive\n\nObservatory archive retains 41 nights.\n",
+            "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n",
+            "# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n"
+          ],
+          "counts": {
+            "dense": 3
+          }
+        },
+        {
+          "mode": "hybrid/lexical_fallback_degraded",
+          "sources": [
+            "observatory.md",
+            "observatory.md",
+            "observatory.md"
+          ],
+          "texts": [
+            "# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n",
+            "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n",
+            "# Observatory archive\n\nObservatory archive retains 41 nights.\n"
+          ],
+          "counts": {
+            "lexical": 3
+          }
+        }
+      ]
+    },
+    {
+      "file": "vector-patch-final.xml",
+      "name": "embedding_http_calls",
+      "value": [
+        4,
+        1
+      ]
+    },
+    {
+      "file": "vector-patch-trace.xml",
+      "name": "patch_context_evidence",
+      "value": {
+        "schema_version": 4,
+        "result": "data",
+        "completeness": "partial",
+        "edit_ready": false,
+        "missing": [
+          "visible_content_assignment_required"
+        ],
+        "sources": 4
+      }
+    }
+  ],
+  "request_ends": [
+    {
+      "event": "docatlas_request_end",
+      "request_id": "4ae4a1de63064b988cbe6ead62b0b897",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 69.42,
+      "trace_incomplete": false
+    },
+    {
+      "event": "docatlas_request_end",
+      "request_id": "16fbac1d7fdf4f31aeae5fd125b5ff9a",
+      "interface": "mcp",
+      "operation": "call_docs_tool_payload",
+      "status": "success",
+      "duration_ms": 92.449,
+      "trace_incomplete": false
+    }
+  ],
+  "sha256": {
+    "vector-patch-final.log": "38e2834891b9dfebeee1745b5861233ecfbba9ccd359c339ebb351f285e83f7e",
+    "vector-patch-final.xml": "69b540e18777c28a315ad2dea93d352c520cddf6915783238de27bf02ed89c75",
+    "vector-patch-trace.log": "a1b801776fb2f837ee872a35f767f8cd991316bfd95ac09a8ca6af7ff52c6ad0",
+    "vector-patch-trace.xml": "ddeff87a08587b13f768522e151ed91c52654fd9d3fbc34910355612277c2880",
+    "vector-patch01.log": "7e1628ad23a36b97b9943f9b5cf1bf9044f7ec0ca339bbbb6ced4d2ee26b28d7",
+    "vector-patch01.xml": "fac76596142fd6e609a0d841b1d9cbdd0fedd9b44689186425783ac0f392a89a",
+    "vector-patch02.log": "aaa637884f8fb7c2653cc7cbefb5d8bbbd2a9e72022b3fe54ee113a46184c035",
+    "vector-patch02.xml": "5fe6e57e5ca66362f4b50029a544891b873517e1c9c73e5de6fbd43f9cccaca6",
+    "vector-patch03.log": "be751bef3f9c8ba9663373908720c2995a28fce24a65ba9c223f17d0e37eba01",
+    "vector-patch04.log": "5af1f59c92b345e9192f9d502f96b7fa62d00cbeb564edea6114934ab8d00618",
+    "vector-patch05.log": "51989953518e414e4d8293b7d30fae1f5f7dcde739587c797b18c4185d548bef"
+  }
+}

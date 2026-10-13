@@ -478,6 +478,7 @@ def context_cmd(
     result = LibraryDocsService(
         config=topology.config,
         library_index_root=topology.library_index_root,
+        read_only_metadata=True,
     ).get_project_context(
         project_path,
         question,

@@ -1,0 +1,11 @@
+..                                                                       [100%]
+==================================== PASSES ====================================
+___ test_public_patch_plan_literal_sources_without_scores_or_graph_expansion ___
+----------------------------- Captured stderr call -----------------------------
+{"event":"docatlas_request_start","request_id":"1a105b356f3e4634acf809a8618a35d8","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"1a105b356f3e4634acf809a8618a35d8","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":10.833,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"ae37d9d9e74f4531b151bc2c639d12a5","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"ae37d9d9e74f4531b151bc2c639d12a5","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":7.034,"trace_incomplete":false}
+{"event":"docatlas_request_start","request_id":"b39153645c094011983f97f85989046d","interface":"mcp","operation":"call_docs_tool_payload","status":"started"}
+{"event":"docatlas_request_end","request_id":"b39153645c094011983f97f85989046d","interface":"mcp","operation":"call_docs_tool_payload","status":"success","duration_ms":12.329,"trace_incomplete":false}
+2 passed in 0.56s

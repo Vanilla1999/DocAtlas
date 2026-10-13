@@ -1,0 +1,90 @@
+           _                 _    
+  __ _  __| |_ __ __ _ _ __ | |_  
+ / _` |/ _` | '__/ _` | '_ \| __| 
+| (_| | (_| | | | (_| | | | | |_  
+ \__, |\__,_|_|  \__,_|_| |_|\__| 
+    |_|                           
+
+Version: 1.19.2, build: 016542aa
+Access web UI at http://localhost:44321/dashboard
+Agentic Skills: https://skills.qdrant.tech/
+
+2026-10-13T12:44:27.415429Z  WARN qdrant::settings: Config file not found: config/config
+2026-10-13T12:44:27.415459Z  WARN qdrant::settings: Config file not found: config/development
+2026-10-13T12:44:27.415579Z  INFO storage::content_manager::consensus::persistent: Initializing new raft state at /tmp/docatlas-real-hybrid-qy8tqj2y/storage/raft_state.json
+2026-10-13T12:44:27.448227Z  INFO qdrant: Distributed mode disabled
+2026-10-13T12:44:27.448256Z  INFO qdrant: Telemetry reporting disabled
+2026-10-13T12:44:27.452483Z  INFO qdrant: gRPC endpoint disabled
+2026-10-13T12:44:27.453066Z  WARN qdrant::actix::web_ui: Static content folder for Web UI './static' does not exist
+2026-10-13T12:44:27.453149Z  INFO qdrant::actix: REST transport settings: keep_alive=5s, client_request_timeout=5s, client_disconnect_timeout=5s
+2026-10-13T12:44:27.453153Z  INFO qdrant::actix: TLS disabled for REST API
+2026-10-13T12:44:27.453179Z  INFO qdrant::actix: Qdrant HTTP listening on 44321
+2026-10-13T12:44:27.453185Z  INFO actix_server::builder: starting 2 workers
+2026-10-13T12:44:27.453191Z  INFO actix_server::server: Actix runtime found; starting in Actix runtime
+2026-10-13T12:44:27.453197Z  INFO actix_server::server: starting service: "actix-web-service-127.0.0.1:44321", workers: 2, listening on: 127.0.0.1:44321
+2026-10-13T12:44:38.499083Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 404 131 "-" "python-client/1.19.1 python/3.12.3" 0.003735
+2026-10-13T12:44:38.500650Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d HTTP/1.1" 404 130 "-" "python-client/1.19.1 python/3.12.3" 0.000310
+2026-10-13T12:44:38.504676Z  INFO storage::content_manager::toc::collection_meta_ops: Creating collection docmancer_docs_pc_416011709f0d_b1ac066f2f0d
+2026-10-13T12:44:38.602849Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d HTTP/1.1" 200 71 "-" "python-client/1.19.1 python/3.12.3" 0.099627
+2026-10-13T12:44:38.959489Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.354061
+2026-10-13T12:44:39.149157Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.188146
+2026-10-13T12:44:39.344639Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.194120
+2026-10-13T12:44:39.537707Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 90 "-" "python-client/1.19.1 python/3.12.3" 0.192072
+2026-10-13T12:44:39.739952Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.200830
+2026-10-13T12:44:39.953749Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.212334
+2026-10-13T12:44:40.162542Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.207481
+2026-10-13T12:44:40.371024Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.206694
+2026-10-13T12:44:40.572356Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.199992
+2026-10-13T12:44:40.808228Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.234393
+2026-10-13T12:44:41.035638Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.226031
+2026-10-13T12:44:41.271248Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.234224
+2026-10-13T12:44:41.277394Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points?wait=true HTTP/1.1" 200 93 "-" "python-client/1.19.1 python/3.12.3" 0.004453
+2026-10-13T12:44:41.282162Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 203 "-" "python-client/1.19.1 python/3.12.3" 0.002357
+2026-10-13T12:44:41.284856Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/scroll HTTP/1.1" 200 100 "-" "python-client/1.19.1 python/3.12.3" 0.000865
+2026-10-13T12:44:43.561180Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/count HTTP/1.1" 200 78 "-" "python-client/1.19.1 python/3.12.3" 0.000601
+2026-10-13T12:44:43.563150Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 201 "-" "python-client/1.19.1 python/3.12.3" 0.000350
+2026-10-13T12:44:43.574601Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.009745
+2026-10-13T12:44:43.575640Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/count HTTP/1.1" 200 78 "-" "python-client/1.19.1 python/3.12.3" 0.000143
+2026-10-13T12:44:43.576391Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000224
+2026-10-13T12:44:43.576990Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000142
+2026-10-13T12:44:43.577618Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/scroll HTTP/1.1" 200 210 "-" "python-client/1.19.1 python/3.12.3" 0.000112
+2026-10-13T12:44:43.587065Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000242
+2026-10-13T12:44:43.587848Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/scroll HTTP/1.1" 200 210 "-" "python-client/1.19.1 python/3.12.3" 0.000127
+2026-10-13T12:44:43.729506Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000290
+2026-10-13T12:44:43.731523Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d HTTP/1.1" 200 651 "-" "python-client/1.19.1 python/3.12.3" 0.001367
+2026-10-13T12:44:43.733278Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 203 "-" "python-client/1.19.1 python/3.12.3" 0.000615
+2026-10-13T12:44:43.739939Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.006064
+2026-10-13T12:44:43.745799Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 90 "-" "python-client/1.19.1 python/3.12.3" 0.005161
+2026-10-13T12:44:43.750130Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.003587
+2026-10-13T12:44:43.754741Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 93 "-" "python-client/1.19.1 python/3.12.3" 0.003942
+2026-10-13T12:44:43.761000Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.005575
+2026-10-13T12:44:43.767274Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.005088
+2026-10-13T12:44:43.773516Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.005565
+2026-10-13T12:44:43.777860Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.003707
+2026-10-13T12:44:43.782405Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.003922
+2026-10-13T12:44:43.788138Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 91 "-" "python-client/1.19.1 python/3.12.3" 0.004944
+2026-10-13T12:44:43.793089Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.004182
+2026-10-13T12:44:43.796802Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/index?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.003045
+2026-10-13T12:44:43.799293Z  INFO actix_web::middleware::logger: 127.0.0.1 "PUT /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points?wait=true HTTP/1.1" 200 92 "-" "python-client/1.19.1 python/3.12.3" 0.001716
+2026-10-13T12:44:43.801166Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000213
+2026-10-13T12:44:43.802065Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/scroll HTTP/1.1" 200 210 "-" "python-client/1.19.1 python/3.12.3" 0.000157
+2026-10-13T12:44:43.806110Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/count HTTP/1.1" 200 78 "-" "python-client/1.19.1 python/3.12.3" 0.000139
+2026-10-13T12:44:43.806862Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000176
+2026-10-13T12:44:43.808524Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000148
+2026-10-13T12:44:43.809334Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/scroll HTTP/1.1" 200 210 "-" "python-client/1.19.1 python/3.12.3" 0.000115
+2026-10-13T12:44:43.837264Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000253
+2026-10-13T12:44:43.838666Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 122 "-" "python-client/1.19.1 python/3.12.3" 0.000400
+2026-10-13T12:44:43.840384Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/count HTTP/1.1" 200 78 "-" "python-client/1.19.1 python/3.12.3" 0.000167
+2026-10-13T12:44:43.841413Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000238
+2026-10-13T12:44:43.931834Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/query HTTP/1.1" 200 1707 "-" "python-client/1.19.1 python/3.12.3" 0.001564
+2026-10-13T12:44:43.942053Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000330
+2026-10-13T12:44:43.943276Z  INFO actix_web::middleware::logger: 127.0.0.1 "GET /collections HTTP/1.1" 200 120 "-" "python-client/1.19.1 python/3.12.3" 0.000112
+2026-10-13T12:44:43.944460Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/count HTTP/1.1" 200 78 "-" "python-client/1.19.1 python/3.12.3" 0.000167
+2026-10-13T12:44:43.945485Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 199 "-" "python-client/1.19.1 python/3.12.3" 0.000235
+2026-10-13T12:44:43.946421Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points HTTP/1.1" 200 200 "-" "python-client/1.19.1 python/3.12.3" 0.000128
+2026-10-13T12:44:43.948859Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/query HTTP/1.1" 200 1707 "-" "python-client/1.19.1 python/3.12.3" 0.000507
+2026-10-13T12:44:44.089570Z  INFO actix_web::middleware::logger: 127.0.0.1 "POST /collections/docmancer_docs_pc_416011709f0d_b1ac066f2f0d/points/query HTTP/1.1" 200 1845 "-" "python-client/1.19.1 python/3.12.3" 0.005399
+2026-10-13T12:44:44.204038Z  INFO actix_server::server: SIGTERM received; starting graceful shutdown
+2026-10-13T12:44:44.204070Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:44:44.204076Z  INFO actix_server::worker: shutting down idle worker
+2026-10-13T12:44:44.204376Z  INFO actix_server::accept: accept thread stopped

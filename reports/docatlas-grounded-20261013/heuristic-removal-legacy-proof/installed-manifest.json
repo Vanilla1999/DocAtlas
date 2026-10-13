@@ -1,0 +1,5 @@
+{
+  "config": {"runtime_authorized": true, "packing_tokens": 12000},
+  "inputs_sha256": {},
+  "authorization": "User requested completion of legacy/proof audit and checks; isolated installed-wheel stdio only."
+}

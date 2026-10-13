@@ -1,0 +1,94 @@
+{
+  "tool": "prepare_docs",
+  "payload": {
+    "tool": "prepare_docs",
+    "action": "sync_project_docs",
+    "status": "success",
+    "project_path": "/tmp/docatlas-default-HXV8YAxA/legacy-installed-final/project",
+    "candidate_count": 1,
+    "summary": {
+      "current_count": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "orphaned_count": 0,
+      "orphaned_removed": 0,
+      "dedup_removed": 0,
+      "stale_removed": 0,
+      "sections_indexed": 1
+    },
+    "metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-63da9568839741f19fb3a2abe22c4d10",
+      "members": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 1,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 1
+    },
+    "vector_sync": {
+      "status": "not_requested"
+    },
+    "unmatched_changed_paths": [],
+    "unmatched_deleted_paths": [],
+    "remaining_deleted_sources": 0,
+    "tombstones": [],
+    "tombstones_omitted": 0,
+    "warnings": [],
+    "message": "Explicit member-only lexical transaction committed; unrelated sources preserved."
+  },
+  "is_error": false,
+  "sdk_result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "tool": "prepare_docs",
+      "action": "sync_project_docs",
+      "status": "success",
+      "project_path": "/tmp/docatlas-default-HXV8YAxA/legacy-installed-final/project",
+      "candidate_count": 1,
+      "summary": {
+        "current_count": 1,
+        "new_count": 1,
+        "changed_count": 0,
+        "orphaned_count": 0,
+        "orphaned_removed": 0,
+        "dedup_removed": 0,
+        "stale_removed": 0,
+        "sections_indexed": 1
+      },
+      "metrics": {
+        "transaction": "committed",
+        "generation_id": "gen-63da9568839741f19fb3a2abe22c4d10",
+        "members": 1,
+        "new_count": 1,
+        "changed_count": 0,
+        "unchanged_files": 0,
+        "derived_writes": 1,
+        "derived_deletes": 0,
+        "sources_deleted": 0,
+        "sections_indexed": 1
+      },
+      "vector_sync": {
+        "status": "not_requested"
+      },
+      "unmatched_changed_paths": [],
+      "unmatched_deleted_paths": [],
+      "remaining_deleted_sources": 0,
+      "tombstones": [],
+      "tombstones_omitted": 0,
+      "warnings": [],
+      "message": "Explicit member-only lexical transaction committed; unrelated sources preserved."
+    },
+    "isError": false
+  }
+}

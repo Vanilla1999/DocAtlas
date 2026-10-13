@@ -2,11 +2,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-import re
 from typing import Any
 
 from docmancer.core.models import RetrievedChunk
-from docmancer.docs.application.evidence_selection import requirement_probe_query
 from docmancer.docs.domain.project_doc_ranking import normalize_doc_path
 
 
@@ -37,17 +35,6 @@ def _exact_document_index_chunks(
         return []
 
     normalized_path = normalize_doc_path(evidence_path)
-    probes = tuple(dict.fromkeys(
-        probe
-        for requirement in requirements or ()
-        if getattr(requirement, "mandatory", False)
-        and (probe := requirement_probe_query(requirement))
-    ))[:8]
-    terms = tuple(dict.fromkeys(
-        token.casefold()
-        for probe in probes
-        for token in re.findall(r"[A-Za-zА-Яа-яЁё0-9_.:/=+-]{3,}", probe)
-    ))[:24]
 
     metadata_cache: dict[str, dict[str, Any]] = {}
     candidates: list[RetrievedChunk] = []
@@ -76,19 +63,10 @@ def _exact_document_index_chunks(
         )
         if source_class != "project_file":
             continue
-        display_text = str(row.get("display_text") or row.get("text") or "").strip()
-        if not display_text:
+        display_text = str(row.get("display_text") or row.get("text") or "")
+        if not display_text.strip():
             continue
 
-        searchable = " ".join((
-            str(row.get("title") or ""),
-            str(row.get("anchor") or ""),
-            str(row.get("text") or ""),
-            display_text,
-        )).casefold()
-        hit_count = sum(term in searchable for term in terms)
-        if terms and hit_count == 0:
-            continue
         metadata = {**source_metadata}
         metadata.update({
             "project_doc_path": row_path,
@@ -126,9 +104,8 @@ def _exact_document_index_chunks(
             source=source,
             chunk_index=int(row.get("chunk_index") or 0),
             text=display_text,
-            score=float(1000 + hit_count),
+            score=0.0,
             metadata=metadata,
         ))
 
-    candidates.sort(key=lambda item: (-item.score, item.chunk_index, item.source))
     return candidates[:_EXACT_DOCUMENT_FALLBACK_LIMIT]

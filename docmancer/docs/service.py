@@ -37,7 +37,7 @@ DEFAULT_DOC_TOKENS = 4000
 
 
 class LibraryDocsService:
-    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None, read_only_startup: bool = False):
+    def __init__(self, *, config: DocmancerConfig | None = None, config_source: str | None = None, config_path: str | Path | None = None, registry: LibraryRegistry | None = None, agent: Any | None = None, agent_factory: Any | None = None, project_reader: ProjectMetadataReader | None = None, job_tracker: DocsJobTracker | None = None, stale_after_days: int = STALE_AFTER_DAYS, library_index_root: Path | None = None, member_storage_policy: Any | None = None, read_only_startup: bool = False, read_only_metadata: bool = False):
         if read_only_startup and (member_storage_policy is None or registry is not None or job_tracker is not None):
             raise PermissionError("read-only startup requires the selected member store and its own read dependencies")
         self.read_only_startup = read_only_startup
@@ -47,7 +47,9 @@ class LibraryDocsService:
         self.member_storage_policy = member_storage_policy
         self._project_service_cache: OrderedDict[tuple[str, str, str], LibraryDocsService] = OrderedDict()
         self._project_service_cache_lock = threading.RLock()
-        self.registry = registry if read_only_startup else registry or LibraryRegistry(self.config.index.db_path)
+        self.registry = registry if read_only_startup else registry or LibraryRegistry(
+            self.config.index.db_path, read_only=read_only_metadata,
+        )
         self.agent_gateway = AgentIndexGateway(
             self.config,
             default_agent=agent,
@@ -55,7 +57,9 @@ class LibraryDocsService:
             library_index_root=library_index_root,
             member_storage_policy=member_storage_policy,
         )
-        read_dependencies = {}
+        # CLI read commands may use a legacy index rather than a member store.
+        # They still must not create ancillary ledgers or resume jobs at startup.
+        read_dependencies = {"read_only": True} if read_only_metadata else {}
         if read_only_startup:
             # Reuse the owned member reader's current-generation SQL snapshot.
             # Ancillary lookups must not create/repair a ledger on a first read.
@@ -94,7 +98,7 @@ class LibraryDocsService:
         self.docs_targets = DocsTargetService(self._render_docs_url, self.jobs)
         self.docs_prefetch = DocsPrefetchService(self)
         self.docs_manifest = DocsManifestService(self)
-        self.resumed_docs_job_ids = [] if read_only_startup else self.library_docs.resume_interrupted_jobs()
+        self.resumed_docs_job_ids = [] if read_only_startup or read_only_metadata else self.library_docs.resume_interrupted_jobs()
 
     def _now(self) -> str:
         return datetime.now(timezone.utc).isoformat(timespec="seconds")

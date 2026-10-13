@@ -470,7 +470,6 @@ def _eligible_candidates(
     question: str,
 ) -> tuple[list[EvidenceCandidate], list[Omission], set[str]]:
     exact_versions = {item.value for item in requirements if item.kind == "exact_version" and item.mandatory}
-    query_identifiers = _query_identifier_values(requirements)
     eligible: list[EvidenceCandidate] = []
     omissions: list[Omission] = []
     critical: set[str] = set()
@@ -489,8 +488,6 @@ def _eligible_candidates(
             reason = "unknown_version"
         elif exact_versions and candidate.resolved_version not in exact_versions:
             reason = "wrong_version"
-        elif result_kind == "patch_context" and _query_identifier_conflict(candidate, query_identifiers):
-            reason = "query_identifier_conflict"
         if reason:
             omissions.append(Omission(candidate.stable_id, reason))
         else:

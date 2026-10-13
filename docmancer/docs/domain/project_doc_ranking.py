@@ -142,7 +142,7 @@ def attach_project_ranking_metadata(chunk: Any, *, base_score: float, final_scor
         "source_weight_reason": source_weight_reason(None, None, None),
         "requirement_reason": None, "selected_by": selected_by,
         "diversity_relaxed": diversity_relaxed,
-        "reasons": ["independent qualified query coverage and base retrieval score"],
+        "reasons": ["source checks and acquisition order; relevance unassessed"],
     }
     # Never overwrite real source metadata with an inferred taxonomy.
     if hasattr(chunk, "model_copy"):
@@ -167,7 +167,7 @@ def chunk_base_score(chunk: Any, original_rank: int) -> float:
         value = metadata.get(key)
         if isinstance(value, (int, float)):
             return float(value)
-    return 1.0 / (original_rank + 1)
+    return 0.0
 
 
 def _query_allows_internal_noise(question: str, intent: Any) -> bool:
@@ -190,7 +190,7 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
         finite_member_paths: frozenset[str] | None = None,
         retain_found_windows: bool = False) -> list[Any]:
     lifecycle = lifecycle_intent_value or lifecycle_intent(question)
-    scored = []
+    selected = []
     for index, chunk in enumerate(chunks):
         if finite_member_paths is not None and getattr(chunk, "path", None) not in finite_member_paths:
             continue
@@ -223,26 +223,10 @@ def rerank_project_doc_chunks(chunks: list[Any], *, question: str, intent: Any,
                   or key.startswith("query-lookup-")}
         if retain_found_windows and not public and literal_context is None:
             continue
-        scored.append((chunk_base_score(chunk, index), index, chunk, public))
-    scored.sort(key=lambda row: (-row[0], row[1]))
-    selected = []
-    counts: dict[str, int] = {}
-    covered: set[str] = set()
-    max_per_source = broad_max_per_source if getattr(intent, "broad", False) else narrow_max_per_source
-    while scored:
-        next_index = max(range(len(scored)), key=lambda i: (
-            len(scored[i][3] - covered), -i,
-        ))
-        score, index, chunk, public = scored.pop(next_index)
-        key = _source_key(chunk, index)
-        relaxed = counts.get(key, 0) >= max_per_source
-        if relaxed and not public - covered and not retain_found_windows:
-            continue
+        score = chunk_base_score(chunk, index)
         selected.append(attach_project_ranking_metadata(chunk, base_score=score,
             final_score=score, original_rank=index, selected_rank=len(selected) + 1,
-            question=question, intent=intent, selected_by="ranking", diversity_relaxed=relaxed))
-        covered.update(public)
-        counts[key] = counts.get(key, 0) + 1
+            question=question, intent=intent, selected_by="native_acquisition_rank"))
         if limit and len(selected) >= limit and not retain_found_windows:
             break
     return selected

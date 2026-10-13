@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/test_heuristic_removal_public_integration.py": "9e953d58df5158bb831c0f8ffb6b867388eb3eea54e65fe4e99d8d5d42d6a2d7"
+    "tests/test_heuristic_removal_public_integration.py": "524da4aeeaa65e2e1ffe1bd922f554b40b18db79102671171f5fc3cb5133daa3"
   }
 }

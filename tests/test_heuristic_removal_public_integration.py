@@ -1,8 +1,7 @@
-"""Public prepare/context/resource guards with real components, no mocks.
+"""Public context and retrieval-runtime guards with real storage/selection.
 
-Two scenarios: 4 confirmed prepare/sync calls, 13 context calls, <=2 resources,
-0 models. Existing optics/scope documents and facts reused unchanged.
-Only host environment is selected; no product helper is asserted or replaced.
+Existing optics/scope documents and facts are reused unchanged. The vector
+scenario substitutes only external embedding HTTP, not retrieval or validation.
 """
 from __future__ import annotations
 
@@ -93,6 +92,49 @@ def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
         facts(lookup, root, OPTICS_FACTS)
         assert lookup.get("answer_supported") is False and lookup.get("edit_ready") is False
         assert not lookup.get("covered_query_ids")
+        with env.context() as advanced, query_trace(True):
+            advanced.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
+            patch_context = context(service, root, OPTICS_QUESTION, context_format="patch_context")
+        assert patch_context.get("edit_ready") is False
+        assert patch_context.get("sources"), json.dumps(patch_context, ensure_ascii=False)
+        assert patch_context.get("answer_supported", False) is False
+        for row in patch_context["sources"]:
+            source = OPTICS_DOCUMENTS[relative_path(row["path"], root)]
+            assert row["text"] in source
+            assert row["content_sha256"] == sha(row["text"].encode())
+            assert row["instruction_trust"] == "untrusted_data"
+            if "char_start" in row and "char_end" in row:
+                assert source[row["char_start"]:row["char_end"]] == row["text"]
+        for path, statements in OPTICS_FACTS.items():
+            windows = [row["text"] for row in patch_context["sources"]
+                       if relative_path(row["path"], root) == path]
+            for statement in statements:
+                assert any(statement in text for text in windows)
+        record_property("patch_context_evidence", json.dumps(patch_context))
+        assert [(row["path"], row["text"]) for row in patch_context["sources"]] == [
+            (row["path_or_url"], row["snippet"]) for row in packets[0]["sources"]
+        ]
+        # Direct SDK service calls own a source-read lifetime too; they must not
+        # depend on being nested under the MCP handler to retain original bytes.
+        direct = service.get_docs_context(
+            OPTICS_QUESTION, project_path=str(root), scope="project",
+            prepare_project_docs=False, allow_network=False,
+        )
+        assert direct.answer_available is False
+        for statements in OPTICS_FACTS.values():
+            for statement in statements:
+                assert any(statement in str(row.get("content") or row.get("snippet") or "")
+                           for row in direct.context_pack)
+        direct_docs = service.get_project_docs(str(root), OPTICS_QUESTION, scope="project")
+        for statements in OPTICS_FACTS.values():
+            for statement in statements:
+                assert any(statement in row.content for row in direct_docs.results)
+        from docmancer import DocmancerClient
+        sdk = DocmancerClient(db_path=inventory["storage_path"])
+        sdk_text = sdk.get_context(OPTICS_QUESTION, budget=12000)
+        for statements in OPTICS_FACTS.values():
+            for statement in statements:
+                assert statement in sdk_text
         assert database(inventory["storage_path"]) == before and files(root) == initial_files
         (root / "docs/issue.md").write_bytes(UPDATED_ISSUE.encode())
         edited_files = files(root)
@@ -193,4 +235,192 @@ def test_public_library_native_context_isolates_versions(tmp_path, monkeypatch):
             assert row["path_or_url"] == (
                 f"https://pub.dev/documentation/{PACKAGE}/{version}/nav_kit/NavigationRegistry-class.html")
             assert row["version_binding"] == "exact_snapshot"
+    with monkeypatch.context() as advanced, query_trace(True):
+        advanced.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
+        patch = call_docs_tool_payload("get_docs_context", {
+            "question": "Explain `Navigation` route registry.", "library": PACKAGE,
+            "version": "1.0.0", "context_format": "patch_context",
+        }, service)
+    assert patch.get("result") == "data", patch
+    assert patch["edit_ready"] is False
+    expected = "NavigationRegistry is a route registry using FIRST_ONLY dispatch in version 1.0.0."
+    assert any(expected in row["text"] for row in patch["sources"]), patch
+    for row in patch["sources"]:
+        assert row["text"] in f"# NavigationRegistry\n\n{expected}\n"
+        assert row["content_sha256"] == sha(row["text"].encode())
+        assert row["resolved_version"] == "1.0.0"
     assert [database(path) for path in paths] == before
+
+
+def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatch, record_property):
+    """Production ingest/runtime with SQLite+sqlite-vec; only embedding HTTP is substituted.
+
+    The fixed embedding response proves rank delivery/access, not model relevance.
+    """
+    import httpx
+    import pytest
+    from docmancer.agent import DocmancerAgent
+    from docmancer.core.config import DocmancerConfig, VectorStoreConfig
+    from docmancer.core.models import Document
+    from docmancer.retrieval.runtime import dispatcher_for_agent
+    from docmancer.retrieval.dispatch import HybridRetrievalError
+    from docmancer.core.product_identity import ensure_owned_home
+
+    home = tmp_path / "home"
+    monkeypatch.setenv("DOCATLAS_HOME", str(home))
+    monkeypatch.setenv("OPENAI_API_KEY", "fixture-only-not-a-credential")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://embeddings.invalid/v1")
+    monkeypatch.delenv("DOCATLAS_AUTO_VECTORS", raising=False)
+    ensure_owned_home(home)
+    calls = []
+
+    def embedding_transport(self, request):
+        assert str(request.url) == "https://embeddings.invalid/v1/embeddings"
+        body = json.loads(request.content)
+        calls.append(len(body["input"]))
+        return httpx.Response(200, json={
+            "object": "list", "model": body["model"],
+            "data": [{"object": "embedding", "index": index, "embedding": [1.0, 0.0, 0.0, 0.0]}
+                     for index, _ in enumerate(body["input"])],
+            "usage": {"prompt_tokens": 1, "total_tokens": 1},
+        })
+
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", embedding_transport)
+    config = DocmancerConfig()
+    config.index.db_path = str(tmp_path / "docs.db")
+    config.index.extracted_dir = str(tmp_path / "extracted")
+    config.embeddings.provider = "openai"
+    config.embeddings.model = "text-embedding-3-small"
+    config.embeddings.dimensions = 4
+    config.embeddings.cache = str(tmp_path / "embeddings")
+    config.vector_store = VectorStoreConfig(provider="sqlite-vec", options={"db_path": str(tmp_path / "vec.db")})
+    config.retrieval.default_mode = "hybrid"
+    config.retrieval.max_sections_per_source = 1
+    config.retrieval.hierarchical.auto = True
+    config.retrieval.hierarchical.auto_min_documents = 1
+    config.retrieval.hierarchical.enabled = True
+    text = ("# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n"
+            "# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n"
+            "# Observatory archive\n\nObservatory archive retains 41 nights.\n")
+    agent = DocmancerAgent(config=config)
+    agent.ingest_documents([
+        Document(source="observatory.md", content=text, metadata={"format": "markdown"}),
+        Document(source="secret.md", content="# Observatory\n\nObservatory secret is HIDDEN_97.\n",
+                 metadata={"format": "markdown"}),
+    ], with_vectors=True)
+    before = database(config.index.db_path)
+    evidence = []
+    hybrid = dispatcher_for_agent(agent, mode="hybrid")
+    with pytest.raises(HybridRetrievalError, match="capability_mismatch:sparse_model"):
+        hybrid.run("observatory", mode="hybrid", limit=10, budget=4000, expand="none")
+    for mode in ("dense", "hybrid"):
+        result = dispatcher_for_agent(agent, mode=mode).run(
+            "observatory", mode=mode, limit=10, budget=4000, expand="none",
+            filters={"forbidden_sources": ["secret.md"]},
+            allow_degraded=mode == "hybrid",
+        )
+        expected_mode = "dense" if mode == "dense" else "hybrid/lexical_fallback_degraded"
+        assert result.mode_used == expected_mode, result
+        if mode == "dense":
+            assert not result.failures
+        else:
+            assert result.failures == {"vector": "capability_mismatch:sparse_model"}
+        assert result.chunks
+        for fact in ("Observatory aperture is 73 mm.", "Observatory shutter waits 19 seconds.",
+                     "Observatory archive retains 41 nights."):
+            assert any(fact in chunk.text for chunk in result.chunks), result
+        for chunk in result.chunks:
+            assert chunk.source == "observatory.md"
+            assert chunk.text in text
+            assert "HIDDEN_97" not in chunk.text
+        evidence.append({"mode": result.mode_used, "sources": [chunk.source for chunk in result.chunks],
+                         "texts": [chunk.text for chunk in result.chunks], "counts": result.candidate_counts})
+    assert database(config.index.db_path) == before
+    record_property("vector_runtime_evidence", json.dumps(evidence))
+    record_property("embedding_http_calls", json.dumps(calls))
+
+
+def test_public_patch_plan_literal_sources_without_scores_or_graph_expansion(tmp_path, monkeypatch, record_property):
+    """Three public reads: literal members, bounded prefix, explicit member path."""
+    from tests._shared_test_docs_service import _service_with_real_agent
+
+    service = _service_with_real_agent(tmp_path, monkeypatch)
+    monkeypatch.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
+    root = tmp_path / "project"
+    documents = {
+        "src/usage.py": "from .neighbor import helper\nvalue = PanelState\n",
+        "src/definition.py": "class PanelState:\n    marker = 'DECLARATION_83'\n",
+        "src/neighbor.py": "def helper():\n    return 'NEIGHBOR_29'\n",
+        "src/panel_state.py": "alias_only = 'SPELLING_61'\n",
+        "outside.py": "class PanelState:\n    forbidden = 'UNDECLARED_47'\n",
+    }
+    runtime.write_project(root, documents)
+    (root / "docatlas.project-docs.yaml").write_text(json.dumps({
+        "schema_version": 1, "documents": [],
+        "code_files": [name for name in documents if name.startswith("src/")],
+    }))
+    before = files(root)
+    args = {"question": "PanelState", "project_path": str(root), "max_tokens": 4000}
+    with query_trace(True):
+        wide = call_docs_tool_payload("get_patch_plan_context", args, service)
+        narrow = call_docs_tool_payload("get_patch_plan_context", {**args, "max_files": 1}, service)
+        explicit = call_docs_tool_payload("get_patch_plan_context", {
+            **args, "question": "unmatched_term", "changed_files": ["src/neighbor.py", "../outside.py"],
+        }, service)
+    assert [row["file"] for row in wide["relevant_files"]] == ["src/usage.py", "src/definition.py"], wide
+    assert narrow["relevant_files"] == wide["relevant_files"][:1]
+    assert [row["file"] for row in explicit["relevant_files"]] == ["src/neighbor.py"], explicit
+    for packet in (wide, narrow, explicit):
+        assert packet["answer_completeness"] == "partial_navigational"
+        assert packet["minimal_patch_path"] == []
+        for row in packet["relevant_files"]:
+            text = documents[row["file"]]
+            assert row["action"] == "read"
+            assert row["content_hash"] == "sha256:" + sha(text.encode())
+            assert row["refs"]
+            for ref in row["refs"]:
+                assert ref["text"].rstrip("\n") == "\n".join(text.splitlines()[ref["start_line"]-1:ref["end_line"]])
+                assert ref["locate_by_pattern"] in ref["text"]
+        assert "UNDECLARED_47" not in json.dumps(packet)
+    assert "PanelState" in wide["relevant_files"][0]["refs"][0]["text"]
+    assert "NEIGHBOR_29" in explicit["relevant_files"][0]["refs"][0]["text"]
+    assert files(root) == before
+    record_property("patch_plan_packets", json.dumps([wide, narrow, explicit]))
+
+
+def test_public_mixed_native_context_keeps_project_and_exact_library(tmp_path, state_root, record_property):
+    """One prepared project, one real library index, one mixed public request."""
+    from tests.docs.test_dependency_version_transition import _seed, PACKAGE
+    from docmancer.docs.service import LibraryDocsService
+    from docmancer.core.product_identity import ensure_owned_home
+    import os
+
+    root = (tmp_path / "project").resolve()
+    runtime.write_project(root, OPTICS_DOCUMENTS)
+    with runtime.isolated_service(state_root) as (service, config):
+        home = Path(os.environ["DOCATLAS_HOME"])
+        home.mkdir(mode=0o700)
+        ensure_owned_home(home)
+        inventory = runtime.index_project(service, config, root)
+        # Explicit fixture provisioning uses the writable service, not the
+        # read-only MCP facade. Both point at this isolated host's real stores.
+        record = _seed(LibraryDocsService(config=config, library_index_root=home / "mcp-members" / "docs-indexes"), "1.0.0", 'MIXED_🧭<a id="raw"></a>_ONLY')
+        library_db = service._index_config_for(record).index.db_path
+        before = (database(inventory["storage_path"]), database(library_db), files(root))
+        with query_trace(True):
+            packet = context(service, root, OPTICS_QUESTION + " Also explain NavigationRegistry.",
+                             library=PACKAGE, version="1.0.0")
+        assert packet.get("context_available") is True, packet
+        assert packet.get("answer_supported") is False and packet.get("edit_ready") is False
+        facts(packet, root, OPTICS_FACTS)
+        expected = 'NavigationRegistry is a route registry using MIXED_🧭<a id="raw"></a>_ONLY dispatch in version 1.0.0.'
+        library_rows = [row for row in packet["sources"] if row["path_or_url"].startswith("https://")]
+        assert any(expected in row["snippet"] for row in library_rows), packet
+        for row in library_rows:
+            assert row["path_or_url"] == f"https://pub.dev/documentation/{PACKAGE}/1.0.0/nav_kit/NavigationRegistry-class.html"
+            assert row["snippet"] in f"# NavigationRegistry\n\n{expected}\n"
+            assert row["version_binding"] == "exact_snapshot"
+        local = {**packet, "sources": [row for row in packet["sources"] if row not in library_rows]}
+        assert not integrity(local, root, OPTICS_DOCUMENTS)["errors"]
+        assert (database(inventory["storage_path"]), database(library_db), files(root)) == before
+        record_property("mixed_context_evidence", json.dumps(packet))

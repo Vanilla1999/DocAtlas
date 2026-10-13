@@ -362,13 +362,6 @@ def _question_explicitly_targets_low_trust_artifacts(question: str) -> bool:
     return False
 
 
-_GATE_WEIGHT_PATH = 1.0
-_GATE_WEIGHT_TITLE_HEADING = 2.0
-_GATE_WEIGHT_CONTENT = 3.0
-_GATE_WEIGHT_SYMBOL = 4.0
-_GATE_WEIGHT_DEPENDENCY = 4.0
-
-
 def _query_relevance_gate(
     *,
     question: str,
@@ -376,72 +369,13 @@ def _query_relevance_gate(
     context_pack: list[dict[str, Any]],
     relevance_terms: list[str] | None = None,
 ) -> dict[str, Any]:
-    terms = relevance_terms if relevance_terms is not None else list(documentation_query_terms(question))
-    if not terms:
-        return {
-            "passed": True,
-            "reason": "no_high_signal_terms_required",
-            "required_terms": [],
-            "matched_terms": [],
-            "weighted_score": None,
-            "matched_term_count": 0,
-            "required_term_count": 0,
-        }
-    matched_details: list[dict[str, Any]] = []
-    for term in terms:
-        normalized_term = _normalize_gate_text(term)
-        if not normalized_term:
-            continue
-        best_weight = 0.0
-        hit_fields: list[str] = []
-        for item in context_pack:
-            item_text = _normalize_gate_text(_context_item_text_for_gate(item))
-            if normalized_term not in item_text:
-                continue
-            path = (item.get("source") or {}).get("path") if isinstance(item.get("source"), dict) else item.get("path")
-            if path and normalized_term in _normalize_gate_text(path):
-                best_weight = max(best_weight, _GATE_WEIGHT_PATH)
-                hit_fields.append("path")
-            heading = item.get("heading_path") or (item.get("section") or {}).get("heading_path")
-            if heading and normalized_term in _normalize_gate_text(heading):
-                best_weight = max(best_weight, _GATE_WEIGHT_TITLE_HEADING)
-                hit_fields.append("heading")
-            title = item.get("title") or (item.get("section") or {}).get("title")
-            if title and normalized_term in _normalize_gate_text(title):
-                best_weight = max(best_weight, _GATE_WEIGHT_TITLE_HEADING)
-                hit_fields.append("title")
-            snippet = item.get("snippet") or item.get("content")
-            if snippet and normalized_term in _normalize_gate_text(snippet):
-                weight = _GATE_WEIGHT_DEPENDENCY if item.get("source_class") == "dependency_doc" else _GATE_WEIGHT_CONTENT
-                best_weight = max(best_weight, weight)
-                hit_fields.append("content")
-            evidence_class = item.get("evidence_class")
-            if evidence_class:
-                best_weight = max(best_weight, _GATE_WEIGHT_SYMBOL)
-                hit_fields.append("evidence")
-        if best_weight > 0:
-            matched_details.append({"term": term, "weight": best_weight, "fields": sorted(set(hit_fields))})
-    total_weight = sum(d["weight"] for d in matched_details)
-    matched_count = len(matched_details)
-    required_count = len(terms)
-    coverage_ratio = matched_count / required_count if required_count > 0 else 0.0
-    has_strong_match = any(d["weight"] >= _GATE_WEIGHT_SYMBOL for d in matched_details)
-    high_signal_count = sum(1 for d in matched_details if d["weight"] >= _GATE_WEIGHT_CONTENT)
-    passes = (
-        matched_count >= 2 and high_signal_count >= 1
-    ) or coverage_ratio >= 0.5 or has_strong_match
-    matched_terms_list = [d["term"] for d in matched_details]
-    missing_terms_list = [t for t in terms[:8] if t not in matched_terms_list]
+    # Compatibility diagnostics only. Token overlap cannot grant relevance or
+    # answer authority, including callers outside the MCP read scope.
     return {
-        "passed": passes,
-        "reason": "weighted_relevance_sufficient" if passes else "insufficient_weighted_relevance",
-        "required_terms": terms[:8],
-        "matched_terms": matched_terms_list,
-        "missing_terms": missing_terms_list,
-        "matched_details": matched_details,
-        "weighted_score": round(total_weight, 1),
-        "matched_term_count": matched_count,
-        "required_term_count": required_count,
+        "passed": False, "reason": "relevance_unassessed",
+        "required_terms": [], "matched_terms": [], "missing_terms": [],
+        "matched_details": [], "weighted_score": None,
+        "matched_term_count": 0, "required_term_count": 0,
     }
 
 
@@ -458,39 +392,10 @@ def _make_context_trust_decision(
     intent: Any,
     support_decision: Any | None = None,
 ) -> ContextTrustDecision:
-    max_project_score = _max_project_ranking_score(project_docs)
-    matched_terms = list(relevance_gate.get("matched_terms") or [])
-    missing_terms = list(relevance_gate["missing_terms"] if "missing_terms" in relevance_gate else relevance_gate.get("required_terms") or [])
-    passed = bool(relevance_gate.get("passed"))
-
-    if _is_low_signal_single_token_query(question):
-        return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
-
-    # Typed proof and query relevance are independent requirements. A locally
-    # valid generic proposition must not authorize an answer to a different
-    # operation merely because both mention the same subject.
-    if (
-        bool(getattr(support_decision, "answer_supported", False))
-        and passed
-        and context_pack
-        and project_docs
-        and project_docs.answer_available
-    ):
-        return ContextTrustDecision(
-            True, "typed_evidence_contract_satisfied", "trusted", passed,
-            max_project_score, matched_terms, missing_terms,
-        )
-
-    has_dependency_answer = bool(dependency_docs and dependency_docs.results)
-    has_source_evidence = any(item.get("evidence_class") == "source_snippet" for item in source_evidence_items)
-    has_strong_project_answer = bool(project_docs and project_docs.answer_available and _score_is_strong(max_project_score))
-    if answer_available and not missing_terms and passed and (has_dependency_answer or has_source_evidence or has_strong_project_answer):
-        return ContextTrustDecision(True, "trusted_context_available", "trusted", passed, max_project_score, matched_terms, missing_terms)
-
-    if context_pack and (passed or getattr(intent, "broad", False) or answer_type in {"partial", "partial_navigational"}):
-        return ContextTrustDecision(False, "partial_navigational_context", "partial", passed, max_project_score, matched_terms, missing_terms)
-
-    return ContextTrustDecision(False, "no_reliable_context", "low", passed, max_project_score, matched_terms, missing_terms)
+    return ContextTrustDecision(
+        False, "partial_navigational_context" if context_pack else "no_reliable_context",
+        "partial" if context_pack else "low", False, None, [], [],
+    )
 
 
 def _max_project_ranking_score(project_docs: ProjectDocsResult | None) -> float | None:

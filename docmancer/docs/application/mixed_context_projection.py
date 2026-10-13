@@ -164,7 +164,7 @@ def retain_mixed_project_context(
         return payload, snapshot
     from .docs_context_projection import project_docs_context
     from .model_visible_projection import (
-        DOCS_SOURCE_FIELDS, _refresh_estimate, validate_model_visible_projection,
+        _refresh_estimate, validate_model_visible_projection,
     )
 
     try:
@@ -211,7 +211,7 @@ def retain_mixed_project_context(
             return payload, snapshot
         for source in project["sources"]:
             # Convert the validated public shape, retaining its exact raw snapshot.
-            projected = {key: source[key] for key in sorted(DOCS_SOURCE_FIELDS)}
+            projected = deepcopy(source)
             evidence_id = projected["evidence_id"]
             original = project_snapshot[evidence_id]["source"]
             if evidence_id in combined_snapshot:

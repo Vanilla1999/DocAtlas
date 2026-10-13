@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="4" time="14.361" timestamp="2026-10-13T15:23:26.945530+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" file="tests/test_heuristic_removal_public_integration.py" line="56" time="0.993"><properties><property name="trace_off_on_off_public_context_calls" value="[1, 1, 1]" /></properties><failure message="AssertionError: assert None is False&#10; +  where None = &lt;built-in method get of dict object at 0x7b8b3c40f940&gt;('answer_supported')&#10; +    where &lt;built-in method get of dict object at 0x7b8b3c40f940&gt; = {'schema_version': 4, 'result': 'failure', 'completeness': 'unavailable', 'edit_ready': False, ...}.get">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-11/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7b8b45986fc0&gt;
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-11/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7b8b4599ccc0&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+                facts(payload, root, OPTICS_FACTS)
+                packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
+                facts(packed, root, OPTICS_FACTS)
+                assert packed["tokens"] &lt;= 12000
+                packets.append(payload)
+            assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+            record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
+            old_row = next(row for row in packets[0]["sources"]
+                           if relative_path(row["path_or_url"], root) == "docs/issue.md")
+            read_source(service, old_row, root, OPTICS_DOCUMENTS)
+            partial = context(service, root,
+                              "How must lenses be packed for an observation trip, and what is the helicopter refuelling schedule?")
+            assert not integrity(partial, root, OPTICS_DOCUMENTS)["errors"]
+            facts(partial, root, {"docs/packing.md": OPTICS_FACTS["docs/packing.md"]})
+            assert partial.get("answer_supported") is False and partial.get("answer_available") is False
+            assert partial.get("edit_ready") is False
+            lookup = context(service, root, "Explain the observatory's night-travel checklist.",
+                             lookup_queries=[OPTICS_QUESTION])
+            assert not integrity(lookup, root, OPTICS_DOCUMENTS)["errors"]
+            facts(lookup, root, OPTICS_FACTS)
+            assert lookup.get("answer_supported") is False and lookup.get("edit_ready") is False
+            assert not lookup.get("covered_query_ids")
+            with env.context() as advanced:
+                advanced.setenv("DOCATLAS_MCP_ADVANCED_TOOLS", "1")
+                patch_context = context(service, root, OPTICS_QUESTION, context_format="patch_context")
+            assert patch_context.get("edit_ready") is False
+&gt;           assert patch_context.get("answer_supported") is False
+E           AssertionError: assert None is False
+E            +  where None = &lt;built-in method get of dict object at 0x7b8b3c40f940&gt;('answer_supported')
+E            +    where &lt;built-in method get of dict object at 0x7b8b3c40f940&gt; = {'schema_version': 4, 'result': 'failure', 'completeness': 'unavailable', 'edit_ready': False, ...}.get
+
+tests/test_heuristic_removal_public_integration.py:100: AssertionError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" file="tests/test_heuristic_removal_public_integration.py" line="128" time="0.536" /><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_library_native_context_isolates_versions" file="tests/test_heuristic_removal_public_integration.py" line="173" time="10.641" /><testcase classname="tests.test_heuristic_removal_public_integration" name="test_vector_runtime_preserves_source_windows_and_access" file="tests/test_heuristic_removal_public_integration.py" line="205" time="1.030"><properties><property name="vector_runtime_evidence" value="[{&quot;mode&quot;: &quot;dense&quot;, &quot;sources&quot;: [&quot;observatory.md&quot;, &quot;observatory.md&quot;, &quot;observatory.md&quot;], &quot;texts&quot;: [&quot;# Observatory archive\n\nObservatory archive retains 41 nights.\n&quot;, &quot;# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n&quot;, &quot;# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n&quot;], &quot;counts&quot;: {&quot;dense&quot;: 3}}, {&quot;mode&quot;: &quot;hybrid/lexical_fallback_degraded&quot;, &quot;sources&quot;: [&quot;observatory.md&quot;, &quot;observatory.md&quot;, &quot;observatory.md&quot;], &quot;texts&quot;: [&quot;# Observatory aperture\n\nObservatory aperture is 73 mm.\n\n&quot;, &quot;# Observatory shutter\n\nObservatory shutter waits 19 seconds.\n\n&quot;, &quot;# Observatory archive\n\nObservatory archive retains 41 nights.\n&quot;], &quot;counts&quot;: {&quot;lexical&quot;: 3}}]" /><property name="embedding_http_calls" value="[4, 1]" /></properties></testcase></testsuite></testsuites>

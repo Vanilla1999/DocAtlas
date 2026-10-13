@@ -21,6 +21,7 @@ from .reference_query_tagging import (
     _discovery_window_key, _record_query_discovery, _tag_retrieval_query,
 )
 from .source_reference_evidence import SourceReferenceContext
+from docmancer.docs.domain.original_body_discovery import original_body_service_scope
 
 from ._project_docs_diagnostics import _retrieval_stage_diagnostics
 
@@ -78,6 +79,7 @@ def _qualify_candidate_lookups(
         result.append(chunk.model_copy(update={"metadata": metadata}))
     return result
 class _ProjectDocsServicePart03:
+    @original_body_service_scope
     @_found_window_retention_producer
     def query_project_docs(
         self,

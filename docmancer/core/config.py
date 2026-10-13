@@ -124,15 +124,10 @@ class FusionConfig(BaseModel):
 
 
 class HierarchicalConfig(BaseModel):
-    """Two-stage hierarchical retrieval: pick top documents, then top sections inside them.
+    """Legacy parsing DTO; document-score preselection has been retired.
 
-    By default the dispatcher decides per-index: ``auto=True`` turns the
-    two-stage pass on when the index contains at least
-    ``auto_min_documents`` distinct ``document_title_hash`` values, and
-    leaves it off on smaller / flatter corpora where the extra round-trip
-    just costs latency. Set ``enabled=True`` to force it on regardless of
-    corpus size; set ``auto=False`` to force it off unless ``enabled``
-    is also true.
+    Neither ``enabled`` nor ``auto`` filters the source-native candidate pool.
+    Fields remain accepted so existing configuration files can still be read.
     """
 
     enabled: bool = False
@@ -163,7 +158,9 @@ class RetrievalConfig(BaseSettings):
     expand: str | None = None
     budget: int | None = None
     limit: int | None = None
-    max_sections_per_source: int | None = Field(default=None, ge=1)
+    max_sections_per_source: int | None = Field(
+        default=None, ge=1, description="Legacy parsing field; source quotas are no longer applied.",
+    )
     model_config = SettingsConfigDict(env_prefix="DOCATLAS_RETRIEVAL_", extra="ignore")
 
 

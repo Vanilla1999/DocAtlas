@@ -223,13 +223,6 @@ def best_local_proof(
             matches.append((unit, proof))
     if not matches:
         return None
-    matches.sort(key=lambda pair: (
-        -pair[1].completeness_score,
-        0 if pair[0].proposition else 1,
-        len(pair[0].text),
-        pair[0].char_start if pair[0].char_start is not None else 10**9,
-        pair[0].unit_id,
-    ))
     return matches[0]
 
 

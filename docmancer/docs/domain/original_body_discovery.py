@@ -11,6 +11,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, field
 from functools import wraps
 import hashlib
+import inspect
 import json
 import os
 from pathlib import Path
@@ -35,6 +36,32 @@ class _BodyRead:
 _BODY_READ: ContextVar[_BodyRead | None] = ContextVar("ordinary_original_body_read", default=None)
 
 
+def original_body_service_scope(method):
+    """Give direct public service reads the same request-owned receipt lifetime.
+
+    Nested calls under MCP keep its scope. Receipts are never returned to the
+    caller and do not authorize replay through a standalone projector.
+    """
+    signature = inspect.signature(method)
+
+    @original_body_read_scope
+    def invoke(name, arguments, invocation):
+        positional, keywords = invocation
+        return method(*positional, **keywords)
+
+    @wraps(method)
+    def scoped(*positional, **keywords):
+        state = _BODY_READ.get()
+        if state is not None and state.active:
+            return method(*positional, **keywords)
+        bound = signature.bind(*positional, **keywords)
+        arguments = dict(bound.arguments)
+        arguments["question"] = arguments.get("question", arguments.get("query", ""))
+        return invoke("get_docs_context", arguments, (positional, keywords))
+
+    return scoped
+
+
 def original_body_read_scope(handler):
     """Scope the synchronous MCP handler, including its final projection.
 
@@ -52,7 +79,8 @@ def original_body_read_scope(handler):
             and root is not None and root.is_absolute() and ".." not in root.parts
             and args.get("scope") in (None, "project", "module", "all")
             and not args.get("module")
-            and not args.get("maintenance") and args.get("context_format") is None
+            and not args.get("maintenance")
+            and args.get("context_format") in (None, "patch_context")
         )
         # Same pure local-owner identity as the member contract, without a new
         # resolve/stat/read. Noncanonical/symlink aliases fail closed here; the

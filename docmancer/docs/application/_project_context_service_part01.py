@@ -9,12 +9,14 @@ from docmancer.docs.application._project_docs_service_part03 import _tag_retriev
 from docmancer.docs.application.project_docs_service import ProjectDocsService
 from docmancer.docs.domain.source_map import ProjectSourceFacts
 from docmancer.docs.domain.project_doc_ranking import _found_window_retention_producer, _invoke_found_window_retention
+from docmancer.docs.domain.original_body_discovery import original_body_service_scope
 
 
 class _ProjectContextServicePart01:
     def __init__(self, facade: Any):
         self.facade = facade
 
+    @original_body_service_scope
     @_found_window_retention_producer
     def get_project_context(
         self,
@@ -120,7 +122,7 @@ class _ProjectContextServicePart01:
                     and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash]
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
-            if project_docs and project_docs.results and not native_rank:
+            if project_docs and project_docs.results:
                 if evidence_path:
                     evidence_path = project_docs.resolved_evidence_path or evidence_path
                     normalized_evidence_path = normalize_doc_path(evidence_path)
@@ -131,60 +133,6 @@ class _ProjectContextServicePart01:
                             if normalize_doc_path(chunk.path) == normalized_evidence_path
                         ],
                     )
-                from .need_context_projection import set_context_variants
-                from docmancer.docs.domain.context_hint_policy import preserves_unresolved_context_candidate
-                prefit_candidates = project_context_pack(
-                    question=question, project_docs=project_docs, dependency_docs=None)
-                checked_sets = {
-                    original.get('stable_chunk_id')
-                    for original, _, _ in set_context_variants(
-                        prefit_candidates,
-                        query_plan=documentation_query_plan.as_payload(),
-                        expected_project_identity=project_docs.results[0].project_identity,
-                        max_tokens=800, diagnostics={},
-                    )
-                }
-                # Keep topical retrieval-only candidates until public admission;
-                # lack of answer proof alone must not erase useful source text.
-                if not checked_sets and not any(
-                    original.get('retrieval_query_ids') for original in prefit_candidates
-                ):
-                    checked_sets.update(original.get('stable_chunk_id')
-                        for original in prefit_candidates
-                        if preserves_unresolved_context_candidate(original,
-                            query_plan=documentation_query_plan.as_payload(),
-                            expected_project_identity=project_docs.results[0].project_identity,
-                            lifecycle_intent=canonical_requirements.lifecycle_intent))
-                context_candidate_ids = frozenset(id(chunk) for chunk in project_docs.results
-                                                 if chunk.stable_chunk_id in checked_sets)
-                if not retain_found_windows and not patch_request:
-                    # Preserve only existing public-query qualifications or strict
-                    # literal body admission, without another acquisition call.
-                    read_presentation_results = rerank_project_doc_chunks(
-                        project_docs.results, question=question, intent=intent,
-                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
-                        finite_member_paths=frozenset(members), retain_found_windows=True,
-                    )
-                project_docs = replace(
-                    project_docs,
-                    results=rerank_project_doc_chunks(
-                        project_docs.results,
-                        question=question,
-                        intent=intent,
-                        limit=limit,
-                        broad_max_per_source=4 if evidence_path else 2,
-                        lifecycle_intent_value=canonical_requirements.lifecycle_intent,
-                        context_candidate_ids=context_candidate_ids,
-                        finite_member_paths=frozenset(members),
-                    ),
-                )
-                routing_stage_observed["project_docs"] = list(project_docs.results)
-                bounded_results, budget_issue = fit_stage_items("project_docs", project_docs.results)
-                project_docs = replace(project_docs, results=bounded_results)
-                if budget_issue:
-                    routing_budget_issues.append(f"project_docs: {budget_issue}")
-                    routing_budget_stages.add("project_docs")
-            elif project_docs and project_docs.results:
                 # Native source windows retain acquisition order until terminal
                 # whole-row packing. Membership/hash checks above still apply;
                 # prefit relevance, reranking and intermediate delivery fitting
@@ -732,12 +680,9 @@ class _ProjectContextServicePart01:
                 },
             ]
         relevance_terms = list(documentation_query_terms(question))
-        source_evidence_answer_available = any(
-            item.get("evidence_class") == "source_snippet"
-            and _context_has_query_evidence([item], relevance_terms)
-            for item in source_evidence_items
-        )
-        answer_available = bool(project_docs and project_docs.answer_available) or bool(dependency_docs and dependency_docs.results) or source_evidence_answer_available
+        # Retrieval supplies context, never answer authority from a term hit or
+        # the mere presence of dependency/source snippets.
+        answer_available = False
         if dependency_confirmation_preblocks_answer:
             answer_available = False
         if routing_budget_issues:

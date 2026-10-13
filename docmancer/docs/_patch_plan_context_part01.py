@@ -19,16 +19,9 @@ def build_implementation_map(
     missing_symbols: list[dict[str, Any]],
     design_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    root = Path(project_path).expanduser().resolve() if project_path else None
-    selected = []
-    if root is not None:
-        for item in relevant_files[:5]:
-            path = item.get("file")
-            if isinstance(path, str):
-                candidate = _changed_file_candidate(root, path)
-                if candidate is not None:
-                    selected.append(candidate)
-    current_behavior = _current_behavior_from_files(selected)
+    # Render the already acquired windows and their hashes. A second filesystem
+    # read could bind the navigation result to different bytes during an edit.
+    current_behavior = _current_behavior_from_files(relevant_files)
     return {
         "current_behavior": current_behavior,
         "minimal_patch_path": [],
@@ -41,7 +34,7 @@ def build_implementation_map(
 
 def _current_behavior_from_files(relevant_files: list[dict[str, Any]]) -> list[dict[str, Any]]:
     behavior: list[dict[str, Any]] = []
-    for item in relevant_files[:5]:
+    for item in relevant_files:
         refs = item.get("refs") or []
         ref = refs[0] if refs else {}
         behavior.append({
@@ -350,78 +343,6 @@ def _read_text(path: Path, *, root: Path | None = None) -> str | None:
         return None
 
 
-def _score_source_file(
-    rel_path: str,
-    text: str,
-    ordered_terms: list[str],
-    variants_by_term: dict[str, set[str]],
-) -> dict[str, Any] | None:
-    basename = Path(rel_path).stem
-    basename_no_ext = basename.removesuffix(".g").removesuffix(".freezed")
-    lowered_text = text.lower()
-    lines = text.splitlines()
-    definitions = _symbol_definitions(lines)
-    imports = _import_export_matches(lines)
-
-    score = 0
-    first_term_index = len(ordered_terms)
-    why_terms: list[str] = []
-    symbols: list[str] = []
-    refs: list[dict[str, Any]] = []
-
-    for index, term in enumerate(ordered_terms):
-        variants = variants_by_term[term]
-        snake = _to_snake_case(term)
-        pascal = _to_pascal_case(term)
-        matched = False
-
-        if snake == basename_no_ext or pascal.lower() == basename_no_ext.replace("_", ""):
-            score += 100
-            matched = True
-            why_terms.append(f"Exact file basename match: {snake} / {pascal}")
-
-        for symbol, line_no in definitions.items():
-            if symbol in variants:
-                score += 80
-                matched = True
-                _append_unique(symbols, symbol)
-                refs.append(_ref_for_line(lines, line_no, symbol=symbol, pattern=f"class {symbol}" if _line_contains_class(lines[line_no - 1], symbol) else symbol))
-                why_terms.append(f"Exact symbol definition match: {symbol}")
-
-        for import_text, line_no in imports:
-            if any(variant.lower() in import_text.lower() for variant in variants):
-                score += 50
-                matched = True
-                refs.append(_ref_for_line(lines, line_no, symbol=None, pattern=import_text.strip()))
-                why_terms.append(f"Exact import/export match: {term}")
-
-        for variant in variants:
-            if variant and variant.lower() in lowered_text:
-                score += 20
-                matched = True
-                line_no = _first_line_containing(lines, variant)
-                if line_no is not None and not any(ref["start_line"] <= line_no <= ref["end_line"] for ref in refs):
-                    refs.append(_ref_for_line(lines, line_no, symbol=pascal if variant == pascal else None, pattern=variant))
-                why_terms.append(f"Exact usage match: {variant}")
-                break
-
-        if matched:
-            first_term_index = min(first_term_index, index)
-            _append_unique(symbols, pascal)
-
-    if score <= 0:
-        return None
-    return {
-        "file": rel_path,
-        "why": "; ".join(_dedupe(why_terms)[:3]),
-        "action": "read",
-        "symbols": symbols,
-        "refs": refs[:3],
-        "_score": score,
-        "_first_term_index": first_term_index,
-    }
-
-
 def _symbol_definitions(lines: list[str]) -> dict[str, int]:
     definitions: dict[str, int] = {}
     for line_no, line in enumerate(lines, start=1):
@@ -490,30 +411,7 @@ def _changed_file_candidate(root: Path, changed_file: str) -> dict[str, Any] | N
         "content_hash": "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "symbols": list(definitions.keys())[:5],
         "refs": refs,
-        "_score": 1_000,
-        "_first_term_index": -1,
     }
-
-
-def _merge_duplicate_source_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    merged: dict[str, dict[str, Any]] = {}
-    for item in candidates:
-        current = merged.get(item["file"])
-        if current is None:
-            merged[item["file"]] = dict(item)
-            continue
-        if item["_score"] > current["_score"] or item["action"] == "edit":
-            replacement = dict(item)
-            if current.get("refs") and not replacement.get("refs"):
-                replacement["refs"] = current["refs"]
-            replacement["symbols"] = _dedupe([*(replacement.get("symbols") or []), *(current.get("symbols") or [])])[:8]
-            if item["action"] == "edit" and current.get("why"):
-                replacement["why"] = f"{item['why']} Also matched query evidence: {current['why']}"
-            merged[item["file"]] = replacement
-        else:
-            current["symbols"] = _dedupe([*(current.get("symbols") or []), *(item.get("symbols") or [])])[:8]
-            current["refs"] = [*(current.get("refs") or []), *(item.get("refs") or [])][:3]
-    return list(merged.values())
 
 
 def _append_unique(items: list[str], value: str) -> None:
@@ -530,4 +428,4 @@ def _dedupe(items: list[str]) -> list[str]:
             result.append(item)
     return result
 
-__all__=['build_implementation_map', '_current_behavior_from_files', '_minimal_patch_path', '_find_patterns_for_plan', '_risks_and_constraints', '_risk', '_implementation_warnings', '_next_actions', 'discover_dart_dependency_apis', 'discover_rejected_sources', '_dedupe_dependency_apis', 'discover_missing_symbols', '_resolved_dart_package_roots', '_pubspec_lock_packages', '_iter_source_files', '_iter_dependency_source_files', '_ordered_terms', '_probable_symbol_terms', '_looks_like_symbol', '_symbol_found_in_source', '_find_dependency_symbol', '_nearest_dependency_alternatives', '_nearest_symbol_alternatives', '_symbol_tokens', '_term_variants', '_to_snake_case', '_to_pascal_case', '_should_skip_source', '_should_skip_dependency_source', '_has_skipped_part', '_read_text', '_score_source_file', '_symbol_definitions', '_import_export_matches', '_line_contains_class', '_first_line_containing', '_first_line_matching', '_ref_for_line', '_changed_file_candidate', '_merge_duplicate_source_candidates', '_append_unique', '_dedupe']
+__all__=['build_implementation_map', '_current_behavior_from_files', '_minimal_patch_path', '_find_patterns_for_plan', '_risks_and_constraints', '_risk', '_implementation_warnings', '_next_actions', 'discover_dart_dependency_apis', 'discover_rejected_sources', '_dedupe_dependency_apis', 'discover_missing_symbols', '_resolved_dart_package_roots', '_pubspec_lock_packages', '_iter_source_files', '_iter_dependency_source_files', '_ordered_terms', '_probable_symbol_terms', '_looks_like_symbol', '_symbol_found_in_source', '_find_dependency_symbol', '_nearest_dependency_alternatives', '_nearest_symbol_alternatives', '_symbol_tokens', '_term_variants', '_to_snake_case', '_to_pascal_case', '_should_skip_source', '_should_skip_dependency_source', '_has_skipped_part', '_read_text', '_symbol_definitions', '_import_export_matches', '_line_contains_class', '_first_line_containing', '_first_line_matching', '_ref_for_line', '_changed_file_candidate', '_append_unique', '_dedupe']

@@ -727,7 +727,16 @@ def validate_model_visible_projection(
         if not isinstance(expected, dict):
             errors.append("internal snapshot is missing its canonical projected source")
             continue
-        optional = {"source_uri"} if kind == "docs_context" else set()
+        project_quote = (
+            kind == "docs_answer" and payload.get("retrieval_only") is True
+            and isinstance(bound.get("source"), dict)
+            and bound["source"].get("source_class") == "project_doc"
+        )
+        allowed_fields = (
+            DOCS_CONTEXT_SOURCE_FIELDS if kind == "docs_context" or project_quote else
+            DOCS_SOURCE_FIELDS if kind == "docs_answer" else PATCH_SOURCE_FIELDS
+        )
+        optional = {"source_uri"} if kind == "docs_context" or project_quote else set()
         missing = sorted(allowed_fields - set(source))
         unknown = sorted(set(source) - allowed_fields - optional)
         for key in missing:

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "runtime_calls": 2,
+  "mocks": false,
+  "dense_model": "BAAI/bge-small-en-v1.5",
+  "sparse_model": "Qdrant/bm25",
+  "binary_sha256": "7dba403e3b1e1b68e8b4ec9f241b6152361a12c58f17d2d8146d1ce343d091a6",
+  "source_sha256": "7d6ed7fa786d3a8447590fd9b7ddac9c01b80fe08df641ab1a72a3580ee592db",
+  "boundary": "production ingest and retrieval runtime, isolated Qdrant/FastEmbed"
+}

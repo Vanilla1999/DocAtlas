@@ -52,10 +52,14 @@ def _project_module_recovery_metadata(
     return reason, candidates
 
 
+from docmancer.docs.domain.original_body_discovery import original_body_service_scope
+
+
 class _UnifiedDocsContextServicePart01:
     def __init__(self, service: Any):
         self.service = service
 
+    @original_body_service_scope
     @_found_window_retention_producer
     def get_docs_context(
         self,

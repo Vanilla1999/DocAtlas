@@ -100,12 +100,8 @@ def _explicit_library_query_values(query: str) -> list[str]:
 
 
 def _clean_library_section(content: str) -> str:
-    text = _ANCHOR_RE.sub("", content or "")
-    text = _EMOJI_RE.sub("", text)
-    cleaned_lines = []
-    for line in text.splitlines():
-        cleaned_lines.append(line.rstrip())
-    return "\n".join(cleaned_lines).strip()
+    """Compatibility name: source witnesses and delivered windows are verbatim."""
+    return content
 
 
 def _code_snippets(content: str) -> list[dict[str, str]]:
@@ -169,15 +165,16 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
     selected = []
     snippet_count = 0
     for chunk in chunks:
-        cleaned = _clean_library_section(chunk.text)
-        snippets = _code_snippets(cleaned)
+        # Presentation metadata must not strip anchors, emoji or whitespace
+        # from an acquired evidence window.
+        snippets = _code_snippets(chunk.text)
         snippet_count += len(snippets)
         metadata = dict(chunk.metadata or {})
         metadata["code_snippets"] = snippets
         metadata["code_snippet_count"] = len(snippets)
         if snippets:
             metadata["top_code_language"] = snippets[0]["language"] or None
-        selected.append(_copy_chunk(chunk, text=cleaned, metadata=metadata))
+        selected.append(_copy_chunk(chunk, text=chunk.text, metadata=metadata))
     return selected, {
         "code_snippets": snippet_count,
         "selection_method": "native_acquisition_rank",

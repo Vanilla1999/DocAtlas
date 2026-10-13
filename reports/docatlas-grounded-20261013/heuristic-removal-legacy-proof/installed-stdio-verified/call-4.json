@@ -1,0 +1,52 @@
+{
+  "tool": "get_docs_context",
+  "payload": {
+    "status": "failed",
+    "error": {
+      "reason_code": "bad_request",
+      "message": "bad_request: request failed",
+      "exception_type": "ValueError",
+      "retryable": false,
+      "where": {
+        "tool": "get_docs_context",
+        "handler": null,
+        "phase": "execution"
+      },
+      "hints": [
+        "Fix the MCP tool arguments and retry."
+      ]
+    },
+    "warnings": []
+  },
+  "is_error": true,
+  "sdk_result": {
+    "meta": null,
+    "content": [
+      {
+        "type": "text",
+        "text": "Structured DocAtlas result attached in structuredContent.",
+        "annotations": null,
+        "meta": null
+      }
+    ],
+    "structuredContent": {
+      "status": "failed",
+      "error": {
+        "reason_code": "bad_request",
+        "message": "bad_request: request failed",
+        "exception_type": "ValueError",
+        "retryable": false,
+        "where": {
+          "tool": "get_docs_context",
+          "handler": null,
+          "phase": "execution"
+        },
+        "hints": [
+          "Fix the MCP tool arguments and retry."
+        ]
+      },
+      "warnings": []
+    },
+    "isError": true
+  }
+}

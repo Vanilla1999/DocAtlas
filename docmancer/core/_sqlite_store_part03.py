@@ -434,7 +434,9 @@ class _SQLiteStorePart03:
             metadata["raw_tokens"] = raw_tokens
             metadata["savings_percent"] = round(savings, 1)
             metadata["runway_multiplier"] = round(runway, 2)
-            score = max(0.0, 1.0 - (rank * 0.05))
+            # Hydration is not a ranking method. Dispatch supplies the actual
+            # backend/fusion score; standalone source reads have no score.
+            score = 0.0
             results.append(
                 RetrievedChunk(
                     source=row["source"],

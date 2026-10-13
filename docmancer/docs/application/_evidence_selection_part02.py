@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
-from ._evidence_selection_part01 import _candidate_preference, _candidate_source_view, _jaccard_millis, _marginal_utility, _repair_mandatory_selection, _selection_terms
+from ._evidence_selection_part01 import _candidate_source_view
 from ._evidence_selection_part01 import _candidate_window_valid, _candidate_lifecycle_valid, _unit_matches_display
 
 def _scope_requirement_value(
@@ -96,11 +96,6 @@ def _witness_for_requirement(
         ]
         if not matching_units:
             return None
-        matching_units.sort(key=lambda unit: (
-            len(unit.text),
-            unit.char_start if unit.char_start is not None else 10**9,
-            unit.unit_id,
-        ))
         unit = matching_units[0]
         proof = LocalProof(
             True,
@@ -144,57 +139,17 @@ def _deduplicate(
     for candidate in candidates:
         duplicate: tuple[OmissionReason, EvidenceCandidate] | None = None
         for representative in selected:
-            if config.result_kind == "patch_context":
-                # Ranking/cost are not evidence semantics. Everything else,
-                # including stable identity, attribution, spans and coverage,
-                # must be interchangeable before one row can be discarded.
-                def semantic_row(row: EvidenceCandidate) -> EvidenceCandidate:
-                    return replace(
-                        row, retrieval_rank=0, component_ranks=(), relevance_millis=0,
-                        token_estimate=0, fit_token_estimate=0, reported_token_estimate=None,
-                    )
-                if (
-                    semantic_row(candidate) == semantic_row(representative)
-                    and _candidate_source_view(candidate) == _candidate_source_view(representative)
-                ):
-                    duplicate = "exact_duplicate", representative
-                    break
-                continue
-            distinct_versions = bool(
-                candidate.resolved_version
-                and representative.resolved_version
-                and candidate.resolved_version.casefold() != representative.resolved_version.casefold()
-            )
-            if distinct_versions:
-                continue
-            # Similarity or a shared parent cannot erase distinct quoted bytes,
-            # including a negation, punctuation or an unrecognized condition.
-            if candidate.display_text != representative.display_text:
-                continue
-            has_new_symbols = bool(set(candidate.symbols) - set(representative.symbols))
-            if candidate.stable_id == representative.stable_id or (
-                candidate.parent_logical_id
-                and candidate.parent_logical_id == representative.parent_logical_id
-                and candidate.content_sha256 == representative.content_sha256
-                and not has_new_symbols
+            # Only interchangeable evidence rows may be discarded.
+            def semantic_row(row: EvidenceCandidate) -> EvidenceCandidate:
+                return replace(
+                    row, retrieval_rank=0, component_ranks=(), relevance_millis=0,
+                    token_estimate=0, fit_token_estimate=0, reported_token_estimate=None,
+                )
+            if (
+                semantic_row(candidate) == semantic_row(representative)
+                and _candidate_source_view(candidate) == _candidate_source_view(representative)
             ):
                 duplicate = "exact_duplicate", representative
-                break
-            if (
-                _overlap_millis(candidate, representative) >= config.overlap_threshold
-                and not (candidate.covered_requirement_ids - representative.covered_requirement_ids)
-                and not has_new_symbols
-            ):
-                duplicate = "overlap_duplicate", representative
-                break
-            if (
-                _normalized_source(candidate.source_identity) == _normalized_source(representative.source_identity)
-                and _jaccard_millis(candidate.display_text, representative.display_text, config.shingle_size)
-                >= config.near_duplicate_threshold
-                and not (candidate.covered_requirement_ids - representative.covered_requirement_ids)
-                and not has_new_symbols
-            ):
-                duplicate = "near_duplicate", representative
                 break
         if duplicate:
             omissions.append(Omission(candidate.stable_id, duplicate[0], duplicate[1].stable_id))
@@ -269,26 +224,11 @@ def _reserve_and_select(
     prefer_proof_completeness: bool = False,
 ) -> tuple[list[EvidenceCandidate], set[str], list[Omission]]:
     if config.result_kind == "patch_context":
-        # Preserve every distinct admitted row. Relevance still orders evidence,
-        # but cost, shared coverage and source counts cannot erase witnesses.
-        selected_terms: set[str] = set()
-        selected: list[EvidenceCandidate] = []
-        pool = list(candidates)
-        omissions: list[Omission] = []
-        while pool:
-            best = min(pool, key=lambda candidate: (
-                -len(candidate.covered_requirement_ids & mandatory),
-                -_marginal_utility(candidate, selected_terms, mandatory),
-                *_candidate_preference(candidate, length_dependent=False),
-            ))
-            pool.remove(best)
-            if not best.covered_requirement_ids and _marginal_utility(best, selected_terms, set()) <= 0:
-                omissions.append(Omission(best.stable_id, "zero_marginal_utility"))
-                continue
-            selected.append(best)
-            selected_terms.update(_selection_terms([best]))
+        # Preserve distinct admitted rows in acquisition order. Mandatory
+        # evidence still gates readiness; lexical novelty does not gate bytes.
+        selected = list(candidates)
         covered = set().union(*(item.covered_requirement_ids for item in selected)) if selected else set()
-        return selected, mandatory - covered, omissions
+        return selected, mandatory - covered, []
     fit_reserve = (
         DOCS_SERIALIZATION_RESERVE_TOKENS
         if config.result_kind == "docs_answer"
@@ -297,138 +237,15 @@ def _reserve_and_select(
     available = max(1, config.hard_tokens - (fit_reserve or 0)) if config.hard_tokens is not None else None
     selected: list[EvidenceCandidate] = []
     remaining = set(mandatory)
-    pool = list(candidates)
     omissions: list[Omission] = []
-    # Compatibility-only docs projection: a single already-eligible witness
-    # may be rendered when the caller did not supply a typed profile. Patch
-    # selection and multi-candidate ranking continue through the normal utility
-    # algorithm, so this cannot become a proof/readiness bypass.
-    if (
-        not mandatory
-        and config.profile == "generic"
-        and config.result_kind == "docs_answer"
-        and len(pool) == 1
-        and (available is None or pool[0].fit_token_estimate <= available)
-    ):
-        return [pool[0]], set(), []
-    while remaining:
-        options = [candidate for candidate in pool if candidate.covered_requirement_ids & remaining]
-        if not options:
-            break
-        def mandatory_choice_key(candidate: EvidenceCandidate) -> tuple[Any, ...]:
-            key: tuple[Any, ...] = (
-                -len(candidate.covered_requirement_ids & remaining),
-            )
-            if prefer_proof_completeness:
-                # A compositional QuestionPlan may have several witnesses that
-                # satisfy the same mandatory facet.  Selection must prefer the
-                # strongest local proof before compactness; otherwise a short
-                # command example can hide a complete procedure summary from
-                # the same source.  Legacy v1-v3 selection keeps its frozen
-                # ordering by leaving this flag false.
-                key += (-sum(
-                    witness.completeness_score
-                    for witness in candidate.requirement_witnesses
-                    if witness.requirement_id in remaining
-                ),)
-            return (*key,
-                _version_rank(candidate.version_binding),
-                0 if candidate.docs_snapshot_exact is True else 1,
-                candidate.token_estimate,
-                candidate.retrieval_rank,
-                candidate.stable_id,
-            )
-
-        best = min(options, key=mandatory_choice_key)
-        selected.append(best)
-        pool.remove(best)
-        remaining -= best.covered_requirement_ids
-    selected = _repair_mandatory_selection(
-        selected,
-        candidates,
-        mandatory,
-        prefer_proof_completeness=prefer_proof_completeness,
-    )
-    covered_after_repair = set().union(*(
-        item.covered_requirement_ids for item in selected
-    )) if selected else set()
-    remaining = mandatory - covered_after_repair
-    selected_ids = {item.stable_id for item in selected}
-    pool = [item for item in candidates if item.stable_id not in selected_ids]
-    if available is not None and sum(item.fit_token_estimate for item in selected) > available:
-        remaining.add("mandatory_evidence_does_not_fit")
-        for candidate in candidates:
-            omissions.append(Omission(candidate.stable_id, "budget"))
-        return [], remaining, omissions
-
-    spent = sum(item.fit_token_estimate for item in selected)
-    selected_sources = {_normalized_source(item.source_identity) for item in selected}
-    source_counts: dict[str, int] = {}
-    for item in selected:
-        key = _normalized_source(item.source_identity)
-        source_counts[key] = source_counts.get(key, 0) + 1
-    selected_terms = _selection_terms(selected)
-    if config.result_kind == "docs_answer" and mandatory and not remaining:
-        omissions.extend(Omission(candidate.stable_id, "dominated") for candidate in pool)
-        return selected, remaining, omissions
-    while pool:
-        scored: list[tuple[tuple[Any, ...], EvidenceCandidate, int]] = []
-        selected_coverage = set().union(*(
-            item.covered_requirement_ids for item in selected
-        )) if selected else set()
-        selected_symbols = {symbol for item in selected for symbol in item.symbols}
-        selected_cost = sum(item.token_estimate for item in selected)
-        for candidate in pool:
-            if (
-                candidate.covered_requirement_ids
-                and candidate.covered_requirement_ids <= selected_coverage
-                and candidate.token_estimate >= selected_cost
-                and not (set(candidate.symbols) - selected_symbols)
-            ):
-                omissions.append(Omission(candidate.stable_id, "dominated"))
-                continue
-            source_key = _normalized_source(candidate.source_identity)
-            is_mandatory = bool(candidate.covered_requirement_ids & mandatory)
-            if not is_mandatory and config.max_sources is not None and source_key not in selected_sources and len(selected_sources) >= config.max_sources:
-                continue
-            if not is_mandatory and config.max_items_per_source is not None and source_counts.get(source_key, 0) >= config.max_items_per_source:
-                continue
-            utility = _marginal_utility(candidate, selected_terms, set())
-            ratio = int(utility * 100 / max(1, candidate.token_estimate))
-            scored.append(((-ratio, -utility, *_candidate_preference(candidate)), candidate, ratio))
-        omitted_ids = {item.stable_id for item in omissions}
-        pool = [item for item in pool if item.stable_id not in omitted_ids]
-        if not scored:
-            break
-        _, best, utility_ratio = min(scored, key=lambda row: row[0])
-        pool.remove(best)
-        source_key = _normalized_source(best.source_identity)
-        if utility_ratio < config.marginal_utility_threshold:
-            omissions.append(Omission(best.stable_id, "zero_marginal_utility"))
-            continue
-        if available is not None and spent + best.fit_token_estimate > available:
-            omissions.append(Omission(best.stable_id, "budget"))
-            continue
-        selected.append(best)
-        spent += best.fit_token_estimate
-        selected_sources.add(source_key)
-        source_counts[source_key] = source_counts.get(source_key, 0) + 1
-        selected_terms = _selection_terms(selected)
-        if available is not None and config.target_tokens is not None and spent >= min(available, config.target_tokens - (config.wrapper_reserve_tokens or 0)):
-            break
-    selected_ids = {item.stable_id for item in selected}
-    omitted_ids = {item.stable_id for item in omissions}
+    spent = 0
     for candidate in candidates:
-        if candidate.stable_id in selected_ids or candidate.stable_id in omitted_ids:
+        if available is not None and spent + candidate.fit_token_estimate > available:
+            omissions.append(Omission(candidate.stable_id, "budget"))
             continue
-        source_key = _normalized_source(candidate.source_identity)
-        reason: OmissionReason = (
-            "source_cap"
-            if (config.max_items_per_source is not None and source_counts.get(source_key, 0) >= config.max_items_per_source)
-            or (config.max_sources is not None and source_key not in selected_sources and len(selected_sources) >= config.max_sources)
-            else "dominated"
-        )
-        omissions.append(Omission(candidate.stable_id, reason))
+        selected.append(candidate)
+        spent += candidate.fit_token_estimate
+        remaining -= candidate.covered_requirement_ids
     return selected, remaining, omissions
 
 

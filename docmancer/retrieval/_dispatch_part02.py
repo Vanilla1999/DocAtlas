@@ -156,13 +156,9 @@ class _RetrievalDispatcherPart02:
     def _candidate_limit_for_diversity(self, limit: int, expand: str | None) -> int:
         if (expand or "").lower() in {"adjacent", "page"}:
             return limit
-        max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
-        if not max_per_source:
-            # Keep a bounded acquisition reserve for exclusions applied after
-            # backend search (e.g. forbidden_sources). No per-source quota is
-            # imposed on the candidates retained for final ranking.
-            return max(limit * 3, limit + 6)
-        return max(limit * 3, limit + int(max_per_source) * 3)
+        # Bounded reserve for policy exclusions after backend search, independent
+        # of document identity or the retired per-source diversity setting.
+        return max(limit * 3, limit + 6)
 
     def _limit_sections_per_source(
         self,
@@ -173,50 +169,9 @@ class _RetrievalDispatcherPart02:
     ) -> list[Any]:
         if (expand or "").lower() in {"adjacent", "page"}:
             return chunks
-        max_per_source = getattr(self.config.retrieval, "max_sections_per_source", None)
-        if not max_per_source:
-            return chunks[:limit] if limit is not None else chunks
-
-        # The per-source quota remains the diversity floor. One additional
-        # candidate may backfill unused global capacity only when its indexed
-        # parent is already represented by a preferred chunk from that source.
-        # Parent identity proves source-local structure, not semantic support;
-        # the normal evidence qualification/projection gates still decide
-        # whether the added candidate may become visible evidence.
-        counts: dict[str, int] = {}
-        preferred: list[Any] = []
-        preferred_parents: dict[str, set[str]] = {}
-        structural_overflow: list[Any] = []
-        overflow_sources: set[str] = set()
-        for chunk in chunks:
-            metadata = getattr(chunk, "metadata", {}) or {}
-            source = str(
-                metadata.get("canonical_url")
-                or getattr(chunk, "source", "")
-                or ""
-            )
-            parent = str(metadata.get("parent_logical_id") or "")
-            count = counts.get(source, 0)
-            if count < int(max_per_source):
-                counts[source] = count + 1
-                preferred.append(chunk)
-                if parent:
-                    preferred_parents.setdefault(source, set()).add(parent)
-                continue
-            if (
-                source not in overflow_sources
-                and parent
-                and parent in preferred_parents.get(source, set())
-            ):
-                structural_overflow.append(chunk)
-                overflow_sources.add(source)
-
-        if limit is None:
-            return [*preferred, *structural_overflow]
-        selected = preferred[:limit]
-        if len(selected) < limit:
-            selected.extend(structural_overflow[:limit - len(selected)])
-        return selected
+        # Source identity is an access/provenance constraint, not a diversity
+        # quota. Preserve the native (or fused) rank under the global bound.
+        return chunks[:limit] if limit is not None else chunks
 
     @staticmethod
     def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:

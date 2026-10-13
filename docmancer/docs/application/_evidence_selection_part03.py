@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from ._evidence_selection_shared import *  # noqa: F401,F403
 
-from ._evidence_selection_part01 import SelectionDecision, _assignment_preference, _candidate_preference, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
+from ._evidence_selection_part01 import SelectionDecision, _candidate_requirement_witness, _candidate_source_view, _count_reasons, _eligible_candidates, _redundant_token_ratio_millis, _selected_identity
 from ._evidence_selection_part02 import _code_group_requirement_matches, _deduplicate, _facet_requirement_matches, _raw_candidate_binding, _reserve_and_select, _scope_requirement_value, _selected_feature_trace, _with_canonical_policy_requirements, _witness_for_requirement
 from ._evidence_selection_part01 import _proof_role_admitted, _technical_requirement_matches, validate_assignment_binding
 
@@ -211,31 +211,9 @@ def select_evidence(
         )
         for candidate in eligible
     ]
-    mandatory_ids = {item.requirement_id for item in requirements if item.mandatory}
-    compositional_question = bool(getattr(requirements, "parse_trace", ()))
-
-    def ordering_key(candidate: EvidenceCandidate) -> tuple[Any, ...]:
-        base = (
-            0 if candidate.covered_requirement_ids & mandatory_ids else 1,
-        )
-        if compositional_question:
-            # QuestionPlan candidates are deduplicated only after local proof
-            # has been computed.  Prefer the candidate carrying the strongest
-            # complete mandatory witness before token compactness/retrieval
-            # rank, otherwise a short command from the same parent can hide a
-            # more complete procedure summary.  Legacy v1-v3 ordering stays
-            # byte-for-byte compatible.
-            mandatory_witnesses = tuple(
-                witness for witness in candidate.requirement_witnesses
-                if witness.requirement_id in mandatory_ids
-            )
-            base += (
-                -len(candidate.covered_requirement_ids & mandatory_ids),
-                -sum(witness.completeness_score for witness in mandatory_witnesses),
-            )
-        return (*base, *_candidate_preference(candidate, length_dependent=config.result_kind != "patch_context"))
-
-    ordered = sorted(covered, key=ordering_key)
+    # Patch evidence retains acquisition order. Coverage is checked below for
+    # authorization; it is not a relevance score for ordering source bytes.
+    ordered = covered
     if config.max_candidates is not None and len(ordered) > config.max_candidates:
         for candidate in ordered[config.max_candidates:]:
             omissions.append(Omission(candidate.stable_id, "candidate_cap"))
@@ -248,7 +226,6 @@ def select_evidence(
         deduped,
         mandatory,
         config,
-        prefer_proof_completeness=compositional_question,
     )
     omissions.extend(selection_omissions)
     selected_documents = {_normalized_source(item.source_identity) for item in selected}
@@ -265,10 +242,6 @@ def select_evidence(
     status: Literal["ok", "insufficient_evidence"] = (
         "ok" if selected and not missing and not conflicts else "insufficient_evidence"
     )
-    selected = sorted(selected, key=lambda item: (
-        0 if item.covered_requirement_ids & mandatory else 1,
-        *_candidate_preference(item, length_dependent=config.result_kind != "patch_context"),
-    ))
     selected_tokens = sum(item.token_estimate for item in selected)
     selected_fit_tokens = sum(item.fit_token_estimate for item in selected)
     metrics = {
@@ -333,9 +306,8 @@ def select_evidence(
             matching.append((candidate, witness))
         if not matching:
             continue
-        matching.sort(key=lambda pair: _assignment_preference(
-            requirement, pair[0], pair[1], length_dependent=config.result_kind != "patch_context",
-        ))
+        # All matches already satisfy the same exact obligation. Bind the first
+        # acquired witness; length, completeness and authority are not scores.
         candidate, witness = matching[0]
         if witness is not None:
             if witness.unit_char_start is None or witness.unit_char_end is None:

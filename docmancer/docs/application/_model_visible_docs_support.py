@@ -25,9 +25,9 @@ def _docs_source(item: dict[str, Any], *, evidence_id: str | None = None,
     )
     if isinstance(snippet, dict):
         snippet = snippet.get("code") or snippet.get("text") or snippet.get("content")
-    snippet = str(snippet or "").strip()
+    snippet = str(snippet or "")
     version = str(item.get("version_binding") or item.get("version") or item.get("requested_version") or "unversioned")
-    if (not path or not snippet or len(path) > 500 or len(section) > 300
+    if (not path or not snippet.strip() or len(path) > 500 or len(section) > 300
         or len(version) > 100):
         return None
     digest = public._source_digest(item)

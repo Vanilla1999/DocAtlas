@@ -19,7 +19,6 @@ class _RetrievalDispatcherPart01:
         self.vector_store = vector_store
         self.provider = _CachedQueryProvider(provider) if provider is not None else None
         self.collection = collection
-        self._auto_hierarchical_cache: bool | None = None
 
     def vector_readiness(self, mode: str | None = None) -> dict[str, Any]:
         """Return the versioned bounded public readiness contract."""
@@ -119,9 +118,7 @@ class _RetrievalDispatcherPart01:
                 "exact_supplement": "explicit-query-only-v1",
                 "intent_rerank": "retriever-order-preserved-v2",
                 "expand": retrieval_expand,
-                "max_sections_per_source": getattr(
-                    self.config.retrieval, "max_sections_per_source", None
-                ),
+                "max_sections_per_source": None,
             },
         })
         if q_active:
@@ -223,18 +220,6 @@ class _RetrievalDispatcherPart01:
                 failures=ready_failure,
             ))
 
-        hierarchical = getattr(self.config.retrieval, "hierarchical", None)
-        if hierarchical is not None and self._hierarchical_active(hierarchical):
-            return finalized(self._run_hierarchical(
-                query=query,
-                mode=effective_mode,
-                limit=limit,
-                budget=budget,
-                filters=merged_filters,
-                expand=retrieval_expand,
-                allow_degraded=allow_degraded,
-            ))
-
         candidate_lists, raw_counts, failures = self._fan_out(
             query=query,
             mode=effective_mode,
@@ -292,6 +277,12 @@ class _RetrievalDispatcherPart01:
         chunks = self._hydrate_policy_filtered(
             section_ids, budget=budget, filters=merged_filters,
         )
+        scores_by_section = {
+            hydration_by_stable[stable_id]: score
+            for stable_id, score, _ in ranked if stable_id in hydration_by_stable
+        }
+        for chunk in chunks:
+            chunk.score = scores_by_section.get(chunk.metadata.get("section_id"), 0.0)
         chunks = self._filter_chunks(chunks, merged_filters)
         chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
         chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
@@ -303,36 +294,6 @@ class _RetrievalDispatcherPart01:
             candidate_counts=raw_counts,
             failures=failures,
         ))
-
-    def _hierarchical_active(self, hcfg: Any) -> bool:
-        """Decide whether to run the two-stage hierarchical pass for this call.
-
-        Explicit ``enabled=True`` always wins. Otherwise, when ``auto`` is
-        on, fall back to a corpus-size heuristic: enable when the index
-        contains at least ``auto_min_documents`` distinct documents. Below
-        that threshold the extra round-trip costs latency without gaining
-        recall (you'd select every document anyway).
-        """
-        if getattr(hcfg, "enabled", False):
-            return True
-        if not getattr(hcfg, "auto", False):
-            return False
-        if self._auto_hierarchical_cache is not None:
-            return self._auto_hierarchical_cache
-        threshold = int(getattr(hcfg, "auto_min_documents", 10))
-        try:
-            distinct = int(self.store.distinct_document_count())
-        except Exception:
-            distinct = 0
-        active = distinct >= threshold
-        self._auto_hierarchical_cache = active
-        if active:
-            logger.debug(
-                "hierarchical retrieval auto-enabled (%d distinct documents >= %d)",
-                distinct,
-                threshold,
-            )
-        return active
 
     def _vector_readiness_failure(self, mode: str) -> dict[str, str]:
         if mode == "lexical" or self.vector_store is None or not self.collection:
@@ -428,160 +389,6 @@ class _RetrievalDispatcherPart01:
             "dim": metadata.dim,
             "sparse_model": metadata.sparse_model,
         }
-
-    def _run_hierarchical(
-        self,
-        *,
-        query: str,
-        mode: str,
-        limit: int,
-        budget: int,
-        filters: dict | None,
-        expand: str | None,
-        allow_degraded: bool = False,
-    ) -> DispatchResult:
-        """Two-stage retrieval: top documents first, then top sections inside them."""
-        hcfg = self.config.retrieval.hierarchical
-        candidate_pool = min(40, int(hcfg.candidate_pool))
-        backend_filters = compile_backend_filters(filters) or None
-        ready_failure = self._vector_readiness_failure(mode)
-        if ready_failure and not allow_degraded:
-            raise HybridRetrievalError(ready_failure)
-
-        # Stage 1: cast a wide net and aggregate by document_title_hash.
-        stage1_candidates, stage1_counts, stage1_failures = self._fan_out(
-            query=query,
-            mode=mode,
-            per_source_limit=candidate_pool,
-            filters=backend_filters,
-            verification_filters=filters,
-        )
-        if stage1_failures and mode != "lexical" and not allow_degraded:
-            raise HybridRetrievalError(stage1_failures)
-        if not stage1_candidates:
-            if not stage1_failures:
-                return DispatchResult(
-                    chunks=[],
-                    mode_used=mode,
-                    candidate_counts=stage1_counts,
-                )
-            query_limit = self._candidate_limit_for_diversity(limit, expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=expand, filters=backend_filters)
-            chunks = self._filter_chunks(chunks, filters)
-            chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=expand, backend_filters=backend_filters, verification_filters=filters)
-            chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
-            return DispatchResult(
-                chunks=chunks,
-                mode_used=f"{mode}/lexical_fallback_degraded",
-                candidate_counts=stage1_counts,
-                failures=stage1_failures,
-            )
-
-        doc_scores: dict[str, float] = {}
-        for source, shaped in stage1_candidates.items():
-            payload_lookup = self._payload_lookup_for(source, shaped)
-            for rank, hit in enumerate(shaped, start=1):
-                sid = int(hit["hydration_id"])
-                doc_hash = payload_lookup.get(sid, "")
-                if not doc_hash:
-                    continue
-                doc_scores[doc_hash] = doc_scores.get(doc_hash, 0.0) + 1.0 / (60 + rank)
-
-        if not doc_scores:
-            # No payloads carry document_title_hash (e.g. mixed corpus where
-            # only some loaders set it). Fall through to a flat fusion.
-            return self._fuse_and_hydrate(
-                stage1_candidates, query=query, limit=limit, budget=budget,
-                expand=expand, counts=stage1_counts, mode=mode, filters=filters,
-                failures=stage1_failures,
-            )
-
-        top_docs = [h for h, _ in sorted(doc_scores.items(), key=lambda kv: kv[1], reverse=True)[: hcfg.documents_limit]]
-
-        # Stage 2: re-retrieve dense + sparse filtered to those documents.
-        stage2_filters = dict(filters or {})
-        stage2_filters["document_title_hash"] = {"in": top_docs}
-        stage2_candidates, stage2_counts, stage2_failures = self._fan_out(
-            query=query,
-            mode=mode,
-            per_source_limit=min(
-                40, max(limit * 3, hcfg.sections_per_document * hcfg.documents_limit)
-            ),
-            filters=compile_backend_filters(stage2_filters),
-            verification_filters=stage2_filters,
-        )
-        if stage2_failures and mode != "lexical" and not allow_degraded:
-            raise HybridRetrievalError(stage2_failures)
-        combined_failures = {
-            **stage1_failures,
-            **{f"{key}.stage2": value for key, value in stage2_failures.items()},
-        }
-        if not stage2_candidates:
-            return self._fuse_and_hydrate(
-                stage1_candidates, query=query, limit=limit, budget=budget,
-                expand=expand, counts=stage1_counts, mode=mode, filters=filters,
-                failures=combined_failures,
-            )
-        return self._fuse_and_hydrate(
-            stage2_candidates,
-            query=query,
-            limit=limit,
-            budget=budget,
-            expand=expand,
-            counts={**stage1_counts, **{f"{k}.stage2": v for k, v in stage2_counts.items()}},
-            mode=f"{mode}/hierarchical",
-            filters=stage2_filters,
-            failures=combined_failures,
-        )
-
-    def _fuse_and_hydrate(
-        self,
-        candidate_lists: dict[str, list[Any]],
-        *,
-        query: str,
-        limit: int,
-        budget: int,
-        expand: str | None,
-        counts: dict[str, int],
-        mode: str,
-        filters: dict | None,
-        failures: dict[str, str] | None = None,
-    ) -> DispatchResult:
-        failures = dict(failures or {})
-        ranked = self._rank_candidate_lists(candidate_lists)[:60]
-        hydration_by_stable = self._hydration_by_stable(candidate_lists)
-        section_ids = self._top_section_ids(
-            ranked,
-            hydration_by_stable=hydration_by_stable,
-            limit=self._candidate_limit_for_diversity(limit, expand),
-        )
-        contributions = {
-            hydration_by_stable[stable_id]: dict(component_ranks)
-            for stable_id, _score, component_ranks in ranked
-            if stable_id in hydration_by_stable
-            and hydration_by_stable[stable_id] in section_ids
-        }
-        if (expand or "").lower() in {"adjacent", "page"}:
-            section_ids = self._expand_section_ids(
-                section_ids, mode=expand, budget_cap=limit * 3
-            )
-        chunks = self._hydrate_policy_filtered(
-            section_ids, budget=budget, filters=filters,
-        )
-        chunks = self._filter_chunks(chunks, filters)
-        chunks = self._append_api_term_matches(
-            query, chunks, budget=budget, expand=expand,
-            backend_filters=compile_backend_filters(filters),
-            verification_filters=filters,
-        )
-        chunks = self._limit_sections_per_source(chunks, limit=limit, expand=expand)
-        return DispatchResult(
-            chunks=chunks,
-            contributions=contributions,
-            mode_used=self._degraded_mode_name(mode, candidate_lists, failures),
-            candidate_counts=counts,
-            failures=failures,
-        )
 
     def _apply_router(self, query: str, filters: dict | None) -> dict | None:
         """Compatibility hook: only explicit filters select retrieval scope."""
