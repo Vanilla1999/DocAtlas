@@ -1,0 +1,1944 @@
+{
+  "cases": [
+    {
+      "case_id": "V40-P03",
+      "question": "How are Poetry configuration setting names converted into environment variable names?",
+      "stages": [
+        {
+          "sequence": 1,
+          "stage": "_search_rows.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 2,
+          "stage": "acquire_candidates.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 170,
+          "stage": "_search_rows.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 171,
+          "stage": "acquire_candidates.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 673,
+          "stage": "select_experimental_candidates.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 675,
+          "stage": "project_native_rank_context.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 676,
+          "stage": "project_docs_context.output",
+          "count": 167,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": true,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 515,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 846,
+          "stage": "enforce_experimental_context_budget.output",
+          "count": 42,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": false,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 442,
+                        "missing_char_ranges": [
+                          [
+                            3247,
+                            3320
+                          ]
+                        ],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-P03/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "original_final_scores": {
+        "native": {
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": false,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 442,
+                        "missing_char_ranges": [
+                          [
+                            3247,
+                            3320
+                          ]
+                        ],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-P03/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        },
+        "packed": {
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-P03/required/set-0/part-0",
+                        "path": "docs/configuration.md",
+                        "line_start": 102,
+                        "line_end": 114,
+                        "covered": false,
+                        "char_start": 2805,
+                        "char_end": 3320,
+                        "expected_characters": 515,
+                        "covered_characters": 442,
+                        "missing_char_ranges": [
+                          [
+                            3247,
+                            3320
+                          ]
+                        ],
+                        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+                        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-P03/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        }
+      },
+      "metadata": {
+        "case_id": "V40-P03",
+        "variant": "V0",
+        "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+        "family": "0-poetry",
+        "public_request": {
+          "question": "How are Poetry configuration setting names converted into environment variable names?",
+          "project_path": "/tmp/opencode/docatlas-two-loss-boundaries-20261013/0-poetry/project",
+          "scope": "project"
+        },
+        "status": "returned",
+        "model_calls": 0,
+        "integrity_errors": [],
+        "raw_sha256": "78d786e2310851d4b7f72206877959096fd7bc686c2ac92fb69a9656f98bd17a",
+        "utf8_bytes": 40407,
+        "tokens": 12594,
+        "seconds": 41.44403225300266,
+        "cpu_seconds": 41.390775925999996,
+        "peak_rss_kib": 217680,
+        "database_unchanged": true,
+        "files_unchanged": true
+      },
+      "witness_overlapping_rows": [
+        {
+          "evidence_id": "ev-1d094ee53f386aed",
+          "rank": 10,
+          "public": {
+            "evidence_id": "ev-1d094ee53f386aed",
+            "path_or_url": "docs/configuration.md",
+            "section": "Configuration > Using environment variables",
+            "snippet": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n",
+            "version_binding": "unversioned",
+            "content_sha256": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+            "project_identity": "local:ae59cb84017224fcd999daa071fecac62c9b390af9d1cd75c40380ed9ebd03c6",
+            "line_start": 102,
+            "line_end": 111,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/a7b95fdba276833e461bdc1d"
+          },
+          "binding": {
+            "source_key": "1f65c4fdd4f53266d6d27094",
+            "source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "candidate_key": "0af7f845acfe35e38ca818a1",
+            "reference_char_start": 2805,
+            "reference_char_end": 3247,
+            "evidence_id": "ev-1d094ee53f386aed",
+            "line_start": 102,
+            "line_end": 111,
+            "visible_char_start": 2805,
+            "visible_char_end": 3247,
+            "visible_span_observation": "exact_occurrence",
+            "snippet_sha256": "b41f32dda72225c91cf43dc88a6873e6da713da3855b245739cabec5397709da",
+            "snippet_characters": 442,
+            "snippet_hash_observation": "recorded"
+          },
+          "raw_source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "exact_verified_intervals": [
+            [
+              2805,
+              3247
+            ]
+          ]
+        },
+        {
+          "evidence_id": "ev-bc19b335e39deece",
+          "rank": 74,
+          "public": {
+            "evidence_id": "ev-bc19b335e39deece",
+            "path_or_url": "docs/configuration.md",
+            "section": "Configuration > Using environment variables",
+            "snippet": "```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n\nThis also works for secret settings, like credentials:\n\n```bash\nexport POETRY_HTTP_BASIC_MY_REPOSITORY_PASSWORD=secret\n```\n\n",
+            "version_binding": "unversioned",
+            "content_sha256": "53729a5679d2417c06063137e7bfdb90154389bd1563ec1c4920924f9e14f8af",
+            "project_identity": "local:ae59cb84017224fcd999daa071fecac62c9b390af9d1cd75c40380ed9ebd03c6",
+            "line_start": 112,
+            "line_end": 121,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/cf63db8f817360e22a17eb1c"
+          },
+          "binding": {
+            "source_key": "1f65c4fdd4f53266d6d27094",
+            "source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+            "candidate_key": "6db5d7ae7ed0335efdfe3433",
+            "reference_char_start": 3247,
+            "reference_char_end": 3446,
+            "evidence_id": "ev-bc19b335e39deece",
+            "line_start": 112,
+            "line_end": 121,
+            "visible_char_start": 3247,
+            "visible_char_end": 3446,
+            "visible_span_observation": "exact_occurrence",
+            "snippet_sha256": "5c7af9651799241fe6a73013580691e0f3aed2179eeeaa0a7f2ef75e47116689",
+            "snippet_characters": 199,
+            "snippet_hash_observation": "recorded"
+          },
+          "raw_source_sha256": "d42823b26bb63d5a1db3c5c6fef14429499c07383fafd9e75704bc7130ffa810",
+          "exact_verified_intervals": [
+            [
+              3247,
+              3446
+            ]
+          ]
+        }
+      ],
+      "budget_cost_observations": {
+        "ev-1d094ee53f386aed": [
+          {
+            "sequence": 687,
+            "stage": "budget.cost",
+            "cost": 2956,
+            "cap": 12000,
+            "over_cap": false,
+            "option": {
+              "evidence_id": "ev-1d094ee53f386aed",
+              "path_or_url": "docs/configuration.md",
+              "section": "Configuration > Using environment variables",
+              "snippet": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n",
+              "version_binding": "unversioned",
+              "content_sha256": "c644258651501101e3a9b8db8a150a5a34b5b09e23f9dc2ea90033cd9ec2703e",
+              "project_identity": "local:ae59cb84017224fcd999daa071fecac62c9b390af9d1cd75c40380ed9ebd03c6",
+              "line_start": 102,
+              "line_end": 111,
+              "authority": "source_of_truth",
+              "scope": "project",
+              "source_uri": "docatlas://source/a7b95fdba276833e461bdc1d"
+            },
+            "option_index": 0,
+            "selected_ids": [
+              "ev-6f3e4757dfa09dd9",
+              "ev-17950dbbb0523646",
+              "ev-7c96650d5ca3967f",
+              "ev-cd09d702fed84063",
+              "ev-8829a96c64cf2f79",
+              "ev-ddf5cac6599b4560",
+              "ev-181cef70272e406a",
+              "ev-6500a87492ebdea1",
+              "ev-bf1b9336e7d6dfa3"
+            ]
+          }
+        ],
+        "ev-bc19b335e39deece": [
+          {
+            "sequence": 751,
+            "stage": "budget.cost",
+            "cost": 12130,
+            "cap": 12000,
+            "over_cap": true,
+            "option": {
+              "evidence_id": "ev-bc19b335e39deece",
+              "path_or_url": "docs/configuration.md",
+              "section": "Configuration > Using environment variables",
+              "snippet": "```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n\nThis also works for secret settings, like credentials:\n\n```bash\nexport POETRY_HTTP_BASIC_MY_REPOSITORY_PASSWORD=secret\n```\n\n",
+              "version_binding": "unversioned",
+              "content_sha256": "53729a5679d2417c06063137e7bfdb90154389bd1563ec1c4920924f9e14f8af",
+              "project_identity": "local:ae59cb84017224fcd999daa071fecac62c9b390af9d1cd75c40380ed9ebd03c6",
+              "line_start": 112,
+              "line_end": 121,
+              "authority": "source_of_truth",
+              "scope": "project",
+              "source_uri": "docatlas://source/cf63db8f817360e22a17eb1c"
+            },
+            "option_index": 0,
+            "selected_ids": [
+              "ev-6f3e4757dfa09dd9",
+              "ev-17950dbbb0523646",
+              "ev-7c96650d5ca3967f",
+              "ev-cd09d702fed84063",
+              "ev-8829a96c64cf2f79",
+              "ev-ddf5cac6599b4560",
+              "ev-181cef70272e406a",
+              "ev-6500a87492ebdea1",
+              "ev-bf1b9336e7d6dfa3",
+              "ev-1d094ee53f386aed",
+              "ev-1110aed37ea40253",
+              "ev-e9973ae8d0105d79",
+              "ev-260b9f7eb3d8b65b",
+              "ev-34a1267267285823",
+              "ev-a8cc1a27245fc1d6",
+              "ev-dd608024226ad371",
+              "ev-cb200752066c619b",
+              "ev-14672c14bc737a3d",
+              "ev-a136b932e5c810c7",
+              "ev-72846196decb9a4b",
+              "ev-990f875c5e112c61",
+              "ev-cd19736033b8f840",
+              "ev-1d3e25255846d828",
+              "ev-1336fd8bc7ca7fa6",
+              "ev-e1c87eed8e7fd45a",
+              "ev-a56f02ccd7fcde26",
+              "ev-ce2b85df9fc526f7",
+              "ev-791b498b9ac1c038",
+              "ev-5473fe9f4a15fab9",
+              "ev-e86ff36740324819",
+              "ev-d25a5608222ae303",
+              "ev-53ce980197a577e6",
+              "ev-52d8de20a433db06",
+              "ev-a726e720c2c77a68",
+              "ev-de66c5419917c77b",
+              "ev-75450ce9c6022be0",
+              "ev-765b000250c2fdc8",
+              "ev-913c296fdf363c1a",
+              "ev-19b5fdf25a29fa24",
+              "ev-ad6b09fe054edd04",
+              "ev-646b09387acf7bac",
+              "ev-c4db4c202644e3f3"
+            ]
+          }
+        ]
+      },
+      "budget_ledger": {
+        "sequence": 847,
+        "stage": "budget.ledger",
+        "ledger": {
+          "limit": 12000,
+          "input_cost": 47901,
+          "measure": "max(o200k_base,utf8_bytes_div4)_mcp_json",
+          "attempts": 167,
+          "omitted_evidence_ids": [
+            "ev-dfd5b8bf8c3035e1",
+            "ev-0c6f6a4d655d21b3",
+            "ev-6a3fafd435c5557d",
+            "ev-7326b3fb57c7ab90",
+            "ev-f94a5879f9e18385",
+            "ev-7780f99b9d5a445f",
+            "ev-1916172d23fed9e8",
+            "ev-d925fc251a8720e3",
+            "ev-cea7366977baf73d",
+            "ev-49edc00e5a2772b3",
+            "ev-f2b32c0bf4105e94",
+            "ev-9439f9623e025745",
+            "ev-48684532f6669d5c",
+            "ev-c1c6217a827b6923",
+            "ev-145f5cf0f480dd75",
+            "ev-09a7e0f6dd265c2b",
+            "ev-c67c4c62623963a9",
+            "ev-6fbeeff40707ca63",
+            "ev-bac97e2b76c85b3b",
+            "ev-6a42330436a9caab",
+            "ev-59b8ede1de1223c1",
+            "ev-d731c43b143cc194",
+            "ev-0bf93bae1a751ee7",
+            "ev-81b6be7fd94e4a87",
+            "ev-ad405afe428a745f",
+            "ev-f270b921473a74f8",
+            "ev-39347247ec88a2a4",
+            "ev-222961ce38d0deb0",
+            "ev-b1a62784e3048283",
+            "ev-77328f458a9cdf82",
+            "ev-4ebb2c558c4e5759",
+            "ev-bc19b335e39deece",
+            "ev-fa981ca04ca0d1d7",
+            "ev-4ba898d335bea67a",
+            "ev-fbecfc8f66a4e8e3",
+            "ev-249e1a9fb74a2876",
+            "ev-adf4ce36969235e2",
+            "ev-98cbe80c8391bc79",
+            "ev-6e555064fbb3ce7f",
+            "ev-b19c3afc91062375",
+            "ev-85a4912120cd86f5",
+            "ev-113c551d8fb30494",
+            "ev-d674d74589084290",
+            "ev-a8bccb5abae8024f",
+            "ev-8ee9b65a921bdefc",
+            "ev-88bb77f40588983d",
+            "ev-3a227b33c7d6ea99",
+            "ev-9b597aeebd1a6911",
+            "ev-15465f4ff5200a9d",
+            "ev-741356ff5b08ce5c",
+            "ev-691d9ff25130b06c",
+            "ev-ff635cd6dda7c9a8",
+            "ev-1c2c1e18a7bfa3c7",
+            "ev-00eb4489574c9597",
+            "ev-7681fbab11c61f9b",
+            "ev-238a8ae9e67fa84c",
+            "ev-0ceee1c6b57c3a0c",
+            "ev-ba6ae68591bdb264",
+            "ev-db209c9a47ed18a2",
+            "ev-c829df589cf6205c",
+            "ev-5b80b70054cb9f6e",
+            "ev-a288213aba1f2177",
+            "ev-4ef83b50bc71751f",
+            "ev-3f1b5472db09c5ce"
+          ],
+          "native_fallbacks": 0,
+          "output_cost": 11882,
+          "omitted_source_count": 125,
+          "source_count": 42,
+          "read_next_omitted": false
+        },
+        "all_omitted_evidence_ids": [
+          "ev-dfd5b8bf8c3035e1",
+          "ev-0c6f6a4d655d21b3",
+          "ev-6a3fafd435c5557d",
+          "ev-7326b3fb57c7ab90",
+          "ev-f94a5879f9e18385",
+          "ev-7780f99b9d5a445f",
+          "ev-1916172d23fed9e8",
+          "ev-d925fc251a8720e3",
+          "ev-cea7366977baf73d",
+          "ev-49edc00e5a2772b3",
+          "ev-f2b32c0bf4105e94",
+          "ev-9439f9623e025745",
+          "ev-48684532f6669d5c",
+          "ev-c1c6217a827b6923",
+          "ev-145f5cf0f480dd75",
+          "ev-09a7e0f6dd265c2b",
+          "ev-c67c4c62623963a9",
+          "ev-6fbeeff40707ca63",
+          "ev-bac97e2b76c85b3b",
+          "ev-6a42330436a9caab",
+          "ev-59b8ede1de1223c1",
+          "ev-d731c43b143cc194",
+          "ev-0bf93bae1a751ee7",
+          "ev-81b6be7fd94e4a87",
+          "ev-ad405afe428a745f",
+          "ev-f270b921473a74f8",
+          "ev-39347247ec88a2a4",
+          "ev-222961ce38d0deb0",
+          "ev-b1a62784e3048283",
+          "ev-77328f458a9cdf82",
+          "ev-4ebb2c558c4e5759",
+          "ev-bc19b335e39deece",
+          "ev-fa981ca04ca0d1d7",
+          "ev-4ba898d335bea67a",
+          "ev-fbecfc8f66a4e8e3",
+          "ev-249e1a9fb74a2876",
+          "ev-adf4ce36969235e2",
+          "ev-98cbe80c8391bc79",
+          "ev-6e555064fbb3ce7f",
+          "ev-b19c3afc91062375",
+          "ev-85a4912120cd86f5",
+          "ev-113c551d8fb30494",
+          "ev-d674d74589084290",
+          "ev-a8bccb5abae8024f",
+          "ev-8ee9b65a921bdefc",
+          "ev-88bb77f40588983d",
+          "ev-3a227b33c7d6ea99",
+          "ev-9b597aeebd1a6911",
+          "ev-15465f4ff5200a9d",
+          "ev-741356ff5b08ce5c",
+          "ev-691d9ff25130b06c",
+          "ev-ff635cd6dda7c9a8",
+          "ev-1c2c1e18a7bfa3c7",
+          "ev-00eb4489574c9597",
+          "ev-7681fbab11c61f9b",
+          "ev-238a8ae9e67fa84c",
+          "ev-0ceee1c6b57c3a0c",
+          "ev-ba6ae68591bdb264",
+          "ev-db209c9a47ed18a2",
+          "ev-c829df589cf6205c",
+          "ev-5b80b70054cb9f6e",
+          "ev-a288213aba1f2177",
+          "ev-4ef83b50bc71751f",
+          "ev-3f1b5472db09c5ce",
+          "ev-611a749b32f1e2b8",
+          "ev-cba8d081c75a9019",
+          "ev-5d67551141e1cd4b",
+          "ev-289132929d4d1973",
+          "ev-ab0ccc47ff5311df",
+          "ev-6e4719ded4a6406a",
+          "ev-520fe0f2bf86d8a8",
+          "ev-c458bcde767ddece",
+          "ev-d87aaabd6588d936",
+          "ev-df20b3745559b487",
+          "ev-1d973fb15c9cd953",
+          "ev-2600a75fbaf0b29d",
+          "ev-33a9744c7421b360",
+          "ev-5adabe889371b2ce",
+          "ev-af737cc19ace84b6",
+          "ev-fee8883c82fef956",
+          "ev-a7a48ab2d66adae8",
+          "ev-c850ea82f78d254c",
+          "ev-891aa46a011ae30a",
+          "ev-a5afe36862ddcc4d",
+          "ev-540dc5b042aa10fb",
+          "ev-767734cc0628334e",
+          "ev-f716eabb385268d1",
+          "ev-1675ba18c8c0f254",
+          "ev-8b88c55bc38b80f5",
+          "ev-1825fc4fdfbfeb3c",
+          "ev-ab690c268df2f1c1",
+          "ev-fcee21a009a2636b",
+          "ev-0d8116709cc6129c",
+          "ev-fdae690acbdd1f77",
+          "ev-665cdca5b363c54c",
+          "ev-a07d01f686b79cb6",
+          "ev-f077c21a598a73a8",
+          "ev-03f1e4eac07e07aa",
+          "ev-3234191e25ff3bab",
+          "ev-dff6331e181d40fe",
+          "ev-a21684688e26b3db",
+          "ev-29bfbf104aad56e1",
+          "ev-204ee30696e0f0c1",
+          "ev-004ca18886be9ad8",
+          "ev-b16dee125ad3bebe",
+          "ev-b84ad59f3fd2a9c9",
+          "ev-a00dc41ea601fd4d",
+          "ev-d00e8eaf348d229c",
+          "ev-e67a7a4e8c15da46",
+          "ev-8fad1a4d46208e72",
+          "ev-49c059c824531754",
+          "ev-ac563cd9dcf85b99",
+          "ev-c1dec4e24ec7dc20",
+          "ev-b674c258c8abc3fc",
+          "ev-0738cc04414ab729",
+          "ev-477aa6a68aaabbae",
+          "ev-18c643e23d1781d7",
+          "ev-bd89ebc5925e6258",
+          "ev-3f5d21e31fcad47d",
+          "ev-2e3fde4bcf91eabd",
+          "ev-967706b29497f786",
+          "ev-f372197363a000cb",
+          "ev-00466110010ca676",
+          "ev-6adc6882b639924c",
+          "ev-78f198dc5f92026f"
+        ]
+      },
+      "independently_proven_loss": "terminal_public_DTO_budget",
+      "previous_output_comparison": {
+        "old_count": 42,
+        "new_count": 42,
+        "removed_count": 1,
+        "added_count": 1,
+        "identical_normalized_rows": false,
+        "root_path_character_delta": 3
+      },
+      "observer_errors": [],
+      "observer_omitted_events": 0
+    },
+    {
+      "case_id": "V40-E01",
+      "question": "Which filenames can ESLint use for its flat configuration file?",
+      "stages": [
+        {
+          "sequence": 1,
+          "stage": "_search_rows.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 2,
+          "stage": "acquire_candidates.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 259,
+          "stage": "_search_rows.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 260,
+          "stage": "acquire_candidates.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 1029,
+          "stage": "select_experimental_candidates.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 1031,
+          "stage": "project_native_rank_context.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 1032,
+          "stage": "project_docs_context.output",
+          "count": 256,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": true,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": true,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": true,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 557,
+                        "missing_char_ranges": [],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 1,
+            "all_documented_claims_covered": true,
+            "missing_documented_claim_ids": [],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [],
+            "errors": []
+          }
+        },
+        {
+          "sequence": 1291,
+          "stage": "enforce_experimental_context_budget.output",
+          "count": 39,
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": false,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 0,
+                        "missing_char_ranges": [
+                          [
+                            584,
+                            1141
+                          ]
+                        ],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-E01/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        }
+      ],
+      "original_final_scores": {
+        "native": {
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": false,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 0,
+                        "missing_char_ranges": [
+                          [
+                            584,
+                            1141
+                          ]
+                        ],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-E01/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        },
+        "packed": {
+          "integrity_errors": [],
+          "original_gold": {
+            "claims": [
+              {
+                "claim_id": "required",
+                "documented": true,
+                "covered": false,
+                "witness_sets": [
+                  {
+                    "set_index": 0,
+                    "covered": false,
+                    "parts": [
+                      {
+                        "witness_id": "V40-E01/required/set-0/part-0",
+                        "path": "docs/src/use/configure/configuration-files.md",
+                        "line_start": 19,
+                        "line_end": 30,
+                        "covered": false,
+                        "char_start": 584,
+                        "char_end": 1141,
+                        "expected_characters": 557,
+                        "covered_characters": 0,
+                        "missing_char_ranges": [
+                          [
+                            584,
+                            1141
+                          ]
+                        ],
+                        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+                        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "required_claim_count": 1,
+            "documented_claim_count": 1,
+            "covered_documented_claim_count": 0,
+            "all_documented_claims_covered": false,
+            "missing_documented_claim_ids": [
+              "required"
+            ],
+            "unavailable_requested_claim_ids": [],
+            "missing_witness_ids": [
+              "V40-E01/required/set-0/part-0"
+            ],
+            "errors": []
+          }
+        }
+      },
+      "metadata": {
+        "case_id": "V40-E01",
+        "variant": "V0",
+        "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+        "family": "0-eslint",
+        "public_request": {
+          "question": "Which filenames can ESLint use for its flat configuration file?",
+          "project_path": "/tmp/opencode/docatlas-two-loss-boundaries-20261013/0-eslint/project",
+          "scope": "project"
+        },
+        "status": "returned",
+        "model_calls": 0,
+        "integrity_errors": [],
+        "raw_sha256": "d3d1eaeda8367d6d4a133bd0df21718d7e25f387e0c0110754388b2c8625a452",
+        "utf8_bytes": 39850,
+        "tokens": 12493,
+        "seconds": 56.71980586900099,
+        "cpu_seconds": 56.681766921,
+        "peak_rss_kib": 234500,
+        "database_unchanged": true,
+        "files_unchanged": true
+      },
+      "witness_overlapping_rows": [
+        {
+          "evidence_id": "ev-5c6bbebd7528a899",
+          "rank": 137,
+          "public": {
+            "evidence_id": "ev-5c6bbebd7528a899",
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "section": "Configuration File",
+            "snippet": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\n",
+            "version_binding": "unversioned",
+            "content_sha256": "9eb7c8b9269e53ad7d7878505d045d4e4be69e3c013a6ebc9533064a76cb78b4",
+            "project_identity": "local:4d47e5d3e1e4ec1470396d685c017ad2497ddd68bd296baaa83a5a876935d5a4",
+            "line_start": 19,
+            "line_end": 29,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/93ef1931cfdafa72f5e89a0a"
+          },
+          "binding": {
+            "source_key": "a23e248282edcf62345f9f06",
+            "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "candidate_key": "16b38ed6ed37b9b1802bd692",
+            "reference_char_start": 584,
+            "reference_char_end": 993,
+            "evidence_id": "ev-5c6bbebd7528a899",
+            "line_start": 19,
+            "line_end": 29,
+            "visible_char_start": 584,
+            "visible_char_end": 993,
+            "visible_span_observation": "exact_occurrence",
+            "snippet_sha256": "806e04ca3f9cec0dccecd0879ffdb4d8909a546cd0e6d8710f98fc8e62a69afb",
+            "snippet_characters": 409,
+            "snippet_hash_observation": "recorded"
+          },
+          "raw_source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "exact_verified_intervals": [
+            [
+              584,
+              993
+            ]
+          ]
+        },
+        {
+          "evidence_id": "ev-89e1fc3914826849",
+          "rank": 141,
+          "public": {
+            "evidence_id": "ev-89e1fc3914826849",
+            "path_or_url": "docs/src/use/configure/configuration-files.md",
+            "section": "Configuration File",
+            "snippet": "It should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+            "version_binding": "unversioned",
+            "content_sha256": "a5e80f6378b8b248cc2d87e3d5499ae0bda2c6bc717a435a5b5212eaac45ecad",
+            "project_identity": "local:4d47e5d3e1e4ec1470396d685c017ad2497ddd68bd296baaa83a5a876935d5a4",
+            "line_start": 30,
+            "line_end": 45,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/71f475f1bcc6207065ec1644"
+          },
+          "binding": {
+            "source_key": "a23e248282edcf62345f9f06",
+            "source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+            "candidate_key": "eda81107bbd7bdc2c8581a27",
+            "reference_char_start": 993,
+            "reference_char_end": 1324,
+            "evidence_id": "ev-89e1fc3914826849",
+            "line_start": 30,
+            "line_end": 45,
+            "visible_char_start": 993,
+            "visible_char_end": 1324,
+            "visible_span_observation": "exact_occurrence",
+            "snippet_sha256": "2df6394c74e954a23c3660fc0505a1f190571772f63282e05a9bb26dcb46e4d4",
+            "snippet_characters": 331,
+            "snippet_hash_observation": "recorded"
+          },
+          "raw_source_sha256": "59290b53aa9d4a63e830090e72433db12a71407c70895f1554fc218c18373c7d",
+          "exact_verified_intervals": [
+            [
+              993,
+              1324
+            ]
+          ]
+        }
+      ],
+      "budget_cost_observations": {
+        "ev-5c6bbebd7528a899": [
+          {
+            "sequence": 1170,
+            "stage": "budget.cost",
+            "cost": 12139,
+            "cap": 12000,
+            "over_cap": true,
+            "option": {
+              "evidence_id": "ev-5c6bbebd7528a899",
+              "path_or_url": "docs/src/use/configure/configuration-files.md",
+              "section": "Configuration File",
+              "snippet": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\n",
+              "version_binding": "unversioned",
+              "content_sha256": "9eb7c8b9269e53ad7d7878505d045d4e4be69e3c013a6ebc9533064a76cb78b4",
+              "project_identity": "local:4d47e5d3e1e4ec1470396d685c017ad2497ddd68bd296baaa83a5a876935d5a4",
+              "line_start": 19,
+              "line_end": 29,
+              "authority": "source_of_truth",
+              "scope": "project",
+              "source_uri": "docatlas://source/93ef1931cfdafa72f5e89a0a"
+            },
+            "option_index": 0,
+            "selected_ids": [
+              "ev-721d3c5a26bd2d0c",
+              "ev-10882b7f442d3177",
+              "ev-58c39ed67c8077e4",
+              "ev-d1cc531dd015fdb4",
+              "ev-cebad7be79c66332",
+              "ev-5b38f3e33c763d63",
+              "ev-2f086b2e9954521a",
+              "ev-6dcd0af1ccd4efae",
+              "ev-4ae0d1e87c0692f9",
+              "ev-b499008d0daf44a6",
+              "ev-703533c0e0642a4d",
+              "ev-bcdc6fbc155ac027",
+              "ev-7358a16b23b554f0",
+              "ev-69afce3e74d91783",
+              "ev-2453cfa4034448ef",
+              "ev-a1075bc473e619dc",
+              "ev-586485fd1758877f",
+              "ev-b2e7893a70fa3f26",
+              "ev-93cfecdca0a7ed2c",
+              "ev-19e767c068f87ab1",
+              "ev-6f159ab215ba7c1b",
+              "ev-e52036081c3e85fb",
+              "ev-15ae24ab0d5c3566",
+              "ev-baaee07bbce43680",
+              "ev-7e771200c0369b2c",
+              "ev-24e252fca56ce9b2",
+              "ev-7a91a9ea0c8d17e8",
+              "ev-1a6ce65de2cef698",
+              "ev-b8e8f4ed7ef056b2",
+              "ev-4ba00ff6da8bab38",
+              "ev-3a80c4e80338c13c",
+              "ev-b41a33e148e2f466",
+              "ev-181b4c18435af1a4",
+              "ev-6b613fab1e5b6784",
+              "ev-7f27a52d3dab9acc",
+              "ev-26e3fd3b5dc209af",
+              "ev-f77386bf0ee18393",
+              "ev-951444dda2ad36fd",
+              "ev-31ba4c88b8cc5d87"
+            ]
+          }
+        ],
+        "ev-89e1fc3914826849": [
+          {
+            "sequence": 1174,
+            "stage": "budget.cost",
+            "cost": 12133,
+            "cap": 12000,
+            "over_cap": true,
+            "option": {
+              "evidence_id": "ev-89e1fc3914826849",
+              "path_or_url": "docs/src/use/configure/configuration-files.md",
+              "section": "Configuration File",
+              "snippet": "It should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: \"error\",\n\t\t\t\"prefer-const\": \"error\",\n\t\t},\n\t},\n]);\n```\n\n",
+              "version_binding": "unversioned",
+              "content_sha256": "a5e80f6378b8b248cc2d87e3d5499ae0bda2c6bc717a435a5b5212eaac45ecad",
+              "project_identity": "local:4d47e5d3e1e4ec1470396d685c017ad2497ddd68bd296baaa83a5a876935d5a4",
+              "line_start": 30,
+              "line_end": 45,
+              "authority": "source_of_truth",
+              "scope": "project",
+              "source_uri": "docatlas://source/71f475f1bcc6207065ec1644"
+            },
+            "option_index": 0,
+            "selected_ids": [
+              "ev-721d3c5a26bd2d0c",
+              "ev-10882b7f442d3177",
+              "ev-58c39ed67c8077e4",
+              "ev-d1cc531dd015fdb4",
+              "ev-cebad7be79c66332",
+              "ev-5b38f3e33c763d63",
+              "ev-2f086b2e9954521a",
+              "ev-6dcd0af1ccd4efae",
+              "ev-4ae0d1e87c0692f9",
+              "ev-b499008d0daf44a6",
+              "ev-703533c0e0642a4d",
+              "ev-bcdc6fbc155ac027",
+              "ev-7358a16b23b554f0",
+              "ev-69afce3e74d91783",
+              "ev-2453cfa4034448ef",
+              "ev-a1075bc473e619dc",
+              "ev-586485fd1758877f",
+              "ev-b2e7893a70fa3f26",
+              "ev-93cfecdca0a7ed2c",
+              "ev-19e767c068f87ab1",
+              "ev-6f159ab215ba7c1b",
+              "ev-e52036081c3e85fb",
+              "ev-15ae24ab0d5c3566",
+              "ev-baaee07bbce43680",
+              "ev-7e771200c0369b2c",
+              "ev-24e252fca56ce9b2",
+              "ev-7a91a9ea0c8d17e8",
+              "ev-1a6ce65de2cef698",
+              "ev-b8e8f4ed7ef056b2",
+              "ev-4ba00ff6da8bab38",
+              "ev-3a80c4e80338c13c",
+              "ev-b41a33e148e2f466",
+              "ev-181b4c18435af1a4",
+              "ev-6b613fab1e5b6784",
+              "ev-7f27a52d3dab9acc",
+              "ev-26e3fd3b5dc209af",
+              "ev-f77386bf0ee18393",
+              "ev-951444dda2ad36fd",
+              "ev-31ba4c88b8cc5d87"
+            ]
+          }
+        ]
+      },
+      "budget_ledger": {
+        "sequence": 1292,
+        "stage": "budget.ledger",
+        "ledger": {
+          "limit": 12000,
+          "input_cost": 73138,
+          "measure": "max(o200k_base,utf8_bytes_div4)_mcp_json",
+          "attempts": 256,
+          "omitted_evidence_ids": [
+            "ev-3e07da7a768e42b9",
+            "ev-d7d80f33db909fa7",
+            "ev-bf9528f2d92c5180",
+            "ev-ffd39a9ea48232b2",
+            "ev-278b8825723d3980",
+            "ev-9fc9a5bb61679485",
+            "ev-1028e0d6ce868c69",
+            "ev-ee7cab842e1fbd81",
+            "ev-43af312ae5fe9b3c",
+            "ev-969a87c004b106e2",
+            "ev-f68ebbc0587f030e",
+            "ev-4f2946baf0b533ac",
+            "ev-76deeb9a4588a334",
+            "ev-88c01b2cb6d8d472",
+            "ev-ddd4a581eb32a9f9",
+            "ev-ddf313848e7acce8",
+            "ev-0b8671c121cb9a8d",
+            "ev-547a501ebfa2fb32",
+            "ev-d5f8c5d3c002b996",
+            "ev-b03d30df4d6db8c0",
+            "ev-37013bfebe20c335",
+            "ev-267bb2bb1c9a14ba",
+            "ev-d7fc40b5e5e7d6ee",
+            "ev-f22a476a3c58efcb",
+            "ev-47d40f387f92c3ad",
+            "ev-e62ed3cc8e8be421",
+            "ev-85d3dd254553a209",
+            "ev-7883df13c881059e",
+            "ev-d3fcd0838501e2f6",
+            "ev-a49a8bc4b9751b04",
+            "ev-57af658425009b9e",
+            "ev-f823ef680b6857a8",
+            "ev-20ca7870c85a90bf",
+            "ev-6c0d84b98e0e4342",
+            "ev-54f6f8e978ebc898",
+            "ev-67805b242e60be67",
+            "ev-15cd7c9f89c3c7e6",
+            "ev-960758434c2e82b3",
+            "ev-4186b0813d65ef08",
+            "ev-82e7abe3910a3571",
+            "ev-615177b634667181",
+            "ev-c02f2db028df47e0",
+            "ev-33ad26a30543ca4c",
+            "ev-168fb737575f1d33",
+            "ev-68b136cb4a4a91b7",
+            "ev-724f4aa140d21d94",
+            "ev-cce362e32454549b",
+            "ev-e6df903898489c48",
+            "ev-b79cfeea39be12e4",
+            "ev-cf747e3f18b2fc55",
+            "ev-68ad3c32871c69bf",
+            "ev-38029c90d7c93f4c",
+            "ev-0896712287a23f89",
+            "ev-28f2d0f6f72e77c0",
+            "ev-8354f6ae356da7e2",
+            "ev-547807d903961531",
+            "ev-3ae4c70a23c56064",
+            "ev-4310c4a19581d52e",
+            "ev-b2a71afceae5bb19",
+            "ev-22d748c771250ff5",
+            "ev-2657e00e7ec02d34",
+            "ev-0d81c7057d56ae2f",
+            "ev-9b9f345a41312e27",
+            "ev-8c4f47c6bf8de25a"
+          ],
+          "native_fallbacks": 0,
+          "output_cost": 11829,
+          "omitted_source_count": 217,
+          "source_count": 39,
+          "read_next_omitted": false
+        },
+        "all_omitted_evidence_ids": [
+          "ev-3e07da7a768e42b9",
+          "ev-d7d80f33db909fa7",
+          "ev-bf9528f2d92c5180",
+          "ev-ffd39a9ea48232b2",
+          "ev-278b8825723d3980",
+          "ev-9fc9a5bb61679485",
+          "ev-1028e0d6ce868c69",
+          "ev-ee7cab842e1fbd81",
+          "ev-43af312ae5fe9b3c",
+          "ev-969a87c004b106e2",
+          "ev-f68ebbc0587f030e",
+          "ev-4f2946baf0b533ac",
+          "ev-76deeb9a4588a334",
+          "ev-88c01b2cb6d8d472",
+          "ev-ddd4a581eb32a9f9",
+          "ev-ddf313848e7acce8",
+          "ev-0b8671c121cb9a8d",
+          "ev-547a501ebfa2fb32",
+          "ev-d5f8c5d3c002b996",
+          "ev-b03d30df4d6db8c0",
+          "ev-37013bfebe20c335",
+          "ev-267bb2bb1c9a14ba",
+          "ev-d7fc40b5e5e7d6ee",
+          "ev-f22a476a3c58efcb",
+          "ev-47d40f387f92c3ad",
+          "ev-e62ed3cc8e8be421",
+          "ev-85d3dd254553a209",
+          "ev-7883df13c881059e",
+          "ev-d3fcd0838501e2f6",
+          "ev-a49a8bc4b9751b04",
+          "ev-57af658425009b9e",
+          "ev-f823ef680b6857a8",
+          "ev-20ca7870c85a90bf",
+          "ev-6c0d84b98e0e4342",
+          "ev-54f6f8e978ebc898",
+          "ev-67805b242e60be67",
+          "ev-15cd7c9f89c3c7e6",
+          "ev-960758434c2e82b3",
+          "ev-4186b0813d65ef08",
+          "ev-82e7abe3910a3571",
+          "ev-615177b634667181",
+          "ev-c02f2db028df47e0",
+          "ev-33ad26a30543ca4c",
+          "ev-168fb737575f1d33",
+          "ev-68b136cb4a4a91b7",
+          "ev-724f4aa140d21d94",
+          "ev-cce362e32454549b",
+          "ev-e6df903898489c48",
+          "ev-b79cfeea39be12e4",
+          "ev-cf747e3f18b2fc55",
+          "ev-68ad3c32871c69bf",
+          "ev-38029c90d7c93f4c",
+          "ev-0896712287a23f89",
+          "ev-28f2d0f6f72e77c0",
+          "ev-8354f6ae356da7e2",
+          "ev-547807d903961531",
+          "ev-3ae4c70a23c56064",
+          "ev-4310c4a19581d52e",
+          "ev-b2a71afceae5bb19",
+          "ev-22d748c771250ff5",
+          "ev-2657e00e7ec02d34",
+          "ev-0d81c7057d56ae2f",
+          "ev-9b9f345a41312e27",
+          "ev-8c4f47c6bf8de25a",
+          "ev-5b046055515ead30",
+          "ev-87763b2f2dd72d9f",
+          "ev-e599e790dc219c34",
+          "ev-3c213ef9d318ad6e",
+          "ev-8ca7f07e94cba620",
+          "ev-b6001627e879e53a",
+          "ev-44ac797d8a22298b",
+          "ev-b338484859169bc6",
+          "ev-3ac1cc66ce396cf9",
+          "ev-cf5fdd3e4e303746",
+          "ev-72574676638497ca",
+          "ev-24ce651a1dd35682",
+          "ev-19cb49f83c7f4118",
+          "ev-5ed6bb9c156ad107",
+          "ev-3f4ebd993f5c40ea",
+          "ev-0aafd6a4421b9160",
+          "ev-605026cb839f02d2",
+          "ev-996ba9b2dd07aa38",
+          "ev-7b59e581144b1f6c",
+          "ev-23cd41ff2b086975",
+          "ev-9eeb422a8aaf0df8",
+          "ev-3d104c35277b1b0e",
+          "ev-72abdcae6cde4254",
+          "ev-87ddf5887625d07e",
+          "ev-70e84f77e2a49dd7",
+          "ev-7f5daffb4f1f284c",
+          "ev-378a8337d838f46a",
+          "ev-0d825a13d239297d",
+          "ev-25e469975a023cd5",
+          "ev-de95317880f10fab",
+          "ev-bff9353d6120b94d",
+          "ev-421443359295b81c",
+          "ev-21dffea0a7dc4616",
+          "ev-5c6bbebd7528a899",
+          "ev-3cf4eb1c27b583ee",
+          "ev-68434828a5c24718",
+          "ev-6734e62c0e4a4678",
+          "ev-89e1fc3914826849",
+          "ev-15d1e75004e2e3d4",
+          "ev-091887aa98d9883b",
+          "ev-16facc48eea78c4a",
+          "ev-f0c8b8b3b98552e7",
+          "ev-f49a0cf6eda3973f",
+          "ev-236b81c2cb0db406",
+          "ev-ccbd5e637d5c7616",
+          "ev-1cacdba0b9afdec8",
+          "ev-ee7cddc97f0a4c68",
+          "ev-ebddc4d8b9b4e303",
+          "ev-30b11a5889f5f49a",
+          "ev-89878dcb3bb546b4",
+          "ev-23d77a801e916129",
+          "ev-3561aa867acbc89a",
+          "ev-09cdda127531f49f",
+          "ev-4fdc6989cfe3a330",
+          "ev-ff049a68f3442924",
+          "ev-9b7f211bfc1e0543",
+          "ev-a844b7169e1a645c",
+          "ev-dd417396fd12b29f",
+          "ev-2e4b10e9c61108ec",
+          "ev-f60196720b80af2f",
+          "ev-5ac7202308a140e9",
+          "ev-4a0964b01b8cc0d3",
+          "ev-8e15dd622da94564",
+          "ev-19bc30536b6b39ff",
+          "ev-adb0b512735cbebb",
+          "ev-b9f4ccd074aafcff",
+          "ev-e8e4437ca7228007",
+          "ev-fe40b827dd0cad84",
+          "ev-13edca6eedfb64fc",
+          "ev-9de0fb6566b8c4d5",
+          "ev-19821758a77021f7",
+          "ev-26f1a1929d5ce083",
+          "ev-c5cc0e9e3838c6bc",
+          "ev-c54bb2d43634aa82",
+          "ev-43d07a8fed97d27f",
+          "ev-07cb5f3d889f7c13",
+          "ev-14ff950f4246cde1",
+          "ev-1dc0dcf8a8cf7681",
+          "ev-a1901af88bb36285",
+          "ev-35c69df405a18855",
+          "ev-8b6d582d2453780e",
+          "ev-89c3df87d404e1a1",
+          "ev-02815762964fd0d2",
+          "ev-b832975f739859be",
+          "ev-63567a6a7ba5eeb9",
+          "ev-bc1f5e65a11643ea",
+          "ev-7560f939ae2273ed",
+          "ev-fe06cf49829aa607",
+          "ev-c01160ceaf95edc6",
+          "ev-f742e7aee452782c",
+          "ev-860f31842d24bfaa",
+          "ev-392439300e746f68",
+          "ev-59e5ad4206811413",
+          "ev-4d1845bb7ba6c160",
+          "ev-86012338df68b354",
+          "ev-646915d5363281e6",
+          "ev-bf6f2f15fb16792f",
+          "ev-ffdba6682dc0005c",
+          "ev-0b213d1c2302f7de",
+          "ev-4e3d1c24f09e3d35",
+          "ev-b0881a4c5c3eb0ea",
+          "ev-d57a45fda82b6564",
+          "ev-8f5e570b8a50cfa0",
+          "ev-14bc9c7479fe7d23",
+          "ev-aec3942c4d9f3d08",
+          "ev-f6cd7d32cb1842ef",
+          "ev-b0123913900c1518",
+          "ev-2904be31537dc032",
+          "ev-8cfb6e17574861e0",
+          "ev-0102940dc29cc9f9",
+          "ev-3bea1f54eb7ac750",
+          "ev-c7c8b752320bc1f4",
+          "ev-283e1833f8b67a36",
+          "ev-6657f84be7ab8c60",
+          "ev-304ecc0a75a1e6b9",
+          "ev-57ff8e1e9beef192",
+          "ev-8382fba49442534e",
+          "ev-5f92996c591dbf46",
+          "ev-20c8fa0871fa8419",
+          "ev-e94ba59cb2cef6a0",
+          "ev-04d3bd2443736bc6",
+          "ev-177506ae4aadc0db",
+          "ev-0e72e8a890ff3f85",
+          "ev-c5fdeed56da7a2d1",
+          "ev-c6068408ddaaa51b",
+          "ev-5d4c8f18ff464f7b",
+          "ev-b000e6c0453a462a",
+          "ev-20541cd0389c2f96",
+          "ev-bc61d1c08e554cde",
+          "ev-589bdbb118e70c85",
+          "ev-bbd25dcda9a981c3",
+          "ev-5336bce90555eca5",
+          "ev-84c4acc99db609dd",
+          "ev-e64b744eb4fcbe2a",
+          "ev-028f1aa810ffdad2",
+          "ev-bf600fc024d17ad6",
+          "ev-560d1f9328a8c7cd",
+          "ev-47b5598e7e29d9ca",
+          "ev-f6c1e1609f040cd0",
+          "ev-3bc7c6f7969c7dec",
+          "ev-132e9490d15401ce",
+          "ev-03e0161dddc71654",
+          "ev-199d3a2c6f264714",
+          "ev-3a95834c81fef1fa",
+          "ev-00874751866f51a5",
+          "ev-4f8c6306784a0ee6",
+          "ev-61bffae8f2b59011",
+          "ev-5cc8a5bad2acc5b7",
+          "ev-d5eb9b0556d253b0",
+          "ev-a26bd7b66146768b",
+          "ev-328294a1bce380e1",
+          "ev-a455dbb5216a0dc2",
+          "ev-375381425ee50a39"
+        ]
+      },
+      "independently_proven_loss": "terminal_public_DTO_budget",
+      "previous_output_comparison": {
+        "old_count": 40,
+        "new_count": 39,
+        "removed_count": 1,
+        "added_count": 0,
+        "identical_normalized_rows": false,
+        "root_path_character_delta": 3
+      },
+      "observer_errors": [],
+      "observer_omitted_events": 0
+    }
+  ],
+  "inputs_unchanged": true,
+  "frozen_files_checked": 463,
+  "additional_product_calls": 0
+}

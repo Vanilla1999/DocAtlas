@@ -94,7 +94,11 @@ def test_public_sdk_delivery_caps_and_explicit_lexical_expansion(tmp_path, recor
 def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
     tmp_path, monkeypatch, state_root, record_property,
 ):
-    """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), <=2 resources."""
+    """2 prepare/sync, 9 MCP contexts, 3 SDK/service reads, <=2 resources.
+
+    Existing off/on/off calls also exercise diagnostic assessor isolation;
+    scripted assessor results are not semantic model-accuracy evidence.
+    """
     root = (tmp_path / "project").resolve()
     runtime.write_project(root, OPTICS_DOCUMENTS)
     with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
@@ -104,9 +108,35 @@ def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
         snapshots(inventory, root, OPTICS_DOCUMENTS)
         before, initial_files = database(inventory["storage_path"]), files(root)
         packets = []
-        for trace in (False, True, False):
-            with query_trace(trace):
+        from contextlib import nullcontext
+        from docmancer.docs.application.context_sufficiency import context_sufficiency_observer
+
+        checked_inputs = []
+
+        def diagnostic_checker(*, question, final_context_json):
+            # Only the external assessor is scripted: retrieval/storage/validation
+            # remain real. This verifies isolation, NOT semantic model accuracy.
+            observed = json.loads(final_context_json)
+            checked_inputs.append((question, final_context_json))
+            ids = [row["evidence_id"] for row in observed["sources"]]
+            observed["sources"].clear()  # Mutating the copy cannot remove delivery.
+            return {"status": "sufficient", "supported_obligations": ["scripted transport verdict"],
+                    "missing_obligations": [], "evidence_ids": ids}
+
+        def failing_checker(**kwargs):
+            raise RuntimeError("external diagnostic assessor unavailable")
+
+        diagnostic_records = []
+        for trace, checker in ((False, None), (True, diagnostic_checker), (False, failing_checker)):
+            scope = context_sufficiency_observer(checker) if checker is not None else nullcontext()
+            with query_trace(trace), scope as observation:
                 payload = context(service, root, OPTICS_QUESTION)
+            if observation is not None:
+                assert observation.calls == 1 and len(observation.records) == 1
+                receipt = observation.records[0]
+                assert receipt["final_context_sha256"] == sha(json.dumps(payload, ensure_ascii=False).encode())
+                diagnostic_records.append(receipt)
+            assert "sufficiency" not in payload and "supported_obligations" not in payload
             assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
             facts(payload, root, OPTICS_FACTS)
             packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
@@ -114,6 +144,12 @@ def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
             assert packed["tokens"] <= 12000
             packets.append(payload)
         assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+        assert checked_inputs == [(OPTICS_QUESTION, json.dumps(packets[1], ensure_ascii=False))]
+        assert diagnostic_records[0]["status"] == "sufficient"
+        assert diagnostic_records[0]["semantic_accuracy"] == "unverified"
+        assert diagnostic_records[1]["status"] == "unknown" and diagnostic_records[1]["observation"] == "error"
+        assert all(packet["answer_supported"] is False and packet["edit_ready"] is False for packet in packets)
+        record_property("sufficiency_transport_only", json.dumps(diagnostic_records))
         record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
         old_row = next(row for row in packets[0]["sources"]
                        if relative_path(row["path_or_url"], root) == "docs/issue.md")

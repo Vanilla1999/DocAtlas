@@ -1,0 +1,301 @@
+{
+  "boundary": "installed public in-process MCP; not stdio/client/production",
+  "installed_origin": "/tmp/opencode/docatlas-sufficiency-runtime-20261013/lib/python3.12/site-packages/docmancer/__init__.py",
+  "preparations": 1,
+  "contexts": 4,
+  "model_calls": 0,
+  "assessor_boundary": "scripted external assessor; semantic accuracy NOT MEASURED",
+  "records": [
+    {
+      "label": "off",
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-060e0c8d4f0e5b0e",
+            "path_or_url": "docs/control.md",
+            "section": "Observatory aperture control",
+            "snippet": "# Observatory aperture control\n\naperture_control sets the lens aperture. The required value is f/8.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "19db8e4b81cb891ff985b8eaaa3f31b959b433c3fedd9e2b54cf90ca61dea5bf",
+            "project_identity": "local:03336182f9712afec6a88e8f6e3535960b23db900f1adefe63a90cc5b11d4eae",
+            "line_start": 1,
+            "line_end": 3,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/191fdde54b724a96febbbe0d"
+          }
+        ],
+        "context_quality": {
+          "status": "unverified",
+          "reasons": [
+            "coverage_unverified"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 314,
+        "context_unassessed": true,
+        "admission_contract": "source_only_heuristic_removal_v1"
+      },
+      "diagnostic": null,
+      "integrity": {
+        "errors": [],
+        "rows": [
+          {
+            "index": 0,
+            "path": "docs/control.md",
+            "raw_sha256": "a663682817f50caac2855d0044166423a5ae6d270ace506d7a7dc64df82c5c28",
+            "errors": []
+          }
+        ]
+      }
+    },
+    {
+      "label": "on",
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-060e0c8d4f0e5b0e",
+            "path_or_url": "docs/control.md",
+            "section": "Observatory aperture control",
+            "snippet": "# Observatory aperture control\n\naperture_control sets the lens aperture. The required value is f/8.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "19db8e4b81cb891ff985b8eaaa3f31b959b433c3fedd9e2b54cf90ca61dea5bf",
+            "project_identity": "local:03336182f9712afec6a88e8f6e3535960b23db900f1adefe63a90cc5b11d4eae",
+            "line_start": 1,
+            "line_end": 3,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/191fdde54b724a96febbbe0d"
+          }
+        ],
+        "context_quality": {
+          "status": "unverified",
+          "reasons": [
+            "coverage_unverified"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 314,
+        "context_unassessed": true,
+        "admission_contract": "source_only_heuristic_removal_v1"
+      },
+      "diagnostic": {
+        "status": "sufficient",
+        "observation": "recorded",
+        "diagnostic_only": true,
+        "checker_called": true,
+        "question_sha256": "44e6696926a6ff11eb8f7acaca02b55438dbf10c75e9ee0e08d331e06de9dfdd",
+        "final_context_sha256": "44e0cc99db91141fcb7205e91925047375de35cd5e78d5692acacef47f3c2569",
+        "final_context_characters": 1326,
+        "supported_obligations": [
+          "scripted external assessor response"
+        ],
+        "missing_obligations": [],
+        "evidence_ids": [
+          "ev-060e0c8d4f0e5b0e"
+        ],
+        "semantic_accuracy": "unverified"
+      },
+      "integrity": {
+        "errors": [],
+        "rows": [
+          {
+            "index": 0,
+            "path": "docs/control.md",
+            "raw_sha256": "a663682817f50caac2855d0044166423a5ae6d270ace506d7a7dc64df82c5c28",
+            "errors": []
+          }
+        ]
+      }
+    },
+    {
+      "label": "error",
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-060e0c8d4f0e5b0e",
+            "path_or_url": "docs/control.md",
+            "section": "Observatory aperture control",
+            "snippet": "# Observatory aperture control\n\naperture_control sets the lens aperture. The required value is f/8.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "19db8e4b81cb891ff985b8eaaa3f31b959b433c3fedd9e2b54cf90ca61dea5bf",
+            "project_identity": "local:03336182f9712afec6a88e8f6e3535960b23db900f1adefe63a90cc5b11d4eae",
+            "line_start": 1,
+            "line_end": 3,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/191fdde54b724a96febbbe0d"
+          }
+        ],
+        "context_quality": {
+          "status": "unverified",
+          "reasons": [
+            "coverage_unverified"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 314,
+        "context_unassessed": true,
+        "admission_contract": "source_only_heuristic_removal_v1"
+      },
+      "diagnostic": {
+        "status": "unknown",
+        "observation": "error",
+        "diagnostic_only": true,
+        "checker_called": true,
+        "question_sha256": "44e6696926a6ff11eb8f7acaca02b55438dbf10c75e9ee0e08d331e06de9dfdd",
+        "final_context_sha256": "44e0cc99db91141fcb7205e91925047375de35cd5e78d5692acacef47f3c2569",
+        "final_context_characters": 1326,
+        "error_type": "RuntimeError"
+      },
+      "integrity": {
+        "errors": [],
+        "rows": [
+          {
+            "index": 0,
+            "path": "docs/control.md",
+            "raw_sha256": "a663682817f50caac2855d0044166423a5ae6d270ace506d7a7dc64df82c5c28",
+            "errors": []
+          }
+        ]
+      }
+    },
+    {
+      "label": "invalid_citation",
+      "payload": {
+        "status": "ok",
+        "kind": "docs_context",
+        "context_status": "ready",
+        "context_available": true,
+        "answer_supported": false,
+        "answer_available": false,
+        "support_status": "retrieval_only",
+        "answer_policy": "cite_only",
+        "coverage_policy": "retrieval_attribution_only",
+        "query_coverage": "partial",
+        "retrieval_coverage": "partial",
+        "facet_coverage": "unverified",
+        "covered_query_ids": [],
+        "missing_query_ids": [
+          "query-original"
+        ],
+        "missing_facets": [],
+        "facets": [],
+        "sources": [
+          {
+            "evidence_id": "ev-060e0c8d4f0e5b0e",
+            "path_or_url": "docs/control.md",
+            "section": "Observatory aperture control",
+            "snippet": "# Observatory aperture control\n\naperture_control sets the lens aperture. The required value is f/8.\n",
+            "version_binding": "unversioned",
+            "content_sha256": "19db8e4b81cb891ff985b8eaaa3f31b959b433c3fedd9e2b54cf90ca61dea5bf",
+            "project_identity": "local:03336182f9712afec6a88e8f6e3535960b23db900f1adefe63a90cc5b11d4eae",
+            "line_start": 1,
+            "line_end": 3,
+            "authority": "source_of_truth",
+            "scope": "project",
+            "source_uri": "docatlas://source/191fdde54b724a96febbbe0d"
+          }
+        ],
+        "context_quality": {
+          "status": "unverified",
+          "reasons": [
+            "coverage_unverified"
+          ]
+        },
+        "read_next": [],
+        "edit_ready": false,
+        "investigation_allowed": true,
+        "estimated_tokens": 314,
+        "context_unassessed": true,
+        "admission_contract": "source_only_heuristic_removal_v1"
+      },
+      "diagnostic": {
+        "status": "unknown",
+        "observation": "error",
+        "diagnostic_only": true,
+        "checker_called": true,
+        "question_sha256": "44e6696926a6ff11eb8f7acaca02b55438dbf10c75e9ee0e08d331e06de9dfdd",
+        "final_context_sha256": "44e0cc99db91141fcb7205e91925047375de35cd5e78d5692acacef47f3c2569",
+        "final_context_characters": 1326,
+        "error_type": "ValueError"
+      },
+      "integrity": {
+        "errors": [],
+        "rows": [
+          {
+            "index": 0,
+            "path": "docs/control.md",
+            "raw_sha256": "a663682817f50caac2855d0044166423a5ae6d270ace506d7a7dc64df82c5c28",
+            "errors": []
+          }
+        ]
+      }
+    }
+  ],
+  "status": "PASS",
+  "read_only": true,
+  "delivery_equivalent": true,
+  "unsupported_authority": false,
+  "model_accuracy": "NOT MEASURED"
+}

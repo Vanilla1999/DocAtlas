@@ -241,7 +241,11 @@ def call_docs_tool_payload(
             tool=name,
             phase="validation",
         )
-    return compact_mcp_payload(payload, tool=name)
+    public_payload = compact_mcp_payload(payload, tool=name)
+    if name == "get_docs_context":
+        from docmancer.docs.application.context_sufficiency import observe_final_context
+        observe_final_context(str(args.get("question") or ""), public_payload)
+    return public_payload
 
 
 def read_docs_resource(uri: str, service: LibraryDocsService | None = None) -> dict[str, str] | None:

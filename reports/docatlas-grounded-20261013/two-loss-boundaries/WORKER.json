@@ -1,0 +1,18 @@
+{
+  "python": "/tmp/opencode/docatlas-sdk-delivery-installed-20261013/bin/python",
+  "datasets": [
+    {
+      "path": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+      "count": 2,
+      "index": 0,
+      "arms": [
+        "V0"
+      ],
+      "case_ids": [
+        "V40-P03",
+        "V40-E01"
+      ]
+    }
+  ],
+  "wall_seconds": 600
+}

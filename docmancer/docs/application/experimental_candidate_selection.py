@@ -52,7 +52,12 @@ def experimental_selection_observer(observer):
 
 @contextmanager
 def experimental_candidate_selector(selector):
-    """Set a synchronous host experiment callback; never populated from wire data."""
+    """Set a host-only order callback, never populated from wire data.
+
+    The callback receives only ``question`` and immutable ``passages`` strings.
+    It must return a complete permutation of checked pool indices. It cannot
+    edit candidates, remove evidence, bypass validation or grant authority.
+    """
     token = _SELECTOR.set(selector)
     try:
         yield
@@ -130,12 +135,22 @@ def select_experimental_candidates(candidates, *, question):
             else:
                 seen.add(binding)
                 pool.append(chunk)
+        order = list(range(len(pool)))
+        selector = _SELECTOR.get()
+        if selector is not None:
+            order = selector(question=question, passages=tuple(chunk.text for chunk in pool))
+            if (not isinstance(order, (list, tuple))
+                    or any(type(index) is not int for index in order)
+                    or len(order) != len(pool) or set(order) != set(range(len(pool)))):
+                raise ValueError("host candidate order must be a complete checked-pool permutation")
+            order = list(order)
         _observe_selection(question, pool, excluded, candidates, {
-            "mode": "native_acquisition_rank", "status": "final_budget_only",
-            "selected_indices": list(range(len(pool))), "top_k": None,
-            "model_forward_attempts": 0, "model_forwards": 0,
+            "mode": "host_reranked_native" if selector is not None else "native_acquisition_rank",
+            "status": "final_budget_only",
+            "selected_indices": order, "top_k": None,
+            "model_work": "host_receipt_required" if selector is not None else "none",
         })
-        return pool
+        return [pool[index] for index in order]
     # No heuristic or callback selector outside a verified native read. The
     # public projector requires a live receipt before delivering project bytes.
     return candidates
