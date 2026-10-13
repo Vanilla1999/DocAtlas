@@ -1,0 +1,70 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-01e904c491348882",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.fs.allow",
+      "snippet": "## server.fs.allow\n\n- **Type:** `string[]`\n\nRestrict files that could be served via `/@fs/`. When `server.fs.strict` is set to `true`, accessing files outside this directory list that aren't imported from an allowed file will result in a 403.\n\nBoth directories and files can be provided.\n\nVite will search for the root of the potential workspace and use it as default. A valid workspace met the following conditions, otherwise will fall back to the [project root](/guide/#index-html-and-project-root).\n\n- contains `workspaces` field in `package.json`\n- contains one of the following file\n  - `lerna.json`\n  - `pnpm-workspace.yaml`\n\nAccepts a path to specify the custom workspace root. Could be a absolute path or a path relative to [project root](/guide/#index-html-and-project-root). For example:\n\n```js\nexport default defineConfig({\n  server: {\n    fs: {\n      // Allow serving files from one level up to the project root\n      allow: ['..'],\n    },\n  },\n})\n```\n\nWhen `server.fs.allow` is specified, the auto workspace root detection will be disabled. To extend the original behavior, a utility `searchForWorkspaceRoot` is exposed:\n\n```js\nimport { defineConfig, searchForWorkspaceRoot } from 'vite'\n\nexport default defineConfig({\n  server: {\n    fs: {\n      allow: [\n        // search up for workspace root\n        searchForWorkspaceRoot(process.cwd()),\n        // your custom rules\n        '/path/to/custom/allow_directory',\n        '/path/to/custom/allow_file.demo',\n      ],\n    },\n  },\n})\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "bd4d836d670bf34ca31b85e4a476a8c7b295d8a17a03f343a71dfc9abea04906",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 386,
+      "line_end": 433,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/a2106187b1d61c60b60676a6"
+    },
+    {
+      "evidence_id": "ev-1b49f3a42bd394fc",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.fs.strict",
+      "snippet": "- **Default:** `true` (enabled by default since Vite 2.7)\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "751d56ec5ee4387210f8016e7d12b77a7df65c665fd106c65d8a89c2e7e94c37",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 382,
+      "line_end": 383,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/761042a07ef46f5c2e351cdc"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/e6fbbbdd1328ad058190b033",
+      "path": "docs/config/server-options.md",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "snapshot_sha256": "sha256:0ca5418780b0f2d2e272801424d0d5cddea7cf9c155c9e6db6983d3305be971e",
+      "line_start": 384,
+      "line_end": 385,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 884
+}

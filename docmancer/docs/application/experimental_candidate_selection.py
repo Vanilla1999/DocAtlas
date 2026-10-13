@@ -22,6 +22,11 @@ _SELECTOR = ContextVar("experimental_native_candidate_selector", default=None)
 _OBSERVER = ContextVar("experimental_native_selection_observer", default=None)
 
 
+def native_rank_selection_active() -> bool:
+    """Use native rank inside a live, source-bound documentation read."""
+    return experimental_selector_settings() is not None
+
+
 @dataclass
 class SelectionObservation:
     """Diagnostics returned to a host observer; never source authorization."""
@@ -107,50 +112,30 @@ def _observe_selection(question, pool, excluded, original, selection):
 
 
 def select_experimental_candidates(candidates, *, question):
-    selector = _SELECTOR.get()
-    if not (policy_candidate_admission_active() or source_valid_candidate_admission_active()):
-        return candidates
-    config = None
-    if selector is None:
-        from .experimental_selection_modes import configured_selector
-        config = configured_selector(experimental_selector_settings())
-        if config is None:
-            return candidates
-    pool, excluded, seen = [], [], set()
-    for ordinal, chunk in enumerate(candidates):
-        metadata = chunk.metadata or {}
-        trace = (metadata.get("retrieval_query_matches") or {}).get("query-original") or {}
-        binding = original_body_discovery_binding(
-            question=question, body=chunk.text, candidate=metadata,
-        )
-        key = (chunk.source, chunk.chunk_index)
-        if binding is None or not (trace.get("qualified") is True or trace.get("literal_context_admission")):
-            excluded.append((chunk, "no_checked_original_admission", ordinal))
-        elif key in seen:
-            excluded.append((chunk, "duplicate_source_chunk", ordinal))
-        else:
-            seen.add(key)
-            pool.append(chunk)
-    if selector is not None:
-        indices = selector(question, tuple(pool), tuple(excluded), tuple(candidates))
-        selection: dict[str, Any] = {"mode": "callback", "status": "callback",
-                                     "model_forward_attempts": 0, "model_forwards": 0}
-    else:
-        from .experimental_selection_modes import choose_configured_candidates, SelectorExecutionError
-        try:
-            indices, selection = choose_configured_candidates(question, tuple(pool), config)
-        except SelectorExecutionError as exc:
-            _observe_selection(question, pool, excluded, candidates, exc.receipt)
-            raise
-    if indices is None:
-        # Observation/control preserves B1's original downstream behavior.
-        selection["selected_indices"] = None
-        _observe_selection(question, pool, excluded, candidates, selection)
-        return candidates
-    indices = tuple(indices)
-    if (any(type(index) is not int or not 0 <= index < len(pool) for index in indices)
-            or len(set(indices)) != len(indices)):
-        raise ValueError("experimental selector returned invalid candidate indices")
-    selection["selected_indices"] = list(indices)
-    _observe_selection(question, pool, excluded, candidates, selection)
-    return [pool[index] for index in indices]
+    if native_rank_selection_active():
+        from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
+        if experimental_context_max_tokens() is None:
+            raise ValueError("native-rank selection requires a fixed experimental context cap")
+        pool, excluded, seen = [], [], set()
+        for ordinal, chunk in enumerate(candidates):
+            metadata = chunk.metadata or {}
+            trace = (metadata.get("retrieval_query_matches") or {}).get("query-original") or {}
+            binding = original_body_discovery_binding(
+                question=question, body=chunk.text, candidate=metadata,
+            )
+            if binding is None or not (trace.get("qualified") is True or trace.get("literal_context_admission")):
+                excluded.append((chunk, "no_checked_original_admission", ordinal))
+            elif binding in seen:
+                excluded.append((chunk, "duplicate_exact_native_occurrence", ordinal))
+            else:
+                seen.add(binding)
+                pool.append(chunk)
+        _observe_selection(question, pool, excluded, candidates, {
+            "mode": "native_acquisition_rank", "status": "final_budget_only",
+            "selected_indices": list(range(len(pool))), "top_k": None,
+            "model_forward_attempts": 0, "model_forwards": 0,
+        })
+        return pool
+    # No heuristic or callback selector outside a verified native read. The
+    # public projector requires a live receipt before delivering project bytes.
+    return candidates

@@ -1,0 +1,17 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/guide/assets.md",
+      "raw_sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/guide/assets.md",
+      "raw_sha256": "ea9464ea42d19e99eb61dba2d3ee5f3a826c53fccb61cfcf308ee46aac87db8b",
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-B05",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-black",
+  "public_request": {
+    "question": "How does --force-exclude differ from --exclude for files passed explicitly to Black?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-black/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "eb7ac9bb388379da46860c6a566a03466450de3aa5ba78ae2fa293afdd1b3249",
+  "utf8_bytes": 31080,
+  "tokens": 9280,
+  "seconds": 41.33439774500039,
+  "cpu_seconds": 41.26649902700001,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

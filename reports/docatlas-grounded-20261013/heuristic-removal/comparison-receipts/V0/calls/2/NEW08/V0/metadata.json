@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW08",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-tox",
+  "public_request": {
+    "question": "tox 4.24.1: what is skip_missing_interpreters' declared default, what does true do if an interpreter is missing, and which wins if the command line switch is also passed?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "54c75de44579e48c323338194433b2e045f01207aa9b2465f6c661cdac648467",
+  "utf8_bytes": 2669,
+  "tokens": 803,
+  "seconds": 1.1875141529999382,
+  "cpu_seconds": 1.1832861479999792,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

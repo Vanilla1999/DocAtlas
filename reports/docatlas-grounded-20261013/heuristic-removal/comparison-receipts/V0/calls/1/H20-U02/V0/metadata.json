@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-U02",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-uv",
+  "public_request": {
+    "question": "Does uv use member-local configuration in a workspace, and do uv tool commands use project-local configuration? Explain the configuration locations for each boundary.",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-uv/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "034f871547728be0ef8771c3853cadb39b5be0c4f1e168e41ec7a72da3b22f7f",
+  "utf8_bytes": 11931,
+  "tokens": 3479,
+  "seconds": 4.983416327999294,
+  "cpu_seconds": 4.981416747999987,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

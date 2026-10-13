@@ -1,0 +1,23 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/usage_and_configuration/the_basics.md",
+      "raw_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "raw_sha256": "84a37184dcacb261bcaf609dcfca3a40829270ebe05610a899a05f77f5247857",
+      "errors": []
+    },
+    {
+      "index": 2,
+      "path": "docs/usage_and_configuration/the_basics.md",
+      "raw_sha256": "149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "errors": []
+    }
+  ]
+}

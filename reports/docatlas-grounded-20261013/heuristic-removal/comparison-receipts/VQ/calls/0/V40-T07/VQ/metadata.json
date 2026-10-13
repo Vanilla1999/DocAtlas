@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T07",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "921728580090058a1ab84c1a66eda58e9b2fab9b48832b091d034cd6fde2bda3",
+  "utf8_bytes": 2868,
+  "tokens": 949,
+  "seconds": 0.6493990610015317,
+  "cpu_seconds": 0.6475196869999991,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

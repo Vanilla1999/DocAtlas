@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M04",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "How does MkDocs extra_javascript treat a plain .mjs string versus a mapping with a .mjs path regarding type=module, and which integrity hash algorithm is automatically applied?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "5f9ec114f76a23077c04980d8af540cdaa2028aa7fadb287980f134865a383b5",
+  "utf8_bytes": 4480,
+  "tokens": 1320,
+  "seconds": 1.3701804869997432,
+  "cpu_seconds": 1.3687778239999986,
+  "peak_rss_kib": 200996,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

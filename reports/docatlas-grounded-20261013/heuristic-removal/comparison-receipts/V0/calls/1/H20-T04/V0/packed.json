@@ -1,0 +1,23 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-c164a48852c456df",
+      "path_or_url": "docs/tutorial/parameter-types/bool.md",
+      "section": "Boolean CLI Options > Alternative names",
+      "snippet": "## Alternative names\n\nNow let's imagine we have a *CLI option* `--accept`.\n\nAnd we want to allow setting `--accept` or the contrary, but `--no-accept` looks ugly.\n\nWe might want to instead have `--accept` and `--reject`.\n\nWe can do that by passing a single `str` with the 2 names for the `bool` *CLI option* separated by `/`:\n\n{* docs_src/parameter_types/bool/tutorial002_an_py310.py hl[9] *}\n\nCheck it:\n\n<div class=\"termy\">\n\n```console\n// Check the help\n$ uv run python main.py --help\n\n// Notice the --accept / --reject\nUsage: main.py [OPTIONS]\n\nOptions:\n  --accept / --reject\n  --help                Show this message and exit.\n\n// Try it\n$ uv run python main.py\n\nI don't know what you want yet\n\n// Now pass --accept\n$ uv run python main.py --accept\n\nAccepting!\n\n// And --reject\n$ uv run python main.py --reject\n\nRejecting!\n```\n\n</div>\n\n## Short names\n\nThe same way, you can declare short versions of the names for these *CLI options*.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "adbd18169c4e5663ec819da620068e8a890a2b387c20bef1f61d882b3c7c5107",
+      "project_identity": "local:150ba4cbe68bb898b14aa66236ef7710025f8dfeb1e708536da735024e0b6163",
+      "line_start": 51,
+      "line_end": 99,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/c7e153819c6a322453dc5936"
+    }
+  ],
+  "tokens": 482,
+  "utf8_bytes": 1515,
+  "sha256": "1e55aaffd95cfc722871dd2e1bf47704192214c274e94012800d7b01ec064ad6",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

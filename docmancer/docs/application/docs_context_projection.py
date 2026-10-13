@@ -1,276 +1,63 @@
-"""Finalized retrieval-only documentation projection with bounded recovery metadata."""
+"""Source-native documentation projection with final provenance checks."""
 from __future__ import annotations
 
-from copy import deepcopy
-from functools import wraps
 from typing import Any
 
-from . import _docs_context_projection_core as _core
-from ._docs_context_payload import _payload
-from .context_quality import context_quality
-from .context_selection import (
-    bind_visible_assignments,
-    component_coverage_decision,
-    component_obligations,
-    component_witnesses,
-    context_selection_decision,
-)
-from .model_visible_projection import (
-    INSUFFICIENT_EVIDENCE_MAX_TOKENS,
-    docs_context_budget_tokens,
-    _refresh_estimate,
-)
-from .source_continuation import (
-    attach_docs_context_read_next,
-    attach_source_continuation_locators,
-    docs_context_read_next_cost,
-    prepare_docs_context_read_next,
-)
-from .visible_evidence_retention import retains_visible_sources as _retains_visible_sources
+from .context_query_probes import authoritative_queries, independent_query_probes, literal_query_probe
+from .context_selection import merge_query_matches
 from .experimental_context_finalization import (
-    capture_experimental_context, recheck_experimental_context,
+    capture_experimental_context, project_native_rank_context, recheck_experimental_context,
 )
 from .projection_decision_trace import ProjectionFlowTrace
+from .source_continuation import attach_source_continuation_locators
+from docmancer.docs.domain.evidence_qualification import qualify_evidence
 from docmancer.docs.domain.original_body_discovery import experimental_context_max_tokens
 
-# Preserve the established helper surface used by focused production tests.
-_expand_selected_snippets = _core._expand_selected_snippets
-_facet_aware_candidates = _core._facet_aware_candidates
-_focused_line_range = _core._focused_line_range
-_focused_snippet = _core._focused_snippet
-_qualified_fragments_impl = _core._qualified_fragments
-_requalify_visible_source = _core._requalify_visible_source
 
-
-def _qualified_fragments(*args: Any, **kwargs: Any) -> Any:
-    """Preserve the established helper seam while the core injects requalification."""
-    kwargs.setdefault("requalify", _requalify_visible_source)
-    return _qualified_fragments_impl(*args, **kwargs)
-
-
-def _core_context_selection_decision(*args: Any, **kwargs: Any) -> Any:
-    """Route core selection through the public facade hook.
-
-    The facade/core split is an implementation detail. Existing same-call observers
-    patch the public helper to capture the exact selection used by production, so
-    the core must resolve that helper dynamically instead of retaining its
-    pre-split imported function object.
-    """
-    return context_selection_decision(*args, **kwargs)
-
-
-def _core_component_coverage_decision(*args: Any, **kwargs: Any) -> Any:
-    """Route core coverage through the public facade hook for the same reason."""
-    return component_coverage_decision(*args, **kwargs)
-
-
-# Keep established observation/monkeypatch seams working without mutating these
-# globals per request. The tiny proxies resolve facade globals at call time, so
-# patched observers remain effective while ordinary calls keep identical behavior.
-_core.context_selection_decision = _core_context_selection_decision
-_core.component_coverage_decision = _core_component_coverage_decision
-
-
-def _facade_hook(name: str):
-    """Resolve a supported facade seam at call time, without per-request writes."""
-    @wraps(globals()[name])
-    def dispatch(*args: Any, **kwargs: Any) -> Any:
-        return globals()[name](*args, **kwargs)
-    return dispatch
-
-
-for _hook_name in (
-    "_expand_selected_snippets", "_facet_aware_candidates", "_focused_line_range",
-    "_focused_snippet", "_qualified_fragments", "_requalify_visible_source",
-):
-    setattr(_core, _hook_name, _facade_hook(_hook_name))
-
-
-def _final_sources(
-    snapshot: dict[str, Any], payload: dict[str, Any], assignments: tuple[Any, ...],
-    *, expected_project_identity: Any = None,
-) -> tuple[dict[str, Any], ...]:
-    rows: list[dict[str, Any]] = []
-    for public in payload.get("sources") or ():
-        bound = snapshot.get(public.get("evidence_id")) if isinstance(public, dict) else None
-        original = bound.get("source") if isinstance(bound, dict) else None
-        if not isinstance(original, dict):
+def _requalify_visible_source(source: dict[str, Any], *, query_text: dict[str, str]) -> dict[str, Any]:
+    visible_text = "\n".join(str(source.get(key) or "") for key in ("path_or_url", "section", "snippet"))
+    matches: dict[str, dict[str, Any]] = {}
+    planned = authoritative_queries(source.get("_independent_query_plan") or {})
+    incoming = independent_query_probes(source, source.get("_independent_query_plan") or {})
+    for query_id, query in planned.items():
+        if query_text.get(query_id) != query["text"]:
             continue
-        # Rebind against the actual surviving snippet, never a hidden retrieval
-        # window. Public serialization intentionally strips these private fields;
-        # their absence must not erase real proof during quality finalization.
-        visible = {
-            **public,
-            "_qualification_candidate": original,
-            "_expected_project_identity": expected_project_identity,
-            "_lifecycle_intent": original.get("_lifecycle_intent", "current"),
-        }
-        rows.append(bind_visible_assignments(original, visible, assignments))
-    return tuple(rows)
-
-
-def _annotate_budget_omissions(
-    retrieval: dict[str, Any], coverage: dict[str, Any], assignments: tuple[Any, ...],
-) -> list[dict[str, Any]]:
-    missing = {str(value) for value in coverage.get("missing_component_ids") or () if value}
-    if not missing:
-        return []
-    plan = retrieval.get("documentation_query_plan") or {}
-    obligations = component_obligations(plan.get("_component_contract") or ())
-    expected_identity = retrieval.get("project_identity")
-    diagnostics = ((retrieval.get("retrieval_diagnostics") or {}).get("docs_context_projection") or {})
-    candidates = tuple(item for item in retrieval.get("context_pack") or () if isinstance(item, dict))
-    events: list[dict[str, Any]] = []
-    for rejection in diagnostics.get("projection_rejections") or ():
-        if not isinstance(rejection, dict) or rejection.get("reason") != "token_budget":
-            continue
-        candidate_id = str(rejection.get("candidate_id") or "")
-        original = next(
-            (item for item in candidates if _core._internal_candidate_id(item) == candidate_id), None,
+        trace = incoming.get(query_id) or {}
+        qualification = qualify_evidence(
+            literal_query_probe(query), query_id=str(query_id), visible_text=visible_text,
+            evidence_text=str(source.get("snippet") or ""), catalog_role=str(source.get("catalog_role") or ""),
+            candidate={**source.get("_qualification_candidate", {}), **source},
+            expected_project_identity=source.get("_expected_project_identity"),
+            lifecycle_intent=source.get("_lifecycle_intent", "current"), authoritative_query=query,
         )
-        if original is None:
-            continue
-        component_ids: set[str] = set()
-        source_ids = {
-            str(original.get(key) or "")
-            for key in ("stable_id", "stable_chunk_id", "evidence_id") if original.get(key)
-        }
-        for assignment in assignments:
-            if not isinstance(assignment, dict):
-                continue
-            requirement = str(assignment.get("requirement_id") or "")
-            if requirement in missing and str(assignment.get("evidence_id") or "") in source_ids:
-                component_ids.add(requirement)
-        probe = {
-            **original,
-            "snippet": str(original.get("content") or original.get("snippet") or ""),
-            "_qualification_candidate": original,
-            "_expected_project_identity": expected_identity,
-        }
-        component_ids.update(component_witnesses(probe, obligations))
-        component_ids &= missing
-        if component_ids:
-            rejection["component_ids"] = sorted(component_ids)
-            events.append({"reason": "token_budget", "component_ids": sorted(component_ids)})
-    return events
-
-
-def _strip_legacy_locators(payload: dict[str, Any], snapshot: dict[str, Any]) -> None:
-    for source in payload.get("sources") or ():
-        if not isinstance(source, dict):
-            continue
-        source.pop("source_uri", None)
-        bound = snapshot.get(source.get("evidence_id"))
-        if isinstance(bound, dict):
-            bound.pop("source_uri", None)
-            projected = bound.get("projected_source")
-            if isinstance(projected, dict):
-                projected.pop("source_uri", None)
-    _refresh_estimate(payload)
-
-
-def _finalize_quality(
-    retrieval: dict[str, Any], payload: dict[str, Any], snapshot: dict[str, Any],
-) -> None:
-    plan = retrieval.get("documentation_query_plan")
-    if not isinstance(plan, dict):
-        plan = {}
-    # Match the core's retrieval-only policy and persist it for recovery/trials.
-    # A source-local assignment proves surviving bytes, not component meaning.
-    plan.update(_component_contract=[], component_scope_complete=False)
-    selection = retrieval.get("selection_decision")
-    assignments = tuple(
-        item for item in ((selection or {}).get("assignments") or ()) if isinstance(item, dict)
-    ) if isinstance(selection, dict) else ()
-    final_sources = _final_sources(
-        snapshot, payload, assignments,
-        expected_project_identity=retrieval.get("project_identity"),
-    )
-    coverage = component_coverage_decision(
-        plan.get("_component_contract") or (), assignments, final_sources,
-        unresolved_residue=plan.get("unresolved_parts") or (),
-        component_scope_complete=plan["component_scope_complete"],
-    ).as_payload()
-    omissions = _annotate_budget_omissions(retrieval, coverage, assignments)
-    plan["_component_coverage"] = coverage
-    plan["_projection_omissions"] = omissions
-    retrieval["documentation_query_plan"] = plan
-    payload["context_quality"] = context_quality(
-        sources=payload.get("sources") or (), component_coverage=coverage, omissions=omissions,
-    )
-    payload.setdefault("read_next", [])
-    _refresh_estimate(payload)
-
-
-def _run_core(
-    *, retrieval: dict[str, Any], max_tokens: int,
-    selection_diagnostics: dict[str, Any] | None, allow_context_hints: bool,
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    return _core.project_docs_context(
-        retrieval=retrieval,
-        max_tokens=max_tokens,
-        selection_diagnostics=selection_diagnostics,
-        _allow_context_hints=allow_context_hints,
-    )
+        qualified_trace = dict(qualification.trace)
+        if query_id == "query-original" and (
+            trace.get("admission_only") or trace.get("query_text") != query["text"]
+            or trace.get("query_origin") != "original" or trace.get("relation") != "direct"
+            or trace.get("public_parent_query_id") or trace.get("derived_from_query_id")
+            or trace.get("derived_from_query_ids")
+        ):
+            qualified_trace["admission_only"] = True
+        matches = merge_query_matches(matches, {str(query_id): qualified_trace})
+    return {**source, "retrieval_query_matches": matches,
+            "retrieval_query_ids": [key for key, trace in matches.items() if trace.get("qualified") is True]}
 
 
 def project_docs_context(
     *, retrieval: dict[str, Any], max_tokens: int | None = None,
-    selection_diagnostics: dict[str, Any] | None = None,
-    _allow_context_hints: bool = False,
+    selection_diagnostics: dict[str, Any] | None = None, _allow_context_hints: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Finalize visible evidence, quality and at most one registered recovery target."""
-    experiment_max = experimental_context_max_tokens()
-    packet_max = (min(max_tokens, experiment_max) if max_tokens is not None and experiment_max is not None
-                  else experiment_max if experiment_max is not None else max_tokens)
-    payload, snapshot = _run_core(
+    cap = experimental_context_max_tokens()
+    packet_max = min(max_tokens, cap) if max_tokens is not None and cap is not None else cap or max_tokens
+    payload, snapshot = project_native_rank_context(
         retrieval=retrieval, max_tokens=packet_max,
-        selection_diagnostics=selection_diagnostics, allow_context_hints=_allow_context_hints,
+        selection_diagnostics=selection_diagnostics, _allow_context_hints=_allow_context_hints,
     )
     flow = ProjectionFlowTrace(retrieval)
     flow.boundary("core.output", payload, snapshot)
-    _strip_legacy_locators(payload, snapshot)
-    _finalize_quality(retrieval, payload, snapshot)
     capture_experimental_context(retrieval, payload, snapshot)
-
     root = str(retrieval.get("_source_continuation_project_root") or "")
-    target: dict[str, Any] | None = None
-    target_source: dict[str, Any] | None = None
-    if root:
-        target, target_source = prepare_docs_context_read_next(payload, snapshot, retrieval, root=root)
-
-    if target is not None and target_source is not None:
-        if attach_docs_context_read_next(payload, target, max_tokens=packet_max):
-            snapshot["__read_next__"] = {"source": deepcopy(target_source)}
-
     if root:
         attach_source_continuation_locators(payload, snapshot, root=root, max_tokens=packet_max)
     flow.boundary("decoration.output", payload, snapshot)
-    # Host-only paired structural-assembly alternative; native admission and
-    # final source/budget checks are identical to the legacy branch.
-    import os
-    from docmancer.docs.domain.original_body_discovery import source_valid_candidate_admission_active
-    if (source_valid_candidate_admission_active()
-            and os.environ.get("DOCATLAS_EXPERIMENT_ASSEMBLER") == "prepared_parent_v1"):
-        from .experimental_prepared_parent_assembler import assemble_prepared_parents
-        payload, snapshot = assemble_prepared_parents(
-            payload, snapshot, retrieval, max_tokens=packet_max)
-        flow.boundary("prepared_parent.output", payload, snapshot)
-        return recheck_experimental_context(payload, snapshot, retrieval)
-    from .joint_context_selection import select_joint_context
-    payload, snapshot = select_joint_context(payload, snapshot, retrieval, max_tokens=packet_max)
-    flow.boundary("joint.output", payload, snapshot)
-    from .query_block_context import select_query_block_context
-    payload, snapshot = select_query_block_context(payload, snapshot, retrieval, max_tokens=packet_max)
-    flow.boundary("query_block.output", payload, snapshot)
-    from .query_block_recovery import select_query_block_recovery
-    payload, snapshot = select_query_block_recovery(payload, snapshot, retrieval, max_tokens=packet_max)
-    flow.boundary("recovery.output", payload, snapshot)
-    return recheck_experimental_context(payload, snapshot, retrieval)
-
-
-__all__ = [
-    "project_docs_context", "_expand_selected_snippets", "_facet_aware_candidates",
-    "_focused_line_range", "_focused_snippet", "_qualified_fragments",
-    "_requalify_visible_source",
-]
+    return recheck_experimental_context(payload, snapshot, retrieval, restore_native=False)

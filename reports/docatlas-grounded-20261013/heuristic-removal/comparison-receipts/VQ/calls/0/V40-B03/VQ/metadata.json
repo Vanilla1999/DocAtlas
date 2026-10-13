@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-B03",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-black",
+  "public_request": {
+    "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-black/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "65c032428deaccc70813280f50ad17c57ad5de91f3306b60d8fd56fd688a1877",
+  "utf8_bytes": 4300,
+  "tokens": 1349,
+  "seconds": 0.579816285000561,
+  "cpu_seconds": 0.5769205839999998,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

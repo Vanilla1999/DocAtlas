@@ -1,0 +1,22 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-33f409970b09f110",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "     ``path/to/my_script`` prefer ``{tox_root}{/}path{/}to{/}my_script``. If your inline script is platform dependent\n     refer to :ref:`platform-specification` on how to select different script per platform.\n\n.. conf::\n   :keys: commands_post\n   :default: <empty list>\n\n   Commands to run after running the :ref:`commands`. Execute regardless of the outcome of both :ref:`commands` and\n   :ref:`commands_pre`. All evaluation and configuration logic applies from :ref:`commands`.\n\n.. conf::\n   :keys: change_dir, changedir\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e6d6fa49340f739ca15d93b8fe8fefb9883a64f8f3a637db48d6b33137d1b90a",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 726,
+      "line_end": 737,
+      "authority": "source_of_truth",
+      "scope": "project"
+    }
+  ],
+  "tokens": 316,
+  "utf8_bytes": 950,
+  "sha256": "66cd2940e5fec2fd139f378ed0f02dc7111aa0913f25225b0ce007cbed092f82",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

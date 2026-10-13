@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW06",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-pytest",
+  "public_request": {
+    "question": "In pytest 8.3.5's skipif Python example, which comparison operator skips versions earlier than 3.10, when is the condition evaluated, and if several skipif decorators are applied must all conditions be true?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-pytest/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "b665c5c23c309cf70c42c540d23268e56316afab6164875c2528ca306d998e88",
+  "utf8_bytes": 13920,
+  "tokens": 3588,
+  "seconds": 0.38803301099869714,
+  "cpu_seconds": 0.3863894809999806,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

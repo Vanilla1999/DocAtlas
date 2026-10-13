@@ -54,7 +54,9 @@ def _record_query_discovery(
 
 def _record_current_body_discovery(context: Any, chunk: Any, query: dict[str, Any]) -> None:
     """Bind the receipt to the owning finite context, not chunk-supplied flags."""
-    if context is None or context.complete is not True or context.question != query.get("text"):
+    if context is None or context.complete is not True:
+        return
+    if context.question != query.get("text") and query.get("origin") != "host_lookup":
         return
     source = str(chunk.source)
     identity = context.sources.get(source)

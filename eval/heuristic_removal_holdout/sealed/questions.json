@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "dataset_id": "NEW20-20261013",
+  "cases": [
+    {
+      "id": "NEW01",
+      "project_group": "click",
+      "family": "click",
+      "question": "For Click 8.1.8, when no explicit type is supplied to a basic value option, how is its type chosen with versus without a default? Does the --n default=1 example establish that every option defaults to integer?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW02",
+      "project_group": "click",
+      "family": "click",
+      "question": "In Click 8.1.8, how do I collect all repetitions of --message, rather than only the last, and what happens if a multiple=True default is a plain string rather than a list or tuple?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW03",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "For Requests 2.32.3, does timeout bound the entire download or socket inactivity, what happens with no explicit timeout, and is 0.001 the library default or merely the shown example?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW04",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "Requests 2.32.3: does successful r.json() prove HTTP success, what should I check instead, and what exception results for a 204 No Content or invalid JSON?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW05",
+      "project_group": "pytest",
+      "family": "pytest",
+      "question": "In pytest 8.3.5, do XFAIL and XPASS fail the suite by default, what changes for XPASS with strict=True, and which ini option changes the strict default?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW06",
+      "project_group": "pytest",
+      "family": "pytest",
+      "question": "In pytest 8.3.5's skipif Python example, which comparison operator skips versions earlier than 3.10, when is the condition evaluated, and if several skipif decorators are applied must all conditions be true?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW07",
+      "project_group": "tox",
+      "family": "tox",
+      "question": "For tox 4.24.1, are commands run after commands_pre fails, are commands_post still run, and how does a leading dash differ from ignore_errors=True with respect to failure status?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW08",
+      "project_group": "tox",
+      "family": "tox",
+      "question": "tox 4.24.1: what is skip_missing_interpreters' declared default, what does true do if an interpreter is missing, and which wins if the command line switch is also passed?",
+      "answerability": "positive",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW09",
+      "project_group": "click",
+      "family": "click",
+      "question": "For Click 8.1.8, how does --shout/--no-shout create a boolean flag, and what exact maximum option-name byte length does this options guide guarantee?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW10",
+      "project_group": "click",
+      "family": "click",
+      "question": "For Click 8.1.8, under what condition is a single boolean flag's default hidden in help, and what guaranteed help-rendering latency in milliseconds does this guide specify?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW11",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "For Requests 2.32.3, which verb does not follow redirects by default, how can I enable it, and what numeric redirect-hop limit is guaranteed by this quickstart?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW12",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "In Requests 2.32.3, what order is Response.history in, and what guaranteed disk-retention duration for redirect history does the quickstart state?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW13",
+      "project_group": "pytest",
+      "family": "pytest",
+      "question": "For pytest 8.3.5, what effect does --runxfail have on xfail markers and pytest.xfail calls, and what production database backup-retention duration is specified by this skipping guide?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW14",
+      "project_group": "tox",
+      "family": "tox",
+      "question": "tox 4.24.1: what is allowlist_externals' default and how does * differ from the rm example, and what cryptographic signature verification algorithm for external commands is specified?",
+      "answerability": "partial",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW15",
+      "project_group": "click",
+      "family": "click",
+      "question": "What exact option-parser heap-memory ceiling in bytes is guaranteed for Click 8.1.8 by the supplied options guide?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW16",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "Which encryption algorithm and key-rotation interval does the Requests 2.32.3 quickstart prescribe for storing Response.history on disk?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW17",
+      "project_group": "requests",
+      "family": "requests",
+      "question": "What guaranteed maximum DNS retry count and exponential-backoff base does the Requests 2.32.3 quickstart specify for ConnectionError?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW18",
+      "project_group": "pytest",
+      "family": "pytest",
+      "question": "What database transaction isolation level does pytest 8.3.5's skipping guide guarantee for pytest.importorskip?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW19",
+      "project_group": "tox",
+      "family": "tox",
+      "question": "What container-image signing algorithm and key-rotation schedule does tox 4.24.1's configuration reference prescribe for allowlist_externals?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    },
+    {
+      "id": "NEW20",
+      "project_group": "tox",
+      "family": "tox",
+      "question": "What exact automatic rollback and filesystem snapshot-retention guarantee does tox 4.24.1 specify when commands_post fails?",
+      "answerability": "negative",
+      "split": "NEW20",
+      "source_kind": "project"
+    }
+  ]
+}

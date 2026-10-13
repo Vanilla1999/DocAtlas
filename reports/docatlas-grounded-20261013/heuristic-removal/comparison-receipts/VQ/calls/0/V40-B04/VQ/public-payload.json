@@ -1,0 +1,84 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-175ba42d7f8618f4",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Command line options > `--no-cache`",
+      "snippet": "#### `--no-cache`\n\nDo not consult or update Black's per-user cache during this run. When `--no-cache` is\nspecified, Black will perform fresh analysis for all files and will neither read from\nnor write to the cache. This is helpful for reproducing formatting results from a clean\nrun, debugging cache-related issues, or ensuring CI executes a fresh formatting analysis\nevery time.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f3643b947dc833cd9ad1f107bf496b39ec7e3c1d13da79f6ca6c93de63bf1ce3",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 232,
+      "line_end": 239,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/8b15a52a651a56d2cf419773"
+    },
+    {
+      "evidence_id": "ev-474c39413526d4bb",
+      "path_or_url": "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "section": "File collection and discovery > Ignoring unmodified files > Disabling the cache with --no-cache",
+      "snippet": "### Disabling the cache with --no-cache\n\nIf you need Black to always perform a fresh analysis and not consult or update the\non-disk cache, use the `--no-cache` flag. When provided, Black will neither read from\nnor write to the per-user cache. This is useful for debugging, for CI runs where you\nwant a deterministic fresh run, or when you suspect cache corruption.\n\nExample:\n\npython -m black --no-cache .\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "167801faa932cabb18de7f80a9dba6e1fb0a092ca28372a62e1568ec668413ee",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 32,
+      "line_end": 42,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/8f1b84dccb24b22f5f38e900"
+    },
+    {
+      "evidence_id": "ev-332818a95fea0976",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Writeback and reporting",
+      "snippet": "By default _Black_ reformats the files given and/or found in place. Sometimes you need\n_Black_ to just tell you what it _would_ do without actually rewriting the Python files.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9c5a44a8d9369e48073c734d81c69ac0f182d73664a5643c302f8f387725c7f8",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "line_start": 439,
+      "line_end": 441,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/c7cd64c425f8682298b898b2"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/6c43c3e892a83bf0e79ed65b",
+      "path": "docs/usage_and_configuration/the_basics.md",
+      "project_identity": "local:5224b304ac7a3714f78a993474754e1c25c48396e79b39618a65453906e18877",
+      "snapshot_sha256": "sha256:149d882cdb759fd7aff81d2d31fa673f972e57ed97dedd5079e7ed554a530796",
+      "line_start": 442,
+      "line_end": 449,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 891
+}

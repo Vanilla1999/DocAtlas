@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/resume_unstarted.py", line 65, in <module>
+    main()
+  File "/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/resume_unstarted.py", line 51, in main
+    child = subprocess.run(command, cwd=safe, env=env, stdout=out, stderr=err, timeout=remaining)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 2141, in _communicate
+    self.wait(timeout=self._remaining_time(endtime))
+  File "/usr/lib/python3.12/subprocess.py", line 1264, in wait
+    return self._wait(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 2045, in _wait
+    raise TimeoutExpired(self.args, timeout)
+subprocess.TimeoutExpired: Command '['/tmp/opencode/docatlas-heuristic-removal-runtime/bin/python', '-I', '/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/run.py', '--manifest', '/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/FROZEN_RUN_V4.json', '--worker', '/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/worker-VA.json', '--output', '/tmp/opencode/docatlas-heuristic-removal-20261013/reports/docatlas-grounded-20261013/heuristic-removal/comparison-receipts/VA', '--work', '/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA']' timed out after 874.9999870439988 seconds

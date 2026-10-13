@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW16",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-requests",
+  "public_request": {
+    "question": "Which encryption algorithm and key-rotation interval does the Requests 2.32.3 quickstart prescribe for storing Response.history on disk?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "49c8f6d4ebffce1494f451ed56e73b5cde19048881d97680e39a98fb101c4599",
+  "utf8_bytes": 20968,
+  "tokens": 5538,
+  "seconds": 0.26060222599880944,
+  "cpu_seconds": 0.2581664600000124,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

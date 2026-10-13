@@ -1,0 +1,79 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-76d750d49fb5c205",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.middlewareMode",
+      "snippet": "## server.middlewareMode\n\n- **Type:** `boolean | { server: http.Server }`\n- **Default:** `false`\n\nCreate Vite server in middleware mode.\n\nIf [proxy](./server-options#server-proxy) is setup for WebSocket, the `server` should be provided to bind the proxy correctly.\n\n- **Related:** [appType](./shared-options#apptype), [SSR - Setting Up the Dev Server](/guide/ssr#setting-up-the-dev-server)\n\n- **Example:**\n\n```js twoslash\nimport express from 'express'\nimport { createServer as createViteServer } from 'vite'\n\nasync function createServer() {\n  const app = express()\n\n  // Create Vite server in middleware mode\n  const vite = await createViteServer({\n    server: { middlewareMode: true },\n    // don't include Vite's default HTML handling middlewares\n    appType: 'custom',\n  })\n  // Use vite's connect instance as middleware\n  app.use(vite.middlewares)\n\n  app.use('*', async (req, res) => {\n    // Since `appType` is `'custom'`, should serve response here.\n    // Note: if `appType` is `'spa'` or `'mpa'`, Vite includes middlewares\n    // to handle HTML requests and 404s so user middlewares should be added\n    // before Vite's middlewares to take effect instead\n  })\n}\n\ncreateServer()\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "17da83289424aaf2abfdfd3caa0b021086c84b1ff43c33e2d3c8c2d8ccf0d481",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 339,
+      "line_end": 378,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/4f99322943363af3be23472a"
+    },
+    {
+      "evidence_id": "ev-3ae6536466516d5e",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > Env Variables > `.env` Files",
+      "snippet": "### `.env` Files\n\nVite uses [dotenv](https://github.com/motdotla/dotenv) to load additional environment variables from the following files in your [environment directory](/config/shared-options.md#envdir):\n\n```\n.env                # loaded in all cases\n.env.local          # loaded in all cases, ignored by git\n.env.[mode]         # only loaded in specified mode\n.env.[mode].local   # only loaded in specified mode, ignored by git\n```\n\n:::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\nIn addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n\n:::\n\n:::warning Bun users\n\nWhen using [Bun](https://bun.sh), be aware that Bun automatically loads `.env` files before your script runs. This built-in behavior loads environment variables directly into `process.env` and can interfere with Vite's feature, as it respects existing `process.env` values. See [oven-sh/bun#5515](https://github.com/oven-sh/bun/issues/5515) for workarounds.\n\n:::\n\nAlso, Vite uses [dotenv-expand](https://github.com/motdotla/dotenv-expand) to expand variables written in env files out of the box. To learn more about the syntax, check out [their docs](https://github.com/motdotla/dotenv-expand#what-rules-does-the-expansion-engine-follow).\n\nNote that if you want to use `$` inside your environment value, you have to escape it with `\\`.\n\n```[.env]\nKEY=123\nNEW_KEY1=test$foo   # test\nNEW_KEY2=test\\$foo  # test$foo\nNEW_KEY3=test$KEY   # test123\n```\n\n::: details Expanding variables in reverse order\n\nVite supports expanding variables in reverse order.\nFor example, the `.env` below will be evaluated as `VITE_FOO=foobar`, `VITE_BAR=bar`.\n\n```[.env]\nVITE_FOO=foo${VITE_BAR}\nVITE_BAR=bar\n```\n\nThis does not work in shell scripts and other tools like `docker compose`.\nThat said, Vite supports this behavior as this has been supported by `dotenv-expand` for a long time and other tools in JavaScript ecosystem use older versions that support this behavior.\n\nTo avoid interop issues, it is recommended to avoid relying on this behavior. Vite may start emitting warnings for this behavior in the future.\n\n:::\n\n:::warning Ignoring local `.env` files\n\n`.env.*.local` files are local-only and can contain sensitive variables. You should add `*.local` to your `.gitignore` to avoid them being checked into git.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9e8a00cfbd4f5ece110ff619a448b6b315a2ea35c6d512876b66ae87697cc939",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 62,
+      "line_end": 124,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/ad965b89ec28135ed3411ec6"
+    },
+    {
+      "evidence_id": "ev-e6323e0633fc46c7",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.port",
+      "snippet": "## server.port\n\n- **Type:** `number`\n- **Default:** `5173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5b1d55214f3aebb5b36167bb3f4ee418b4352dfa275e7a42d58baf33a3ea9a65",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 63,
+      "line_end": 69,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/bcb009c967ae4ba3594a2c66"
+    },
+    {
+      "evidence_id": "ev-c66b14aafe987977",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.strictPort",
+      "snippet": "## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "2f5fc68e9745ab6e9a6eb54f2bdd0d706b4e3a50906b10601c922544ba2bd03b",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 70,
+      "line_end": 75,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2136064b6416c93353cbd87d"
+    },
+    {
+      "evidence_id": "ev-bd48c8eb35e15a59",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > Modes",
+      "snippet": "By default, the dev server (`dev` command) runs in `development` mode and the `build` command runs in `production` mode.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9d05796e9ad75ca91912b033c35725526e7866f74cd06f5f57931b11ba8c0df7",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 177,
+      "line_end": 178,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/219b5fb03b444e3f7c35adca"
+    }
+  ],
+  "tokens": 2210,
+  "utf8_bytes": 7302,
+  "sha256": "5d0dfedb7e5c925c50665b99e1c0c6d5779e44f46b2b9008a4bb5f81f4c05c7c",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

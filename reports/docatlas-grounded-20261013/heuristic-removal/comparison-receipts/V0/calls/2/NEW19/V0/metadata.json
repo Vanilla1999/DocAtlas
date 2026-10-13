@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW19",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-tox",
+  "public_request": {
+    "question": "What container-image signing algorithm and key-rotation schedule does tox 4.24.1's configuration reference prescribe for allowlist_externals?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "76ab188c634b342bf29372c7a5f5e4d9f47a6ecd8f44e61d89ca86995537e711",
+  "utf8_bytes": 1783,
+  "tokens": 531,
+  "seconds": 0.3475060660002782,
+  "cpu_seconds": 0.3449827290000087,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

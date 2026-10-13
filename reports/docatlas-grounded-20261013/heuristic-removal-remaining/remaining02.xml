@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="2.170" timestamp="2026-10-13T14:40:24.035810+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" file="tests/test_heuristic_removal_public_integration.py" line="56" time="1.007"><properties><property name="trace_off_on_off_public_context_calls" value="[1, 1, 1]" /></properties></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" file="tests/test_heuristic_removal_public_integration.py" line="121" time="0.413" /><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_library_native_context_isolates_versions" file="tests/test_heuristic_removal_public_integration.py" line="166" time="0.348"><failure message="AssertionError: assert 'exact_snapshot' in {'1.0.0', 'exact', 'exact_version', 'exact_version_indexed'}">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-7/test_public_library_native_con0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x723c9e1e4620&gt;
+
+    def test_public_library_native_context_isolates_versions(tmp_path, monkeypatch):
+        """Real per-library SQLite indexes and public MCP read; no transport or retrieval mocks."""
+        from tests._shared_test_docs_service import _service_with_real_agent
+        from tests.docs.test_dependency_version_transition import _seed, PACKAGE, QUESTION
+    
+        service = _service_with_real_agent(tmp_path, monkeypatch)
+        service.config.retrieval.default_mode = "lexical"
+        first = _seed(service, "1.0.0", "FIRST_ONLY")
+        second = _seed(service, "2.0.0", "SECOND_ONLY")
+        paths = [service._index_config_for(row).index.db_path for row in (first, second)]
+        before = [database(path) for path in paths]
+        for version, marker, other in [("1.0.0", "FIRST_ONLY", "SECOND_ONLY"),
+                                        ("2.0.0", "SECOND_ONLY", "FIRST_ONLY")]:
+            with query_trace(True):
+                payload = call_docs_tool_payload("get_docs_context", {
+                    "question": QUESTION, "library": PACKAGE, "version": version,
+                }, service)
+            assert payload.get("context_available") is True, payload
+            assert payload.get("answer_supported") is False and payload.get("edit_ready") is False
+            rows = payload.get("sources") or []
+            expected = f"NavigationRegistry is a route registry using {marker} dispatch in version {version}."
+            assert any(expected in row["snippet"] for row in rows), payload
+            original = f"# NavigationRegistry\n\n{expected}\n"
+            for row in rows:
+                assert row["snippet"] in original
+                assert other not in row["snippet"]
+                assert row["path_or_url"] == (
+                    f"https://pub.dev/documentation/{PACKAGE}/{version}/nav_kit/NavigationRegistry-class.html")
+&gt;               assert row["version_binding"] in {"exact", "exact_version", "exact_version_indexed", version}
+E               AssertionError: assert 'exact_snapshot' in {'1.0.0', 'exact', 'exact_version', 'exact_version_indexed'}
+
+tests/test_heuristic_removal_public_integration.py:195: AssertionError</failure></testcase></testsuite></testsuites>

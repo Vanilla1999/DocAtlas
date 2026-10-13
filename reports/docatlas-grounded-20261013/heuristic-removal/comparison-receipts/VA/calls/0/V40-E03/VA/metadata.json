@@ -1,0 +1,13 @@
+{
+  "case_id": "V40-E03",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "How does --fix-dry-run differ from --fix, and can it be used with stdin?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "started",
+  "model_calls": 0
+}

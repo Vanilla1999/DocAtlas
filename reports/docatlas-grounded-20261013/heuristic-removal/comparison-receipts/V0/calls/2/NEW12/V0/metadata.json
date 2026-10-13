@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW12",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-requests",
+  "public_request": {
+    "question": "In Requests 2.32.3, what order is Response.history in, and what guaranteed disk-retention duration for redirect history does the quickstart state?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "9b5b44c0c0dc23994d07d52fbf05b9515ff79ed03e54005b70ab7a0ef15307f4",
+  "utf8_bytes": 20962,
+  "tokens": 5538,
+  "seconds": 0.2997420530009549,
+  "cpu_seconds": 0.29827050800000166,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-V02",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-vite",
+  "public_request": {
+    "question": "What wins when the same Vite environment variable is defined by the process and by .env files?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-vite/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "0a440a26f5976207a0857a140552a6a69804ca80ce6fbfbe59ebe3afa7af50ab",
+  "utf8_bytes": 43641,
+  "tokens": 12110,
+  "seconds": 20.723863539000376,
+  "cpu_seconds": 20.71867190799992,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

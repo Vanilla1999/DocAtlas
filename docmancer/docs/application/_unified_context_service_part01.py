@@ -176,7 +176,7 @@ class _UnifiedDocsContextServicePart01:
         if mode_selected == "project":
             delegated_mode = "auto" if project_auto else "project-only"
             routing["delegated_mode"] = delegated_mode
-            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
+            project_result = _invoke_found_window_retention(self.service.get_project_context, project_path, question, tokens=tokens, limit=limit, expand=expand, version=version, module=module, module_path=module_path, scope=scope, mode=delegated_mode, response_style=response_style, allow_network=effective_allow_network, mutation_intent=mutation_intent, lookup_queries=lookup_queries, **retention_kwargs)
         elif mode_selected == "dependency":
             if not effective_allow_network and self._dependency_prefetch_needed(project_path):
                 lanes["dependency"] = {"status": "confirmation_required", "source_count": 0}

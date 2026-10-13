@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P06",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "1601598b848bd93f58d66083c35bdee69c61df0006756663bad53d022698d588",
+  "utf8_bytes": 647,
+  "tokens": 172,
+  "seconds": 0.2675963490000868,
+  "cpu_seconds": 0.2664316029999938,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

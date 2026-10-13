@@ -50,7 +50,6 @@ from docmancer.docs.application.evidence_selection import (
 STALE_AFTER_DAYS = 30
 DEFAULT_DOC_TOKENS = 4000
 MAX_CHUNKS_PER_SOURCE = 2
-MMR_LAMBDA = 0.7
 PUB_DOCS_URL_TEMPLATE = "https://pub.dev/documentation/{library}/{version}/"
 NO_PROJECT_VERSION_WARNING = "No version was found in project metadata; using latest/default docs."
 PACKAGE_NOT_FOUND_WARNING = "Package was not found in pubspec.lock."
@@ -116,33 +115,6 @@ def _code_snippets(content: str) -> list[dict[str, str]]:
     return snippets
 
 
-def _code_relevance(snippets: list[dict[str, str]], terms: set[str]) -> int:
-    if not snippets or not terms:
-        return 0
-    score = 0
-    for snippet in snippets:
-        snippet_terms = _query_terms(snippet["code"])
-        score += len(terms & snippet_terms)
-    return score
-
-
-def _text_similarity(left: str, right: str) -> float:
-    left_terms = _query_terms(left)
-    right_terms = _query_terms(right)
-    if not left_terms or not right_terms:
-        return 0.0
-    return len(left_terms & right_terms) / len(left_terms | right_terms)
-
-
-def _chunk_relevance(content: str, snippets: list[dict[str, str]], terms: set[str]) -> float:
-    if not terms:
-        return 0.0
-    text_terms = _query_terms(content)
-    lexical = len(terms & text_terms) / len(terms)
-    code = min(1.0, _code_relevance(snippets, terms) / len(terms))
-    return lexical + code
-
-
 def _copy_chunk(chunk: Any, *, text: str, metadata: dict[str, Any]) -> Any:
     if hasattr(chunk, "model_copy"):
         return chunk.model_copy(update={"text": text, "metadata": metadata})
@@ -194,10 +166,9 @@ def _bounded_library_evidence_chunks(
 
 
 def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any], dict[str, Any]]:
-    terms = _query_terms(query)
-    candidates: list[dict[str, Any]] = []
+    selected = []
     snippet_count = 0
-    for index, chunk in enumerate(chunks):
+    for chunk in chunks:
         cleaned = _clean_library_section(chunk.text)
         snippets = _code_snippets(cleaned)
         snippet_count += len(snippets)
@@ -206,33 +177,11 @@ def _postprocess_library_chunks(chunks: list[Any], query: str) -> tuple[list[Any
         metadata["code_snippet_count"] = len(snippets)
         if snippets:
             metadata["top_code_language"] = snippets[0]["language"] or None
-        candidates.append(
-            {
-                "index": index,
-                "relevance": _chunk_relevance(cleaned, snippets, terms),
-                "chunk": _copy_chunk(chunk, text=cleaned, metadata=metadata),
-            }
-        )
-
-    selected = []
-    while candidates:
-        scored = []
-        for candidate in candidates:
-            diversity = max(_text_similarity(candidate["chunk"].text, chunk.text) for chunk in selected) if selected else 0.0
-            mmr_score = MMR_LAMBDA * candidate["relevance"] - (1 - MMR_LAMBDA) * diversity
-            scored.append((mmr_score, candidate["relevance"], -candidate["index"], candidate))
-        _mmr_score, _relevance, _negative_index, best = max(scored, key=lambda item: item[:3])
-        candidates.remove(best)
-        chunk = best["chunk"]
-        selected.append(chunk)
-
-    top_relevance = max((candidate["relevance"] for candidate in candidates), default=None)
-    if top_relevance is None:
-        top_relevance = max((_chunk_relevance(chunk.text, _code_snippets(chunk.text), terms) for chunk in selected), default=0.0)
+        selected.append(_copy_chunk(chunk, text=cleaned, metadata=metadata))
     return selected, {
         "code_snippets": snippet_count,
-        "top_relevance": top_relevance,
-        "mmr_lambda": MMR_LAMBDA,
+        "selection_method": "native_acquisition_rank",
+        "relevance_unassessed": True,
         "max_chunks_per_source": None,
         "chunks_dropped_for_diversity": 0,
         "unique_sources@5": len({chunk.source for chunk in selected[:5]}),

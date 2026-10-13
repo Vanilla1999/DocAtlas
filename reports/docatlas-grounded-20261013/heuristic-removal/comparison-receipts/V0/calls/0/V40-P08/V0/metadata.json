@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-P08",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-poetry",
+  "public_request": {
+    "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-poetry/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "68bea6d9a1e365a330bde5851de49e42b6ca7d813e897d3e772bf7e6b7e0f4e4",
+  "utf8_bytes": 16220,
+  "tokens": 4826,
+  "seconds": 5.799413540000387,
+  "cpu_seconds": 5.7905360800000025,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

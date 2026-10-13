@@ -1,0 +1,265 @@
+{
+  "boundary": "partial installed in-process public context; original1800s wall reached; no further product runtime",
+  "comparison_starts": 175,
+  "comparison_returns": 173,
+  "prepare_starts": 27,
+  "guard_contexts": 4,
+  "guard_prepares": 6,
+  "guard_resources": 1,
+  "unit": 0,
+  "generator": 0,
+  "grounded": 0,
+  "VS_status": "NOT RUN: global wall deadline",
+  "VALL_status": "HALTED: explicit project-version guard",
+  "cost_boundary": "returned times exclude2 interrupted calls/setup/prepares; saved JSON not protocol/billing;12000 common ceiling not equal spend",
+  "costs": [
+    {
+      "arm": "V0",
+      "context_starts": 80,
+      "context_returns": 80,
+      "not_returned_started": 0,
+      "prepare_starts": 13,
+      "context_returned_seconds_sum": 240.2759275310127,
+      "context_returned_median_seconds": 0.7314633185005732,
+      "context_returned_max_seconds": 33.10411641199971,
+      "returned_calls_over60_seconds": 0,
+      "returned_cpu_seconds_sum": 239.88962140599992,
+      "peak_rss_kib": 209392,
+      "saved_pretty_json_tokens_sum": 237620,
+      "packed_source_tokens_sum": 212865,
+      "packed_source_tokens_max": 11824,
+      "integrity_errors": 0,
+      "state_mutations": 0
+    },
+    {
+      "arm": "VQ",
+      "context_starts": 60,
+      "context_returns": 59,
+      "not_returned_started": 1,
+      "prepare_starts": 9,
+      "context_returned_seconds_sum": 467.4997366279986,
+      "context_returned_median_seconds": 1.691837239999586,
+      "context_returned_max_seconds": 60.00304081899958,
+      "returned_calls_over60_seconds": 0,
+      "returned_cpu_seconds_sum": 466.87565770299994,
+      "peak_rss_kib": 228656,
+      "saved_pretty_json_tokens_sum": 237360,
+      "packed_source_tokens_sum": 216667,
+      "packed_source_tokens_max": 11826,
+      "integrity_errors": 0,
+      "state_mutations": 0
+    },
+    {
+      "arm": "VA",
+      "context_starts": 35,
+      "context_returns": 34,
+      "not_returned_started": 1,
+      "prepare_starts": 5,
+      "context_returned_seconds_sum": 871.6299585230008,
+      "context_returned_median_seconds": 29.830893361001472,
+      "context_returned_max_seconds": 41.33439774500039,
+      "returned_calls_over60_seconds": 0,
+      "returned_cpu_seconds_sum": 870.8627590679998,
+      "peak_rss_kib": 213464,
+      "saved_pretty_json_tokens_sum": 371982,
+      "packed_source_tokens_sum": 353523,
+      "packed_source_tokens_max": 11802,
+      "integrity_errors": 0,
+      "state_mutations": 0
+    }
+  ],
+  "aggregates": [
+    {
+      "dataset": 0,
+      "arm": "V0",
+      "planned_cases": 40,
+      "returned": 40,
+      "not_returned": 0,
+      "categories": {
+        "partial": {
+          "observed": 8,
+          "packed_pass": 4,
+          "native_pass": 4
+        },
+        "unanswerable": {
+          "observed": 8,
+          "packed_pass": 5,
+          "native_pass": 5
+        },
+        "within_budget": {
+          "observed": 24,
+          "packed_pass": 23,
+          "native_pass": 23
+        }
+      }
+    },
+    {
+      "dataset": 0,
+      "arm": "VQ",
+      "planned_cases": 40,
+      "returned": 40,
+      "not_returned": 0,
+      "categories": {
+        "partial": {
+          "observed": 8,
+          "packed_pass": 4,
+          "native_pass": 4
+        },
+        "unanswerable": {
+          "observed": 8,
+          "packed_pass": 5,
+          "native_pass": 5
+        },
+        "within_budget": {
+          "observed": 24,
+          "packed_pass": 22,
+          "native_pass": 22
+        }
+      }
+    },
+    {
+      "dataset": 0,
+      "arm": "VA",
+      "planned_cases": 40,
+      "returned": 34,
+      "not_returned": 6,
+      "categories": {
+        "partial": {
+          "observed": 6,
+          "packed_pass": 6,
+          "native_pass": 6
+        },
+        "unanswerable": {
+          "observed": 6,
+          "packed_pass": 0,
+          "native_pass": 0
+        },
+        "within_budget": {
+          "observed": 22,
+          "packed_pass": 22,
+          "native_pass": 22
+        }
+      }
+    },
+    {
+      "dataset": 0,
+      "arm": "VS",
+      "planned_cases": 40,
+      "returned": 0,
+      "not_returned": 40,
+      "categories": {}
+    },
+    {
+      "dataset": 0,
+      "arm": "VALL",
+      "planned_cases": 40,
+      "returned": 0,
+      "not_returned": 40,
+      "categories": {}
+    },
+    {
+      "dataset": 1,
+      "arm": "V0",
+      "planned_cases": 20,
+      "returned": 20,
+      "not_returned": 0,
+      "categories": {
+        "partial": {
+          "observed": 6,
+          "packed_pass": 5,
+          "native_pass": 5
+        },
+        "unanswerable": {
+          "observed": 6,
+          "packed_pass": 0,
+          "native_pass": 0
+        },
+        "within_budget": {
+          "observed": 8,
+          "packed_pass": 6,
+          "native_pass": 6
+        }
+      }
+    },
+    {
+      "dataset": 1,
+      "arm": "VQ",
+      "planned_cases": 20,
+      "returned": 19,
+      "not_returned": 1,
+      "categories": {
+        "partial": {
+          "observed": 6,
+          "packed_pass": 5,
+          "native_pass": 5
+        },
+        "unanswerable": {
+          "observed": 5,
+          "packed_pass": 0,
+          "native_pass": 0
+        },
+        "within_budget": {
+          "observed": 8,
+          "packed_pass": 6,
+          "native_pass": 6
+        }
+      }
+    },
+    {
+      "dataset": 1,
+      "arm": "VA",
+      "planned_cases": 20,
+      "returned": 0,
+      "not_returned": 20,
+      "categories": {}
+    },
+    {
+      "dataset": 1,
+      "arm": "VS",
+      "planned_cases": 20,
+      "returned": 0,
+      "not_returned": 20,
+      "categories": {}
+    },
+    {
+      "dataset": 1,
+      "arm": "VALL",
+      "planned_cases": 20,
+      "returned": 0,
+      "not_returned": 20,
+      "categories": {}
+    },
+    {
+      "dataset": 2,
+      "arm": "V0",
+      "planned_cases": 20,
+      "returned": 20,
+      "not_returned": 0,
+      "categories": {
+        "negative": {
+          "observed": 6,
+          "packed_pass": 2,
+          "native_pass": 2
+        },
+        "partial": {
+          "observed": 6,
+          "packed_pass": 3,
+          "native_pass": 3
+        },
+        "positive": {
+          "observed": 8,
+          "packed_pass": 5,
+          "native_pass": 5
+        }
+      }
+    },
+    {
+      "dataset": 2,
+      "arm": "VALL",
+      "planned_cases": 20,
+      "returned": 0,
+      "not_returned": 20,
+      "categories": {}
+    }
+  ]
+}

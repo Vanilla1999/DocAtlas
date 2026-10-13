@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-E07",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "7cd7915004a1703cec85a27a6937b0437e972148aadaa4c815f837a2061002f7",
+  "utf8_bytes": 21256,
+  "tokens": 5970,
+  "seconds": 6.0546690999999555,
+  "cpu_seconds": 6.040073020000008,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

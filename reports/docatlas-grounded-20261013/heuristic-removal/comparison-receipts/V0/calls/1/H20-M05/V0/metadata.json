@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M05",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "What is the default number of worker processes used by the MkDocs development server?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "8951ed52610810bdce04cc7d0f674beb397386a555542c68c3b390a3f2bd0302",
+  "utf8_bytes": 16818,
+  "tokens": 4831,
+  "seconds": 1.7476560100003553,
+  "cpu_seconds": 1.7457844280000074,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

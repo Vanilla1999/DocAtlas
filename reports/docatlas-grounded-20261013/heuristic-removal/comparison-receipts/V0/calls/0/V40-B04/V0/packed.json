@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-175ba42d7f8618f4",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Command line options > `--no-cache`",
+      "snippet": "#### `--no-cache`\n\nDo not consult or update Black's per-user cache during this run. When `--no-cache` is\nspecified, Black will perform fresh analysis for all files and will neither read from\nnor write to the cache. This is helpful for reproducing formatting results from a clean\nrun, debugging cache-related issues, or ensuring CI executes a fresh formatting analysis\nevery time.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f3643b947dc833cd9ad1f107bf496b39ec7e3c1d13da79f6ca6c93de63bf1ce3",
+      "project_identity": "local:f493d0aa482ff9e210656f69911170972ef54106992866cf79ef9c1cee0870d2",
+      "line_start": 232,
+      "line_end": 239,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/c0c0d4bb0aefc448bc1d0845"
+    },
+    {
+      "evidence_id": "ev-474c39413526d4bb",
+      "path_or_url": "docs/usage_and_configuration/file_collection_and_discovery.md",
+      "section": "File collection and discovery > Ignoring unmodified files > Disabling the cache with --no-cache",
+      "snippet": "### Disabling the cache with --no-cache\n\nIf you need Black to always perform a fresh analysis and not consult or update the\non-disk cache, use the `--no-cache` flag. When provided, Black will neither read from\nnor write to the per-user cache. This is useful for debugging, for CI runs where you\nwant a deterministic fresh run, or when you suspect cache corruption.\n\nExample:\n\npython -m black --no-cache .\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "167801faa932cabb18de7f80a9dba6e1fb0a092ca28372a62e1568ec668413ee",
+      "project_identity": "local:f493d0aa482ff9e210656f69911170972ef54106992866cf79ef9c1cee0870d2",
+      "line_start": 32,
+      "line_end": 42,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/851f1a4da5257a5407990e17"
+    },
+    {
+      "evidence_id": "ev-332818a95fea0976",
+      "path_or_url": "docs/usage_and_configuration/the_basics.md",
+      "section": "The basics > Usage > Writeback and reporting",
+      "snippet": "By default _Black_ reformats the files given and/or found in place. Sometimes you need\n_Black_ to just tell you what it _would_ do without actually rewriting the Python files.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9c5a44a8d9369e48073c734d81c69ac0f182d73664a5643c302f8f387725c7f8",
+      "project_identity": "local:f493d0aa482ff9e210656f69911170972ef54106992866cf79ef9c1cee0870d2",
+      "line_start": 439,
+      "line_end": 441,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/412b8e66347085413323e190"
+    }
+  ],
+  "tokens": 841,
+  "utf8_bytes": 2677,
+  "sha256": "8586300e79be5bfea3382a4423e8da226d5dd574aa57756e89a6c901c233dd6a",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

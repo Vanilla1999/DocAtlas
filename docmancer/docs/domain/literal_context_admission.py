@@ -13,7 +13,7 @@ from typing import Any, Mapping
 from docmancer.core.structured_chunking import _atom_spans, parse_markdown_parents
 
 from .context_blocks import source_block_alternatives
-from .evidence_qualification import _relation_units, qualify_evidence
+from .evidence_qualification import _relation_units, qualify_evidence, source_only_admission_active
 from .original_body_discovery import original_body_discovery_binding
 from .query_reference_binding import QueryMention, query_mentions, document_statement_mentions
 from .query_terms import documentation_query_terms, query_constraint_roles
@@ -283,14 +283,16 @@ def _checked_original_candidate(
     ) if candidate.get(key)]
     if not catalog_hashes or any(value != member["catalog_entry_hash"] for value in catalog_hashes):
         return None
-    roles = query_constraint_roles(question)
     query = {"query_id": "query-original", "text": question,
              "origin": "original", "relation": "direct"}
-    qualification = qualify_evidence({
+    probe = {
         "query_text": question, "query_origin": "original", "relation": "direct",
-        "query_terms": list(documentation_query_terms(question)),
-        "exact_terms": list(roles.hard_exact), "bound_subjects": list(roles.bound_subjects),
-    }, query_id="query-original", visible_text=evidence_text, evidence_text=evidence_text,
+    }
+    if not source_only_admission_active():
+        roles = query_constraint_roles(question)
+        probe.update(query_terms=list(documentation_query_terms(question)),
+                     exact_terms=list(roles.hard_exact), bound_subjects=list(roles.bound_subjects))
+    qualification = qualify_evidence(probe, query_id="query-original", visible_text=evidence_text, evidence_text=evidence_text,
         candidate=candidate, expected_project_identity=expected_project_identity or scope["project_id"],
         catalog_role=str(candidate.get("catalog_role") or candidate.get("project_doc_reason") or ""),
         lifecycle_intent=lifecycle_intent, authoritative_query=query)
@@ -317,6 +319,27 @@ def admit_original_literal_context(
     if checked is None:
         return None
     qualification, evidence, identity, scope = checked
+    if source_only_admission_active():
+        if qualification.reason != "source_valid_relevance_unassessed":
+            return None
+        body_window = _checked_raw_body_window(
+            evidence_text, candidate, evidence, qualification.trace.get("reference_visible_span"),
+        )
+        if body_window is None:
+            return None
+        witness = source_valid_original_candidate_witness(
+            question=question, evidence_text=evidence_text, candidate=candidate,
+        )
+        if witness is None:
+            return None
+        return {
+            "reason": witness["kind"], "query_id": "query-original",
+            "qualification_reason": qualification.reason, "coverage_credit": False,
+            "relevance_unassessed": True, "admission_contract": "source_only_heuristic_removal_v1",
+            "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
+            "source_id": identity.get("document_id"), "path": identity.get("canonical_path"),
+            "body_witnesses": [witness], "body_window": body_window,
+        }
     # The canonical qualifier rechecks raw-document SHA, body/window/owner,
     # project/generation and lifecycle. Any such rejection is not a relevance
     # fallback. Qualified windows retain the existing qualification path.
@@ -510,8 +533,9 @@ def recheck_source_valid_candidate(
     result describes native/derived provenance and the surviving existing or
     unassessed route; it grants no new qualification, coverage or edit authority.
     Serialized results cannot replace the current native receipt or raw source.
-    Existing qualified/literal routes keep their own request constraints: the
-    broad route's missing-exact/unresolved-name guard must not tighten them.
+    Existing qualified/literal routes keep their own request constraints. A/ALL
+    uses only the canonical source/request/lineage checks, never the historical
+    missing-exact/unresolved-name barriers.
     """
     if rejection_diagnostics is not None:
         rejection_diagnostics.clear()
@@ -549,7 +573,8 @@ def recheck_source_valid_candidate(
     seed_qualification = seed_checked[0]
     seed_admission = None
     if not seed_qualification.qualified:
-        if seed_qualification.reason != "insufficient_visible_match":
+        if seed_qualification.reason not in ({"source_valid_relevance_unassessed"}
+                                            if source_only_admission_active() else {"insufficient_visible_match"}):
             return reject(qualification_axis(seed_qualification.reason), seed_qualification.reason)
         checkpoint = "native_admission"
         seed_admission = admit_original_literal_context(
@@ -576,7 +601,9 @@ def recheck_source_valid_candidate(
         ))):
         return reject("source_admissible", "derived_source_mismatch")
     checkpoint = "visible_source_qualification"
-    if not qualification.qualified and qualification.reason != "insufficient_visible_match":
+    if not qualification.qualified and qualification.reason not in (
+        {"source_valid_relevance_unassessed"} if source_only_admission_active() else {"insufficient_visible_match"}
+    ):
         return reject(qualification_axis(qualification.reason), qualification.reason)
     checkpoint = "visible_raw_window"
     window = _checked_raw_body_window(
@@ -601,6 +628,29 @@ def recheck_source_valid_candidate(
         edge, native_binding = "native", own_binding
     if edge is None:
         return reject("source_admissible", "unverified_structural_derivation")
+    if source_only_admission_active():
+        # All canonical/lineage/structural checks above remain mandatory. Skip
+        # old semantic routes rather than admitting then resurrecting their veto.
+        visible_candidate = {**candidate, **window, "_reference_evidence": {
+            **evidence, "char_start": window["char_start"], "char_end": window["char_end"], "text": evidence_text,
+        }}
+        checkpoint = "source_only_visible_admission"
+        witness = source_valid_original_candidate_witness(
+            question=question, evidence_text=evidence_text, candidate=visible_candidate, native_candidate=seed,
+        )
+        if witness is None:
+            return reject("source_admissible", "no_verified_raw_context")
+        return {
+            "schema_version": 1, "route": "source_valid_unassessed", "derivation": edge,
+            "native_discovery_binding_sha256": native_binding,
+            "native_span": (list((evidence["char_start"], evidence["char_end"]))
+                            if own_binding is not None and native_binding == own_binding else list(seed_span)),
+            "body_window": window,
+            "project_identity": scope["project_id"], "generation_id": scope["snapshot_id"],
+            "source_id": identity["document_id"], "source_sha256": identity["content_sha256"],
+            "qualification_reason": qualification.reason, "coverage_credit": False,
+            "relevance_unassessed": True, "admission_contract": "source_only_heuristic_removal_v1",
+        }
     route = "existing_qualified" if qualification.qualified else None
     admission = None
     if route is None:

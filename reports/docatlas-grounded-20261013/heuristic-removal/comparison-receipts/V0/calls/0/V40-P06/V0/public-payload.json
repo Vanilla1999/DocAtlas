@@ -1,0 +1,27 @@
+{
+  "status": "insufficient_evidence",
+  "kind": "docs_context",
+  "missing": [
+    "required_evidence_missing"
+  ],
+  "estimated_tokens": 134,
+  "context_quality": {
+    "status": "unavailable",
+    "reasons": [
+      "source_unavailable"
+    ]
+  },
+  "read_next": [],
+  "reason_code": "required_evidence_missing",
+  "context_available": false,
+  "answer_supported": false,
+  "answer_available": false,
+  "edit_ready": false,
+  "support_status": "insufficient_evidence",
+  "requires_confirmation": false,
+  "delivery_decision": {
+    "deliverable": false,
+    "reason_code": "required_evidence_missing"
+  },
+  "operational_status": "not_found"
+}

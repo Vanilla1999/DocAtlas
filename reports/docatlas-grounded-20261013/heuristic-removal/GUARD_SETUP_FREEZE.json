@@ -1,0 +1,9 @@
+{
+  "reason": "new integration inventory shard, no changed frozen product or oracle",
+  "inputs_sha256": {
+    "tests/diagnostic_labels.heuristic_removal.json": "9abfe3c2b42d5a0fd0bfcb30b1f8cb9848e57f07730a26a7222bc1e8e0aaad06",
+    "tests/conftest.py": "b4e9c232b8a31d30e323ed265755df301e777b5f19411b63f1c500ea5b47e16e",
+    "tests/diagnostic_labels.py": "6f3a709b0dcb0ca3445b4deaff5ec095f80ecedabf752aadfdc236d6cb4d272c"
+  },
+  "first_guard_context_calls": 0
+}

@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-78c02c1ff11bdc5a",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Cancelling workers",
+      "snippet": "### Cancelling workers\n\nYou can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].\nThis will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "28702d31429706be1f33ce3dfa659be9443929dc31e05f4fbf151358708066f9",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 91,
+      "line_end": 95,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/fdacf7710349165fece43156"
+    },
+    {
+      "evidence_id": "ev-a2ccea018238aed2",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers > Work decorator",
+      "snippet": "The addition of `@work(exclusive=True)` converts the `update_weather` coroutine into a regular function which when called will create and start a worker.\nNote that even though `update_weather` is an `async def` function, the decorator means that we don't need to use the `await` keyword when calling it.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "0aee918bcab721ef988f5ca9d60e9e381a176468b043450e29b0d9abacc4a38e",
+      "project_identity": "local:e43e7623987a686169569abdb663ae26f693db3eb6b08c5400ad3b10a66bd10b",
+      "line_start": 75,
+      "line_end": 77,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/685dfed415bfb41fd2bd11eb"
+    }
+  ],
+  "tokens": 511,
+  "utf8_bytes": 1588,
+  "sha256": "77b3a253dfd82d0ba4df1238f1c4f778e37598c13bd7b472f4d70528c22884d6",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

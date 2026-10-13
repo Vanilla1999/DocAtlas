@@ -140,15 +140,16 @@ def _source_ground_documentation_gap(
 
 def project_context_pack(*, question: str = "", project_docs: ProjectDocsResult | None, dependency_docs: DocsResult | None) -> list[dict[str, Any]]:
     pack: list[dict[str, Any]] = []
+    source_native = True
     answer_lifecycle_intent = lifecycle_intent_for_question(question)
     if project_docs:
         for item in project_docs.results:
             lifecycle_metadata = {"lifecycle_status": item.lifecycle_status or "active"}
             if item.stale or not lifecycle_allows(lifecycle_metadata, answer_lifecycle_intent):
                 continue
-            if _drop_placeholder_context_doc(item):
+            if not source_native and _drop_placeholder_context_doc(item):
                 continue
-            if _drop_low_value_context_section(item.content, item.title, item.heading_path):
+            if not source_native and _drop_low_value_context_section(item.content, item.title, item.heading_path):
                 continue
             token_estimate = max(1, len(item.content) // 4) if item.content else 0
             freshness = "stale" if item.stale else "current"

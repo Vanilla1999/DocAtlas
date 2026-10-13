@@ -1,0 +1,88 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-c519792f3ac41c6b",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "Configuration File Resolution",
+      "snippet": "In this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n\n## TypeScript Configuration Files\n\nFor Deno and Bun, TypeScript configuration files are natively supported; for Node.js, you must install the optional dev dependency [`jiti`](https://github.com/unjs/jiti) in version 2.2.0 or later in your project (this dependency is not automatically installed by ESLint):\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"jiti\"],\n    args: [\"--save-dev\"]\n}) }}\n\nYou can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).\n\n::: important\nESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "de4eb61ead88c48e9a8e19690980abb37cc6f93d93a8ff6d6a239f9340b60c72",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 793,
+      "line_end": 810,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/21ffae1abb5b9a536d9665cb"
+    },
+    {
+      "evidence_id": "ev-cb6f14bd3e2ae779",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Miscellaneous > `--env-info`",
+      "snippet": "#### `--env-info`\n\nThis option outputs information about the execution environment, including the version of Node.js, npm, and local and global installations of ESLint.\n\n- **Argument Type**: No argument.\n\nThe ESLint team may ask for this information to help solve bugs. When you use this flag, the CLI does not perform linting.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "316e44524c04f7d76b46c9b2290a4acbaaf991d49ec027f524f8143144c3ad55",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 855,
+      "line_end": 862,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/a32ebfe311f0326f6fdc45f1"
+    },
+    {
+      "evidence_id": "ev-6a74ee5684b2c564",
+      "path_or_url": "docs/src/use/configure/configuration-files.md",
+      "section": "TypeScript Configuration Files > Native TypeScript Support",
+      "snippet": "### Native TypeScript Support\n\nIf you're using **Node.js >= 22.13.0**, you can load TypeScript configuration files natively without requiring [`jiti`](https://github.com/unjs/jiti). This is possible thanks to the [**`--experimental-strip-types`**](https://nodejs.org/docs/latest-v22.x/api/cli.html#--experimental-strip-types) flag.\n\nSince this feature is still experimental, you must also enable the `unstable_native_nodejs_ts_config` flag.\n\n```bash\nnpx --node-options='--experimental-strip-types' eslint --flag unstable_native_nodejs_ts_config\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "74d1b75e75ac81e5472808baa199cf37bf51373dd1b68474fc05b0b7f8a4c237",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 811,
+      "line_end": 820,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/0b6fd9569c663fcc276cef73"
+    },
+    {
+      "evidence_id": "ev-67933f62b7eb0548",
+      "path_or_url": "docs/src/use/command-line-interface.md",
+      "section": "Options > Output > `--color` and `--no-color`",
+      "snippet": "#### `--color` and `--no-color`\n\nThese options force the enabling/disabling of colorized output.\n\n- **Argument Type**: No argument.\n\nYou can use these options to override the default behavior, which is to enable colorized output unless no TTY is detected, such as when piping `eslint` through `cat` or `less`.\n\n::: warning\n\nWhen neither `--color` nor `--no-color` is specified, the formatter may decide whether to colorize the output based on the runtime environment. For example, when using the default `stylish` formatter under Node.js, [`FORCE_COLOR`](https://nodejs.org/api/cli.html#force_color1-2-3), [`NO_COLOR`](https://nodejs.org/api/cli.html#no_colorany), or [`NODE_DISABLE_COLORS`](https://nodejs.org/api/cli.html#node_disable_colors1) environment variables may affect whether colors are used.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9fb3615ff27a796dacdede65bd4bc7e13038bf7086a32a2327be747b2e6f7e7f",
+      "project_identity": "local:db16ec0ccc6697942d9d11fe06e66afdfd2a27eba76ce711db9e4b7640392387",
+      "line_start": 592,
+      "line_end": 605,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/49dfd550f2f3b40c26ccc8f3"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 1296
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T05",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "What does exclusive=True do when Textual starts a new worker?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "8ffb39818fbad1412da4717e357206909ed41701cda4009dddb88b83da20460a",
+  "utf8_bytes": 8683,
+  "tokens": 2415,
+  "seconds": 0.5656323679995694,
+  "cpu_seconds": 0.5619608410000012,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

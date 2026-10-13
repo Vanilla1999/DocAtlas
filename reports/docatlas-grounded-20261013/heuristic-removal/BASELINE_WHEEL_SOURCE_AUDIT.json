@@ -1,0 +1,2018 @@
+{
+  "base": "91dd2b4e9f0615e9c6ac5c4346c13200accca550",
+  "checked_python_members": 402,
+  "mismatches": [],
+  "records": [
+    {
+      "path": "docmancer/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "ea315537b1d751a0845afd3f6e79949ab3fd75cac3b6a92c47cc224cd9e916b1"
+    },
+    {
+      "path": "docmancer/__main__.py",
+      "matches_base_commit": true,
+      "sha256": "89f442e27353c7c18a7ec5197f2568eb965c38ca4e1a4d6d68608232d6d3844a"
+    },
+    {
+      "path": "docmancer/_agent_parser_loading.py",
+      "matches_base_commit": true,
+      "sha256": "14ed019178b10e4ce4fa392fb07cd82661587dfb98933a1d4db6b2c9da8a5c12"
+    },
+    {
+      "path": "docmancer/_version.py",
+      "matches_base_commit": true,
+      "sha256": "1e0280dd1a99bc2eec968f0c80bc9f7c21b025b437718e88ee850c16f18b5a9b"
+    },
+    {
+      "path": "docmancer/agent.py",
+      "matches_base_commit": true,
+      "sha256": "b22806a000842283911f5ae7b79eea016284780780af648215b7668af8faba1d"
+    },
+    {
+      "path": "docmancer/async_agent.py",
+      "matches_base_commit": true,
+      "sha256": "0bf5612d9dbbe117939fe0c7bc5ab58cab7ea86911eff502979b2885ac2b6e3e"
+    },
+    {
+      "path": "docmancer/client.py",
+      "matches_base_commit": true,
+      "sha256": "e036dd6dfe99f82155da0f94e32b5d6cb6a1dd96e783d020af7e2aa900b68fc7"
+    },
+    {
+      "path": "docmancer/context.py",
+      "matches_base_commit": true,
+      "sha256": "cd04264465a9fba8541a59a5d447623ca87cf3364cfaa874cd5ccfc062cf1822"
+    },
+    {
+      "path": "docmancer/support_policy.py",
+      "matches_base_commit": true,
+      "sha256": "4ec5727b0ac5029b3a4ad812ee682c2a1b6cff5e72a065279f811b1b40c79105"
+    },
+    {
+      "path": "docmancer/_internal/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "d41f951f4f574feb7313af5640f078cd5a4e033cf0dcf95329bad1829c6869e5"
+    },
+    {
+      "path": "docmancer/_internal/shard_compat.py",
+      "matches_base_commit": true,
+      "sha256": "e5f71ff861bb459d7a09029324341878ce6c998a95fc515e3fbfe59a64e27285"
+    },
+    {
+      "path": "docmancer/cli/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/cli/__main__.py",
+      "matches_base_commit": true,
+      "sha256": "07206579ae610c653275d220e6df4b0da7b61b8de5d1be1b1b9a32120f800455"
+    },
+    {
+      "path": "docmancer/cli/_commands_part01.py",
+      "matches_base_commit": true,
+      "sha256": "c3709f3b3b53304c5852d99f704b7769cea641ef2e487093a6f2eb6fdde6e7bd"
+    },
+    {
+      "path": "docmancer/cli/_commands_part02.py",
+      "matches_base_commit": true,
+      "sha256": "bc38418d58bde444a23edc1d43f977cb3c369f164cb9fd830a766f93efbe1f1e"
+    },
+    {
+      "path": "docmancer/cli/_commands_part03.py",
+      "matches_base_commit": true,
+      "sha256": "88bfdcd69a4c45d89b0c77337841a9475487ffbbc036c91650dfbffd47e3668b"
+    },
+    {
+      "path": "docmancer/cli/_commands_part04.py",
+      "matches_base_commit": true,
+      "sha256": "12f42a6d803ad12b4953fd3dbc88fe8c24ba0d63fbb393f4c2acf58cbd7e533d"
+    },
+    {
+      "path": "docmancer/cli/_commands_part05.py",
+      "matches_base_commit": true,
+      "sha256": "b92055e75c256641dc0dbc5d80fdfe49efff7f50396d361e9d0d8b6eee5cec06"
+    },
+    {
+      "path": "docmancer/cli/_commands_shared.py",
+      "matches_base_commit": true,
+      "sha256": "b0b91e8d1cd73c282b220dc38e8085687a221c9f7633d9cf4624311c6b4237e5"
+    },
+    {
+      "path": "docmancer/cli/client_identity.py",
+      "matches_base_commit": true,
+      "sha256": "26aa356c4f40ade72058deae1e212a4bb7a5aee16e80d77c250a66a2fb69679d"
+    },
+    {
+      "path": "docmancer/cli/commands.py",
+      "matches_base_commit": true,
+      "sha256": "05710dacf2c9783316b28a636365467dd7b74c7fe3192dd31ef811129ae73a7c"
+    },
+    {
+      "path": "docmancer/cli/help.py",
+      "matches_base_commit": true,
+      "sha256": "b0de139112c2e981f266d12c32ed2cd7e5370f9b7011d23a6fd1d54f92ce3cc9"
+    },
+    {
+      "path": "docmancer/cli/mcp_commands.py",
+      "matches_base_commit": true,
+      "sha256": "dfa6eeaf18b73e1b49f5fb3b27b451e37a991ac1b18df659dcd81e9589c8b047"
+    },
+    {
+      "path": "docmancer/cli/qdrant_commands.py",
+      "matches_base_commit": true,
+      "sha256": "9d8a9d5f20e087a4ae720f7ec757a8f0d03f5c099edc84eed1746353cda68d63"
+    },
+    {
+      "path": "docmancer/cli/state_commands.py",
+      "matches_base_commit": true,
+      "sha256": "db88be788d3ff5d06240dcf8e3c86d453d2e150cd3e6adfb6c98318e2a5eed6d"
+    },
+    {
+      "path": "docmancer/cli/ui.py",
+      "matches_base_commit": true,
+      "sha256": "4190fe9830c7cda158a532659ca4a5af7081c6ec9c52f1b052b933fdbcfd6f70"
+    },
+    {
+      "path": "docmancer/connectors/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/base.py",
+      "matches_base_commit": true,
+      "sha256": "789eda6333ca798eaf66987856c89caacc4c86acfebb992d6a1ae4ecfd95983a"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/crawl4ai.py",
+      "matches_base_commit": true,
+      "sha256": "a9537ae63f52cd20a124d3f266c9e5bf3d2e12b769b59b6bf809df6e61c5df70"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/factory.py",
+      "matches_base_commit": true,
+      "sha256": "0b5eb211ecf897ad1a6996e635d360ff173a050a352cf6234991db4ea6ea2605"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/gitbook.py",
+      "matches_base_commit": true,
+      "sha256": "1a4f7fc4af0b7f747b8bf659a5efeeb4c4ee2c509770b42f1fb59494e94731f7"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/github.py",
+      "matches_base_commit": true,
+      "sha256": "33f1ae1ce66d82fea610aa76497e73ab8fc3d082c1f9badf999b27b2fb1b4122"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/llms_txt.py",
+      "matches_base_commit": true,
+      "sha256": "62efc882694fa15d6bf23114236f8bc5f9fb9d06852d9573bca564928b656628"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/mintlify.py",
+      "matches_base_commit": true,
+      "sha256": "5dcb0fc505dd98a87322044fd33c4df450c5743cb4a8b3a4a4f5f083531cdb70"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/web.py",
+      "matches_base_commit": true,
+      "sha256": "a6d5fcb348b18d77e6e90c9ace1eec64f2ac0f8dd11da42c54a5cce45bb67c18"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "d557a2647293e6e67ca1aa06a33ab1dc41ae0a25627f05d79ecd37f49754718b"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/part01.py",
+      "matches_base_commit": true,
+      "sha256": "5ffda93826d131d9f5352cb22b55c9f4de7d3b236972a890a832916ebfc2e3a3"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/part02.py",
+      "matches_base_commit": true,
+      "sha256": "d7ac0bfd51156118af8bdb1123756b5cc0c2774e466e939e38fa592bbe896f07"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/_web/shared.py",
+      "matches_base_commit": true,
+      "sha256": "0c25a5fc73ed990d216ba95174a4c64cf8f17aa39c2a39d775f59d55a317085d"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "a6a416674276d3328dd8b2dc786058c8c29ec203883606b921c863be2476ae8f"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/browser.py",
+      "matches_base_commit": true,
+      "sha256": "4cda306c9e00248b7f50bdb54f3f5f75fe89938db31d82dfa213ddb08f6f1b59"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/crawl4ai_extraction.py",
+      "matches_base_commit": true,
+      "sha256": "7d2c385994bcb137ee36953a051f5e766277d29c2dc16a0642d3ba768764c11f"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/detection.py",
+      "matches_base_commit": true,
+      "sha256": "f911503f3304473de5f5e139526e012d7fb613678da9a3c42a9467c89b64c868"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/discovery.py",
+      "matches_base_commit": true,
+      "sha256": "ec65fed0222b723c6de2e6877504a05f0a6d51433e39c247d39c59507fc65d44"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/extraction.py",
+      "matches_base_commit": true,
+      "sha256": "5616de1c237be2ecf9b01e9869cd776820a639bf50afdb36f003630e199dea44"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/filtering.py",
+      "matches_base_commit": true,
+      "sha256": "8006aa161192aef33df01798e9b2506bf7ce0b696aa2e7f292679a80558e84a3"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/rate_limit.py",
+      "matches_base_commit": true,
+      "sha256": "2220333740dd09e52fff54f02305aaff7a541ccc7a438e212ab91f0171c26c57"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/redirect.py",
+      "matches_base_commit": true,
+      "sha256": "4d754365606d3c3443bc387b5601572bfffc59534c17b778da2050c9baadb371"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/robots.py",
+      "matches_base_commit": true,
+      "sha256": "67f39daadaa12ade2978bb7ae59bc17b902b5842f8fd30152ab397d1bb2615ca"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/pipeline/sitemap.py",
+      "matches_base_commit": true,
+      "sha256": "e87074053deb51796f15e1b4bbe4469b8c3bac493ea4dc42314f6f9e2be8d785"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "76a7d9debc8dda69c273b85264012f81713c95844dbb5feef7a2775fd11a6ad6"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/normalizer.py",
+      "matches_base_commit": true,
+      "sha256": "9d2b3eed05ca7e6e685d9b6fc1983e57b6154c602327c9e0b7ebf50e85c26642"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/parser.py",
+      "matches_base_commit": true,
+      "sha256": "1607b4c2465d2f39e9d8207af445adad2c99901862aefca763d022800bffe7b7"
+    },
+    {
+      "path": "docmancer/connectors/fetchers/uspto_tm/schema.py",
+      "matches_base_commit": true,
+      "sha256": "0355ca756e5a9953d26c4d81949973698b4aed1ac3766d9cf0cfedfaa9b934e0"
+    },
+    {
+      "path": "docmancer/connectors/parsers/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "ea8729fa6f32c43bce8ce694e75a2e77939070595b474151c764b06a8500fbc2"
+    },
+    {
+      "path": "docmancer/connectors/parsers/base.py",
+      "matches_base_commit": true,
+      "sha256": "7997b5a578d5f461379e54b051f7aef8773eeebb68b410b16094d268cfcce4a8"
+    },
+    {
+      "path": "docmancer/connectors/parsers/docx.py",
+      "matches_base_commit": true,
+      "sha256": "99ae2d00876d5beefdcfd7bf3239a20ebe69a0712e397eaf32d70739e37be060"
+    },
+    {
+      "path": "docmancer/connectors/parsers/html.py",
+      "matches_base_commit": true,
+      "sha256": "8219f8b0eb1a1df7ae76a74d1b8108a08e96c1215d440ae78f2c4da52f8aae39"
+    },
+    {
+      "path": "docmancer/connectors/parsers/markdown.py",
+      "matches_base_commit": true,
+      "sha256": "a06ef067198e08a78776d668dab4737b71f8cce88fbe3226b633ce1e7da3239f"
+    },
+    {
+      "path": "docmancer/connectors/parsers/pdf.py",
+      "matches_base_commit": true,
+      "sha256": "f18106dfbe269c933314437f878873a56c688e31eed67a367b7641ef363d5682"
+    },
+    {
+      "path": "docmancer/connectors/parsers/rtf.py",
+      "matches_base_commit": true,
+      "sha256": "d7e82bd993fed51437a062e11f6f094a6748a23cc62b47a1f5bb1d64dd8d89b4"
+    },
+    {
+      "path": "docmancer/connectors/parsers/text.py",
+      "matches_base_commit": true,
+      "sha256": "b8e06ba653e63585b5829432433b00830c2f16943a8cddccb421720aa81d37c9"
+    },
+    {
+      "path": "docmancer/core/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_active_fts.py",
+      "matches_base_commit": true,
+      "sha256": "f0f58470561fe232b441b5b0b13cdf9e3c2b52e748b184992bca94aa3e09969a"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_filter_metadata.py",
+      "matches_base_commit": true,
+      "sha256": "113a2cd810bfd47e1a20bc594c052d2842046c27226b8fdee014c0d5e875066c"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part01.py",
+      "matches_base_commit": true,
+      "sha256": "03f9e0dcc22c6a88bce1b93206335a53d7454453c3375a0f3a4592cadaefc241"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part02.py",
+      "matches_base_commit": true,
+      "sha256": "013b23d6307e0f617a7410c891896ebcfe55d5b78e2a032ae7d8d083e3d3feea"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part03.py",
+      "matches_base_commit": true,
+      "sha256": "926ba50fcec986c28a796e139dd97874de34a2e3402e8c44e126a4149e5652b0"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part04.py",
+      "matches_base_commit": true,
+      "sha256": "544787d703869e5cf05c5535d48df9f1a391e4663b1d4549e43b42aed7910feb"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_part05.py",
+      "matches_base_commit": true,
+      "sha256": "1681557a71d22f61ad442fc7757958796593118e1b64927d649239ae8eb721a0"
+    },
+    {
+      "path": "docmancer/core/_sqlite_store_shared.py",
+      "matches_base_commit": true,
+      "sha256": "1a9c4283b9b118f34de4c46863e9b4541aaf29566d64abead5b4f41d59315bf2"
+    },
+    {
+      "path": "docmancer/core/chunking.py",
+      "matches_base_commit": true,
+      "sha256": "62189251b29ce189efa02aa6eb4ea71285cb64139b537ff70ec29e4c413aa305"
+    },
+    {
+      "path": "docmancer/core/config.py",
+      "matches_base_commit": true,
+      "sha256": "6d932315d7194dcd2b5f058fbf118209846047800b530b5770ab4d55e7a6ff5f"
+    },
+    {
+      "path": "docmancer/core/config_resolution.py",
+      "matches_base_commit": true,
+      "sha256": "e0a3a665b469c2154383d583f4110677315a7a88ac47a534cf024163b29328aa"
+    },
+    {
+      "path": "docmancer/core/html_utils.py",
+      "matches_base_commit": true,
+      "sha256": "20486dd0dd3c7d43372334b54369104a2d2fb596a37d89d418abec86d4c2981a"
+    },
+    {
+      "path": "docmancer/core/index_meta.py",
+      "matches_base_commit": true,
+      "sha256": "8bb1ec7e91ba965f4d462f23a4e0b9d65cbee2291e40c082261b7c57ea0a2c21"
+    },
+    {
+      "path": "docmancer/core/member_read_store.py",
+      "matches_base_commit": true,
+      "sha256": "b62440b322b676c8d1b69d05ab0d11a9af5750023b2bfef53e0bb07f329a3981"
+    },
+    {
+      "path": "docmancer/core/member_storage_policy.py",
+      "matches_base_commit": true,
+      "sha256": "574042189621dcc56c2d3ec7959ee5aae09295a2a281391f4a4b738ec1927b3a"
+    },
+    {
+      "path": "docmancer/core/models.py",
+      "matches_base_commit": true,
+      "sha256": "6a158f0bd4fffe1c75c9821ba2a349ad7e4c9fe50cde37ac25c6e36cd9dde4ce"
+    },
+    {
+      "path": "docmancer/core/prepared_parent_sections.py",
+      "matches_base_commit": true,
+      "sha256": "d2edc2551f55113dfcf5233be56804380ee08bc9cc2aa2e35267928b08301632"
+    },
+    {
+      "path": "docmancer/core/product_identity.py",
+      "matches_base_commit": true,
+      "sha256": "923517aa47eee7728b45a8b2a1e390bc4e74eafc8222b3f1fe4d0da2daef8153"
+    },
+    {
+      "path": "docmancer/core/sqlite_store.py",
+      "matches_base_commit": true,
+      "sha256": "0347c43a9eeeae64acb0235a13a0fa1a1431438285be78ef438e4e8094e48b49"
+    },
+    {
+      "path": "docmancer/core/storage_topology.py",
+      "matches_base_commit": true,
+      "sha256": "2009d4904aed3d30d03cee82dd26325853e3cefaca31bab0c9cc84ffb41e714f"
+    },
+    {
+      "path": "docmancer/core/structured_chunking.py",
+      "matches_base_commit": true,
+      "sha256": "428294f9ce2bfc32d4dd32d06a0f437bfd53749dde8bee3d39436c4ce8ad514e"
+    },
+    {
+      "path": "docmancer/docs/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "65d7284c6538f79f992c8d4dc966c31cffdeb348764e6591ebb5c345c4b7a433"
+    },
+    {
+      "path": "docmancer/docs/_impact_part01.py",
+      "matches_base_commit": true,
+      "sha256": "84f80ca51dc9eb759bb1a5e024d2e63eb80dd51805055cb9aec6d4f441afa091"
+    },
+    {
+      "path": "docmancer/docs/_impact_part02.py",
+      "matches_base_commit": true,
+      "sha256": "b807779cf4e0a8f4fd728ebeab965b2597ca404279f8225dde3fa743ba147da8"
+    },
+    {
+      "path": "docmancer/docs/_impact_part03.py",
+      "matches_base_commit": true,
+      "sha256": "35965baece8a81a8322c8f0be6a69a59143ff0006051d6477e3d1a35435ac50c"
+    },
+    {
+      "path": "docmancer/docs/_impact_part04.py",
+      "matches_base_commit": true,
+      "sha256": "602dad329f17bc27089d44569e5b16fca63e5fcba887f9bf9a72f093cd3af47d"
+    },
+    {
+      "path": "docmancer/docs/_impact_shared.py",
+      "matches_base_commit": true,
+      "sha256": "5cc6e78f82ee549dca40df0a5b43efcbe5743f16a484efe8ecd40ddaeb3929ea"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part01.py",
+      "matches_base_commit": true,
+      "sha256": "96ffb7b40275289bdba06f47c60236b3505705a4c870113063dac884f7414f4e"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_part02.py",
+      "matches_base_commit": true,
+      "sha256": "a789f0755fcdd181acaea5450c2691d925c361e78b38bcf4ff1455ab0eaf9816"
+    },
+    {
+      "path": "docmancer/docs/_patch_plan_context_shared.py",
+      "matches_base_commit": true,
+      "sha256": "d37be7fce59b48d00883557aefe11144084b371d1e2cf0f19f0ea7ed847a6f16"
+    },
+    {
+      "path": "docmancer/docs/agent_contract.py",
+      "matches_base_commit": true,
+      "sha256": "55b1f3d733865dd40c47d2601a9e8281a0df0f4d359deec34f18abcd41f2fe1f"
+    },
+    {
+      "path": "docmancer/docs/agent_question_planning_eval.py",
+      "matches_base_commit": true,
+      "sha256": "b5545e4b5ed543743489e4089e09001c8d5a891f0ab06023ed6415791b6a8b62"
+    },
+    {
+      "path": "docmancer/docs/cargo_project.py",
+      "matches_base_commit": true,
+      "sha256": "8766917136902cb4b6e198386e84c7da6a04b942fdf5c2f2cc7dbf190aae390c"
+    },
+    {
+      "path": "docmancer/docs/code_context.py",
+      "matches_base_commit": true,
+      "sha256": "bae7c2c4e45e6cfb1037752dccd68a97078153d00a4cba491c167a2ad0c17ce1"
+    },
+    {
+      "path": "docmancer/docs/curated_sources.py",
+      "matches_base_commit": true,
+      "sha256": "b24075dd2c4d8e9c0c4cd431551c9db3351cd672d5debfc1ba7e91b4b68ae0c9"
+    },
+    {
+      "path": "docmancer/docs/dart_official_docs.py",
+      "matches_base_commit": true,
+      "sha256": "da2d7b8847757849b9f47aea449d84563b46316d49bf4e430373da7667d329dc"
+    },
+    {
+      "path": "docmancer/docs/dart_package_config.py",
+      "matches_base_commit": true,
+      "sha256": "3d3afd2212a24edb06248ef5017f6a4c5e72ddbab05b6a9e5a7ac8d95db6ee93"
+    },
+    {
+      "path": "docmancer/docs/dartdoc.py",
+      "matches_base_commit": true,
+      "sha256": "0cfee762ea38a19f7d97818ae4a71217d9a5d156fd08eca4f45779939dfbc5c5"
+    },
+    {
+      "path": "docmancer/docs/discovery_candidates.py",
+      "matches_base_commit": true,
+      "sha256": "019a1aa39492011675143c5eba734df2984a3ce9bacf18339616a832171e7817"
+    },
+    {
+      "path": "docmancer/docs/documentation_evidence.py",
+      "matches_base_commit": true,
+      "sha256": "68754ef8756755ff106cb5b769cd06bb23c0eeed817013bb6e2a1147c1a34e9b"
+    },
+    {
+      "path": "docmancer/docs/ecosystem_adapters.py",
+      "matches_base_commit": true,
+      "sha256": "6017056b131337273d292029efa1fe2f4e7b781a4f92b46a16d8727da764b7e3"
+    },
+    {
+      "path": "docmancer/docs/exact_version.py",
+      "matches_base_commit": true,
+      "sha256": "5be6287ede66c6a6793593caccc515f8975a772c34645e8f2a054e547fcf4aac"
+    },
+    {
+      "path": "docmancer/docs/fetch_policy.py",
+      "matches_base_commit": true,
+      "sha256": "00e6e7515373dea1545b3b6fa245be9365b108673fdbd8b87e603c5841031d0f"
+    },
+    {
+      "path": "docmancer/docs/fetch_transport.py",
+      "matches_base_commit": true,
+      "sha256": "596e918da12ff349bf640539cca33f9e86f9c6f20fac363e72eebd5d3d71251d"
+    },
+    {
+      "path": "docmancer/docs/finite_membership.py",
+      "matches_base_commit": true,
+      "sha256": "40ee42f49d24d9f19312f989af672d64b4f2264721ff434983c0dc1774641bcc"
+    },
+    {
+      "path": "docmancer/docs/github_source_manifest.py",
+      "matches_base_commit": true,
+      "sha256": "287553110e2fe6201dd1118a4f5500467a57a92e69c27ffe53f6266e23a0cad6"
+    },
+    {
+      "path": "docmancer/docs/go_project.py",
+      "matches_base_commit": true,
+      "sha256": "f87ca283edce5231ea7ba50bcb8f0ed21fd63f2519d31de8711fa912e48316d7"
+    },
+    {
+      "path": "docmancer/docs/impact.py",
+      "matches_base_commit": true,
+      "sha256": "22609652f4f7062ffd3d222c9160404a792122188142461421a967af92bf5dc7"
+    },
+    {
+      "path": "docmancer/docs/java_project.py",
+      "matches_base_commit": true,
+      "sha256": "51ec30a62f309abe0a08a9d1d784f9a43d1c4d912cb1ffc1cca1ff9a32e09262"
+    },
+    {
+      "path": "docmancer/docs/local_membership.py",
+      "matches_base_commit": true,
+      "sha256": "fc990a47230f2f43d93b65f95940177c806b94556f09344712fdf4f1f67753da"
+    },
+    {
+      "path": "docmancer/docs/manifest_contract.py",
+      "matches_base_commit": true,
+      "sha256": "3e10d480fd0ae5f59efb376c6f6672b30e36d085a6693656074df14e8f63d2dd"
+    },
+    {
+      "path": "docmancer/docs/mcp_footprint.py",
+      "matches_base_commit": true,
+      "sha256": "c997df98f3088f7adbe3820a6828ab8ad6df00080c685d64f887eb8f7fe1e77c"
+    },
+    {
+      "path": "docmancer/docs/models.py",
+      "matches_base_commit": true,
+      "sha256": "f132d46411911730202e42be2631ae27a39bb9f0db7dbac60ec0633093ba201d"
+    },
+    {
+      "path": "docmancer/docs/node_project.py",
+      "matches_base_commit": true,
+      "sha256": "e843fc1a9512ede1477ad89ac84693901e560b554559928949f522d7fc157287"
+    },
+    {
+      "path": "docmancer/docs/patch_plan_context.py",
+      "matches_base_commit": true,
+      "sha256": "38d0814588b684d7af90b8b921987b62f3fa0ea6ca09e2e66935062e62ce38b3"
+    },
+    {
+      "path": "docmancer/docs/project.py",
+      "matches_base_commit": true,
+      "sha256": "c0f5eb9a3e72342d86f2f824b1e65e65b5aba0cce7c2cbf0fa2974f5db23becf"
+    },
+    {
+      "path": "docmancer/docs/project_docs_catalog.py",
+      "matches_base_commit": true,
+      "sha256": "25236b585a48d17d8461d49d0cd6a7ecc3a913da494e3aecb35e2bf50ff70637"
+    },
+    {
+      "path": "docmancer/docs/pub_project.py",
+      "matches_base_commit": true,
+      "sha256": "b148e6b5369eb268e1a06aa1ebe1b55cf3cc3c01aa279d24a95da6909098c737"
+    },
+    {
+      "path": "docmancer/docs/python_project.py",
+      "matches_base_commit": true,
+      "sha256": "dc54b01469396d7f30ce969408cfa75de40050a3d7dc1ee70696efb2b5655a11"
+    },
+    {
+      "path": "docmancer/docs/registry.py",
+      "matches_base_commit": true,
+      "sha256": "6265967ad52683f74e5b8ac2c5e745f733855fd552c976b9bf4cd27b21fe7631"
+    },
+    {
+      "path": "docmancer/docs/resolver.py",
+      "matches_base_commit": true,
+      "sha256": "787ac38dbbcb3eba671fc03b87d11cbb60cbd22ee7e543e609b4727492da590c"
+    },
+    {
+      "path": "docmancer/docs/section_metadata.py",
+      "matches_base_commit": true,
+      "sha256": "31830833561bed2b1436dda47d87073ceb1f4274cfcbcf86711c924b874fc159"
+    },
+    {
+      "path": "docmancer/docs/service.py",
+      "matches_base_commit": true,
+      "sha256": "d2efeb4d2261f0b1682ca0fec7aab675513c5bb8411ccc3cc2910886dffc16e4"
+    },
+    {
+      "path": "docmancer/docs/tool_choice_eval.py",
+      "matches_base_commit": true,
+      "sha256": "e9d3bc0a408570f5f4c14fdf913a15f78b8fb5ca9b5e8ddae3f78c2c27fd408e"
+    },
+    {
+      "path": "docmancer/docs/application/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "7f518920c6fd354304cf786eaf62f528529cc3c0b9497f46771a75ac5498df65"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part01.py",
+      "matches_base_commit": true,
+      "sha256": "2e5334e03e4954312c2cee24b28d08aadc6eb1df16c123ddb96a3d5fef548f59"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part02.py",
+      "matches_base_commit": true,
+      "sha256": "660671f9e3e2aa1ea4b097ca6844d07828f70e59e1d12a6b9d5bd9b276935372"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part03.py",
+      "matches_base_commit": true,
+      "sha256": "daf8e78d2508d48127d194428910675524e92ee0029f6e95a4f85cd640b60b21"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_part04.py",
+      "matches_base_commit": true,
+      "sha256": "8dec19d2eb2437ea6201e569d7856158c78e2d72e823d31e7d5363970b1eb0d9"
+    },
+    {
+      "path": "docmancer/docs/application/_action_packet_shared.py",
+      "matches_base_commit": true,
+      "sha256": "a26fac2f44cbba06414048a0006bde129732cdc445f6fa47842ed32bafbe9063"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_payload.py",
+      "matches_base_commit": true,
+      "sha256": "ed9950c5f99a8dbc19e1f743987b50735a8c158cf7459462614e9dfb833e96d8"
+    },
+    {
+      "path": "docmancer/docs/application/_docs_context_projection_core.py",
+      "matches_base_commit": true,
+      "sha256": "5c8dd062c52d45449cc7f3a5831e37b0fcb0523383847a6c7fe8ae5d5bb6c146"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part01.py",
+      "matches_base_commit": true,
+      "sha256": "3cdeb863ded666eebf04d99cb0607b4c795a72737da2ae4e421b7e916c6d97d5"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part02.py",
+      "matches_base_commit": true,
+      "sha256": "7b853babb76746865195f66a99be61772a9baf4f2a0cc53683ee4357c1ec51ee"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part03.py",
+      "matches_base_commit": true,
+      "sha256": "dfba410e57597fc99d318aa87c1787418b1fee21f1cd4095485aac6fca8b6264"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_part04.py",
+      "matches_base_commit": true,
+      "sha256": "b23c6b53f072cfb9364fcb545ba4ec7ec42ad9ef505e0b4d73798ec61eafb538"
+    },
+    {
+      "path": "docmancer/docs/application/_evidence_selection_shared.py",
+      "matches_base_commit": true,
+      "sha256": "e91afef0a75513ad4ea38134999cd78d8bc3c72c07f8e36fb1d94d67c042ce8e"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "1943b970645ae4dcdcc62344f4a59c6f826e427f1a4cf7c8584b0e4236c8b43e"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part02.py",
+      "matches_base_commit": true,
+      "sha256": "5a1dcfbab2f26e228a687289bc2af646d956ad9ba955a7c89921f9bbe318fb82"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part03.py",
+      "matches_base_commit": true,
+      "sha256": "e05e12ce6a2aa33d540c514f2737694845f433bb6ea1c2c10c971b0b99d50b19"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_part04.py",
+      "matches_base_commit": true,
+      "sha256": "afeaa256d68896e2c83737d266196a12be17002ea8174ca668afe79c024048ca"
+    },
+    {
+      "path": "docmancer/docs/application/_library_docs_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "8e23b3a0738cf3668a9b3a84a34558237ecd6f0736ef053b913f2b5e33843441"
+    },
+    {
+      "path": "docmancer/docs/application/_model_visible_docs_support.py",
+      "matches_base_commit": true,
+      "sha256": "91b603426a36f4cbadc4daacbac7db1bf9170129f9e20011b1b834a9fa1d689f"
+    },
+    {
+      "path": "docmancer/docs/application/_model_visible_patch_projection.py",
+      "matches_base_commit": true,
+      "sha256": "5f36e4915ab6aec8d0c7b979e99948574304e527e615954e87b2ec8f15ae211c"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "239a75b8a6a26c0c7fb1dff3c28d8e00d7506b511bec151c566944fe403fed03"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part02.py",
+      "matches_base_commit": true,
+      "sha256": "1c38652b4cf41af635e77ae763dcf4c1c8daf85cdfddbf7edf81f94726bc30df"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_part03.py",
+      "matches_base_commit": true,
+      "sha256": "b96ac4eaacacba4e95ef974748730e769d2f1c0cd6ce78525517883dddd28669"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_constraints_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "673660be44b2391c103c6159a4fbb3935ca4885aee6c4dff026f5bd74c351afe"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "d27cdc9845eccdbe70807c1a48f59ddb731200f542a39e45cd061ce30f0bdf20"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_part02.py",
+      "matches_base_commit": true,
+      "sha256": "3aa217e07f66ff3bf5aee7c4fdc7c720083a6875525006f7f2a94654ea2766d5"
+    },
+    {
+      "path": "docmancer/docs/application/_patch_review_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "051b06b7000c705fbd46fe78a4191860e875e3a088bf86f6d909c277d38a2c91"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "449ba37cf674c7868ee18e9d63a5bb2e3829e36763706ba5c7a4a289fdb797c4"
+    },
+    {
+      "path": "docmancer/docs/application/_project_context_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "61bc8fcd03af2003c892654cc70803a06a01520695837714fd722bb291eed418"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_continuations.py",
+      "matches_base_commit": true,
+      "sha256": "d5724c8d5bee565727d85c1e149399289c93969bd5d177d1552f60f3549395d8"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_diagnostics.py",
+      "matches_base_commit": true,
+      "sha256": "82b5fb797e129ac4e2d16a49f321934eb21cf9b6cc330fd1761dc82428367bff"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_exact_document.py",
+      "matches_base_commit": true,
+      "sha256": "53dbdb497fd869c15e80b2aa3ea188fcb473ddf529da443dfb5e9bce2b83fb5f"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "3a58b23897de94332c89bc712f633946e64aa39ed78d201a18bac5a8a5cdac42"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part02.py",
+      "matches_base_commit": true,
+      "sha256": "21bdcc4ffe5c0f71e8e1b391500c0825f149982e0be87f24304c970c98d91060"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_part03.py",
+      "matches_base_commit": true,
+      "sha256": "bab86e1e91688bc156139b507bf5f8a2cb31db9a403bb40e74cb028e5ae41640"
+    },
+    {
+      "path": "docmancer/docs/application/_project_docs_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "b5e8c60b2d31bde60eacabe0a180ed9220e639dc4ae6578c8d8c1a48d7321645"
+    },
+    {
+      "path": "docmancer/docs/application/_source_continuation_core.py",
+      "matches_base_commit": true,
+      "sha256": "46697471d3030951379ca1ae14694b875dae0a56fe23e5e299d22c2570464705"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part01.py",
+      "matches_base_commit": true,
+      "sha256": "8cbfd7b0d1408f316529f50496f0ec2d04ba0078e94757dccfff8b9e777c19ca"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_part02.py",
+      "matches_base_commit": true,
+      "sha256": "c9b3d4ccf41213249b0d92a15b504dd6bcba22dcf1648d1f484d3fe81d19d912"
+    },
+    {
+      "path": "docmancer/docs/application/_unified_context_service_shared.py",
+      "matches_base_commit": true,
+      "sha256": "c64a9f6b30dce9e8597de9378f47e37e7664762eff3c97878a2be5fd8e7d0262"
+    },
+    {
+      "path": "docmancer/docs/application/action_packet.py",
+      "matches_base_commit": true,
+      "sha256": "92bba6db6284304386f48a7855bd59a5bc4f0ec5abe351b1a3d5faa768e3b434"
+    },
+    {
+      "path": "docmancer/docs/application/context_candidate_ranking.py",
+      "matches_base_commit": true,
+      "sha256": "5d1caa8e05a81de49754c5e0e7e88f0792b04287db5d9c33ca2bf33209730527"
+    },
+    {
+      "path": "docmancer/docs/application/context_packet_labels.py",
+      "matches_base_commit": true,
+      "sha256": "91f4f7d6b44a7d83c54604416239275154ec50a42131ca0ac23eea203d398787"
+    },
+    {
+      "path": "docmancer/docs/application/context_quality.py",
+      "matches_base_commit": true,
+      "sha256": "4a89945351c01464ecc68c9c3db06d33f05da11bde69d833b80ffac029248bbd"
+    },
+    {
+      "path": "docmancer/docs/application/context_query_probes.py",
+      "matches_base_commit": true,
+      "sha256": "56af78d89a4e8d6eac34c45e1a5175b726dda0ec65d98be5c32bb7cd66eaccd2"
+    },
+    {
+      "path": "docmancer/docs/application/context_selection.py",
+      "matches_base_commit": true,
+      "sha256": "d3454183ad2580d35b1e033bd56871362364dcccf06da6e069f75149906129bf"
+    },
+    {
+      "path": "docmancer/docs/application/context_variant_retention.py",
+      "matches_base_commit": true,
+      "sha256": "9d36dca38db8e7d1d179e7459a2e6f1af04563bc2b1c8caec6d47b66c5354b89"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_docs_service.py",
+      "matches_base_commit": true,
+      "sha256": "fb710dd898e1289eb73299b71229b0da882705aeb9045fe4f925492aeefd0df1"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_project_prefetch.py",
+      "matches_base_commit": true,
+      "sha256": "80c0b7c983c9e8b2ee381707c3541118a1bc269aaffba8d9d3773f259c9c935b"
+    },
+    {
+      "path": "docmancer/docs/application/dependency_resolution.py",
+      "matches_base_commit": true,
+      "sha256": "f1c09db77fb8edd4919309566006d3ab7f947f7dd5790d145292e4f29a192b66"
+    },
+    {
+      "path": "docmancer/docs/application/docs_context_projection.py",
+      "matches_base_commit": true,
+      "sha256": "24b3f2b16c4e4ddb4ea0e6c8af1243ca8fcb2feea3b2da97f0d9ada19f80e5b6"
+    },
+    {
+      "path": "docmancer/docs/application/docs_job_service.py",
+      "matches_base_commit": true,
+      "sha256": "2eafa9129210273fc3626025d4b88824dada7d01c9bdf40c780691bc0565d657"
+    },
+    {
+      "path": "docmancer/docs/application/docs_manifest_service.py",
+      "matches_base_commit": true,
+      "sha256": "b15374137c0ea86e76d711dda105825c120ccc02c48a97818cfdc4b13a0055d2"
+    },
+    {
+      "path": "docmancer/docs/application/docs_prefetch_service.py",
+      "matches_base_commit": true,
+      "sha256": "6ec24a7d396b6eb7f18a175bfa20dccda9246b32d0a148262067fa2dc6f31408"
+    },
+    {
+      "path": "docmancer/docs/application/docs_target_service.py",
+      "matches_base_commit": true,
+      "sha256": "6bc2ac4b3d9ca8936bb0c3d9c6242dda6d3f3060f428efdb48c56e0d0eba7ff7"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_candidates.py",
+      "matches_base_commit": true,
+      "sha256": "da927e4a0a47bb5f76e7b62bb4da15bcb4e44b3ca8ba67f5cd78cc895ecad6e4"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_models.py",
+      "matches_base_commit": true,
+      "sha256": "c46a14e95fa38fd9db0b333a5f4cade2c3cba4d6d2a9613ebc020e9d3723f734"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_requirements.py",
+      "matches_base_commit": true,
+      "sha256": "e2baf10a57df0f5864234a1dc62264fb8687718367ad4c5c957cd52360d1d344"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_selection.py",
+      "matches_base_commit": true,
+      "sha256": "e3c6b2f68eb64f3072a51d022db46bbfe4956034389e191df1f3c61ddf80c459"
+    },
+    {
+      "path": "docmancer/docs/application/evidence_semantic_density.py",
+      "matches_base_commit": true,
+      "sha256": "3d06bf3ed7990817d4eeab3907508a8134d4197a8df0245302e84a3059676847"
+    },
+    {
+      "path": "docmancer/docs/application/experimental_candidate_selection.py",
+      "matches_base_commit": true,
+      "sha256": "feb979d71dbb58fb431529df598db2fec147191e574f119edd3ad21aafd6d952"
+    },
+    {
+      "path": "docmancer/docs/application/experimental_context_finalization.py",
+      "matches_base_commit": true,
+      "sha256": "29764a693cdeed8a81cf26800bc38b2f2c94b005418a25339b87668fc4742bc5"
+    },
+    {
+      "path": "docmancer/docs/application/experimental_prepared_parent_assembler.py",
+      "matches_base_commit": true,
+      "sha256": "c07c747618696a6d8373880b27d3bc52a9bc5fadba31a6c5462860e796922e63"
+    },
+    {
+      "path": "docmancer/docs/application/experimental_selection_modes.py",
+      "matches_base_commit": true,
+      "sha256": "717f32b1ae8bb5f48d771608e7d0bb8bf78c65822dc676a827c7862a488feaee"
+    },
+    {
+      "path": "docmancer/docs/application/index_storage_cleanup.py",
+      "matches_base_commit": true,
+      "sha256": "fa7f10f8507c763290334a9f24de977bcf1f531a1c743ab75799f9791fe54982"
+    },
+    {
+      "path": "docmancer/docs/application/inspection_recovery_seeds.py",
+      "matches_base_commit": true,
+      "sha256": "6e61866580b358b581af7611b6f8829d26b05bdce0311d2103d28803927fb5b2"
+    },
+    {
+      "path": "docmancer/docs/application/insufficient_projection.py",
+      "matches_base_commit": true,
+      "sha256": "f3a2db38091db66f78acdc303e37d815a5d8499ffe75e62d37bdef62822d7681"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_candidates.py",
+      "matches_base_commit": true,
+      "sha256": "74d521eb5f1b346c2d53a141b47ca4e74b69c618df7d8ff07818ee17e61a165d"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_lineage.py",
+      "matches_base_commit": true,
+      "sha256": "806725ca8e16547210b72af4294d72b49e50fdf243271c26ab2953a705c76c0f"
+    },
+    {
+      "path": "docmancer/docs/application/joint_context_selection.py",
+      "matches_base_commit": true,
+      "sha256": "f5acaeb9be473e81b2d6aec5a0bffed72b217e46a3372f478aefb9bea2db3763"
+    },
+    {
+      "path": "docmancer/docs/application/joint_seed_envelopes.py",
+      "matches_base_commit": true,
+      "sha256": "2a5949049d0cb698d52c3b2b9d948ac0ca479ec49c911628548c2636085c1a27"
+    },
+    {
+      "path": "docmancer/docs/application/library_docs_service.py",
+      "matches_base_commit": true,
+      "sha256": "328d01ddc13a4c30e84c6efb7c761018bccb23734f651f8569824dd57159ae94"
+    },
+    {
+      "path": "docmancer/docs/application/library_index_publication.py",
+      "matches_base_commit": true,
+      "sha256": "bb7b579ac877a06ad22a3c7d7dbf401c7581f1a2b13441dabecacfec92f20c99"
+    },
+    {
+      "path": "docmancer/docs/application/library_ingest_orchestrator.py",
+      "matches_base_commit": true,
+      "sha256": "c3dcb7ce3ca211083e8d917ad24588893b16e9219439967322433fd56ee04f52"
+    },
+    {
+      "path": "docmancer/docs/application/library_ingest_ports.py",
+      "matches_base_commit": true,
+      "sha256": "9b587f3061b8dd00653258eb63650694feeb79cb5ba7fc04b63e5cd59bce90e8"
+    },
+    {
+      "path": "docmancer/docs/application/library_job_executor.py",
+      "matches_base_commit": true,
+      "sha256": "fbae0e5c47bdb4954b94ba99f3e58b6556ba3f260947ebff72f0281cfd2f8b11"
+    },
+    {
+      "path": "docmancer/docs/application/library_refresh_ops.py",
+      "matches_base_commit": true,
+      "sha256": "9d3d0eb439fdfaf2f57ff8fca6895a9150a450ab6df159a2c6654787db108fea"
+    },
+    {
+      "path": "docmancer/docs/application/library_refresh_policy.py",
+      "matches_base_commit": true,
+      "sha256": "a24bd4e20c51222047ed0638e44a1e8d850da4c1f66a95b934c21ea445bc47a1"
+    },
+    {
+      "path": "docmancer/docs/application/library_registry_ops.py",
+      "matches_base_commit": true,
+      "sha256": "5c3e4499b49fcdfbabc7f132435491e65636fe9be73e7ec93b8463a77ca461c3"
+    },
+    {
+      "path": "docmancer/docs/application/library_source_discovery.py",
+      "matches_base_commit": true,
+      "sha256": "cfba1656a4acfa696c401d4bc22e18690f98334a1a31979aa03d832307b33d12"
+    },
+    {
+      "path": "docmancer/docs/application/mixed_context_projection.py",
+      "matches_base_commit": true,
+      "sha256": "8c167922629acc6f909eaafcc10c9dcd50a9a924e33d55dc59a8ff5c7272d35f"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection.py",
+      "matches_base_commit": true,
+      "sha256": "6e822a4db485c4ca4f36ac3d3ae03c4dbec559a8a378e5aa2d005b168f3deb64"
+    },
+    {
+      "path": "docmancer/docs/application/model_visible_projection_helpers.py",
+      "matches_base_commit": true,
+      "sha256": "636128154d92170ac6e9623747cd1117366e64847e3f384a4447ca579884edfd"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_disposition.py",
+      "matches_base_commit": true,
+      "sha256": "9b2902f46af1836e95e6eca6c7917118a63b6712f8db20e75cc2981e43f1ceae"
+    },
+    {
+      "path": "docmancer/docs/application/need_context_projection.py",
+      "matches_base_commit": true,
+      "sha256": "29a350d5beb12350ccfaf39f5c01e9ec409f969f26841caeca59b95be86a0b6e"
+    },
+    {
+      "path": "docmancer/docs/application/need_query_schedule.py",
+      "matches_base_commit": true,
+      "sha256": "aa269e8d40d9888f699d0f7c6627c1051ca8b33d240f5c99b3acb742de40a6f1"
+    },
+    {
+      "path": "docmancer/docs/application/patch_constraint_validation_service.py",
+      "matches_base_commit": true,
+      "sha256": "eb18ea507e74b931d6da46be0c303842147fcdb352db86dafb79da5ea48a4f78"
+    },
+    {
+      "path": "docmancer/docs/application/patch_constraints_service.py",
+      "matches_base_commit": true,
+      "sha256": "23cf6c807c49658e2620f93e769aa9e3253b36c238f72a62395be6636b0d1c01"
+    },
+    {
+      "path": "docmancer/docs/application/patch_review_service.py",
+      "matches_base_commit": true,
+      "sha256": "e42239714f55d2c43843b36156a57d2299b236ee601a803d5d85b72930d68eb0"
+    },
+    {
+      "path": "docmancer/docs/application/project_answer_outline.py",
+      "matches_base_commit": true,
+      "sha256": "3993c0c6428777390f765dc5c183168a43cc0388f665ba9d8f7247c127ee5383"
+    },
+    {
+      "path": "docmancer/docs/application/project_context_service.py",
+      "matches_base_commit": true,
+      "sha256": "084c10690a674ff666f2182f70810fef5e5bafeeac16fc896e8a093d17156d83"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_member_transaction.py",
+      "matches_base_commit": true,
+      "sha256": "e255652379cefb73ce393f2f7e7a1996672e54cda66f608c359ff288c053a2b6"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_service.py",
+      "matches_base_commit": true,
+      "sha256": "77240859ffde2972090dcf7a0c9e86306a7cd5ae5ab85c6c56703965f7179eda"
+    },
+    {
+      "path": "docmancer/docs/application/project_docs_state.py",
+      "matches_base_commit": true,
+      "sha256": "02964d4921b98b981658525678c83c234415c0aa1d9648ff309844c75180a90b"
+    },
+    {
+      "path": "docmancer/docs/application/project_section_index.py",
+      "matches_base_commit": true,
+      "sha256": "e42e1038453b8a0e72cff0a76229d61f8b7e19db815407cd951714a201d16298"
+    },
+    {
+      "path": "docmancer/docs/application/projection_decision_trace.py",
+      "matches_base_commit": true,
+      "sha256": "4f0c671355ee28cd3c149b3f30d274627f6a77ebd54a326703027e32a45d60f6"
+    },
+    {
+      "path": "docmancer/docs/application/projection_tokenizer.py",
+      "matches_base_commit": true,
+      "sha256": "ee097b4d71fcc0783f2eee35cc14d0d05d262ef2ec8fcee042dd3135d09edfe6"
+    },
+    {
+      "path": "docmancer/docs/application/proofability.py",
+      "matches_base_commit": true,
+      "sha256": "b997fc57cae0fb9f212fcde7d24ba08c5ac88d7a7d54ab1736614a83ae2a2d8d"
+    },
+    {
+      "path": "docmancer/docs/application/qualified_support_units.py",
+      "matches_base_commit": true,
+      "sha256": "cbfe62805d1bfadf9a82b39b0679a7c1fe3d328f3840b3bca497930bf10a4901"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_bridge.py",
+      "matches_base_commit": true,
+      "sha256": "baa6c813d0125f82e129fafd7bcd94e9cb1edeef978caf5513d695b22130a00e"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_context.py",
+      "matches_base_commit": true,
+      "sha256": "71f556a21936cca95ba0a4491e6c1c3769c25672a3a5eb72b7d1533d44a16b5a"
+    },
+    {
+      "path": "docmancer/docs/application/query_block_recovery.py",
+      "matches_base_commit": true,
+      "sha256": "f14844029c46ddc1dc70dec2bca6bf6f1c2f9bd7812f66595a63bb42c8bd8e5f"
+    },
+    {
+      "path": "docmancer/docs/application/query_trace.py",
+      "matches_base_commit": true,
+      "sha256": "951d5142996c5a1b1e040f98a428366364c3f993d850f56eebe070c703255a0f"
+    },
+    {
+      "path": "docmancer/docs/application/recovery.py",
+      "matches_base_commit": true,
+      "sha256": "e0d4f36b45e1f75e47c1c237602f7f5d05f45c7d62bbf6ef8366a66724396b2b"
+    },
+    {
+      "path": "docmancer/docs/application/reference_query_tagging.py",
+      "matches_base_commit": true,
+      "sha256": "a2a1abc7c242704a807e6dcdd7cb41f2613c9e8f95e9a5f726697f870631a285"
+    },
+    {
+      "path": "docmancer/docs/application/retrieval_need_support.py",
+      "matches_base_commit": true,
+      "sha256": "948ae91f89f1efe49f20cceee496b7bcb05112fcc97ab7130ea0a8f17fb488ef"
+    },
+    {
+      "path": "docmancer/docs/application/source_continuation.py",
+      "matches_base_commit": true,
+      "sha256": "f1142fdc31798c5c9f3dc5a1f348b8fd0397768d255b345ae3e61faeeeeee439"
+    },
+    {
+      "path": "docmancer/docs/application/source_dependency_preparation.py",
+      "matches_base_commit": true,
+      "sha256": "426e32fdbf3092783c944893940649d2b133e4ee2810b424f41185038622ae20"
+    },
+    {
+      "path": "docmancer/docs/application/source_recovery_ranges.py",
+      "matches_base_commit": true,
+      "sha256": "c029bfb26ee859ea2f8077b40def0102c7d76197049d4fc06034bd46ea360ea6"
+    },
+    {
+      "path": "docmancer/docs/application/source_reference_evidence.py",
+      "matches_base_commit": true,
+      "sha256": "d597728e9445d431dda80d9d483848b3f4b42990c0080ba9a264c7bb7608868b"
+    },
+    {
+      "path": "docmancer/docs/application/unified_context_service.py",
+      "matches_base_commit": true,
+      "sha256": "d7b473639c1baf52f839f193bf534f27776f3dd03040c9754da697608a0e97b0"
+    },
+    {
+      "path": "docmancer/docs/application/visible_evidence_retention.py",
+      "matches_base_commit": true,
+      "sha256": "12e7eb9793ad72190fec1e1f4334c62859d39e804c0d3e6e2fe6924a673247d6"
+    },
+    {
+      "path": "docmancer/docs/domain/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "f2493bc9d3a7d8ccc3cf7de2bec69856c673b5d0f75b161a960f063671425640"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_part01.py",
+      "matches_base_commit": true,
+      "sha256": "75565a8b41c756dc16e452e59a430b5a58f68e78dd9374c818da0aacd9d3997e"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_part02.py",
+      "matches_base_commit": true,
+      "sha256": "6f280be80e270050b6b82cfe8564ff51470203fb0102382bfea3a93e492acb3d"
+    },
+    {
+      "path": "docmancer/docs/domain/_answer_units_shared.py",
+      "matches_base_commit": true,
+      "sha256": "b763b73e88652b7265e7405ad9c334c62cea3773bcb9a1af670bd1300ded940a"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_part01.py",
+      "matches_base_commit": true,
+      "sha256": "0c7d08e7c2e319955e5cc692cd04af7a98c5070744db2d59bca556c129b48e40"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_part02.py",
+      "matches_base_commit": true,
+      "sha256": "f9d30740c3d44febc8bc88e3a8a9b3700285c2c6d9b207508c2c3a79ac0f5992"
+    },
+    {
+      "path": "docmancer/docs/domain/_code_graph_shared.py",
+      "matches_base_commit": true,
+      "sha256": "c58dc4294c642e65980985b9233caacd13f977b66a2dea2fb5d79d35354e07fa"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part01.py",
+      "matches_base_commit": true,
+      "sha256": "21ec80210b28514d1ea17f487658316d3a83279eece971e75cfd7d0991b25c9f"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_part02.py",
+      "matches_base_commit": true,
+      "sha256": "8b881b07cdea5dbe6f078d0e70504b7d4aa20faa983bf46ffd5a67fc9e0e134a"
+    },
+    {
+      "path": "docmancer/docs/domain/_project_answer_contract_shared.py",
+      "matches_base_commit": true,
+      "sha256": "b99965cb91486c06116c06c4e5e8c80a584da915d5ca3ebb7351cdc29b96780e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_contract.py",
+      "matches_base_commit": true,
+      "sha256": "192e69f9043e109c63d7e13edf2afecc5d695121135c80d801cc8c833b9b91e1"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_grammar.py",
+      "matches_base_commit": true,
+      "sha256": "21e5e4f32ee259981898c066412d46222889ad53fd5b1aa3e4ec420149c56b6e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_local_binding.py",
+      "matches_base_commit": true,
+      "sha256": "efd2e2832ba10ebb69a9d780426850867c7d16e912d2d67ae53e5e3291caf33e"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_meaning.py",
+      "matches_base_commit": true,
+      "sha256": "9eea34d0250f79d9c12147b1a89efdc8ce3a9ffaf5109f63d67cd3086e53e9ab"
+    },
+    {
+      "path": "docmancer/docs/domain/admission_relations.py",
+      "matches_base_commit": true,
+      "sha256": "99f77bf2c565ad4cec351a73cb1e6c4399fe30f50d4dde91824b800a0f98934f"
+    },
+    {
+      "path": "docmancer/docs/domain/answer_completeness.py",
+      "matches_base_commit": true,
+      "sha256": "269cd1fefe20208f5d6eeccb7e053f90edaf92efb9a154957e35af9a66f8e6d0"
+    },
+    {
+      "path": "docmancer/docs/domain/answer_units.py",
+      "matches_base_commit": true,
+      "sha256": "f5b08a0838be98eef19794cbb827733b82325bdad14fd8dd621928d488cdd2f9"
+    },
+    {
+      "path": "docmancer/docs/domain/canonical.py",
+      "matches_base_commit": true,
+      "sha256": "39dc9e061d10fd4fb7655796d3ccf33e98c0a175d474faddc4c026c4dca4f604"
+    },
+    {
+      "path": "docmancer/docs/domain/code_graph.py",
+      "matches_base_commit": true,
+      "sha256": "4b7c95ef9e295f7ab91410e0eea85cb26c7f63d46c4c5085c6b0099bc16dbe10"
+    },
+    {
+      "path": "docmancer/docs/domain/compositional_question_plan.py",
+      "matches_base_commit": true,
+      "sha256": "38544b8c9e63a5ec9342e64dd391dbdee9feeaf3c930c19a1f1bbd4d994b8c16"
+    },
+    {
+      "path": "docmancer/docs/domain/content_trust.py",
+      "matches_base_commit": true,
+      "sha256": "a8f7d738a66b55a30e0c4ab6a0694a647f1500f1cbfb15e74896daea8fbba3b5"
+    },
+    {
+      "path": "docmancer/docs/domain/context_blocks.py",
+      "matches_base_commit": true,
+      "sha256": "cd22acd74eaf313780cf9a33a5eb6e24c326bae6c8627f924ffe5636f1f89031"
+    },
+    {
+      "path": "docmancer/docs/domain/context_budget.py",
+      "matches_base_commit": true,
+      "sha256": "3902df6d1a7cf5b672d59e53b2501ff9c2a7fda06b4f61aee5fb03f90e539cda"
+    },
+    {
+      "path": "docmancer/docs/domain/context_hint_policy.py",
+      "matches_base_commit": true,
+      "sha256": "f061f74693cedaa26a92a56089e4accb32c25317e183544bf24b3c4fad276ce7"
+    },
+    {
+      "path": "docmancer/docs/domain/context_request_preferences.py",
+      "matches_base_commit": true,
+      "sha256": "fff8504d893bc39dfa55c912bdb173caed80a3bf678af62195906a5d8bd28068"
+    },
+    {
+      "path": "docmancer/docs/domain/context_windows.py",
+      "matches_base_commit": true,
+      "sha256": "6f154df9fdac9453359a99ee0dedd2a677e4bba76de2f6ce62f5ff41dd489409"
+    },
+    {
+      "path": "docmancer/docs/domain/documentation_query_plan.py",
+      "matches_base_commit": true,
+      "sha256": "fa6d2990d3d5673b8396f7a1c0ab4cabe83f8e2dd5da185354fb5aefc0a95220"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_qualification.py",
+      "matches_base_commit": true,
+      "sha256": "34d299026e7f826c72c5f40f79b48980eda3671690da7282e84b9e7d5d38c554"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_set_types.py",
+      "matches_base_commit": true,
+      "sha256": "f0a0d09d92d3a400dbb9f2634c353c66d6fab271f972e2e2013e7e40927d4594"
+    },
+    {
+      "path": "docmancer/docs/domain/evidence_set_validation.py",
+      "matches_base_commit": true,
+      "sha256": "b6e5e8fe2591c3256c02f8096054f0efe65a1367f9b4dc9be813d91c6d893297"
+    },
+    {
+      "path": "docmancer/docs/domain/governance_value_proof.py",
+      "matches_base_commit": true,
+      "sha256": "69e0e18c4d2381809c9dc93398fc4a2dd46efeedbde6a507b91d11abdd777ca8"
+    },
+    {
+      "path": "docmancer/docs/domain/legacy_question_coverage.py",
+      "matches_base_commit": true,
+      "sha256": "e6b3dcde6fe7779b14427139a6829acc037ba73df308f419d8664c273fd48431"
+    },
+    {
+      "path": "docmancer/docs/domain/library_source_options.py",
+      "matches_base_commit": true,
+      "sha256": "9cf701f0ad665f6035626102a020e63e576c97f93ef53f3bf33a324d2eb532ad"
+    },
+    {
+      "path": "docmancer/docs/domain/lifecycle_policy.py",
+      "matches_base_commit": true,
+      "sha256": "d8bc57dd9ce6c8747edcf534421fbaa00b939fc9f26ed9d9a723c97b80d0337c"
+    },
+    {
+      "path": "docmancer/docs/domain/literal_context_admission.py",
+      "matches_base_commit": true,
+      "sha256": "49dba87cd01fc24dda84ef63b6a6c886a76af6418a59e9718e72fee8e1d6b655"
+    },
+    {
+      "path": "docmancer/docs/domain/mutation_intent.py",
+      "matches_base_commit": true,
+      "sha256": "ac4b018331453ddabe61608321e4af3f7d6725d7671dfcc3bc035a4cd7b7bab9"
+    },
+    {
+      "path": "docmancer/docs/domain/need_composition.py",
+      "matches_base_commit": true,
+      "sha256": "363b8e2e847aef334682855bd551adfbb8bc9df33357333511f70de67e4a7330"
+    },
+    {
+      "path": "docmancer/docs/domain/need_contracts.py",
+      "matches_base_commit": true,
+      "sha256": "33f319d7d0552f409bb756b6114d8b15af61ea778c949cd1dd70b5d4aeb5b183"
+    },
+    {
+      "path": "docmancer/docs/domain/normative_language.py",
+      "matches_base_commit": true,
+      "sha256": "de87153f11fd00b874995b54b460010321ac21f2eb4ed7a1e8bad0328e757c87"
+    },
+    {
+      "path": "docmancer/docs/domain/ordinary_body_context.py",
+      "matches_base_commit": true,
+      "sha256": "22e1540cfa3b87e07d9209e0dcbb10316fcc6e80902909bff172a7d42526dfaf"
+    },
+    {
+      "path": "docmancer/docs/domain/original_body_discovery.py",
+      "matches_base_commit": true,
+      "sha256": "c7b03af035bf63963fa636ea09282560723c11b31bd463383df746c81a2d5d78"
+    },
+    {
+      "path": "docmancer/docs/domain/patch_request_plan.py",
+      "matches_base_commit": true,
+      "sha256": "4171dbf13ebbbbf37b2b6ca591b1734f721ca74ec6496d4fb8a15e27e048f56a"
+    },
+    {
+      "path": "docmancer/docs/domain/patch_requirements.py",
+      "matches_base_commit": true,
+      "sha256": "99fc15ae1eada2c80566fe4cbbca4be832b94b598ff64e2602153932518e0101"
+    },
+    {
+      "path": "docmancer/docs/domain/policies.py",
+      "matches_base_commit": true,
+      "sha256": "e4ae72c6bb8869b94056e939e4986bcbd8e785eb1b17c59c05fc7af4225d8846"
+    },
+    {
+      "path": "docmancer/docs/domain/project_answer_contract.py",
+      "matches_base_commit": true,
+      "sha256": "58667c5798abd763f1c2196829a683cc6a856b39cad1a6c5eda49e6d49fa2439"
+    },
+    {
+      "path": "docmancer/docs/domain/project_doc_ranking.py",
+      "matches_base_commit": true,
+      "sha256": "6826a23587842d2b18369ab2306ded82a1652d6d35a34f414575f4c02b6df9c6"
+    },
+    {
+      "path": "docmancer/docs/domain/project_evidence.py",
+      "matches_base_commit": true,
+      "sha256": "0438d2fca4a26da81e288ac185fc7e2708351081f57713c30d37165ecbd5d651"
+    },
+    {
+      "path": "docmancer/docs/domain/project_path_validation.py",
+      "matches_base_commit": true,
+      "sha256": "d8a4535ea1e3be6bfca0c6841f405aa27aaf9f32636b788bead4e41827bbd932"
+    },
+    {
+      "path": "docmancer/docs/domain/project_query_intent.py",
+      "matches_base_commit": true,
+      "sha256": "0a909dfd15fc0217930d304503928612bf8d00a256c28c9889ad41404d50871e"
+    },
+    {
+      "path": "docmancer/docs/domain/project_retrieval_intent.py",
+      "matches_base_commit": true,
+      "sha256": "d1940e93bf701033bf57ca3f0e3fe767326a275e497c1ece28d2154b3c489248"
+    },
+    {
+      "path": "docmancer/docs/domain/project_state.py",
+      "matches_base_commit": true,
+      "sha256": "26ade5123720fb61ceb8976fc4c19641423a60d6d24ca3c1fb4c9f15a6d77021"
+    },
+    {
+      "path": "docmancer/docs/domain/quality.py",
+      "matches_base_commit": true,
+      "sha256": "004721d1ff3560b3cde976a87441dca7346a97e94cb3f9224b64f136003d0cce"
+    },
+    {
+      "path": "docmancer/docs/domain/query_reference_binding.py",
+      "matches_base_commit": true,
+      "sha256": "0bdf65939526fd19ecc239ce3a3ee67bdaf9d067e184798f0b8f9f9b13ef528b"
+    },
+    {
+      "path": "docmancer/docs/domain/query_script_runs.py",
+      "matches_base_commit": true,
+      "sha256": "1c730ba86746f05a7895d9d8a1156903dc454efc8ee6c16587bde9c4aba5ab9f"
+    },
+    {
+      "path": "docmancer/docs/domain/query_terms.py",
+      "matches_base_commit": true,
+      "sha256": "8f50273b0edb31e028a62fa4d32cdeb67aaaffefefd89fcf6f2270127179efc6"
+    },
+    {
+      "path": "docmancer/docs/domain/question_component_rewrite.py",
+      "matches_base_commit": true,
+      "sha256": "d87f6a092162bd6d0ff8fc1bcee19b09e383495f3f31045e0194921d49da9148"
+    },
+    {
+      "path": "docmancer/docs/domain/question_frame_core.py",
+      "matches_base_commit": true,
+      "sha256": "bab02ded393e11cbe51bdabbd5ae3fd405d7b383400d86244232693f80a6c571"
+    },
+    {
+      "path": "docmancer/docs/domain/question_ownership.py",
+      "matches_base_commit": true,
+      "sha256": "045e2a2fcf5c6137ed5e15234959d372b7038aa40b2ca1e6c12f9b24a19733e2"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan.py",
+      "matches_base_commit": true,
+      "sha256": "90588252e7a739061250df77f4ec79ccaa81d2342ab3f51e554f4170f1eb6831"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_command_rules.py",
+      "matches_base_commit": true,
+      "sha256": "01066e1ed9897a33cea9ae563e4c619a6dfcd76bcd8103c19a978cceae68e64d"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_core.py",
+      "matches_base_commit": true,
+      "sha256": "71dccd291ba799149f5485fad818fb2a5008af3c79ca542053e50000a9ec5d5b"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_proof.py",
+      "matches_base_commit": true,
+      "sha256": "985df8fa9476381f131f002c114f339e0351f27cd538f480cf7b51a907fcbc4f"
+    },
+    {
+      "path": "docmancer/docs/domain/question_plan_surface_rules.py",
+      "matches_base_commit": true,
+      "sha256": "c3b337cd0737ca1ce0d7dd954f5d6b2ee2e9eae8da9f36dc38ed135dbf820fed"
+    },
+    {
+      "path": "docmancer/docs/domain/question_premise_proof.py",
+      "matches_base_commit": true,
+      "sha256": "dc9f543bef179effe022784ecd739c0ec21b19ead007d047b32a8df2a419fdbc"
+    },
+    {
+      "path": "docmancer/docs/domain/question_retrieval_needs.py",
+      "matches_base_commit": true,
+      "sha256": "2542795f8826982fc83510e64e30de22127dec621f500ac851301672ba4e8b70"
+    },
+    {
+      "path": "docmancer/docs/domain/question_semantic_frames.py",
+      "matches_base_commit": true,
+      "sha256": "e9a82e3af5b2bcf2669166c4de08ce73096a63bee422e1ad579c2d6e4f3275de"
+    },
+    {
+      "path": "docmancer/docs/domain/question_surface_normalization.py",
+      "matches_base_commit": true,
+      "sha256": "5c72aceaa936558445de6ed545e7da3ee4b3b87290725bcc13056080e340b8d0"
+    },
+    {
+      "path": "docmancer/docs/domain/recovery_handoff.py",
+      "matches_base_commit": true,
+      "sha256": "6cb7dde7b979ecf3f929baee8a4d3cfb147d11ea3226dd6c47074f537a597e13"
+    },
+    {
+      "path": "docmancer/docs/domain/request_intent.py",
+      "matches_base_commit": true,
+      "sha256": "d57241db1f427614c03a09efd556f2ebd2db2fd2c09e1a3c65d4bed17869fb4e"
+    },
+    {
+      "path": "docmancer/docs/domain/retrieval_routing.py",
+      "matches_base_commit": true,
+      "sha256": "fb828c602331cebf41f4a39bb262dd90c4a2e78b0890316f504591c4ec3a10dc"
+    },
+    {
+      "path": "docmancer/docs/domain/snippets.py",
+      "matches_base_commit": true,
+      "sha256": "c1ec274488737d95b36bd0b12afdc9125b0f3ccf4c3d97a645af9acde761f6ae"
+    },
+    {
+      "path": "docmancer/docs/domain/source_boundary.py",
+      "matches_base_commit": true,
+      "sha256": "1fcfcc4805bd1538dba9899d78d55cc7c97393432f0e90beff24737d78a8ce61"
+    },
+    {
+      "path": "docmancer/docs/domain/source_dependency_graph.py",
+      "matches_base_commit": true,
+      "sha256": "e2f64b2e5ba7b6f87387dd6cd776faba58790842dde544a2c459e13536ee3959"
+    },
+    {
+      "path": "docmancer/docs/domain/source_identity.py",
+      "matches_base_commit": true,
+      "sha256": "aa9f78fd5de8021158dbacb8de00b3892003a4e9e70ba44e0ea7308662f2cc52"
+    },
+    {
+      "path": "docmancer/docs/domain/source_map.py",
+      "matches_base_commit": true,
+      "sha256": "9f27abdb267984d227f436dbf6b08bba3a1f8eb14667ada7582131b802361bda"
+    },
+    {
+      "path": "docmancer/docs/domain/source_subject_binding.py",
+      "matches_base_commit": true,
+      "sha256": "cb3e0f1576de1412de839af8878eaf12ee200f996849947668cd1174ced8f105"
+    },
+    {
+      "path": "docmancer/docs/domain/target_security.py",
+      "matches_base_commit": true,
+      "sha256": "f89c4b5315fcc7d3c525a055cf336c2bf92b6d7bc37ac7ab57f104c701849583"
+    },
+    {
+      "path": "docmancer/docs/domain/technical_terms.py",
+      "matches_base_commit": true,
+      "sha256": "ebff4b6f79cdbf99e9282d37dad2b0c56830ebdaedbca5f3cace1fceccb4443d"
+    },
+    {
+      "path": "docmancer/docs/domain/technical_tokens.py",
+      "matches_base_commit": true,
+      "sha256": "f307750447918c3d1cc2dbafdb1ebb7a9b77726a90d1f1afec0c7b6f08cc2e48"
+    },
+    {
+      "path": "docmancer/docs/domain/tool_selection.py",
+      "matches_base_commit": true,
+      "sha256": "027150c6283bdb70653ce25125c95cd37d5027c1bba72f5727d0e11df23fc9f1"
+    },
+    {
+      "path": "docmancer/docs/domain/trust_contract.py",
+      "matches_base_commit": true,
+      "sha256": "d60504ee4fc9b5b00f4c04a866216c2a4640f717eff0f94ef6482a4864936cf9"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "c2f7012a6052298ff3709c681eee8b1f156eda907a187ee7e4b280524af73daa"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/agent_index_gateway.py",
+      "matches_base_commit": true,
+      "sha256": "a7392f024a9d2b6dd141db1c2bc4e86538eb32de74274b7e0664dfa675bda765"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/filesystem_locks.py",
+      "matches_base_commit": true,
+      "sha256": "d399507c95981286a0cd5f8e9247f8776579ab07263ad656c2b23f2b170bb0f1"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/project_source_read_gateway.py",
+      "matches_base_commit": true,
+      "sha256": "ab9d58cf1c9ed39268a4cd24ddefe9b2801eb26225991b5d7168f6164130bbe1"
+    },
+    {
+      "path": "docmancer/docs/infrastructure/storage_mutation_lock.py",
+      "matches_base_commit": true,
+      "sha256": "9c41199a55ac3a8735401aee588d49007d5ce5c195781d16350534a06f614d19"
+    },
+    {
+      "path": "docmancer/docs/interfaces/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "33fdbcc1cf3a8ce3f47fb7e4a159cc340e0177ee2fbbc6f3d7e74785087139e8"
+    },
+    {
+      "path": "docmancer/docs/interfaces/grounded_mcp_session.py",
+      "matches_base_commit": true,
+      "sha256": "4e6cd0ab39ceccb5774761141299b62b77ff8b940ce7211b6cfe4b84212edb46"
+    },
+    {
+      "path": "docmancer/docs/interfaces/host_context.py",
+      "matches_base_commit": true,
+      "sha256": "19f4f75a597b0d7785251cd6f2a15e8a03e65794e53be73e0c8e6fed888c1461"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "0be9d0898d0560441c806aadec86b3d131411948e18e4fe2b33a8efa4312324c"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/_context_recovery_actions.py",
+      "matches_base_commit": true,
+      "sha256": "98c75c7cc42594d4219ecb6c86549c2024882b296e1d6790199f39898d1ee5d3"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/context_tools.py",
+      "matches_base_commit": true,
+      "sha256": "6c936d53acf78aa87efedf350b7f1c9173422ae1ba9b3f69828acd11a84246d1"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/docs_context_routing.py",
+      "matches_base_commit": true,
+      "sha256": "e165bd5f000c61fc03741569f82a3a4d488e82aded1d5d036cbbcc63a4503f7d"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/docs_tools.py",
+      "matches_base_commit": true,
+      "sha256": "fbbf97f788a909d013f027f40293f1fbbd644638c4e0c7134496fab10d76acb4"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/error_contract.py",
+      "matches_base_commit": true,
+      "sha256": "c5f80f7ea998c202dfb6982fb6e5fe208f56fa5134e6cbc04f8d0211ef00b78a"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/output_contract.py",
+      "matches_base_commit": true,
+      "sha256": "1d08588ba938226db5d8d0820988f255d322f27d7e96a20a1f56d89328097109"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/prefetch_tools.py",
+      "matches_base_commit": true,
+      "sha256": "d6d9fa9d70765b2ddad83c1f17ebbd29e041d0bbd92a1dac9b947d89f21c19b1"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/project_tools.py",
+      "matches_base_commit": true,
+      "sha256": "aa6ff85cef9d892bf9d051a2f46a3930a46993807ed35f0b0c3ca9efc14e8c72"
+    },
+    {
+      "path": "docmancer/docs/interfaces/mcp/recovery_projection.py",
+      "matches_base_commit": true,
+      "sha256": "59087794435e089cd9fcb1aa9a88f841df54d7eae89daee788dcbc27c8fe8e0b"
+    },
+    {
+      "path": "docmancer/embeddings/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "aeb3400bf70a3f0c265ebdda64079cbb38a5c9886efdda1182968f32a6c13c36"
+    },
+    {
+      "path": "docmancer/embeddings/base.py",
+      "matches_base_commit": true,
+      "sha256": "8a3a86452b3bd8334f277887b02fd0623d819c36e246166f30073a73fe3d3c2c"
+    },
+    {
+      "path": "docmancer/embeddings/cohere_provider.py",
+      "matches_base_commit": true,
+      "sha256": "a8cc130dfe0e265688c3e1b7b2645082c9f8570e32193f959ca514282977ec47"
+    },
+    {
+      "path": "docmancer/embeddings/fastembed_provider.py",
+      "matches_base_commit": true,
+      "sha256": "23a584a1af5fc44d0dc25ea53cb1b8f87815e8754587cfbd00e7549ccd256954"
+    },
+    {
+      "path": "docmancer/embeddings/openai_provider.py",
+      "matches_base_commit": true,
+      "sha256": "1c81059884d13ba7b0ebcc064d2d04fda9540e09caf8950066943b41faa088c9"
+    },
+    {
+      "path": "docmancer/embeddings/pipeline.py",
+      "matches_base_commit": true,
+      "sha256": "7434944b2afbdb89eb7a74e0c6295001816405ec8bf67315e483752bb2c687eb"
+    },
+    {
+      "path": "docmancer/embeddings/voyage_provider.py",
+      "matches_base_commit": true,
+      "sha256": "b1c275c7275eaab2a9f8bdc4a848c951c599dd89a6813e02054636c1d4c2d42c"
+    },
+    {
+      "path": "docmancer/eval/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "4fcfe42cab91a4d5f7d5d883c8ba9d4a03f07f7a3f44ec47f69339b6b575a79c"
+    },
+    {
+      "path": "docmancer/eval/health.py",
+      "matches_base_commit": true,
+      "sha256": "610aa5bb296625e232cd6af082d92923873a8886fbef98b61588510797e9104a"
+    },
+    {
+      "path": "docmancer/eval/metrics.py",
+      "matches_base_commit": true,
+      "sha256": "e22f5c08754654b8e68bd0e87331f20953d7035cb9fc2e35834a73887d970d26"
+    },
+    {
+      "path": "docmancer/eval/runner.py",
+      "matches_base_commit": true,
+      "sha256": "d34388e5ae4dfce1d5e62d5e597da8babc677023e01ed05b0133418e6280d0b6"
+    },
+    {
+      "path": "docmancer/eval/schema.py",
+      "matches_base_commit": true,
+      "sha256": "573edeca78ea3b16f153296a539bd65f6de53fd074e20a86ac009700e8c27ad1"
+    },
+    {
+      "path": "docmancer/eval/story_corpus.py",
+      "matches_base_commit": true,
+      "sha256": "ce64dcd583717826c75876efc13c3a03a83c51309f6dacf826b8dcef03759036"
+    },
+    {
+      "path": "docmancer/eval/trace.py",
+      "matches_base_commit": true,
+      "sha256": "baa09c93dc523a8c6564051375d8d30e559c79a0fea963724a3742bf5b4d464b"
+    },
+    {
+      "path": "docmancer/mcp/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "70461480ec40a74742648d38b26d1c01e54b518b374b8825c3cf59dc1195ae63"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_part01.py",
+      "matches_base_commit": true,
+      "sha256": "194c81c61a668c04a23536814183beea9edf32411b8872650b4ebdb71803ac53"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_resources.py",
+      "matches_base_commit": true,
+      "sha256": "b61e5414d1a959e8ad1a99d6c42d50cafa27583f8045d6c4933c07965425e905"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_schema.py",
+      "matches_base_commit": true,
+      "sha256": "339debc75c84734429189d0376b0025f4c1eada64404617ba1aeef19ca19b663"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_shared.py",
+      "matches_base_commit": true,
+      "sha256": "60034439fb33d26b9c9dbccec1f6ee35bb423e726c53b81d0324b8c7b8da42ff"
+    },
+    {
+      "path": "docmancer/mcp/_docs_server_tool_data.py",
+      "matches_base_commit": true,
+      "sha256": "24e968fd533ca5e4a876af6c8544de7c93cfdbe8a18381351b9a7863e576a2d7"
+    },
+    {
+      "path": "docmancer/mcp/agent_config.py",
+      "matches_base_commit": true,
+      "sha256": "2c74ebe463a2f98d4d90df029118cf1a12dff3ed6ffbe1b0dd4f3a6b31390966"
+    },
+    {
+      "path": "docmancer/mcp/agent_workflow_contract.py",
+      "matches_base_commit": true,
+      "sha256": "273992d92a73a23da2034db28c11dcbe617b92ba5318d17e8f349cfcd8529678"
+    },
+    {
+      "path": "docmancer/mcp/credentials.py",
+      "matches_base_commit": true,
+      "sha256": "30c8e860f3fceab480cfa21edca21c6f85e3c2b24a3624a5a0f1bebf37938cd0"
+    },
+    {
+      "path": "docmancer/mcp/dispatcher.py",
+      "matches_base_commit": true,
+      "sha256": "22a59947e007a968774f23ded5a8e46ca6162ac99d5f8c49075d93f8006aae1e"
+    },
+    {
+      "path": "docmancer/mcp/docs_server.py",
+      "matches_base_commit": true,
+      "sha256": "87856c52c07ac73a733fe92d84b2ed08265230113ba136b17b7a245562703143"
+    },
+    {
+      "path": "docmancer/mcp/doctor.py",
+      "matches_base_commit": true,
+      "sha256": "683ae4f34cecf1b909c98ba401961486c8d5d3a108860d48acf660671efa387c"
+    },
+    {
+      "path": "docmancer/mcp/idempotency.py",
+      "matches_base_commit": true,
+      "sha256": "8ae604681e9d4dc6b29cb362d1e1682a4ea9c9601bf88392ae572f9ad2687c7d"
+    },
+    {
+      "path": "docmancer/mcp/installer.py",
+      "matches_base_commit": true,
+      "sha256": "fca9196bed88caccd6aa3332d8a326f2fabcd82e771aedaa4ccb03dd2df43616"
+    },
+    {
+      "path": "docmancer/mcp/logging.py",
+      "matches_base_commit": true,
+      "sha256": "a126a059cc8b5a1798c79a5bb9e87acc957b00f3e73d6733c1b40f692b6ed4c3"
+    },
+    {
+      "path": "docmancer/mcp/manifest.py",
+      "matches_base_commit": true,
+      "sha256": "71a1139ff3e7aebc9cd87bd25dbe99abf6f0e9033fa4b24ff8f42a2ddb11bcfe"
+    },
+    {
+      "path": "docmancer/mcp/network_policy.py",
+      "matches_base_commit": true,
+      "sha256": "d3e088ed0ae32f683788c525b8af078bcac3d0a8e616b3b209162287f76fbce0"
+    },
+    {
+      "path": "docmancer/mcp/paths.py",
+      "matches_base_commit": true,
+      "sha256": "0b219ec458d4b1fd3c3a51a9d94147a18b6d7c7e658cd4098038fa86443b70ba"
+    },
+    {
+      "path": "docmancer/mcp/registry.py",
+      "matches_base_commit": true,
+      "sha256": "93d3a13e2c52bb1a54c47d28a4517ad2c1b9493f8b940732d7b4d5d386a097b7"
+    },
+    {
+      "path": "docmancer/mcp/safety.py",
+      "matches_base_commit": true,
+      "sha256": "a1446d0a6777f15a32b71f7f2c899d856c8310b0a30afc3a74d7f36269e76627"
+    },
+    {
+      "path": "docmancer/mcp/search.py",
+      "matches_base_commit": true,
+      "sha256": "6a3b4fe5a89bd9464ad010a1dd80287237f7cf20fc0d151a4dc4ece15618a16c"
+    },
+    {
+      "path": "docmancer/mcp/search_semantic.py",
+      "matches_base_commit": true,
+      "sha256": "6e9b355865c5895e5c84bdf4ced85550499a649403403ea58259be0bd8d1bad1"
+    },
+    {
+      "path": "docmancer/mcp/serve.py",
+      "matches_base_commit": true,
+      "sha256": "ad7d491f0f42800e7f0f5ac291a261d129a13fcf242e3fe878162e222b79d192"
+    },
+    {
+      "path": "docmancer/mcp/slug.py",
+      "matches_base_commit": true,
+      "sha256": "c763d961cfb182c1b2d1ad7558c999fdcbf065f35edbf740949f39f68afb736a"
+    },
+    {
+      "path": "docmancer/mcp/executors/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "965f1edfd275dbc15327c09a02b3e052321ef6532f472ba6c51c7f49b26d3364"
+    },
+    {
+      "path": "docmancer/mcp/executors/base.py",
+      "matches_base_commit": true,
+      "sha256": "031614a168b97036f719fe63fbaa90f8e50719cf93890df8dd9fce8a754e0af0"
+    },
+    {
+      "path": "docmancer/mcp/executors/http.py",
+      "matches_base_commit": true,
+      "sha256": "0f9ac73a55d9c2870053a428a2cf4c4b65d7f298f4f31f6f6d703dc74138f553"
+    },
+    {
+      "path": "docmancer/mcp/executors/noop.py",
+      "matches_base_commit": true,
+      "sha256": "32040a0c8bad09e5f2e85a60ebc6083614ddb3f914bef156b76272c03b1b2a83"
+    },
+    {
+      "path": "docmancer/mcp/executors/python_import.py",
+      "matches_base_commit": true,
+      "sha256": "80ff34d999e08e04bee917b048f75f0099937f74093d4ba8189d731ec653fc96"
+    },
+    {
+      "path": "docmancer/retrieval/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "b3147b1672dd6b5b5da7bb20a6c69400cc126143fe4bafdb219d6ea6f980044e"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_part01.py",
+      "matches_base_commit": true,
+      "sha256": "da82ee7a867cbedd22c4b8fc4ea41bc543477c7c6b70c3e07e94e0864315cd26"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_part02.py",
+      "matches_base_commit": true,
+      "sha256": "93495d3f815fc99889f6075c1fac7e03d8c0c3adf338c913704705c5bd6a68e2"
+    },
+    {
+      "path": "docmancer/retrieval/_dispatch_shared.py",
+      "matches_base_commit": true,
+      "sha256": "e3c893e189859f18b1c42eaeb7967988d1f956674f1ae5b35e920bd5a40fd391"
+    },
+    {
+      "path": "docmancer/retrieval/contextual_indexing.py",
+      "matches_base_commit": true,
+      "sha256": "f61dc2b41d772ecd5d039d9a781aa8b8e773bcfcda019f22feee2dc63abe3ab2"
+    },
+    {
+      "path": "docmancer/retrieval/contracts.py",
+      "matches_base_commit": true,
+      "sha256": "b157175252d3eab24492cffe107af48122eab633b151fa0b472314db928145aa"
+    },
+    {
+      "path": "docmancer/retrieval/dense.py",
+      "matches_base_commit": true,
+      "sha256": "c5a868f3bc7fee2872899e7df1aebb913bb36902076f79b81310a3d5f25407c0"
+    },
+    {
+      "path": "docmancer/retrieval/dispatch.py",
+      "matches_base_commit": true,
+      "sha256": "25211d5dada532655f31783d09dcae7d566dfa686602f07a0da78f289b2d66bf"
+    },
+    {
+      "path": "docmancer/retrieval/fusion.py",
+      "matches_base_commit": true,
+      "sha256": "bd753c848cae251559c3fb5fe301848250a0f0a81ae530d42bd2fb7243d0e382"
+    },
+    {
+      "path": "docmancer/retrieval/lexical.py",
+      "matches_base_commit": true,
+      "sha256": "bffe5ab0019d49bd3fef6719fb07e49eb3322cf35ecd52ee976e78a1835686a3"
+    },
+    {
+      "path": "docmancer/retrieval/query_planning.py",
+      "matches_base_commit": true,
+      "sha256": "2e1045ba7ad045837853aac84e6647cf2840f63d881c57538b8cffe2dfeb18d3"
+    },
+    {
+      "path": "docmancer/retrieval/runtime.py",
+      "matches_base_commit": true,
+      "sha256": "e68d0244383db7466c9f44040fabcefe53606b53b11c237630002b22d95dd8f2"
+    },
+    {
+      "path": "docmancer/retrieval/sparse.py",
+      "matches_base_commit": true,
+      "sha256": "4cf8707890f19efc1fc4a19b6c800c2010cb6f091bddfca76e9bfc46e0c96cb4"
+    },
+    {
+      "path": "docmancer/runtime/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docmancer/runtime/qdrant_manager.py",
+      "matches_base_commit": true,
+      "sha256": "e21aa0ab2128cc1faf95153f04b272ed79e41f0e74e5e76fac958ab45e092060"
+    },
+    {
+      "path": "docmancer/stores/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "fb72b6dc2b7afbfbf42be143a5d25d91345ac2026a324cbc536b3f6e2f346f7d"
+    },
+    {
+      "path": "docmancer/stores/base.py",
+      "matches_base_commit": true,
+      "sha256": "0142de1871bf2bfecf420cf208c743ea32688ac0eacf4c8b2293ed9ca2553b89"
+    },
+    {
+      "path": "docmancer/stores/qdrant_store.py",
+      "matches_base_commit": true,
+      "sha256": "50fb39d5a77ee9247878ae46ee8e15df75db60f854b8f1d9b27f01b3b7f55c30"
+    },
+    {
+      "path": "docmancer/stores/sqlite_vec_store.py",
+      "matches_base_commit": true,
+      "sha256": "07b0423e802bae58a53f05173f6325e884b410124b6cb18a214c572818865d9b"
+    },
+    {
+      "path": "docmancer/templates/__init__.py",
+      "matches_base_commit": true,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "boundary": "offline wheel bytes against Git source, not runtime/default behavior proof"
+}

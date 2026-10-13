@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW04",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-requests",
+  "public_request": {
+    "question": "Requests 2.32.3: does successful r.json() prove HTTP success, what should I check instead, and what exception results for a 204 No Content or invalid JSON?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "5f0777b1064df1b6cfe3940c5ce672420a9d9d6641dff802f46d7f775a284d51",
+  "utf8_bytes": 20962,
+  "tokens": 5538,
+  "seconds": 3.266328417001205,
+  "cpu_seconds": 3.2601406920000215,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

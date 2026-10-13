@@ -1,0 +1,17 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/concepts/configuration-files.md",
+      "raw_sha256": "e026002bb6cdb2c2c575fca5ceb29b82981874016d67162baf27693c0e335e91",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/concepts/configuration-files.md",
+      "raw_sha256": "e026002bb6cdb2c2c575fca5ceb29b82981874016d67162baf27693c0e335e91",
+      "errors": []
+    }
+  ]
+}

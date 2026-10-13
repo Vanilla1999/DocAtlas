@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW14",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-tox",
+  "public_request": {
+    "question": "tox 4.24.1: what is allowlist_externals' default and how does * differ from the rm example, and what cryptographic signature verification algorithm for external commands is specified?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "dd8815a1dcf8d7b0f66d61693927e0a47b7d07077ae673c0639495c4b508b7a6",
+  "utf8_bytes": 1770,
+  "tokens": 528,
+  "seconds": 0.3696071819995268,
+  "cpu_seconds": 0.36686405800000443,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

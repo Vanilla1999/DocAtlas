@@ -1,0 +1,665 @@
+{
+  "0:VQ": [
+    {
+      "case_id": "V40-B01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B06",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B07",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P06",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P07",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P08",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T03",
+      "category": "within_budget",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T06",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T07",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V06",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V07",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-E03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E05",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E06",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E07",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E08",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    }
+  ],
+  "0:VA": [
+    {
+      "case_id": "V40-B01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B06",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B07",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-B08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-P01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-P06",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": true,
+      "change": "gain"
+    },
+    {
+      "case_id": "V40-P07",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-P08",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T03",
+      "category": "within_budget",
+      "baseline_pass": false,
+      "candidate_pass": true,
+      "change": "gain"
+    },
+    {
+      "case_id": "V40-T04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T06",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-T07",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": true,
+      "change": "gain"
+    },
+    {
+      "case_id": "V40-T08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-V01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V03",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V04",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V05",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-V06",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": true,
+      "change": "gain"
+    },
+    {
+      "case_id": "V40-V07",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-V08",
+      "category": "unanswerable",
+      "baseline_pass": true,
+      "candidate_pass": false,
+      "change": "loss"
+    },
+    {
+      "case_id": "V40-E01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "V40-E02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    }
+  ],
+  "0:VS": [],
+  "0:VALL": [],
+  "1:VQ": [
+    {
+      "case_id": "H20-R01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-R02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-R03",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-R04",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-U01",
+      "category": "within_budget",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-U02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-U03",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-U04",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-U05",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M02",
+      "category": "within_budget",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M03",
+      "category": "partial",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M04",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M05",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-M06",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-T01",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-T02",
+      "category": "within_budget",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-T03",
+      "category": "partial",
+      "baseline_pass": true,
+      "candidate_pass": true,
+      "change": "same"
+    },
+    {
+      "case_id": "H20-T04",
+      "category": "unanswerable",
+      "baseline_pass": false,
+      "candidate_pass": false,
+      "change": "same"
+    }
+  ],
+  "1:VA": [],
+  "1:VS": [],
+  "1:VALL": [],
+  "2:VALL": []
+}

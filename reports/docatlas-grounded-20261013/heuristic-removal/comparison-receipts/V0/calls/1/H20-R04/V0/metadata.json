@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-R04",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-ruff",
+  "public_request": {
+    "question": "What is Ruff's documented maximum resident-memory limit in megabytes for ruff format?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-ruff/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "80d2e188b3849555bf804ab1f8c8480b0dbf151489f316f840b5cd3716359f4f",
+  "utf8_bytes": 40256,
+  "tokens": 11348,
+  "seconds": 5.593127756001195,
+  "cpu_seconds": 5.585264760999991,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

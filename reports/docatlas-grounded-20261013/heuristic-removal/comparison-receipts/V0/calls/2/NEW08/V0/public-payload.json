@@ -1,0 +1,59 @@
+{
+  "status": "truncated",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-cf070f036be3796d",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "      environment variable ``TOX_SKIP_ENV`` regular expression (e.g. ``py27.*`` means **don't** evaluate environments\n      that start with the key ``py27``). Skipped environments will be logged at level two verbosity level.\n\n.. conf::\n   :keys: skip_missing_interpreters\n   :default: config\n   :version_added: 1.7.2\n\n   Setting this to ``true`` will force ``tox`` to return success even if some of the specified environments were\n",
+      "version_binding": "unversioned",
+      "content_sha256": "65c617edc31a4e962be21c03017a20df147aec6da01236c13d2491ffd6e4f926",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 231,
+      "line_end": 239,
+      "authority": "source_of_truth",
+      "scope": "project"
+    },
+    {
+      "evidence_id": "ev-73ff7ea6aa019a93",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "changed via ``TOX_USER_CONFIG_FILE`` environment variable. Example configuration:\n\n.. code-block:: ini\n\n    [tox]\n    skip_missing_interpreters = true\n\n\nSet CLI flags via environment variables\n---------------------------------------\nAll configuration can be overridden via environment variables too, the naming convention here is ``TOX_<option>``. E.g.\n``TOX_WORK_DIR`` sets the ``--workdir`` flag, or ``TOX_OVERRIDE`` sets the ``--override`` flag. For flags accepting more\n",
+      "version_binding": "unversioned",
+      "content_sha256": "016f47fed553db449fdc408c0d824436dc953341c89afa594a3fe5b4d025e0b3",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "line_start": 1181,
+      "line_end": 1192,
+      "authority": "source_of_truth",
+      "scope": "project"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified",
+      "budget_limited"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 585
+}

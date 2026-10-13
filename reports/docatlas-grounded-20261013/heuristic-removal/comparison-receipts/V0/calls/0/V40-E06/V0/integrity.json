@@ -1,0 +1,17 @@
+{
+  "errors": [],
+  "rows": [
+    {
+      "index": 0,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    },
+    {
+      "index": 1,
+      "path": "docs/src/use/command-line-interface.md",
+      "raw_sha256": "fa5be8d53f1a546613f9b66e9248a1641cb0b5d8cb1a7303595b2ff2fc4b79a2",
+      "errors": []
+    }
+  ]
+}

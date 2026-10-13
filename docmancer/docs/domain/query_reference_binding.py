@@ -434,7 +434,9 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
             if statement is not None:
                 binding["syntax"] = "structural_filename"
             bindings.append(binding)
-    if plan is not None:
+    from .evidence_qualification import source_only_admission_active
+    source_only = source_only_admission_active() and probe.get("query_origin") in {"original", "host_lookup"}
+    if plan is not None and not source_only:
         body_question = reference_body_question(plan)
         exact_plan = plan
         if result.get("mode") == "exact_path":
@@ -464,6 +466,12 @@ def prepare_reference_probe(probe, *, candidate, evidence_text: str):
     owner_reason = prepared_owner_rejection(evidence)
     if owner_reason is not None:
         return result, owner_reason
+    if source_only:
+        # Locator bindings are global request restrictions; body identities and
+        # inferred lexical roles are not obligations on every acquired window.
+        result.update(reference_bindings=bindings,
+                      reference_visible_span=[visible_start, visible_start+len(visible)])
+        return result, None
     owner = evidence.get("owner") or {}
     owner_text = str(owner.get("text") or "")
     if (owner_text and type(owner.get("scope_start")) is int and type(owner.get("scope_end")) is int

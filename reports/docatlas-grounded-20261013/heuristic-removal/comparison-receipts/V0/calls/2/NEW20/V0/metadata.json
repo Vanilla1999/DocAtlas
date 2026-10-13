@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW20",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-tox",
+  "public_request": {
+    "question": "What exact automatic rollback and filesystem snapshot-retention guarantee does tox 4.24.1 specify when commands_post fails?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "935522cbeb6b858dec1396ac51f8532fd0a3d30c83599eb5ad03366ed173e7d6",
+  "utf8_bytes": 1787,
+  "tokens": 542,
+  "seconds": 0.3416069599988987,
+  "cpu_seconds": 0.33913702300000637,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

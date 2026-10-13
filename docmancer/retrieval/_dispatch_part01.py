@@ -81,6 +81,12 @@ class _RetrievalDispatcherPart01:
             or (configured_mode if isinstance(configured_mode, str) else None)
             or "lexical"
         ).lower()
+        from .experimental_acquisition import (
+            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
+            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+        )
+
+        q_active = effective_mode == "lexical"
         limit = min(40, limit or self.config.query.default_limit)
         budget = budget or self.config.query.default_budget
         per_source_limit = min(40, max(limit * 3, 20))
@@ -118,6 +124,14 @@ class _RetrievalDispatcherPart01:
                 ),
             },
         })
+        if q_active:
+            fusion_config_hash = canonical_hash({
+                "schema_version": ACQUISITION_METHOD,
+                "candidate_ceiling": ACQUISITION_CANDIDATES,
+                "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
+                "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
+                "expansion": "none", "source_quota": None,
+            })
 
         def finalized(result: DispatchResult) -> DispatchResult:
             result.query_plan_hash = query_plan.plan_hash
@@ -140,6 +154,30 @@ class _RetrievalDispatcherPart01:
                         "final_rank": final_rank,
                     }
             return result
+
+        if q_active:
+            chunks = self.store.query(
+                query, limit=ACQUISITION_CANDIDATES,
+                budget=ACQUISITION_ESTIMATED_TOKENS, expand="none",
+                filters=backend_filters,
+            )
+            acquired_count = len(chunks)
+            chunks = self._filter_chunks(chunks, merged_filters)
+            for chunk in chunks:
+                chunk.metadata.setdefault("acquisition", {}).update({
+                    "dispatcher_post_policy_rows": len(chunks),
+                    "delivery_limit_not_applied": limit,
+                    "delivery_budget_not_applied": budget,
+                })
+            return finalized(DispatchResult(
+                chunks=chunks,
+                contributions={
+                    c.metadata.get("section_id"): {"lexical": idx + 1}
+                    for idx, c in enumerate(chunks)
+                    if c.metadata.get("section_id") is not None
+                },
+                mode_used="lexical", candidate_counts={"lexical": acquired_count},
+            ))
 
         missing_capabilities: dict[str, str] = {}
         if effective_mode != "lexical":

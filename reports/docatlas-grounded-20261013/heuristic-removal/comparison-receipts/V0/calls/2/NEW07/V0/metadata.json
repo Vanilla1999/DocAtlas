@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW07",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-tox",
+  "public_request": {
+    "question": "For tox 4.24.1, are commands run after commands_pre fails, are commands_post still run, and how does a leading dash differ from ignore_errors=True with respect to failure status?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "6468f70c98f7a765ab2ea5a82c3da467325a276823dcfdc5cd07b0e1bad73136",
+  "utf8_bytes": 6558,
+  "tokens": 2062,
+  "seconds": 33.10411641199971,
+  "cpu_seconds": 33.060430956999994,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

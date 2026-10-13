@@ -40,6 +40,8 @@ class _ProjectContextServicePart01:
         _retention_ack: Any = None,
     ) -> ProjectContextResult:
         response_style = validate_response_style(response_style)
+        from .experimental_candidate_selection import native_rank_selection_active
+        native_rank = native_rank_selection_active()
         # This is a read boundary. Only a caller-supplied contract can request
         # mutation guidance; unknown prose never constructs mutation authority.
         mutation_intent = mutation_intent or MutationIntentContract("none", "unknown", ())
@@ -47,6 +49,8 @@ class _ProjectContextServicePart01:
         routing_budget_stages: set[str] = set()
         routing_stage_observed: dict[str, list[Any]] = {}
         mode = mode.lower()
+        if version is not None and mode in {"auto", "project-only"} and not library and not libraries:
+            raise ValueError("Local project documents are unversioned; an explicit version cannot be satisfied")
         if mode not in {"auto", "project-only", "deps-only", "public-docs"}:
             raise ValueError("mode must be one of: auto, project-only, deps-only, public-docs")
         root = Path(project_path).expanduser().resolve()
@@ -116,7 +120,7 @@ class _ProjectContextServicePart01:
                     and (chunk.metadata or {}).get("project_doc_catalog_entry_hash") == members[chunk.path].catalog_entry_hash]
             if project_docs and project_docs.requires_confirmation and project_docs.confirmation_reason == "project_docs_preflight":
                 return _project_docs_preflight_confirmation_result(root=root, question=question, mode=mode, project_docs=project_docs)
-            if project_docs and project_docs.results:
+            if project_docs and project_docs.results and not native_rank:
                 if evidence_path:
                     evidence_path = project_docs.resolved_evidence_path or evidence_path
                     normalized_evidence_path = normalize_doc_path(evidence_path)
@@ -180,6 +184,12 @@ class _ProjectContextServicePart01:
                 if budget_issue:
                     routing_budget_issues.append(f"project_docs: {budget_issue}")
                     routing_budget_stages.add("project_docs")
+            elif project_docs and project_docs.results:
+                # Native source windows retain acquisition order until terminal
+                # whole-row packing. Membership/hash checks above still apply;
+                # prefit relevance, reranking and intermediate delivery fitting
+                # cannot erase this independently bounded acquisition pool.
+                routing_stage_observed["project_docs"] = list(project_docs.results)
 
         explicit_dependency = library or (libraries[0] if libraries else None)
         literal_dependency = self.dependency_mentioned_in_question(metadata, question)

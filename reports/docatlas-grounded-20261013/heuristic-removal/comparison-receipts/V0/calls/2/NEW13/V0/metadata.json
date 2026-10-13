@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW13",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-pytest",
+  "public_request": {
+    "question": "For pytest 8.3.5, what effect does --runxfail have on xfail markers and pytest.xfail calls, and what production database backup-retention duration is specified by this skipping guide?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-pytest/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "2dc00046ad6417bdc44dd79a4cedb2768f666174a3938a543ca3a2f46774c61f",
+  "utf8_bytes": 13926,
+  "tokens": 3587,
+  "seconds": 0.30976401999942027,
+  "cpu_seconds": 0.3084465430000023,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

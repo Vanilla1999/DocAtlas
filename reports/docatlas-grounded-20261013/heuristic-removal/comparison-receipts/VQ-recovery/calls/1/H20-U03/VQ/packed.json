@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-c8531ac554fb1cac",
+      "path_or_url": "docs/concepts/configuration-files.md",
+      "section": "Configuration files > Environment variable files",
+      "snippet": "## Environment variable files\n\n`uv run` can load environment variables from dotenv files (e.g., `.env`, `.env.local`,\n`.env.development`), powered by the [`dotenvy`](https://github.com/allan2/dotenvy) crate.\n\nTo load a `.env` file from a dedicated location, set the `UV_ENV_FILE` environment variable, or pass\nthe `--env-file` flag to `uv run`.\n\nFor example, to load environment variables from a `.env` file in the current working directory:\n\n```console\n$ echo \"MY_VAR='Hello, world!'\" > .env\n$ uv run --env-file .env -- python -c 'import os; print(os.getenv(\"MY_VAR\"))'\nHello, world!\n```\n\nThe `--env-file` flag can be provided multiple times, with subsequent files overriding values\ndefined in previous files. To provide multiple files via the `UV_ENV_FILE` environment variable,\nseparate the paths with a space (e.g., `UV_ENV_FILE=\"/path/to/file1 /path/to/file2\"`).\n\nTo disable dotenv loading (e.g., to override `UV_ENV_FILE` or the `--env-file` command-line\nargument), set the `UV_NO_ENV_FILE` environment variable to `1`, or pass the`--no-env-file` flag to\n`uv run`.\n\nIf the same variable is defined in the environment and in a `.env` file, the value from the\nenvironment will take precedence.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "a93ee2c6f933741b7e55fd169f13e930f0461612dbc2e9807ff5e47a4a5cb82e",
+      "project_identity": "local:1fe233bcddb3ec27ff4a037aaa9af0f9dd655ffe9737ab92e64cd36ea270668e",
+      "line_start": 80,
+      "line_end": 106,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/6b9f0eed7b6db1eef5e1a6da"
+    },
+    {
+      "evidence_id": "ev-1ef1d49902d11d3d",
+      "path_or_url": "docs/concepts/configuration-files.md",
+      "section": "Configuration files",
+      "snippet": "For example, if a string, number, or boolean is present in both the project- and user-level\nconfiguration tables, the project-level value will be used, and the user-level value will be\nignored. If an array is present in both tables, the arrays will be concatenated, with the\nproject-level settings appearing earlier in the merged array.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "869c551fc4f8fc918cd850d9fc016b2a402d367969e8343c1897d616fe6f0a57",
+      "project_identity": "local:1fe233bcddb3ec27ff4a037aaa9af0f9dd655ffe9737ab92e64cd36ea270668e",
+      "line_start": 61,
+      "line_end": 65,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/06d2022fc2676c536deed335"
+    }
+  ],
+  "tokens": 800,
+  "utf8_bytes": 2613,
+  "sha256": "6248d1727a67dd147621d13ed2616806adc628b7355c8188c83e08208b28e369",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

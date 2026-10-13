@@ -1,0 +1,93 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-9f71d1e7fa4ed488",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > IntelliSense for TypeScript",
+      "snippet": "## IntelliSense for TypeScript\n\nBy default, Vite provides type definitions for `import.meta.env` in [`vite/client.d.ts`](https://github.com/vitejs/vite/blob/main/packages/vite/client.d.ts). While you can define more custom env variables in `.env.[mode]` files, you may want to get TypeScript IntelliSense for user-defined env variables that are prefixed with `VITE_`.\n\nTo achieve this, you can create an `vite-env.d.ts` in `src` directory, then augment `ImportMetaEnv` like this:\n\n```typescript [vite-env.d.ts]\ninterface ViteTypeOptions {\n  // By adding this line, you can make the type of ImportMetaEnv strict\n  // to disallow unknown keys.\n  // strictImportMetaEnv: unknown\n}\n\ninterface ImportMetaEnv {\n  readonly VITE_APP_TITLE: string\n  // more env variables...\n}\n\ninterface ImportMeta {\n  readonly env: ImportMetaEnv\n}\n```\n\nIf your code relies on types from browser environments such as [DOM](https://github.com/microsoft/TypeScript/blob/main/src/lib/dom.generated.d.ts) and [WebWorker](https://github.com/microsoft/TypeScript/blob/main/src/lib/webworker.generated.d.ts), you can update the [lib](https://www.typescriptlang.org/tsconfig#lib) field in `tsconfig.json`.\n\n```json [tsconfig.json]\n{\n  \"lib\": [\"WebWorker\"]\n}\n```\n\n:::warning Imports will break type augmentation\n\nIf the `ImportMetaEnv` augmentation does not work, make sure you do not have any `import` statements in `vite-env.d.ts`. See the [TypeScript documentation](https://www.typescriptlang.org/docs/handbook/2/modules.html#how-javascript-modules-are-defined) for more information.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "2c9c05c1d0f313b1c3dfcaf79437d0d997d459f6447da2d040b4447411f6fc75",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 125,
+      "line_end": 161,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/7f737f73ed40ce2fb9f284ca"
+    },
+    {
+      "evidence_id": "ev-9d5212e496bf2479",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > Env Variables",
+      "snippet": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\nThe parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n:::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n\n:::warning Protecting secrets\n\n`VITE_*` variables should _not_ contain sensitive information such as API keys. The values of these variables are bundled into your source code at build time. For production deployments, consider a backend server or serverless/edge functions to properly secure secrets.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "71ff2bb06f48c19f09570583637ea20515523835b2222f829f4cd6536e878c56",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 32,
+      "line_end": 61,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/27acea34c546b24e5edb6e43"
+    },
+    {
+      "evidence_id": "ev-30ccad9e5249a228",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > Env Variables",
+      "snippet": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "3b0c1b6f12eb65e7df2301442fae6cc46b44e52ea5586d573717fdb10f11a772",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 32,
+      "line_end": 42,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/6cdf642273366f33f9c29612"
+    },
+    {
+      "evidence_id": "ev-266cdbce46227091",
+      "path_or_url": "docs/guide/env-and-mode.md",
+      "section": "Env Variables and Modes > Env Variables",
+      "snippet": ":::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n\n:::warning Protecting secrets\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "d21692ffd598e495a8efa7d24e461156e8fad814f31778508e0bfc9925e44be9",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 52,
+      "line_end": 57,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/3e1d142da1cb2b4b375adca7"
+    },
+    {
+      "evidence_id": "ev-53d03acf48ee3af9",
+      "path_or_url": "docs/guide/assets.md",
+      "section": "Static Asset Handling > new URL(url, import.meta.url)",
+      "snippet": "## new URL(url, import.meta.url)\n\n[import.meta.url](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import.meta) is a native ESM feature that exposes the current module's URL. Combining it with the native [URL constructor](https://developer.mozilla.org/en-US/docs/Web/API/URL), we can obtain the full, resolved URL of a static asset using relative path from a JavaScript module:\n\n```js\nconst imgUrl = new URL('./img.png', import.meta.url).href\n\ndocument.getElementById('hero-img').src = imgUrl\n```\n\nThis works natively in modern browsers - in fact, Vite doesn't need to process this code at all during development!\n\nThis pattern also supports dynamic URLs via template literals:\n\n```js\nfunction getImageUrl(name) {\n  // note that this does not include files in subdirectories\n  return new URL(`./dir/${name}.png`, import.meta.url).href\n}\n```\n\nDuring the production build, Vite will perform necessary transforms so that the URLs still point to the correct location even after bundling and asset hashing. However, the URL string must be static so it can be analyzed, otherwise the code will be left as is, which can cause runtime errors if `build.target` does not support `import.meta.url`.\n\n```js\n// Vite will not transform this\nconst imgUrl = new URL(imagePath, import.meta.url).href\n```\n\n::: details How it works\n\nVite will transform the `getImageUrl` function to:\n\n```js\nimport __img0png from './dir/img0.png'\nimport __img1png from './dir/img1.png'\n\nfunction getImageUrl(name) {\n  const modules = {\n    './dir/img0.png': __img0png,\n    './dir/img1.png': __img1png,\n  }\n  return new URL(modules[`./dir/${name}.png`], import.meta.url).href\n}\n```\n\n:::\n\n::: warning Does not work with SSR\nThis pattern does not work if you are using Vite for Server-Side Rendering, because `import.meta.url` has different semantics in browsers vs. Node.js. The server bundle also cannot determine the client host URL ahead of time.\n:::\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e489ce151530307a05d8b6f7a786edaaeeecfdcfb9b0933ba8bfc46a7af9f59b",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 128,
+      "line_end": 177,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/0152f78a399ea1f48ae3568f"
+    },
+    {
+      "evidence_id": "ev-83865a7e4271e722",
+      "path_or_url": "docs/guide/assets.md",
+      "section": "Static Asset Handling > Importing Asset as URL",
+      "snippet": "- TypeScript, by default, does not recognize static asset imports as valid modules. To fix this, include [`vite/client`](./features#client-types).\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "7bf9b7e738e2392706f029393a0186aa38e406186fe26f3066b5c0f47479d04a",
+      "project_identity": "local:98ced70b025801b1a78e3f973de15f608ec9f122ed119579cb906496834cde85",
+      "line_start": 33,
+      "line_end": 34,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/453cae00d8bea4ac8f98ccd2"
+    }
+  ],
+  "tokens": 2620,
+  "utf8_bytes": 8875,
+  "sha256": "e16f5ec21e8d0016021ba63d9bde0a93cade67c9c1f72b208659d4301c25e9f4",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

@@ -1,0 +1,365 @@
+{
+  "root": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+  "inventory": {
+    "seconds": 0.1771641230006935,
+    "expected_paths": [
+      "docs/user/quickstart.rst"
+    ],
+    "indexed_paths": [
+      "docs/user/quickstart.rst"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-00ffe4f619564bf22a7b0db933067ff2dc75daca",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": ".. _quickstart:\n\nQuickstart\n==========\n\n.. module:: requests.models\n\nEager to get started? This page gives a good introduction in how to get started\nwith Requests.\n\nFirst, make sure that:\n\n* Requests is :ref:`installed <install>`\n* Requests is :ref:`up-to-date <updates>`\n\n\nLet's get started with some simple examples.\n\n\nMake a Request\n--------------\n\nMaking a request with Requests is very simple.\n\nBegin by importing the Requests module::\n\n    >>> import requests\n\n",
+        "line_start": 1,
+        "line_end": 28
+      },
+      {
+        "stable_chunk_id": "child-9477f6a54357d6927cbff71d59ba8ac321552f35",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Now, let's try to get a webpage. For this example, let's get GitHub's public\ntimeline::\n\n    >>> r = requests.get('https://api.github.com/events')\n\nNow, we have a :class:`Response <requests.Response>` object called ``r``. We can\nget all the information we need from this object.\n\nRequests' simple API means that all forms of HTTP request are as obvious. For\nexample, this is how you make an HTTP POST request::\n\n    >>> r = requests.post('https://httpbin.org/post', data={'key': 'value'})\n\n",
+        "line_start": 29,
+        "line_end": 41
+      },
+      {
+        "stable_chunk_id": "child-25f65143f067427acbfbbcb4d8cb8a49c665e726",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Nice, right? What about the other HTTP request types: PUT, DELETE, HEAD and\nOPTIONS? These are all just as simple::\n\n    >>> r = requests.put('https://httpbin.org/put', data={'key': 'value'})\n    >>> r = requests.delete('https://httpbin.org/delete')\n    >>> r = requests.head('https://httpbin.org/get')\n    >>> r = requests.options('https://httpbin.org/get')\n\nThat's all well and good, but it's also only the start of what Requests can\ndo.\n\n\nPassing Parameters In URLs\n--------------------------\n\n",
+        "line_start": 42,
+        "line_end": 56
+      },
+      {
+        "stable_chunk_id": "child-4154ddcac647aa29637e0b98bad303d8c34c6866",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "You often want to send some sort of data in the URL's query string. If\nyou were constructing the URL by hand, this data would be given as key/value\npairs in the URL after a question mark, e.g. ``httpbin.org/get?key=val``.\nRequests allows you to provide these arguments as a dictionary of strings,\nusing the ``params`` keyword argument. As an example, if you wanted to pass\n``key1=value1`` and ``key2=value2`` to ``httpbin.org/get``, you would use the\nfollowing code::\n\n",
+        "line_start": 57,
+        "line_end": 64
+      },
+      {
+        "stable_chunk_id": "child-21cb56858897a59e1489ab0131d9afd8eff219f4",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> payload = {'key1': 'value1', 'key2': 'value2'}\n    >>> r = requests.get('https://httpbin.org/get', params=payload)\n\nYou can see that the URL has been correctly encoded by printing the URL::\n\n    >>> print(r.url)\n    https://httpbin.org/get?key2=value2&key1=value1\n\nNote that any dictionary key whose value is ``None`` will not be added to the\nURL's query string.\n\nYou can also pass a list of items as a value::\n\n    >>> payload = {'key1': 'value1', 'key2': ['value2', 'value3']}\n\n",
+        "line_start": 65,
+        "line_end": 79
+      },
+      {
+        "stable_chunk_id": "child-ff4692d8b4d9c4099341908d9c0ce854b89ea44b",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r = requests.get('https://httpbin.org/get', params=payload)\n    >>> print(r.url)\n    https://httpbin.org/get?key1=value1&key2=value2&key2=value3\n\nResponse Content\n----------------\n\nWe can read the content of the server's response. Consider the GitHub timeline\nagain::\n\n    >>> import requests\n\n    >>> r = requests.get('https://api.github.com/events')\n    >>> r.text\n    '[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n\n",
+        "line_start": 80,
+        "line_end": 95
+      },
+      {
+        "stable_chunk_id": "child-d83b87e6cf4b91cfffdc534c851590dc561805b5",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Requests will automatically decode content from the server. Most unicode\ncharsets are seamlessly decoded.\n\nWhen you make a request, Requests makes educated guesses about the encoding of\nthe response based on the HTTP headers. The text encoding guessed by Requests\nis used when you access ``r.text``. You can find out what encoding Requests is\nusing, and change it, using the ``r.encoding`` property::\n\n    >>> r.encoding\n    'utf-8'\n    >>> r.encoding = 'ISO-8859-1'\n\n",
+        "line_start": 96,
+        "line_end": 107
+      },
+      {
+        "stable_chunk_id": "child-9563aa69d75d89d70a25582fe5518b93864cb427",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "If you change the encoding, Requests will use the new value of ``r.encoding``\nwhenever you call ``r.text``. You might want to do this in any situation where\nyou can apply special logic to work out what the encoding of the content will\nbe. For example, HTML and XML have the ability to specify their encoding in\ntheir body. In situations like this, you should use ``r.content`` to find the\nencoding, and then set ``r.encoding``. This will let you use ``r.text`` with\nthe correct encoding.\n\n",
+        "line_start": 108,
+        "line_end": 115
+      },
+      {
+        "stable_chunk_id": "child-c8bccacfd8834f3014630ee05f2705ff5fa20a69",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Requests will also use custom encodings in the event that you need them. If\nyou have created your own encoding and registered it with the ``codecs``\nmodule, you can simply use the codec name as the value of ``r.encoding`` and\nRequests will handle the decoding for you.\n\nBinary Response Content\n-----------------------\n\nYou can also access the response body as bytes, for non-text requests::\n\n    >>> r.content\n    b'[{\"repository\":{\"open_issues\":0,\"url\":\"https://github.com/...\n\n",
+        "line_start": 116,
+        "line_end": 128
+      },
+      {
+        "stable_chunk_id": "child-eb8fc7699a966889da4d9448666489bf68ab75e0",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "The ``gzip`` and ``deflate`` transfer-encodings are automatically decoded for you.\n\nThe ``br``  transfer-encoding is automatically decoded for you if a Brotli library\nlike `brotli <https://pypi.org/project/brotli>`_ or `brotlicffi <https://pypi.org/project/brotlicffi>`_ is installed.\n\nFor example, to create an image from binary data returned by a request, you can\nuse the following code::\n\n    >>> from PIL import Image\n    >>> from io import BytesIO\n\n    >>> i = Image.open(BytesIO(r.content))\n\n\n",
+        "line_start": 129,
+        "line_end": 142
+      },
+      {
+        "stable_chunk_id": "child-ddd7307f0ea6a681ab8d28369ee03841fe1ff78d",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "JSON Response Content\n---------------------\n\nThere's also a builtin JSON decoder, in case you're dealing with JSON data::\n\n    >>> import requests\n\n    >>> r = requests.get('https://api.github.com/events')\n    >>> r.json()\n    [{'repository': {'open_issues': 0, 'url': 'https://github.com/...\n\n",
+        "line_start": 143,
+        "line_end": 153
+      },
+      {
+        "stable_chunk_id": "child-18b5e75acaac658a85ba237ebd5d646b3ba22fa0",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "In case the JSON decoding fails, ``r.json()`` raises an exception. For example, if\nthe response gets a 204 (No Content), or if the response contains invalid JSON,\nattempting ``r.json()`` raises ``requests.exceptions.JSONDecodeError``. This wrapper exception\nprovides interoperability for multiple exceptions that may be thrown by different\npython versions and json serialization libraries.\n\n",
+        "line_start": 154,
+        "line_end": 159
+      },
+      {
+        "stable_chunk_id": "child-c45647edc66c51db6fbe6253c561f1192e1a9895",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "It should be noted that the success of the call to ``r.json()`` does **not**\nindicate the success of the response. Some servers may return a JSON object in a\nfailed response (e.g. error details with HTTP 500). Such JSON will be decoded\nand returned. To check that a request is successful, use\n``r.raise_for_status()`` or check ``r.status_code`` is what you expect.\n\n\nRaw Response Content\n--------------------\n\n",
+        "line_start": 160,
+        "line_end": 169
+      },
+      {
+        "stable_chunk_id": "child-1ddb54257aea612089f3760ca6400ca7cd91f307",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "In the rare case that you'd like to get the raw socket response from the\nserver, you can access ``r.raw``. If you want to do this, make sure you set\n``stream=True`` in your initial request. Once you do, you can do this::\n\n    >>> r = requests.get('https://api.github.com/events', stream=True)\n\n    >>> r.raw\n    <urllib3.response.HTTPResponse object at 0x101194810>\n\n    >>> r.raw.read(10)\n    b'\\x1f\\x8b\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x03'\n\n",
+        "line_start": 170,
+        "line_end": 181
+      },
+      {
+        "stable_chunk_id": "child-bab9d9845387a65b1929f15e28676cb24d3084d5",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "In general, however, you should use a pattern like this to save what is being\nstreamed to a file::\n\n    with open(filename, 'wb') as fd:\n        for chunk in r.iter_content(chunk_size=128):\n            fd.write(chunk)\n\n",
+        "line_start": 182,
+        "line_end": 188
+      },
+      {
+        "stable_chunk_id": "child-0c7f42bd1e0b8b86fae0cb23edae6044ca3a69b1",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Using ``Response.iter_content`` will handle a lot of what you would otherwise\nhave to handle when using ``Response.raw`` directly. When streaming a\ndownload, the above is the preferred and recommended way to retrieve the\ncontent. Note that ``chunk_size`` can be freely adjusted to a number that\nmay better fit your use cases.\n\n.. note::\n\n",
+        "line_start": 189,
+        "line_end": 196
+      },
+      {
+        "stable_chunk_id": "child-6eb026d15a9cfd311c03b60d4244ed3a30d97486",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "   An important note about using ``Response.iter_content`` versus ``Response.raw``.\n   ``Response.iter_content`` will automatically decode the ``gzip`` and ``deflate``\n   transfer-encodings.  ``Response.raw`` is a raw stream of bytes -- it does not\n   transform the response content.  If you really need access to the bytes as they\n   were returned, use ``Response.raw``.\n\n\n.. _custom-headers:\n\nCustom Headers\n--------------\n\n",
+        "line_start": 197,
+        "line_end": 208
+      },
+      {
+        "stable_chunk_id": "child-75212227a7e27bfb19bc9bb9e3721e032eb17d24",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "If you'd like to add HTTP headers to a request, simply pass in a ``dict`` to the\n``headers`` parameter.\n\nFor example, we didn't specify our user-agent in the previous example::\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> headers = {'user-agent': 'my-app/0.0.1'}\n\n    >>> r = requests.get(url, headers=headers)\n\n",
+        "line_start": 209,
+        "line_end": 218
+      },
+      {
+        "stable_chunk_id": "child-9ecd73ef84ed9ff4f2b0e04ef11af4ab45dd2af3",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Note: Custom headers are given less precedence than more specific sources of information. For instance:\n\n* Authorization headers set with `headers=` will be overridden if credentials\n  are specified in ``.netrc``, which in turn will be overridden by the  ``auth=``\n  parameter. Requests will search for the netrc file at `~/.netrc`, `~/_netrc`,\n  or at the path specified by the `NETRC` environment variable.\n* Authorization headers will be removed if you get redirected off-host.\n* Proxy-Authorization headers will be overridden by proxy credentials provided in the URL.\n* Content-Length headers will be overridden when we can determine the length of the content.\n\n",
+        "line_start": 219,
+        "line_end": 228
+      },
+      {
+        "stable_chunk_id": "child-3c052022343fffab5678516c416f85912cb4c457",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Furthermore, Requests does not change its behavior at all based on which custom headers are specified. The headers are simply passed on into the final request.\n\nNote: All header values must be a ``string``, bytestring, or unicode. While permitted, it's advised to avoid passing unicode header values.\n\nMore complicated POST requests\n------------------------------\n\n",
+        "line_start": 229,
+        "line_end": 235
+      },
+      {
+        "stable_chunk_id": "child-91823c076e05ab1edd75cca3720a089b0a272e93",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Typically, you want to send some form-encoded data — much like an HTML form.\nTo do this, simply pass a dictionary to the ``data`` argument. Your\ndictionary of data will automatically be form-encoded when the request is made::\n\n    >>> payload = {'key1': 'value1', 'key2': 'value2'}\n\n    >>> r = requests.post('https://httpbin.org/post', data=payload)\n    >>> print(r.text)\n    {\n      ...\n      \"form\": {\n        \"key2\": \"value2\",\n        \"key1\": \"value1\"\n      },\n      ...\n    }\n\n",
+        "line_start": 236,
+        "line_end": 252
+      },
+      {
+        "stable_chunk_id": "child-69c633d67a16989311d770985fbf1b8261c2ea7b",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "The ``data`` argument can also have multiple values for each key. This can be\ndone by making ``data`` either a list of tuples or a dictionary with lists\nas values. This is particularly useful when the form has multiple elements that\nuse the same key::\n\n",
+        "line_start": 253,
+        "line_end": 257
+      },
+      {
+        "stable_chunk_id": "child-ca95fe03b4e5b055dd7fa3218bdc302f157bae4f",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> payload_tuples = [('key1', 'value1'), ('key1', 'value2')]\n    >>> r1 = requests.post('https://httpbin.org/post', data=payload_tuples)\n    >>> payload_dict = {'key1': ['value1', 'value2']}\n    >>> r2 = requests.post('https://httpbin.org/post', data=payload_dict)\n    >>> print(r1.text)\n    {\n      ...\n      \"form\": {\n        \"key1\": [\n          \"value1\",\n          \"value2\"\n        ]\n      },\n      ...\n    }\n    >>> r1.text == r2.text\n    True\n\n",
+        "line_start": 258,
+        "line_end": 275
+      },
+      {
+        "stable_chunk_id": "child-a8686c428b73fb05f1c41c869e0342e49f6e7d32",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "There are times that you may want to send data that is not form-encoded. If\nyou pass in a ``string`` instead of a ``dict``, that data will be posted directly.\n\nFor example, the GitHub API v3 accepts JSON-Encoded POST/PATCH data::\n\n    >>> import json\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> payload = {'some': 'data'}\n\n    >>> r = requests.post(url, data=json.dumps(payload))\n\n",
+        "line_start": 276,
+        "line_end": 287
+      },
+      {
+        "stable_chunk_id": "child-374df9eef23bd7b96412e0a720f9f573d39a4211",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Please note that the above code will NOT add the ``Content-Type`` header\n(so in particular it will NOT set it to ``application/json``).\n\nIf you need that header set and you don't want to encode the ``dict`` yourself,\nyou can also pass it directly using the ``json`` parameter (added in version 2.4.2)\nand it will be encoded automatically:\n\n    >>> url = 'https://api.github.com/some/endpoint'\n    >>> payload = {'some': 'data'}\n\n    >>> r = requests.post(url, json=payload)\n\n",
+        "line_start": 288,
+        "line_end": 299
+      },
+      {
+        "stable_chunk_id": "child-1dc07b38e96b577d5eb178477be9c2627ec5a48c",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Note, the ``json`` parameter is ignored if either ``data`` or ``files`` is passed.\n\nPOST a Multipart-Encoded File\n-----------------------------\n\nRequests makes it simple to upload Multipart-encoded files::\n\n    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': open('report.xls', 'rb')}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"<censored...binary...data>\"\n      },\n      ...\n    }\n\n",
+        "line_start": 300,
+        "line_end": 319
+      },
+      {
+        "stable_chunk_id": "child-4bb898fcd718f4b8949ea404ff531dcd2f09a946",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "You can set the filename, content_type and headers explicitly::\n\n    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': ('report.xls', open('report.xls', 'rb'), 'application/vnd.ms-excel', {'Expires': '0'})}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"<censored...binary...data>\"\n      },\n      ...\n    }\n\nIf you want, you can send strings to be received as files::\n\n",
+        "line_start": 320,
+        "line_end": 336
+      },
+      {
+        "stable_chunk_id": "child-676fd18916c875329afba13c49891452d3129b20",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> url = 'https://httpbin.org/post'\n    >>> files = {'file': ('report.csv', 'some,data,to,send\\nanother,row,to,send\\n')}\n\n    >>> r = requests.post(url, files=files)\n    >>> r.text\n    {\n      ...\n      \"files\": {\n        \"file\": \"some,data,to,send\\\\nanother,row,to,send\\\\n\"\n      },\n      ...\n    }\n\n",
+        "line_start": 337,
+        "line_end": 349
+      },
+      {
+        "stable_chunk_id": "child-a70231d942cb9d591b8d35b27828d1721fdeabdd",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "In the event you are posting a very large file as a ``multipart/form-data``\nrequest, you may want to stream the request. By default, ``requests`` does not\nsupport this, but there is a separate package which does -\n``requests-toolbelt``. You should read `the toolbelt's documentation\n<https://toolbelt.readthedocs.io>`_ for more details about how to use it.\n\nFor sending multiple files in one request refer to the :ref:`advanced <advanced>`\nsection.\n\n",
+        "line_start": 350,
+        "line_end": 358
+      },
+      {
+        "stable_chunk_id": "child-0ea36dfd1287da8131708007a29092f4ff21652a",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": ".. warning:: It is strongly recommended that you open files in :ref:`binary\n             mode <tut-files>`. This is because Requests may attempt to provide\n             the ``Content-Length`` header for you, and if it does this value\n             will be set to the number of *bytes* in the file. Errors may occur\n             if you open the file in *text mode*.\n\n\nResponse Status Codes\n---------------------\n\nWe can check the response status code::\n\n",
+        "line_start": 359,
+        "line_end": 370
+      },
+      {
+        "stable_chunk_id": "child-da0f4ff5a0a961669f4655ab6fa4b587e4d540d3",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r = requests.get('https://httpbin.org/get')\n    >>> r.status_code\n    200\n\nRequests also comes with a built-in status code lookup object for easy\nreference::\n\n    >>> r.status_code == requests.codes.ok\n    True\n\nIf we made a bad request (a 4XX client error or 5XX server error response), we\ncan raise it with\n:meth:`Response.raise_for_status() <requests.Response.raise_for_status>`::\n\n    >>> bad_r = requests.get('https://httpbin.org/status/404')\n    >>> bad_r.status_code\n    404\n\n",
+        "line_start": 371,
+        "line_end": 388
+      },
+      {
+        "stable_chunk_id": "child-8e1b579b7067810d6dfd2d16ab2ef8e211df809c",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> bad_r.raise_for_status()\n    Traceback (most recent call last):\n      File \"requests/models.py\", line 832, in raise_for_status\n        raise http_error\n    requests.exceptions.HTTPError: 404 Client Error\n\nBut, since our ``status_code`` for ``r`` was ``200``, when we call\n``raise_for_status()`` we get::\n\n    >>> r.raise_for_status()\n    None\n\nAll is well.\n\n\nResponse Headers\n----------------\n\nWe can view the server's response headers using a Python dictionary::\n\n",
+        "line_start": 389,
+        "line_end": 408
+      },
+      {
+        "stable_chunk_id": "child-48ad640683ed934bad99f39dfd63a27271982859",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r.headers\n    {\n        'content-encoding': 'gzip',\n        'transfer-encoding': 'chunked',\n        'connection': 'close',\n        'server': 'nginx/1.0.4',\n        'x-runtime': '148ms',\n        'etag': '\"e1ca502697e5c9317743dc078f67693f\"',\n        'content-type': 'application/json'\n    }\n\nThe dictionary is special, though: it's made just for HTTP headers. According to\n`RFC 7230 <https://tools.ietf.org/html/rfc7230#section-3.2>`_, HTTP Header names\nare case-insensitive.\n\n",
+        "line_start": 409,
+        "line_end": 423
+      },
+      {
+        "stable_chunk_id": "child-4b6f8a53afd907c63f4944372896a36807684b39",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "So, we can access the headers using any capitalization we want::\n\n    >>> r.headers['Content-Type']\n    'application/json'\n\n    >>> r.headers.get('content-type')\n    'application/json'\n\nIt is also special in that the server could have sent the same header multiple\ntimes with different values, but requests combines them so they can be\nrepresented in the dictionary within a single mapping, as per\n`RFC 7230 <https://tools.ietf.org/html/rfc7230#section-3.2>`_:\n\n",
+        "line_start": 424,
+        "line_end": 436
+      },
+      {
+        "stable_chunk_id": "child-51a4399ca39143276e9f52d93a9d2acdb9ecf540",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    A recipient MAY combine multiple header fields with the same field name\n    into one \"field-name: field-value\" pair, without changing the semantics\n    of the message, by appending each subsequent field value to the combined\n    field value in order, separated by a comma.\n\nCookies\n-------\n\nIf a response contains some Cookies, you can quickly access them::\n\n    >>> url = 'http://example.com/some/cookie/setting/url'\n    >>> r = requests.get(url)\n\n",
+        "line_start": 437,
+        "line_end": 449
+      },
+      {
+        "stable_chunk_id": "child-fcfece4a0f7529edfa965f39c0728851a67beff2",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r.cookies['example_cookie_name']\n    'example_cookie_value'\n\nTo send your own cookies to the server, you can use the ``cookies``\nparameter::\n\n    >>> url = 'https://httpbin.org/cookies'\n    >>> cookies = dict(cookies_are='working')\n\n    >>> r = requests.get(url, cookies=cookies)\n    >>> r.text\n    '{\"cookies\": {\"cookies_are\": \"working\"}}'\n\n",
+        "line_start": 450,
+        "line_end": 462
+      },
+      {
+        "stable_chunk_id": "child-c38ebd702abc20dd1ef345177a5e53b4083c6e6e",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "Cookies are returned in a :class:`~requests.cookies.RequestsCookieJar`,\nwhich acts like a ``dict`` but also offers a more complete interface,\nsuitable for use over multiple domains or paths.  Cookie jars can\nalso be passed in to requests::\n\n",
+        "line_start": 463,
+        "line_end": 467
+      },
+      {
+        "stable_chunk_id": "child-9fa5ff4b924361540bf87372dd333cd374777f3d",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> jar = requests.cookies.RequestsCookieJar()\n    >>> jar.set('tasty_cookie', 'yum', domain='httpbin.org', path='/cookies')\n    >>> jar.set('gross_cookie', 'blech', domain='httpbin.org', path='/elsewhere')\n    >>> url = 'https://httpbin.org/cookies'\n    >>> r = requests.get(url, cookies=jar)\n    >>> r.text\n    '{\"cookies\": {\"tasty_cookie\": \"yum\"}}'\n\n\nRedirection and History\n-----------------------\n\nBy default Requests will perform location redirection for all verbs except\nHEAD.\n\n",
+        "line_start": 468,
+        "line_end": 482
+      },
+      {
+        "stable_chunk_id": "child-e984a7e3d7bf1d9053316a92ce7de0cccebd48c6",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "We can use the ``history`` property of the Response object to track redirection.\n\nThe :attr:`Response.history <requests.Response.history>` list contains the\n:class:`Response <requests.Response>` objects that were created in order to\ncomplete the request. The list is sorted from the oldest to the most recent\nresponse.\n\nFor example, GitHub redirects all HTTP requests to HTTPS::\n\n    >>> r = requests.get('http://github.com/')\n\n    >>> r.url\n    'https://github.com/'\n\n    >>> r.status_code\n    200\n\n",
+        "line_start": 483,
+        "line_end": 499
+      },
+      {
+        "stable_chunk_id": "child-20d1b1bd9cdbf423225607ff49bb6dfa4c18c28e",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r.history\n    [<Response [301]>]\n\n\nIf you're using GET, OPTIONS, POST, PUT, PATCH or DELETE, you can disable\nredirection handling with the ``allow_redirects`` parameter::\n\n    >>> r = requests.get('http://github.com/', allow_redirects=False)\n\n    >>> r.status_code\n    301\n\n    >>> r.history\n    []\n\nIf you're using HEAD, you can enable redirection as well::\n\n    >>> r = requests.head('http://github.com/', allow_redirects=True)\n\n    >>> r.url\n    'https://github.com/'\n\n",
+        "line_start": 500,
+        "line_end": 521
+      },
+      {
+        "stable_chunk_id": "child-52e2ec56a515e0be982abf93654f13148ea603b5",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> r.history\n    [<Response [301]>]\n\n\nTimeouts\n--------\n\nYou can tell Requests to stop waiting for a response after a given number of\nseconds with the ``timeout`` parameter. Nearly all production code should use\nthis parameter in nearly all requests. Failure to do so can cause your program\nto hang indefinitely::\n\n",
+        "line_start": 522,
+        "line_end": 533
+      },
+      {
+        "stable_chunk_id": "child-cd5900dfb40c707dec179a13dd96f140af81b058",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    >>> requests.get('https://github.com/', timeout=0.001)\n    Traceback (most recent call last):\n      File \"<stdin>\", line 1, in <module>\n    requests.exceptions.Timeout: HTTPConnectionPool(host='github.com', port=80): Request timed out. (timeout=0.001)\n\n\n.. admonition:: Note\n\n",
+        "line_start": 534,
+        "line_end": 541
+      },
+      {
+        "stable_chunk_id": "child-b31edb4436f29425d7e90137390ec8731ed87193",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "    ``timeout`` is not a time limit on the entire response download;\n    rather, an exception is raised if the server has not issued a\n    response for ``timeout`` seconds (more precisely, if no bytes have been\n    received on the underlying socket for ``timeout`` seconds). If no timeout is specified explicitly, requests do\n    not time out.\n\n\nErrors and Exceptions\n---------------------\n\n",
+        "line_start": 542,
+        "line_end": 551
+      },
+      {
+        "stable_chunk_id": "child-f9864b09ffec0b84b027c7d84474acf0b751ca5a",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "In the event of a network problem (e.g. DNS failure, refused connection, etc),\nRequests will raise a :exc:`~requests.exceptions.ConnectionError` exception.\n\n:meth:`Response.raise_for_status() <requests.Response.raise_for_status>` will\nraise an :exc:`~requests.exceptions.HTTPError` if the HTTP request\nreturned an unsuccessful status code.\n\nIf a request times out, a :exc:`~requests.exceptions.Timeout` exception is\nraised.\n\n",
+        "line_start": 552,
+        "line_end": 561
+      },
+      {
+        "stable_chunk_id": "child-99102db94bd1b609f85ec97d0dc0d5068a6175da",
+        "source_path": "docs/user/quickstart.rst",
+        "display_text": "If a request exceeds the configured number of maximum redirections, a\n:exc:`~requests.exceptions.TooManyRedirects` exception is raised.\n\nAll exceptions that Requests explicitly raises inherit from\n:exc:`requests.exceptions.RequestException`.\n\n-----------------------\n\nReady for more? Check out the :ref:`advanced <advanced>` section.\n",
+        "line_start": 562,
+        "line_end": 570
+      }
+    ],
+    "sqlite_version": "3.45.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "7c31568e74ad51014dc644cc3542a1fd67c71f94c7125d20df7d13c145c368f4",
+    "storage_path": "/tmp/docatlas-removal-secure-xs_64g44/docatlas-evidence-ktmplnka/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-4463a12756f344d781cf6876f169eb82",
+    "catalog_sha256": "f3b81ff754ae04c272687cb1c40c3dd1a457ac5d66ee1e25584af3ca8cc91760",
+    "documents": [
+      {
+        "path": "docs/user/quickstart.rst",
+        "content_sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+        "catalog_entry_hash": "sha256:4bb7a7ea9264b26df1bde80570f80377f06d57a1353a6b6dbe908735ca49bb07"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-4463a12756f344d781cf6876f169eb82",
+      "members": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 1,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 1
+    }
+  },
+  "snapshot_sources": [
+    {
+      "path": "docs/user/quickstart.rst",
+      "content_sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "matches_pinned_source": true
+    }
+  ],
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "requests"
+}

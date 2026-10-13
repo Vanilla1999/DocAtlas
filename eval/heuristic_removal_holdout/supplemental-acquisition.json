@@ -1,0 +1,11 @@
+[
+  {
+    "url": "https://www.sqlite.org/fts5.html",
+    "path": "research/sqlite-fts5.html",
+    "sha256": "de3092630358518a6869bf047055b3938e18b476e3fbc54f4e2146d1e593497f",
+    "bytes": 215354,
+    "status": 200,
+    "final_url": "https://www.sqlite.org/fts5.html",
+    "paper": "sqlite-fts5"
+  }
+]

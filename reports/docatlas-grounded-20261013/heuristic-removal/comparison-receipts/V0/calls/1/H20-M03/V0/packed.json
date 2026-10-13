@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-c8491f13d22286ae",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Build directories > extra_javascript",
+      "snippet": "### extra_javascript\n\nSet a list of JavaScript files in your `docs_dir` to be included by the theme, as `<script>` tags.\n\n> NEW: **Changed in version 1.5:**\n>\n> Older versions of MkDocs supported only a plain list of strings, but now several additional config keys are available: `type`, `async`, `defer`.\n\nSee the examples and what they produce:\n\n```yaml\nextra_javascript:\n  - some_plain_javascript.js       # <script src=\"some_plain_javascript.js\"></script>\n        # New behavior in MkDocs 1.5:\n  - implicitly_as_module.mjs       # <script src=\"implicitly_as_module.mjs\" type=\"module\"></script>\n        # Config keys only supported since MkDocs 1.5:\n  - path: explicitly_as_module.mjs # <script src=\"explicitly_as_module.mjs\" type=\"module\"></script>\n    type: module\n  - path: deferred_plain.js        # <script src=\"deferred_plain.js\" defer></script>\n    defer: true\n  - path: scripts/async_module.mjs # <script src=\"scripts/async_module.mjs\" type=\"module\" async></script>\n    type: module\n    async: true\n```\n\nSo, each item can be either:\n\n* a plain string, or\n* a mapping that has the required `path` key and 3 optional keys `type` (string), `async` (boolean), `defer` (boolean).\n\nOnly the plain string variant detects the `.mjs` extension and adds `type=\"module\"`, otherwise `type: module` must be written out regardless of extension.\n\n**default**: `[]` (an empty list).\n\nNOTE: `*.js` and `*.css` files, just like any other type of file, are always copied from `docs_dir` into the site's deployed copy, regardless if they're linked to the pages via the above configs or not.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "fb7807bee4bb72a5e56372e38a84f9a0d926c25787a913a1c04528848323e611",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 591,
+      "line_end": 626,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/02e7cfcd979f054a1739a9a9"
+    },
+    {
+      "evidence_id": "ev-bad03471a99d8224",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Special YAML tags > Paths relative to the current file or site",
+      "snippet": "### Paths relative to the current file or site\n\nNEW: **New in version 1.5.**\n\nSome Markdown extensions can benefit from knowing the path of the Markdown file that's currently being processed, or just the root path of the current site. For that, the special tag `!relative` can be used in most contexts within the config file, though the only known usecases are within [`markdown_extensions`](#markdown_extensions).\n\nExamples of the possible values are:\n\n```yaml\n- !relative  # Relative to the directory of the current Markdown file\n- !relative $docs_dir  # Path of the docs_dir\n- !relative $config_dir  # Path of the directory that contains the main mkdocs.yml\n- !relative $config_dir/some/child/dir  # Some subdirectory of the root config directory\n```\n\n(Here, `$docs_dir` and `$config_dir` are currently the *only* special prefixes that are recognized.)\n\nExample:\n\n```yaml\nmarkdown_extensions:\n  - pymdownx.snippets:\n      base_path: !relative  # Relative to the current Markdown file\n```\n\nThis allows the [pymdownx.snippets] extension to include files relative to the current Markdown file, which without this tag it would have no way of knowing.\n\n> NOTE: Even for the default case, any extension's base path is technically the *current working directory* although the assumption is that it's the *directory of mkdocs.yml*. So even if you don't want the paths to be relative, to improve the default behavior, always prefer to use this idiom:\n>\n> ```yaml\n> markdown_extensions:\n>   - pymdownx.snippets:\n>       base_path: !relative $config_dir  # Relative to the root directory with mkdocs.yml\n> ```\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "2be6b351f2063f6e2889b0e358ad85fd5f10c773be9a8b5a4dd35cd4816f81a0",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 1107,
+      "line_end": 1141,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/ae98e8e9ee467187cba34457"
+    },
+    {
+      "evidence_id": "ev-f3a1a1129a67b1c9",
+      "path_or_url": "docs/user-guide/configuration.md",
+      "section": "Configuration > Build directories > site_dir",
+      "snippet": "The directory where the output HTML and other files are created. This can either\nbe a relative directory, in which case it is resolved relative to the directory\ncontaining your configuration file, or it can be an absolute directory path from\nthe root of your local file system.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "01640600dfc808fd0a86caea3287b94fccf615eba953bf8ee7ee483585e195c6",
+      "project_identity": "local:18a9d3d6a98d70194bb3aead922fb5869ba3ea3010914eb9600c8c9eac1da5db",
+      "line_start": 557,
+      "line_end": 561,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/8c993645d9c8e5aff1b1f7b9"
+    }
+  ],
+  "tokens": 1513,
+  "utf8_bytes": 5184,
+  "sha256": "0e99a86617ba47bb09f5aa5c9257a5ee1fe4acdf03734987d845fdd7ec20586f",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

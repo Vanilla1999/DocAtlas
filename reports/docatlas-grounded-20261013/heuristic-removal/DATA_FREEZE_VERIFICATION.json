@@ -1,0 +1,9 @@
+{
+  "dataset_id": "NEW20-20261013",
+  "manifest_sha256": "7d1962363aeb11020752a30370c34a35f62c6431ae5d6bd2fa261f2d7e58a2ad",
+  "verified_files": 27,
+  "mismatches": [],
+  "sealed_files_hashed_not_parsed": true,
+  "code_frozen": false,
+  "product_calls": 0
+}

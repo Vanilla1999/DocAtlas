@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-V01",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-vite",
+  "public_request": {
+    "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-vite/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "1e39d61e8e16d09d5f651d947d9bd05d7a2dfd3d8ad2461f29ca0cb6d0b51fd8",
+  "utf8_bytes": 43766,
+  "tokens": 12277,
+  "seconds": 21.20367893399998,
+  "cpu_seconds": 21.191591852999977,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW03",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-requests",
+  "public_request": {
+    "question": "For Requests 2.32.3, does timeout bound the entire download or socket inactivity, what happens with no explicit timeout, and is 0.001 the library default or merely the shown example?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-requests/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "4e9b6ac6ce6a6a108b430204bda67c8a2fa1abb264da0b2b53c4b0ca3c1aee34",
+  "utf8_bytes": 20968,
+  "tokens": 5539,
+  "seconds": 0.46459480299927236,
+  "cpu_seconds": 0.4619807209999749,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

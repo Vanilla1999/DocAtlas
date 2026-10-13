@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="0.942" timestamp="2026-10-13T13:22:40.630713+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" time="0.386"><failure message="AssertionError: ('docs/packing.md', 'A rigid case holds at most 4 lenses.', [])&#10;assert False&#10; +  where False = any(&lt;generator object facts.&lt;locals&gt;.&lt;genexpr&gt; at 0x79867eb92260&gt;)">tmp_path = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x79867eb9aff0&gt;
+state_root = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x79867eba9f80&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.setenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "ALL")
+            env.setenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+&gt;               facts(payload, root, OPTICS_FACTS)
+
+tests/test_heuristic_removal_public_integration.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'status': 'ok', 'kind': 'docs_context', 'context_status': 'ready', 'context_available': True, ...}
+root = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_lifecycle_0/project')
+required = {'docs/packing.md': ('A rigid case holds at most 4 lenses.', 'Foam dividers separate every pair of lenses.'), 'docs/is...n trip goes to the collection custodian.', 'The collection custodian checks completeness and signs before departure.')}
+
+    def facts(payload, root, required):
+        for relative, statements in required.items():
+            delivered = [row["snippet"] for row in payload.get("sources") or []
+                         if Path(row["path_or_url"]) == root / relative]
+            for statement in statements:
+&gt;               assert any(statement in text for text in delivered), (relative, statement, delivered)
+E               AssertionError: ('docs/packing.md', 'A rigid case holds at most 4 lenses.', [])
+E               assert False
+E                +  where False = any(&lt;generator object facts.&lt;locals&gt;.&lt;genexpr&gt; at 0x79867eb92260&gt;)
+
+tests/test_heuristic_removal_public_integration.py:36: AssertionError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" time="0.151"><failure message="ValueError: '/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/foreign/docs/foreign.md' is not in the subpath of '/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/project'">tmp_path = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x79867ead2540&gt;
+state_root = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/member-state')
+
+    def test_public_removal_explicit_scope_version_and_foreign_locator(
+        tmp_path, monkeypatch, state_root,
+    ):
+        """2 prepare, 6 contexts; foreign project also indexed, so locator isolation is real."""
+        root, foreign = (tmp_path / "project").resolve(), (tmp_path / "foreign").resolve()
+        runtime.write_project(root, SCOPE_DOCUMENTS)
+        catalog = root / "docatlas.project-docs.yaml"
+        data = yaml.safe_load(catalog.read_bytes())
+        for entry in data["documents"]:
+            if entry["path"] == "modules/imaging/guide.md":
+                entry.update(scope="module", module_path="modules/imaging")
+        catalog.write_text(yaml.safe_dump(data, sort_keys=False))
+        foreign_documents = {"docs/foreign.md": "# Foreign vault\n\n`FOREIGN_VAULT_PIN` unlocks the foreign vault.\n"}
+        runtime.write_project(foreign, foreign_documents)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.setenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", "ALL")
+            env.setenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", "12000")
+            runtime.index_project(service, config, foreign)
+            inventory = runtime.index_project(service, config, root)
+&gt;           snapshots(inventory, root, SCOPE_DOCUMENTS)
+
+tests/test_heuristic_removal_public_integration.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+eval/heuristic_removal/receipts.py:66: in snapshots
+    relative = Path(source).relative_to(root).as_posix()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/foreign/docs/foreign.md')
+other = PosixPath('/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/project')
+walk_up = False, _deprecated = ()
+
+    def relative_to(self, other, /, *_deprecated, walk_up=False):
+        """Return the relative path to another path identified by the passed
+        arguments.  If the operation is not possible (because this is not
+        related to the other path), raise ValueError.
+    
+        The *walk_up* parameter controls whether `..` may be used to resolve
+        the path.
+        """
+        if _deprecated:
+            msg = ("support for supplying more than one positional argument "
+                   "to pathlib.PurePath.relative_to() is deprecated and "
+                   "scheduled for removal in Python {remove}")
+            warnings._deprecated("pathlib.PurePath.relative_to(*args)", msg,
+                                 remove=(3, 14))
+        other = self.with_segments(other, *_deprecated)
+        for step, path in enumerate([other] + list(other.parents)):
+            if self.is_relative_to(path):
+                break
+            elif not walk_up:
+&gt;               raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E               ValueError: '/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/foreign/docs/foreign.md' is not in the subpath of '/tmp/docatlas-removal-secure-xs_64g44/pytest-of-viadmin/pytest-0/test_public_removal_explicit_s0/project'
+
+/usr/lib/python3.12/pathlib.py:682: ValueError</failure></testcase></testsuite></testsuites>

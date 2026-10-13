@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-E01",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "Which filenames can ESLint use for its flat configuration file?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "8e900980ccb62440da9afbf4ba389ad37373047f3c9f0eb510d379ad12e8eaf9",
+  "utf8_bytes": 43379,
+  "tokens": 12322,
+  "seconds": 41.3556545449992,
+  "cpu_seconds": 41.350986337999984,
+  "peak_rss_kib": 220892,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

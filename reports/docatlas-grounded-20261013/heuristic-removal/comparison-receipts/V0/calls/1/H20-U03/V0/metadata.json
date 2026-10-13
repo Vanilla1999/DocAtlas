@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-U03",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-uv",
+  "public_request": {
+    "question": "For uv run with repeated --env-file arguments, which file wins for duplicate variables and how do existing environment variables compare; what is the default network retry count?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-uv/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "93e8154025e90f7aae2a8c697ba6e2e19bfb8ee085c5c0bdef06dc4151513e7a",
+  "utf8_bytes": 3507,
+  "tokens": 1039,
+  "seconds": 1.4702748140007316,
+  "cpu_seconds": 1.4684312189999957,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-T03",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-typer",
+  "public_request": {
+    "question": "How do you specify Typer's --accept and --reject names for a boolean option, and what is the default retry delay in milliseconds after --reject?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-typer/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "81440cedf4aa11aedecd8d03d18efd7e543297c05a86789dba6d0bdd32a447ab",
+  "utf8_bytes": 3359,
+  "tokens": 1085,
+  "seconds": 0.6638822539989633,
+  "cpu_seconds": 0.659606471999993,
+  "peak_rss_kib": 205488,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

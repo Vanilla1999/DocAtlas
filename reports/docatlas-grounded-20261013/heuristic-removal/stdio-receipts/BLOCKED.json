@@ -1,0 +1,5 @@
+{
+  "status": "BLOCKED",
+  "error": "unhandled errors in a TaskGroup (1 sub-exception)",
+  "type": "ExceptionGroup"
+}

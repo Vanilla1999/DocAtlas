@@ -1,0 +1,35 @@
+{
+  "schema_version": "new20-rubric-v1",
+  "independence": "New rubric; historical V40/H20 oracle and negative failures unchanged.",
+  "exact_frozen_coverage": {
+    "unit": "required independent source fact",
+    "rule": "OR across witness_sets, AND inside each set; literal case/symbol-preserving source text occurrence; all required facts for per-case pass",
+    "partial": "Only supported obligations in denominator; unavailable obligations reported separately, never manufactured.",
+    "negative": "No required fact denominator; report NA, not vacuous coverage PASS.",
+    "warning": "Literal coverage is neither entailment nor sufficient context. Alternative witnesses must be frozen, not added after outputs."
+  },
+  "semantic_sufficiency": {
+    "review_order": "Stage 1 label-hidden question+anonymized packet only; Stage 2 independent sources/oracle reconciliation.",
+    "labels": ["sufficient", "useful_partial", "insufficient", "contradictory", "needs_review"],
+    "rule": "Preserve conditions, negation, defaults vs example, code/operator roles; assess all requested obligations, not overlap. Quote packet spans for supported obligations and identify missing obligations.",
+    "boundary": "AI assessment must be marked AI-assessed, not human-verified. No autorater implementation or paper accuracy claim is reproduced."
+  },
+  "negative_empty_source": {
+    "rule": "Strict historical-compatible contract: negative passes only with sources=[] and no delivered evidence text. Source-valid topical text is still a failure of this metric.",
+    "contract": "Separate from retrieval-only admission; no retrospective relabeling."
+  },
+  "source_integrity": {
+    "rule": "Check every delivered occurrence against authorized project root/version/member, canonical original bytes, SHA and span; verify freshness and no foreign source/false answer or edit authority.",
+    "on_violation": "Stop affected arm; integrity failure is not relevance failure."
+  },
+  "actual_answer_quality": {
+    "rule": "Score generated answer separately for all documented facts, qualified partial/abstention, preserved conditions and unsupported claims; compare to independent original sources.",
+    "without_generation": "NOT MEASURED, never inferred from retrieval or semantic sufficiency."
+  },
+  "unsupported_claims": {
+    "rule": "Count claims asserted without source support, including invented unavailable configuration, guarantee, numeric threshold, retention, default and operator semantics. Separate contradictory from merely undocumented claims."
+  },
+  "cost_and_reporting": {
+    "rule": "Report native and fixed content-independent packed text separately; same frozen tokenizer and ceiling, attribution charged; equal ceiling is not equal spend. Record prepare/context/resource/model calls and raw setup failures separately. No merged quality/readiness PASS."
+  }
+}

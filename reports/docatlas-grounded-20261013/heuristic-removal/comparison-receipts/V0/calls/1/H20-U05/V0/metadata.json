@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-U05",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-uv",
+  "public_request": {
+    "question": "Which certificate-pinning algorithm does uv use for the test.pypi.org index shown in the configuration example?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-uv/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "fb1f248a38846216176193cfd0819813519af9b7639cc9cca8644597460953ef",
+  "utf8_bytes": 5599,
+  "tokens": 1525,
+  "seconds": 0.4168341960012185,
+  "cpu_seconds": 0.41364377200000035,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

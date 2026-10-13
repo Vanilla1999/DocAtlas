@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M01",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "In MkDocs 1.6 configuration, how do draft_docs and exclude_docs differ between serve and build, and what does mkdocs serve --clean do to drafts?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "bbe849ef203acb0bdab1d65e23ac67b75bcdaa107f589d6b3df8ceac31b244a8",
+  "utf8_bytes": 21004,
+  "tokens": 6281,
+  "seconds": 16.805097078000472,
+  "cpu_seconds": 16.774944929999997,
+  "peak_rss_kib": 200996,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

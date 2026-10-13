@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-V06",
+  "variant": "VQ",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-vite",
+  "public_request": {
+    "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ/0-vite/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "84acc8e4e96b57e399322f6a1bb16e13572fde87d2a266d82a7201835ed318b2",
+  "utf8_bytes": 3945,
+  "tokens": 1250,
+  "seconds": 0.6276999310011888,
+  "cpu_seconds": 0.6265353370000071,
+  "peak_rss_kib": 206804,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

@@ -1,0 +1,104 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/pallets/click/8.1.8/docs/options.rst",
+    "path": "corpus/click/docs/options.rst",
+    "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+    "bytes": 26719,
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/pallets/click/8.1.8/docs/options.rst",
+    "family": "click",
+    "repository": "pallets/click",
+    "revision": "8.1.8",
+    "upstream_path": "docs/options.rst"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/psf/requests/v2.32.3/docs/user/quickstart.rst",
+    "path": "corpus/requests/docs/user/quickstart.rst",
+    "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+    "bytes": 19018,
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/psf/requests/v2.32.3/docs/user/quickstart.rst",
+    "family": "requests",
+    "repository": "psf/requests",
+    "revision": "v2.32.3",
+    "upstream_path": "docs/user/quickstart.rst"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/pytest-dev/pytest/8.3.5/doc/en/how-to/skipping.rst",
+    "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+    "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+    "bytes": 12148,
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/pytest-dev/pytest/8.3.5/doc/en/how-to/skipping.rst",
+    "family": "pytest",
+    "repository": "pytest-dev/pytest",
+    "revision": "8.3.5",
+    "upstream_path": "doc/en/how-to/skipping.rst"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/tox-dev/tox/4.24.1/docs/config.rst",
+    "path": "corpus/tox/docs/config.rst",
+    "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+    "bytes": 54596,
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/tox-dev/tox/4.24.1/docs/config.rst",
+    "family": "tox",
+    "repository": "tox-dev/tox",
+    "revision": "4.24.1",
+    "upstream_path": "docs/config.rst"
+  },
+  {
+    "url": "https://arxiv.org/pdf/2104.08663v4",
+    "path": "research/beir.pdf",
+    "sha256": "1925755aeb627123d1a63c66f02e5aa2432f7e92751a02bea7c8c3b6bbb6ec33",
+    "bytes": 2094824,
+    "status": 200,
+    "final_url": "https://arxiv.org/pdf/2104.08663v4",
+    "paper": "beir"
+  },
+  {
+    "url": "https://arxiv.org/pdf/2411.06037v3",
+    "path": "research/sufficient-context.pdf",
+    "sha256": "3be47b8cff286f84fc19329091581427279a69c06fe9795a4aa8a24b58066f77",
+    "bytes": 1067523,
+    "status": 200,
+    "final_url": "https://arxiv.org/pdf/2411.06037v3",
+    "paper": "sufficient-context"
+  },
+  {
+    "url": "https://arxiv.org/pdf/2507.06838v2",
+    "path": "research/setr.pdf",
+    "sha256": "bab1a97b7aef03759f1bf349f243a5e8dc12764b6d9baf491d5a7684de40c5a1",
+    "bytes": 1722790,
+    "status": 200,
+    "final_url": "https://arxiv.org/pdf/2507.06838v2",
+    "paper": "setr"
+  },
+  {
+    "url": "https://arxiv.org/pdf/2401.18059v1",
+    "path": "research/raptor.pdf",
+    "sha256": "01319e2e6e6ecfd504ee1bbda41d023f9e060bd3505ab3c161baa1d6d696cf75",
+    "bytes": 2547113,
+    "status": 200,
+    "final_url": "https://arxiv.org/pdf/2401.18059v1",
+    "paper": "raptor"
+  },
+  {
+    "url": "https://aclanthology.org/2024.tacl-1.9.pdf",
+    "path": "research/lost-middle.pdf",
+    "sha256": "f37f6fabe0fe0d8c73b67579cd115dbf14e282cfb7b7af655ae8109638402c9b",
+    "bytes": 2609413,
+    "status": 200,
+    "final_url": "https://aclanthology.org/2024.tacl-1.9.pdf",
+    "paper": "lost-middle"
+  },
+  {
+    "url": "https://www.anthropic.com/engineering/contextual-retrieval",
+    "path": "research/anthropic.html",
+    "sha256": "8c6a16b16b3ddb744447449292a7c5cf8e89f66265371f5717c9328ef80d2d97",
+    "bytes": 162879,
+    "status": 200,
+    "final_url": "https://www.anthropic.com/engineering/contextual-retrieval",
+    "paper": "anthropic"
+  }
+]

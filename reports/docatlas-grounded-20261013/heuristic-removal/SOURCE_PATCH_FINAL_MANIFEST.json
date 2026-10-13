@@ -1,0 +1,20 @@
+{
+  "base_commit": "91dd2b4e9f0615e9c6ac5c4346c13200accca550",
+  "patch_sha256": "22f087489dbebeb830e555706b7ae78426d1edc492a0e18cbe5b0242261255d6",
+  "added_code_files": [
+    "docmancer/docs/application/experimental_heuristic_removal.py",
+    "docmancer/retrieval/experimental_acquisition.py",
+    "eval/heuristic_removal/__init__.py",
+    "eval/heuristic_removal/assess.py",
+    "eval/heuristic_removal/config.template.json",
+    "eval/heuristic_removal/installed_stdio.py",
+    "eval/heuristic_removal/receipts.py",
+    "eval/heuristic_removal/run.py",
+    "tests/diagnostic_labels.heuristic_removal.json",
+    "tests/test_heuristic_removal_public_integration.py"
+  ],
+  "earlier_patch_preserved": "SOURCE_PATCH.patch",
+  "difference_boundary": "measurement-only unstarted recovery filter and source-root-aware offline assessor; product unchanged",
+  "product_immutability": "PRODUCT_IMMUTABILITY.json",
+  "unit_tests_added": 0
+}

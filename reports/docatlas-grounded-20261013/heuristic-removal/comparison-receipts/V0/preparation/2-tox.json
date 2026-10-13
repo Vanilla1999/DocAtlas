@@ -1,0 +1,820 @@
+{
+  "root": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-tox/project",
+  "inventory": {
+    "seconds": 0.2558301470016886,
+    "expected_paths": [
+      "docs/config.rst"
+    ],
+    "indexed_paths": [
+      "docs/config.rst"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-2f456456e15f6fee8aae4240428a823d3c0cd559",
+        "source_path": "docs/config.rst",
+        "display_text": ".. _configuration:\n\nConfiguration\n+++++++++++++\n\ntox configuration can be split into two categories: core and environment specific. Core settings are options that can\nbe set once and used for all tox environments, while environment options are applied to the given tox environment only.\n\nDiscovery and file types\n------------------------\n\nWith regards to the configuration format, at the moment we support the following formats:\n\n- `INI <https://en.wikipedia.org/wiki/INI_file>`_.\n- `TOML <https://toml.io/en/v1.0.0>`_.\n\n",
+        "line_start": 1,
+        "line_end": 16
+      },
+      {
+        "stable_chunk_id": "child-ac18f3b851c779442854f9c81207562978526bbc",
+        "source_path": "docs/config.rst",
+        "display_text": "Out of box tox supports five configuration locations prioritized in the following order:\n\n1. ``tox.ini`` (INI),\n2. ``setup.cfg`` (INI),\n3. ``pyproject.toml`` with the ``tool.tox`` table, having ``legacy_tox_ini`` key (containing INI),\n4. Native ``pyproject.toml`` under the ``tool.tox`` table (TOML),\n5. ``tox.toml`` (TOML).\n\n",
+        "line_start": 17,
+        "line_end": 24
+      },
+      {
+        "stable_chunk_id": "child-842e5bbc971eed9f07f9c42889140c28fff7c024",
+        "source_path": "docs/config.rst",
+        "display_text": "Historically, the INI format was created first, and TOML was added in 2024. The TOML format generally is more robust,\nhowever is less powerful and more verbose. You should use TOML unless you need some of the more advanced features\nthat TOML does not support (such as conditional factors, generative environments to name a few -- however, PRs to\nadd support for these in TOML is welcome).\n\n.. _tox-ini:\n\n``tox.ini``\n",
+        "line_start": 25,
+        "line_end": 32
+      },
+      {
+        "stable_chunk_id": "child-cd01d865fe132bbac66fc1e5549cbb4c5aaf2a55",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~\n\nThis configuration file uses:\n\n- ``tox`` section to host core configuration,\n- ``testenv:{env_name}`` section to host environment configuration,\n- ``testenv`` section as base configuration for run environments (fallback location for missing values for a test/run\n  environment),\n- ``pkgenv`` section as base configuration for package environments (fallback location for missing values for a package\n  environment).\n\nFor example:\n\n.. code-block:: ini\n\n    [tox]\n    min_version = 4.20\n    env_list =\n        3.13\n        3.12\n        type\n\n    [testenv]\n    deps = pytest\n    commands = pytest tests\n\n    [testenv:type]\n    deps = mypy\n    commands = mypy src\n\n``setup.cfg``\n~~~~~~~~~~~~~\n",
+        "line_start": 33,
+        "line_end": 64
+      },
+      {
+        "stable_chunk_id": "child-aca9d24dd28e4e527556ffea9f6eee3e6b107787",
+        "source_path": "docs/config.rst",
+        "display_text": "This configuration file uses:\n\n- ``tox:tox`` section to host core configuration,\n- ``testenv:{env_name}`` section to host environment configuration,\n- ``testenv`` section as base configuration for run environments (fallback location for missing values for a test/run\n  environment),\n- ``pkgenv`` section as base configuration for package environments (fallback location for missing values for a package\n  environment).\n\n.. code-block:: ini\n\n",
+        "line_start": 65,
+        "line_end": 75
+      },
+      {
+        "stable_chunk_id": "child-a21254c6b8c2ec80134fd83d9a6ef5c3e1d2b59b",
+        "source_path": "docs/config.rst",
+        "display_text": "    [tox:tox]\n    min_version = 4.0\n    env_list =\n        3.13\n        3.12\n        type\n\n    [testenv]\n    deps = pytest\n    commands = pytest tests\n\n    [testenv:type]\n    deps = mypy\n    commands = mypy src\n\n``pyproject.toml`` - INI\n",
+        "line_start": 76,
+        "line_end": 91
+      },
+      {
+        "stable_chunk_id": "child-8d3b0e5ca261e63f2b35de0da777c9b6bf56f807",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~~\nThis configuration file is equivalent to :ref:`tox.ini <tox-ini>` format, with the difference that the text is stored\ninstead inside the ``pyproject.toml`` file under the ``tool.tox`` table and ``legacy_tox_ini`` key:\n\n.. code-block:: toml\n\n    [tool.tox]\n    legacy_tox_ini = \"\"\"\n        [tox]\n        min_version = 4.0\n        env_list =\n            py310\n            py39\n            type\n\n        [testenv]\n        deps = pytest\n        commands = pytest tests\n\n        [testenv:type]\n        deps = mypy\n        commands = mypy src\n    \"\"\"\n\n\n.. _pyproject-toml-native:\n\n``pyproject.toml`` - native\n~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n",
+        "line_start": 92,
+        "line_end": 121
+      },
+      {
+        "stable_chunk_id": "child-e63ffef132f6c2ae742f0c4c4a8d7e54b7b5b3a8",
+        "source_path": "docs/config.rst",
+        "display_text": "We support native TOML configuration via the ``pyproject.toml`` files ``tool.tox`` table. This configuration file uses:\n\n- ``tool.tox`` table to host core configuration,\n- ``tool.tox.env.{env_name}`` table to host environment configuration,\n- ``tool.tox.env_run_base`` table as base configuration for run environments (fallback location for missing values for\n  a test/run environment),\n- ``tool.tox.env_pkg_base`` table as base configuration for package environments (fallback location for missing values\n  for a package environment).\n\n",
+        "line_start": 122,
+        "line_end": 130
+      },
+      {
+        "stable_chunk_id": "child-af9d60b294dc9e11d9d19c9866924c1ecf014f09",
+        "source_path": "docs/config.rst",
+        "display_text": ".. code-block:: toml\n\n    [tool.tox]\n    requires = [\"tox>=4.19\"]\n    env_list = [\"3.13\", \"3.12\", \"type\"]\n\n    [tool.tox.env_run_base]\n    description = \"Run test under {base_python}\"\n    commands = [[\"pytest\"]]\n\n    [tool.tox.env.type]\n    description = \"run type check on code base\"\n    deps = [\"mypy==1.11.2\", \"types-cachetools>=5.5.0.20240820\", \"types-chardet>=5.0.4.6\"]\n    commands = [[\"mypy\", \"src{/}tox\"], [\"mypy\", \"tests\"]]\n\n``tox.toml``\n",
+        "line_start": 131,
+        "line_end": 146
+      },
+      {
+        "stable_chunk_id": "child-3ac323fce039aa1c0f0c5996d02bc586b14e0135",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~\n\nThis configuration file is equivalent to :ref:`pyproject.toml - native <pyproject-toml-native>` with the difference\nthat it lives in a separate dedicated files and accordingly the ``tool.tox`` sub-table is no longer required.\n\nFor example:\n\n.. code-block:: toml\n\n    requires = [\"tox>=4.19\"]\n    env_list = [\"3.13\", \"3.12\", \"type\"]\n\n    [env_run_base]\n    description = \"Run test under {base_python}\"\n    commands = [[\"pytest\"]]\n\n    [env.type]\n    description = \"run type check on code base\"\n",
+        "line_start": 147,
+        "line_end": 164
+      },
+      {
+        "stable_chunk_id": "child-ca73c5e0517d4d1cce6652e57cd4cc6b3d2b67ed",
+        "source_path": "docs/config.rst",
+        "display_text": "    deps = [\"mypy==1.11.2\", \"types-cachetools>=5.5.0.20240820\", \"types-chardet>=5.0.4.6\"]\n    commands = [[\"mypy\", \"src{/}tox\"], [\"mypy\", \"tests\"]]\n\n.. _conf-core:\n\nCore\n----\n\nThe following options are set in the ``[tox]`` section of ``tox.ini`` or the ``[tox:tox]`` section of ``setup.cfg``.\n\n.. conf::\n   :keys: requires\n   :default: <empty list>\n   :version_added: 3.2.0\n\n   Specify a list of :pep:`508` compliant dependencies that must be satisfied in the Python environment hosting tox when\n",
+        "line_start": 165,
+        "line_end": 180
+      },
+      {
+        "stable_chunk_id": "child-e0cfb601ffaafcc944a773e33c4f5355b2b63dc7",
+        "source_path": "docs/config.rst",
+        "display_text": "   running the tox command. If any of these dependencies are not satisfied will automatically create a provisioned tox\n   environment that does not have this issue, and run the tox command within that environment. See\n   :ref:`provision_tox_env` for more details.\n\n    .. tab:: TOML\n\n       .. code-block:: toml\n\n          [tool.tox]\n          requires = [\n            \"tox>=4\",\n            \"virtualenv>20.2\",\n          ]\n\n    .. tab:: INI\n\n       .. code-block:: ini\n\n        [tox]\n        requires =\n            tox>=4\n",
+        "line_start": 181,
+        "line_end": 201
+      },
+      {
+        "stable_chunk_id": "child-750dab1424023fd3d8b2764a558399edf92cf3f1",
+        "source_path": "docs/config.rst",
+        "display_text": "            virtualenv>20.2\n.. conf::\n   :keys: min_version, minversion\n   :default: <current version of tox>\n\n   A string to define the minimal tox version required to run. If the host's tox version is less than this, it will\n   automatically create a provisioned tox environment that satisfies this requirement. See :ref:`provision_tox_env`\n   for more details.\n\n.. conf::\n   :keys: provision_tox_env\n   :default: .tox\n   :version_added: 3.8.0\n\n   Name of the tox environment used to provision a valid tox run environment.\n\n",
+        "line_start": 202,
+        "line_end": 217
+      },
+      {
+        "stable_chunk_id": "child-fa9b4005b1432e1e1cbf72b19bd65f4024a357d0",
+        "source_path": "docs/config.rst",
+        "display_text": "   .. versionchanged:: 3.23.0\n\n      When tox is invoked with the ``--no-provision`` flag, the provision won't be attempted,  tox will fail instead.\n\n.. conf::\n   :keys: env_list, envlist\n   :default: <empty list>\n\n   A list of environments to run by default (when the user does not specify anything during the invocation).\n\n   .. versionchanged:: 3.4.0\n\n      Which tox environments are run during the tox invocation can be further filtered via the operating system\n",
+        "line_start": 218,
+        "line_end": 230
+      },
+      {
+        "stable_chunk_id": "child-5cb2f4674717275c2f54922837d5e0b273282a19",
+        "source_path": "docs/config.rst",
+        "display_text": "      environment variable ``TOX_SKIP_ENV`` regular expression (e.g. ``py27.*`` means **don't** evaluate environments\n      that start with the key ``py27``). Skipped environments will be logged at level two verbosity level.\n\n.. conf::\n   :keys: skip_missing_interpreters\n   :default: config\n   :version_added: 1.7.2\n\n   Setting this to ``true`` will force ``tox`` to return success even if some of the specified environments were\n",
+        "line_start": 231,
+        "line_end": 239
+      },
+      {
+        "stable_chunk_id": "child-9f7a9212d4f70b61b6329e6b6f1e59e2923e29e3",
+        "source_path": "docs/config.rst",
+        "display_text": "   missing. This is useful for some CI systems or when running on a developer box, where you might only have a subset\n   of all your supported interpreters installed but don't want to mark the build as failed because of it. As expected,\n   the command line switch always overrides this setting if passed on the invocation. Setting it to ``config`` means\n   that the value is read from the config file.\n\n.. conf::\n   :keys: tox_root, toxinidir\n\n   The root directory for the tox project (where the configuration file is found).\n\n",
+        "line_start": 240,
+        "line_end": 249
+      },
+      {
+        "stable_chunk_id": "child-e658603e73b0fd6d28b3583f61e7f741a331fd23",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: work_dir, toxworkdir\n   :default: {tox_root}/.tox\n\n   Directory for tox to generate its environments into, will be created if it does not exist.\n\n.. conf::\n   :keys: temp_dir\n   :default: {work_dir}/.tmp\n\n   Directory where to put tox temporary files. For example: we create a hard link (if possible, otherwise new copy) in\n   this directory for the project package. This ensures tox works correctly when having parallel runs (as each session\n",
+        "line_start": 250,
+        "line_end": 261
+      },
+      {
+        "stable_chunk_id": "child-440ed15d1fe71fb1b33b0b6b538416b8202a9abc",
+        "source_path": "docs/config.rst",
+        "display_text": "   will have its own copy of the project package - e.g. the source distribution).\n\n.. conf::\n   :keys: no_package, skipsdist\n   :default: false\n\n   Flag indicating to perform the packaging operation or not. Set it to ``true`` when using tox for an application,\n   instead of a library.\n\n.. conf::\n   :keys: package_env, isolated_build_env\n   :default: .pkg\n   :version_added: 3.3.0\n\n    Default name of the virtual environment used to create a source distribution from the source tree.\n\n.. conf::\n",
+        "line_start": 262,
+        "line_end": 278
+      },
+      {
+        "stable_chunk_id": "child-fd95ef0602619cfcca6ce4afbefba1de4d8058c1",
+        "source_path": "docs/config.rst",
+        "display_text": "   :keys: package_root, setupdir\n   :default: {tox_root}\n\n    Indicates where the packaging root file exists (historically setup.py file or pyproject.toml now).\n\n.. conf::\n   :keys: labels\n   :default: <empty dictionary>\n\n   A mapping of label names to environments it applies too. For example:\n\n    .. tab:: TOML\n\n       .. code-block:: toml\n\n          [tool.tox]\n          labels = { test = [\"3.13\", \"3.12\"], static = [\"ruff\", \"mypy\"] }\n\n    .. tab:: INI\n\n       .. code-block:: ini\n\n          [tox]\n          labels =\n",
+        "line_start": 279,
+        "line_end": 302
+      },
+      {
+        "stable_chunk_id": "child-0f441c828c2278c58cac199bf3c568017fb05b7c",
+        "source_path": "docs/config.rst",
+        "display_text": "               test = 3.13, 3.12\n               static = ruff, mypy\n\n.. conf::\n   :keys: on_platform\n   :constant:\n\n   A constant holding the platform of the tox runtime environment.\n\nPython language core options\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n.. conf::\n   :keys: ignore_base_python_conflict, ignore_basepython_conflict\n   :default: True\n\n    .. versionadded:: 3.1.0\n\n",
+        "line_start": 303,
+        "line_end": 320
+      },
+      {
+        "stable_chunk_id": "child-63f8d87ac16366a5c9a04b145f0adedbef3a9115",
+        "source_path": "docs/config.rst",
+        "display_text": "    tox allows setting the Python version for an environment via the :ref:`base_python` setting. If that's not set tox\n    can set a default value from the environment name (e.g. ``py310`` implies Python 3.10). Matching up the Python\n    version with the environment name has became expected at this point, leading to surprises when some configs don't\n    do so. To help with sanity of users, an error will be raised whenever the environment name version does not match\n    up with this expectation.\n\n",
+        "line_start": 321,
+        "line_end": 326
+      },
+      {
+        "stable_chunk_id": "child-fafa0d00f72d72caf49cc66fab4a27ce862e549a",
+        "source_path": "docs/config.rst",
+        "display_text": "    Furthermore, we allow hard enforcing this rule by setting this flag to ``true``. In such cases we ignore the\n    :ref:`base_python` and instead always use the base Python implied from the Python name. This allows you to configure\n    :ref:`base_python` in the :ref:`base` section without affecting environments that have implied base Python versions.\n\n.. _conf-testenv:\n\ntox environment\n---------------\n\nThese are configuration for the tox environments (either packaging or run type).\n\nBase options\n",
+        "line_start": 327,
+        "line_end": 338
+      },
+      {
+        "stable_chunk_id": "child-f8eca3f8e09dd4d214607f6194a81a38d7578a06",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~\n\n.. conf::\n   :keys: envname, env_name\n   :constant:\n\n   The name of the tox environment.\n\n.. conf::\n   :keys: env_dir, envdir\n   :default: {work_dir}/{env_name}\n   :version_added: 1.5\n\n   Directory assigned to the tox environment. If not absolute it would be treated as relative to :ref:`tox_root`.\n\n.. conf::\n   :keys: env_tmp_dir, envtmpdir\n   :default: {work_dir}/{env_name}/tmp\n\n   A folder that is always reset at the start of the run.\n\n.. conf::\n   :keys: env_log_dir, envlogdir\n",
+        "line_start": 339,
+        "line_end": 361
+      },
+      {
+        "stable_chunk_id": "child-241e8e672ef413198b1db2a3f44c5b1bc1b69383",
+        "source_path": "docs/config.rst",
+        "display_text": "   :default: {work_dir}/{env_name}/log\n\n   A folder containing log files about tox runs. It's always reset at the start of the run. Currently contains every\n   process invocation in the format of ``<index>-<run name>.log``, and details the execution request (command,\n   environment variables, current working directory, etc.) and its outcome (exit code and standard output/error\n   content).\n\n.. conf::\n   :keys: platform\n\n",
+        "line_start": 362,
+        "line_end": 371
+      },
+      {
+        "stable_chunk_id": "child-7940237cefdebfdb202c420e5e759aef7ea9b8e4",
+        "source_path": "docs/config.rst",
+        "display_text": "   Run on platforms that match this regular expression (empty means any platform). If a non-empty expression is defined\n   and does not match against the ``sys.platform`` string the entire test environment will be skipped and none of the\n   commands will be executed. Running ``tox -e <platform_name>`` will run commands for a particular platform and skip\n   the rest.\n\n.. conf::\n   :keys: pass_env, passenv\n   :default: <empty list>\n\n",
+        "line_start": 372,
+        "line_end": 380
+      },
+      {
+        "stable_chunk_id": "child-9a02638376ded5d64f4a0060e9e4793d21705e16",
+        "source_path": "docs/config.rst",
+        "display_text": "   Environment variables to pass on to the tox environment. The values are evaluated as UNIX shell-style wildcards, see\n   `fnmatch <https://docs.python.org/3/library/fnmatch.html>`_  If a specified environment variable doesn't exist in the\n   tox invocation environment it is ignored. The list of environment variable names is not case sensitive, for example:\n   passing ``A`` or ``a`` will pass through both ``A`` and ``a``.\n\n",
+        "line_start": 381,
+        "line_end": 385
+      },
+      {
+        "stable_chunk_id": "child-088d758baaaf351f33f5cd67277f4fc9477f8aea",
+        "source_path": "docs/config.rst",
+        "display_text": "   Some variables are always passed through to ensure the basic functionality of standard library functions or tooling like\n   pip. This is also not case sensitive on all platforms except Windows.\n\n    .. list-table:: Environment Variables per Operating System\n        :widths: 25 25 25 25\n        :header-rows: 1\n\n        *   - Environment Variable\n            - Linux\n            - MacOS\n            - Windows\n        *   - https_proxy\n            - ✅\n            - ✅\n            - ✅\n        *   - http_proxy\n",
+        "line_start": 386,
+        "line_end": 401
+      },
+      {
+        "stable_chunk_id": "child-2a22c5ca817a34ba890f3248c8ae646036facbc8",
+        "source_path": "docs/config.rst",
+        "display_text": "            - ✅\n            - ✅\n            - ✅\n        *   - no_proxy\n            - ✅\n            - ✅\n            - ✅\n        *   - LANG\n            - ✅\n            - ✅\n            - ✅\n        *   - LANGUAGE\n            - ✅\n            - ✅\n            - ✅\n        *   - CURL_CA_BUNDLE\n            - ✅\n            - ✅\n            - ✅\n        *   - SSL_CERT_FILE\n            - ✅\n            - ✅\n            - ✅\n        *   - CC\n            - ✅\n            - ✅\n            - ✅\n",
+        "line_start": 402,
+        "line_end": 428
+      },
+      {
+        "stable_chunk_id": "child-c762cb0698772d73f517c8ab5fe9007bfdc9cba9",
+        "source_path": "docs/config.rst",
+        "display_text": "        *   - CFLAGS\n            - ✅\n            - ✅\n            - ✅\n        *   - CCSHARED\n            - ✅\n            - ✅\n            - ✅\n        *   - CXX\n            - ✅\n            - ✅\n            - ✅\n        *   - CPPFLAGS\n            - ✅\n            - ✅\n            - ✅\n        *   - LD_LIBRARY_PATH\n            - ✅\n            - ✅\n            - ✅\n        *   - LDFLAGS\n            - ✅\n            - ✅\n            - ✅\n        *   - HOME\n            - ✅\n            - ✅\n",
+        "line_start": 429,
+        "line_end": 455
+      },
+      {
+        "stable_chunk_id": "child-5680301095dab48cb92531c95211f504b4a7ce7d",
+        "source_path": "docs/config.rst",
+        "display_text": "            - ✅\n        *   - FORCE_COLOR\n            - ✅\n            - ✅\n            - ✅\n        *   - NO_COLOR\n            - ✅\n            - ✅\n            - ✅\n        *   - TMPDIR\n            - ✅\n            - ✅\n            - ❌\n        *   - TEMP\n            - ❌\n            - ❌\n            - ✅\n        *   - TMP\n            - ❌\n            - ❌\n            - ✅\n        *   - USERPROFILE\n            - ❌\n            - ❌\n            - ✅\n        *   - PATHEXT\n            - ❌\n",
+        "line_start": 456,
+        "line_end": 482
+      },
+      {
+        "stable_chunk_id": "child-e3c2b0b264d85e0c57b468b08ffa356039802e4e",
+        "source_path": "docs/config.rst",
+        "display_text": "            - ❌\n            - ✅\n        *   - MSYSTEM\n            - ❌\n            - ❌\n            - ✅\n        *   - WINDIR\n            - ❌\n            - ❌\n            - ✅\n        *   - APPDATA\n            - ❌\n            - ❌\n            - ✅\n        *   - PROGRAMDATA\n            - ❌\n            - ❌\n            - ✅\n        *   - PROGRAMFILES(x86)\n            - ❌\n            - ❌\n            - ✅\n        *   - SYSTEMDRIVE\n            - ❌\n            - ❌\n            - ✅\n",
+        "line_start": 483,
+        "line_end": 508
+      },
+      {
+        "stable_chunk_id": "child-ed9bd0977423a6dbb70903ba1eea14883655ad42",
+        "source_path": "docs/config.rst",
+        "display_text": "        *   - SYSTEMROOT\n            - ❌\n            - ❌\n            - ✅\n        *   - COMSPEC\n            - ❌\n            - ❌\n            - ✅\n        *   - PROCESSOR_ARCHITECTURE\n            - ❌\n            - ❌\n            - ✅\n        *   - NUMBER_OF_PROCESSORS\n            - ❌\n            - ❌\n            - ✅\n        *   - PIP_*\n            - ✅\n            - ✅\n            - ✅\n        *   - VIRTUALENV_*\n            - ✅\n            - ✅\n            - ✅\n        *   - NETRC\n            - ✅\n",
+        "line_start": 509,
+        "line_end": 534
+      },
+      {
+        "stable_chunk_id": "child-c2d8fd6b81ef317ba38fe8c0351e2294f9005e63",
+        "source_path": "docs/config.rst",
+        "display_text": "            - ✅\n            - ✅\n        *   - NIX_LD*\n            - ✅\n            - ✅\n            - ❌\n        *   - NIX_LD_LIBRARY_PATH\n            - ✅\n            - ✅\n            - ❌\n\n\n\n   More environment variable-related information\n   can be found in :ref:`environment variable substitutions`.\n\n.. conf::\n   :keys: set_env, setenv\n\n   A dictionary of environment variables to set when running commands in the tox environment. Lines starting with a\n",
+        "line_start": 535,
+        "line_end": 554
+      },
+      {
+        "stable_chunk_id": "child-35c3cc98084c3354f4aefec1c7eabef9d100f9fb",
+        "source_path": "docs/config.rst",
+        "display_text": "   ``file|`` prefix define the location of environment file.\n\n    .. note::\n\n       Environment files are processed using the following rules:\n\n       - blank lines are ignored,\n       - lines starting with the ``#`` character are ignored,\n       - each line is in KEY=VALUE format; both the key and the value are stripped,\n       - there is no special handling of quotation marks, they are part of the key or value.\n\n   More environment variable-related information\n",
+        "line_start": 555,
+        "line_end": 566
+      },
+      {
+        "stable_chunk_id": "child-96ac5c02736bf69f36132bc2cb648c2eb304bbee",
+        "source_path": "docs/config.rst",
+        "display_text": "   can be found in :ref:`environment variable substitutions`.\n\n.. conf::\n   :keys: parallel_show_output\n   :default: False\n   :version_added: 3.7\n\n   If set to ``True`` the content of the output will always be shown  when running in parallel mode.\n\n.. conf::\n   :keys: recreate\n   :default: False\n\n   Always recreate virtual environment if this option is true, otherwise leave it up to tox.\n\n.. conf::\n   :keys: allowlist_externals\n   :default: <empty list>\n\n",
+        "line_start": 567,
+        "line_end": 585
+      },
+      {
+        "stable_chunk_id": "child-b352710e6f4a941f40799932e7e4da24af7d84ac",
+        "source_path": "docs/config.rst",
+        "display_text": "   Each line specifies a command name (in glob-style pattern format) which can be used in the commands section even if\n   it's located outside of the tox environment. For example: if you use the unix *rm* command for running tests you can\n   list ``allowlist_externals=rm`` or ``allowlist_externals=/usr/bin/rm``. If you want to allow all external\n   commands you can use ``allowlist_externals=*`` which will match all commands (not recommended).\n\n.. conf::\n   :keys: labels\n   :default: <empty list>\n   :ref_suffix: env\n\n",
+        "line_start": 586,
+        "line_end": 595
+      },
+      {
+        "stable_chunk_id": "child-0d14a674705fd45279be179ac52b84ea003b8a9f",
+        "source_path": "docs/config.rst",
+        "display_text": "   A list of labels to apply for this environment. For example:\n\n    .. tab:: TOML\n\n       .. code-block:: toml\n\n          [tool.tox.env_run_base]\n          labels = [\"test\", \"core\"]\n          [tool.tox.env.flake8]\n          labels = [\"mypy\"]\n\n    .. tab:: INI\n\n       .. code-block:: ini\n\n          [testenv]\n          labels = test, core\n          [testenv:flake8]\n          labels = mypy\n\nExecute\n~~~~~~~\n\n.. conf::\n   :keys: suicide_timeout\n   :default: 0.0\n   :version_added: 3.15.2\n\n",
+        "line_start": 596,
+        "line_end": 623
+      },
+      {
+        "stable_chunk_id": "child-11e8b51c00746f7f1cc6eb8c5717f18afc20fb1d",
+        "source_path": "docs/config.rst",
+        "display_text": "    When an interrupt is sent via Ctrl+C or the tox process is killed with a SIGTERM, a SIGINT is sent to all foreground\n    processes. The :ref:`suicide_timeout` gives the running process time to cleanup and exit before receiving (in some\n    cases, a duplicate) SIGINT from tox.\n\n.. conf::\n   :keys: interrupt_timeout\n   :default: 0.3\n   :version_added: 3.15\n\n    When tox is interrupted, it propagates the signal to the child process after :ref:`suicide_timeout` seconds. If the\n",
+        "line_start": 624,
+        "line_end": 633
+      },
+      {
+        "stable_chunk_id": "child-2d37ed569b41c33d49cc85067475b29b83c8ee0e",
+        "source_path": "docs/config.rst",
+        "display_text": "    process still hasn't exited after :ref:`interrupt_timeout` seconds, its sends a SIGTERM.\n\n.. conf::\n   :keys: terminate_timeout\n   :default: 0.2\n   :version_added: 3.15\n\n    When tox is interrupted, after waiting :ref:`interrupt_timeout` seconds, it propagates the signal to the child\n    process, waits :ref:`interrupt_timeout` seconds, sends it a SIGTERM, waits :ref:`terminate_timeout` seconds, and\n    sends it a SIGKILL if it hasn't exited.\n\nRun\n~~~\n\n.. conf::\n   :keys: base\n   :default: testenv\n",
+        "line_start": 634,
+        "line_end": 650
+      },
+      {
+        "stable_chunk_id": "child-39eaa552658133fd9ef3d9d624a4962b330b47da",
+        "source_path": "docs/config.rst",
+        "display_text": "   :version_added: 4.0.0\n\n   Inherit missing keys from these sections.\n\n.. conf::\n   :keys: runner\n   :default:\n   :version_added: 4.0.0\n\n   The tox execute used to evaluate this environment. Defaults to Python virtual environments, however may be\n   overwritten by plugins.\n\n.. conf::\n   :keys: description\n   :default: <empty string>\n\n   A short description of the environment, this will be used to explain the environment to the user upon listing\n   environments.\n\n.. conf::\n   :keys: depends\n   :default: <empty list>\n\n",
+        "line_start": 651,
+        "line_end": 673
+      },
+      {
+        "stable_chunk_id": "child-04a1a12f7e1b336d88d6be49f26920f9c91e735f",
+        "source_path": "docs/config.rst",
+        "display_text": "   tox environments that this environment depends on (must be run after those).\n\n   .. warning::\n\n      ``depends`` does not pull in dependencies into the run target, for example if you select ``py310,py39,coverage``\n      via the ``-e`` tox will only run those three (even if ``coverage`` may specify as ``depends`` other targets too -\n      such as ``py310, py39, py38``). This is solely meant to specify dependencies and order in between a target run\n      set.\n\n.. conf::\n   :keys: commands_pre\n   :default: <empty list>\n",
+        "line_start": 674,
+        "line_end": 685
+      },
+      {
+        "stable_chunk_id": "child-679ac3a38cd3ed49ecb3a74a5a6d08cc8647473d",
+        "source_path": "docs/config.rst",
+        "display_text": "   :version_added: 3.4\n\n   Commands to run before running the :ref:`commands`. All evaluation and configuration logic applies from\n   :ref:`commands`.\n\n.. conf::\n   :keys: commands\n   :default: <empty list>\n\n   The commands to be called for testing. Only execute if :ref:`commands_pre` succeed. Each line is interpreted as one\n   command; however a command can be split over multiple lines by ending the line with the ``\\`` character.\n\n",
+        "line_start": 686,
+        "line_end": 697
+      },
+      {
+        "stable_chunk_id": "child-07ad4898305d905a785d11b7fe8db033af2a9ee1",
+        "source_path": "docs/config.rst",
+        "display_text": "   Commands will execute one by one in sequential fashion until one of them fails (their exit code is non-zero) or all\n   of them succeed. The exit code of a command may be ignored (meaning they are always considered successful) by\n   prefixing the command with a dash (``-``) - this is similar to how ``make`` recipe lines work. The outcome of the\n   environment is considered successful only if all commands (these + setup + teardown) succeeded (exit code ignored\n   via the ``-`` or success exit code value of zero).\n\n",
+        "line_start": 698,
+        "line_end": 703
+      },
+      {
+        "stable_chunk_id": "child-98a5bc37e369a7bb83cffa1b08f220e066c99a7b",
+        "source_path": "docs/config.rst",
+        "display_text": "   .. note::\n\n      The virtual environment binary path (see :ref:`env_bin_dir`) is prepended to the ``PATH`` environment variable,\n      meaning commands will first try to resolve to an executable from within the virtual environment, and only after\n      that outside of it. Therefore ``python`` translates as the virtual environments ``python`` (having the same\n      runtime version as the :ref:`base_python`), and ``pip`` translates as the virtual environments ``pip``.\n\n   .. note::\n\n",
+        "line_start": 704,
+        "line_end": 712
+      },
+      {
+        "stable_chunk_id": "child-948a3cf6e927fc8ff58c86de795318a34302cc4c",
+        "source_path": "docs/config.rst",
+        "display_text": "       ``shlex`` POSIX-mode quoting rules are used to split the command line into arguments on all\n       supported platforms as of tox 4.4.0.\n\n       The backslash ``\\`` character can be used to escape quotes, whitespace, itself, and\n       other characters (except on Windows, where a backslash in a path will not be interpreted as an escape).\n       Unescaped single quote will disable the backslash escape until closed by another unescaped single quote.\n",
+        "line_start": 713,
+        "line_end": 718
+      },
+      {
+        "stable_chunk_id": "child-77d97e90e6fe91c6f913520b68d2624cb858304c",
+        "source_path": "docs/config.rst",
+        "display_text": "       For more details, please see :doc:`shlex parsing rules <python:library/shlex>`.\n\n   .. note::\n\n     Inline scripts can be used, however note these are discovered from the project root directory, and is not\n     influenced by :ref:`change_dir` (this only affects the runtime current working directory). To make this behavior\n     explicit we recommend that you make inline scripts absolute paths by prepending ``{tox_root}``, instead of\n",
+        "line_start": 719,
+        "line_end": 725
+      },
+      {
+        "stable_chunk_id": "child-9904fdc8596ae504c7a75e4fc06828ef2ff6103d",
+        "source_path": "docs/config.rst",
+        "display_text": "     ``path/to/my_script`` prefer ``{tox_root}{/}path{/}to{/}my_script``. If your inline script is platform dependent\n     refer to :ref:`platform-specification` on how to select different script per platform.\n\n.. conf::\n   :keys: commands_post\n   :default: <empty list>\n\n   Commands to run after running the :ref:`commands`. Execute regardless of the outcome of both :ref:`commands` and\n   :ref:`commands_pre`. All evaluation and configuration logic applies from :ref:`commands`.\n\n.. conf::\n   :keys: change_dir, changedir\n",
+        "line_start": 726,
+        "line_end": 737
+      },
+      {
+        "stable_chunk_id": "child-702dcc022250397a55b3215c5d8eca010f2fee35",
+        "source_path": "docs/config.rst",
+        "display_text": "   :default: {tox_root}\n\n   Change to this working directory when executing the test command. If the directory does not exist yet, it will be\n   created (required for Windows to be able to execute any command).\n\n.. conf::\n   :keys: args_are_paths\n   :default: False\n\n   Treat positional arguments passed to tox as file system paths and - if they exist on the filesystem and are in\n   relative format - rewrite them according to the current and :ref:`change_dir` working directory. This handles\n",
+        "line_start": 738,
+        "line_end": 748
+      },
+      {
+        "stable_chunk_id": "child-688bf9086972c83597cdb369271a2103fa2ca903",
+        "source_path": "docs/config.rst",
+        "display_text": "   automatically transforming relative paths specified on the CLI to relative paths respective of the commands executing\n   directory.\n\n.. conf::\n   :keys: ignore_errors\n   :default: False\n\n   When executing the commands keep going even if a sub-command exits with non-zero exit code. The overall status will\n   be \"commands failed\", i.e. tox will exit non-zero in case any command failed. It may be helpful to note that this\n   setting is analogous to the ``-k`` or ``--keep-going`` option of GNU Make.\n\n.. conf::\n",
+        "line_start": 749,
+        "line_end": 760
+      },
+      {
+        "stable_chunk_id": "child-ba4eb7ade6cd3ad54fd16f46396e9256f96a807d",
+        "source_path": "docs/config.rst",
+        "display_text": "   :keys: ignore_outcome\n   :default: False\n\n   If set to true a failing result of this test environment will not make tox fail (instead just warn).\n\n.. conf::\n   :keys: skip_install\n   :default: False\n   :version_added: 1.9\n\n   Skip installation of the package.  This can be used when you need the virtualenv management but do not want to\n   install the current package into that environment.\n\n.. conf::\n   :keys: package_env\n   :default: {package_env}\n   :version_added: 4.0.0\n   :ref_suffix: env\n\n",
+        "line_start": 761,
+        "line_end": 779
+      },
+      {
+        "stable_chunk_id": "child-c198d6679d32669a1fbf2d553c6b6ea8ea9ad867",
+        "source_path": "docs/config.rst",
+        "display_text": "   Name of the virtual environment used to create a source distribution from the source tree for this environment.\n\n.. conf::\n   :keys: package_tox_env_type\n   :version_added: 4.0.0\n   :default: virtualenv-pep-517\n\n   tox package type used to package.\n\n.. _python-options:\n\nPython options\n~~~~~~~~~~~~~~\n.. conf::\n   :keys: base_python, basepython\n   :default: <{env_name} python factor> or <python version of tox>\n\n",
+        "line_start": 780,
+        "line_end": 796
+      },
+      {
+        "stable_chunk_id": "child-e533fa7802ac52197cc4f4995fb90c2625a72bee",
+        "source_path": "docs/config.rst",
+        "display_text": "   Name or path to a Python interpreter which will be used for creating the virtual environment, first one found wins.\n   This determines in practice the Python for what we'll create a virtual isolated environment. Use this to specify the\n   Python version for a tox environment. If not specified, the virtual environments factors (e.g. name part) will be\n   used to automatically set one. For example, ``py310`` means ``python3.10``, ``py3`` means ``python3`` and ``py``\n   means ``python``. If the name does not match this pattern the same Python version tox is installed into will be used.\n\n",
+        "line_start": 797,
+        "line_end": 802
+      },
+      {
+        "stable_chunk_id": "child-e510b074e33b90fc13180a001560636c10290432",
+        "source_path": "docs/config.rst",
+        "display_text": "    .. versionchanged:: 3.1\n\n        After resolving this value if the interpreter reports back a different version number than implied from the name\n        a warning will be printed by default. However, if :ref:`ignore_basepython_conflict` is set, the value is\n        ignored and we force the :ref:`base_python` implied from the factor name.\n\n    .. note::\n\n",
+        "line_start": 803,
+        "line_end": 810
+      },
+      {
+        "stable_chunk_id": "child-88c5cc34a992b1aedb8b08456b10b161adc5b780",
+        "source_path": "docs/config.rst",
+        "display_text": "      Leaving this unset will cause an error if the package under test has a different Python requires than tox itself\n      and tox is installed into a Python that's not supported by the package. For example, if your package requires\n      Python 3.10 or later, and you install tox in Python 3.9, when you run a tox environment that has left this\n      unspecified tox will use Python 3.9 to build and install your package which will fail given it requires 3.10.\n\n",
+        "line_start": 811,
+        "line_end": 815
+      },
+      {
+        "stable_chunk_id": "child-814752c0e353390be39aa7b03a43f5260aa4ae76",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: env_site_packages_dir, envsitepackagesdir\n   :constant:\n\n   The Python environments site package - where packages are installed (the purelib folder path).\n\n.. conf::\n   :keys: env_bin_dir, envbindir\n   :constant:\n\n   The binary folder where console/gui scripts are generated during installation.\n\n.. conf::\n   :keys: env_python, envpython\n   :constant:\n\n   The Python executable from within the tox environment.\n\nPython run\n",
+        "line_start": 816,
+        "line_end": 834
+      },
+      {
+        "stable_chunk_id": "child-c52a06342001428894e9ea9027e9b4d93742480e",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~\n.. conf::\n   :keys: dependency_groups\n   :default: <empty list>\n   :version_added: 4.22\n\n   A list of names of dependency groups (as defined by :pep:`735`) to install into this Python environment. The\n   installation will happen before installing the package or any of its dependencies.\n\n   For example:\n\n    .. tab:: TOML\n\n       .. code-block:: toml\n\n          [dependency-groups]\n          test = [\n             \"pytest>=8\",\n          ]\n\n          [tool.tox.env_run_base]\n          dependency_groups = [\n",
+        "line_start": 835,
+        "line_end": 856
+      },
+      {
+        "stable_chunk_id": "child-603a988c60ad50cee77a6a1739d0b4796b8fe889",
+        "source_path": "docs/config.rst",
+        "display_text": "            \"test\",\n          ]\n\n    .. tab:: INI\n\n       .. code-block:: ini\n\n        [testenv]\n        dependency_groups =\n            test\n\n       .. code-block:: toml\n\n          [dependency-groups]\n          test = [\n             \"pytest>=8\",\n          ]\n\n.. conf::\n   :keys: deps\n   :default: <empty list>\n\n   Name of the Python dependencies. Installed into the environment prior to project after environment creation, but\n",
+        "line_start": 857,
+        "line_end": 879
+      },
+      {
+        "stable_chunk_id": "child-f294706165a6835fd6aebc1ae9965e6015ef7257",
+        "source_path": "docs/config.rst",
+        "display_text": "   before package installation. All installer commands are executed using the :ref:`tox_root` as the current working\n   directory. Each value must be one of:\n\n   - a Python dependency as specified by :pep:`440`,\n   - a `requirement file <https://pip.pypa.io/en/stable/user_guide/#requirements-files>`_ when the value starts with\n     ``-r`` (followed by a file path),\n   - a `constraint file <https://pip.pypa.io/en/stable/user_guide/#constraints-files>`_ when the value starts with\n     ``-c`` (followed by a file path).\n\n",
+        "line_start": 880,
+        "line_end": 888
+      },
+      {
+        "stable_chunk_id": "child-8fb07716d9058ad6b8f0370584cbcdaea623a736",
+        "source_path": "docs/config.rst",
+        "display_text": "   If you are only defining :pep:`508` requirements (aka no pip requirement files), you should use\n   :ref:`dependency_groups` instead.\n\n   For example:\n    .. tab:: TOML\n\n       .. code-block:: toml\n\n          [tool.tox.env_run_base]\n          deps = [\n            \"pytest>=8\",\n            \"-r requirements.txt\",\n            \"-c constraints.txt\",\n          ]\n\n    .. tab:: INI\n\n       .. code-block:: ini\n\n        [testenv]\n        deps =\n            pytest>=7,<8\n            -r requirements.txt\n            -c constraints.txt\n",
+        "line_start": 889,
+        "line_end": 912
+      },
+      {
+        "stable_chunk_id": "child-69202bb6a72825558bc73c7d8d8c71a2bf338588",
+        "source_path": "docs/config.rst",
+        "display_text": "\n.. conf::\n   :keys: use_develop, usedevelop\n   :default: false\n   :version_added: 1.6\n\n   Install the current package in development mode using :pep:`660`. This means that the package will\n   be installed in-place and editable.\n\n   .. note::\n\n      ``package = editable`` is the preferred way to enable development/editable mode. See the details in :ref:`package`.\n\n   .. note::\n\n      PEP-660 introduced a standardized way of installing a package in development mode, providing the same effect as if\n",
+        "line_start": 913,
+        "line_end": 928
+      },
+      {
+        "stable_chunk_id": "child-f22108b0b9a13251bd00db4118b24630024ba6cd",
+        "source_path": "docs/config.rst",
+        "display_text": "      ``pip install -e`` was used.\n\n.. conf::\n   :keys: package\n   :version_added: 4.0\n\n   When option can be one of ``wheel``, ``sdist``, ``editable``, ``editable-legacy``, ``skip``, or ``external``. If\n   :ref:`use_develop` is set this becomes a constant of ``editable``. If :ref:`skip_install` is set this becomes a\n   constant of ``skip``.\n\n\n.. conf::\n   :keys: wheel_build_env\n   :version_added: 4.0\n   :default: <package_env>-<python-flavor-lowercase><python-version-no-dot>\n\n",
+        "line_start": 929,
+        "line_end": 944
+      },
+      {
+        "stable_chunk_id": "child-9980067b1278dbb5eaf2854c8ebb470e593a5c37",
+        "source_path": "docs/config.rst",
+        "display_text": "   If :ref:`package` is set to ``wheel`` this will be the tox Python environment in which the wheel will be\n   built. The value is generated to be unique per Python flavor and version, and prefixed with :ref:`package_env` value.\n   This is to ensure the target interpreter and the generated wheel will be compatible. If you have a wheel that can be\n   reused across multiple Python versions set this value to the same across them (to avoid building a new wheel for\n   each one of them).\n\n.. conf::\n   :keys: extras\n",
+        "line_start": 945,
+        "line_end": 952
+      },
+      {
+        "stable_chunk_id": "child-677a3222286ecb953c944e7ec9e0fd2f2b0c9ded",
+        "source_path": "docs/config.rst",
+        "display_text": "   :version_added: 2.4\n   :default: <empty list>\n\n   A list of \"extras\" from the package to be installed. For example, ``extras = testing`` is equivalent to ``[testing]``\n   in a ``pip install`` command.\n\n.. _external-package-builder:\n\nExternal package builder\n~~~~~~~~~~~~~~~~~~~~~~~~\n\n",
+        "line_start": 953,
+        "line_end": 963
+      },
+      {
+        "stable_chunk_id": "child-299be03e4b33b4f213d5ee525130c160ac497b87",
+        "source_path": "docs/config.rst",
+        "display_text": "tox supports operating with externally built packages. External packages might be provided in two ways:\n\n- explicitly via the :ref:`--installpkg <tox-run---installpkg>` CLI argument,\n- setting the :ref:`package` to ``external`` and using a tox packaging environment named ``<package_env>_external``\n  (see :ref:`package_env`) to build the package. The tox packaging environment takes all configuration flags of a\n  :ref:`python environment <python-options>`, plus the following:\n\n",
+        "line_start": 964,
+        "line_end": 970
+      },
+      {
+        "stable_chunk_id": "child-dbe55d8876dc53f08cc527df23b57880a5ed709d",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: deps\n   :default: <empty list>\n   :ref_suffix: external\n\n   Name of the Python dependencies as specified by :pep:`440`. Installed into the environment prior running the build\n   commands. All installer commands are executed using the :ref:`tox_root` as the current working directory.\n\n.. conf::\n   :keys: commands\n   :default: <empty list>\n   :ref_suffix: external\n\n",
+        "line_start": 971,
+        "line_end": 983
+      },
+      {
+        "stable_chunk_id": "child-aabf68d64524ad192815a431e590e5af27055177",
+        "source_path": "docs/config.rst",
+        "display_text": "   Commands to run that will build the package. If any command fails the packaging operation is considered failed and\n   will fail all environments using that package.\n\n.. conf::\n   :keys: ignore_errors\n   :default: False\n   :ref_suffix: external\n\n",
+        "line_start": 984,
+        "line_end": 991
+      },
+      {
+        "stable_chunk_id": "child-77394c90b4c7f0c07b2e0bb46a301e9116b8c6b5",
+        "source_path": "docs/config.rst",
+        "display_text": "   When executing the commands keep going even if a sub-command exits with non-zero exit code. The overall status will\n   be \"commands failed\", i.e. tox will exit non-zero in case any command failed. It may be helpful to note that this\n   setting is analogous to the ``-k`` or ``--keep-going`` option of GNU Make.\n\n.. conf::\n   :keys: change_dir, changedir\n   :default: {tox_root}\n   :ref_suffix: external\n\n",
+        "line_start": 992,
+        "line_end": 1000
+      },
+      {
+        "stable_chunk_id": "child-f22963898e4afa95013aa84328977e03ab815cc4",
+        "source_path": "docs/config.rst",
+        "display_text": "   Change to this working directory when executing the package build command. If the directory does not exist yet, it\n   will be created (required for Windows to be able to execute any command).\n\n.. conf::\n   :keys: package_glob\n   :default: {envtmpdir}{/}dist{/}*\n\n   A glob that should match the wheel/sdist file to install. If no file or multiple files is matched the packaging\n   operation is considered failed and will raise an error.\n\n\nPython virtual environment\n",
+        "line_start": 1001,
+        "line_end": 1012
+      },
+      {
+        "stable_chunk_id": "child-4f11787a3dfa2c1d1251acb76f61057c859470bc",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~~~~\n.. conf::\n   :keys: system_site_packages, sitepackages\n   :default: False\n\n   Create virtual environments that also have access to globally installed packages. Note the default value may be\n   overwritten by the ``VIRTUALENV_SYSTEM_SITE_PACKAGES`` environment variable.\n\n   .. warning::\n\n     In cases where a command line tool is also installed globally you have to make sure that you use the tool installed\n     in the virtualenv by using ``python -m <command line tool>`` (if supported by the tool) or\n     ``{env_bin_dir}/<command line tool>``. If you forget to do that you will get an error.\n\n.. conf::\n   :keys: always_copy, alwayscopy\n   :default: False\n\n   Force virtualenv to always copy rather than symlink. Note the default value may be overwritten by the\n   ``VIRTUALENV_COPIES`` or ``VIRTUALENV_ALWAYS_COPY`` (in that order) environment variables.  This is useful for\n   situations where hardlinks don't work (e.g. running in VMS with Windows guests).\n\n.. conf::\n   :keys: download\n   :version_added: 3.10\n   :default: False\n\n   True if you want virtualenv to upgrade pip/wheel/setuptools to the latest version. Note the default value may be\n   overwritten by the ``VIRTUALENV_DOWNLOAD`` environment variable. If (and only if) you want to choose a specific\n   version (not necessarily the latest) then you can add ``VIRTUALENV_PIP=20.3.3`` (and similar) to your :ref:`set_env`.\n\n\nPython virtual environment packaging\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
+        "line_start": 1013,
+        "line_end": 1046
+      },
+      {
+        "stable_chunk_id": "child-e80916722b1ee3ad05576fd7f902fe979f517a9e",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: meta_dir\n   :version_added: 4.0.0\n   :default: {env_dir}/.meta\n\n   Directory where to put the project metadata files.\n\n.. conf::\n   :keys: pkg_dir\n   :version_added: 4.0.0\n   :default: {env_dir}/.dist\n\n   Directory where to put project packages.\n\n.. conf::\n   :keys: config_settings_get_requires_for_build_sdist\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``get_requires_for_build_sdist`` backend API endpoint.\n\n",
+        "line_start": 1047,
+        "line_end": 1066
+      },
+      {
+        "stable_chunk_id": "child-90b65771d9c99a5e288258438d68f2771148d979",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: config_settings_build_sdist\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``build_sdist`` backend API endpoint.\n\n.. conf::\n   :keys: config_settings_get_requires_for_build_wheel\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``get_requires_for_build_wheel`` backend API endpoint.\n\n.. conf::\n   :keys: config_settings_prepare_metadata_for_build_wheel\n   :version_added: 4.11\n\n",
+        "line_start": 1067,
+        "line_end": 1082
+      },
+      {
+        "stable_chunk_id": "child-be904747b52410b183dc5cf2cb2964de5a918480",
+        "source_path": "docs/config.rst",
+        "display_text": "   Config settings (``dict[str, str]``) passed to the ``prepare_metadata_for_build_wheel`` backend API endpoint.\n\n.. conf::\n   :keys: config_settings_build_wheel\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``build_wheel`` backend API endpoint.\n\n.. conf::\n   :keys: config_settings_get_requires_for_build_editable\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``get_requires_for_build_editable`` backend API endpoint.\n\n",
+        "line_start": 1083,
+        "line_end": 1096
+      },
+      {
+        "stable_chunk_id": "child-d39f6d01fa1b26f4fdd73057bb01693252739e15",
+        "source_path": "docs/config.rst",
+        "display_text": ".. conf::\n   :keys: config_settings_prepare_metadata_for_build_editable\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``prepare_metadata_for_build_editable`` backend API endpoint.\n\n.. conf::\n   :keys: config_settings_build_editable\n   :version_added: 4.11\n\n   Config settings (``dict[str, str]``) passed to the ``build_editable`` backend API endpoint.\n\n.. conf::\n   :keys: fresh_subprocess\n   :version_added: 4.14.0\n   :default: True if build backend is setuptools otherwise False\n\n",
+        "line_start": 1097,
+        "line_end": 1113
+      },
+      {
+        "stable_chunk_id": "child-c1ef4b47b225bc60ffaa6e398c0ee3da10d00d4f",
+        "source_path": "docs/config.rst",
+        "display_text": "   A flag controlling if each call to the build backend should be done in a fresh subprocess or not (especially older\n   build backends such as ``setuptools`` might require this to discover newly provisioned dependencies).\n\n\nPip installer\n",
+        "line_start": 1114,
+        "line_end": 1118
+      },
+      {
+        "stable_chunk_id": "child-b2c8c6814b5dd458e42b7b7c3088f9c19c04d5f8",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~\n\n.. conf::\n   :keys: install_command\n   :default: python -I -m pip install {opts} {packages}\n   :version_added: 1.6\n\n   Determines the command used for installing packages into the virtual environment; both the package under test and its\n   dependencies (defined with :ref:`deps`). Must contain the substitution key ``{packages}`` which will be replaced by\n   the package(s) to install.  You should also accept ``{opts}`` -- it will contain index server options such as\n   ``--pre`` (configured as ``pip_pre``).\n\n",
+        "line_start": 1119,
+        "line_end": 1130
+      },
+      {
+        "stable_chunk_id": "child-a8220c78c3020cc03cf8a59eccda18c3fc3c29c2",
+        "source_path": "docs/config.rst",
+        "display_text": "   .. note::\n\n      You can also provide arbitrary commands to the ``install_command``. Please take care that these commands can be\n      executed on the supported operating systems. When executing shell scripts we recommend to not specify the script\n      directly but instead pass it to the appropriate shell as argument (e.g. prefer ``bash script.sh`` over\n      ``script.sh``).\n\n.. conf::\n   :keys: list_dependencies_command\n   :default: python -m pip freeze --all\n   :version_added: 2.4\n\n",
+        "line_start": 1131,
+        "line_end": 1142
+      },
+      {
+        "stable_chunk_id": "child-0686c23e67f82ebb89e8b1d1e935c4b5f12810f3",
+        "source_path": "docs/config.rst",
+        "display_text": "   The ``list_dependencies_command`` setting is used for listing the packages installed into the virtual environment.\n   This command will be executed only if executing on Continuous Integrations is detected (for example set environment\n   variable ``CI=1``) or if journal is active.\n\n\n.. conf::\n   :keys: pip_pre\n   :default: false\n   :version_added: 1.9\n\n   If ``true``, adds ``--pre`` to the ``opts`` passed to :ref:`install_command`. This will cause it to install the\n",
+        "line_start": 1143,
+        "line_end": 1153
+      },
+      {
+        "stable_chunk_id": "child-e254833632e82e8b1b275604bc3180f172021a97",
+        "source_path": "docs/config.rst",
+        "display_text": "   latest available pre-release of any dependencies without a specified version. If ``false``, pip will only install\n   final releases of unpinned dependencies.\n\n.. conf::\n   :keys: constrain_package_deps\n   :default: false\n   :version_added: 4.4.0\n\n   If ``constrain_package_deps`` is true, then tox will create and use ``{env_dir}{/}constraints.txt`` when installing\n   package dependencies during ``install_package_deps`` stage. When this value is set to false, any conflicting package\n",
+        "line_start": 1154,
+        "line_end": 1163
+      },
+      {
+        "stable_chunk_id": "child-9952a5de56fb523ff3fc7652b85378938e174470",
+        "source_path": "docs/config.rst",
+        "display_text": "   dependencies will override explicit dependencies and constraints passed to ``deps``.\n\n.. conf::\n   :keys: use_frozen_constraints\n   :default: false\n   :version_added: 4.4.0\n\n   When ``use_frozen_constraints`` is true, then tox will use the ``list_dependencies_command`` to enumerate package\n   versions in order to create ``{env_dir}{/}constraints.txt``. Otherwise the package specifications explicitly listed\n",
+        "line_start": 1164,
+        "line_end": 1172
+      },
+      {
+        "stable_chunk_id": "child-c3ddfc63e1c76a824384d828963a09d0eeb6d160",
+        "source_path": "docs/config.rst",
+        "display_text": "   under ``deps`` (or in requirements / constraints files referenced in ``deps``) will be used as the constraints. If\n   ``constrain_package_deps`` is false, then this setting has no effect.\n\nUser configuration\n------------------\n\ntox allows creation of user level config-file to modify default values of the CLI commands. It is located in the\nOS-specific user config directory under ``tox/config.ini`` path, see ``tox --help`` output for exact location. It can be\n",
+        "line_start": 1173,
+        "line_end": 1180
+      },
+      {
+        "stable_chunk_id": "child-224878c03dbebe8f6928ca61172385a29d32762f",
+        "source_path": "docs/config.rst",
+        "display_text": "changed via ``TOX_USER_CONFIG_FILE`` environment variable. Example configuration:\n\n.. code-block:: ini\n\n    [tox]\n    skip_missing_interpreters = true\n\n\nSet CLI flags via environment variables\n---------------------------------------\nAll configuration can be overridden via environment variables too, the naming convention here is ``TOX_<option>``. E.g.\n``TOX_WORK_DIR`` sets the ``--workdir`` flag, or ``TOX_OVERRIDE`` sets the ``--override`` flag. For flags accepting more\n",
+        "line_start": 1181,
+        "line_end": 1192
+      },
+      {
+        "stable_chunk_id": "child-fb331f49e0458cf411940888a879232af2da85e4",
+        "source_path": "docs/config.rst",
+        "display_text": "than one argument, use the ``;`` character to separate these values:\n\nAll configuration inside the configuration file may be overwritten via the ``TOX_OVERRIDE``, note in this case the\nconfiguration file and its access (section/table + key) are needed. Here we demonstrate with a ``tox.ini`` file:\n\n.. code-block:: bash\n\n   # set FOO and bar as passed environment variable\n   $ env 'TOX_OVERRIDE=testenv.pass_env=FOO,BAR' tox c -k pass_env -e py\n   [testenv:py]\n   pass_env =\n     BAR\n     FOO\n     <default pass_envs>\n\n",
+        "line_start": 1193,
+        "line_end": 1207
+      },
+      {
+        "stable_chunk_id": "child-a10bbfc2fff8b2ce9e78446d45fc97fb2337f8cb",
+        "source_path": "docs/config.rst",
+        "display_text": ".. code-block:: bash\n\n   # append FOO and bar as passed environment variable to the list already defined in\n   # the tox configuration\n   $ env 'TOX_OVERRIDE=testenv.pass_env+=FOO,BAR' tox c -k pass_env -e py\n   [testenv:py]\n   pass_env =\n     BAR\n     FOO\n     <pass_envs defined in configuration>\n     <default pass_envs>\n\n.. code-block:: bash\n\n   # set httpx and deps to and 3.12 as base_python\n   $ env 'TOX_OVERRIDE=testenv.deps=httpx;testenv.base_python=3.12' .tox/dev/bin/tox c \\\n         -k deps base_python -e py\n",
+        "line_start": 1208,
+        "line_end": 1224
+      },
+      {
+        "stable_chunk_id": "child-e5dc90fed765fd311145673128e18a70db252cba",
+        "source_path": "docs/config.rst",
+        "display_text": "   [testenv:py]\n   deps = httpx\n   base_python = 3.12\n\nOverriding configuration from the command line\n----------------------------------------------\n\nYou can override options in the configuration file, from the command line. For example, given this config:\n\n.. tab:: TOML\n\n   .. code-block:: toml\n\n       # tox.toml\n      [env_run_base]\n      deps = [\"pytest\"]\n      set_env = { foo = \"bar\" }\n      commands = [[ \"pytest\", \"tests\" ]]\n\n.. tab:: INI\n\n   .. code-block:: ini\n\n    [testenv]\n    deps = pytest\n    set_env =\n",
+        "line_start": 1225,
+        "line_end": 1250
+      },
+      {
+        "stable_chunk_id": "child-36d43f2f520e3241eada739a028b0879b1e4884a",
+        "source_path": "docs/config.rst",
+        "display_text": "      foo=bar\n    commands = pytest tests\n\nYou could enable ``ignore_errors`` by running:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox --override env_run_base.ignore_errors=True\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox --override testenv.ignore_errors=True\n\n\nYou could add additional dependencies by running:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox --override env_run_base.deps+=pytest-xdist\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox --override testenv.deps+=pytest-xdist\n\n",
+        "line_start": 1251,
+        "line_end": 1282
+      },
+      {
+        "stable_chunk_id": "child-1c8056459c90de547d5f680779ebb7c2c21a342b",
+        "source_path": "docs/config.rst",
+        "display_text": "You could set additional environment variables by running:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox --override env_run_base.set_env+=baz=quux\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox --override testenv.set_env+=baz=quux\n\nYou can specify overrides multiple times on the command line to append multiple items:\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox -x env_run_base.set_env+=foo=bar -x env_run_base.set_env+=baz=quux\n",
+        "line_start": 1283,
+        "line_end": 1303
+      },
+      {
+        "stable_chunk_id": "child-170bd6f1c26f516db1d701ebb24497fe4ad92eba",
+        "source_path": "docs/config.rst",
+        "display_text": "       tox -x testenv_run_baseenv.deps+=pytest-xdist -x env_run_base.deps+=pytest-covt\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n       tox -x testenv.set_env+=foo=bar -x testenv.set_env+=baz=quux\n       tox -x testenv.deps+=pytest-xdist -x testenv.deps+=pytest-covt\n\nOr reset override and append to that (note the first override is ``=`` and not ``+=``):\n\n.. tab:: TOML\n\n    .. code-block:: bash\n\n       tox -x env_run_base.deps=pytest-xdist -x env_run_base.deps+=pytest-cov\n\n.. tab:: INI\n\n    .. code-block:: bash\n\n",
+        "line_start": 1304,
+        "line_end": 1324
+      },
+      {
+        "stable_chunk_id": "child-ea8a01fc952ec4dc0d5c87948b45a814226d8190",
+        "source_path": "docs/config.rst",
+        "display_text": "       tox -x testenv.deps=pytest-xdist -x testenv.deps+=pytest-cov\n\nTOML only\n---------\n\nThese additional rules are active for native TOML configuration files.\n\nString elements (excluding keys) will be transformed according to the :ref:`Substitutions <substitution>` section.\n\nString substitution references\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n.. versionadded:: 4.21\n\nWithin strings values from other sections can be referred to via ``{[<table>]<key>}``:\n\n",
+        "line_start": 1325,
+        "line_end": 1340
+      },
+      {
+        "stable_chunk_id": "child-176f359d8092a20e9c439de15fb425ab5c97a7a4",
+        "source_path": "docs/config.rst",
+        "display_text": "which you can use to avoid repetition of config values. You can put default values in one section and reference them in\nothers to avoid repeating the same values:\n\n.. code-block:: toml\n\n    [extra]\n    ok = \"o\"\n    [.env.B]\n    description = \"{[extra]ok}\"\n\nIf the target table is one of the tox environments variable substitution will be applied on the replaced value,\notherwise the text will be inserted as is (e.g., here with extra).\n\nConfiguration reference\n",
+        "line_start": 1341,
+        "line_end": 1354
+      },
+      {
+        "stable_chunk_id": "child-e0f3baea71051a53b5d817c541dc95379e66f55f",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~\n.. versionadded:: 4.21\n\nYou can reference other configurations via the ``ref`` replacement. This can either be of type:\n\n\n- ``env``, in this case the configuration is loaded from another tox environment, where string substitution will happen\n  in that environments scope:\n\n    .. code-block:: toml\n\n        [env.src]\n        extras = [\"A\", \"{env_name}\"]\n        [env.dest]\n        extras = [{ replace = \"ref\", env = \"src\", key = \"extras\", extend = true }, \"B\"\n\n  In this case ``dest`` environments ``extras`` will be ``A``, ``src``, ``B``.\n\n- ``raw``, in this case the configuration is loaded as raw, and substitution executed in the current environments scope:\n\n    .. code-block:: toml\n\n        [env.src]\n        extras = [\"A\", \"{env_name}\"]\n        [env.dest]\n        extras = [{ replace = \"ref\", of = [\"env\", \"extras\"], extend = true }, \"B\"]\n\n  In this case ``dest`` environments ``extras`` will be ``A``, ``dest``, ``B``.\n\nThe ``extend`` flag controls if after replacement the value should be replaced as is in the host structure (when flag is\nfalse -- by default) or be extended into. This flag only operates when the host is a list.\n\nPositional argument reference\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n",
+        "line_start": 1355,
+        "line_end": 1388
+      },
+      {
+        "stable_chunk_id": "child-8cce40dede7abfc611fd50015d1e3e0f6ec73709",
+        "source_path": "docs/config.rst",
+        "display_text": ".. versionadded:: 4.21\n\nYou can reference positional arguments via the ``posargs`` replacement:\n\n.. code-block:: toml\n\n    [env.A]\n    commands = [[\"python\", { replace = \"posargs\", default = [\"a\", \"b\"], extend = true } ]]\n\nIf the positional arguments are not set commands will become ``python a b``, otherwise will be ``python posarg-set``.\nThe ``extend`` option instructs tox to unroll the positional arguments within the host structure. Without it the result\nwould become ``[\"python\", [\"a\", \"b\"]`` which would be invalid.\n\n",
+        "line_start": 1389,
+        "line_end": 1401
+      },
+      {
+        "stable_chunk_id": "child-d323b07678569057dea2ae97b96023d94d51f54a",
+        "source_path": "docs/config.rst",
+        "display_text": "Note that:\n\n.. code-block:: toml\n\n    [env.A]\n    commands = [[\"python\", \"{posargs}\" ]]\n\nDiffers in sense that the positional arguments will be set as a single argument, while in the original example they are\npassed through as separate.\n\nEmpty commands groups will be ignored:\n\n.. code-block:: toml\n\n    [env.A]\n    commands = [[], [\"pytest]]\n\nwill only invoke pytest. This is especially useful together with posargs allowing you to opt out of running a set of\ncommands:\n\n  .. code-block:: toml\n\n",
+        "line_start": 1402,
+        "line_end": 1423
+      },
+      {
+        "stable_chunk_id": "child-dfc13572997465448462c9844426802c72ac5010",
+        "source_path": "docs/config.rst",
+        "display_text": "    [env.A]\n    commands = [\n        { replace = \"posargs\", default = [\"python\", \"patch.py\"]},\n        [\"pytest\"]\n    ]\n\nWhen running ``tox run -e A`` it will invoke ``python patch.py`` followed by pytest. When running ``tox run -e A --`` it\nwill invoke only pytest.\n\n\nEnvironment variable reference\n",
+        "line_start": 1424,
+        "line_end": 1434
+      },
+      {
+        "stable_chunk_id": "child-62d6581455841a4a1b5fb117e0e8dcdd219d47f8",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n.. versionadded:: 4.21\n\nYou can reference environment variables via the ``env`` replacement:\n\n.. code-block:: toml\n\n    [env.A]\n    set_env.COVERAGE_FILE = { replace = \"env\", name = \"COVERAGE_FILE\", default = \"ok\" }\n\nIf the environment variable is set the the ``COVERAGE_FILE`` will become that, otherwise will default to ``ok``.\n\nReferences within set_env\n~~~~~~~~~~~~~~~~~~~~~~~~~\n.. versionadded:: 4.21.1\n\nWhen you want to inherit ``set_env`` from another environment you can use the feature that if you pass a list of\ndictionaries to ``set_env`` they will be merged together, for example:\n\n.. code-block:: toml\n\n        [tool.tox.env_run_base]\n        set_env = { A = \"1\", B = \"2\"}\n\n        [tool.tox.env.magic]\n        set_env = [\n            { replace = \"ref\", of = [\"tool\", \"tox\", \"env_run_base\", \"set_env\"]},\n            { C = \"3\", D = \"4\"},\n        ]\n\nHere the ``magic`` tox environment will have both ``A``, ``B``, ``C`` and ``D`` environments set.\n\nINI only\n--------\nThese additional rules are active for native INI configuration.\n\nThe value for each setting in an INI configuration will be transformed according to the\n:ref:`Substitutions <substitution>` section.\n\nSubstitution for values from other sections\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n",
+        "line_start": 1435,
+        "line_end": 1476
+      },
+      {
+        "stable_chunk_id": "child-1fc77ba4fa775288cb34b4e1df2e623b6d7206fc",
+        "source_path": "docs/config.rst",
+        "display_text": ".. versionadded:: 1.4\n\nValues from other sections can be referred to via::\n\n   {[sectionname]valuename}\n\nwhich you can use to avoid repetition of config values. You can put default values in one section and reference them in\nothers to avoid repeating the same values:\n\n.. code-block:: ini\n\n    [base]\n    deps =\n        pytest\n        mock\n        pytest-xdist\n\n    [testenv:dulwich]\n    deps =\n        dulwich\n        {[base]deps}\n\n    [testenv:mercurial]\n    deps =\n        mercurial\n        {[base]deps}\n\nConditional settings\n",
+        "line_start": 1477,
+        "line_end": 1504
+      },
+      {
+        "stable_chunk_id": "child-1ffe8b5304cebcca00e4054f4c4ad4fe2222a619",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~\n\n- Configurations may be set conditionally within the ``tox.ini`` file. If a line starts with an environment name\n  or names, separated by a comma, followed by ``:`` the configuration will only be used if the\n  environment name(s) matches the executed tox environment. For example:\n\n  .. code-block:: ini\n\n     [testenv]\n     deps =\n        pip\n        format: black\n        py310,py39: pytest\n\n  Here pip will be always installed as the configuration value is not conditional. black is only used for the ``format``\n  environment, while ``pytest`` is only installed for the ``py310`` and ``py39`` environments.\n\nGenerative environment list\n~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n",
+        "line_start": 1505,
+        "line_end": 1524
+      },
+      {
+        "stable_chunk_id": "child-12259d5d642b00a80359ef69e350ec555d03cfad",
+        "source_path": "docs/config.rst",
+        "display_text": "If you have a large matrix of dependencies, python versions and/or environments you can use a generative\n:ref:`env_list` and conditional settings to express that in a concise form:\n\n.. code-block:: ini\n\n    [tox]\n    env_list = py{311,310,39}-django{41,40}-{sqlite,mysql}\n\n",
+        "line_start": 1525,
+        "line_end": 1532
+      },
+      {
+        "stable_chunk_id": "child-a064ba408654977322c6611ccce33f6ea346c86c",
+        "source_path": "docs/config.rst",
+        "display_text": "    [testenv]\n    deps =\n        django41: Django>=4.1,<4.2\n        django40: Django>=4.0,<4.1\n        # use PyMySQL if factors \"py311\" and \"mysql\" are present in env name\n        py311-mysql: PyMySQL\n        # use urllib3 if any of \"py311\" or \"py310\" are present in env name\n        py311,py310: urllib3\n        # mocking sqlite on 3.11 and 3.10 if factor \"sqlite\" is present\n        py{311,310}-sqlite: mock\n\nThis will generate the following tox environments:\n\n.. code-block:: shell\n\n",
+        "line_start": 1533,
+        "line_end": 1547
+      },
+      {
+        "stable_chunk_id": "child-02299a35562a71e6943ae7eb93911fb1165efbd9",
+        "source_path": "docs/config.rst",
+        "display_text": "    > tox l\n    default environments:\n    py311-django41-sqlite -> [no description]\n    py311-django41-mysql  -> [no description]\n    py311-django40-sqlite -> [no description]\n    py311-django40-mysql  -> [no description]\n    py310-django41-sqlite -> [no description]\n    py310-django41-mysql  -> [no description]\n    py310-django40-sqlite -> [no description]\n    py310-django40-mysql  -> [no description]\n    py39-django41-sqlite  -> [no description]\n    py39-django41-mysql   -> [no description]\n    py39-django40-sqlite  -> [no description]\n    py39-django40-mysql   -> [no description]\n\n",
+        "line_start": 1548,
+        "line_end": 1562
+      },
+      {
+        "stable_chunk_id": "child-d1689956219306aea4e07ed75e83d4b842912cfa",
+        "source_path": "docs/config.rst",
+        "display_text": "Generative section names\n",
+        "line_start": 1563,
+        "line_end": 1563
+      },
+      {
+        "stable_chunk_id": "child-380e82ef0478939c7d1fe88347f8fa36e69f9820",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~~\n\nSuppose you have some binary packages, and need to run tests both in 32 and 64 bits. You also want an environment to\ncreate your virtual env for the developers.\n\n.. code-block:: ini\n\n    [testenv]\n    base_python =\n        py311-x86: python3.11-32\n        py311-x64: python3.11-64\n    commands = pytest\n\n    [testenv:py311-{x86,x64}-venv]\n    envdir =\n        x86: .venv-x86\n        x64: .venv-x64\n\n.. code-block:: shell\n\n    > tox l\n    default environments:\n    py          -> [no description]\n\n",
+        "line_start": 1564,
+        "line_end": 1587
+      },
+      {
+        "stable_chunk_id": "child-4f945279143349c509c17248f4eabb4e7b1f5b8b",
+        "source_path": "docs/config.rst",
+        "display_text": "    additional environments:\n    py310-black -> [no description]\n    py310-lint  -> [no description]\n    py311-black -> [no description]\n    py311-lint  -> [no description]\n\n.. _substitution:\n\nSubstitutions\n-------------\n\n**Value substitution** operates through the ``{...}`` string-substitution pattern. The string inside the curly braces\nmay reference a global or per-environment config key as described above.\n\nIn substitutions, the backslash character ``\\`` will act as an escape when preceding\n",
+        "line_start": 1588,
+        "line_end": 1602
+      },
+      {
+        "stable_chunk_id": "child-33a2909d4f0a9ca41cc62bb29a84e6bbec3f3f6c",
+        "source_path": "docs/config.rst",
+        "display_text": "``{``, ``}``, ``:``, ``[``, or ``]``, otherwise the backslash will be reproduced literally:\n\n.. tab:: TOML\n\n    .. code-block:: toml\n\n        commands = [\n          [\"python\", \"-c\", 'print(\"\\{posargs} = \\{}\".format(\"{posargs}\"))'],\n          [\"python\", \"-c\", 'print(\"host: \\{}\".format(\"{env:HOSTNAME:host\\: not set}\")'],\n        ]\n\n.. tab:: INI\n\n    .. code-block:: ini\n\n        commands =\n          python -c 'print(\"\\{posargs} = \\{}\".format(\"{posargs}\"))'\n",
+        "line_start": 1603,
+        "line_end": 1619
+      },
+      {
+        "stable_chunk_id": "child-a826e2a363b531f31ce313761f2a4b05243fe872",
+        "source_path": "docs/config.rst",
+        "display_text": "          python -c 'print(\"host: \\{}\".format(\"{env:HOSTNAME:host\\: not set}\")'\n\n\nNote that any backslashes remaining after substitution may be processed by ``shlex`` during command parsing. On POSIX\nplatforms, the backslash will escape any following character; on windows, the backslash will escape any following quote,\nwhitespace, or backslash character (since it normally acts as a path delimiter).\n\nSpecial substitutions that accept additional colon-delimited ``:`` parameters\n",
+        "line_start": 1620,
+        "line_end": 1627
+      },
+      {
+        "stable_chunk_id": "child-d48f6fbebe77a1d0e2657d028fd3c7a87629e6aa",
+        "source_path": "docs/config.rst",
+        "display_text": "cannot have a space after the ``:`` at the beginning of line (e.g.  ``{posargs:\nmagic}`` would be parsed as factorial ``{posargs``, having value magic).\n\n.. _`environment variable substitutions`:\n\nEnvironment variable substitutions\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nIf you specify a substitution string like this::\n\n    {env:KEY}\n\nthen the value will be retrieved as ``os.environ['KEY']`` and raise an Error if the environment variable does not exist.\n\n\nEnvironment variable substitutions with default values\n",
+        "line_start": 1628,
+        "line_end": 1643
+      },
+      {
+        "stable_chunk_id": "child-80c5976229d76631b15e92ee84b786688fff8a51",
+        "source_path": "docs/config.rst",
+        "display_text": "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\nIf you specify a substitution string like this::\n\n    {env:KEY:DEFAULTVALUE}\n\nthen the value will be retrieved as ``os.environ['KEY']`` and replace with DEFAULTVALUE if the environment variable does\nnot exist.\n\nIf you specify a substitution string like this::\n\n    {env:KEY:}\n\nthen the value will be retrieved as ``os.environ['KEY']`` and replace with an empty string if the environment variable\ndoes not exist.\n\n",
+        "line_start": 1644,
+        "line_end": 1659
+      },
+      {
+        "stable_chunk_id": "child-46d68c78d049b65f3911d2832d41fe5a64f61aee",
+        "source_path": "docs/config.rst",
+        "display_text": "Substitutions can also be nested. In that case they are expanded starting from the innermost expression::\n\n    {env:KEY:{env:DEFAULT_OF_KEY}}\n\nthe above example is roughly equivalent to ``os.environ.get('KEY', os.environ['DEFAULT_OF_KEY'])``\n\nInteractive shell substitution\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n.. versionadded:: 3.4.0\n\nIt's possible to inject a config value only when tox is running in interactive shell (standard input)::\n\n    {tty:ON_VALUE:OFF_VALUE}\n\n",
+        "line_start": 1660,
+        "line_end": 1674
+      },
+      {
+        "stable_chunk_id": "child-fb89d4d72ed86276fbe0d9ee80dd539a4034a08b",
+        "source_path": "docs/config.rst",
+        "display_text": "The first value is the value to inject when the interactive terminal is available, the second value is the value to use\nwhen it's not (optional). A good use case for this is e.g. passing in the ``--pdb`` flag for pytest.\n\n.. _`command positional substitution`:\n.. _`positional substitution`:\n\nSubstitutions for positional arguments in commands\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n.. versionadded:: 1.0\n\nIf you specify a substitution string like this::\n\n    {posargs:DEFAULTS}\n\n",
+        "line_start": 1675,
+        "line_end": 1689
+      },
+      {
+        "stable_chunk_id": "child-5970e08a623970e906bbe83f227ea08ae131419a",
+        "source_path": "docs/config.rst",
+        "display_text": "then the value will be replaced with positional arguments as provided to the tox command::\n\n    tox arg1 arg2\n\nIn this instance, the positional argument portion will be replaced with ``arg1 arg2``. If no positional arguments were\nspecified, the value of DEFAULTS will be used instead. If DEFAULTS contains other substitution strings, such as\n``{env:*}``, they will be interpreted.,\n\nUse a double ``--`` if you also want to pass options to an underlying test command, for example::\n\n    tox run -e 3.13 -- --opt1 ARG1\n\n",
+        "line_start": 1690,
+        "line_end": 1701
+      },
+      {
+        "stable_chunk_id": "child-da980d934a1682eee7fc4d5fee3cdc173b981f2f",
+        "source_path": "docs/config.rst",
+        "display_text": "will make the ``--opt1 ARG1`` appear in all test commands where ``[]`` or ``{posargs}`` was specified.  By default (see\n``args_are_paths`` setting), ``tox`` rewrites each positional argument if it is a relative path and exists on the\nfilesystem to become a path relative to the ``changedir`` setting.\n\nOther Substitutions\n~~~~~~~~~~~~~~~~~~~\n\n* ``{:}`` - replaced as ``os.pathsep``\n* ``{/}`` - replaced as ``os.sep``\n",
+        "line_start": 1702,
+        "line_end": 1710
+      }
+    ],
+    "sqlite_version": "3.45.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "bb57fc29adbfca4b909b45f64ced7f89bfc1424e33369befc49d8ff66887cf30",
+    "storage_path": "/tmp/docatlas-removal-secure-xs_64g44/docatlas-evidence-4j6seh7l/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-eaf428daa6a84b1fb497dae884523d11",
+    "catalog_sha256": "d33282702d5d5445c13dcb623c15b2a223c6c86be8f3959f9161e009a94fa641",
+    "documents": [
+      {
+        "path": "docs/config.rst",
+        "content_sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+        "catalog_entry_hash": "sha256:f09c5f965fd2226b2f28ce300c8a1f2351403b91721f124ebcf8aa0487842ee7"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-eaf428daa6a84b1fb497dae884523d11",
+      "members": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 1,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 1
+    }
+  },
+  "snapshot_sources": [
+    {
+      "path": "docs/config.rst",
+      "content_sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "matches_pinned_source": true
+    }
+  ],
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "tox"
+}

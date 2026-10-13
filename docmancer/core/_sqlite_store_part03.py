@@ -191,113 +191,87 @@ class _SQLiteStorePart03:
         expand: str | None = None,
         filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
-        expand_mode = expand or "none"
-        # The FTS scoring window is internal; the returned candidate lane is
-        # still capped by the dispatcher. Keeping the wider scoring window is
-        # required for authority/diversity reranking to displace contamination.
-        rows = [dict(r) for r in self._search_rows(text, max(limit * 4, limit), filters=filters)]
-        content_terms = set(re.findall(r"\w+", self._strip_stopwords(text).lower()))
-        ranked = [(self._ranking_candidate(row, text, content_terms), row) for row in rows]
-        raw_order = {
-            candidate.stable_id: index
-            for index, (candidate, _) in enumerate(
-                sorted(
-                    ranked,
-                    key=lambda item: (
-                        dict(item[0].raw_component_ranks)["fts5_bm25_cost"],
-                        item[0].stable_id,
-                    ),
-                ),
-                start=1,
-            )
-        }
-        ranked.sort(key=lambda item: (-item[0].final_utility, item[0].stable_id))
-        for final_rank, (candidate, row) in enumerate(ranked, start=1):
-            trace = candidate.trace()
-            trace.update(
-                {
-                    "raw_rank": raw_order[candidate.stable_id],
-                    "final_rank": final_rank,
-                    "rank_delta": raw_order[candidate.stable_id] - final_rank,
-                    "candidate_pool_size": len(ranked),
-                }
-            )
-            row["_ranking_trace"] = trace
-        rows = [row for _, row in ranked]
-        selected: list[dict] = []
-        used_ids: set[int] = set()
-        seen_content: set[str] = set()
-        token_total = 0
+        return self._query_bm25_candidates(text, limit=limit, budget=budget, filters=filters)
 
-        for row in rows:
-            expanded = self._expand_row(row, expand_mode)
-            for raw_candidate in expanded:
-                candidate = dict(raw_candidate)
-                candidate.setdefault("rank", row["rank"])
-                candidate.setdefault("_lexical_query_mode", row.get("_lexical_query_mode", "and"))
-                candidate.setdefault("_ranking_trace", row.get("_ranking_trace"))
-                row_id = int(candidate["id"])
-                if row_id in used_ids:
-                    continue
-                # Dedupe sections with identical content (common in
-                # aggregated sources like llms-full.txt where the same
-                # heading/text can appear in multiple pages).
-                content_key = hashlib.sha1(
-                    (candidate["title"] + "\n" + candidate["text"]).encode()
-                ).hexdigest()
-                if content_key in seen_content:
-                    used_ids.add(row_id)
-                    continue
-                tokens = int(candidate["token_estimate"])
-                if selected and token_total + tokens > budget:
-                    continue
-                selected.append(candidate)
-                used_ids.add(row_id)
-                seen_content.add(content_key)
-                token_total += tokens
-                if len(selected) >= limit:
-                    break
-            if len(selected) >= limit or token_total >= budget:
-                break
+    def _query_bm25_candidates(
+        self, text: str, *, limit: int, budget: int,
+        filters: dict[str, Any] | None,
+    ) -> list[RetrievedChunk]:
+        """Acquire bounded native children independently of the delivery budget."""
+        from docmancer.retrieval.experimental_acquisition import (
+            ACQUISITION_CANDIDATES, ACQUISITION_ESTIMATED_TOKENS,
+            ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
+        )
+
+        rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
+        selected: list[dict[str, Any]] = []
+        seen_ids: set[int] = set()
+        token_total = byte_total = skipped = 0
+        for raw_rank, row in enumerate(rows, start=1):
+            row_id = int(row["id"])
+            if row_id in seen_ids:
+                continue
+            seen_ids.add(row_id)
+            tokens = max(0, int(row["token_estimate"]))
+            text_bytes = len(str(row["text"]).encode("utf-8"))
+            if (
+                token_total + tokens > ACQUISITION_ESTIMATED_TOKENS
+                or byte_total + text_bytes > ACQUISITION_TEXT_BYTES
+            ):
+                skipped += 1
+                continue
+            selected.append({**row, "_bm25_rank": raw_rank})
+            token_total += tokens
+            byte_total += text_bytes
 
         raw_tokens = self._raw_token_total([row["source"] for row in selected])
-        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - (token_total / raw_tokens)))
+        savings = 0.0 if raw_tokens <= 0 else max(0.0, 100.0 * (1 - token_total / raw_tokens))
         runway = 1.0 if token_total <= 0 else raw_tokens / token_total
+        acquisition = {
+            "method": ACQUISITION_METHOD,
+            "sql_rows": len(rows),
+            "candidate_ceiling": ACQUISITION_CANDIDATES,
+            "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
+            "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
+            "admitted_rows": len(selected),
+            "admitted_estimated_tokens": token_total,
+            "admitted_text_bytes": byte_total,
+            "resource_skipped_rows": skipped,
+            "delivery_limit_not_applied": limit,
+            "delivery_budget_not_applied": budget,
+        }
         results: list[RetrievedChunk] = []
-        for index, row in enumerate(selected):
+        for row in selected:
+            cost = float(row["rank"])
+            rank = int(row["_bm25_rank"])
             metadata = json.loads(row["metadata_json"] or "{}")
-            metadata.update(
-                {
-                    "title": row["title"],
+            metadata.update({
+                "title": row["title"], "section_id": int(row["id"]),
+                "token_estimate": int(row["token_estimate"]),
+                "docmancer_tokens": token_total, "raw_tokens": raw_tokens,
+                "savings_percent": round(savings, 1),
+                "runway_multiplier": round(runway, 2),
+                "acquisition": dict(acquisition),
+                "ranking": {
+                    "stable_id": self._lexical_row_identity(row),
                     "section_id": int(row["id"]),
-                    "token_estimate": int(row["token_estimate"]),
-                    "docmancer_tokens": token_total,
-                    "raw_tokens": raw_tokens,
-                    "savings_percent": round(savings, 1),
-                    "runway_multiplier": round(runway, 2),
-                }
-            )
-            if isinstance(row, dict) and isinstance(row.get("_ranking_trace"), dict):
-                metadata["ranking"] = dict(row["_ranking_trace"])
-            metadata["lexical_match"] = self._lexical_match_trace(
-                text,
-                title=str(row["title"]),
-                body=str(row["text"]),
-                retrieval_text=str(row.get("retrieval_text") or ""),
-                mode=str(row.get("_lexical_query_mode") or "and"),
-                bm25_cost=float(row["rank"]),
-            )
-            # FTS5 bm25 is lower-is-better. Present a positive rank-like score.
-            score = max(0.0, 1.0 - (index * 0.05))
-            results.append(
-                RetrievedChunk(
-                    source=row["source"],
-                    chunk_index=int(row["chunk_index"]),
-                    text=row["text"],
-                    score=score,
-                    metadata=metadata,
-                )
-            )
+                    "score_direction": "higher_is_better",
+                    "raw_component_ranks": {"fts5_bm25_cost": cost},
+                    "base_utility": -cost, "feature_contributions": {},
+                    "final_utility": -cost, "raw_rank": rank,
+                    "final_rank": rank, "rank_delta": 0,
+                    "candidate_pool_size": len(rows), "method": ACQUISITION_METHOD,
+                },
+                "lexical_match": self._lexical_match_trace(
+                    text, title=str(row["title"]), body=str(row["text"]),
+                    retrieval_text=str(row.get("retrieval_text") or ""),
+                    mode="or", bm25_cost=cost,
+                ),
+            })
+            results.append(RetrievedChunk(
+                source=row["source"], chunk_index=int(row["chunk_index"]),
+                text=row["text"], score=-cost, metadata=metadata,
+            ))
         return results
 
     @classmethod
@@ -489,77 +463,38 @@ class _SQLiteStorePart03:
         # These are literal query words, never an FTS expression. Quote every
         # token so uppercase AND/OR/NOT remain data in both backend lanes.
         literal_terms = [f'"{token}"' for token in terms]
-        cleaned = " ".join(literal_terms)
         filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+        from docmancer.retrieval.experimental_acquisition import (
+            ACQUISITION_CANDIDATES,
+        )
+
         with self._connect() as conn:
             active_generation = self._active_generation_id(conn)
             if not active_generation:
                 return []
-            if active_generation:
-                rows: list[Any] = []
-                try:
-                    rows = list(
-                        conn.execute(
-                            f"""
-                            SELECT sections.hydration_id AS id, sections.*,
-                                   sections.display_text AS text,
-                                   sections.display_token_estimate AS token_estimate,
-                                   sections.display_content_hash AS content_hash,
-                                   bm25(retrieval_children_fts, 6.0, 2.0, 0.5) AS rank
-                            FROM retrieval_children_fts
-                            JOIN retrieval_children AS sections
-                              ON sections.id = retrieval_children_fts.rowid
-                            WHERE retrieval_children_fts MATCH ?
-                              AND sections.generation_id = ?
-                            {filter_sql}
-                            ORDER BY rank, sections.source, sections.chunk_index,
-                                     sections.stable_chunk_id
-                            LIMIT ?
-                            """,
-                            (cleaned, active_generation, *filter_params, limit),
-                        )
-                    )
-                    if len(terms) <= 1:
-                        return self._mark_lexical_mode(rows, "and")
-                except sqlite3.OperationalError:
-                    pass
-                if rows and not (filters or {}).get("project_identity"):
-                    return self._mark_lexical_mode(rows, "and")
-                fallback_query = " OR ".join(literal_terms)
-                if not fallback_query:
-                    return []
-                child_fallback = list(
-                    conn.execute(
-                        f"""
-                        SELECT sections.hydration_id AS id, sections.*,
-                               sections.display_text AS text,
-                               sections.display_token_estimate AS token_estimate,
-                               sections.display_content_hash AS content_hash,
-                               bm25(retrieval_children_fts, 6.0, 2.0, 0.5) AS rank
-                        FROM retrieval_children_fts
-                        JOIN retrieval_children AS sections
-                          ON sections.id = retrieval_children_fts.rowid
-                        WHERE retrieval_children_fts MATCH ?
-                          AND sections.generation_id = ?
-                        {filter_sql}
-                        ORDER BY rank, sections.source, sections.chunk_index,
-                                 sections.stable_chunk_id
-                        LIMIT ?
-                        """,
-                        (fallback_query, active_generation, *filter_params, limit),
-                    )
-                )
-                if not rows:
-                    return self._mark_lexical_mode(child_fallback, "or_fallback")
-
-                combined = self._mark_lexical_mode(rows, "and")
-                seen = {self._lexical_row_identity(row) for row in combined}
-                for row in self._mark_lexical_mode(child_fallback, "or_union"):
-                    identity = self._lexical_row_identity(row)
-                    if identity not in seen:
-                        combined.append(row)
-                        seen.add(identity)
-                return combined
+            if not literal_terms:
+                return []
+            rows = list(conn.execute(
+                f"""
+                SELECT sections.hydration_id AS id, sections.*,
+                       sections.display_text AS text,
+                       sections.display_token_estimate AS token_estimate,
+                       sections.display_content_hash AS content_hash,
+                       bm25(retrieval_children_fts) AS rank
+                FROM retrieval_children_fts
+                JOIN retrieval_children AS sections
+                  ON sections.id = retrieval_children_fts.rowid
+                WHERE retrieval_children_fts MATCH ?
+                  AND sections.generation_id = ?
+                {filter_sql}
+                ORDER BY rank, sections.source, sections.chunk_index,
+                         sections.stable_chunk_id
+                LIMIT ?
+                """,
+                (" OR ".join(literal_terms), active_generation, *filter_params,
+                 min(limit, ACQUISITION_CANDIDATES)),
+            ))
+            return self._mark_lexical_mode(rows, "or")
 
     @staticmethod
     def _mark_lexical_mode(rows: list[Any], mode: str) -> list[dict[str, Any]]:

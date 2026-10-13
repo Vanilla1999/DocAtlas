@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-U04",
+  "variant": "V0",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-uv",
+  "public_request": {
+    "question": "Does index-url under [tool.uv.pip] affect uv sync as well as uv pip install, and for how many days is uv's HTTP cache retained by default?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/1-uv/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "659c9ce2f9ae9ed859f5920f87d62b877f844e85902e08693c0d787f84dd5aa1",
+  "utf8_bytes": 3143,
+  "tokens": 942,
+  "seconds": 1.666564429000573,
+  "cpu_seconds": 1.6650218860000052,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

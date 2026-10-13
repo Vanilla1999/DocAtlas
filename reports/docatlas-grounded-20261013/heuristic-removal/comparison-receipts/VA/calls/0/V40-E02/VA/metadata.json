@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-E02",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "How does ESLint search for a configuration file for each target file when run on the command line?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "7f0a1b46265260c660527b53f072c77173a918bc176a552564381d17f9cda53e",
+  "utf8_bytes": 40524,
+  "tokens": 11532,
+  "seconds": 10.203481794000254,
+  "cpu_seconds": 10.201337008999985,
+  "peak_rss_kib": 213464,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

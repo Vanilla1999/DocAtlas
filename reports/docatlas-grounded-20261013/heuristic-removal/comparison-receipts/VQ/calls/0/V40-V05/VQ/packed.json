@@ -1,0 +1,37 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-ef20b88fdf485dee",
+      "path_or_url": "docs/guide/assets.md",
+      "section": "Static Asset Handling > The `public` Directory",
+      "snippet": "## The `public` Directory\n\nIf you have assets that are:\n\n- Never referenced in source code (e.g. `robots.txt`)\n- Must retain the exact same file name (without hashing)\n- ...or you simply don't want to have to import an asset first just to get its URL\n\nThen you can place the asset in a special `public` directory under your project root. Assets in this directory will be served at root path `/` during dev, and copied to the root of the dist directory as-is.\n\nThe directory defaults to `<root>/public`, but can be configured via the [`publicDir` option](/config/shared-options.md#publicdir).\n\nNote that you should always reference `public` assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`.\n\n::: tip Choosing between imports and the `public` directory\n\nIn general, prefer **importing assets** unless you specifically need the guarantees provided by the `public` directory.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9f4157da498bab7221502cd03aea23f42ba04546543aa0ba02753f58b96d5497",
+      "project_identity": "local:c0c7c6c5954d89ba8e1c3b3161b0fb1a1a2ae59e791a7b5aee1f76ad1ac8d1a8",
+      "line_start": 108,
+      "line_end": 127,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/767830561e2086d56a37baa1"
+    },
+    {
+      "evidence_id": "ev-2826e2387cd1a5ce",
+      "path_or_url": "docs/guide/assets.md",
+      "section": "Static Asset Handling > Importing Asset as URL",
+      "snippet": "- Referenced assets are included as part of the build assets graph, will get hashed file names, and can be processed by plugins for optimization.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "197f7c7302184bcaf59e2e12b2418a873e4c6706e84e75a05813f6cb39d1607f",
+      "project_identity": "local:c0c7c6c5954d89ba8e1c3b3161b0fb1a1a2ae59e791a7b5aee1f76ad1ac8d1a8",
+      "line_start": 27,
+      "line_end": 28,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/f8d91447bd751929d8104e8f"
+    }
+  ],
+  "tokens": 673,
+  "utf8_bytes": 2146,
+  "sha256": "1de90d8361a39bd9e889cecd072c3e85f501da0b846815a1a6f1c25f19f2ae81",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

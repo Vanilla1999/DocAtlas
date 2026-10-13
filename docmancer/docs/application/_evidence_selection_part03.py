@@ -78,8 +78,6 @@ def select_evidence(
         raise ValueError(
             "unsupported evidence requirement provenance: " + ", ".join(invalid_provenance)
         )
-    if config.result_kind == "docs_answer" and isinstance(requirements, EvidenceRequirementSet):
-        _hydrate_cohesive_contract_paragraphs(materialized_items, requirements)
     v3_answer_units = any(
         item.obligation_kind in {"purpose", "effect"}
         or item.relation == "applicable_contract"
@@ -181,6 +179,13 @@ def select_evidence(
         result_kind=config.result_kind, question=question,
     )
     omissions.extend(hard_omissions)
+    if config.result_kind == "docs_answer":
+        return _native_read_selection(
+            eligible, omissions, critical_failures, identity_collisions,
+            requirements=requirements, config=config,
+            eligibility_contract_hash=eligibility_contract_hash,
+            candidate_trace_hash=candidate_trace_hash, candidate_count=len(raw_candidates),
+        )
     policy_requirements = _with_canonical_policy_requirements(requirements, eligible, config.result_kind)
     if policy_requirements != requirements.requirements:
         requirements = EvidenceRequirementSet(
@@ -454,6 +459,66 @@ def select_evidence(
         eligibility_contract_hash=eligibility_contract_hash,
         candidate_trace_hash=candidate_trace_hash, selection_hash=selection_hash,
         assignments=assignments, support_decision=support_decision, requirements=requirements,
+    )
+
+
+def _native_read_selection(
+    eligible, omissions, critical_failures, identity_collisions, *, requirements,
+    config, eligibility_contract_hash, candidate_trace_hash, candidate_count,
+):
+    """Select whole eligible occurrences in acquisition order, without proof ranking."""
+    selected, seen = [], set()
+    used = 0
+    reserve = config.wrapper_reserve_tokens or 0
+    hard_tokens = config.hard_tokens if config.hard_tokens is not None else 12000
+    for candidate in eligible:
+        if candidate.stable_id in seen:
+            continue
+        seen.add(candidate.stable_id)
+        cost = candidate.fit_token_estimate
+        if used + cost + reserve > hard_tokens:
+            omissions.append(Omission(candidate.stable_id, "budget"))
+            continue
+        selected.append(candidate)
+        used += cost
+    mandatory = tuple(sorted(row.requirement_id for row in requirements if row.mandatory))
+    missing = tuple(sorted(set(mandatory) | set(critical_failures)
+                           | {"unsupported_answer_authorization:context_only"}
+                           | {f"stable_identity_collision:{value}" for value in identity_collisions}))
+    omissions = tuple(sorted(omissions, key=lambda row: (
+        row.stable_id, row.reason_code, row.representative_stable_id or "")))
+    selection_hash = canonical_hash({
+        "schema_version": SELECTOR_SCHEMA_VERSION, "config_hash": config.config_hash,
+        "eligibility_contract_hash": eligibility_contract_hash,
+        "candidate_trace_hash": candidate_trace_hash, "requirements": requirements.hash_payload,
+        "selected": [_selected_identity(row) for row in selected], "assignments": [],
+        "omissions": [asdict(row) for row in omissions], "missing": list(missing), "conflicts": [],
+    })
+    support = {
+        "answer_supported": False, "support_status": "insufficient_evidence",
+        "reason_code": "context_only", "missing_requirement_ids": missing,
+        "satisfied_requirement_ids": (), "mandatory_requirement_ids": mandatory,
+        "mandatory_coverage": 0.0, "selected_evidence_ids": (),
+        "requirements_hash": requirements.requirements_hash,
+        "selector_config_hash": config.config_hash, "eligibility_contract_hash": eligibility_contract_hash,
+        "candidate_trace_hash": candidate_trace_hash, "selection_hash": selection_hash,
+        "assignment_hash": canonical_hash([]),
+    }
+    return SelectionDecision(
+        status="insufficient_evidence", selected_candidates=tuple(selected), omissions=omissions,
+        missing_requirements=missing, unresolved_conflicts=(), assignments=(), requirements=requirements,
+        selector_config_hash=config.config_hash, eligibility_contract_hash=eligibility_contract_hash,
+        candidate_trace_hash=candidate_trace_hash, selection_hash=selection_hash,
+        support_decision=SupportDecision(**support, decision_hash=canonical_hash(support), requirements=requirements),
+        metrics={
+            "selection_method": "native_acquisition_rank", "relevance_unassessed": True,
+            "candidate_count": candidate_count, "eligible_count": len(eligible),
+            "selected_count": len(selected), "selected_tokens": sum(row.token_estimate for row in selected),
+            "projected_total_tokens": used + reserve, "hard_tokens": hard_tokens,
+            "mandatory_requirements": len(mandatory), "mandatory_covered": 0,
+            "mandatory_coverage_millis": 0, "requirements_hash": requirements.requirements_hash,
+            "omission_counts": _count_reasons(omissions), "cache": "disabled",
+        },
     )
 
 

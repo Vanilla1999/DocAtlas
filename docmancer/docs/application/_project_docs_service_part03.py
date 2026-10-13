@@ -12,20 +12,8 @@ from docmancer.docs.domain.documentation_query_plan import (
     DocumentationLookup,
     DocumentationQueryPlan,
 )
-from docmancer.docs.domain.evidence_qualification import (
-    derived_parent_trace,
-    qualify_evidence,
-)
 from docmancer.docs.domain.project_doc_ranking import (
     condition_lead_priority, _found_window_retention_producer, _invoke_found_window_retention,
-)
-from docmancer.docs.domain.project_retrieval_intent import build_project_retrieval_aliases
-from docmancer.docs.application.retrieval_need_support import apply_retrieval_need_witness
-from docmancer.docs.domain.query_terms import (
-    documentation_query_terms,
-    documentation_technical_anchors,
-    query_constraint_roles,
-    supplemental_query_is_useful,
 )
 
 
@@ -35,20 +23,6 @@ from .reference_query_tagging import (
 from .source_reference_evidence import SourceReferenceContext
 
 from ._project_docs_diagnostics import _retrieval_stage_diagnostics
-
-
-def _candidate_admission_priority(query: str, chunk: Any) -> tuple[bool, int]:
-    """Keep qualified condition-bearing evidence inside the bounded pool.
-
-    This is only an admission ordering preference. It cannot qualify a chunk,
-    alter source policy, or increase the candidate/query budget.
-    """
-    qualified = bool((chunk.metadata or {}).get("retrieval_query_ids"))
-    return (
-        not qualified,
-        -condition_lead_priority(query, str(getattr(chunk, "text", "") or "")),
-    )
-
 
 
 from ._project_docs_continuations import (
@@ -153,6 +127,8 @@ class _ProjectDocsServicePart03:
             query, lookup_queries=lookup_queries, explicit_path=evidence_path,
             requirements=requirements,
         )
+        # The current planner emits the unchanged original plus explicit host
+        # lookups only. Inferred requirements never become executable queries.
         from .need_query_schedule import scheduled_plan, requirement_search_probes
         documentation_query_plan, scheduled_lookups = scheduled_plan(documentation_query_plan,
             supplemental_queries=requirement_search_probes(requirements))
@@ -255,6 +231,8 @@ class _ProjectDocsServicePart03:
                         anchor_lookup,
                         expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                     )
+        # A second filtered acquisition of identical request bytes, not a query
+        # rewrite or parent/semantic rescue. S keeps the unfiltered read first.
         authoritative_chunks = _run(
             query,
             query_limit=max(effective_limit, 20),
@@ -306,25 +284,10 @@ class _ProjectDocsServicePart03:
                     expected_project_identity=filters["project_identity"], lifecycle_intent=answer_lifecycle_intent,
                 )
             supplemental_chunks_by_query[supplemental_query] = lane
-        queries_by_origin: dict[str, list[list[Any]]] = {}
-        for item in documentation_query_plan.queries:
-            lane = supplemental_chunks_by_query.get(item.text)
-            if lane:
-                queries_by_origin.setdefault(item.origin, []).append(lane)
-        candidates = select_context_candidates([
-            [
-                *queries_by_origin.get("exact_path", []),
-                *queries_by_origin.get("exact_anchor", []),
-                *queries_by_origin.get("lexical_topic", []),
-            ],
-            [[*authoritative_chunks, *chunks]],
-            queries_by_origin.get("host_lookup", []),
-            [
-                *queries_by_origin.get("canonical_intent", []),
-                *queries_by_origin.get("concept_alias", []),
-                *queries_by_origin.get("retrieval_hint", []),
-            ],
-        ])
+        # Use the actual original read, then the existing other reads,
+        # without score/category/lane-fairness ordering.
+        candidates = [*chunks, *authoritative_chunks,
+                      *(chunk for lane in supplemental_chunks_by_query.values() for chunk in lane)]
         # Cross-check selected candidates without extra retrieval.
         candidates = _qualify_candidate_lookups(
             candidates, documentation_query_plan,
@@ -332,7 +295,6 @@ class _ProjectDocsServicePart03:
             lifecycle_intent=answer_lifecycle_intent,
             discovery_records=discovery_records,
         )
-        candidates.sort(key=lambda chunk: _candidate_admission_priority(query, chunk))
         from .experimental_candidate_selection import select_experimental_candidates
         candidates = select_experimental_candidates(candidates, question=query)
         if internal_diagnostics is not None:
@@ -340,83 +302,11 @@ class _ProjectDocsServicePart03:
                 _retrieval_stage_diagnostics(documentation_query_plan, candidates)
             )
             internal_diagnostics["prepared_parents"] = dict(reference_context.structure_diagnostics)
-        selected = []
-        seen: set[tuple[str, int]] = set()
-        token_total = 0
-        for chunk in candidates:
-            if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):
-                continue
-            key = (chunk.source, chunk.chunk_index)
-            if key in seen:
-                existing_index = next(
-                    index for index, item in enumerate(selected)
-                    if (item.source, item.chunk_index) == key
-                )
-                merged_matches = merge_query_matches(
-                    (selected[existing_index].metadata or {}).get("retrieval_query_matches"),
-                    (chunk.metadata or {}).get("retrieval_query_matches"),
-                )
-                merged_ids = tuple(
-                    key for key, value in merged_matches.items() if value.get("qualified") is True
-                )
-                existing = selected[existing_index]
-                preferred = chunk if chunk.score > existing.score else existing
-                selected[existing_index] = preferred.model_copy(update={
-                    "metadata": {
-                        **(preferred.metadata or {}),
-                        "retrieval_query_matches": merged_matches,
-                        "retrieval_query_ids": merged_ids,
-                    },
-                })
-                continue
-            matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
-            admitted = any((trace.get("qualified") is True
-                            or (query_id == "query-original" and trace.get("literal_context_admission")))
-                           for query_id, trace in matches.items()
-                           if isinstance(trace, dict) and (query_id == "query-original" or query_id.startswith("query-lookup-")))
-            if not admitted and len(selected) >= effective_limit:
-                anchor = selected[0]
-                same_authoritative_source = (
-                    chunk.source == anchor.source
-                    and len(selected) < max(effective_limit, 4)
-                )
-                if not same_authoritative_source:
-                    continue
-            chunk_tokens = int((chunk.metadata or {}).get("token_estimate") or 0)
-            if not admitted and token_total + chunk_tokens > budget:
-                continue
-            selected.append(chunk)
-            seen.add(key)
-            token_total += chunk_tokens
+        selected = [chunk for chunk in candidates
+                    if lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent)]
         if _control_chunks is not None:
             _control_chunks.extend(selected)
-        if not retain_found_windows:
-            return selected
-        # Acquisition is unchanged. Independently qualified windows and checked
-        # literal body context bypass representation packing. The latter keeps
-        # its failed query trace; ranking/projection recheck its source binding.
-        retained = {(chunk.source, chunk.chunk_index): chunk for chunk in selected}
-        for chunk in candidates:
-            matches = (chunk.metadata or {}).get("retrieval_query_matches") or {}
-            if not any((trace.get("qualified") is True
-                        or (key == "query-original" and trace.get("literal_context_admission")))
-                       for key, trace in matches.items()
-                       if isinstance(trace, dict) and (key == "query-original" or key.startswith("query-lookup-"))):
-                continue
-            if not lifecycle_allows(chunk.metadata or {}, answer_lifecycle_intent):
-                continue
-            key = (chunk.source, chunk.chunk_index)
-            existing = retained.get(key)
-            if existing is None:
-                retained[key] = chunk
-                continue
-            merged = merge_query_matches((existing.metadata or {}).get("retrieval_query_matches"), matches)
-            preferred = chunk if chunk.score > existing.score else existing
-            retained[key] = preferred.model_copy(update={"metadata": {
-                **(preferred.metadata or {}), "retrieval_query_matches": merged,
-                "retrieval_query_ids": tuple(key for key, trace in merged.items() if trace.get("qualified") is True),
-            }})
-        return list(retained.values())
+        return selected
 
     @_found_window_retention_producer
     def get_project_docs(

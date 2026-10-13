@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-T04",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-textual",
+  "public_request": {
+    "question": "What arguments does a Textual watch method receive when it declares one positional argument versus two?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-textual/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "b83ac758515d53319f0cd99cc2fb6c7ec8e8314de1e3cf67b2d9e23df9152779",
+  "utf8_bytes": 14127,
+  "tokens": 4141,
+  "seconds": 13.25068042500061,
+  "cpu_seconds": 13.220183636999991,
+  "peak_rss_kib": 206904,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

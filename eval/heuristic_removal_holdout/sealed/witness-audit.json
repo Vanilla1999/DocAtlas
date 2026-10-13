@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "boundary": "data-only; no product calls",
+  "witnesses": [
+    {
+      "case_id": "NEW01",
+      "fact_id": "F1",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 1846,
+      "end_byte": 1984,
+      "exact": true
+    },
+    {
+      "case_id": "NEW01",
+      "fact_id": "F2",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 2906,
+      "end_byte": 2993,
+      "exact": true
+    },
+    {
+      "case_id": "NEW02",
+      "fact_id": "F1",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 5561,
+      "end_byte": 5659,
+      "exact": true
+    },
+    {
+      "case_id": "NEW02",
+      "fact_id": "F1",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 5881,
+      "end_byte": 5928,
+      "exact": true
+    },
+    {
+      "case_id": "NEW02",
+      "fact_id": "F2",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 6089,
+      "end_byte": 6247,
+      "exact": true
+    },
+    {
+      "case_id": "NEW03",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 17872,
+      "end_byte": 18211,
+      "exact": true
+    },
+    {
+      "case_id": "NEW03",
+      "fact_id": "F2",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 17596,
+      "end_byte": 17646,
+      "exact": true
+    },
+    {
+      "case_id": "NEW04",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 5474,
+      "end_byte": 5588,
+      "exact": true
+    },
+    {
+      "case_id": "NEW04",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 5767,
+      "end_byte": 5838,
+      "exact": true
+    },
+    {
+      "case_id": "NEW04",
+      "fact_id": "F2",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 5083,
+      "end_byte": 5317,
+      "exact": true
+    },
+    {
+      "case_id": "NEW05",
+      "fact_id": "F1",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9357,
+      "end_byte": 9423,
+      "exact": true
+    },
+    {
+      "case_id": "NEW05",
+      "fact_id": "F2",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9535,
+      "end_byte": 9566,
+      "exact": true
+    },
+    {
+      "case_id": "NEW05",
+      "fact_id": "F2",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9598,
+      "end_byte": 9694,
+      "exact": true
+    },
+    {
+      "case_id": "NEW05",
+      "fact_id": "F3",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9696,
+      "end_byte": 9795,
+      "exact": true
+    },
+    {
+      "case_id": "NEW06",
+      "fact_id": "F1",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 2875,
+      "end_byte": 2962,
+      "exact": true
+    },
+    {
+      "case_id": "NEW06",
+      "fact_id": "F1",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 2993,
+      "end_byte": 3085,
+      "exact": true
+    },
+    {
+      "case_id": "NEW06",
+      "fact_id": "F2",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 4804,
+      "end_byte": 4927,
+      "exact": true
+    },
+    {
+      "case_id": "NEW07",
+      "fact_id": "F1",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 20151,
+      "end_byte": 20234,
+      "exact": true
+    },
+    {
+      "case_id": "NEW07",
+      "fact_id": "F2",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 22562,
+      "end_byte": 22698,
+      "exact": true
+    },
+    {
+      "case_id": "NEW07",
+      "fact_id": "F3",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 20515,
+      "end_byte": 20652,
+      "exact": true
+    },
+    {
+      "case_id": "NEW07",
+      "fact_id": "F4",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 23498,
+      "end_byte": 23694,
+      "exact": true
+    },
+    {
+      "case_id": "NEW08",
+      "fact_id": "F1",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 7039,
+      "end_byte": 7091,
+      "exact": true
+    },
+    {
+      "case_id": "NEW08",
+      "fact_id": "F2",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 7121,
+      "end_byte": 7242,
+      "exact": true
+    },
+    {
+      "case_id": "NEW08",
+      "fact_id": "F2",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 7471,
+      "end_byte": 7632,
+      "exact": true
+    },
+    {
+      "case_id": "NEW09",
+      "fact_id": "F1",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 6851,
+      "end_byte": 7094,
+      "exact": true
+    },
+    {
+      "case_id": "NEW10",
+      "fact_id": "F1",
+      "path": "corpus/click/docs/options.rst",
+      "sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "start_byte": 3268,
+      "end_byte": 3358,
+      "exact": true
+    },
+    {
+      "case_id": "NEW11",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 16206,
+      "end_byte": 16286,
+      "exact": true
+    },
+    {
+      "case_id": "NEW11",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 17168,
+      "end_byte": 17225,
+      "exact": true
+    },
+    {
+      "case_id": "NEW12",
+      "fact_id": "F1",
+      "path": "corpus/requests/docs/user/quickstart.rst",
+      "sha256": "e2be6bd4a434b69e0c23c4ca5bcc12a2c7785ffd3b9eadd747ca98caea666bfd",
+      "start_byte": 16543,
+      "end_byte": 16606,
+      "exact": true
+    },
+    {
+      "case_id": "NEW13",
+      "fact_id": "F1",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9947,
+      "end_byte": 9964,
+      "exact": true
+    },
+    {
+      "case_id": "NEW13",
+      "fact_id": "F1",
+      "path": "corpus/pytest/doc/en/how-to/skipping.rst",
+      "sha256": "3cf0500a6b7daf72f11e3e0fa35af89c914921ff17910c1bb83d11c721ca78e6",
+      "start_byte": 9966,
+      "end_byte": 10125,
+      "exact": true
+    },
+    {
+      "case_id": "NEW14",
+      "fact_id": "F1",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 16839,
+      "end_byte": 16891,
+      "exact": true
+    },
+    {
+      "case_id": "NEW14",
+      "fact_id": "F2",
+      "path": "corpus/tox/docs/config.rst",
+      "sha256": "5351bece5974034d571c0ccc01e69d261a59756f9b50b74d0a463808b6f3c673",
+      "start_byte": 17135,
+      "end_byte": 17339,
+      "exact": true
+    }
+  ]
+}

@@ -1,0 +1,491 @@
+{
+  "root": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-click/project",
+  "inventory": {
+    "seconds": 0.24695762100054708,
+    "expected_paths": [
+      "docs/options.rst"
+    ],
+    "indexed_paths": [
+      "docs/options.rst"
+    ],
+    "excluded_or_failed_paths": [],
+    "unexpected_paths": [],
+    "rows": [
+      {
+        "stable_chunk_id": "child-31b1186c82541a5949bbf07bdacb252c66253857",
+        "source_path": "docs/options.rst",
+        "display_text": ".. _options:\n\nOptions\n=======\n\n.. currentmodule:: click\n\nAdding options to commands can be accomplished by the :func:`option`\ndecorator.  Since options can come in various different versions, there\nare a ton of parameters to configure their behavior. Options in click are\ndistinct from :ref:`positional arguments <arguments>`.\n\nName Your Options\n-----------------\n\n",
+        "line_start": 1,
+        "line_end": 15
+      },
+      {
+        "stable_chunk_id": "child-4ff6b743e498f4ab41c0205cac10291434151aa1",
+        "source_path": "docs/options.rst",
+        "display_text": "Options have a name that will be used as the Python argument name when\ncalling the decorated function. This can be inferred from the option\nnames or given explicitly. Names are given as position arguments to the\ndecorator.\n\nA name is chosen in the following order\n\n",
+        "line_start": 16,
+        "line_end": 22
+      },
+      {
+        "stable_chunk_id": "child-7917ed0068575b1fecc26e8c499f1a8169c89970",
+        "source_path": "docs/options.rst",
+        "display_text": "1.  If a name is not prefixed, it is used as the Python argument name\n    and not treated as an option name on the command line.\n2.  If there is at least one name prefixed with two dashes, the first\n    one given is used as the name.\n3.  The first name prefixed with one dash is used otherwise.\n\nTo get the Python argument name, the chosen name is converted to lower\ncase, up to two dashes are removed as the prefix, and other dashes are\nconverted to underscores.\n\n.. code-block:: python\n\n",
+        "line_start": 23,
+        "line_end": 34
+      },
+      {
+        "stable_chunk_id": "child-83933f5a46d8b1189a77e72450419f808bf1a1be",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('-s', '--string-to-echo')\n    def echo(string_to_echo):\n        click.echo(string_to_echo)\n\n.. code-block:: python\n\n    @click.command()\n    @click.option('-s', '--string-to-echo', 'string')\n    def echo(string):\n        click.echo(string)\n\n",
+        "line_start": 35,
+        "line_end": 46
+      },
+      {
+        "stable_chunk_id": "child-5e9c849a8f7c8d33b948507c9e81eadfa3985916",
+        "source_path": "docs/options.rst",
+        "display_text": "-   ``\"-f\", \"--foo-bar\"``, the name is ``foo_bar``\n-   ``\"-x\"``, the name is ``x``\n-   ``\"-f\", \"--filename\", \"dest\"``, the name is  ``dest``\n-   ``\"--CamelCase\"``, the name is ``camelcase``\n-   ``\"-f\", \"-fb\"``, the name is ``f``\n-   ``\"--f\", \"--foo-bar\"``, the name is ``f``\n-   ``\"---f\"``, the name is ``_f``\n\nBasic Value Options\n-------------------\n\n",
+        "line_start": 47,
+        "line_end": 57
+      },
+      {
+        "stable_chunk_id": "child-67f64cfe0589ec68991ef760dde1d17073b3bd61",
+        "source_path": "docs/options.rst",
+        "display_text": "The most basic option is a value option.  These options accept one\nargument which is a value.  If no type is provided, the type of the default\nvalue is used.  If no default value is provided, the type is assumed to be\n:data:`STRING`.  Unless a name is explicitly specified, the name of the\nparameter is the first long option defined; otherwise the first short one is\nused. By default, options are not required, however to make an option required,\nsimply pass in `required=True` as an argument to the decorator.\n\n",
+        "line_start": 58,
+        "line_end": 65
+      },
+      {
+        "stable_chunk_id": "child-89e473f49a12474e1fafff6b087f8bb274bf0cfe",
+        "source_path": "docs/options.rst",
+        "display_text": ".. click:example::\n\n    @click.command()\n    @click.option('--n', default=1)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:example::\n\n    # How to make an option required\n    @click.command()\n    @click.option('--n', required=True, type=int)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:example::\n\n",
+        "line_start": 66,
+        "line_end": 82
+      },
+      {
+        "stable_chunk_id": "child-f6997ede81248b4ecba5491d63d7fbc9e878817b",
+        "source_path": "docs/options.rst",
+        "display_text": "    # How to use a Python reserved word such as `from` as a parameter\n    @click.command()\n    @click.option('--from', '-f', 'from_')\n    @click.option('--to', '-t')\n    def reserved_param_name(from_, to):\n        click.echo(f\"from {from_} to {to}\")\n\nAnd on the command line:\n\n.. click:run::\n\n   invoke(dots, args=['--n=2'])\n\nIn this case the option is of type :data:`INT` because the default value\nis an integer.\n\nTo show the default values when showing command help, use ``show_default=True``\n\n.. click:example::\n\n",
+        "line_start": 83,
+        "line_end": 102
+      },
+      {
+        "stable_chunk_id": "child-714228f2378f0db0db008152523b09ee9cfa451c",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--n', default=1, show_default=True)\n    def dots(n):\n        click.echo('.' * n)\n\n.. click:run::\n\n   invoke(dots, args=['--help'])\n\nFor single option boolean flags, the default remains hidden if the default\nvalue is False.\n\n.. click:example::\n\n",
+        "line_start": 103,
+        "line_end": 116
+      },
+      {
+        "stable_chunk_id": "child-f41f15aad11a7f5b2cd3daf29697bcfcfb9cfc3f",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--n', default=1, show_default=True)\n    @click.option(\"--gr\", is_flag=True, show_default=True, default=False, help=\"Greet the world.\")\n    @click.option(\"--br\", is_flag=True, show_default=True, default=True, help=\"Add a thematic break\")\n    def dots(n, gr, br):\n        if gr:\n            click.echo('Hello world!')\n        click.echo('.' * n)\n        if br:\n            click.echo('-' * n)\n\n.. click:run::\n\n   invoke(dots, args=['--help'])\n\n\nMulti Value Options\n-------------------\n\n",
+        "line_start": 117,
+        "line_end": 135
+      },
+      {
+        "stable_chunk_id": "child-e7a21104531f68ee034ae231f18aeac0740598c4",
+        "source_path": "docs/options.rst",
+        "display_text": "Sometimes, you have options that take more than one argument.  For options,\nonly a fixed number of arguments is supported.  This can be configured by\nthe ``nargs`` parameter.  The values are then stored as a tuple.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--pos', nargs=2, type=float)\n    def findme(pos):\n        a, b = pos\n        click.echo(f\"{a} / {b}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(findme, args=['--pos', '2.0', '3.0'])\n\n.. _tuple-type:\n\n",
+        "line_start": 136,
+        "line_end": 155
+      },
+      {
+        "stable_chunk_id": "child-c35633cc14c5ee112b89f0c5515c3f7b54b384eb",
+        "source_path": "docs/options.rst",
+        "display_text": "Tuples as Multi Value Options\n-----------------------------\n\n.. versionadded:: 4.0\n\nAs you can see that by using `nargs` set to a specific number each item in\nthe resulting tuple is of the same type.  This might not be what you want.\nCommonly you might want to use different types for different indexes in\nthe tuple.  For this you can directly specify a tuple as type:\n\n.. click:example::\n\n",
+        "line_start": 156,
+        "line_end": 167
+      },
+      {
+        "stable_chunk_id": "child-1cdcc4bda757851ce6a892349e64579188f5f0f7",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--item', type=(str, int))\n    def putitem(item):\n        name, id = item\n        click.echo(f\"name={name} id={id}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(putitem, args=['--item', 'peter', '1338'])\n\nBy using a tuple literal as type, `nargs` gets automatically set to the\nlength of the tuple and the :class:`click.Tuple` type is automatically\nused.  The above example is thus equivalent to this:\n\n.. click:example::\n\n",
+        "line_start": 168,
+        "line_end": 185
+      },
+      {
+        "stable_chunk_id": "child-0926d04f9229ff088628adb29762d53998f46592",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--item', nargs=2, type=click.Tuple([str, int]))\n    def putitem(item):\n        name, id = item\n        click.echo(f\"name={name} id={id}\")\n\n.. _multiple-options:\n\nMultiple Options\n----------------\n\n",
+        "line_start": 186,
+        "line_end": 196
+      },
+      {
+        "stable_chunk_id": "child-a8cd06cd3bfde3957a79c1ecc924ac9fb4d4788e",
+        "source_path": "docs/options.rst",
+        "display_text": "Similarly to ``nargs``, there is also the case of wanting to support a\nparameter being provided multiple times and have all the values recorded --\nnot just the last one.  For instance, ``git commit -m foo -m bar`` would\nrecord two lines for the commit message: ``foo`` and ``bar``. This can be\naccomplished with the ``multiple`` flag:\n\nExample:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--message', '-m', multiple=True)\n    def commit(message):\n        click.echo('\\n'.join(message))\n\n",
+        "line_start": 197,
+        "line_end": 211
+      },
+      {
+        "stable_chunk_id": "child-1c9f29fc6b8ed24094ac78b5b1e9329ff5726f57",
+        "source_path": "docs/options.rst",
+        "display_text": "And on the command line:\n\n.. click:run::\n\n    invoke(commit, args=['-m', 'foo', '-m', 'bar'])\n\nWhen passing a ``default`` with ``multiple=True``, the default value\nmust be a list or tuple, otherwise it will be interpreted as a list of\nsingle characters.\n\n.. code-block:: python\n\n    @click.option(\"--format\", multiple=True, default=[\"json\"])\n\n\nCounting\n--------\n\nIn some very rare circumstances, it is interesting to use the repetition\nof options to count an integer up.  This can be used for verbosity flags,\nfor instance:\n\n",
+        "line_start": 212,
+        "line_end": 233
+      },
+      {
+        "stable_chunk_id": "child-e433f43bef632604d4fed1c67b5b9becc4e4d5c4",
+        "source_path": "docs/options.rst",
+        "display_text": ".. click:example::\n\n    @click.command()\n    @click.option('-v', '--verbose', count=True)\n    def log(verbose):\n        click.echo(f\"Verbosity: {verbose}\")\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(log, args=['-vvv'])\n\nBoolean Flags\n-------------\n\n",
+        "line_start": 234,
+        "line_end": 249
+      },
+      {
+        "stable_chunk_id": "child-319c04fcf12454887d88170db7b72ae71bc66cff",
+        "source_path": "docs/options.rst",
+        "display_text": "Boolean flags are options that can be enabled or disabled.  This can be\naccomplished by defining two flags in one go separated by a slash (``/``)\nfor enabling or disabling the option.  (If a slash is in an option string,\nClick automatically knows that it's a boolean flag and will pass\n``is_flag=True`` implicitly.)  Click always wants you to provide an enable\nand disable flag so that you can change the default later.\n\nExample:\n\n.. click:example::\n\n    import sys\n\n",
+        "line_start": 250,
+        "line_end": 262
+      },
+      {
+        "stable_chunk_id": "child-b20e09cb73eaccd21cb012dbea81f13a61856b4e",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--shout/--no-shout', default=False)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--shout'])\n    invoke(info, args=['--no-shout'])\n    invoke(info)\n\nIf you really don't want an off-switch, you can just define one and\nmanually inform Click that something is a flag:\n\n.. click:example::\n\n    import sys\n\n",
+        "line_start": 263,
+        "line_end": 285
+      },
+      {
+        "stable_chunk_id": "child-ce23c97fdcb0ab2f1eed8534a68f0d6d3cf1ce44",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--shout', is_flag=True)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--shout'])\n    invoke(info)\n\nNote that if a slash is contained in your option already (for instance, if\nyou use Windows-style parameters where ``/`` is the prefix character), you\ncan alternatively split the parameters through ``;`` instead:\n\n.. click:example::\n\n",
+        "line_start": 286,
+        "line_end": 306
+      },
+      {
+        "stable_chunk_id": "child-775073dbca075d62a778f277300daaa1ca5de2fb",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('/debug;/no-debug')\n    def log(debug):\n        click.echo(f\"debug={debug}\")\n\n    if __name__ == '__main__':\n        log()\n\n.. versionchanged:: 6.0\n\nIf you want to define an alias for the second option only, then you will\nneed to use leading whitespace to disambiguate the format string:\n\nExample:\n\n.. click:example::\n\n    import sys\n\n",
+        "line_start": 307,
+        "line_end": 325
+      },
+      {
+        "stable_chunk_id": "child-a1f9d7c7078da5792e858c6ee9887da6569e0d2a",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--shout/--no-shout', ' /-S', default=False)\n    def info(shout):\n        rv = sys.platform\n        if shout:\n            rv = rv.upper() + '!!!!111'\n        click.echo(rv)\n\n.. click:run::\n\n    invoke(info, args=['--help'])\n\nFeature Switches\n----------------\n\n",
+        "line_start": 326,
+        "line_end": 340
+      },
+      {
+        "stable_chunk_id": "child-183a7aa36f3ed7713e809dff45cd915e947eec4f",
+        "source_path": "docs/options.rst",
+        "display_text": "In addition to boolean flags, there are also feature switches.  These are\nimplemented by setting multiple options to the same parameter name and\ndefining a flag value.  Note that by providing the ``flag_value`` parameter,\nClick will implicitly set ``is_flag=True``.\n\nTo set a default flag, assign a value of `True` to the flag that should be\nthe default.\n\n.. click:example::\n\n    import sys\n\n",
+        "line_start": 341,
+        "line_end": 352
+      },
+      {
+        "stable_chunk_id": "child-2bcbbdfbf738592dc99f83af29f37fdfcd5fcf65",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--upper', 'transformation', flag_value='upper',\n                  default=True)\n    @click.option('--lower', 'transformation', flag_value='lower')\n    def info(transformation):\n        click.echo(getattr(sys.platform, transformation)())\n\nAnd on the command line:\n\n.. click:run::\n\n    invoke(info, args=['--upper'])\n    invoke(info, args=['--lower'])\n    invoke(info)\n\n.. _choice-opts:\n\nChoice Options\n--------------\n\n",
+        "line_start": 353,
+        "line_end": 372
+      },
+      {
+        "stable_chunk_id": "child-38ce5b30468014979ba0e60e8c442b69f678183b",
+        "source_path": "docs/options.rst",
+        "display_text": "Sometimes, you want to have a parameter be a choice of a list of values.\nIn that case you can use :class:`Choice` type.  It can be instantiated\nwith a list of valid values.  The originally passed choice will be returned,\nnot the str passed on the command line.  Token normalization functions and\n``case_sensitive=False`` can cause the two to be different but still match.\n\nExample:\n\n.. click:example::\n\n",
+        "line_start": 373,
+        "line_end": 382
+      },
+      {
+        "stable_chunk_id": "child-53e977605a81897d8955996911067c111c2b4698",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--hash-type',\n                  type=click.Choice(['MD5', 'SHA1'], case_sensitive=False))\n    def digest(hash_type):\n        click.echo(hash_type)\n\nWhat it looks like:\n\n.. click:run::\n\n    invoke(digest, args=['--hash-type=MD5'])\n    println()\n    invoke(digest, args=['--hash-type=md5'])\n    println()\n    invoke(digest, args=['--hash-type=foo'])\n    println()\n    invoke(digest, args=['--help'])\n\n",
+        "line_start": 383,
+        "line_end": 400
+      },
+      {
+        "stable_chunk_id": "child-31a0f0c11c4ee54a67b468aeded9c08cb15cf916",
+        "source_path": "docs/options.rst",
+        "display_text": "Only pass the choices as list or tuple. Other iterables (like\ngenerators) may lead to unexpected results.\n\nChoices work with options that have ``multiple=True``. If a ``default``\nvalue is given with ``multiple=True``, it should be a list or tuple of\nvalid choices.\n\nChoices should be unique after considering the effects of\n``case_sensitive`` and any specified token normalization function.\n\n",
+        "line_start": 401,
+        "line_end": 410
+      },
+      {
+        "stable_chunk_id": "child-bfc1fcac0573562c6351692fc8efbc3c3a3714bf",
+        "source_path": "docs/options.rst",
+        "display_text": ".. versionchanged:: 7.1\n    The resulting value from an option will always be one of the\n    originally passed choices regardless of ``case_sensitive``.\n\n.. _option-prompting:\n\nPrompting\n---------\n\nIn some cases, you want parameters that can be provided from the command line,\nbut if not provided, ask for user input instead.  This can be implemented with\nClick by defining a prompt string.\n\nExample:\n\n.. click:example::\n\n",
+        "line_start": 411,
+        "line_end": 427
+      },
+      {
+        "stable_chunk_id": "child-9a1692fbff529de5470690836fc48f085749bb6f",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--name', prompt=True)\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\nAnd what it looks like:\n\n.. click:run::\n\n    invoke(hello, args=['--name=John'])\n    invoke(hello, input=['John'])\n\nIf you are not happy with the default prompt string, you can ask for\na different one:\n\n.. click:example::\n\n    @click.command()\n    @click.option('--name', prompt='Your name please')\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\nWhat it looks like:\n\n.. click:run::\n\n",
+        "line_start": 428,
+        "line_end": 453
+      },
+      {
+        "stable_chunk_id": "child-18fc1d708dfc271976a66901d18afa1d15dcc138",
+        "source_path": "docs/options.rst",
+        "display_text": "    invoke(hello, input=['John'])\n\nIt is advised that prompt not be used in conjunction with the multiple\nflag set to True. Instead, prompt in the function interactively.\n\nBy default, the user will be prompted for an input if one was not passed\nthrough the command line. To turn this behavior off, see\n:ref:`optional-value`.\n\n\nPassword Prompts\n----------------\n\nClick also supports hidden prompts and asking for confirmation.  This is\nuseful for password input:\n\n.. click:example::\n\n    import codecs\n\n",
+        "line_start": 454,
+        "line_end": 473
+      },
+      {
+        "stable_chunk_id": "child-8887ffcb8b58b6e88344d7172fc11b7a2bbb5a85",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option(\n        \"--password\", prompt=True, hide_input=True,\n        confirmation_prompt=True\n    )\n    def encode(password):\n        click.echo(f\"encoded: {codecs.encode(password, 'rot13')}\")\n\n.. click:run::\n\n    invoke(encode, input=['secret', 'secret'])\n\nBecause this combination of parameters is quite common, this can also be\nreplaced with the :func:`password_option` decorator:\n\n.. code-block:: python\n\n",
+        "line_start": 474,
+        "line_end": 490
+      },
+      {
+        "stable_chunk_id": "child-07e257b990adfd2b35aaded9d90324ddcea94638",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.password_option()\n    def encrypt(password):\n        click.echo(f\"encoded: to {codecs.encode(password, 'rot13')}\")\n\n\nDynamic Defaults for Prompts\n----------------------------\n\nThe ``auto_envvar_prefix`` and ``default_map`` options for the context\nallow the program to read option values from the environment or a\nconfiguration file.  However, this overrides the prompting mechanism, so\nthat the user does not get the option to change the value interactively.\n\n",
+        "line_start": 491,
+        "line_end": 504
+      },
+      {
+        "stable_chunk_id": "child-56e8e8e610008cc0b0fe13647fbe4f6092e85ea9",
+        "source_path": "docs/options.rst",
+        "display_text": "If you want to let the user configure the default value, but still be\nprompted if the option isn't specified on the command line, you can do so\nby supplying a callable as the default value. For example, to get a default\nfrom the environment:\n\n.. code-block:: python\n\n    import os\n\n    @click.command()\n    @click.option(\n        \"--username\", prompt=True,\n        default=lambda: os.environ.get(\"USER\", \"\")\n    )\n    def hello(username):\n        click.echo(f\"Hello, {username}!\")\n\n",
+        "line_start": 505,
+        "line_end": 521
+      },
+      {
+        "stable_chunk_id": "child-bd0e9b0321a1c8d108129c1059bfc3644be26531",
+        "source_path": "docs/options.rst",
+        "display_text": "To describe what the default value will be, set it in ``show_default``.\n\n.. click:example::\n\n    import os\n\n    @click.command()\n    @click.option(\n        \"--username\", prompt=True,\n        default=lambda: os.environ.get(\"USER\", \"\"),\n        show_default=\"current user\"\n    )\n    def hello(username):\n        click.echo(f\"Hello, {username}!\")\n\n.. click:run::\n\n   invoke(hello, args=[\"--help\"])\n\n\nCallbacks and Eager Options\n---------------------------\n\n",
+        "line_start": 522,
+        "line_end": 544
+      },
+      {
+        "stable_chunk_id": "child-fb2fb4e57d700550153a6fcccafc2b76032981f7",
+        "source_path": "docs/options.rst",
+        "display_text": "Sometimes, you want a parameter to completely change the execution flow.\nFor instance, this is the case when you want to have a ``--version``\nparameter that prints out the version and then exits the application.\n\nNote: an actual implementation of a ``--version`` parameter that is\nreusable is available in Click as :func:`click.version_option`.  The code\nhere is merely an example of how to implement such a flag.\n\n",
+        "line_start": 545,
+        "line_end": 552
+      },
+      {
+        "stable_chunk_id": "child-4ce4a9dccdaa1ad4e18fd3196d419a39c163dba2",
+        "source_path": "docs/options.rst",
+        "display_text": "In such cases, you need two concepts: eager parameters and a callback.  An\neager parameter is a parameter that is handled before others, and a\ncallback is what executes after the parameter is handled.  The eagerness\nis necessary so that an earlier required parameter does not produce an\nerror message.  For instance, if ``--version`` was not eager and a\nparameter ``--foo`` was required and defined before, you would need to\nspecify it for ``--version`` to work.  For more information, see\n:ref:`callback-evaluation-order`.\n\n",
+        "line_start": 553,
+        "line_end": 561
+      },
+      {
+        "stable_chunk_id": "child-cbf7a6342220620fa1e4131bb7dde34759ea3ce5",
+        "source_path": "docs/options.rst",
+        "display_text": "A callback is a function that is invoked with three parameters: the\ncurrent :class:`Context`, the current :class:`Parameter`, and the value.\nThe context provides some useful features such as quitting the\napplication and gives access to other already processed parameters.\n\nHere an example for a ``--version`` flag:\n\n.. click:example::\n\n    def print_version(ctx, param, value):\n        if not value or ctx.resilient_parsing:\n            return\n        click.echo('Version 1.0')\n        ctx.exit()\n\n",
+        "line_start": 562,
+        "line_end": 576
+      },
+      {
+        "stable_chunk_id": "child-804fb4dcb57a4c4867d8549f8e39845b5c7a7e1c",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--version', is_flag=True, callback=print_version,\n                  expose_value=False, is_eager=True)\n    def hello():\n        click.echo('Hello World!')\n\n",
+        "line_start": 577,
+        "line_end": 582
+      },
+      {
+        "stable_chunk_id": "child-2132de47997201123a2d9b3e6af785aa4a33ad7a",
+        "source_path": "docs/options.rst",
+        "display_text": "The `expose_value` parameter prevents the pretty pointless ``version``\nparameter from being passed to the callback.  If that was not specified, a\nboolean would be passed to the `hello` script.  The `resilient_parsing`\nflag is applied to the context if Click wants to parse the command line\nwithout any destructive behavior that would change the execution flow.  In\nthis case, because we would exit the program, we instead do nothing.\n\nWhat it looks like:\n\n.. click:run::\n\n",
+        "line_start": 583,
+        "line_end": 593
+      },
+      {
+        "stable_chunk_id": "child-af754be67384ec68b06efe075abcc5ecd307d782",
+        "source_path": "docs/options.rst",
+        "display_text": "    invoke(hello)\n    invoke(hello, args=['--version'])\n\n.. admonition:: Callback Signature Changes\n\n    In Click 2.0 the signature for callbacks changed.  For more\n    information about these changes see :ref:`upgrade-to-2.0`.\n\nYes Parameters\n--------------\n\nFor dangerous operations, it's very useful to be able to ask a user for\nconfirmation.  This can be done by adding a boolean ``--yes`` flag and\nasking for confirmation if the user did not provide it and to fail in a\ncallback:\n\n.. click:example::\n\n",
+        "line_start": 594,
+        "line_end": 611
+      },
+      {
+        "stable_chunk_id": "child-b2c52ab946138d5f90087268e6b7ba7a256db523",
+        "source_path": "docs/options.rst",
+        "display_text": "    def abort_if_false(ctx, param, value):\n        if not value:\n            ctx.abort()\n\n    @click.command()\n    @click.option('--yes', is_flag=True, callback=abort_if_false,\n                  expose_value=False,\n                  prompt='Are you sure you want to drop the db?')\n    def dropdb():\n        click.echo('Dropped all tables!')\n\nAnd what it looks like on the command line:\n\n.. click:run::\n\n    invoke(dropdb, input=['n'])\n    invoke(dropdb, args=['--yes'])\n\n",
+        "line_start": 612,
+        "line_end": 629
+      },
+      {
+        "stable_chunk_id": "child-4ff7a685823158f3808dfb1156dacb302f3a4a64",
+        "source_path": "docs/options.rst",
+        "display_text": "Because this combination of parameters is quite common, this can also be\nreplaced with the :func:`confirmation_option` decorator:\n\n.. click:example::\n\n    @click.command()\n    @click.confirmation_option(prompt='Are you sure you want to drop the db?')\n    def dropdb():\n        click.echo('Dropped all tables!')\n\n.. admonition:: Callback Signature Changes\n\n    In Click 2.0 the signature for callbacks changed.  For more\n    information about these changes see :ref:`upgrade-to-2.0`.\n\n",
+        "line_start": 630,
+        "line_end": 644
+      },
+      {
+        "stable_chunk_id": "child-4546a8a507897ea0ac7cae6eece9ea153a74f89c",
+        "source_path": "docs/options.rst",
+        "display_text": "Values from Environment Variables\n---------------------------------\n\nA very useful feature of Click is the ability to accept parameters from\nenvironment variables in addition to regular parameters.  This allows\ntools to be automated much easier.  For instance, you might want to pass\na configuration file with a ``--config`` parameter but also support exporting\na ``TOOL_CONFIG=hello.cfg`` key-value pair for a nicer development\nexperience.\n\n",
+        "line_start": 645,
+        "line_end": 654
+      },
+      {
+        "stable_chunk_id": "child-4eb8e690040f6e4523f803f5ca9a7ab0810309fe",
+        "source_path": "docs/options.rst",
+        "display_text": "This is supported by Click in two ways.  One is to automatically build\nenvironment variables which is supported for options only.  To enable this\nfeature, the ``auto_envvar_prefix`` parameter needs to be passed to the\nscript that is invoked.  Each command and parameter is then added as an\nuppercase underscore-separated variable.  If you have a subcommand\ncalled ``run`` taking an option called ``reload`` and the prefix is\n``WEB``, then the variable is ``WEB_RUN_RELOAD``.\n\nExample usage:\n\n.. click:example::\n\n",
+        "line_start": 655,
+        "line_end": 666
+      },
+      {
+        "stable_chunk_id": "child-af46e1d82fa95ec7f23ba552bd76db8c90983693",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('--username')\n    def greet(username):\n        click.echo(f'Hello {username}!')\n\n    if __name__ == '__main__':\n        greet(auto_envvar_prefix='GREETER')\n\nAnd from the command line:\n\n.. click:run::\n\n    invoke(greet, env={'GREETER_USERNAME': 'john'},\n           auto_envvar_prefix='GREETER')\n\n",
+        "line_start": 667,
+        "line_end": 681
+      },
+      {
+        "stable_chunk_id": "child-93329f8cc0f91271dad872b28b814e701b0bd2fd",
+        "source_path": "docs/options.rst",
+        "display_text": "When using ``auto_envvar_prefix`` with command groups, the command name\nneeds to be included in the environment variable, between the prefix and\nthe parameter name, *i.e.* ``PREFIX_COMMAND_VARIABLE``. If you have a\nsubcommand called ``run-server`` taking an option called ``host`` and\nthe prefix is ``WEB``, then the variable is ``WEB_RUN_SERVER_HOST``.\n\nExample:\n\n.. click:example::\n\n   @click.group()\n   @click.option('--debug/--no-debug')\n   def cli(debug):\n       click.echo(f\"Debug mode is {'on' if debug else 'off'}\")\n\n",
+        "line_start": 682,
+        "line_end": 696
+      },
+      {
+        "stable_chunk_id": "child-eab06025989213bde731acd4a06db2e36fff2b3c",
+        "source_path": "docs/options.rst",
+        "display_text": "   @cli.command()\n   @click.option('--username')\n   def greet(username):\n       click.echo(f\"Hello {username}!\")\n\n   if __name__ == '__main__':\n       cli(auto_envvar_prefix='GREETER')\n\n.. click:run::\n\n   invoke(cli, args=['greet',],\n          env={'GREETER_GREET_USERNAME': 'John', 'GREETER_DEBUG': 'false'},\n          auto_envvar_prefix='GREETER')\n\n\nThe second option is to manually pull values in from specific environment\nvariables by defining the name of the environment variable on the option.\n\nExample usage:\n\n",
+        "line_start": 697,
+        "line_end": 716
+      },
+      {
+        "stable_chunk_id": "child-8587e3ee0bf97a2ad7629854fe75a094d4ea1d8d",
+        "source_path": "docs/options.rst",
+        "display_text": ".. click:example::\n\n    @click.command()\n    @click.option('--username', envvar='USERNAME')\n    def greet(username):\n       click.echo(f\"Hello {username}!\")\n\n    if __name__ == '__main__':\n        greet()\n\nAnd from the command line:\n\n.. click:run::\n\n    invoke(greet, env={'USERNAME': 'john'})\n\nIn that case it can also be a list of different environment variables\nwhere the first one is picked.\n\nMultiple Values from Environment Values\n---------------------------------------\n\n",
+        "line_start": 717,
+        "line_end": 738
+      },
+      {
+        "stable_chunk_id": "child-2ad2992695965ab1759b3fa0fe32a6d406f1b3aa",
+        "source_path": "docs/options.rst",
+        "display_text": "As options can accept multiple values, pulling in such values from\nenvironment variables (which are strings) is a bit more complex.  The way\nClick solves this is by leaving it up to the type to customize this\nbehavior.  For both ``multiple`` and ``nargs`` with values other than\n``1``, Click will invoke the :meth:`ParamType.split_envvar_value` method to\nperform the splitting.\n\n",
+        "line_start": 739,
+        "line_end": 745
+      },
+      {
+        "stable_chunk_id": "child-80b1106b5afb5834af1d92c9a0fbba1cd7db9edc",
+        "source_path": "docs/options.rst",
+        "display_text": "The default implementation for all types is to split on whitespace.  The\nexceptions to this rule are the :class:`File` and :class:`Path` types\nwhich both split according to the operating system's path splitting rules.\nOn Unix systems like Linux and OS X, the splitting happens for those on\nevery colon (``:``), and for Windows, on every semicolon (``;``).\n\nExample usage:\n\n.. click:example::\n\n",
+        "line_start": 746,
+        "line_end": 755
+      },
+      {
+        "stable_chunk_id": "child-9065e83b45f16de68eafe36a46d151a4ac4ba5bc",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option('paths', '--path', envvar='PATHS', multiple=True,\n                  type=click.Path())\n    def perform(paths):\n        for path in paths:\n            click.echo(path)\n\n    if __name__ == '__main__':\n        perform()\n\nAnd from the command line:\n\n.. click:run::\n\n    import os\n    invoke(perform, env={\"PATHS\": f\"./foo/bar{os.path.pathsep}./test\"})\n\nOther Prefix Characters\n-----------------------\n\n",
+        "line_start": 756,
+        "line_end": 775
+      },
+      {
+        "stable_chunk_id": "child-30101fbc6f0cd09f237de9986e4f27dd83a77342",
+        "source_path": "docs/options.rst",
+        "display_text": "Click can deal with alternative prefix characters other than ``-`` for\noptions.  This is for instance useful if you want to handle slashes as\nparameters ``/`` or something similar.  Note that this is strongly\ndiscouraged in general because Click wants developers to stay close to\nPOSIX semantics.  However in certain situations this can be useful:\n\n.. click:example::\n\n    @click.command()\n    @click.option('+w/-w')\n    def chmod(w):\n        click.echo(f\"writable={w}\")\n\n    if __name__ == '__main__':\n        chmod()\n\n",
+        "line_start": 776,
+        "line_end": 791
+      },
+      {
+        "stable_chunk_id": "child-049e2b681f14097b500b7ca73f098a293215245a",
+        "source_path": "docs/options.rst",
+        "display_text": "And from the command line:\n\n.. click:run::\n\n    invoke(chmod, args=['+w'])\n    invoke(chmod, args=['-w'])\n\nNote that if you are using ``/`` as prefix character and you want to use a\nboolean flag you need to separate it with ``;`` instead of ``/``:\n\n.. click:example::\n\n    @click.command()\n    @click.option('/debug;/no-debug')\n    def log(debug):\n        click.echo(f\"debug={debug}\")\n\n    if __name__ == '__main__':\n        log()\n\n.. _ranges:\n\nRange Options\n-------------\n\n",
+        "line_start": 792,
+        "line_end": 816
+      },
+      {
+        "stable_chunk_id": "child-33c41f3e5663dc2f2c34033a2a9017b079a34cb8",
+        "source_path": "docs/options.rst",
+        "display_text": "The :class:`IntRange` type extends the :data:`INT` type to ensure the\nvalue is contained in the given range. The :class:`FloatRange` type does\nthe same for :data:`FLOAT`.\n\nIf ``min`` or ``max`` is omitted, that side is *unbounded*. Any value in\nthat direction is accepted. By default, both bounds are *closed*, which\nmeans the boundary value is included in the accepted range. ``min_open``\nand ``max_open`` can be used to exclude that boundary from the range.\n\n",
+        "line_start": 817,
+        "line_end": 825
+      },
+      {
+        "stable_chunk_id": "child-cd6d739d1f934071ae9f00fc37505b62c4e958d0",
+        "source_path": "docs/options.rst",
+        "display_text": "If ``clamp`` mode is enabled, a value that is outside the range is set\nto the boundary instead of failing. For example, the range ``0, 5``\nwould return ``5`` for the value ``10``, or ``0`` for the value ``-1``.\nWhen using :class:`FloatRange`, ``clamp`` can only be enabled if both\nbounds are *closed* (the default).\n\n.. click:example::\n\n",
+        "line_start": 826,
+        "line_end": 833
+      },
+      {
+        "stable_chunk_id": "child-149f27ed2928ccb425e0457caeba0b189ae08646",
+        "source_path": "docs/options.rst",
+        "display_text": "    @click.command()\n    @click.option(\"--count\", type=click.IntRange(0, 20, clamp=True))\n    @click.option(\"--digit\", type=click.IntRange(0, 9))\n    def repeat(count, digit):\n        click.echo(str(digit) * count)\n\n.. click:run::\n\n    invoke(repeat, args=['--count=100', '--digit=5'])\n    invoke(repeat, args=['--count=6', '--digit=12'])\n\n\nCallbacks for Validation\n------------------------\n\n.. versionchanged:: 2.0\n\n",
+        "line_start": 834,
+        "line_end": 850
+      },
+      {
+        "stable_chunk_id": "child-f51dc0f32c7a78c09af56ea2ba072b5a26aa4a2f",
+        "source_path": "docs/options.rst",
+        "display_text": "If you want to apply custom validation logic, you can do this in the\nparameter callbacks. These callbacks can both modify values as well as\nraise errors if the validation does not work. The callback runs after\ntype conversion. It is called for all sources, including prompts.\n\n",
+        "line_start": 851,
+        "line_end": 855
+      },
+      {
+        "stable_chunk_id": "child-9e1bdc9dbba425e5ea5ebe21df4abe9c50d51c56",
+        "source_path": "docs/options.rst",
+        "display_text": "In Click 1.0, you can only raise the :exc:`UsageError` but starting with\nClick 2.0, you can also raise the :exc:`BadParameter` error, which has the\nadded advantage that it will automatically format the error message to\nalso contain the parameter name.\n\n.. click:example::\n\n    def validate_rolls(ctx, param, value):\n        if isinstance(value, tuple):\n            return value\n\n",
+        "line_start": 856,
+        "line_end": 866
+      },
+      {
+        "stable_chunk_id": "child-858703cd063ba70c668e5a5c6f588341b5cfe2c5",
+        "source_path": "docs/options.rst",
+        "display_text": "        try:\n            rolls, _, dice = value.partition(\"d\")\n            return int(dice), int(rolls)\n        except ValueError:\n            raise click.BadParameter(\"format must be 'NdM'\")\n\n    @click.command()\n    @click.option(\n        \"--rolls\", type=click.UNPROCESSED, callback=validate_rolls,\n        default=\"1d6\", prompt=True,\n    )\n    def roll(rolls):\n        sides, times = rolls\n        click.echo(f\"Rolling a {sides}-sided dice {times} time(s)\")\n\n.. click:run::\n\n",
+        "line_start": 867,
+        "line_end": 883
+      },
+      {
+        "stable_chunk_id": "child-fdaa9f363cb486f71c51ec5c2d4f3ee85a7a8766",
+        "source_path": "docs/options.rst",
+        "display_text": "    invoke(roll, args=[\"--rolls=42\"])\n    println()\n    invoke(roll, args=[\"--rolls=2d12\"])\n    println()\n    invoke(roll, input=[\"42\", \"2d12\"])\n\n\n.. _optional-value:\n\nOptional Value\n--------------\n\nProviding the value to an option can be made optional, in which case\nproviding only the option's flag without a value will either show a\nprompt or use its ``flag_value``.\n\n",
+        "line_start": 884,
+        "line_end": 899
+      },
+      {
+        "stable_chunk_id": "child-40c6a2b75cc295da05e45d348673e614cc89ae94",
+        "source_path": "docs/options.rst",
+        "display_text": "Setting ``is_flag=False, flag_value=value`` tells Click that the option\ncan still be passed a value, but if only the flag is given the\n``flag_value`` is used.\n\n.. click:example::\n\n    @click.command()\n    @click.option(\"--name\", is_flag=False, flag_value=\"Flag\", default=\"Default\")\n    def hello(name):\n        click.echo(f\"Hello, {name}!\")\n\n.. click:run::\n\n    invoke(hello, args=[])\n    invoke(hello, args=[\"--name\", \"Value\"])\n    invoke(hello, args=[\"--name\"])\n\n",
+        "line_start": 900,
+        "line_end": 916
+      },
+      {
+        "stable_chunk_id": "child-544f864883e6479c525da32292cfc7a3039d9437",
+        "source_path": "docs/options.rst",
+        "display_text": "If the option has ``prompt`` enabled, then setting\n``prompt_required=False`` tells Click to only show the prompt if the\noption's flag is given, instead of if the option is not provided at all.\n\n.. click:example::\n\n    @click.command()\n    @click.option('--name', prompt=True, prompt_required=False, default=\"Default\")\n    def hello(name):\n        click.echo(f\"Hello {name}!\")\n\n.. click:run::\n\n    invoke(hello)\n    invoke(hello, args=[\"--name\", \"Value\"])\n    invoke(hello, args=[\"--name\"], input=\"Prompt\")\n\n",
+        "line_start": 917,
+        "line_end": 933
+      },
+      {
+        "stable_chunk_id": "child-fd0f689849ad093f664112f54d9acaf656512344",
+        "source_path": "docs/options.rst",
+        "display_text": "If ``required=True``, then the option will still prompt if it is not\ngiven, but it will also prompt if only the flag is given.\n",
+        "line_start": 934,
+        "line_end": 935
+      }
+    ],
+    "sqlite_version": "3.45.1",
+    "schema_sha256": "c764075e56206bb671927443448993393c4d22050ee012146d68c37f05086571",
+    "config_sha256": "bb4e630e951051818367e1996c0acf459ea4b07e9d57d26d20a13f24c24c5944",
+    "storage_path": "/tmp/docatlas-removal-secure-xs_64g44/docatlas-evidence-m74dmz7y/docatlas_home/mcp-members/members.db",
+    "generation_id": "gen-5b78418ab73c4347ac27fc175e128846",
+    "catalog_sha256": "6f2a867d0bf5a3f567cbcf1b2f43432ee97533a40eeb91fe0aedf9567d932ef3",
+    "documents": [
+      {
+        "path": "docs/options.rst",
+        "content_sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+        "catalog_entry_hash": "sha256:ce3b9c5a61ee09eb16a993b21a3fc68c42ef471599408838350d764f42eec4bd"
+      }
+    ],
+    "transaction_metrics": {
+      "transaction": "committed",
+      "generation_id": "gen-5b78418ab73c4347ac27fc175e128846",
+      "members": 1,
+      "new_count": 1,
+      "changed_count": 0,
+      "unchanged_files": 0,
+      "derived_writes": 1,
+      "derived_deletes": 0,
+      "sources_deleted": 0,
+      "sections_indexed": 1
+    }
+  },
+  "snapshot_sources": [
+    {
+      "path": "docs/options.rst",
+      "content_sha256": "6ef07a7fd827f7918533855a78d4d83ea0c46e25f9487e25bc55c2071ef91747",
+      "matches_pinned_source": true
+    }
+  ],
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "click"
+}

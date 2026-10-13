@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-E08",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-eslint",
+  "public_request": {
+    "question": "What production uptime SLA does ESLint guarantee for local linting?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/0-eslint/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "84f11810605bbe879fc16bee27eec502dc89ec1b6d8ec29d94c508f41f9d10a1",
+  "utf8_bytes": 1670,
+  "tokens": 511,
+  "seconds": 0.3602840389994526,
+  "cpu_seconds": 0.3574478989999932,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

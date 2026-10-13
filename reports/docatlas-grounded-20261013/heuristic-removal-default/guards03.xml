@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="1.555" timestamp="2026-10-13T14:20:04.872317+03:00" hostname="ViPC"><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only" time="0.704"><properties><property name="trace_off_on_off_public_context_calls" value="[1, 1, 1]" /></properties><failure message="ValueError: 'docs/issue.md' is not in the subpath of '/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-1/test_public_removal_lifecycle_0/project'">tmp_path = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-1/test_public_removal_lifecycle_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7984231a7230&gt;
+state_root = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-1/test_public_removal_lifecycle_0/member-state')
+record_property = &lt;function record_property.&lt;locals&gt;.append_property at 0x7984231b9e40&gt;
+
+    def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
+        tmp_path, monkeypatch, state_root, record_property,
+    ):
+        """2 prepare/sync, 7 contexts (off/on/off, partial, stale, fresh, invalid grant), &lt;=2 resources."""
+        root = (tmp_path / "project").resolve()
+        runtime.write_project(root, OPTICS_DOCUMENTS)
+        with runtime.isolated_service(state_root) as (service, config), monkeypatch.context() as env:
+            env.delenv("DOCATLAS_EXPERIMENT_HEURISTIC_REMOVAL", raising=False)
+            env.delenv("DOCATLAS_EXPERIMENT_CONTEXT_MAX_TOKENS", raising=False)
+            inventory = runtime.index_project(service, config, root)
+            snapshots(inventory, root, OPTICS_DOCUMENTS)
+            before, initial_files = database(inventory["storage_path"]), files(root)
+            packets = []
+            for trace in (False, True, False):
+                with query_trace(trace):
+                    payload = context(service, root, OPTICS_QUESTION)
+                assert not integrity(payload, root, OPTICS_DOCUMENTS)["errors"]
+                facts(payload, root, OPTICS_FACTS)
+                packed = pack(payload, tiktoken.get_encoding("o200k_base"), 12000)
+                facts(packed, root, OPTICS_FACTS)
+                assert packed["tokens"] &lt;= 12000
+                packets.append(payload)
+            assert stable_packet(packets[0]) == stable_packet(packets[1]) == stable_packet(packets[2])
+            record_property("trace_off_on_off_public_context_calls", [1, 1, 1])
+            old_row = next(row for row in packets[0]["sources"]
+                           if relative_path(row["path_or_url"], root) == "docs/issue.md")
+&gt;           read_source(service, old_row, root, OPTICS_DOCUMENTS)
+
+tests/test_heuristic_removal_public_integration.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_heuristic_removal_public_integration.py:48: in read_source
+    relative = Path(payload["path"]).relative_to(root).as_posix()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('docs/issue.md')
+other = PosixPath('/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-1/test_public_removal_lifecycle_0/project')
+walk_up = False, _deprecated = ()
+
+    def relative_to(self, other, /, *_deprecated, walk_up=False):
+        """Return the relative path to another path identified by the passed
+        arguments.  If the operation is not possible (because this is not
+        related to the other path), raise ValueError.
+    
+        The *walk_up* parameter controls whether `..` may be used to resolve
+        the path.
+        """
+        if _deprecated:
+            msg = ("support for supplying more than one positional argument "
+                   "to pathlib.PurePath.relative_to() is deprecated and "
+                   "scheduled for removal in Python {remove}")
+            warnings._deprecated("pathlib.PurePath.relative_to(*args)", msg,
+                                 remove=(3, 14))
+        other = self.with_segments(other, *_deprecated)
+        for step, path in enumerate([other] + list(other.parents)):
+            if self.is_relative_to(path):
+                break
+            elif not walk_up:
+&gt;               raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E               ValueError: 'docs/issue.md' is not in the subpath of '/tmp/docatlas-default-HXV8YAxA/pytest-of-viadmin/pytest-1/test_public_removal_lifecycle_0/project'
+
+/usr/lib/python3.12/pathlib.py:682: ValueError</failure></testcase><testcase classname="tests.test_heuristic_removal_public_integration" name="test_public_removal_explicit_scope_version_and_foreign_locator" time="0.456" /></testsuite></testsuites>

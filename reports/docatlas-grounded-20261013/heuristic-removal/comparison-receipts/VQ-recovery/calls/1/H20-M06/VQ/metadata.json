@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M06",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "Which SQL database engine is the default storage backend for MkDocs' search index?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "83270d4930531cb1c303dcf1cd7326c574134847f449c97d338697dfcc2ca212",
+  "utf8_bytes": 2825,
+  "tokens": 897,
+  "seconds": 1.0445468449997861,
+  "cpu_seconds": 1.0419801090000078,
+  "peak_rss_kib": 205488,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

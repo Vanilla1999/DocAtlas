@@ -1,0 +1,22 @@
+{
+  "case_id": "NEW09",
+  "variant": "V0",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal_holdout",
+  "family": "2-click",
+  "public_request": {
+    "question": "For Click 8.1.8, how does --shout/--no-shout create a boolean flag, and what exact maximum option-name byte length does this options guide guarantee?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/V0/2-click/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "fe6893a94e7c2db76d71477e4b52106c4de213f15917358a17e778d5d1affbb5",
+  "utf8_bytes": 29081,
+  "tokens": 7863,
+  "seconds": 0.7447100010012946,
+  "cpu_seconds": 0.7434226250000222,
+  "peak_rss_kib": 209392,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

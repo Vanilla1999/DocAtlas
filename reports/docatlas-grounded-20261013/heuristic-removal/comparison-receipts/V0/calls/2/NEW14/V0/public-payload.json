@@ -1,0 +1,46 @@
+{
+  "status": "truncated",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-de2c402f6ce2b9df",
+      "path_or_url": "docs/config.rst",
+      "section": "Document",
+      "snippet": "Each line specifies a command name (in glob-style pattern format) which can be used in the commands section even if\n   it's located outside of the tox environment. For example: if you use the unix *rm* command for running tests you can\n   list ``allowlist_externals=rm`` or ``allowlist_externals=/usr/bin/rm``. If you want to allow all external\n   commands you can use ``allowlist_externals=*`` which will match all commands (not recommended).\n\n.. conf::\n   :keys: labels\n   :default: <empty list>\n   :ref_suffix: env",
+      "version_binding": "unversioned",
+      "content_sha256": "0781572c26878d5440142bd99f71e88ea6e81d514af128695f9fd4e5bdceb157",
+      "project_identity": "local:58d80ffa326c88d5febb2bfa0c7dca72b78a3e53d1d6c544d70de89f4ec9424c",
+      "authority": "source_of_truth",
+      "scope": "project",
+      "line_start": 586,
+      "line_end": 594
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified",
+      "budget_limited"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 385
+}

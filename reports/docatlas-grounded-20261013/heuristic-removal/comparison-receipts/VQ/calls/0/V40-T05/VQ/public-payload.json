@@ -1,0 +1,126 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "partial",
+  "retrieval_coverage": "partial",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [],
+  "missing_query_ids": [
+    "query-original"
+  ],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-93345206d55baf82",
+      "path_or_url": "docs/guide/workers.md",
+      "section": "Workers > Workers",
+      "snippet": "## Workers\n\nBefore we go into detail, let's see an example that demonstrates a common pitfall for apps that make network requests.\n\nThe following app uses [httpx](https://www.python-httpx.org/) to get the current weather for any given city, by making a request to [wttr.in](https://wttr.in/).\n\n=== \"weather01.py\"\n\n    ```python title=\"weather01.py\"\n    --8<-- \"docs/examples/guide/workers/weather01.py\"\n    ```\n\n=== \"weather.tcss\"\n\n    ```css title=\"weather.tcss\"\n    --8<-- \"docs/examples/guide/workers/weather.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/workers/weather01.py\"}\n    ```\n\nIf you were to run this app, you should see weather information update as you type.\nBut you may find that the input is not as responsive as usual, with a noticeable delay between pressing a key and seeing it echoed in screen.\nThis is because we are making a request to the weather API within a message handler, and the app will not be able to process other messages until the request has completed (which may be anything from a few hundred milliseconds to several seconds later).\n\nTo resolve this we can use the [run_worker][textual.dom.DOMNode.run_worker] method which runs the `update_weather` coroutine (`async def` function) in the background. Here's the code:\n\n```python title=\"weather02.py\" hl_lines=\"21\"\n--8<-- \"docs/examples/guide/workers/weather02.py\"\n```\n\nThis one line change will make typing as responsive as you would expect from any app.\n\nThe `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later.\n\n!!! tip\n\n    The [Worker][textual.worker.Worker] object has a few useful methods on it, but you can often ignore it as we did in `weather02.py`.\n\nThe call to `run_worker` also sets `exclusive=True` which solves an additional problem with concurrent network requests: when pulling data from the network, there is no guarantee that you will receive the responses in the same order as the requests.\nFor instance, if you start typing \"Paris\", you may get the response for \"Pari\" *after* the response for \"Paris\", which could show the wrong weather information.\nThe `exclusive` flag tells Textual to cancel all previous workers before starting the new one.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ef84fb88f43d2330852c12dd0f91db379b50d4711e3a8094603478cc6b761f91",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 20,
+      "line_end": 64,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/ef1a4116c31e054b2e8c86ce"
+    },
+    {
+      "evidence_id": "ev-3d45b126271bccc9",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Recompose",
+      "snippet": "    ```{.textual path=\"docs/examples/guide/reactivity/recompose02.py\" }\n    ```\n\nIn this version, the app is recomposed when the `time` attribute changes, which replaces the `Digits` widget with a new instance and updated time.\nThere's no need for the `watch_time` method, because the new `Digits` instance will already show the current time.\n\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e91378774bd4af9db4dfcb2e5583d6549bfb99563131497b1a1ef87758d08a9b",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 301,
+      "line_end": 307,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/2eacea907073cfffab5bf24b"
+    },
+    {
+      "evidence_id": "ev-8ec088161ee50e63",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Recompose",
+      "snippet": "## Recompose\n\nAn alternative to a refresh is *recompose*.\nIf you set `recompose=True` on a reactive, then Textual will remove all the child widgets and call [`compose()`][textual.widget.Widget.compose] again, when the reactive attribute changes.\nThe process of removing and mounting new widgets occurs in a single update, so it will appear as though the content has simply updated.\n\nThe following example uses recompose:\n\n=== \"refresh03.py\"\n\n    ```python hl_lines=\"10 12-13\"\n    --8<-- \"docs/examples/guide/reactivity/refresh03.py\"\n    ```\n\n    1. Setting `recompose=True` will cause all child widgets to be removed and `compose` called again to add new widgets.\n    2. This `compose()` method will be called when `who` is changed.\n\n=== \"refresh03.tcss\"\n\n    ```css\n    --8<-- \"docs/examples/guide/reactivity/refresh03.tcss\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/refresh03.py\" press=\"P,a,u,l\"}\n    ```\n\nWhile the end-result is identical to `refresh02.py`, this code works quite differently.\nThe main difference is that recomposing creates an entirely new set of child widgets rather than updating existing widgets.\nSo when the `who` attribute changes, the `Name` widget will replace its `Label` with a new instance (containing updated content).\n\n!!! warning \n\n    You should avoid storing a reference to child widgets when using recompose.\n    Better to [query](../guide/queries.md) for a child widget when you need them.\n\nIt is important to note that any child widgets will have their state reset after a recompose.\nFor simple content, that doesn't matter much.\nBut widgets with an internal state (such as [`DataTable`](../widgets/data_table.md), [`Input`](../widgets/input.md), or [`TextArea`](../widgets/text_area.md)) would not be particularly useful if recomposed.\n\nRecomposing is slightly less efficient than a simple refresh, and best avoided if you need to update rapidly or you have many child widgets.\nThat said, it can often simplify your code.\nLet's look at a practical example.\nFirst a version *without* recompose:\n\n=== \"recompose01.py\"\n\n    ```python hl_lines=\"20 26-27\"\n    --8<-- \"docs/examples/guide/reactivity/recompose01.py\"\n    ```\n\n    1. Called when the `time` attribute changes.\n    2. Update the time once a second.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/recompose01.py\" }\n    ```\n\nThis displays a clock which updates once a second.\nThe code is straightforward, but note how we format the time in two places: `compose()` *and* `watch_time()`.\nWe can simplify this by recomposing rather than refreshing:\n\n=== \"recompose02.py\"\n\n    ```python hl_lines=\"15\"\n    --8<-- \"docs/examples/guide/reactivity/recompose02.py\"\n    ```\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/recompose02.py\" }\n    ```\n\nIn this version, the app is recomposed when the `time` attribute changes, which replaces the `Digits` widget with a new instance and updated time.\nThere's no need for the `watch_time` method, because the new `Digits` instance will already show the current time.\n\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e051c65321d6ce38092511a67b42167e4df245dda28ddf85b4408679a24ff970",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 229,
+      "line_end": 307,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/71bede8db2e1068672c64321"
+    },
+    {
+      "evidence_id": "ev-0567ae7435e5ff9d",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Mutable reactives",
+      "snippet": "## Mutable reactives\n\nTextual can detect when you set a reactive to a new value, but it can't detect when you _mutate_ a value.\nIn practice, this means that Textual can detect changes to basic types (int, float, str, etc.), but not if you update a collection, such as a list or dict. \n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "b218fb8a91d7d79569f9827767006145364dac87195748421e5f610b0d384448",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 386,
+      "line_end": 390,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/52053f94204964389b4623ff"
+    },
+    {
+      "evidence_id": "ev-2db29c8cee36f67f",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Mutable reactives",
+      "snippet": "## Mutable reactives\n\nTextual can detect when you set a reactive to a new value, but it can't detect when you _mutate_ a value.\nIn practice, this means that Textual can detect changes to basic types (int, float, str, etc.), but not if you update a collection, such as a list or dict. \n\nYou can still use collections and other mutable objects in reactives, but you will need to call [`mutate_reactive`][textual.dom.DOMNode.mutate_reactive] after making changes for the reactive superpowers to work.\n\nHere's an example, that uses a reactive list:\n\n=== \"set_reactive03.py\"\n\n    ```python hl_lines=\"16\"\n    --8<-- \"docs/examples/guide/reactivity/set_reactive03.py\"\n    ```\n\n    1. Creates a reactive list of strings.\n    2. Explicitly mutate the reactive list.\n\n=== \"Output\"\n\n    ```{.textual path=\"docs/examples/guide/reactivity/set_reactive03.py\" press=\"W,i,l,l,enter\"}\n    ```\n\nNote the call to `mutate_reactive`. Without it, the display would not update when a new name is appended to the list.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "9d354589227b36f79c49dab4578f126a25637633a04cb982932fc48332ba6e3c",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 386,
+      "line_end": 410,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/35591079e802b66db5721f55"
+    },
+    {
+      "evidence_id": "ev-b8c74448d82cec63",
+      "path_or_url": "docs/guide/reactivity.md",
+      "section": "Reactivity > Smart refresh",
+      "snippet": "    If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "5a4e76873b360d0ecb7d66647ec8de72454c9d6f16dbf1221908bf76ab79483f",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "line_start": 72,
+      "line_end": 73,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/77bf91f11f872c664f7a7348"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [
+    {
+      "source_uri": "docatlas://source/25137e8f944cb18748286bb3",
+      "path": "docs/guide/reactivity.md",
+      "project_identity": "local:5ccd7edb86d574c2e80cf0a7f55acda3b68b2ff61dfcc109219d8bdbee88d71f",
+      "snapshot_sha256": "sha256:16fee25c2b563bbcc5cae651d372b8b275e5a0929b57d8bb1217530e59716097",
+      "line_start": 74,
+      "line_end": 111,
+      "reason": "inspect_source_context"
+    }
+  ],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 2821
+}

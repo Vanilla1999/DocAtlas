@@ -1,0 +1,22 @@
+{
+  "case_id": "V40-B02",
+  "variant": "VA",
+  "dataset": "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/prepared_model_comparison40",
+  "family": "0-black",
+  "public_request": {
+    "question": "How does Black determine target Python versions when --target-version is not set?",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VA/0-black/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "c5ed4e34be6e4985bbbdfa9509f3f2b9d8f6db248a1f1d2ac074fc7c71ed093b",
+  "utf8_bytes": 33596,
+  "tokens": 10168,
+  "seconds": 29.532329781000954,
+  "cpu_seconds": 29.497119389000005,
+  "peak_rss_kib": 210320,
+  "database_unchanged": true,
+  "files_unchanged": true
+}

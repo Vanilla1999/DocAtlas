@@ -14,6 +14,11 @@ from docmancer.docs.domain.project_answer_contract import LifecycleIntent
 CoverageKind = Literal["direct", "derived"]
 
 
+def source_only_admission_active() -> bool:
+    """Compatibility predicate for the unconditional source-only admission policy."""
+    return True
+
+
 
 
 def _clean_relation_line(value: str) -> str:
@@ -274,6 +279,27 @@ def qualify_evidence(
         result["admission_only"] = True
     if reference_reason is not None:
         return _rejected(result, reference_reason)
+    if (source_only_admission_active() and expected_origin in {"original", "host_lookup"}
+        and isinstance((candidate or {}).get("_reference_root_plan"), Mapping)):
+        # Canonical source/locator checks above do not establish query relevance.
+        # Admission separately requires the live original-discovery receipt and
+        # raw window. Never promote source validity into lexical query credit.
+        for key in (
+            "matched_terms", "body_matched_terms", "heading_context_used",
+            "table_context_used", "missing_exact_terms", "missing_parent_exact_terms",
+            "missing_bound_subjects", "matched_term_count", "match_ratio",
+            "covered_query_ids", "coverage_kind", "literal_context_admission",
+            "query_terms", "exact_terms", "parent_exact_terms", "bound_subjects",
+            "retrieval_anchors",
+        ):
+            result.pop(key, None)
+        result.update(
+            qualified=False, qualification_reason="source_valid_relevance_unassessed",
+            relevance_unassessed=True, context_only=True, coverage_credit=False,
+            admission_only=True,
+            admission_contract="source_only_heuristic_removal_v1",
+        )
+        return EvidenceQualification(False, (), None, "source_valid_relevance_unassessed", result)
     lines = body.splitlines()
     substantive_lines = []
     heading_lines = []
@@ -507,4 +533,5 @@ __all__ = [
     "evidence_policy_rejection_reason",
     "qualify_evidence",
     "qualify_visible_trace",
+    "source_only_admission_active",
 ]

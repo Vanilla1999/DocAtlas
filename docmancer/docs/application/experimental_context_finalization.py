@@ -27,6 +27,114 @@ from .projection_tokenizer import projection_token_count
 _SEED_KEY = "_experimental_native_context"
 
 
+def _mark_unassessed(payload: dict) -> None:
+    """Admission/source validity is never semantic sufficiency or query credit."""
+    payload.update(context_unassessed=True, admission_contract="source_only_heuristic_removal_v1")
+    if payload.get("sources"):
+        payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
+    _refresh_estimate(payload)
+
+
+def project_native_rank_context(*, retrieval: dict, max_tokens: int | None = None,
+                                selection_diagnostics: dict | None = None,
+                                _allow_context_hints: bool = False) -> tuple[dict, dict]:
+    """Render checked whole acquired windows; no semantic ranking or variants.
+
+    The coordinator dispatches here only on S/ALL before the legacy core. The
+    ordinary recheck and terminal JSON budget still run after decoration.
+    """
+    from .experimental_candidate_selection import native_rank_selection_active
+    from .model_visible_projection import (
+        _docs_source, _snapshot_entry, _explicit_delivery_block,
+        _request_input_limit_failures, _requires_exact_snapshot, project_insufficient,
+    )
+    from .context_query_probes import authoritative_queries
+    from .docs_context_projection import _requalify_visible_source
+    from docmancer.docs.domain.lifecycle_policy import lifecycle_intent
+    from docmancer.docs.domain.literal_context_admission import recheck_source_valid_candidate
+
+    if not native_rank_selection_active() or experimental_context_max_tokens() is None:
+        return project_insufficient(
+            kind="docs_context", missing=["live_source_read_required"],
+            recommended_next_action=None, max_tokens=max_tokens,
+        ), {}
+    blocked = _explicit_delivery_block(retrieval, kind="docs_context", max_tokens=max_tokens)
+    if blocked is not None:
+        return blocked, {}
+    plan = dict(retrieval.get("documentation_query_plan") or {})
+    question = str(plan.get("original_question") or retrieval.get("question") or "")
+    failures = _request_input_limit_failures(question, retrieval)
+    if failures:
+        payload = project_insufficient(kind="docs_context", missing=failures,
+                                       recommended_next_action=None, max_tokens=max_tokens)
+        payload["reason_code"] = "request_input_limit_exceeded"
+        _refresh_estimate(payload)
+        return payload, {}
+    queries = authoritative_queries(plan)
+    plan.update(queries=list(queries.values()), query_ids=list(queries),
+                public_query_ids=list(queries), _component_contract=[],
+                component_scope_complete=False, assigned_requirement_ids=[],
+                broad_context_only=True)
+    texts = {key: str(value.get("text") or "") for key, value in queries.items()}
+    expected = retrieval.get("project_identity")
+    requirements = retrieval.get("requirements") or {}
+    intent = (requirements.get("lifecycle_intent") if isinstance(requirements, dict) else None) or lifecycle_intent(question)
+    rows, snapshot, seen = [], {}, set()
+    for candidate in retrieval.get("context_pack") or ():
+        if not isinstance(candidate, dict) or candidate.get("source_class") != "project_doc":
+            continue
+        if _requires_exact_snapshot(retrieval) and candidate.get("docs_snapshot_exact") is not True:
+            continue
+        original = {**candidate, "_expected_project_identity": expected,
+                    "_lifecycle_intent": intent, "_independent_query_plan": plan}
+        body = original.get("content") or original.get("display_text") or ""
+        if not isinstance(body, str) or not body:
+            continue
+        receipt = recheck_source_valid_candidate(
+            question=question, evidence_text=body, candidate=original,
+            expected_project_identity=expected, lifecycle_intent=intent,
+        )
+        if receipt is None:
+            continue
+        # This identity is issued by the current source check, not a predicted
+        # owner or text-similarity key. Distinct occurrences retain distinct IDs.
+        key = receipt["native_discovery_binding_sha256"]
+        if key in seen:
+            continue
+        row = _docs_source(original, display_snippet=body,
+                           evidence_id="ev-" + hashlib.sha256(key.encode()).hexdigest()[:16])
+        if row is None:
+            continue
+        window = receipt["body_window"]
+        row.update(snippet=body, project_identity=original.get("project_identity"),
+                   line_start=window["line_start"], line_end=window["line_end"],
+                   authority=str(original.get("authority") or "supporting"),
+                   scope=str(original.get("doc_scope") or "project"),
+                   catalog_role=str(original.get("catalog_role") or ""),
+                   _assigned_requirement_ids=[])
+        # Lexical attribution stays diagnostic, not an admission/ranking gate.
+        visible = _requalify_visible_source({
+            **original, **row, "_qualification_candidate": original,
+        }, query_text=texts)
+        row.update(retrieval_query_ids=visible["retrieval_query_ids"],
+                   retrieval_query_matches=visible["retrieval_query_matches"])
+        rows.append(row)
+        snapshot[row["evidence_id"]] = _snapshot_entry(original, row)
+        seen.add(key)
+    decision = context_selection_decision(rows, tuple(queries))
+    payload = _payload(rows, decision=decision, query_plan=plan)
+    _mark_unassessed(payload)
+    snapshot = {row["evidence_id"]: _snapshot_entry(snapshot[row["evidence_id"]]["source"], row)
+                for row in payload.get("sources") or ()}
+    if rows:
+        payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
+    _refresh_estimate(payload)
+    errors = validate_model_visible_projection(payload, snapshot=snapshot)
+    if errors:
+        raise ValueError("native-rank projection is invalid: " + "; ".join(errors))
+    return payload, snapshot
+
+
 def experimental_context_cost(payload: dict[str, Any]) -> int:
     """Account for the actual non-ASCII-escaped MCP text, including whitespace.
 
@@ -53,9 +161,7 @@ def capture_experimental_context(retrieval: dict, payload: dict, snapshot: dict)
     discovery ledger and canonical policies again.  Native row alternatives are
     only rows already admitted by the ordinary core projection.
     """
-    if (experimental_context_max_tokens() is None
-            and not source_valid_candidate_admission_active()):
-        return
+    _mark_unassessed(payload)
     originals = []
     seen = set()
     candidates = [
@@ -95,6 +201,7 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
         if result.get("reason_code") and result.get("missing") == [result["reason_code"]]:
             result.pop("missing")  # The same reason remains in its typed field.
         _refresh_estimate(result)
+        _mark_unassessed(result)
         return result, {}
 
     from .docs_context_projection import _requalify_visible_source
@@ -148,6 +255,7 @@ def _rebuild(payload: dict, snapshot: dict, retrieval: dict, rows: list[dict], *
         ]
         result["context_quality"] = {"status": "unavailable", "reasons": [reason]}
     _refresh_estimate(result)
+    _mark_unassessed(result)
     return result, bound
 
 
@@ -250,14 +358,15 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict,
                                  restore_native: bool = True,
                                  _trace_stage: str = "recheck") -> tuple[dict, dict]:
     """Validate native/derived source lineage after the last structural rewrite."""
-    active = source_valid_candidate_admission_active()
+    from .experimental_candidate_selection import native_rank_selection_active
+    _mark_unassessed(payload)
     flow = ProjectionFlowTrace(retrieval)
-    call_sequence = flow.boundary(_trace_stage + ".input", payload, snapshot, active=active)
-    if not active:
-        flow.boundary(_trace_stage + ".output", payload, snapshot, active=False, call_sequence=call_sequence)
-        return payload, snapshot
+    call_sequence = flow.boundary(_trace_stage + ".input", payload, snapshot, active=True)
     from docmancer.docs.domain.literal_context_admission import recheck_source_valid_candidate
     from .joint_context_lineage import _occurrence
+    native_rank = native_rank_selection_active()
+    if native_rank:
+        restore_native = False
 
     state = retrieval.get(_SEED_KEY) or {}
     originals = state.get("originals") or ()
@@ -318,7 +427,7 @@ def recheck_experimental_context(payload: dict, snapshot: dict, retrieval: dict,
             receipt = attempt(derivation="contained_span")
         seed_source_mismatches = seed_span_unavailable = seed_bounds_invalid = 0
         occurrence_available = None
-        if receipt is None:
+        if receipt is None and not native_rank:
             # Core crops can keep the native reference envelope in their
             # snapshot. Classify the verified visible occurrence, not that
             # wider reference; A still independently validates the relation.
@@ -412,6 +521,9 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
     recursive finalization, arbitrary text crop, or model call.
     """
     cap = experimental_context_max_tokens()
+    from .experimental_candidate_selection import native_rank_selection_active
+    native_rank = native_rank_selection_active()
+    _mark_unassessed(payload)
     flow = ProjectionFlowTrace(retrieval)
     active = cap is not None and payload.get("kind") == "docs_context"
     flow.boundary("budget.input", payload, snapshot, active=active)
@@ -420,6 +532,23 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
         return payload, snapshot
     diagnostics = retrieval.setdefault("retrieval_diagnostics", {}).setdefault(
         "docs_context_projection", {})
+    if native_rank:
+        from .joint_context_lineage import _occurrence
+        unique, seen = [], set()
+        for row in payload.get("sources") or ():
+            occurrence = _occurrence(row, snapshot)
+            source = (snapshot.get(row.get("evidence_id")) or {}).get("source") or {}
+            member = (source.get("_reference_evidence") or {}).get("member_binding")
+            key = (occurrence, json.dumps(member, sort_keys=True), row.get("snippet"))
+            if occurrence is not None and key in seen:
+                continue
+            if occurrence is not None:
+                seen.add(key)
+            unique.append(row)
+        removed = len(payload.get("sources") or ()) - len(unique)
+        diagnostics["native_exact_dedupe"] = {"removed": removed}
+        if removed:
+            payload, snapshot = _rebuild(payload, snapshot, retrieval, unique, reason="exact_occurrence_dedupe")
     before = experimental_context_cost(payload)
     ledger = diagnostics.setdefault("experimental_budget", {})
     ledger.update(limit=cap, input_cost=before, measure="max(o200k_base,utf8_bytes_div4)_mcp_json",
@@ -438,7 +567,8 @@ def enforce_experimental_context_budget(payload: dict, snapshot: dict,
         if any(item["evidence_id"] == row["evidence_id"] for item in selected):
             continue
         options = [(deepcopy(row), deepcopy(snapshot[row["evidence_id"]]))]
-        options.extend(_native_alternatives(row, snapshot, retrieval))
+        if not native_rank:
+            options.extend(_native_alternatives(row, snapshot, retrieval))
         accepted_current = False
         for index, (option, binding) in enumerate(options):
             if any(item["evidence_id"] == option["evidence_id"] for item in selected):

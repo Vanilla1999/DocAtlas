@@ -1,0 +1,51 @@
+{
+  "sources": [
+    {
+      "evidence_id": "ev-c66b14aafe987977",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.port",
+      "snippet": "Specify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n\n## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "b43730b1977ecc839c102550e74dbfb26ae3c06059c932572c8f9c946b44260c",
+      "project_identity": "local:c0c7c6c5954d89ba8e1c3b3161b0fb1a1a2ae59e791a7b5aee1f76ad1ac8d1a8",
+      "line_start": 68,
+      "line_end": 75,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/6713476efc04268ef814a76f"
+    },
+    {
+      "evidence_id": "ev-e8578dd0a41f040c",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.ws",
+      "snippet": "## server.ws\n\n- **Type:** `false | { protocol?: string, host?: string, port?: number, path?: string, timeout?: number, clientPort?: number, server?: Server }`\n\nConfigure WebSocket connection options. Set to `false` to disable the WebSocket connection entirely.\n\n- `protocol` - WebSocket protocol (`ws` or `wss`)\n- `host` - WebSocket server host\n- `port` - WebSocket server port\n- `path` - WebSocket path\n- `clientPort` - Override the port on the client side, allowing you to serve the websocket on a different port than the client code looks for it on\n- `timeout` - Connection timeout in milliseconds (default: 30000)\n- `server` - Use a custom HTTP server for WebSocket connections\n\nWhen `server.ws.server` is defined, Vite will process the WebSocket connection requests through the provided server. If not in middleware mode, Vite will attempt to process WebSocket connection requests through the existing server. This can be helpful when using self-signed certificates or when you want to expose Vite over a network on a single port.\n\n```js\nexport default defineConfig({\n  server: {\n    ws: {\n      protocol: 'wss',\n      host: 'localhost',\n      port: 3001,\n    },\n  },\n})\n```\n\nCheck out [`vite-setup-catalogue`](https://github.com/sapphi-red/vite-setup-catalogue) for some examples.\n\n::: tip NOTE\n\nWith the default configuration, reverse proxies in front of Vite are expected to support proxying WebSocket. If the Vite HMR client fails to connect WebSocket, the client will fall back to connecting the WebSocket directly to the Vite HMR server bypassing the reverse proxies:\n\n```\nDirect websocket connection fallback. Check out https://vite.dev/config/server-options.html#server-ws to remove the previous connection error.\n```\n\nThe error that appears in the Browser when the fallback happens can be ignored. To avoid the error by directly bypassing reverse proxies, you could either:\n\n- configure the reverse proxy to proxy WebSocket too\n- set [`server.strictPort = true`](#server-strictport) and set `server.ws.clientPort` to the same value with `server.port`\n- set `server.ws.port` to a different value from [`server.port`](#server-port)\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "e4ec3ee4f09d92defd4d4969a1d8d6855eb8a19984463651ed6abb66a9d35ef0",
+      "project_identity": "local:c0c7c6c5954d89ba8e1c3b3161b0fb1a1a2ae59e791a7b5aee1f76ad1ac8d1a8",
+      "line_start": 202,
+      "line_end": 247,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/758b5d995e55b1ec5db3acd6"
+    },
+    {
+      "evidence_id": "ev-52abbd85bd04ab13",
+      "path_or_url": "docs/config/server-options.md",
+      "section": "Server Options > server.host",
+      "snippet": "The first case is when `localhost` is used. Node.js's [`dns.setDefaultResultOrder`](https://nodejs.org/docs/latest-v24.x/api/dns.html#dnssetdefaultresultorderorder) changes how DNS-resolved addresses are ordered, and browsers may use a different resolved address than the one Vite is listening to. Vite prints the resolved address when it differs.\n\nThe second case is when wildcard hosts (e.g. `0.0.0.0`) are used. This is because servers listening on non-wildcard hosts take priority over those listening on wildcard hosts.\n\n:::\n\n::: tip Accessing the server on WSL2 from your LAN\n\nWhen running Vite on WSL2, it is not sufficient to set `host: true` to access the server from your LAN.\nSee [the WSL document](https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan) for more details.\n\n:::\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "54d1dc8dd70473d92eefe326e29ec880ffcf8a306784e9d31e056f3b7b912542",
+      "project_identity": "local:c0c7c6c5954d89ba8e1c3b3161b0fb1a1a2ae59e791a7b5aee1f76ad1ac8d1a8",
+      "line_start": 19,
+      "line_end": 31,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/6697a30296c9107817f59804"
+    }
+  ],
+  "tokens": 1460,
+  "utf8_bytes": 4925,
+  "sha256": "814d32821880f8f646b1a223af684afa65c29b75a9ad59d3166004402c0949b3",
+  "policy": "whole-source input-rank prefix including full attribution",
+  "ceiling": 12000
+}

@@ -1,0 +1,8 @@
+{
+  "boundary": "offline product immutability/provenance, not quality test",
+  "product_files_frozen": 420,
+  "frozen_product_mismatches": [],
+  "candidate_wheel_members": 420,
+  "wheel_source_mismatches": [],
+  "postfreeze_changes": "test/harness measurement only; see V2/V3/V4 amendments"
+}

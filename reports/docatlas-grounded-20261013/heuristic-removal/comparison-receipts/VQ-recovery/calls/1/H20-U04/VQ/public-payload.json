@@ -1,0 +1,60 @@
+{
+  "status": "ok",
+  "kind": "docs_context",
+  "context_status": "ready",
+  "context_available": true,
+  "answer_supported": false,
+  "answer_available": false,
+  "support_status": "retrieval_only",
+  "answer_policy": "cite_only",
+  "coverage_policy": "retrieval_attribution_only",
+  "query_coverage": "full",
+  "retrieval_coverage": "full",
+  "facet_coverage": "unverified",
+  "covered_query_ids": [
+    "query-original"
+  ],
+  "missing_query_ids": [],
+  "missing_facets": [],
+  "facets": [],
+  "sources": [
+    {
+      "evidence_id": "ev-486f08adfa9dc918",
+      "path_or_url": "docs/concepts/configuration-files.md",
+      "section": "Configuration files > Configuring the pip interface",
+      "snippet": "## Configuring the pip interface\n\nA dedicated [`[tool.uv.pip]`](../reference/settings.md#pip) section is provided for configuring\n_just_ the `uv pip` command line interface. Settings in this section will not apply to `uv` commands\noutside the `uv pip` namespace. However, many of the settings in this section have corollaries in\nthe top-level namespace which _do_ apply to the `uv pip` interface unless they are overridden by a\nvalue in the `uv.pip` section.\n\nThe `uv.pip` settings are designed to adhere closely to pip's interface and are declared separately\nto retain compatibility while allowing the global settings to use alternate designs (e.g.,\n`--no-build`).\n\nAs an example, setting the `index-url` under `[tool.uv.pip]`, as in the following `pyproject.toml`,\nwould only affect the `uv pip` subcommands (e.g., `uv pip install`, but not `uv sync`, `uv lock`, or\n`uv run`):\n\n```toml title=\"pyproject.toml\"\n[tool.uv.pip]\nindex-url = \"https://test.pypi.org/simple\"\n```\n",
+      "version_binding": "unversioned",
+      "content_sha256": "f8bed4046207714a68da0d51c0d44229dee35463d7621fb48cead5ede0e24c73",
+      "project_identity": "local:1fe233bcddb3ec27ff4a037aaa9af0f9dd655ffe9737ab92e64cd36ea270668e",
+      "line_start": 107,
+      "line_end": 126,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/78a9ac9841591e92a34ddcea"
+    },
+    {
+      "evidence_id": "ev-d4f4fa14d100e4d6",
+      "path_or_url": "docs/concepts/configuration-files.md",
+      "section": "Configuration files",
+      "snippet": "In workspaces, uv will begin its search at the workspace root, ignoring any configuration defined in\nworkspace members. Since the workspace is locked as a single unit, configuration is shared across\nall members.\n\n",
+      "version_binding": "unversioned",
+      "content_sha256": "ec0fc0db2e98432cd2729e158e1bf8ff022988a1a868d83484045a4b26b98d62",
+      "project_identity": "local:1fe233bcddb3ec27ff4a037aaa9af0f9dd655ffe9737ab92e64cd36ea270668e",
+      "line_start": 14,
+      "line_end": 17,
+      "authority": "source_of_truth",
+      "scope": "project",
+      "source_uri": "docatlas://source/452e7f9b6f6b85df5f9b9a05"
+    }
+  ],
+  "context_quality": {
+    "status": "unverified",
+    "reasons": [
+      "coverage_unverified"
+    ]
+  },
+  "read_next": [],
+  "edit_ready": false,
+  "investigation_allowed": true,
+  "estimated_tokens": 701
+}

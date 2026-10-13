@@ -1,0 +1,22 @@
+{
+  "case_id": "H20-M02",
+  "variant": "VQ",
+  "dataset": "/home/viadmin/StudioProjects/hermes/docmancer/reports/docatlas-grounded-20261013/reproduction/eval/prepared_ablation/holdout",
+  "family": "1-mkdocs",
+  "public_request": {
+    "question": "For MkDocs api-guide.md, compare the generated file and URL with use_directory_urls true versus false, state the default, and name the documented hosting conditions that require false.",
+    "project_path": "/tmp/docatlas-removal-secure-xs_64g44/comparison-work/VQ-recovery/1-mkdocs/project",
+    "scope": "project"
+  },
+  "status": "returned",
+  "model_calls": 0,
+  "integrity_errors": [],
+  "raw_sha256": "995398e1a72230eaa349452bd60101060f042e437205aa67a4356a892a754873",
+  "utf8_bytes": 632,
+  "tokens": 172,
+  "seconds": 0.023965264999787905,
+  "cpu_seconds": 0.02274135199999705,
+  "peak_rss_kib": 200996,
+  "database_unchanged": true,
+  "files_unchanged": true
+}
