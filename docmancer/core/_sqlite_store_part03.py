@@ -191,10 +191,45 @@ class _SQLiteStorePart03:
         expand: str | None = None,
         filters: dict[str, Any] | None = None,
     ) -> list[RetrievedChunk]:
-        return self._query_bm25_candidates(text, limit=limit, budget=budget, filters=filters)
+        """Deliver whole windows under the public count and stored-token caps."""
+        if limit < 0 or budget < 0:
+            raise ValueError("limit and budget must be non-negative")
+        candidates = self.acquire_candidates(text, expand=expand, filters=filters)
+        selected: list[RetrievedChunk] = []
+        used = 0
+        for chunk in candidates:
+            if len(selected) >= limit:
+                break
+            cost = int(chunk.metadata["token_estimate"])
+            if used + cost > budget:
+                continue
+            selected.append(chunk)
+            used += cost
+        raw_tokens = self._raw_token_total([chunk.source for chunk in selected])
+        for chunk in selected:
+            chunk.metadata.update({
+                "docmancer_tokens": used, "raw_tokens": raw_tokens,
+                "savings_percent": round(0.0 if raw_tokens <= 0 else
+                                         max(0.0, 100.0 * (1 - used / raw_tokens)), 1),
+                "runway_multiplier": round(1.0 if used <= 0 else raw_tokens / used, 2),
+            })
+            chunk.metadata["delivery"] = {
+                "limit": limit, "budget": budget, "estimated_tokens": used,
+                "measure": "stored_display_token_estimate",
+            }
+        return selected
+
+    def acquire_candidates(
+        self, text: str, *, expand: str | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> list[RetrievedChunk]:
+        """Internal acquisition; public delivery caps do not shrink this pool."""
+        return self._query_bm25_candidates(
+            text, expand=expand or "none", filters=filters,
+        )
 
     def _query_bm25_candidates(
-        self, text: str, *, limit: int, budget: int,
+        self, text: str, *, expand: str,
         filters: dict[str, Any] | None,
     ) -> list[RetrievedChunk]:
         """Acquire bounded native children independently of the delivery budget."""
@@ -203,11 +238,27 @@ class _SQLiteStorePart03:
             ACQUISITION_METHOD, ACQUISITION_TEXT_BYTES,
         )
 
+        if expand not in {"none", "adjacent", "page"}:
+            raise ValueError("expand must be none, adjacent or page")
         rows = self._search_rows(text, ACQUISITION_CANDIDATES, filters=filters)
+        native_count = len(rows)
+        # Keep all native hits first. Expansion appends existing source windows,
+        # never synthetic scores or a second semantic retrieval.
+        if expand != "none":
+            expanded = []
+            for rank, row in enumerate(rows, start=1):
+                for neighbor in self._expand_row(row, expand, filters=filters):
+                    if int(neighbor["id"]) != int(row["id"]):
+                        expanded.append({**dict(neighbor), "rank": 0.0,
+                                         "_expansion_anchor_id": int(row["id"]),
+                                         "_expansion_anchor_rank": rank})
+            rows = [*rows, *expanded]
         selected: list[dict[str, Any]] = []
         seen_ids: set[int] = set()
         token_total = byte_total = skipped = 0
         for raw_rank, row in enumerate(rows, start=1):
+            if len(selected) >= ACQUISITION_CANDIDATES:
+                break
             row_id = int(row["id"])
             if row_id in seen_ids:
                 continue
@@ -229,7 +280,7 @@ class _SQLiteStorePart03:
         runway = 1.0 if token_total <= 0 else raw_tokens / token_total
         acquisition = {
             "method": ACQUISITION_METHOD,
-            "sql_rows": len(rows),
+            "sql_rows": native_count,
             "candidate_ceiling": ACQUISITION_CANDIDATES,
             "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
             "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
@@ -237,14 +288,18 @@ class _SQLiteStorePart03:
             "admitted_estimated_tokens": token_total,
             "admitted_text_bytes": byte_total,
             "resource_skipped_rows": skipped,
-            "delivery_limit_not_applied": limit,
-            "delivery_budget_not_applied": budget,
+            "expansion": expand,
         }
         results: list[RetrievedChunk] = []
         for row in selected:
             cost = float(row["rank"])
             rank = int(row["_bm25_rank"])
             metadata = json.loads(row["metadata_json"] or "{}")
+            if "_expansion_anchor_id" in row:
+                metadata["expansion"] = {
+                    "mode": expand, "anchor_section_id": row["_expansion_anchor_id"],
+                    "anchor_rank": row["_expansion_anchor_rank"],
+                }
             metadata.update({
                 "title": row["title"], "section_id": int(row["id"]),
                 "token_estimate": int(row["token_estimate"]),
@@ -268,6 +323,12 @@ class _SQLiteStorePart03:
                     mode="or", bm25_cost=cost,
                 ),
             })
+            if "expansion" in metadata:
+                metadata["ranking"] = {
+                    "method": "source_expansion", "final_rank": rank,
+                    "anchor_section_id": row["_expansion_anchor_id"],
+                }
+                metadata.pop("lexical_match", None)
             results.append(RetrievedChunk(
                 source=row["source"], chunk_index=int(row["chunk_index"]),
                 text=row["text"], score=-cost, metadata=metadata,

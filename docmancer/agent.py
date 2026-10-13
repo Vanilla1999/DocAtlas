@@ -939,8 +939,8 @@ class DocmancerAgent:
     ) -> list[RetrievedChunk]:
         return self.store.query(
             text,
-            limit=limit or self.config.query.default_limit,
-            budget=budget or self.config.query.default_budget,
+            limit=limit if limit is not None else self.config.query.default_limit,
+            budget=budget if budget is not None else self.config.query.default_budget,
             expand=expand if expand is not None else self.config.query.default_expand,
             filters=filters,
         )
@@ -964,7 +964,10 @@ class DocmancerAgent:
         chunks = self.query(text, limit=limit, budget=budget, expand=expand, filters=filters)
         from docmancer.context import format_context
 
-        return format_context(chunks, style=style, include_sources=include_sources)
+        return format_context(
+            chunks, style=style, include_sources=include_sources,
+            max_tokens=budget if budget is not None else self.config.query.default_budget,
+        )
 
     def collection_stats(self) -> dict:
         return self.store.collection_stats()

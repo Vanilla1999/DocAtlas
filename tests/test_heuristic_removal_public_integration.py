@@ -53,6 +53,44 @@ def read_source(service, row, root, documents):
     assert payload["snippet"] == "\n".join(text.splitlines()[start - 1:end])
 
 
+def test_public_sdk_delivery_caps_and_explicit_lexical_expansion(tmp_path, record_property):
+    """1 prepare, 12 public retrieval calls; real SQLite, no model/transport mocks."""
+    from eval.heuristic_removal.sdk_delivery import observe
+    audit = Path(__file__).resolve().parents[1] / "reports/docatlas-grounded-20261013/pre-model-research-audit"
+    result = observe(tmp_path, audit)
+    record_property("sdk_delivery", json.dumps(result, ensure_ascii=False))
+    assert result["state_unchanged"]
+    assert len(result["small"]) == 1
+    assert sum(row["metadata"]["token_estimate"] for row in result["small"]) <= 100
+    assert all(row["metadata"]["docmancer_tokens"] <= 100 for row in result["small"])
+    assert (len(result["tight_text"]) + 3) // 4 <= 100
+    assert len(result["wide"]) == 3
+    assert len(result["dispatcher_acquired"]) == 3  # MCP pool not shrunk by SDK caps
+    assert (len(result["wide_text"]) + 3) // 4 <= 12000
+    for path in ("docs/packing.md", "docs/transport.md", "docs/storage.md"):
+        source = result["documents"][path]
+        assert source in result["wide_text"]
+    fact = result["expected_neighbor"]
+    assert not any(fact in row["text"] for row in result["bare"])
+    for key in ("adjacent", "page", "dispatcher_expanded"):
+        assert any(fact in row["text"] for row in result[key])
+    assert fact in result["expanded_text"]
+    assert (len(result["expanded_text"]) + 3) // 4 <= 600
+    assert not result["zero_chunks"] and result["zero_text"] == ""
+    for key in ("small", "wide", "bare", "adjacent", "page", "dispatcher_expanded"):
+        for row in result[key]:
+            relative = relative_path(row["source"], tmp_path / "project")
+            source = result["documents"][relative]
+            metadata = row["metadata"]
+            start, end = metadata["char_span"]
+            assert source[start:end] == row["text"]
+            assert metadata["content_hash"] == sha(row["text"].encode())
+            assert metadata["source_content_hash"] == sha(source.encode())
+            assert metadata["doc_scope"] == "project"
+            assert metadata["resolved_version"] == ""
+            assert metadata["generation_id"] == result["wide"][0]["metadata"]["generation_id"]
+
+
 def test_public_removal_lifecycle_partial_source_integrity_trace_and_read_only(
     tmp_path, monkeypatch, state_root, record_property,
 ):

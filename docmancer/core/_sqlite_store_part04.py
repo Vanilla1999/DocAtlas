@@ -5,7 +5,9 @@ from ._sqlite_store_shared import *  # noqa: F401,F403
 
 
 class _SQLiteStorePart04:
-    def _expand_row(self, row: sqlite3.Row, expand: str) -> list[sqlite3.Row]:
+    def _expand_row(
+        self, row: sqlite3.Row, expand: str, *, filters: dict | None = None,
+    ) -> list[sqlite3.Row]:
         if expand == "none":
             return [row]
         with self._connect() as conn:
@@ -20,6 +22,10 @@ class _SQLiteStorePart04:
                 if expand == "page" and row["atom_type"] in {"code", "table"}:
                     clauses.append("atom_id = ?")
                     params.append(row["atom_id"])
+                filter_sql, filter_params = self._metadata_filter_sql(filters, promoted=True)
+                filter_sql = filter_sql.replace("sections.", "c.")
+                parent_sql = "AND parent_logical_id = ?" if expand == "page" else ""
+                parent_params = [parent_logical_id] if expand == "page" else []
                 rows = list(
                     conn.execute(
                         f"""
@@ -27,17 +33,19 @@ class _SQLiteStorePart04:
                                c.display_token_estimate AS token_estimate,
                                c.display_content_hash AS content_hash
                         FROM retrieval_children c
-                        WHERE c.generation_id = ? AND c.parent_logical_id = ?
-                          AND ({' OR '.join(clauses)})
+                         WHERE c.generation_id = ? AND c.source = ?
+                           {parent_sql}
+                           AND ({' OR '.join(clauses)})
+                           {filter_sql}
                         ORDER BY c.chunk_index
                         LIMIT 8
                         """,
-                        (generation_id, parent_logical_id, *params),
+                         (generation_id, row["source"], *parent_params, *params, *filter_params),
                     )
                 )
                 return [item for item in rows if int(item["id"]) == int(row["id"])] + [
                     item for item in rows if int(item["id"]) != int(row["id"])
-                ]
+                ][:7]
         return [row]
 
     def _raw_token_total(self, sources: list[str]) -> int:

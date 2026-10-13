@@ -67,6 +67,7 @@ class DocmancerClient:
         style: str | None = None,
         limit: int | None = None,
         budget: int | None = None,
+        expand: str | None = None,
     ) -> str:
         """Query the index and return a formatted context string."""
         return self._agent.query_context(
@@ -74,6 +75,7 @@ class DocmancerClient:
             style=style or self._style,
             limit=limit,
             budget=budget,
+            expand=expand,
         )
 
     def get_chunks(
@@ -82,9 +84,10 @@ class DocmancerClient:
         *,
         limit: int | None = None,
         budget: int | None = None,
+        expand: str | None = None,
     ) -> list[RetrievedChunk]:
         """Query the index and return raw RetrievedChunk objects."""
-        return self._agent.query(query, limit=limit, budget=budget)
+        return self._agent.query(query, limit=limit, budget=budget, expand=expand)
 
     def list_sources(self) -> list[str]:
         """Return all indexed source URLs/paths."""

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_sdk_delivery.py", line 69, in <module>
+    main()
+  File "/tmp/opencode/docatlas-heuristic-removal-20261013/eval/heuristic_removal/installed_sdk_delivery.py", line 19, in main
+    import docmancer
+ModuleNotFoundError: No module named 'docmancer'

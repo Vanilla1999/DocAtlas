@@ -127,7 +127,7 @@ class _RetrievalDispatcherPart01:
                 "candidate_ceiling": ACQUISITION_CANDIDATES,
                 "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
                 "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
-                "expansion": "none", "source_quota": None,
+                "expansion": retrieval_expand or "none", "source_quota": None,
             })
 
         def finalized(result: DispatchResult) -> DispatchResult:
@@ -153,9 +153,8 @@ class _RetrievalDispatcherPart01:
             return result
 
         if q_active:
-            chunks = self.store.query(
-                query, limit=ACQUISITION_CANDIDATES,
-                budget=ACQUISITION_ESTIMATED_TOKENS, expand="none",
+            chunks = self.store.acquire_candidates(
+                query, expand=retrieval_expand or "none",
                 filters=backend_filters,
             )
             acquired_count = len(chunks)
@@ -187,7 +186,7 @@ class _RetrievalDispatcherPart01:
 
         if effective_mode == "lexical" or missing_capabilities:
             query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self.store.acquire_candidates(query, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
@@ -208,7 +207,7 @@ class _RetrievalDispatcherPart01:
             raise HybridRetrievalError(ready_failure)
         if ready_failure:
             query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self.store.acquire_candidates(query, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)
@@ -239,7 +238,7 @@ class _RetrievalDispatcherPart01:
                     candidate_counts=raw_counts,
                 ))
             query_limit = self._candidate_limit_for_diversity(limit, retrieval_expand)
-            chunks = self.store.query(query, limit=query_limit, budget=budget, expand=retrieval_expand, filters=backend_filters)
+            chunks = self.store.acquire_candidates(query, expand=retrieval_expand, filters=backend_filters)
             chunks = self._filter_chunks(chunks, merged_filters)
             chunks = self._append_api_term_matches(query, chunks, budget=budget, expand=retrieval_expand, backend_filters=backend_filters, verification_filters=merged_filters)
             chunks = self._limit_sections_per_source(chunks, limit=limit, expand=retrieval_expand)

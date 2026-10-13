@@ -1,0 +1,24 @@
+{
+  "base_commit": "304b56e1f2173ff7ec82622109931e0597f07276",
+  "working_copy": true,
+  "files_sha256": {
+    "docmancer/agent.py": "6446fec37ffdce2c3b7a6e2f305211b41c81bc8d4ec74335740a2f1af6b99981",
+    "docmancer/client.py": "96a6c5596084633d32b76af25862a298a16751d4863b42e572f672b0c70e4771",
+    "docmancer/context.py": "5e8769077c520c2b4e65ee4cf66e0a0496175297f507637760a967a46af03932",
+    "docmancer/core/_sqlite_store_part03.py": "dc00e3d2d8992266945e2d5dbfa559f29a8536d1a3c2396cbddb22e9c0c823bd",
+    "docmancer/core/_sqlite_store_part04.py": "b40217675c46e9d475ffe463d7ad2ab5e45cf26d9c7557f99185e2e8f1923a40",
+    "docmancer/retrieval/_dispatch_part01.py": "1c0f549b2671c44e549c06954805ef76f33b6eec6489113b7a04b42bbd4312b7",
+    "docmancer/retrieval/lexical.py": "7c42a501186067a1ec8df3d3f6ee4286375a6f53b70d78b9500ee534a32d012b",
+    "tests/diagnostic_labels.heuristic_removal.json": "f67764fb466f2522d8161a7443e931d93dd2ca6b898db7d66e6377488b926831",
+    "tests/test_heuristic_removal_public_integration.py": "54632c5d4eddfe187a1a39a331cc98ec3493cb82f69feab65be94d1b3f991d72",
+    "eval/heuristic_removal/sdk_delivery.py": "806db8776150ac30dbb42cb23b3d51e8231f30f39dc29530810cd0ac3f131855",
+    "eval/heuristic_removal/installed_sdk_delivery.py": "4f30cc587d82e622843d7cbe329e94999ba74cda0f90334ceb763193f0ec70af",
+    "docs/sdk-delivery-budgets.md": "89cc4acbbe6479d88976f2a40edcc9233bff8545749c81bb4bcc7663a55036e4"
+  },
+  "wheel_sha256": "2cf676bff56f5b7c4e698be91b6ff6622fcc781f2e934c303e8795d75987d610",
+  "wheel_changed_product_files_match_source_and_installed": true,
+  "syntax": "PASS",
+  "diff_check": "PASS",
+  "model_calls": 0,
+  "installed_origin": "/tmp/opencode/docatlas-sdk-delivery-installed-20261013/lib/python3.12/site-packages/docmancer/__init__.py"
+}
