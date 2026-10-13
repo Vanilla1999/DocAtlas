@@ -1,0 +1,1832 @@
+{
+  "commit": "8605cbdbb52150fc2752dc7d1544e1e90a4052b7",
+  "arm": "current-default (historical runner label V0)",
+  "boundary": "installed wheel, public in-process MCP, prepared real SQLite; not stdio/generation",
+  "planned": 40,
+  "returned": 40,
+  "workload_status": "completed",
+  "prepare_attempts": 5,
+  "context_attempts": 40,
+  "model_calls": 0,
+  "workload_seconds": 170.65918974099986,
+  "judgments": {
+    "native": {
+      "within_budget": {
+        "total": 24,
+        "passed": 22,
+        "failed": 2,
+        "not_measured": 0
+      },
+      "partial": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "not_measured": 0
+      },
+      "unanswerable": {
+        "total": 8,
+        "passed": 0,
+        "failed": 8,
+        "not_measured": 0
+      }
+    },
+    "packed": {
+      "within_budget": {
+        "total": 24,
+        "passed": 22,
+        "failed": 2,
+        "not_measured": 0
+      },
+      "partial": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "not_measured": 0
+      },
+      "unanswerable": {
+        "total": 8,
+        "passed": 0,
+        "failed": 8,
+        "not_measured": 0
+      }
+    }
+  },
+  "by_family": {
+    "black": {
+      "total": 8,
+      "positive_pass": 5,
+      "partial_pass": 2,
+      "negative_pass": 0
+    },
+    "poetry": {
+      "total": 8,
+      "positive_pass": 4,
+      "partial_pass": 1,
+      "negative_pass": 0
+    },
+    "textual": {
+      "total": 8,
+      "positive_pass": 5,
+      "partial_pass": 2,
+      "negative_pass": 0
+    },
+    "vite": {
+      "total": 8,
+      "positive_pass": 5,
+      "partial_pass": 1,
+      "negative_pass": 0
+    },
+    "eslint": {
+      "total": 8,
+      "positive_pass": 3,
+      "partial_pass": 2,
+      "negative_pass": 0
+    }
+  },
+  "failures": [
+    {
+      "case_id": "V40-B08",
+      "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 41,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-P03",
+      "question": "How are Poetry configuration setting names converted into environment variable names?",
+      "answerability": "within_budget",
+      "metric": "strict_positive_pass",
+      "missing_claim_ids": [
+        "required"
+      ],
+      "sources": 42,
+      "interpretation": "fixed witness delivery failed"
+    },
+    {
+      "case_id": "V40-P07",
+      "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 43,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-P08",
+      "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 40,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-T08",
+      "question": "What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 41,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-V07",
+      "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 40,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-V08",
+      "question": "What exact CDN cache TTL does Vite guarantee for production build assets?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 41,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-E01",
+      "question": "Which filenames can ESLint use for its flat configuration file?",
+      "answerability": "within_budget",
+      "metric": "strict_positive_pass",
+      "missing_claim_ids": [
+        "required"
+      ],
+      "sources": 40,
+      "interpretation": "fixed witness delivery failed"
+    },
+    {
+      "case_id": "V40-E07",
+      "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 41,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    },
+    {
+      "case_id": "V40-E08",
+      "question": "What production uptime SLA does ESLint guarantee for local linting?",
+      "answerability": "unanswerable",
+      "metric": "strict_negative_empty_source_pass",
+      "missing_claim_ids": [],
+      "sources": 40,
+      "interpretation": "nonempty evidence is not generated unsupported answer"
+    }
+  ],
+  "facts": [
+    {
+      "case_id": "V40-B01",
+      "question": "What is Black's default line length?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B01/required/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 63,
+              "line_end": 65,
+              "covered": true,
+              "char_start": 1931,
+              "char_end": 2016,
+              "expected_characters": 85,
+              "covered_characters": 85,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "ff84b17988a30936f80c28fc463edfbe95274b7eea4ac1cf360419ad8631c7a1",
+              "trimmed_quote_sha256": "e85868e9ba0a4bb5d97d62ba909f6816e9c4d6a94cdfe896aeb740429f579ea7",
+              "independent_original_quote": "#### `-l`, `--line-length`\n\nHow many characters per line to allow. The default is 88.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B02",
+      "question": "How does Black determine target Python versions when --target-version is not set?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B02/required/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 86,
+              "line_end": 88,
+              "covered": true,
+              "char_start": 2576,
+              "char_end": 2802,
+              "expected_characters": 226,
+              "covered_characters": 226,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "add4d3794296f47b1a889dadaaea09a8f38fbe1b6ebba70eccc83fc2289d1429",
+              "trimmed_quote_sha256": "ad5734424cc2b09ccbff8e033757484a58ea4c07ed46f98df347ee3c2690fb82",
+              "independent_original_quote": "By default, Black will infer target versions from the project metadata in\n`pyproject.toml`, specifically the `[project.requires-python]` field. If this does not\nyield conclusive results, Black will use per-file auto-detection.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B03",
+      "question": "Which exit codes can Black --check return for unchanged files, files needing reformatting, and internal errors?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B03/required/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 180,
+              "line_end": 186,
+              "covered": true,
+              "char_start": 5929,
+              "char_end": 6145,
+              "expected_characters": 216,
+              "covered_characters": 216,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "2baace0cb119e7d453cd7c66754f761c2863dcae4474589f3eb94e0152c253d6",
+              "trimmed_quote_sha256": "c16fba7d072d0e3bbb6882cd1c8ae90cb1f344eeb5ac82e408f3120d99be0c1e",
+              "independent_original_quote": "#### `--check`\n\nDon't write the files back, just return the status. _Black_ will exit with:\n\n- code 0 if nothing would change;\n- code 1 if some files would be reformatted; or\n- code 123 if there was an internal error\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B04",
+      "question": "What does Black --no-cache do to cache reads and writes?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B04/required/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 232,
+              "line_end": 237,
+              "covered": true,
+              "char_start": 7264,
+              "char_end": 7631,
+              "expected_characters": 367,
+              "covered_characters": 367,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "760fd993b7744a7dc5fcc759f721e2f20a68475c349b8eabc0684967440b6eb2",
+              "trimmed_quote_sha256": "f837ea3ec31a4290858547bfb36077fc96ffceea8f8d4890edf3b0ff332c6155",
+              "independent_original_quote": "#### `--no-cache`\n\nDo not consult or update Black's per-user cache during this run. When `--no-cache` is\nspecified, Black will perform fresh analysis for all files and will neither read from\nnor write to the cache. This is helpful for reproducing formatting results from a clean\nrun, debugging cache-related issues, or ensuring CI executes a fresh formatting analysis\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B05",
+      "question": "How does --force-exclude differ from --exclude for files passed explicitly to Black?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B05/required/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 329,
+              "line_end": 333,
+              "covered": true,
+              "char_start": 11536,
+              "char_end": 11808,
+              "expected_characters": 272,
+              "covered_characters": 272,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "1bd1cb00a79136808f22640da38a337be4681b20600504b880e1180e8bd5a16d",
+              "trimmed_quote_sha256": "e883fbaa608387bc95542a849b76934148bcc2546ce1ff0822d7e2e65fa8f9ab",
+              "independent_original_quote": "#### `--force-exclude`\n\nLike `--exclude`, but files and directories matching this regex will be excluded even\nwhen they are passed explicitly as arguments. This is useful when invoking Black\nprogrammatically on changed files, such as in a pre-commit hook or editor plugin.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B06",
+      "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B06/documented_part/set-0/part-0",
+              "path": "docs/usage_and_configuration/the_basics.md",
+              "line_start": 490,
+              "line_end": 496,
+              "covered": true,
+              "char_start": 16936,
+              "char_end": 17344,
+              "expected_characters": 408,
+              "covered_characters": 408,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "051076253dcb9e43457b46f5fd2b5621c8ac934ab4d21fac033e3c578f089b4a",
+              "trimmed_quote_sha256": "90381ea678e708779a4227143bc412584c71d1175fc6d4f901e259ecdb984fe6",
+              "independent_original_quote": "### Where _Black_ looks for the file\n\nBy default _Black_ looks for `pyproject.toml` containing a `[tool.black]` section\nstarting from the common base directory of all files and directories passed on the\ncommand line. If it's not there, it looks in parent directories. It stops looking when\nit finds the file, or a `.git` directory, or a `.hg` directory, or the root of the file\nsystem, whichever comes first.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B06",
+      "question": "Where does Black search for pyproject.toml, and what TCP port does blackd listen on by default?",
+      "claim_id": "blackd_default_port",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-B07",
+      "question": "Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-B07/documented_part/set-0/part-0",
+              "path": "docs/usage_and_configuration/file_collection_and_discovery.md",
+              "line_start": 25,
+              "line_end": 30,
+              "covered": true,
+              "char_start": 1122,
+              "char_end": 1605,
+              "expected_characters": 483,
+              "covered_characters": 483,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "b9dfe174cd050f624a48eafdb8a860665537f2795f0e1419b30b664772915a10",
+              "trimmed_quote_sha256": "67957a363d9fe5c3ae38278a21341d1f8e4a355af606d8c15d0252421dd5ecb9",
+              "independent_original_quote": "To override the location of these files on all systems, set the environment variable\n`BLACK_CACHE_DIR` to the preferred location. Alternatively on macOS and Linux, set\n`XDG_CACHE_HOME` to your preferred location. For example, if you want to put the cache\nin the directory you're running _Black_ from, set `BLACK_CACHE_DIR=.cache/black`.\n_Black_ will then write the above files to `.cache/black`. Note that `BLACK_CACHE_DIR`\nwill take precedence over `XDG_CACHE_HOME` if both are set.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-B07",
+      "question": "Which environment variable overrides Black's cache directory, and for exactly how many days are cache entries retained?",
+      "claim_id": "cache_retention_days",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-B08",
+      "question": "What guaranteed 99th-percentile formatting latency in milliseconds does Black provide?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-P01",
+      "question": "Which file stores Poetry project-local application configuration, and is it the same file as pyproject.toml?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-P01/required/set-0/part-0",
+              "path": "docs/configuration.md",
+              "line_start": 33,
+              "line_end": 35,
+              "covered": true,
+              "char_start": 858,
+              "char_end": 995,
+              "expected_characters": 137,
+              "covered_characters": 137,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "1e35eec415a5fd00ec53888a1c87b7cd5058cad2f6740cd1d327767a0f0b22d0",
+              "trimmed_quote_sha256": "1fceb871a7e7f4963b5b24239d2027142e6e1a598936d7232ae1e6cd42179def",
+              "independent_original_quote": "{{% note %}}\nYour local configuration of Poetry application is stored in the `poetry.toml` file,\nwhich is separate from `pyproject.toml`.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P02",
+      "question": "What is Poetry's configuration precedence from highest to lowest?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-P02/required/set-0/part-0",
+              "path": "docs/configuration.md",
+              "line_start": 122,
+              "line_end": 134,
+              "covered": true,
+              "char_start": 3446,
+              "char_end": 4039,
+              "expected_characters": 593,
+              "covered_characters": 593,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "642de5ef2792e225dca1ff3f8959a3a5227fff084c9189185c33cb275f67327e",
+              "trimmed_quote_sha256": "0c9867ec1f1da56893e3d967bda380545392ee80585a479564ccc694c1999da4",
+              "independent_original_quote": "## Configuration sources\n\nWhen a setting is set in multiple places, Poetry applies the following precedence\n(from highest to lowest):\n\n1. Environment variables (for example, `POETRY_VIRTUALENVS_CREATE`)\n2. The local `poetry.toml` file (created with `poetry config --local`)\n3. The global `config.toml` file\n4. The setting's default value\n\nFor repository credentials (`http-basic.*`, `pypi-token.*`), Poetry may also read\nfrom `auth.toml` and the system keyring (for details see [Repositories]({{< relref \"repositories\" >}})).\nEnvironment variables still take precedence over file-based values.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P03",
+      "question": "How are Poetry configuration setting names converted into environment variable names?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": "UNKNOWN_BEFORE_PUBLIC_NATIVE",
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": false,
+          "parts": [
+            {
+              "witness_id": "V40-P03/required/set-0/part-0",
+              "path": "docs/configuration.md",
+              "line_start": 102,
+              "line_end": 114,
+              "covered": false,
+              "char_start": 2805,
+              "char_end": 3320,
+              "expected_characters": 515,
+              "covered_characters": 442,
+              "missing_char_ranges": [
+                [
+                  3247,
+                  3320
+                ]
+              ],
+              "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+              "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2",
+              "independent_original_quote": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P04",
+      "question": "How do you undo an explicitly selected Poetry Python environment and return to default behavior?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-P04/required/set-0/part-0",
+              "path": "docs/managing-environments.md",
+              "line_start": 72,
+              "line_end": 76,
+              "covered": true,
+              "char_start": 2194,
+              "char_end": 2375,
+              "expected_characters": 181,
+              "covered_characters": 181,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "d034ac818985866fc4a3610b8e18e8e873b34970e467cb1d71edd9e9d0ddba51",
+              "trimmed_quote_sha256": "2e91d535e385ec6d15c36d355ac80a4a78b477c668666162f37d66b545c3c569",
+              "independent_original_quote": "If you want to disable the explicitly activated virtual environment, you can use the\nspecial `system` Python version to retrieve the default behavior:\n\n```bash\npoetry env use system\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P05",
+      "question": "What version range does the compatible release requirement ~=1.2.3 allow in Poetry?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-P05/required/set-0/part-0",
+              "path": "docs/dependency-specification.md",
+              "line_start": 87,
+              "line_end": 98,
+              "covered": true,
+              "char_start": 2476,
+              "char_end": 3039,
+              "expected_characters": 563,
+              "covered_characters": 563,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "cf0b5946ccca7b63d82adf26bd67948cb4c8c624dfeb4e7015c09434961a795a",
+              "trimmed_quote_sha256": "e8f331ebaf1daf2536bb249e03419fa80ce063b7696a374bb2162b27aa925f35",
+              "independent_original_quote": "### Compatible release requirements\n\n**Compatible release requirements** specify a minimal version with the ability to update to later versions of the same level.\nFor example, if you specify a major, minor, and patch version, only patch-level changes are allowed.\nIf you only specify a major, and minor version, then minor- and patch-level changes are allowed.\n\n`~=1.2.3` is an example of a compatible release requirement.\n\n| Requirement | Versions allowed |\n| ----------- | ---------------- |\n| ~=1.2.3     | >=1.2.3 <1.3.0   |\n| ~=1.2       | >=1.2.0 <2.0.0   |\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P06",
+      "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-P06/documented_part/set-0/part-0",
+              "path": "docs/managing-environments.md",
+              "line_start": 79,
+              "line_end": 87,
+              "covered": true,
+              "char_start": 2381,
+              "char_end": 2834,
+              "expected_characters": 453,
+              "covered_characters": 453,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "ada7c56e0be50d0aa04a77f33709c052be6364a4d49d4a8131bd6c5ee348f6e5",
+              "trimmed_quote_sha256": "768d16fe7577d77d4d9eed485e41dbd927337a6ec08632237b991e08d8e5e070",
+              "independent_original_quote": "## Activating the environment\n\n{{% note %}}\nLooking for `poetry shell`? It was moved to a plugin: [`poetry-plugin-shell`](https://github.com/python-poetry/poetry-plugin-shell)\n{{% /note %}}\n\nThe `poetry env activate` command prints the activate command of the virtual environment to the console.\nYou can run the output command manually or feed it to the eval command of your shell to activate the environment.\nThis way you won't leave the current shell.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-P06",
+      "question": "What does poetry env activate print, and what process ID will the activated shell have?",
+      "claim_id": "activated_shell_pid",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-P07",
+      "question": "What guaranteed 99th-percentile dependency resolution latency does Poetry provide?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-P08",
+      "question": "What hard maximum number of virtual environments will Poetry retain automatically for one project?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-T01",
+      "question": "What does the first positional argument to Textual reactive specify?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T01/required/set-0/part-0",
+              "path": "docs/guide/reactivity.md",
+              "line_start": 28,
+              "line_end": 36,
+              "covered": true,
+              "char_start": 840,
+              "char_end": 1259,
+              "expected_characters": 419,
+              "covered_characters": 419,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "cbc33f6f4bfec78c34e1dabec95a1c892b829b2b82264571918555639d926b79",
+              "trimmed_quote_sha256": "e51ffa90bb4fba299007c5539531b6bef2bf8799db19dc9e14e4d7974fe9e573",
+              "independent_original_quote": "1. Create a string attribute with a default of `\"Paul\"`\n2. Creates an integer attribute with a default of `0`.\n3. Creates a boolean attribute with a default of `True`.\n\nThe `reactive` constructor accepts a default value as the first positional argument.\n\n!!! information\n\n    Textual uses Python's _descriptor protocol_ to create reactive attributes, which is the same protocol used by the builtin `property` decorator.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T02",
+      "question": "If several reactive attributes change together, how many refreshes does Textual perform?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T02/required/set-0/part-0",
+              "path": "docs/guide/reactivity.md",
+              "line_start": 66,
+              "line_end": 72,
+              "covered": true,
+              "char_start": 2449,
+              "char_end": 2865,
+              "expected_characters": 416,
+              "covered_characters": 416,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "a071a9629fc2c16cf95ef13ed85de7fbbc826aa51a995681e3b779d7ee4d002d",
+              "trimmed_quote_sha256": "4fb64864f37ccfcb3239c63e5dd1b8dacedb06760d2874ad02b7bab4ddae4f5d",
+              "independent_original_quote": "## Smart refresh\n\nThe first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.\n\n!!! information\n\n    If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T03",
+      "question": "Which Textual reactive helper can be used when changes should not trigger refresh or layout?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T03/required/set-0/part-0",
+              "path": "docs/guide/reactivity.md",
+              "line_start": 99,
+              "line_end": 110,
+              "covered": true,
+              "char_start": 3604,
+              "char_end": 4053,
+              "expected_characters": 449,
+              "covered_characters": 449,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "fcacf8d9ce36b7b360fd1b69d93bf3e29b8140b5202d91491f1c811e3a8de4a7",
+              "trimmed_quote_sha256": "e354743573eef4ce0673c08efcc66a3099b34d524217c08efe962cc4d3b97f1d",
+              "independent_original_quote": "### Disabling refresh\n\nIf you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.\n\nThe following code illustrates how you create non-refreshing reactive attributes.\n\n```python\nclass MyWidget(Widget):\n    count = var(0)  # (1)!\n```\n\n1. Changing `self.count` wont cause a refresh or layout.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T04",
+      "question": "What arguments does a Textual watch method receive when it declares one positional argument versus two?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T04/required/set-0/part-0",
+              "path": "docs/guide/reactivity.md",
+              "line_start": 166,
+              "line_end": 173,
+              "covered": true,
+              "char_start": 6273,
+              "char_end": 6720,
+              "expected_characters": 447,
+              "covered_characters": 447,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "815be0e6bddc19f8ae8d89d03fe1574846caf3ba9bfcd7f5bee1cdba044a457c",
+              "trimmed_quote_sha256": "5a6cce68e2f043a3f9d4bb95fbc8ad497b5d641532e49bc1b92d4fee88e46cc4",
+              "independent_original_quote": "## Watch methods\n\nWatch methods are another superpower.\nTextual will call watch methods when reactive attributes are modified.\nWatch method names begin with `watch_` followed by the name of the attribute, and should accept one or two arguments.\nIf the method accepts a single argument, it will be called with the new assigned value.\nIf the method accepts *two* positional arguments, it will be called with both the *old* value and the *new* value.\n\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T05",
+      "question": "What does exclusive=True do when Textual starts a new worker?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T05/required/set-0/part-0",
+              "path": "docs/guide/workers.md",
+              "line_start": 55,
+              "line_end": 64,
+              "covered": true,
+              "char_start": 2501,
+              "char_end": 3469,
+              "expected_characters": 968,
+              "covered_characters": 968,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "6c3e9d9412ab93d2342b0f5725108dfe168a4d272b06505933d3346a8b62c3bd",
+              "trimmed_quote_sha256": "76920399f7673a220d334625bf754b2a557bcf0e17a40c34a3cdd9d05ebc8ee5",
+              "independent_original_quote": "The `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later.\n\n!!! tip\n\n    The [Worker][textual.worker.Worker] object has a few useful methods on it, but you can often ignore it as we did in `weather02.py`.\n\nThe call to `run_worker` also sets `exclusive=True` which solves an additional problem with concurrent network requests: when pulling data from the network, there is no guarantee that you will receive the responses in the same order as the requests.\nFor instance, if you start typing \"Paris\", you may get the response for \"Pari\" *after* the response for \"Paris\", which could show the wrong weather information.\nThe `exclusive` flag tells Textual to cancel all previous workers before starting the new one.\n\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T06",
+      "question": "What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T06/documented_part/set-0/part-0",
+              "path": "docs/guide/workers.md",
+              "line_start": 91,
+              "line_end": 94,
+              "covered": true,
+              "char_start": 4932,
+              "char_end": 5193,
+              "expected_characters": 261,
+              "covered_characters": 261,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "485b6d87a27d849d5283beca0ae184d0abbc2e35a47f55a6218783bacf1c9bef",
+              "trimmed_quote_sha256": "04e87810559214fad519dda673e159817c0f06c4b450c80e19da7b33c0de39f9",
+              "independent_original_quote": "### Cancelling workers\n\nYou can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].\nThis will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T06",
+      "question": "What happens inside a coroutine when Worker.cancel is called, and what maximum cancellation latency does Textual guarantee?",
+      "claim_id": "guaranteed_cancel_latency",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-T07",
+      "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-T07/documented_part/set-0/part-0",
+              "path": "docs/guide/workers.md",
+              "line_start": 153,
+              "line_end": 159,
+              "covered": true,
+              "char_start": 8227,
+              "char_end": 8910,
+              "expected_characters": 683,
+              "covered_characters": 683,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "15dcc2a0be540adcf682e28215e01ca3b281629f67ff1aeb542e8c12122a2be0",
+              "trimmed_quote_sha256": "43988eb8954933279c1a7627468fbffd8eadf16c0abb088a9de7c16c063c8758",
+              "independent_original_quote": "You can create threads by setting `thread=True` on the `run_worker` method or the `work` decorator.\nThe API for thread workers is identical to async workers, but there are a few differences you need to be aware of when writing code for thread workers.\n\nThe first difference is that you should **avoid calling methods on your UI directly** from a threaded worker, or setting reactive variables.\nYou can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread.\n\nThe second difference is that you can't cancel threads in the same way as coroutines, but you *can* manually check if the worker was cancelled.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-T07",
+      "question": "How should a thread worker update the UI, and which exact OS thread scheduling policy does Textual use?",
+      "claim_id": "thread_scheduling_policy",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-T08",
+      "question": "What guaranteed 99th-percentile keyboard-to-render latency does Textual provide?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-V01",
+      "question": "Which env variables does Vite expose to client-side code by default, and what type are their parsed values?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V01/required/set-0/part-0",
+              "path": "docs/guide/env-and-mode.md",
+              "line_start": 32,
+              "line_end": 54,
+              "covered": true,
+              "char_start": 1309,
+              "char_end": 2326,
+              "expected_characters": 1017,
+              "covered_characters": 1017,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "f91c87588ea23e08d83c83a8dffd9fab1ef6927204b99242d7778a3f0d2ba03d",
+              "trimmed_quote_sha256": "f6b0d17f76db9c20c4f5f49df9b6330edb897e5993cf00e773befaf32aab44b2",
+              "independent_original_quote": "## Env Variables\n\nVite exposes env variables under the `import.meta.env` object as strings automatically.\n\nVariables prefixed with `VITE_` will be exposed in client-side source code after Vite bundling. To prevent accidentally leaking env variables to the client, avoid using this prefix. As an example, consider the following:\n\n```[.env]\nVITE_SOME_KEY=123\nDB_PASSWORD=foobar\n```\n\nThe parsed value of `VITE_SOME_KEY` – `\"123\"` – will be exposed on the client, but the value of `DB_PASSWORD` will not. You can test this by adding the following to your code:\n\n```js\nconsole.log(import.meta.env.VITE_SOME_KEY) // \"123\"\nconsole.log(import.meta.env.DB_PASSWORD) // undefined\n```\n\nIf you want to customize the env variables prefix, see the [envPrefix](/config/shared-options.html#envprefix) option.\n\n:::tip Env parsing\nAs shown above, `VITE_SOME_KEY` is a number but returns a string when parsed. The same would also happen for boolean env variables. Make sure to convert to the desired type when using it in your code.\n:::\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V02",
+      "question": "What wins when the same Vite environment variable is defined by the process and by .env files?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V02/required/set-0/part-0",
+              "path": "docs/guide/env-and-mode.md",
+              "line_start": 73,
+              "line_end": 81,
+              "covered": true,
+              "char_start": 3071,
+              "char_end": 3801,
+              "expected_characters": 730,
+              "covered_characters": 730,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "09b32b07984e189d66ded1dc567fb2f5e60741bf062575581ea19ee6c8ec5269",
+              "trimmed_quote_sha256": "8864cc6d5e148dd655353f1d8e31a3180819e4504d9010375e53c947ccc91527",
+              "independent_original_quote": ":::tip Env Loading Priorities\n\nAn env file for a specific mode (e.g. `.env.production`) will take higher priority than a generic one (e.g. `.env`).\n\nVite will always load `.env` and `.env.local` in addition to the mode-specific `.env.[mode]` file. Variables declared in mode-specific files will take precedence over those in generic files, but variables defined only in `.env` or `.env.local` will still be available in the environment.\n\nIn addition, environment variables that already exist when Vite is executed have the highest priority and will not be overwritten by `.env` files. For example, when running `VITE_SOME_KEY=123 vite build`.\n\n`.env` files are loaded at the start of Vite. Restart the server after making changes.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V03",
+      "question": "What is Vite dev server's default port, and what happens when that port is already in use?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V03/required/set-0/part-0",
+              "path": "docs/config/server-options.md",
+              "line_start": 63,
+              "line_end": 68,
+              "covered": true,
+              "char_start": 3036,
+              "char_end": 3276,
+              "expected_characters": 240,
+              "covered_characters": 240,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "b48785938f00a7a1b05227abba3938f1faf4d42399b3551292d1ea4d6102d77f",
+              "trimmed_quote_sha256": "04ceccd478cf9b0a96826f62bd8c832ac65bc0e66515a729f220e732a4381128",
+              "independent_original_quote": "## server.port\n\n- **Type:** `number`\n- **Default:** `5173`\n\nSpecify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V04",
+      "question": "What does server.strictPort=true do when the configured Vite port is already in use?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V04/required/set-0/part-0",
+              "path": "docs/config/server-options.md",
+              "line_start": 70,
+              "line_end": 74,
+              "covered": true,
+              "char_start": 3278,
+              "char_end": 3428,
+              "expected_characters": 150,
+              "covered_characters": 150,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "19338f093410684065efefac4d33b0d44892b605a34f97415df20810acbde612",
+              "trimmed_quote_sha256": "7e85a813df5f979207e546bc61d0711ce2ec1e992dbd04dd0ad547f5210af55f",
+              "independent_original_quote": "## server.strictPort\n\n- **Type:** `boolean`\n\nSet to `true` to exit if port is already in use, instead of automatically trying the next available port.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V05",
+      "question": "How are files in Vite's public directory served and how should public/icon.png be referenced from source code?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V05/required/set-0/part-0",
+              "path": "docs/guide/assets.md",
+              "line_start": 108,
+              "line_end": 124,
+              "covered": true,
+              "char_start": 3656,
+              "char_end": 4594,
+              "expected_characters": 938,
+              "covered_characters": 938,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "2548971bd60fdcc3cab0a66d1490f97bc76af49ca1fc16982a8e6d3a7d5cacdf",
+              "trimmed_quote_sha256": "54b94f1cb8afc0e85d607ec78162d38153d260a1dbd393e604e5f3c60037eb07",
+              "independent_original_quote": "## The `public` Directory\n\nIf you have assets that are:\n\n- Never referenced in source code (e.g. `robots.txt`)\n- Must retain the exact same file name (without hashing)\n- ...or you simply don't want to have to import an asset first just to get its URL\n\nThen you can place the asset in a special `public` directory under your project root. Assets in this directory will be served at root path `/` during dev, and copied to the root of the dist directory as-is.\n\nThe directory defaults to `<root>/public`, but can be configured via the [`publicDir` option](/config/shared-options.md#publicdir).\n\nNote that you should always reference `public` assets using root absolute path - for example, `public/icon.png` should be referenced in source code as `/icon.png`.\n\n::: tip Choosing between imports and the `public` directory\n\nIn general, prefer **importing assets** unless you specifically need the guarantees provided by the `public` directory.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V06",
+      "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-V06/documented_part/set-0/part-0",
+              "path": "docs/config/server-options.md",
+              "line_start": 379,
+              "line_end": 384,
+              "covered": true,
+              "char_start": 16109,
+              "char_end": 16260,
+              "expected_characters": 151,
+              "covered_characters": 151,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "e329597c168961df61bb6cae9cd23baf394db117beca47c3012010edc6e127b0",
+              "trimmed_quote_sha256": "695508acb6da8ca62789f936e30340c5de82e69102fe7cba6b80f6361c694330",
+              "independent_original_quote": "## server.fs.strict\n\n- **Type:** `boolean`\n- **Default:** `true` (enabled by default since Vite 2.7)\n\nRestrict serving files outside of workspace root.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-V06",
+      "question": "What is the default value of server.fs.strict, and what HTTP status code is guaranteed for a file blocked specifically by server.fs.deny?",
+      "claim_id": "fs_deny_status",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-V07",
+      "question": "What guaranteed 99th-percentile HMR propagation latency does Vite provide?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-V08",
+      "question": "What exact CDN cache TTL does Vite guarantee for production build assets?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-E01",
+      "question": "Which filenames can ESLint use for its flat configuration file?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": "UNKNOWN_BEFORE_PUBLIC_NATIVE",
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": false,
+          "parts": [
+            {
+              "witness_id": "V40-E01/required/set-0/part-0",
+              "path": "docs/src/use/configure/configuration-files.md",
+              "line_start": 19,
+              "line_end": 30,
+              "covered": false,
+              "char_start": 584,
+              "char_end": 1141,
+              "expected_characters": 557,
+              "covered_characters": 0,
+              "missing_char_ranges": [
+                [
+                  584,
+                  1141
+                ]
+              ],
+              "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+              "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d",
+              "independent_original_quote": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\nIt should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E02",
+      "question": "How does ESLint search for a configuration file for each target file when run on the command line?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-E02/required/set-0/part-0",
+              "path": "docs/src/use/configure/configuration-files.md",
+              "line_start": 782,
+              "line_end": 793,
+              "covered": true,
+              "char_start": 31142,
+              "char_end": 31855,
+              "expected_characters": 713,
+              "covered_characters": 713,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "21c9560771acff5fac8547fc1ebde48c0f41aef68ccd1fc49b902ab318ffbcbf",
+              "trimmed_quote_sha256": "f08f5017ff311f852b329dec39118a6a61d7e81aa947037acc4fbfb4846e069c",
+              "independent_original_quote": "## Configuration File Resolution\n\nWhen ESLint is run on the command line, it determines configuration for each target file by first looking in the directory that contains the file and then searching up ancestor directories until it finds an `eslint.config.*` file. This behavior improves support for monorepos, where subdirectories can have their own configuration files.\n\nYou can prevent this search by using the `-c` or `--config` option on the command line to specify an alternate configuration file, such as:\n\n{{ npx_tabs({\n    package: \"eslint\",\n    args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]\n}) }}\n\nIn this case, ESLint does not search for configuration files and instead uses `some-other-file.js`.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E03",
+      "question": "How does --fix-dry-run differ from --fix, and can it be used with stdin?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-E03/required/set-0/part-0",
+              "path": "docs/src/use/command-line-interface.md",
+              "line_start": 373,
+              "line_end": 381,
+              "covered": true,
+              "char_start": 13171,
+              "char_end": 13713,
+              "expected_characters": 542,
+              "covered_characters": 542,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "41c9ed94707d3db296cb930cb04836f97b31b51304fa29cf8b3a9a931c9cf356",
+              "trimmed_quote_sha256": "4abe9e312c1e8f0ad35be8b8463da6618986aab849686c9dc0943e219cef9f16",
+              "independent_original_quote": "#### `--fix-dry-run`\n\nThis option has the same effect as `--fix` with the difference that the fixes are not saved to the file system. Because the default formatter does not output the fixed code, you'll have to use another formatter (e.g. `--format json`) to get the fixes.\n\n- **Argument Type**: No argument.\n\nThis makes it possible to fix code from `stdin` when used with the `--stdin` flag.\n\nThis flag can be useful for integrations (e.g. editor plugins) which need to autofix text from the command line without saving it to the filesystem.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E04",
+      "question": "What are ESLint's default globally ignored paths and default JavaScript file patterns?",
+      "claim_id": "required",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-E04/required/set-0/part-0",
+              "path": "docs/src/use/configure/ignore.md",
+              "line_start": 24,
+              "line_end": 48,
+              "covered": true,
+              "char_start": 928,
+              "char_end": 2017,
+              "expected_characters": 1089,
+              "covered_characters": 1089,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "6f4f7f3a861ae61767c6410276be423dc148d9d7c05a27d80488ab45d4605b31",
+              "trimmed_quote_sha256": "c0180168d74b1636414f4ab60c37bccf367657129df643e80259e3bcfde82f42",
+              "independent_original_quote": "## Ignore Files\n\nIn your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([globalIgnores([\".config/*\"])]);\n```\n\nThis configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.\n\nBy default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),\n]);\n```\n\nWhen non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E05",
+      "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-E05/documented_part/set-0/part-0",
+              "path": "docs/src/use/configure/configuration-files.md",
+              "line_start": 795,
+              "line_end": 809,
+              "covered": true,
+              "char_start": 31857,
+              "char_end": 32552,
+              "expected_characters": 695,
+              "covered_characters": 695,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "ccd5d54cd38e1311a8dedb21f239c1af8b461246390443dc99e33fc67c158475",
+              "trimmed_quote_sha256": "8453b53c83dc412aa46ddfcc6ec07c68f0aedd5747fcb0a41525472b3d91f005",
+              "independent_original_quote": "## TypeScript Configuration Files\n\nFor Deno and Bun, TypeScript configuration files are natively supported; for Node.js, you must install the optional dev dependency [`jiti`](https://github.com/unjs/jiti) in version 2.2.0 or later in your project (this dependency is not automatically installed by ESLint):\n\n{{ npm_tabs({\n    command: \"install\",\n    packages: [\"jiti\"],\n    args: [\"--save-dev\"]\n}) }}\n\nYou can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).\n\n::: important\nESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.\n:::\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E05",
+      "question": "What extra dependency does Node.js need for TypeScript ESLint config files, and what exact startup overhead in milliseconds does it add?",
+      "claim_id": "jiti_startup_overhead",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-E06",
+      "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+      "claim_id": "documented_part",
+      "documented": true,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": true,
+      "in_packed": true,
+      "first_proven_loss": null,
+      "witness_sets": [
+        {
+          "set_index": 0,
+          "covered": true,
+          "parts": [
+            {
+              "witness_id": "V40-E06/documented_part/set-0/part-0",
+              "path": "docs/src/use/command-line-interface.md",
+              "line_start": 1020,
+              "line_end": 1028,
+              "covered": true,
+              "char_start": 35795,
+              "char_end": 36151,
+              "expected_characters": 356,
+              "covered_characters": 356,
+              "missing_char_ranges": [],
+              "raw_quote_sha256": "5730caf85f20523286c069218262bdad3a52c96d66b44f0d594ba9dc68273a06",
+              "trimmed_quote_sha256": "0547b8bee493805775b8fe2fd36d8069e328ee0b9a70083d9307e503d17c5859",
+              "independent_original_quote": "#### `--concurrency`\n\nThis option controls the number of worker threads used to lint files.\n\n- **Argument Type**: Int|String. A positive integer, `auto` or `off`.\n- **Multiple Arguments**: No\n- **Default Value**: `off`\n\nThe value `off` causes all files to be linted in the main thread. The value `auto` attempts to determine the best setting automatically.\n"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "V40-E06",
+      "question": "What is the default --concurrency value and what does auto mean, and exactly how many worker threads will auto choose on an 8-core host?",
+      "claim_id": "auto_worker_count_8_core",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-E07",
+      "question": "What hard maximum memory usage per lint worker does ESLint guarantee?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    },
+    {
+      "case_id": "V40-E08",
+      "question": "What production uptime SLA does ESLint guarantee for local linting?",
+      "claim_id": "unsupported_request",
+      "documented": false,
+      "in_acquisition": "UNKNOWN",
+      "after_admission": "UNKNOWN",
+      "after_selection": "UNKNOWN",
+      "in_public_native": false,
+      "in_packed": false,
+      "first_proven_loss": null,
+      "witness_sets": []
+    }
+  ],
+  "answer_quality": "NOT MEASURED",
+  "generated_hallucinations": "NOT MEASURED",
+  "context_seconds_sum": 167.61996178298796,
+  "context_seconds_median": 3.1674626325002464,
+  "context_seconds_max": 7.9818360329991265,
+  "read_only_failures": [],
+  "runtime_integrity_failures": [],
+  "assessor_integrity_failures": [],
+  "costs": [
+    {
+      "case_id": "V40-B01",
+      "native_saved_json_tokens": 12678,
+      "native_saved_json_bytes": 39789,
+      "packed_source_tokens": 11790,
+      "packed_source_bytes": 35599
+    },
+    {
+      "case_id": "V40-B02",
+      "native_saved_json_tokens": 12695,
+      "native_saved_json_bytes": 39912,
+      "packed_source_tokens": 11807,
+      "packed_source_bytes": 35722
+    },
+    {
+      "case_id": "V40-B03",
+      "native_saved_json_tokens": 12677,
+      "native_saved_json_bytes": 39777,
+      "packed_source_tokens": 11789,
+      "packed_source_bytes": 35587
+    },
+    {
+      "case_id": "V40-B04",
+      "native_saved_json_tokens": 12690,
+      "native_saved_json_bytes": 39779,
+      "packed_source_tokens": 11802,
+      "packed_source_bytes": 35589
+    },
+    {
+      "case_id": "V40-B05",
+      "native_saved_json_tokens": 12593,
+      "native_saved_json_bytes": 39814,
+      "packed_source_tokens": 11705,
+      "packed_source_bytes": 35624
+    },
+    {
+      "case_id": "V40-B06",
+      "native_saved_json_tokens": 12498,
+      "native_saved_json_bytes": 39785,
+      "packed_source_tokens": 11626,
+      "packed_source_bytes": 35677
+    },
+    {
+      "case_id": "V40-B07",
+      "native_saved_json_tokens": 12560,
+      "native_saved_json_bytes": 39738,
+      "packed_source_tokens": 11672,
+      "packed_source_bytes": 35548
+    },
+    {
+      "case_id": "V40-B08",
+      "native_saved_json_tokens": 12646,
+      "native_saved_json_bytes": 39836,
+      "packed_source_tokens": 11758,
+      "packed_source_bytes": 35646
+    },
+    {
+      "case_id": "V40-P01",
+      "native_saved_json_tokens": 12659,
+      "native_saved_json_bytes": 40434,
+      "packed_source_tokens": 11787,
+      "packed_source_bytes": 36326
+    },
+    {
+      "case_id": "V40-P02",
+      "native_saved_json_tokens": 12566,
+      "native_saved_json_bytes": 40366,
+      "packed_source_tokens": 11678,
+      "packed_source_bytes": 36176
+    },
+    {
+      "case_id": "V40-P03",
+      "native_saved_json_tokens": 12704,
+      "native_saved_json_bytes": 40253,
+      "packed_source_tokens": 11800,
+      "packed_source_bytes": 35981
+    },
+    {
+      "case_id": "V40-P04",
+      "native_saved_json_tokens": 12676,
+      "native_saved_json_bytes": 40486,
+      "packed_source_tokens": 11804,
+      "packed_source_bytes": 36378
+    },
+    {
+      "case_id": "V40-P05",
+      "native_saved_json_tokens": 12632,
+      "native_saved_json_bytes": 39316,
+      "packed_source_tokens": 11776,
+      "packed_source_bytes": 35290
+    },
+    {
+      "case_id": "V40-P06",
+      "native_saved_json_tokens": 12524,
+      "native_saved_json_bytes": 39551,
+      "packed_source_tokens": 11652,
+      "packed_source_bytes": 35443
+    },
+    {
+      "case_id": "V40-P07",
+      "native_saved_json_tokens": 12696,
+      "native_saved_json_bytes": 40001,
+      "packed_source_tokens": 11776,
+      "packed_source_bytes": 35647
+    },
+    {
+      "case_id": "V40-P08",
+      "native_saved_json_tokens": 12489,
+      "native_saved_json_bytes": 39164,
+      "packed_source_tokens": 11617,
+      "packed_source_bytes": 35056
+    },
+    {
+      "case_id": "V40-T01",
+      "native_saved_json_tokens": 12696,
+      "native_saved_json_bytes": 40910,
+      "packed_source_tokens": 11808,
+      "packed_source_bytes": 36720
+    },
+    {
+      "case_id": "V40-T02",
+      "native_saved_json_tokens": 12589,
+      "native_saved_json_bytes": 40483,
+      "packed_source_tokens": 11717,
+      "packed_source_bytes": 36375
+    },
+    {
+      "case_id": "V40-T03",
+      "native_saved_json_tokens": 12511,
+      "native_saved_json_bytes": 40724,
+      "packed_source_tokens": 11639,
+      "packed_source_bytes": 36616
+    },
+    {
+      "case_id": "V40-T04",
+      "native_saved_json_tokens": 12663,
+      "native_saved_json_bytes": 40351,
+      "packed_source_tokens": 11791,
+      "packed_source_bytes": 36243
+    },
+    {
+      "case_id": "V40-T05",
+      "native_saved_json_tokens": 12687,
+      "native_saved_json_bytes": 40924,
+      "packed_source_tokens": 11799,
+      "packed_source_bytes": 36734
+    },
+    {
+      "case_id": "V40-T06",
+      "native_saved_json_tokens": 12693,
+      "native_saved_json_bytes": 41079,
+      "packed_source_tokens": 11805,
+      "packed_source_bytes": 36889
+    },
+    {
+      "case_id": "V40-T07",
+      "native_saved_json_tokens": 12518,
+      "native_saved_json_bytes": 40625,
+      "packed_source_tokens": 11646,
+      "packed_source_bytes": 36517
+    },
+    {
+      "case_id": "V40-T08",
+      "native_saved_json_tokens": 12655,
+      "native_saved_json_bytes": 40780,
+      "packed_source_tokens": 11767,
+      "packed_source_bytes": 36590
+    },
+    {
+      "case_id": "V40-V01",
+      "native_saved_json_tokens": 12644,
+      "native_saved_json_bytes": 39573,
+      "packed_source_tokens": 11756,
+      "packed_source_bytes": 35383
+    },
+    {
+      "case_id": "V40-V02",
+      "native_saved_json_tokens": 12693,
+      "native_saved_json_bytes": 39752,
+      "packed_source_tokens": 11805,
+      "packed_source_bytes": 35562
+    },
+    {
+      "case_id": "V40-V03",
+      "native_saved_json_tokens": 12548,
+      "native_saved_json_bytes": 39629,
+      "packed_source_tokens": 11676,
+      "packed_source_bytes": 35521
+    },
+    {
+      "case_id": "V40-V04",
+      "native_saved_json_tokens": 12656,
+      "native_saved_json_bytes": 39813,
+      "packed_source_tokens": 11784,
+      "packed_source_bytes": 35705
+    },
+    {
+      "case_id": "V40-V05",
+      "native_saved_json_tokens": 12649,
+      "native_saved_json_bytes": 39402,
+      "packed_source_tokens": 11761,
+      "packed_source_bytes": 35212
+    },
+    {
+      "case_id": "V40-V06",
+      "native_saved_json_tokens": 12565,
+      "native_saved_json_bytes": 39381,
+      "packed_source_tokens": 11693,
+      "packed_source_bytes": 35273
+    },
+    {
+      "case_id": "V40-V07",
+      "native_saved_json_tokens": 12524,
+      "native_saved_json_bytes": 39154,
+      "packed_source_tokens": 11652,
+      "packed_source_bytes": 35046
+    },
+    {
+      "case_id": "V40-V08",
+      "native_saved_json_tokens": 12550,
+      "native_saved_json_bytes": 39383,
+      "packed_source_tokens": 11662,
+      "packed_source_bytes": 35193
+    },
+    {
+      "case_id": "V40-E01",
+      "native_saved_json_tokens": 12652,
+      "native_saved_json_bytes": 40881,
+      "packed_source_tokens": 11780,
+      "packed_source_bytes": 36773
+    },
+    {
+      "case_id": "V40-E02",
+      "native_saved_json_tokens": 12686,
+      "native_saved_json_bytes": 41617,
+      "packed_source_tokens": 11798,
+      "packed_source_bytes": 37427
+    },
+    {
+      "case_id": "V40-E03",
+      "native_saved_json_tokens": 12553,
+      "native_saved_json_bytes": 40090,
+      "packed_source_tokens": 11649,
+      "packed_source_bytes": 35818
+    },
+    {
+      "case_id": "V40-E04",
+      "native_saved_json_tokens": 12666,
+      "native_saved_json_bytes": 41100,
+      "packed_source_tokens": 11794,
+      "packed_source_bytes": 36992
+    },
+    {
+      "case_id": "V40-E05",
+      "native_saved_json_tokens": 12686,
+      "native_saved_json_bytes": 41283,
+      "packed_source_tokens": 11798,
+      "packed_source_bytes": 37093
+    },
+    {
+      "case_id": "V40-E06",
+      "native_saved_json_tokens": 12711,
+      "native_saved_json_bytes": 41203,
+      "packed_source_tokens": 11807,
+      "packed_source_bytes": 36931
+    },
+    {
+      "case_id": "V40-E07",
+      "native_saved_json_tokens": 12537,
+      "native_saved_json_bytes": 40375,
+      "packed_source_tokens": 11649,
+      "packed_source_bytes": 36185
+    },
+    {
+      "case_id": "V40-E08",
+      "native_saved_json_tokens": 12567,
+      "native_saved_json_bytes": 40758,
+      "packed_source_tokens": 11695,
+      "packed_source_bytes": 36650
+    }
+  ],
+  "cost_totals": {
+    "native_saved_json_tokens": 504882,
+    "native_saved_json_bytes": 1607271,
+    "packed_source_tokens": 469570,
+    "packed_source_bytes": 1440737
+  },
+  "cost_maxima": {
+    "native_saved_json_tokens": 12711,
+    "packed_source_tokens": 11808
+  },
+  "claim_totals": {
+    "native": {
+      "documented": 32,
+      "covered": 30
+    },
+    "packed": {
+      "documented": 32,
+      "covered": 30
+    }
+  }
+}

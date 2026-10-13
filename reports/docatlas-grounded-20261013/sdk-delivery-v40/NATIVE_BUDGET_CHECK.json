@@ -1,0 +1,411 @@
+{
+  "limit": 12000,
+  "serializer": "json.dumps(payload,ensure_ascii=False)",
+  "metric": "max(o200k_base,ceil(UTF8/4))_full_native_public_DTO",
+  "rows": [
+    {
+      "case_id": "V40-B01",
+      "native_mcp_text_tokens": 11982,
+      "utf8_quarter": 9085,
+      "cost": 11982,
+      "estimated_tokens": 8827,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B02",
+      "native_mcp_text_tokens": 11999,
+      "utf8_quarter": 9116,
+      "cost": 11999,
+      "estimated_tokens": 8858,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B03",
+      "native_mcp_text_tokens": 11981,
+      "utf8_quarter": 9082,
+      "cost": 11981,
+      "estimated_tokens": 8824,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B04",
+      "native_mcp_text_tokens": 11994,
+      "utf8_quarter": 9083,
+      "cost": 11994,
+      "estimated_tokens": 8825,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B05",
+      "native_mcp_text_tokens": 11897,
+      "utf8_quarter": 9092,
+      "cost": 11897,
+      "estimated_tokens": 8833,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B06",
+      "native_mcp_text_tokens": 11818,
+      "utf8_quarter": 9105,
+      "cost": 11818,
+      "estimated_tokens": 8853,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-B07",
+      "native_mcp_text_tokens": 11864,
+      "utf8_quarter": 9073,
+      "cost": 11864,
+      "estimated_tokens": 8814,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-B08",
+      "native_mcp_text_tokens": 11950,
+      "utf8_quarter": 9097,
+      "cost": 11950,
+      "estimated_tokens": 8839,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-E01",
+      "native_mcp_text_tokens": 11972,
+      "utf8_quarter": 9379,
+      "cost": 11972,
+      "estimated_tokens": 9127,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-E02",
+      "native_mcp_text_tokens": 11990,
+      "utf8_quarter": 9542,
+      "cost": 11990,
+      "estimated_tokens": 9284,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-E03",
+      "native_mcp_text_tokens": 11841,
+      "utf8_quarter": 9140,
+      "cost": 11841,
+      "estimated_tokens": 8876,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 42
+    },
+    {
+      "case_id": "V40-E04",
+      "native_mcp_text_tokens": 11986,
+      "utf8_quarter": 9434,
+      "cost": 11986,
+      "estimated_tokens": 9181,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-E05",
+      "native_mcp_text_tokens": 11990,
+      "utf8_quarter": 9459,
+      "cost": 11990,
+      "estimated_tokens": 9201,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-E06",
+      "native_mcp_text_tokens": 11999,
+      "utf8_quarter": 9418,
+      "cost": 11999,
+      "estimated_tokens": 9154,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 42
+    },
+    {
+      "case_id": "V40-E07",
+      "native_mcp_text_tokens": 11841,
+      "utf8_quarter": 9232,
+      "cost": 11841,
+      "estimated_tokens": 8974,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-E08",
+      "native_mcp_text_tokens": 11887,
+      "utf8_quarter": 9348,
+      "cost": 11887,
+      "estimated_tokens": 9096,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-P01",
+      "native_mcp_text_tokens": 11979,
+      "utf8_quarter": 9267,
+      "cost": 11979,
+      "estimated_tokens": 9015,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-P02",
+      "native_mcp_text_tokens": 11870,
+      "utf8_quarter": 9230,
+      "cost": 11870,
+      "estimated_tokens": 8971,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-P03",
+      "native_mcp_text_tokens": 11992,
+      "utf8_quarter": 9181,
+      "cost": 11992,
+      "estimated_tokens": 8917,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 42
+    },
+    {
+      "case_id": "V40-P04",
+      "native_mcp_text_tokens": 11996,
+      "utf8_quarter": 9280,
+      "cost": 11996,
+      "estimated_tokens": 9028,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-P05",
+      "native_mcp_text_tokens": 11968,
+      "utf8_quarter": 9008,
+      "cost": 11968,
+      "estimated_tokens": 8762,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 39
+    },
+    {
+      "case_id": "V40-P06",
+      "native_mcp_text_tokens": 11844,
+      "utf8_quarter": 9046,
+      "cost": 11844,
+      "estimated_tokens": 8794,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-P07",
+      "native_mcp_text_tokens": 11968,
+      "utf8_quarter": 9097,
+      "cost": 11968,
+      "estimated_tokens": 8827,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 43
+    },
+    {
+      "case_id": "V40-P08",
+      "native_mcp_text_tokens": 11809,
+      "utf8_quarter": 8950,
+      "cost": 11809,
+      "estimated_tokens": 8697,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-T01",
+      "native_mcp_text_tokens": 12000,
+      "utf8_quarter": 9366,
+      "cost": 12000,
+      "estimated_tokens": 9107,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-T02",
+      "native_mcp_text_tokens": 11909,
+      "utf8_quarter": 9279,
+      "cost": 11909,
+      "estimated_tokens": 9027,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-T03",
+      "native_mcp_text_tokens": 11831,
+      "utf8_quarter": 9340,
+      "cost": 11831,
+      "estimated_tokens": 9087,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-T04",
+      "native_mcp_text_tokens": 11983,
+      "utf8_quarter": 9246,
+      "cost": 11983,
+      "estimated_tokens": 8994,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-T05",
+      "native_mcp_text_tokens": 11991,
+      "utf8_quarter": 9369,
+      "cost": 11991,
+      "estimated_tokens": 9111,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-T06",
+      "native_mcp_text_tokens": 11997,
+      "utf8_quarter": 9408,
+      "cost": 11997,
+      "estimated_tokens": 9150,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-T07",
+      "native_mcp_text_tokens": 11838,
+      "utf8_quarter": 9315,
+      "cost": 11838,
+      "estimated_tokens": 9063,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-T08",
+      "native_mcp_text_tokens": 11959,
+      "utf8_quarter": 9333,
+      "cost": 11959,
+      "estimated_tokens": 9075,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-V01",
+      "native_mcp_text_tokens": 11948,
+      "utf8_quarter": 9031,
+      "cost": 11948,
+      "estimated_tokens": 8773,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-V02",
+      "native_mcp_text_tokens": 11997,
+      "utf8_quarter": 9076,
+      "cost": 11997,
+      "estimated_tokens": 8818,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-V03",
+      "native_mcp_text_tokens": 11868,
+      "utf8_quarter": 9066,
+      "cost": 11868,
+      "estimated_tokens": 8814,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-V04",
+      "native_mcp_text_tokens": 11976,
+      "utf8_quarter": 9112,
+      "cost": 11976,
+      "estimated_tokens": 8860,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-V05",
+      "native_mcp_text_tokens": 11953,
+      "utf8_quarter": 8989,
+      "cost": 11953,
+      "estimated_tokens": 8730,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    },
+    {
+      "case_id": "V40-V06",
+      "native_mcp_text_tokens": 11885,
+      "utf8_quarter": 9004,
+      "cost": 11885,
+      "estimated_tokens": 8752,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-V07",
+      "native_mcp_text_tokens": 11844,
+      "utf8_quarter": 8947,
+      "cost": 11844,
+      "estimated_tokens": 8695,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 40
+    },
+    {
+      "case_id": "V40-V08",
+      "native_mcp_text_tokens": 11854,
+      "utf8_quarter": 8984,
+      "cost": 11854,
+      "estimated_tokens": 8726,
+      "status": "truncated",
+      "context_status": "ready",
+      "source_count": 41
+    }
+  ],
+  "violations": [],
+  "max_cost": 12000,
+  "median_cost": 11963.5,
+  "native_token_sum": 477250
+}

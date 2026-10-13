@@ -1,0 +1,253 @@
+[
+  {
+    "case_id": "V40-P03",
+    "question": "How are Poetry configuration setting names converted into environment variable names?",
+    "fixed_oracle_pass": false,
+    "witness_sets": [
+      {
+        "set_index": 0,
+        "covered": false,
+        "parts": [
+          {
+            "witness_id": "V40-P03/required/set-0/part-0",
+            "path": "docs/configuration.md",
+            "line_start": 102,
+            "line_end": 114,
+            "covered": false,
+            "char_start": 2805,
+            "char_end": 3320,
+            "expected_characters": 515,
+            "covered_characters": 442,
+            "missing_char_ranges": [
+              [
+                3247,
+                3320
+              ]
+            ],
+            "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+            "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2",
+            "independent_original_quote": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n```bash\nexport POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory\n```\n"
+          }
+        ]
+      }
+    ],
+    "core_source_count": 167,
+    "core_rows_omitted": 103,
+    "final_sources": 42,
+    "trace_events_omitted": 1974,
+    "required_terms_observations": {
+      "POETRY_": [
+        {
+          "path": "docs/configuration.md",
+          "line_start": 455,
+          "line_end": 469,
+          "snippet": "### `solver.min-release-age-exclude`\n\n**Type**: `string`\n\n**Default**: *not set*\n\n**Environment Variable**: `POETRY_SOLVER_MIN_RELEASE_AGE_EXCLUDE`\n\n*Introduced in 2.4.0*\n\nA comma-separated list of package names that should be excluded from the\n[`solver.min-release-age`](#solvermin-release-age) filter.\nVersions of these packages will always be considered by the solver,\nregardless of their upload age.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 567,
+          "line_end": 579,
+          "snippet": "### `virtualenvs.options.always-copy`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_OPTIONS_ALWAYS_COPY`\n\n*Introduced in 1.2.0*\n\nIf set to `true` the `--always-copy` parameter is passed to `virtualenv` on creation of the virtual environment, so that\nall needed files are copied into it instead of symlinked.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 102,
+          "line_end": 111,
+          "snippet": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 171,
+          "line_end": 178,
+          "snippet": "### Cache Directory\n\n- Linux: `$XDG_CACHE_HOME/pypoetry` or `~/.cache/pypoetry`\n- Windows: `%LOCALAPPDATA%\\pypoetry`\n- macOS: `~/Library/Caches/pypoetry`\n\nYou can override the cache directory by setting the `POETRY_CACHE_DIR` environment variable.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 155,
+          "line_end": 162,
+          "snippet": "### Config Directory\n\n- Linux: `$XDG_CONFIG_HOME/pypoetry` or `~/.config/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the config directory by setting the `POETRY_CONFIG_DIR` environment variable.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 368,
+          "line_end": 380,
+          "snippet": "### `requests.max-retries`\n\n**Type**: `int`\n\n**Default**: `0`\n\n**Environment Variable**: `POETRY_REQUESTS_MAX_RETRIES`\n\n*Introduced in 2.0.0*\n\nSet the maximum number of retries in an unstable network.\nThis setting has no effect if the server does not support HTTP range requests.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 613,
+          "line_end": 626,
+          "snippet": "### `virtualenvs.path`\n\n**Type**: `string`\n\n**Default**: `{cache-dir}/virtualenvs`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_PATH`\n\nDirectory where virtual environments will be created.\n\n{{% note %}}\nThis setting controls the global virtual environment storage path. It most likely will not be useful at the local level. To store virtual environments in the project root, see `virtualenvs.in-project`.\n{{% /note %}}\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 195,
+          "line_end": 209,
+          "snippet": "### `data-dir`\n\n**Type**: `string`\n\n**Environment Variable**: `POETRY_DATA_DIR`\n\nThe path to the data directory used by Poetry.\n\n- Linux: `$XDG_DATA_HOME/pypoetry` or `~/.local/share/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the data directory by setting the `POETRY_DATA_DIR` or `POETRY_HOME` environment variables. If\n`POETRY_HOME` is set, it will be given higher priority.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 398,
+          "line_end": 409,
+          "snippet": "### `python.installation-dir`\n\n**Type**: `string`\n\n**Default**: `{data-dir}/python`\n\n**Environment Variable**: `POETRY_PYTHON_INSTALLATION_DIR`\n\n*Introduced in 2.1.0*\n\nThe directory in which Poetry managed Python versions are installed to.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 627,
+          "line_end": 639,
+          "snippet": "### `virtualenvs.prompt`\n\n**Type**: `string`\n\n**Default**: `{project_name}-py{python_version}`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_PROMPT`\n\n*Introduced in 1.2.0*\n\nFormat string defining the prompt to be displayed when the virtual environment is activated.\nThe variables `project_name` and `python_version` are available for formatting.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 122,
+          "line_end": 131,
+          "snippet": "## Configuration sources\n\nWhen a setting is set in multiple places, Poetry applies the following precedence\n(from highest to lowest):\n\n1. Environment variables (for example, `POETRY_VIRTUALENVS_CREATE`)\n2. The local `poetry.toml` file (created with `poetry config --local`)\n3. The global `config.toml` file\n4. The setting's default value\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 163,
+          "line_end": 170,
+          "snippet": "### Data Directory\n\n- Linux: `$XDG_DATA_HOME/pypoetry` or `~/.local/share/pypoetry`\n- Windows: `%APPDATA%\\pypoetry`\n- macOS: `~/Library/Application Support/pypoetry`\n\nYou can override the data directory by setting the `POETRY_DATA_DIR` or `POETRY_HOME` environment variables. If `POETRY_HOME` is set, it will be given higher priority.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 512,
+          "line_end": 521,
+          "snippet": "### `virtualenvs.create`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_CREATE`\n\nCreate a new virtual environment if one doesn't already exist.\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 310,
+          "line_end": 319,
+          "snippet": "### `installer.builtin-uninstall`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_INSTALLER_BUILTIN_UNINSTALL`\n\n*Introduced in 2.5.0*\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 410,
+          "line_end": 419,
+          "snippet": "### `solver.lazy-wheel`\n\n**Type**: `boolean`\n\n**Default**: `true`\n\n**Environment Variable**: `POETRY_SOLVER_LAZY_WHEEL`\n\n*Introduced in 1.8.0*\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 261,
+          "line_end": 274,
+          "snippet": "```bash\npoetry config --local installer.no-binary :all:\n```\n{{% /note %}}\n\n{{% note %}}\nFor CI or container environments using [environment variable](#using-environment-variables)\nto configure this might be useful.\n\n```bash\nexport POETRY_INSTALLER_NO_BINARY=:all:\n```\n{{% /note %}}\n\n"
+        },
+        {
+          "path": "docs/configuration.md",
+          "line_start": 602,
+          "line_end": 612,
+          "snippet": "### `virtualenvs.options.system-site-packages`\n\n**Type**: `boolean`\n\n**Default**: `false`\n\n**Environment Variable**: `POETRY_VIRTUALENVS_OPTIONS_SYSTEM_SITE_PACKAGES`\n\nGive the virtual environment access to the system site-packages directory.\nApplies on virtualenv creation.\n\n"
+        }
+      ],
+      "uppercase": [
+        {
+          "path": "docs/configuration.md",
+          "line_start": 102,
+          "line_end": 111,
+          "snippet": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n"
+        }
+      ],
+      "dots and dashes replaced by underscore": [
+        {
+          "path": "docs/configuration.md",
+          "line_start": 102,
+          "line_end": 111,
+          "snippet": "## Using environment variables\n\nSometimes, in particular when using Poetry with CI tools, it's easier\nto use environment variables and not have to execute configuration commands.\n\nPoetry supports this and any setting can be set by using environment variables.\n\nThe environment variables must be prefixed by `POETRY_` and are comprised of the uppercase\nname of the setting and with dots and dashes replaced by underscore, here is an example:\n\n"
+        }
+      ]
+    },
+    "first_proven_loss": "UNKNOWN_BEFORE_PUBLIC_NATIVE; bounded trace incomplete",
+    "interpretation": "Main conversion rule delivered; exact frozen example at lines112-114 missing. Fixed criterion remains FAIL."
+  },
+  {
+    "case_id": "V40-E01",
+    "question": "Which filenames can ESLint use for its flat configuration file?",
+    "fixed_oracle_pass": false,
+    "witness_sets": [
+      {
+        "set_index": 0,
+        "covered": false,
+        "parts": [
+          {
+            "witness_id": "V40-E01/required/set-0/part-0",
+            "path": "docs/src/use/configure/configuration-files.md",
+            "line_start": 19,
+            "line_end": 30,
+            "covered": false,
+            "char_start": 584,
+            "char_end": 1141,
+            "expected_characters": 557,
+            "covered_characters": 0,
+            "missing_char_ranges": [
+              [
+                584,
+                1141
+              ]
+            ],
+            "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+            "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d",
+            "independent_original_quote": "## Configuration File\n\nThe ESLint configuration file may be named any of the following:\n\n- `eslint.config.js`\n- `eslint.config.mjs`\n- `eslint.config.cjs`\n- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))\n- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))\n\nIt should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:\n"
+          }
+        ]
+      }
+    ],
+    "core_source_count": 256,
+    "core_rows_omitted": 192,
+    "final_sources": 40,
+    "trace_events_omitted": 1982,
+    "required_terms_observations": {
+      "eslint.config.js": [
+        {
+          "path": "docs/src/use/configure/configuration-files.md",
+          "line_start": 546,
+          "line_end": 562,
+          "snippet": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\trules: {\n\t\t\tsemi: [\"error\", \"never\"],\n\t\t},\n\t},\n]);\n```\n\nEach rule specifies its own options and can be any valid JSON data type. Please check the documentation for the rule you want to configure for more information about its available options.\n\nFor more information on configuring rules, see [Configure Rules](rules).\n\n"
+        },
+        {
+          "path": "docs/src/use/configure/configuration-files.md",
+          "line_start": 393,
+          "line_end": 427,
+          "snippet": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t{\n\t\tbasePath: \"tests\",\n\t\textends: [\n\t\t\t// matches all files in tests and its subdirectories\n\t\t\t{\n\t\t\t\trules: {\n\t\t\t\t\t\"no-undef\": \"error\",\n\t\t\t\t},\n\t\t\t},\n\n\t\t\t// matches all files ending with spec.js in tests and its subdirectories\n\t\t\t{\n\t\t\t\tfiles: [\"**/*.spec.js\"],\n\t\t\t\tlanguageOptions: {\n\t\t\t\t\tglobals: {\n\t\t\t\t\t\tit: \"readonly\",\n\t\t\t\t\t\tdescribe: \"readonly\",\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t},\n\n\t\t\t// globally ignores tests/fixtures directory\n\t\t\t{\n\t\t\t\tignores: [\"fixtures/\"],\n\t\t\t},\n\t\t],\n\t},\n]);\n```\n\n"
+        },
+        {
+          "path": "docs/src/use/configure/configuration-files.md",
+          "line_start": 358,
+          "line_end": 390,
+          "snippet": "```js\n// eslint.config.js\nimport { defineConfig } from \"eslint/config\";\n\nexport default defineConfig([\n\t// matches all files in tests and its subdirectories\n\t{\n\t\tbasePath: \"tests\",\n\t\trules: {\n\t\t\t\"no-undef\": \"error\",\n\t\t},\n\t},\n\n\t// matches all files ending with spec.js in tests and its subdirectories\n\t{\n\t\tbasePath: \"tests\",\n\t\tfiles: [\"**/*.spec.js\"],\n\t\tlanguageOptions: {\n\t\t\tglobals: {\n\t\t\t\tit: \"readonly\",\n\t\t\t\tdescribe: \"readonly\",\n\t\t\t},\n\t\t},\n\t},\n\n\t// globally ignores tests/fixtures directory\n\t{\n\t\tbasePath: \"tests\",\n\t\tignores: [\"fixtures/\"],\n\t},\n]);\n```\n\n"
+        },
+        {
+          "path": "docs/src/use/configure/ignore.md",
+          "line_start": 95,
+          "line_end": 107,
+          "snippet": "```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\n\t\t\"!node_modules/\", // unignore `node_modules/` directory\n\t\t\"node_modules/*\", // ignore its content\n\t\t\"!node_modules/mylibrary/\", // unignore `node_modules/mylibrary` directory\n\t]),\n]);\n```\n\n"
+        },
+        {
+          "path": "docs/src/use/command-line-interface.md",
+          "line_start": 181,
+          "line_end": 189,
+          "snippet": "##### `-c`, `--config` example\n\n{{ npx_tabs ({\n    package: \"eslint\",\n    args: [\"-c\", \"~/my.eslint.config.js\", \"file.js\"]\n}) }}\n\nThis example uses the configuration file at `~/my.eslint.config.js`, which is used instead of searching for an `eslint.config.js` file.\n\n"
+        },
+        {
+          "path": "docs/src/use/configure/ignore.md",
+          "line_start": 174,
+          "line_end": 186,
+          "snippet": "## Name the Global Ignores Config\n\nBy default, `globalIgnores()` will assign a name to the config that represents your ignores. You can override this name by providing a second argument to `globalIgnores()`, which is the name you'd like to use instead of the default:\n\n```js\n// eslint.config.js\nimport { defineConfig, globalIgnores } from \"eslint/config\";\n\nexport default defineConfig([\n\tglobalIgnores([\"build/**/*\"], \"Ignore Build Directory\"),\n]);\n```\n\n"
+        },
+        {
+          "path": "docs/src/use/configure/configuration-files.md",
+          "line_start": 46,
+          "line_end": 49,
+          "snippet": "In this example, the `defineConfig()` helper is used to define a configuration array with just one configuration object. The configuration object enables two rules: `semi` and `prefer-const`. These rules are applied to all of the files ESLint processes using this config file.\n\nIf your project specifies `\"type\": \"commonjs\"` in its `package.json` file, then `eslint.config.js` must be in CommonJS format, such as:\n\n"
+        }
+      ],
+      "eslint.config.mjs": [],
+      "eslint.config.cjs": [],
+      "eslint.config.ts": [],
+      "eslint.config.mts": [],
+      "eslint.config.cts": []
+    },
+    "first_proven_loss": "UNKNOWN_BEFORE_PUBLIC_NATIVE; bounded trace incomplete",
+    "interpretation": "Complete six-name list missing; examples containing .js do not supply other supported names. Fixed criterion FAIL."
+  }
+]
