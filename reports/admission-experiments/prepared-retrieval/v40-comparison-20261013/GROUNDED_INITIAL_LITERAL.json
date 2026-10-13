@@ -1,0 +1,2201 @@
+{
+  "method": "source-bound exact normalized line inclusion (strict); >=85% core lines tolerant; no model answers",
+  "metrics": {
+    "G2": {
+      "P": 15,
+      "PART": 4,
+      "N": 0,
+      "strict_pass": 19,
+      "tolerant_pass": 21,
+      "chars": 284250,
+      "sources": 80,
+      "median_seconds": 1.96
+    },
+    "G5": {
+      "P": 16,
+      "PART": 5,
+      "N": 0,
+      "strict_pass": 21,
+      "tolerant_pass": 23,
+      "chars": 699287,
+      "sources": 200,
+      "median_seconds": 1.956
+    },
+    "Dold": {
+      "P": 18,
+      "PART": 4,
+      "N": 1,
+      "strict_pass": 23,
+      "tolerant_pass": 22,
+      "chars": 74939,
+      "sources": 68,
+      "median_seconds": 0.834
+    },
+    "Dnew": {
+      "P": 18,
+      "PART": 5,
+      "N": 1,
+      "strict_pass": 24,
+      "tolerant_pass": 23,
+      "chars": 86241,
+      "sources": 71,
+      "median_seconds": 0.562
+    }
+  },
+  "cases": [
+    {
+      "id": "V40-B01",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 2,
+          "expected_lines": 2,
+          "core_matched": 1,
+          "core_total": 1,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 9571
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 2,
+          "expected_lines": 2,
+          "core_matched": 1,
+          "core_total": 1,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 23980
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 2,
+          "expected_lines": 2,
+          "core_matched": 1,
+          "core_total": 1,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 497
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 2,
+          "expected_lines": 2,
+          "core_matched": 1,
+          "core_total": 1,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 497
+        }
+      }
+    },
+    {
+      "id": "V40-B02",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 9571
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 21867
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 1347
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2694
+        }
+      }
+    },
+    {
+      "id": "V40-B03",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 9013
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 25483
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1299
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1299
+        }
+      }
+    },
+    {
+      "id": "V40-B04",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 11578
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 23980
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 787
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 787
+        }
+      }
+    },
+    {
+      "id": "V40-B05",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "Like `--exclude`, but files and directories matching this regex will be excluded even",
+            "when they are passed explicitly as arguments. This is useful when invoking Black",
+            "programmatically on changed files, such as in a pre-commit hook or editor plugin."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 14256
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 26879
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 796
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 796
+        }
+      }
+    },
+    {
+      "id": "V40-B06",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 7510
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 5,
+          "source_count": 5,
+          "chars": 28992
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2166
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2166
+        }
+      }
+    },
+    {
+      "id": "V40-B07",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 6893
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 5,
+          "chars": 23980
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 1387
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 1387
+        }
+      }
+    },
+    {
+      "id": "V40-B08",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 14469
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 23399
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 1132
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 1670
+        }
+      }
+    },
+    {
+      "id": "V40-P01",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 6333
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 17726
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2421
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2421
+        }
+      }
+    },
+    {
+      "id": "V40-P02",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": true,
+          "matched": 9,
+          "expected_lines": 10,
+          "core_matched": 8,
+          "core_total": 9,
+          "unmatched_lines": [
+            "from `auth.toml` and the system keyring (for details see [Repositories]({{< relref \"repositories\" >}}))."
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 2956
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": true,
+          "matched": 9,
+          "expected_lines": 10,
+          "core_matched": 8,
+          "core_total": 9,
+          "unmatched_lines": [
+            "from `auth.toml` and the system keyring (for details see [Repositories]({{< relref \"repositories\" >}}))."
+          ],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 14029
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 2087
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 2087
+        }
+      }
+    },
+    {
+      "id": "V40-P03",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 7,
+          "core_matched": 0,
+          "core_total": 6,
+          "unmatched_lines": [
+            "## Using environment variables",
+            "Sometimes, in particular when using Poetry with CI tools, it's easier",
+            "to use environment variables and not have to execute configuration commands.",
+            "Poetry supports this and any setting can be set by using environment variables.",
+            "The environment variables must be prefixed by `POETRY_` and are comprised of the uppercase",
+            "name of the setting and with dots and dashes replaced by underscore, here is an example:",
+            "export POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory"
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 9718
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 7,
+          "core_matched": 0,
+          "core_total": 6,
+          "unmatched_lines": [
+            "## Using environment variables",
+            "Sometimes, in particular when using Poetry with CI tools, it's easier",
+            "to use environment variables and not have to execute configuration commands.",
+            "Poetry supports this and any setting can be set by using environment variables.",
+            "The environment variables must be prefixed by `POETRY_` and are comprised of the uppercase",
+            "name of the setting and with dots and dashes replaced by underscore, here is an example:",
+            "export POETRY_VIRTUALENVS_PATH=/path/to/virtualenvs/directory"
+          ],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 21025
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 7,
+          "expected_lines": 7,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2410
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 7,
+          "expected_lines": 7,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2410
+        }
+      }
+    },
+    {
+      "id": "V40-P04",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 5753
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 5,
+          "chars": 19941
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2272
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2272
+        }
+      }
+    },
+    {
+      "id": "V40-P05",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": true,
+          "matched": 8,
+          "expected_lines": 9,
+          "core_matched": 7,
+          "core_total": 8,
+          "unmatched_lines": [
+            "| ----------- | ---------------- |"
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 4915
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": true,
+          "matched": 8,
+          "expected_lines": 9,
+          "core_matched": 7,
+          "core_total": 8,
+          "unmatched_lines": [
+            "| ----------- | ---------------- |"
+          ],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 14403
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 2,
+          "expected_lines": 9,
+          "core_matched": 2,
+          "core_total": 8,
+          "unmatched_lines": [
+            "### Compatible release requirements",
+            "**Compatible release requirements** specify a minimal version with the ability to update to later versions of the same level.",
+            "For example, if you specify a major, minor, and patch version, only patch-level changes are allowed.",
+            "If you only specify a major, and minor version, then minor- and patch-level changes are allowed.",
+            "`~=1.2.3` is an example of a compatible release requirement.",
+            "| ~=1.2.3     | >=1.2.3 <1.3.0   |",
+            "| ~=1.2       | >=1.2.0 <2.0.0   |"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 2745
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 2,
+          "expected_lines": 9,
+          "core_matched": 2,
+          "core_total": 8,
+          "unmatched_lines": [
+            "### Compatible release requirements",
+            "**Compatible release requirements** specify a minimal version with the ability to update to later versions of the same level.",
+            "For example, if you specify a major, minor, and patch version, only patch-level changes are allowed.",
+            "If you only specify a major, and minor version, then minor- and patch-level changes are allowed.",
+            "`~=1.2.3` is an example of a compatible release requirement.",
+            "| ~=1.2.3     | >=1.2.3 <1.3.0   |",
+            "| ~=1.2       | >=1.2.0 <2.0.0   |"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 2745
+        }
+      }
+    },
+    {
+      "id": "V40-P06",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 7,
+          "expected_lines": 7,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 3383
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 7,
+          "expected_lines": 7,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 10423
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 7,
+          "core_matched": 0,
+          "core_total": 6,
+          "unmatched_lines": [
+            "## Activating the environment",
+            "{{% note %}}",
+            "Looking for `poetry shell`? It was moved to a plugin: [`poetry-plugin-shell`](https://github.com/python-poetry/poetry-plugin-shell)",
+            "{{% /note %}}",
+            "The `poetry env activate` command prints the activate command of the virtual environment to the console.",
+            "You can run the output command manually or feed it to the eval command of your shell to activate the environment.",
+            "This way you won't leave the current shell."
+          ],
+          "source_matches": 0,
+          "source_count": 0,
+          "chars": 0
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 7,
+          "core_matched": 0,
+          "core_total": 6,
+          "unmatched_lines": [
+            "## Activating the environment",
+            "{{% note %}}",
+            "Looking for `poetry shell`? It was moved to a plugin: [`poetry-plugin-shell`](https://github.com/python-poetry/poetry-plugin-shell)",
+            "{{% /note %}}",
+            "The `poetry env activate` command prints the activate command of the virtual environment to the console.",
+            "You can run the output command manually or feed it to the eval command of your shell to activate the environment.",
+            "This way you won't leave the current shell."
+          ],
+          "source_matches": 0,
+          "source_count": 0,
+          "chars": 0
+        }
+      }
+    },
+    {
+      "id": "V40-P07",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 6653
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 15535
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 3705
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 4526
+        }
+      }
+    },
+    {
+      "id": "V40-P08",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 9719
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 16335
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 1,
+          "chars": 1492
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 2984
+        }
+      }
+    },
+    {
+      "id": "V40-T01",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 5727
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 10171
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2451
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2451
+        }
+      }
+    },
+    {
+      "id": "V40-T02",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 3,
+          "expected_lines": 4,
+          "core_matched": 2,
+          "core_total": 3,
+          "unmatched_lines": [
+            "The first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 5587
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 3,
+          "expected_lines": 4,
+          "core_matched": 2,
+          "core_total": 3,
+          "unmatched_lines": [
+            "The first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content."
+          ],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 13004
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 4,
+          "core_matched": 1,
+          "core_total": 3,
+          "unmatched_lines": [
+            "## Smart refresh",
+            "The first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.",
+            "If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates."
+          ],
+          "source_matches": 3,
+          "source_count": 3,
+          "chars": 1843
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 4,
+          "core_matched": 1,
+          "core_total": 3,
+          "unmatched_lines": [
+            "## Smart refresh",
+            "The first superpower we will look at is \"smart refresh\". When you modify a reactive attribute, Textual will make note of the fact that it has changed and refresh automatically by calling the widget's [`render()`][textual.widget.Widget.render] method to get updated content.",
+            "If you modify multiple reactive attributes, Textual will only do a single refresh to minimize updates."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1697
+        }
+      }
+    },
+    {
+      "id": "V40-T03",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 5,
+          "expected_lines": 6,
+          "core_matched": 4,
+          "core_total": 5,
+          "unmatched_lines": [
+            "If you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 5587
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 5,
+          "expected_lines": 6,
+          "core_matched": 4,
+          "core_total": 5,
+          "unmatched_lines": [
+            "If you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`."
+          ],
+          "source_matches": 5,
+          "source_count": 5,
+          "chars": 13207
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 6,
+          "core_matched": 0,
+          "core_total": 5,
+          "unmatched_lines": [
+            "### Disabling refresh",
+            "If you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.",
+            "The following code illustrates how you create non-refreshing reactive attributes.",
+            "class MyWidget(Widget):",
+            "count = var(0)  # (1)!",
+            "1. Changing `self.count` wont cause a refresh or layout."
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 981
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 6,
+          "core_matched": 0,
+          "core_total": 5,
+          "unmatched_lines": [
+            "### Disabling refresh",
+            "If you *don't* want an attribute to prompt a refresh or layout but you still want other reactive superpowers, you can use [var][textual.reactive.var] to create an attribute. You can import `var` from `textual.reactive`.",
+            "The following code illustrates how you create non-refreshing reactive attributes.",
+            "class MyWidget(Widget):",
+            "count = var(0)  # (1)!",
+            "1. Changing `self.count` wont cause a refresh or layout."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1962
+        }
+      }
+    },
+    {
+      "id": "V40-T04",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 5802
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 16146
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2481
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2481
+        }
+      }
+    },
+    {
+      "id": "V40-T05",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 5,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 6,
+          "unmatched_lines": [
+            "The `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 7709
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 5,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 6,
+          "unmatched_lines": [
+            "The `run_worker` method schedules a new *worker* to run `update_weather`, and returns a [Worker][textual.worker.Worker] object. This happens almost immediately, so it won't prevent other messages from being processed. The `update_weather` function is now running concurrently, and will finish a second or two later."
+          ],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 18661
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 3,
+          "source_count": 3,
+          "chars": 3580
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 6,
+          "core_total": 6,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 3139
+        }
+      }
+    },
+    {
+      "id": "V40-T06",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 3,
+          "core_matched": 0,
+          "core_total": 2,
+          "unmatched_lines": [
+            "You can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].",
+            "This will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 13309
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 3,
+          "core_matched": 0,
+          "core_total": 2,
+          "unmatched_lines": [
+            "You can cancel a worker at any time before it is finished by calling [Worker.cancel][textual.worker.Worker.cancel].",
+            "This will raise a [CancelledError][asyncio.CancelledError] within the coroutine, and should cause it to exit prematurely."
+          ],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 20272
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 263
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 263
+        }
+      }
+    },
+    {
+      "id": "V40-T07",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 4,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 5,
+          "unmatched_lines": [
+            "You can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread."
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 13309
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 4,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 5,
+          "unmatched_lines": [
+            "You can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread."
+          ],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 19302
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 5,
+          "core_matched": 0,
+          "core_total": 5,
+          "unmatched_lines": [
+            "You can create threads by setting `thread=True` on the `run_worker` method or the `work` decorator.",
+            "The API for thread workers is identical to async workers, but there are a few differences you need to be aware of when writing code for thread workers.",
+            "The first difference is that you should **avoid calling methods on your UI directly** from a threaded worker, or setting reactive variables.",
+            "You can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread.",
+            "The second difference is that you can't cancel threads in the same way as coroutines, but you *can* manually check if the worker was cancelled."
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 453
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 5,
+          "core_matched": 0,
+          "core_total": 5,
+          "unmatched_lines": [
+            "You can create threads by setting `thread=True` on the `run_worker` method or the `work` decorator.",
+            "The API for thread workers is identical to async workers, but there are a few differences you need to be aware of when writing code for thread workers.",
+            "The first difference is that you should **avoid calling methods on your UI directly** from a threaded worker, or setting reactive variables.",
+            "You can work around this with the [App.call_from_thread][textual.app.App.call_from_thread] method which runs your function from the main thread.",
+            "The second difference is that you can't cancel threads in the same way as coroutines, but you *can* manually check if the worker was cancelled."
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 453
+        }
+      }
+    },
+    {
+      "id": "V40-T08",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 7218
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 15854
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 4950
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 4950
+        }
+      }
+    },
+    {
+      "id": "V40-V01",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 12,
+          "expected_lines": 12,
+          "core_matched": 11,
+          "core_total": 11,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 6347
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 12,
+          "expected_lines": 12,
+          "core_matched": 11,
+          "core_total": 11,
+          "unmatched_lines": [],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 10998
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 12,
+          "expected_lines": 12,
+          "core_matched": 11,
+          "core_total": 11,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1699
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 12,
+          "expected_lines": 12,
+          "core_matched": 11,
+          "core_total": 11,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 4227
+        }
+      }
+    },
+    {
+      "id": "V40-V02",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 4884
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 10000
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 2901
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 5802
+        }
+      }
+    },
+    {
+      "id": "V40-V03",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 3055
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 9490
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "## server.port",
+            "- **Type:** `number`",
+            "- **Default:** `5173`",
+            "Specify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on."
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 4092
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "## server.port",
+            "- **Type:** `number`",
+            "- **Default:** `5173`",
+            "Specify server port. Note if the port is already being used, Vite will automatically try the next available port so this may not be the actual port the server ends up listening on."
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 4092
+        }
+      }
+    },
+    {
+      "id": "V40-V04",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 3055
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 9299
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2300
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 3,
+          "expected_lines": 3,
+          "core_matched": 2,
+          "core_total": 2,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 2302
+        }
+      }
+    },
+    {
+      "id": "V40-V05",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 1968
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 5,
+          "chars": 8651
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 945
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 10,
+          "expected_lines": 10,
+          "core_matched": 9,
+          "core_total": 9,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 945
+        }
+      }
+    },
+    {
+      "id": "V40-V06",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "## server.fs.strict",
+            "- **Type:** `boolean`",
+            "- **Default:** `true` (enabled by default since Vite 2.7)",
+            "Restrict serving files outside of workspace root."
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 5218
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 4,
+          "expected_lines": 4,
+          "core_matched": 3,
+          "core_total": 3,
+          "unmatched_lines": [],
+          "source_matches": 3,
+          "source_count": 5,
+          "chars": 9522
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "- **Type:** `boolean`",
+            "- **Default:** `true` (enabled by default since Vite 2.7)",
+            "Restrict serving files outside of workspace root."
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 1500
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 4,
+          "core_matched": 0,
+          "core_total": 3,
+          "unmatched_lines": [
+            "- **Type:** `boolean`",
+            "- **Default:** `true` (enabled by default since Vite 2.7)",
+            "Restrict serving files outside of workspace root."
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 1500
+        }
+      }
+    },
+    {
+      "id": "V40-V07",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 4166
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 6672
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 2466
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 2466
+        }
+      }
+    },
+    {
+      "id": "V40-V08",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 2962
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 11690
+        },
+        "Dold": {
+          "status": "PASS",
+          "number": 0,
+          "chars": 0
+        },
+        "Dnew": {
+          "status": "PASS",
+          "number": 0,
+          "chars": 0
+        }
+      }
+    },
+    {
+      "id": "V40-E01",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 9,
+          "expected_lines": 9,
+          "core_matched": 8,
+          "core_total": 8,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 4416
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 9,
+          "expected_lines": 9,
+          "core_matched": 8,
+          "core_total": 8,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 5,
+          "chars": 20902
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 9,
+          "core_matched": 0,
+          "core_total": 8,
+          "unmatched_lines": [
+            "The ESLint configuration file may be named any of the following:",
+            "- `eslint.config.js`",
+            "- `eslint.config.mjs`",
+            "- `eslint.config.cjs`",
+            "- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))",
+            "- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))",
+            "- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))",
+            "It should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:"
+          ],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 715
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 1,
+          "expected_lines": 9,
+          "core_matched": 0,
+          "core_total": 8,
+          "unmatched_lines": [
+            "The ESLint configuration file may be named any of the following:",
+            "- `eslint.config.js`",
+            "- `eslint.config.mjs`",
+            "- `eslint.config.cjs`",
+            "- `eslint.config.ts` (requires [additional setup](#typescript-configuration-files))",
+            "- `eslint.config.mts` (requires [additional setup](#typescript-configuration-files))",
+            "- `eslint.config.cts` (requires [additional setup](#typescript-configuration-files))",
+            "It should be placed in the root directory of your project and export an array of [configuration objects](#configuration-objects). Here's an example:"
+          ],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1430
+        }
+      }
+    },
+    {
+      "id": "V40-E02",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 6,
+          "expected_lines": 8,
+          "core_matched": 5,
+          "core_total": 7,
+          "unmatched_lines": [
+            "{{ npx_tabs({",
+            "args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 6257
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 6,
+          "expected_lines": 8,
+          "core_matched": 5,
+          "core_total": 7,
+          "unmatched_lines": [
+            "{{ npx_tabs({",
+            "args: [\"--config\", \"some-other-file.js\", \"**/*.js\"]"
+          ],
+          "source_matches": 2,
+          "source_count": 5,
+          "chars": 17147
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 8,
+          "expected_lines": 8,
+          "core_matched": 7,
+          "core_total": 7,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 1,
+          "chars": 715
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 8,
+          "expected_lines": 8,
+          "core_matched": 7,
+          "core_total": 7,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 1430
+        }
+      }
+    },
+    {
+      "id": "V40-E03",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 10509
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 25998
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 718
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 5,
+          "expected_lines": 5,
+          "core_matched": 4,
+          "core_total": 4,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 718
+        }
+      }
+    },
+    {
+      "id": "V40-E04",
+      "category": "P",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 7,
+          "expected_lines": 13,
+          "core_matched": 6,
+          "core_total": 12,
+          "unmatched_lines": [
+            "In your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:",
+            "export default defineConfig([globalIgnores([\".config/*\"])]);",
+            "This configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.",
+            "By default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:",
+            "globalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),",
+            "When non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 6113
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 7,
+          "expected_lines": 13,
+          "core_matched": 6,
+          "core_total": 12,
+          "unmatched_lines": [
+            "In your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:",
+            "export default defineConfig([globalIgnores([\".config/*\"])]);",
+            "This configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.",
+            "By default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:",
+            "globalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),",
+            "When non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:"
+          ],
+          "source_matches": 1,
+          "source_count": 5,
+          "chars": 23085
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 13,
+          "core_matched": 0,
+          "core_total": 12,
+          "unmatched_lines": [
+            "## Ignore Files",
+            "In your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:",
+            "// eslint.config.js",
+            "import { defineConfig, globalIgnores } from \"eslint/config\";",
+            "export default defineConfig([globalIgnores([\".config/*\"])]);",
+            "This configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.",
+            "By default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:",
+            "// eslint.config.js",
+            "import { defineConfig, globalIgnores } from \"eslint/config\";",
+            "export default defineConfig([",
+            "globalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),",
+            "]);",
+            "When non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:"
+          ],
+          "source_matches": 0,
+          "source_count": 3,
+          "chars": 6429
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 0,
+          "expected_lines": 13,
+          "core_matched": 0,
+          "core_total": 12,
+          "unmatched_lines": [
+            "## Ignore Files",
+            "In your `eslint.config.js` file, you can use the `globalIgnores()` helper function to indicate patterns of files to be ignored. Here's an example:",
+            "// eslint.config.js",
+            "import { defineConfig, globalIgnores } from \"eslint/config\";",
+            "export default defineConfig([globalIgnores([\".config/*\"])]);",
+            "This configuration specifies that all of the files in the `.config` directory should be ignored. This pattern is added after the default patterns, which are `[\"**/node_modules/\", \".git/\"]`.",
+            "By default, ESLint lints files that match the patterns `**/*.js`, `**/*.cjs`, and `**/*.mjs`. You can ignore them with `globalIgnores()` if you don't want ESLint to lint these files:",
+            "// eslint.config.js",
+            "import { defineConfig, globalIgnores } from \"eslint/config\";",
+            "export default defineConfig([",
+            "globalIgnores([\"**/*.js\", \"**/*.cjs\", \"**/*.mjs\"]),",
+            "]);",
+            "When non-JS files are specified in the `files` property, ESLint still lints files that match the default patterns. To lint only the files specified in the `files` property, you must ignore the default file patterns:"
+          ],
+          "source_matches": 0,
+          "source_count": 2,
+          "chars": 5981
+        }
+      }
+    },
+    {
+      "id": "V40-E05",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 8,
+          "expected_lines": 11,
+          "core_matched": 7,
+          "core_total": 10,
+          "unmatched_lines": [
+            "{{ npm_tabs({",
+            "packages: [\"jiti\"],",
+            "args: [\"--save-dev\"]"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 7299
+        },
+        "G5": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 8,
+          "expected_lines": 11,
+          "core_matched": 7,
+          "core_total": 10,
+          "unmatched_lines": [
+            "{{ npm_tabs({",
+            "packages: [\"jiti\"],",
+            "args: [\"--save-dev\"]"
+          ],
+          "source_matches": 2,
+          "source_count": 5,
+          "chars": 21075
+        },
+        "Dold": {
+          "status": "FAIL",
+          "tolerant": false,
+          "matched": 7,
+          "expected_lines": 11,
+          "core_matched": 6,
+          "core_total": 10,
+          "unmatched_lines": [
+            "You can then create a configuration file with a `.ts`, `.mts`, or `.cts` extension, and export an array of [configuration objects](#configuration-objects).",
+            "::: important",
+            "ESLint does not perform type checking on your configuration file and does not apply any settings from `tsconfig.json`.",
+            ":::"
+          ],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 729
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 11,
+          "expected_lines": 11,
+          "core_matched": 10,
+          "core_total": 10,
+          "unmatched_lines": [],
+          "source_matches": 1,
+          "source_count": 2,
+          "chars": 1026
+        }
+      }
+    },
+    {
+      "id": "V40-E06",
+      "category": "PART",
+      "results": {
+        "G2": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 7102
+        },
+        "G5": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 4,
+          "source_count": 5,
+          "chars": 19137
+        },
+        "Dold": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 4694
+        },
+        "Dnew": {
+          "status": "PASS",
+          "tolerant": true,
+          "matched": 6,
+          "expected_lines": 6,
+          "core_matched": 5,
+          "core_total": 5,
+          "unmatched_lines": [],
+          "source_matches": 2,
+          "source_count": 2,
+          "chars": 4694
+        }
+      }
+    },
+    {
+      "id": "V40-E07",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 6909
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 18920
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 1162
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 1162
+        }
+      }
+    },
+    {
+      "id": "V40-E08",
+      "category": "N",
+      "results": {
+        "G2": {
+          "status": "FAIL",
+          "number": 2,
+          "chars": 7451
+        },
+        "G5": {
+          "status": "FAIL",
+          "number": 5,
+          "chars": 22107
+        },
+        "Dold": {
+          "status": "FAIL",
+          "number": 1,
+          "chars": 329
+        },
+        "Dnew": {
+          "status": "FAIL",
+          "number": 1,
+          "chars": 329
+        }
+      }
+    }
+  ]
+}
