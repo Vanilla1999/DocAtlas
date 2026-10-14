@@ -61,8 +61,8 @@ def test_budget_mode_and_observer_leave_public_evidence_unchanged(
         with experimental_selection_observer(mutate_copy) as observation, query_trace(True):
             copied = _context(service, project, SHUTTER_QUESTION)
         assert observation.calls == 1 and not observation.errors
-        assert len(observed) == 1 and observed[0]["mode"] == "budget"
-        assert observed[0]["model_forwards"] == 0
+        assert len(observed) == 1 and observed[0]["mode"] == "native_acquisition_rank"
+        assert observed[0]["model_work"] == "none"
         assert _database_state(inventory) == original_db
         assert _file_state(project) == original_files
 
@@ -84,5 +84,5 @@ def test_budget_mode_and_observer_leave_public_evidence_unchanged(
         record_property("optional_model_modules_before_after", json.dumps({"before": imported_before, "after": imported_after}))
         record_property("public_prepare_calls", 1)
         record_property("public_context_calls", 3)
-        record_property("model_forwards", 0)
+        record_property("selection_model_work", observed[0]["model_work"])
         record_property("source_continuation_calls", 0)

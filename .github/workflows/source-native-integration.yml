@@ -42,8 +42,10 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: ${{ matrix.python }}
-      - name: Prepare tokenizer cache
-        run: echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/source-native-tokenizer" >> "$GITHUB_ENV"
+      - name: Prepare isolated integration evidence paths
+        run: |
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/source-native-tokenizer" >> "$GITHUB_ENV"
+          echo "PYTEST_DOCATLAS_ARTIFACT_DIR=$RUNNER_TEMP/source-native-results/scenarios" >> "$GITHUB_ENV"
       - name: Install runtime and explicit external-transport test extra
         run: |
           python -m pip install uv==0.9.25
@@ -56,6 +58,7 @@ jobs:
             tests/test_public_surface_integration.py \
             tests/test_prepared_retrieval_review_integration.py \
             tests/test_native_context_preservation_integration.py \
+            tests/test_experimental_selection_modes_integration.py \
             tests/test_context_budget_refusal_integration.py \
             --junitxml="$RUNNER_TEMP/source-native-results/integration.xml"
       - name: Preserve execution evidence even on failure

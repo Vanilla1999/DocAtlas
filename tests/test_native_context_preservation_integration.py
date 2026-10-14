@@ -191,9 +191,10 @@ def test_selected_native_context_survives_public_delivery_with_trace_parity(
             assert metadata["database_unchanged"] and metadata["files_unchanged"], metadata
 
         imported_after = {name: name in sys.modules for name in imported_before}
-        model_forwards = sum(receipt["selection"]["model_forwards"]
-                             for record in records.values() for receipt in record["receipts"])
-        operations.update(model_forwards=model_forwards, optional_model_modules_before=imported_before,
+        model_work = [receipt["selection"]["model_work"]
+                      for record in records.values() for receipt in record["receipts"]]
+        # These are observational receipts, not measured model-forward counts.
+        operations.update(selection_model_work=model_work, optional_model_modules_before=imported_before,
                           optional_model_modules_after=imported_after)
         _save(output / "operations.json", operations)
         for name, value in operations.items():
@@ -215,10 +216,11 @@ def test_selected_native_context_survives_public_delivery_with_trace_parity(
             assert metadata["observation_calls"] == len(record["receipts"]) == 1
             assert metadata["observation_errors"] == []
             selection = record["receipts"][0]["selection"]
-            assert selection["mode"] == "budget" and selection["model_forwards"] == 0
+            assert selection["mode"] == "native_acquisition_rank"
+            assert selection["model_work"] == "none"
             coverage[mode] = _witness_coverage(payload, project, documents, witness)
         _save(output / "witness-coverage.json", coverage)
-        assert imported_before == imported_after and model_forwards == 0
+        assert imported_before == imported_after and model_work == ["none", "none"]
         off, on = records["trace-off"], records["trace-on"]
         assert _semantic_packet(off["payload"]) == _semantic_packet(on["payload"])
         for field in ("pool", "complete_candidates", "excluded"):

@@ -304,19 +304,23 @@ async def rejected_default_formats(session, spec, arguments: dict, *, text_only:
 
 
 def validate_context_payload(answer: dict, *, required_fragment: str) -> None:
-    assert answer.get("status") == "ok", answer
     assert answer.get("kind") in {"docs_answer", "docs_context"}, answer
     if answer["kind"] == "docs_context":
+        # A bounded retrieval-only packet may omit other candidates. The
+        # required fact must still be delivered in source text below; status
+        # alone is neither a completeness oracle nor answer authority.
+        assert answer.get("status") in {"ok", "truncated"}, answer
         assert answer.get("support_status") == "retrieval_only", answer
         assert answer.get("context_status") == "ready", answer
         assert answer.get("answer_supported") is False, answer
         assert answer.get("answer_available") is False, answer
     else:
+        assert answer.get("status") == "ok", answer
         assert answer.get("support_status") == "supported", answer
         assert answer.get("answer_supported") is True, answer
         assert answer.get("answer_available") is True, answer
-    assert required_fragment in json.dumps(answer), answer
     assert answer.get("sources"), answer
+    assert any(required_fragment in source.get("snippet", "") for source in answer["sources"]), answer
     for source in answer["sources"]:
         assert source.get("path_or_url") and source.get("snippet"), source
         digest = source.get("content_sha256", "")

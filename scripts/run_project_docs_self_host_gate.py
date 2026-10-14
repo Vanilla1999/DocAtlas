@@ -43,7 +43,7 @@ from docmancer.core.config import DocmancerConfig
 from docmancer.mcp.docs_server import call_docs_tool_payload
 from docmancer.docs.registry import LibraryRegistry
 from docmancer.docs.service import DocsJobTracker, LibraryDocsService
-from docmancer.docs.application import docs_context_projection
+from docmancer.docs.application import experimental_context_finalization
 from docmancer.docs.application.model_visible_projection import (
     DOCS_CONTEXT_SOURCE_FIELDS,
     _source_digest,
@@ -421,32 +421,11 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService, *, trace_e
     member_read = getattr(member_facade, "get_project_docs", None)
     delivery_observations: list[dict] = []
     delivery_counts: dict[str, int] = {}
-    select = docs_context_projection.context_selection_decision
+    # Observe the actual source-native consumer, not aliases of retired
+    # projectors. The observer forwards operands/results without replacing
+    # retrieval, selection or validation. Native reads issue no component proof.
+    select = experimental_context_finalization.context_selection_decision
     validate = context_tools.validate_model_visible_projection
-    coverage = docs_context_projection.component_coverage_decision
-
-    def capture_coverage(contract, assignments, sources, **kwargs):
-        contract, assignments, sources = tuple(contract), tuple(assignments), tuple(sources)
-        decision = coverage(contract, assignments, sources, **kwargs)
-        if not trace_enabled:
-            return decision
-        component_bindings.clear()
-        for source in sources:
-            original = source.get("_qualification_candidate") or {}
-            source_ids = {original.get(key) for key in ("stable_id", "stable_chunk_id", "evidence_id") if original.get(key)}
-            source_ids.add(source.get("evidence_id"))
-            for component_id, runtime_evidence_id in getattr(decision, "_component_evidence", ()):
-                if runtime_evidence_id not in source_ids:
-                    continue
-                component_bindings.append({
-                    "component_id": component_id,
-                    "evidence_id": source.get("evidence_id"),
-                    "path_or_url": source.get("path_or_url"),
-                    "snippet_sha256": hashlib.sha256(str(source.get("snippet") or "").encode()).hexdigest(),
-                    "runtime_evidence_ids": [runtime_evidence_id],
-                })
-        return decision
-
     def capture_delivery(stage, result, args, kwargs):
         delivery_counts[stage] = delivery_counts.get(stage, 0) + 1
         if not trace_enabled:
@@ -493,9 +472,8 @@ def _call_with_snapshot(arguments: dict, service: LibraryDocsService, *, trace_e
             if callable(project_read) else nullcontext(),
         patch.object(member_facade, "get_project_docs", delivery_observer(member_read, "member_read"))
             if callable(member_read) else nullcontext(),
-        patch.object(docs_context_projection, "context_selection_decision", capture_selection),
+        patch.object(experimental_context_finalization, "context_selection_decision", capture_selection),
         patch.object(context_tools, "validate_model_visible_projection", capture_validation),
-        patch.object(docs_context_projection, "component_coverage_decision", capture_coverage),
         ):
             payload = call_docs_tool_payload("get_docs_context", arguments, service)
     finally:

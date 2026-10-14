@@ -1,7 +1,7 @@
 """Host-only source recheck and bounded final MCP context, without retrieval.
 
-The ordinary default has no new cap.  Experimental limits apply to the complete
-JSON text returned by Docs MCP, using its existing offline codec and UTF-8 proxy.
+The source-native default applies its explicit cap to the complete JSON text
+returned by Docs MCP, using the offline codec and UTF-8 proxy.
 Source rows are indivisible; only already-admitted native windows are fallback
 representations.  No source text, question, or stored metadata enables this path.
 """
@@ -29,6 +29,15 @@ _SEED_KEY = "_experimental_native_context"
 
 def _mark_unassessed(payload: dict) -> None:
     """Admission/source validity is never semantic sufficiency or query credit."""
+    veto = payload.get("delivery_decision")
+    if not payload.get("sources") and isinstance(veto, dict) and veto.get("deliverable") is False:
+        # An operational denial contains no candidate context to assess. Keep
+        # its source/consent cause and confirmation fields ahead of optional
+        # admission annotations, including under a small final DTO budget.
+        payload.pop("context_unassessed", None)
+        payload.pop("admission_contract", None)
+        _refresh_estimate(payload)
+        return
     payload.update(context_unassessed=True, admission_contract="source_only_heuristic_removal_v1")
     if payload.get("sources"):
         payload["context_quality"] = {"status": "unverified", "reasons": ["coverage_unverified"]}
