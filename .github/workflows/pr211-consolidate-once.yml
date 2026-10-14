@@ -18,18 +18,18 @@ jobs:
     env:
       DOCATLAS_AUTO_VECTORS: '0'
       DOCATLAS_OFFLINE: '1'
-      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          fetch-depth: 2
+          fetch-depth: 0
           persist-credentials: true
       - name: Refuse replay or concurrent branch changes
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD^)" = 317088c106f84aaf558ff22309306301249ab2ba
+          test "$(git rev-parse HEAD^)" = b5cf19b6977cedc20ceaf1e0b28ce6722fa4afe7
           test "$(git ls-remote origin refs/heads/integration/stage3-v2-identity-pr1 | cut -f1)" = "$GITHUB_SHA"
           mkdir -p "$RUNNER_TEMP/pr211-maintenance"
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/tokenizer-cache" >> "$GITHUB_ENV"
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.13'

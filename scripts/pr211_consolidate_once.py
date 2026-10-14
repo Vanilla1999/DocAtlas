@@ -36,7 +36,7 @@ def replace(path, pairs):
     Path(path).write_text(text, encoding="utf-8")
 
 
-if subprocess.check_output(["git", "rev-parse", "HEAD^"], text=True).strip() != BASE:
+if subprocess.run(["git", "merge-base", "--is-ancestor", BASE, "HEAD"]).returncode:
     raise RuntimeError("Refuse replay or wrong parent")
 replace("tests/docs/test_context_projection_boundaries.py", [
     ("from docmancer.docs.application.docs_context_projection import (\n    _focused_snippet,\n    project_docs_context,\n)\n", ""),
