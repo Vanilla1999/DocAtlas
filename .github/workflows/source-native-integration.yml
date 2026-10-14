@@ -62,6 +62,8 @@ jobs:
             tests/test_native_context_preservation_integration.py \
             tests/test_experimental_selection_modes_integration.py \
             tests/test_context_budget_refusal_integration.py \
+            tests/evidence_quality_v2/test_measurement.py \
+            tests/test_project_docs_self_host_fixture.py::test_frozen_catalog_only_changes_isolated_prepared_membership \
             --junitxml="$RUNNER_TEMP/source-native-results/integration.xml"
       - name: Preserve execution evidence even on failure
         if: always()
