@@ -1,0 +1,213 @@
+[
+  {
+    "name": "setr-paper",
+    "url": "https://arxiv.org/html/2507.06838v2",
+    "resolved": "https://arxiv.org/html/2507.06838v2",
+    "bytes": 217550,
+    "sha256": "549168ed06b50192b8e468da65be571abe36b041fec032c7ab29bcb6483d813e"
+  },
+  {
+    "name": "setr-readme",
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/README.md",
+    "resolved": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/README.md",
+    "bytes": 3222,
+    "sha256": "770f7f2b4448ff76c46827d57afcc34a20df3a7809a4dc2d85abd3a5e02650e4"
+  },
+  {
+    "name": "setr-license",
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/License.md",
+    "resolved": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/License.md",
+    "bytes": 1551,
+    "sha256": "ce29faa429f1f220367494cf6d158b1a269dd07fdc343afa6002008f38d1e882"
+  },
+  {
+    "name": "setr-train",
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/train_llama_3.1_8B_inst_gcp.sh",
+    "resolved": "https://raw.githubusercontent.com/LGAI-Research/SetR/main/train_llama_3.1_8B_inst_gcp.sh",
+    "bytes": 1983,
+    "sha256": "acd889a5f1ce874db4ad317207d329535fdd33c337cb23209e49a7abac515bfa"
+  },
+  {
+    "name": "paraset-paper",
+    "url": "https://arxiv.org/html/2607.05712v1",
+    "resolved": "https://arxiv.org/html/2607.05712v1",
+    "bytes": 416751,
+    "sha256": "f7220657849cfd75eb96cf2a639bd1f3c13c148d971d513acdbdc04cc81fe126"
+  },
+  {
+    "name": "provence-paper",
+    "url": "https://arxiv.org/html/2501.16214v1",
+    "resolved": "https://arxiv.org/html/2501.16214v1",
+    "bytes": 429575,
+    "sha256": "ea5b93935126b864e87e23a2e1d24820a3d0aefaf5db371f8cd56b0123b3ab6b"
+  },
+  {
+    "name": "provence-card",
+    "url": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/README.md",
+    "resolved": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/README.md",
+    "bytes": 9387,
+    "sha256": "86b0a0597b61f8b70be65ddef5cbf23fc4b2bd0c510c6689fbb06d2b335fb2d5"
+  },
+  {
+    "name": "provence-config",
+    "url": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/config.json",
+    "resolved": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/config.json",
+    "bytes": 1163,
+    "sha256": "f2174e79a32cf0cc91b826440db15c8c285130a1905939f0a82e88230b787280"
+  },
+  {
+    "name": "provence-license",
+    "url": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/Provence%20LICENSE.txt",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "xprovence-paper",
+    "url": "https://arxiv.org/html/2601.18886v1",
+    "resolved": "https://arxiv.org/html/2601.18886v1",
+    "bytes": 118527,
+    "sha256": "43e5de9b5535dd3509fe5b6a34dada4d66ea33f78e1ea0feebbea19e5564b429"
+  },
+  {
+    "name": "xprovence-card",
+    "url": "https://huggingface.co/naver/xprovence-reranker-bgem3-v2/raw/main/README.md",
+    "resolved": "https://huggingface.co/naver/xprovence-reranker-bgem3-v2/raw/main/README.md",
+    "bytes": 9724,
+    "sha256": "b5483a6b5050d84c8c03b688dfefbcef164248e3960fd6e37fcc94d4065f94ce"
+  },
+  {
+    "name": "xprovence-config",
+    "url": "https://huggingface.co/naver/xprovence-reranker-bgem3-v2/raw/main/config.json",
+    "resolved": "https://huggingface.co/naver/xprovence-reranker-bgem3-v2/raw/main/config.json",
+    "bytes": 807,
+    "sha256": "dff29375d7d58e3b83aceab9254860846013fee4f851c884f743d4258f3194e9"
+  },
+  {
+    "name": "late-paper",
+    "url": "https://arxiv.org/html/2409.04701v3",
+    "resolved": "https://arxiv.org/html/2409.04701v3",
+    "bytes": 186643,
+    "sha256": "6caaacd5b6b999b98e3e2ed6e4894a8b38f1044d09026c09b4ab8cdb67348fb3"
+  },
+  {
+    "name": "late-readme",
+    "url": "https://raw.githubusercontent.com/jina-ai/late-chunking/main/README.md",
+    "resolved": "https://raw.githubusercontent.com/jina-ai/late-chunking/main/README.md",
+    "bytes": 9856,
+    "sha256": "7c03173cbe58b0af934b1b256b24d57f57311ba37096a8bd9cd5b8043d46cfa9"
+  },
+  {
+    "name": "late-license",
+    "url": "https://raw.githubusercontent.com/jina-ai/late-chunking/main/LICENSE",
+    "resolved": "https://raw.githubusercontent.com/jina-ai/late-chunking/main/LICENSE",
+    "bytes": 11357,
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "name": "jina-card",
+    "url": "https://huggingface.co/jinaai/jina-embeddings-v2-base-en/raw/main/README.md",
+    "resolved": "https://huggingface.co/jinaai/jina-embeddings-v2-base-en/raw/main/README.md",
+    "bytes": 71254,
+    "sha256": "3ffb3d200e9f837467a6709d10c54467b17d96485f154b76c078884029c0e78e"
+  },
+  {
+    "name": "longrefiner-paper",
+    "url": "https://arxiv.org/html/2505.10413v1",
+    "resolved": "https://arxiv.org/html/2505.10413v1",
+    "bytes": 354110,
+    "sha256": "ca99a9de5ed630bdf7dd6c22302127ab2e1144a3ebca762d2413b55729c80b68"
+  },
+  {
+    "name": "longrefiner-readme",
+    "url": "https://raw.githubusercontent.com/ignorejjj/LongRefiner/main/README.md",
+    "resolved": "https://raw.githubusercontent.com/ignorejjj/LongRefiner/main/README.md",
+    "bytes": 3830,
+    "sha256": "4155c52046b0fa273c1e67acc89cfe8bfbab4b454be18c0018550b225df56411"
+  },
+  {
+    "name": "longrefiner-license",
+    "url": "https://raw.githubusercontent.com/ignorejjj/LongRefiner/main/LICENSE",
+    "resolved": "https://raw.githubusercontent.com/ignorejjj/LongRefiner/main/LICENSE",
+    "bytes": 1056,
+    "sha256": "06dcddbb6908a0c6dd4a9e8ec822eea41d5a460a53089fecccc8a68049e99241"
+  },
+  {
+    "name": "longrefiner-card",
+    "url": "https://huggingface.co/ignorejjj/LongRefiner/raw/main/README.md",
+    "error": "HTTP Error 401: Unauthorized"
+  },
+  {
+    "name": "longrefiner-selection-card",
+    "url": "https://huggingface.co/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct/raw/main/README.md",
+    "resolved": "https://huggingface.co/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct/raw/main/README.md",
+    "sha256": "a54efcf3d427383b546c8426263f65c54566060fe76a77e90b4f74cbb798d8b8",
+    "bytes": 5303
+  },
+  {
+    "name": "longrefiner-selection-config",
+    "url": "https://huggingface.co/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct/raw/main/adapter_config.json",
+    "resolved": "https://huggingface.co/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct/raw/main/adapter_config.json",
+    "sha256": "f2037f66124e41763c2d1c72a2097d2722a314965f43ee00ed8bd8f910f2a697",
+    "bytes": 744
+  },
+  {
+    "name": "provence-real-license",
+    "url": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/main/LICENSE",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "xprovence-real-license",
+    "url": "https://huggingface.co/naver/xprovence-reranker-bgem3-v2/raw/main/xProvence%20LICENSE.txt",
+    "error": "HTTP Error 404: Not Found"
+  },
+  {
+    "name": "setr-tree",
+    "url": "https://api.github.com/repos/LGAI-Research/SetR/git/trees/main?recursive=1",
+    "resolved": "https://api.github.com/repos/LGAI-Research/SetR/git/trees/main?recursive=1",
+    "sha256": "fef018472989aa32c168c8c3e4bebdc2a6be6ac91f92d4b965569f1550da72e7",
+    "bytes": 9879
+  },
+  {
+    "name": "longrefiner-tree",
+    "url": "https://api.github.com/repos/ignorejjj/LongRefiner/git/trees/main?recursive=1",
+    "resolved": "https://api.github.com/repos/ignorejjj/LongRefiner/git/trees/main?recursive=1",
+    "sha256": "f5e0a96a55f15af7376b3c30963060b47e75c102e435ec297d9ddd91b34f3875",
+    "bytes": 7046
+  },
+  {
+    "name": "longrefiner-selection-info",
+    "url": "https://huggingface.co/api/models/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct",
+    "resolved": "https://huggingface.co/api/models/jinjiajie/Global-Selection-Qwen2.5-3B-Instruct",
+    "sha256": "8b7d32e9a6ef1d32a3dc306a309b2141badd38edd1b0cfda2ee3a64ddae788df",
+    "bytes": 3798
+  },
+  {
+    "name": "provence-reranker-debertav3-v1-info",
+    "url": "https://huggingface.co/api/models/naver/provence-reranker-debertav3-v1",
+    "sha256": "52fff9c94fb3092f17a8a47a267df70f8ecdb2d2ffd1d6b945cebaeffc609864",
+    "bytes": 1971
+  },
+  {
+    "name": "provence-reranker-debertav3-v1-info-license",
+    "url": "https://huggingface.co/naver/provence-reranker-debertav3-v1/raw/ef49e233e3c6e50efc476c68f1390f8a63add4d4/Provence_LICENSE.txt",
+    "sha256": "32b8844733ab38da3a12522e32297842340fea3e9203b58365ac472355be9aa8",
+    "bytes": 3391
+  },
+  {
+    "name": "xprovence-reranker-bgem3-v2-info",
+    "url": "https://huggingface.co/api/models/naver/xprovence-reranker-bgem3-v2",
+    "sha256": "9f4a92cd4168131e0b54174ae4fca10a8a8ae0ccd7303d3e0245f3eb25c3e2f8",
+    "bytes": 2015
+  },
+  {
+    "name": "Query-Analysis-Qwen2.5-3B-Instruct-info",
+    "url": "https://huggingface.co/api/models/jinjiajie/Query-Analysis-Qwen2.5-3B-Instruct",
+    "sha256": "c8b0a90c8c6a7e32080037ce4d8d2b24cf53eed5b18f542b56462c7d08f03197",
+    "bytes": 3632
+  },
+  {
+    "name": "Doc-Structuring-Qwen2.5-3B-Instruct-info",
+    "url": "https://huggingface.co/api/models/jinjiajie/Doc-Structuring-Qwen2.5-3B-Instruct",
+    "sha256": "a31fa2e4e3334d761faaf01be93c8563d9e6978f8cef6c3d6ed41613d353e836",
+    "bytes": 3521
+  }
+]

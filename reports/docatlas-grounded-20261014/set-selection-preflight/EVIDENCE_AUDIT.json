@@ -1,0 +1,110 @@
+{
+  "head": "a011c7298f0731455799de2b19b4b7bb304876e8",
+  "archive_files_verified": 47,
+  "frozen_inputs_match": true,
+  "installed_files_match": true,
+  "cases": [
+    {
+      "case": "V40-P03",
+      "pool": 167,
+      "selected": 41,
+      "omitted": 126,
+      "actual_cost": 11884,
+      "compact_cost": 10868,
+      "feasibility_cost": 743,
+      "whole_verified_windows": [
+        {
+          "id": "ev-4ee38ec394d37817",
+          "span": [
+            2805,
+            3247
+          ],
+          "scope": "project",
+          "version": "unversioned"
+        },
+        {
+          "id": "ev-de9f17e55b14ffb8",
+          "span": [
+            3247,
+            3446
+          ],
+          "scope": "project",
+          "version": "unversioned"
+        }
+      ],
+      "mandatory_range_coverage": {
+        "witness_id": "V40-P03/required/set-0/part-0",
+        "path": "docs/configuration.md",
+        "line_start": 102,
+        "line_end": 114,
+        "covered": false,
+        "char_start": 2805,
+        "char_end": 3320,
+        "expected_characters": 515,
+        "covered_characters": 442,
+        "missing_char_ranges": [
+          [
+            3247,
+            3320
+          ]
+        ],
+        "raw_quote_sha256": "3f013b250c5ff8ffd8eecf9b6fb642d6ff5c8ba2b86d94e8e451f49fe1f67512",
+        "trimmed_quote_sha256": "6d5e15c200dd421edca53403b7f48d56200690911fb92ae2509eabd6fc5130e2"
+      },
+      "read_only_recorded": true
+    },
+    {
+      "case": "V40-E01",
+      "pool": 256,
+      "selected": 39,
+      "omitted": 217,
+      "actual_cost": 11819,
+      "compact_cost": 10850,
+      "feasibility_cost": 811,
+      "whole_verified_windows": [
+        {
+          "id": "ev-c47c2b1fdeb26ffb",
+          "span": [
+            584,
+            993
+          ],
+          "scope": "project",
+          "version": "unversioned"
+        },
+        {
+          "id": "ev-6d6e478eedb2ef59",
+          "span": [
+            993,
+            1324
+          ],
+          "scope": "project",
+          "version": "unversioned"
+        }
+      ],
+      "mandatory_range_coverage": {
+        "witness_id": "V40-E01/required/set-0/part-0",
+        "path": "docs/src/use/configure/configuration-files.md",
+        "line_start": 19,
+        "line_end": 30,
+        "covered": false,
+        "char_start": 584,
+        "char_end": 1141,
+        "expected_characters": 557,
+        "covered_characters": 0,
+        "missing_char_ranges": [
+          [
+            584,
+            1141
+          ]
+        ],
+        "raw_quote_sha256": "1877aa26e84c3deda11fe2fa2035748ce52fcd7b9664eb5dc6a0f534a779855c",
+        "trimmed_quote_sha256": "8dd38af4e6553cfad610acc0f15a23f090e671976409444b8e937fb17d3e421d"
+      },
+      "read_only_recorded": true
+    }
+  ],
+  "product_calls": 0,
+  "inference_calls": 0,
+  "boundary": "offline audit of saved installed in-process MCP receipts; no new live validation",
+  "oracle": "diagnostic only: feasibility packets are gold-informed, not arm B"
+}

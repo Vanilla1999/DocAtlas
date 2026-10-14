@@ -1,0 +1,196 @@
+{
+  "archive_sha256": "599e25a37677ad14a0989947abdce03c3f10cdafac771a7c8fa5052f41368e04",
+  "archive_bytes": 416600,
+  "files": {
+    "run/V40-E01-preparation.json": {
+      "bytes": 158376,
+      "sha256": "bfc69d5f1c1dff5a5bc3b81a7611844d9cfc2df5ccdaa176469270b236ca66fd"
+    },
+    "run/V40-P03-preparation.json": {
+      "bytes": 93523,
+      "sha256": "ecf305a37f633004a96ed86bb57d08940ac4180f1a36c09161ff32303fd73c01"
+    },
+    "run/V40-P03-feasible-packet.json": {
+      "bytes": 2682,
+      "sha256": "d719b25f97d10d66399cc7828e56757e001d604ac8efcf32ed1ee75033c123be"
+    },
+    "run/V40-E01-off-public.json": {
+      "bytes": 39850,
+      "sha256": "d25be2e33bcc365fc9a7982b3118bd1657e980d9925d0c640dc6a1b961ac648e"
+    },
+    "run/V40-E01-on-public.json": {
+      "bytes": 39850,
+      "sha256": "d25be2e33bcc365fc9a7982b3118bd1657e980d9925d0c640dc6a1b961ac648e"
+    },
+    "run/V40-P03-off-public.json": {
+      "bytes": 39333,
+      "sha256": "d5cee5bd752e62a339d18b6e379385c588cd6c1059d421c5eb19230378a277a2"
+    },
+    "run/V40-P03-on-public.json": {
+      "bytes": 39333,
+      "sha256": "d5cee5bd752e62a339d18b6e379385c588cd6c1059d421c5eb19230378a277a2"
+    },
+    "run/V40-P03-trace.json": {
+      "bytes": 3687666,
+      "sha256": "e4d28fc7e4a678d6da820a165252d06330d852c7b15b5276d6cde612af6644f4"
+    },
+    "run/V40-E01-normalized-diagnostic.json": {
+      "bytes": 32117,
+      "sha256": "d0d52f9c0dfac3fc1ec6b019f4982dfa2448dab12a4ce183ffb300aba5a6d48a"
+    },
+    "run/V40-E01-trace.json": {
+      "bytes": 5574049,
+      "sha256": "26e6953b6e0403a2c639211d01f51437a25d3c5b6e2e3ea140b75e4ebb7f142e"
+    },
+    "run/V40-E01-feasible-packet.json": {
+      "bytes": 2802,
+      "sha256": "5a6bbab0ec261752f26cc480b42cd2ef5a16760a51a7b29b3e773653de15b279"
+    },
+    "run/V40-P03-normalized-diagnostic.json": {
+      "bytes": 31192,
+      "sha256": "51aec1a82e73539f96d1623e6938e45857a4241fea4a9e6e10aeb5fedd16cbab"
+    },
+    "primary/Doc-Structuring-Qwen2.5-3B-Instruct-info.txt": {
+      "bytes": 3521,
+      "sha256": "a31fa2e4e3334d761faaf01be93c8563d9e6978f8cef6c3d6ed41613d353e836"
+    },
+    "primary/jina-card.txt": {
+      "bytes": 71254,
+      "sha256": "3ffb3d200e9f837467a6709d10c54467b17d96485f154b76c078884029c0e78e"
+    },
+    "primary/setr-paper.txt": {
+      "bytes": 217550,
+      "sha256": "549168ed06b50192b8e468da65be571abe36b041fec032c7ab29bcb6483d813e"
+    },
+    "primary/xprovence-paper.txt": {
+      "bytes": 118527,
+      "sha256": "43e5de9b5535dd3509fe5b6a34dada4d66ea33f78e1ea0feebbea19e5564b429"
+    },
+    "primary/setr-train.txt": {
+      "bytes": 1983,
+      "sha256": "acd889a5f1ce874db4ad317207d329535fdd33c337cb23209e49a7abac515bfa"
+    },
+    "primary/setr-license.txt": {
+      "bytes": 1551,
+      "sha256": "ce29faa429f1f220367494cf6d158b1a269dd07fdc343afa6002008f38d1e882"
+    },
+    "primary/longrefiner-selection-card.txt": {
+      "bytes": 5303,
+      "sha256": "a54efcf3d427383b546c8426263f65c54566060fe76a77e90b4f74cbb798d8b8"
+    },
+    "primary/provence-reranker-debertav3-v1-info.txt": {
+      "bytes": 1971,
+      "sha256": "52fff9c94fb3092f17a8a47a267df70f8ecdb2d2ffd1d6b945cebaeffc609864"
+    },
+    "primary/setr-readme.txt": {
+      "bytes": 3222,
+      "sha256": "770f7f2b4448ff76c46827d57afcc34a20df3a7809a4dc2d85abd3a5e02650e4"
+    },
+    "primary/longrefiner-license.txt": {
+      "bytes": 1056,
+      "sha256": "06dcddbb6908a0c6dd4a9e8ec822eea41d5a460a53089fecccc8a68049e99241"
+    },
+    "primary/xprovence-config.txt": {
+      "bytes": 807,
+      "sha256": "dff29375d7d58e3b83aceab9254860846013fee4f851c884f743d4258f3194e9"
+    },
+    "primary/longrefiner-readme.txt": {
+      "bytes": 3830,
+      "sha256": "4155c52046b0fa273c1e67acc89cfe8bfbab4b454be18c0018550b225df56411"
+    },
+    "primary/paraset-paper.txt": {
+      "bytes": 416751,
+      "sha256": "f7220657849cfd75eb96cf2a639bd1f3c13c148d971d513acdbdc04cc81fe126"
+    },
+    "primary/SOURCES.json": {
+      "bytes": 9090,
+      "sha256": "a89bceb97e91825e485d3ac2dc3cc2b7a7072dd5407af80cab42fec519e2decd"
+    },
+    "primary/provence-config.txt": {
+      "bytes": 1163,
+      "sha256": "f2174e79a32cf0cc91b826440db15c8c285130a1905939f0a82e88230b787280"
+    },
+    "primary/provence-card.txt": {
+      "bytes": 9387,
+      "sha256": "86b0a0597b61f8b70be65ddef5cbf23fc4b2bd0c510c6689fbb06d2b335fb2d5"
+    },
+    "primary/late-paper.txt": {
+      "bytes": 186643,
+      "sha256": "6caaacd5b6b999b98e3e2ed6e4894a8b38f1044d09026c09b4ab8cdb67348fb3"
+    },
+    "primary/provence-paper.txt": {
+      "bytes": 429575,
+      "sha256": "ea5b93935126b864e87e23a2e1d24820a3d0aefaf5db371f8cd56b0123b3ab6b"
+    },
+    "primary/longrefiner-tree.txt": {
+      "bytes": 7046,
+      "sha256": "f5e0a96a55f15af7376b3c30963060b47e75c102e435ec297d9ddd91b34f3875"
+    },
+    "primary/xprovence-card.txt": {
+      "bytes": 9724,
+      "sha256": "b5483a6b5050d84c8c03b688dfefbcef164248e3960fd6e37fcc94d4065f94ce"
+    },
+    "primary/longrefiner-selection-info.txt": {
+      "bytes": 3798,
+      "sha256": "8b7d32e9a6ef1d32a3dc306a309b2141badd38edd1b0cfda2ee3a64ddae788df"
+    },
+    "primary/longrefiner-paper.txt": {
+      "bytes": 354110,
+      "sha256": "ca99a9de5ed630bdf7dd6c22302127ab2e1144a3ebca762d2413b55729c80b68"
+    },
+    "primary/xprovence-reranker-bgem3-v2-info.txt": {
+      "bytes": 2015,
+      "sha256": "9f4a92cd4168131e0b54174ae4fca10a8a8ae0ccd7303d3e0245f3eb25c3e2f8"
+    },
+    "primary/Query-Analysis-Qwen2.5-3B-Instruct-info.txt": {
+      "bytes": 3632,
+      "sha256": "c8b0a90c8c6a7e32080037ce4d8d2b24cf53eed5b18f542b56462c7d08f03197"
+    },
+    "primary/provence-reranker-debertav3-v1-info-license.txt": {
+      "bytes": 3391,
+      "sha256": "32b8844733ab38da3a12522e32297842340fea3e9203b58365ac472355be9aa8"
+    },
+    "primary/late-readme.txt": {
+      "bytes": 9856,
+      "sha256": "7c03173cbe58b0af934b1b256b24d57f57311ba37096a8bd9cd5b8043d46cfa9"
+    },
+    "primary/late-license.txt": {
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    "primary/longrefiner-selection-config.txt": {
+      "bytes": 744,
+      "sha256": "f2037f66124e41763c2d1c72a2097d2722a314965f43ee00ed8bd8f910f2a697"
+    },
+    "primary/setr-tree.txt": {
+      "bytes": 9879,
+      "sha256": "fef018472989aa32c168c8c3e4bebdc2a6be6ac91f92d4b965569f1550da72e7"
+    },
+    "ci/FROZEN_RUN.json": {
+      "bytes": 73124,
+      "sha256": "8cf60dfcb65d5ce4db46009ca763f5405173fe71e593a84a613ba6c34b6d29ad"
+    },
+    "ci/WORKER.json": {
+      "bytes": 290,
+      "sha256": "2fb53de796c7134aa418aca260a7c65ce24b7e83b69fdc4397bdd7069a4cb68b"
+    },
+    "ci/SUMMARY.json": {
+      "bytes": 7164,
+      "sha256": "bcf14e0fdcfcf24a87602abaa4db68cb05dbdba76d796d187454b5ddc907a011"
+    },
+    "ci/assessment.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ci/runtime.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ci/integration.xml": {
+      "bytes": 5815,
+      "sha256": "e35c9ef3ac38e21c8f48e556a164d51b218e7f151fe0acad1f15a16cf902f464"
+    }
+  },
+  "verified": true,
+  "omitted_duplicate": "BoundaryObserver writes call-1.json per instance; use unique per-case trace files, not overwritten scratch boundaries"
+}

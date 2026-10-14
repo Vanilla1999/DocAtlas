@@ -1,0 +1,137 @@
+{
+  "setr-repo": {
+    "url": "https://api.github.com/repos/LGAI-Research/SetR",
+    "accessed_at": "2026-10-14T15:41:49.677865+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/repos/LGAI-Research/SetR",
+    "file": "setr-repo.txt",
+    "bytes": 6289,
+    "sha256": "f47341b37b6fef5a25ce3597276b188e34978be8c25dbeff345dcb09e781f685"
+  },
+  "setr-tree": {
+    "url": "https://api.github.com/repos/LGAI-Research/SetR/git/trees/main?recursive=1",
+    "accessed_at": "2026-10-14T15:41:49.678517+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/repos/LGAI-Research/SetR/git/trees/main?recursive=1",
+    "file": "setr-tree.txt",
+    "bytes": 9879,
+    "sha256": "fef018472989aa32c168c8c3e4bebdc2a6be6ac91f92d4b965569f1550da72e7"
+  },
+  "setr-releases": {
+    "url": "https://api.github.com/repos/LGAI-Research/SetR/releases",
+    "accessed_at": "2026-10-14T15:41:49.678945+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/repos/LGAI-Research/SetR/releases",
+    "file": "setr-releases.txt",
+    "bytes": 2,
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "setr-issues": {
+    "url": "https://api.github.com/repos/LGAI-Research/SetR/issues?state=all&per_page=100",
+    "accessed_at": "2026-10-14T15:41:49.679319+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/repos/LGAI-Research/SetR/issues?state=all&per_page=100",
+    "file": "setr-issues.txt",
+    "bytes": 4420,
+    "sha256": "2ae4edec7305a47eee26a6d1e5518c96895fe4479b690d3ba6e8ea175469e3f8"
+  },
+  "setr-paper": {
+    "url": "https://arxiv.org/html/2507.06838v2",
+    "accessed_at": "2026-10-14T15:41:50.682384+00:00",
+    "status": 200,
+    "final_url": "https://arxiv.org/html/2507.06838v2",
+    "file": "setr-paper.txt",
+    "bytes": 217550,
+    "sha256": "549168ed06b50192b8e468da65be571abe36b041fec032c7ab29bcb6483d813e"
+  },
+  "paraset-paper": {
+    "url": "https://arxiv.org/html/2607.05712v1",
+    "accessed_at": "2026-10-14T15:41:50.738154+00:00",
+    "status": 200,
+    "final_url": "https://arxiv.org/html/2607.05712v1",
+    "file": "paraset-paper.txt",
+    "bytes": 416751,
+    "sha256": "f7220657849cfd75eb96cf2a639bd1f3c13c148d971d513acdbdc04cc81fe126"
+  },
+  "paraset-abstract": {
+    "url": "https://arxiv.org/abs/2607.05712",
+    "accessed_at": "2026-10-14T15:41:50.854018+00:00",
+    "status": 200,
+    "final_url": "https://arxiv.org/abs/2607.05712",
+    "file": "paraset-abstract.txt",
+    "bytes": 43524,
+    "sha256": "32398b659377417a13d86fd66aac11b2041dedf0d3804b3ee7af60d73fcace22"
+  },
+  "hf-paraset": {
+    "url": "https://huggingface.co/api/models?search=ParaSet&limit=100",
+    "accessed_at": "2026-10-14T15:41:50.877747+00:00",
+    "status": 200,
+    "final_url": "https://huggingface.co/api/models?search=ParaSet&limit=100",
+    "file": "hf-paraset.txt",
+    "bytes": 2,
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "hf-setce": {
+    "url": "https://huggingface.co/api/models?search=SetCE&limit=100",
+    "accessed_at": "2026-10-14T15:41:51.597915+00:00",
+    "status": 200,
+    "final_url": "https://huggingface.co/api/models?search=SetCE&limit=100",
+    "file": "hf-setce.txt",
+    "bytes": 2,
+    "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "hf-setr": {
+    "url": "https://huggingface.co/api/models?search=SetR&limit=100",
+    "accessed_at": "2026-10-14T15:41:51.647498+00:00",
+    "status": 200,
+    "final_url": "https://huggingface.co/api/models?search=SetR&limit=100",
+    "file": "hf-setr.txt",
+    "bytes": 2914,
+    "sha256": "a1e0381bcd372d9110664d6f8880a74c8316e2babe1eb061a42500b1547de9a7"
+  },
+  "github-paraset": {
+    "url": "https://api.github.com/search/repositories?q=ParaSet",
+    "accessed_at": "2026-10-14T15:41:51.688291+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/search/repositories?q=ParaSet",
+    "file": "github-paraset.txt",
+    "bytes": 43205,
+    "sha256": "262f480f9cb3633339650f173faa7d7f4705088866203a1694ec0bc027104030"
+  },
+  "github-setce": {
+    "url": "https://api.github.com/search/repositories?q=SetCE",
+    "accessed_at": "2026-10-14T15:41:51.751416+00:00",
+    "status": 200,
+    "final_url": "https://api.github.com/search/repositories?q=SetCE",
+    "file": "github-setce.txt",
+    "bytes": 117929,
+    "sha256": "bea352077c199c9b00609cb529fcc1542a5b6cb454d61ed7540ca0d6e6fcdca6"
+  },
+  "setr-readme": {
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/README.md",
+    "accessed_at": "2026-10-14T15:41:53.727187+00:00",
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/README.md",
+    "file": "setr-readme.txt",
+    "bytes": 3222,
+    "sha256": "770f7f2b4448ff76c46827d57afcc34a20df3a7809a4dc2d85abd3a5e02650e4"
+  },
+  "setr-license": {
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/License.md",
+    "accessed_at": "2026-10-14T15:41:56.187717+00:00",
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/License.md",
+    "file": "setr-license.txt",
+    "bytes": 1551,
+    "sha256": "ce29faa429f1f220367494cf6d158b1a269dd07fdc343afa6002008f38d1e882"
+  },
+  "setr-train": {
+    "url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/train_llama_3.1_8B_inst_gcp.sh",
+    "accessed_at": "2026-10-14T15:41:56.963951+00:00",
+    "status": 200,
+    "final_url": "https://raw.githubusercontent.com/LGAI-Research/SetR/d1ac78b7e41f7c6a2cd8d582934fbba02893f343/train_llama_3.1_8B_inst_gcp.sh",
+    "file": "setr-train.txt",
+    "bytes": 1983,
+    "sha256": "acd889a5f1ce874db4ad317207d329535fdd33c337cb23209e49a7abac515bfa"
+  }
+}
