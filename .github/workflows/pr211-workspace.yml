@@ -1,80 +1,12 @@
-name: PR211 isolated integration repair
+name: PR211 isolated installed acceptance
 on:
   push:
     branches: [work/pr211-integration-20261014]
 permissions:
   contents: read
 jobs:
-  assemble:
-    if: github.repository == 'Vanilla1999/DocAtlas' && github.ref == 'refs/heads/work/pr211-integration-20261014'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    outputs:
-      candidate: ${{ steps.commit.outputs.candidate }}
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          ref: ${{ github.sha }}
-          fetch-depth: 0
-          persist-credentials: false
-      - name: Assemble verified integration follow-up
-        id: commit
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python .pr211-workspace/build_final.py
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: pr211-final-assembly-${{ github.run_id }}
-          path: ${{ runner.temp }}/assembly/
-          retention-days: 30
-          if-no-files-found: error
-  integration:
-    needs: assemble
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      DOCATLAS_AUTO_VECTORS: '0'
-      DOCATLAS_OFFLINE: '1'
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
-        with:
-          ref: ${{ needs.assemble.outputs.candidate }}
-          persist-credentials: false
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
-        with:
-          python-version: '3.12'
-      - name: Prepare frozen runtime and evidence
-        run: |
-          mkdir -p "$RUNNER_TEMP/proof"
-          git rev-parse HEAD > "$RUNNER_TEMP/proof/head.txt"
-          echo "PYTEST_DOCATLAS_ARTIFACT_DIR=$RUNNER_TEMP/proof/scenarios" >> "$GITHUB_ENV"
-          python -m pip install uv==0.9.25
-          uv sync --frozen --extra dev --extra embeddings-openai
-      - name: Real public integration, trace parity and explicit quotas
-        run: |
-          .venv/bin/python -m pytest -v --tb=short -o junit_family=legacy \
-            tests/test_heuristic_removal_public_integration.py \
-            tests/test_public_surface_integration.py \
-            tests/test_prepared_retrieval_review_integration.py \
-            tests/test_native_context_preservation_integration.py \
-            tests/test_experimental_selection_modes_integration.py \
-            tests/test_context_budget_refusal_integration.py \
-            tests/test_project_context_quality_v2_protocol.py::test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls \
-            tests/test_retrieval_features.py::test_lexical_compact_results_limit_sections_per_source_when_configured \
-            tests/test_retrieval_features.py::test_expand_bypasses_sections_per_source_cap \
-            --junitxml="$RUNNER_TEMP/proof/integration.xml"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        if: always()
-        with:
-          name: pr211-final-integration-${{ needs.assemble.outputs.candidate }}
-          path: ${{ runner.temp }}/proof/
-          retention-days: 30
-          if-no-files-found: error
   installed:
-    needs: assemble
+    if: github.repository == 'Vanilla1999/DocAtlas' && github.ref == 'refs/heads/work/pr211-integration-20261014'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -87,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          ref: ${{ needs.assemble.outputs.candidate }}
+          ref: 896ce88d7e5a6b5b261c11710418e2da7defce77
           persist-credentials: false
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
@@ -102,7 +34,18 @@ jobs:
           UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/installed" uv sync --frozen --no-dev --no-install-project
           uv pip install --python "$RUNNER_TEMP/installed/bin/python" --no-deps "$RUNNER_TEMP"/dist/*.whl
           uv pip check --python "$RUNNER_TEMP/installed/bin/python"
-      - name: Real installed MCP stdio including package and CLI surfaces
+          echo "$RUNNER_TEMP/installed/bin" >> "$GITHUB_PATH"
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/tokenizer" >> "$GITHUB_ENV"
+          python - <<'PY'
+          import gzip,hashlib,os,pathlib
+          cache=pathlib.Path(os.environ['RUNNER_TEMP'])/'tokenizer'
+          cache.mkdir()
+          data=gzip.decompress(pathlib.Path('docmancer/docs/data/o200k_base.tiktoken.gz').read_bytes())
+          assert hashlib.sha256(data).hexdigest()=='446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d'
+          url='https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken'
+          (cache/hashlib.sha1(url.encode()).hexdigest()).write_bytes(data)
+          PY
+      - name: Real installed MCP stdio and console script outside checkout
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           script="$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
@@ -117,7 +60,7 @@ jobs:
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
-          name: pr211-final-installed-${{ matrix.python }}-${{ needs.assemble.outputs.candidate }}
+          name: pr211-installed-acceptance-${{ matrix.python }}-896ce88d
           path: |
             ${{ runner.temp }}/installed-proof/
             ${{ runner.temp }}/dist/
