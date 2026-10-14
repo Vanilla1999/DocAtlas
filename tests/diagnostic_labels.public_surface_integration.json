@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "module_labels": {
+    "tests/test_public_surface_integration.py": "behavioral"
+  },
+  "node_overrides": {},
+  "module_node_hashes": {
+    "tests/test_public_surface_integration.py": "88d2f86ce9030182559648e870c3a30979ea30ac831c7f59c93d984754c8c85a"
+  }
+}

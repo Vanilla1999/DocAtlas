@@ -1,0 +1,80 @@
+name: PR211 reviewed integration migration
+
+on:
+  push:
+    branches: [integration/stage3-v2-identity-pr1]
+    paths: [.github/workflows/pr211-consolidate-once.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    if: github.repository == 'Vanilla1999/DocAtlas' && github.ref == 'refs/heads/integration/stage3-v2-identity-pr1'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_OFFLINE: '1'
+      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Refuse replay or concurrent branch changes
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD^)" = 317088c106f84aaf558ff22309306301249ab2ba
+          test "$(git ls-remote origin refs/heads/integration/stage3-v2-identity-pr1 | cut -f1)" = "$GITHUB_SHA"
+          mkdir -p "$RUNNER_TEMP/pr211-maintenance"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.13'
+      - name: Install the committed lock, without reranker extras
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev --extra embeddings-openai
+          .venv/bin/python -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+      - name: Apply reviewed migration and reconcile actual collection
+        run: .venv/bin/python scripts/pr211_consolidate_once.py
+      - name: Publish only the reviewed migration, no main or force push
+        run: |
+          set -euo pipefail
+          git diff --check
+          git rm .github/workflows/pr211-consolidate-once.yml .github/workflows/pr211-lock-repair-once.yml scripts/pr211_consolidate_once.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/ci.yml .github/workflows/main-flow-context-review.yml tests docs/source-native-test-migration.json docs/source-native-test-inventory.json
+          git commit -m 'test: migrate retired selector internals to public integration boundaries'
+          git push origin HEAD:refs/heads/integration/stage3-v2-identity-pr1
+          git rev-parse HEAD > "$RUNNER_TEMP/pr211-maintenance/head.txt"
+          git rev-parse HEAD^{tree} > "$RUNNER_TEMP/pr211-maintenance/tree.txt"
+          git diff HEAD^ --binary > "$RUNNER_TEMP/pr211-maintenance/changes.patch"
+          git archive --format=tar.gz HEAD > "$RUNNER_TEMP/pr211-maintenance/source.tar.gz"
+      - name: Export locked dependencies for isolated offline reproduction
+        if: ${{ !cancelled() }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/wheelhouse"
+          uv export --frozen --extra dev --extra embeddings-openai --no-emit-project --no-hashes --output-file "$RUNNER_TEMP/wheelhouse/requirements.txt"
+          python -m pip wheel --wheel-dir "$RUNNER_TEMP/wheelhouse" -r "$RUNNER_TEMP/wheelhouse/requirements.txt" 'hatchling<1.27'
+          cp -r "$TIKTOKEN_CACHE_DIR" "$RUNNER_TEMP/wheelhouse/tokenizer-cache"
+      - name: Preserve migration and collection evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr211-migration-${{ github.sha }}
+          path: ${{ runner.temp }}/pr211-maintenance/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Preserve offline reproduction dependencies
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pr211-offline-wheels-${{ github.sha }}
+          path: ${{ runner.temp }}/wheelhouse/
+          retention-days: 7
+          if-no-files-found: warn
