@@ -19,7 +19,7 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Apply only pinned repair and publish separate candidate, never main or PR branch
+      - name: Apply pinned repair to a separate candidate branch
         id: commit
         env:
           GH_TOKEN: ${{ github.token }}
@@ -71,7 +71,6 @@ jobs:
       DOCATLAS_AUTO_VECTORS: '0'
       DOCATLAS_OFFLINE: '1'
       PYTHONUNBUFFERED: '1'
-      PYTEST_DOCATLAS_ARTIFACT_DIR: ${{ runner.temp }}/proof/scenarios
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -80,6 +79,8 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
+      - name: Prepare isolated evidence paths
+        run: echo "PYTEST_DOCATLAS_ARTIFACT_DIR=$RUNNER_TEMP/proof/scenarios" >> "$GITHUB_ENV"
       - name: Install frozen real runtime
         id: install
         run: |
@@ -87,7 +88,7 @@ jobs:
           git rev-parse HEAD > "$RUNNER_TEMP/proof/head.txt"
           python -m pip install uv==0.9.25
           uv sync --frozen --extra dev --extra embeddings-openai
-      - name: Execute existing source-native public integration and cold stdio regressions
+      - name: Execute source-native public integration and cold stdio regressions
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           .venv/bin/python -m pytest -v --tb=short -o junit_family=legacy \
@@ -139,7 +140,6 @@ jobs:
       DOCATLAS_AUTO_VECTORS: '0'
       DOCATLAS_OFFLINE: '1'
       PYTHONUNBUFFERED: '1'
-      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/installed-tokenizer
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
@@ -148,6 +148,8 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
+      - name: Prepare isolated tokenizer path
+        run: echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/installed-tokenizer" >> "$GITHUB_ENV"
       - name: Build and install exact candidate wheel outside checkout
         id: install
         run: |
@@ -158,13 +160,13 @@ jobs:
           UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/candidate-installed" uv sync --frozen --no-dev --no-install-project
           uv pip install --python "$RUNNER_TEMP/candidate-installed/bin/python" --no-deps "$RUNNER_TEMP"/candidate-wheel/*.whl
           "$RUNNER_TEMP/candidate-installed/bin/python" -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
-      - name: Real installed MCP stdio smoke, outside source tree
+      - name: Real installed MCP stdio outside source tree
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           script="$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/candidate-installed/bin/python" -I "$script" > "$RUNNER_TEMP/installed-proof/stdio.log" 2>&1
-      - name: Frozen V40 strict acceptance, no expected-result changes
+      - name: Frozen V40 strict acceptance without expected-result changes
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: |
           "$RUNNER_TEMP/candidate-installed/bin/python" -I eval/heuristic_removal/ci_acceptance.py \
