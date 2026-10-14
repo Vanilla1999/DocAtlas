@@ -104,8 +104,15 @@ def test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls(tmp_p
         assert fact in "\n".join(source["snippet"] for source in on["sources"])
         assert runner._citation_integrity(on, snapshot_on)
         assert on["diagnostics"]["observer_counts"] == {"retrieval_calls": 1, "validation_calls": 1}
-        trace = on["diagnostics"]["projection_observation"]["returned_core_diagnostics"]["decision_trace"]
-        assert trace["events"]["recorded_count"] > 0
+        # The removed heuristic projector no longer emits decision_trace.
+        # Observe the source-native recheck and terminal-budget events instead.
+        trace = on["diagnostics"]["projection_observation"]["returned_core_diagnostics"]["context_flow"]
+        assert trace["observation"] == "recorded"
+        assert 0 < trace["recorded_events"] == len(trace["events"]) <= 256
+        assert trace["event_count"] == trace["recorded_events"] + trace["omitted_events"]
+        assert trace["serialization_omitted_events"] == trace["diagnostic_error_count"] == 0
+        boundaries = {event["stage"] for event in trace["events"] if event["event"] == "boundary"}
+        assert {"recheck.input", "recheck.output", "budget.input", "budget.output"} <= boundaries
         for raw in (raw_calls[0], raw_calls[2]):
             assert "same_call_pipeline" not in raw.get("ingestion_diagnostics", {}).get("project", {})
         assert capsys.readouterr().out == ""

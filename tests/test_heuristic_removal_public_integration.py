@@ -369,7 +369,9 @@ def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatc
     config.embeddings.cache = str(tmp_path / "embeddings")
     config.vector_store = VectorStoreConfig(provider="sqlite-vec", options={"db_path": str(tmp_path / "vec.db")})
     config.retrieval.default_mode = "hybrid"
-    config.retrieval.max_sections_per_source = 1
+    # Native-order completeness uses the ordinary default, not an explicit
+    # one-window cap. The capped arm below independently checks that contract.
+    assert config.retrieval.max_sections_per_source is None
     config.retrieval.hierarchical.auto = True
     config.retrieval.hierarchical.auto_min_documents = 1
     config.retrieval.hierarchical.enabled = True
@@ -407,8 +409,35 @@ def test_vector_runtime_preserves_source_windows_and_access(tmp_path, monkeypatc
             assert chunk.source == "observatory.md"
             assert chunk.text in text
             assert "HIDDEN_97" not in chunk.text
+        # Reuse the real indexed vector/lexical backends for an explicit cap,
+        # then bypass that cap only through an explicit page expansion request.
+        config.retrieval.max_sections_per_source = 1
+        try:
+            capped = dispatcher_for_agent(agent, mode=mode).run(
+                "observatory", mode=mode, limit=10, budget=4000, expand="none",
+                filters={"forbidden_sources": ["secret.md"]}, allow_degraded=mode == "hybrid",
+            )
+            expanded = dispatcher_for_agent(agent, mode=mode).run(
+                "observatory", mode=mode, limit=10, budget=4000, expand="page",
+                filters={"forbidden_sources": ["secret.md"]}, allow_degraded=mode == "hybrid",
+            )
+        finally:
+            config.retrieval.max_sections_per_source = None
+        assert len(capped.chunks) == 1, capped
+        assert capped.chunks[0].text in {chunk.text for chunk in result.chunks}
+        for packet in (capped, expanded):
+            assert packet.mode_used == expected_mode
+            assert packet.failures == result.failures
+            assert packet.chunks
+            assert all(chunk.source == "observatory.md" and chunk.text in text
+                       and "HIDDEN_97" not in chunk.text for chunk in packet.chunks)
+        for fact in ("Observatory aperture is 73 mm.", "Observatory shutter waits 19 seconds.",
+                     "Observatory archive retains 41 nights."):
+            assert any(fact in chunk.text for chunk in expanded.chunks), expanded
         evidence.append({"mode": result.mode_used, "sources": [chunk.source for chunk in result.chunks],
-                         "texts": [chunk.text for chunk in result.chunks], "counts": result.candidate_counts})
+                         "texts": [chunk.text for chunk in result.chunks], "counts": result.candidate_counts,
+                         "explicit_cap_texts": [chunk.text for chunk in capped.chunks],
+                         "explicit_page_texts": [chunk.text for chunk in expanded.chunks]})
     assert database(config.index.db_path) == before
     record_property("vector_runtime_evidence", json.dumps(evidence))
     record_property("embedding_http_calls", json.dumps(calls))
