@@ -4,6 +4,7 @@ from __future__ import annotations
 from ._docs_server_shared import *  # noqa: F401,F403
 from docmancer.docs.interfaces.mcp.output_contract import compact_mcp_payload, is_v4_patch_projection
 from docmancer.docs.application.query_trace import traced_request
+from docmancer.docs.application.context_json import serialize_context_json
 
 
 class LocalMemberService:
@@ -331,7 +332,7 @@ def _json_text(
     if text_fallback:
         text = (
             json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
-            if is_v4_patch_projection(payload) else json.dumps(payload, ensure_ascii=False)
+            if is_v4_patch_projection(payload) else serialize_context_json(payload)
         )
     else:
         text = BOUNDED_STRUCTURED_CONTENT_MARKER

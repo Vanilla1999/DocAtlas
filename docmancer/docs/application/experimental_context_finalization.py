@@ -22,6 +22,7 @@ from .context_selection import context_selection_decision
 from .model_visible_projection import _refresh_estimate, validate_model_visible_projection
 from .projection_decision_trace import ProjectionFlowTrace
 from .projection_tokenizer import projection_token_count
+from .context_json import serialize_context_json
 
 
 _SEED_KEY = "_experimental_native_context"
@@ -151,7 +152,7 @@ def experimental_context_cost(payload: dict[str, Any]) -> int:
     full chat prompt, billing, or repeated history.  The independently measurable
     UTF-8/4 ceiling is enforced as well.
     """
-    wire = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    wire = serialize_context_json(payload).encode("utf-8")
     return max(math.ceil(len(wire) / 4), projection_token_count(wire))
 
 
