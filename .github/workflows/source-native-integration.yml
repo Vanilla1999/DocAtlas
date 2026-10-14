@@ -56,6 +56,8 @@ jobs:
           .venv/bin/python -m pytest -v --tb=short -o junit_family=legacy \
             tests/test_heuristic_removal_public_integration.py \
             tests/test_public_surface_integration.py \
+            tests/docs/test_module_docs_manifest_e2e.py \
+            tests/test_mcp_trusted_storage_lifecycle.py::test_prepared_module_and_project_scope_isolation \
             tests/test_prepared_retrieval_review_integration.py \
             tests/test_native_context_preservation_integration.py \
             tests/test_experimental_selection_modes_integration.py \

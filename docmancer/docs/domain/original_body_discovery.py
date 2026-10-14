@@ -88,8 +88,12 @@ def original_body_read_scope(handler):
         state = _BodyRead(question, project_path,
                           "local:" + hashlib.sha256(str(root).encode("utf-8")).hexdigest()) if eligible else None
         if state is not None:
-            state.scope = args.get("scope") or "project"
+            # Match the public retrieval contract: an exact module path always
+            # narrows to that module; an omitted scope is repository-wide.
+            # Explicit project scope still excludes all module documents.
+            # This is argument binding, never an inference from question text.
             state.module_path = args.get("module_path") or ""
+            state.scope = "module" if state.module_path else args.get("scope") or "all"
             state.lookup_queries = tuple(args.get("lookup_queries") or ())
         # Capture request-local settings once. Wire metadata cannot mint receipts.
         if state is not None:

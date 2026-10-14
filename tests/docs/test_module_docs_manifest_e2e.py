@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from hashlib import sha256
+
+from eval.heuristic_removal.receipts import database, files
+
 from docmancer.agent import DocmancerAgent
 from docmancer.core.config import DocmancerConfig
 from docmancer.docs.application.docs_job_service import DocsJobTracker
@@ -77,6 +81,48 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         ("README.md", "docs/modules/orion-routing.md", "docs/modules/vega-proof.md"),
     )
     assert sync.status == "success"
+    # One real preparation, two service queries and eleven public MCP reads.
+    # Independent source bytes and catalog/index state are fixed before reads.
+    documents = {name: (project / name).read_text(encoding="utf-8") for name in (
+        "README.md", "docs/modules/orion-routing.md", "docs/modules/vega-proof.md",
+    )}
+    before_files = files(project)
+    before_db = database(service.config.index.db_path)
+
+    def check_sources(payload, expected_paths, expected_scope):
+        assert payload.get("status") == "ok", payload
+        assert payload.get("answer_supported") is False
+        assert payload.get("edit_ready") is False
+        rows = payload.get("sources") or []
+        assert rows, payload
+        delivered_paths = set()
+        for row in rows:
+            path = row["path_or_url"]
+            if path.startswith(str(project) + "/"):
+                path = path[len(str(project)) + 1:]
+            assert path in expected_paths, row
+            delivered_paths.add(path)
+            text = documents[path]
+            snippet = row["snippet"]
+            assert snippet and snippet in text
+            assert row["scope"] == expected_scope
+            # Public content_sha256 is a DTO fingerprint, not a raw-file hash.
+            fingerprint = row["content_sha256"]
+            assert len(fingerprint) == 64 and all(ch in "0123456789abcdef" for ch in fingerprint)
+            assert row["project_identity"] == "local:" + sha256(str(project).encode()).hexdigest()
+            assert row["version_binding"] == "unversioned"
+            start, end = row["line_start"], row["line_end"]
+            assert type(start) is int and type(end) is int
+            assert 1 <= start <= end <= len(text.splitlines())
+            assert snippet in "\n".join(text.splitlines()[start - 1:end])
+        assert delivered_paths == set(expected_paths), payload
+        required_facts = {
+            "README.md": "Two documented modules share a proof contract.",
+            "docs/modules/orion-routing.md": "It publishes those facets through `ModuleEvidenceContract` for the proof module.",
+            "docs/modules/vega-proof.md": "`VegaProof` validates every mandatory facet received through `ModuleEvidenceContract` and rejects incomplete evidence.",
+        }
+        for path in expected_paths:
+            assert any(required_facts[path] in row["snippet"] for row in rows), (path, payload)
 
     orion = service.get_project_docs(
         str(project), "OrionRouter ModuleEvidenceContract",
@@ -113,10 +159,21 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         },
         service,
     )
-    for payload, marker in ((orion_public, "OrionRouter"), (vega_public, "VegaProof")):
-        assert payload["status"] == "ok", payload
-        rendered = str(payload)
-        assert marker in rendered
+    for payload, name, marker in ((orion_public, "orion", "OrionRouter"),
+                                  (vega_public, "vega", "VegaProof")):
+        path = f"docs/modules/{name}-{'routing' if name == 'orion' else 'proof'}.md"
+        check_sources(payload, {path}, "module")
+        assert any(marker in row["snippet"] for row in payload["sources"])
+        # Three explicit argument forms, not natural-language scope guesses.
+        # A supplied path must never widen to siblings, even with scope=all.
+        for scope in (None, "all", "project"):
+            arguments = {"question": f"What does {marker} do?",
+                         "project_path": str(project), "module_path": f"modules/{name}"}
+            if scope is not None:
+                arguments["scope"] = scope
+            narrowed = call_docs_tool_payload("get_docs_context", arguments, service)
+            check_sources(narrowed, {path}, "module")
+            assert any(marker in row["snippet"] for row in narrowed["sources"])
 
     cross = call_docs_tool_payload(
         "get_docs_context",
@@ -126,5 +183,17 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
         },
         service,
     )
-    assert cross["status"] == "ok", cross
-    assert "ModuleEvidenceContract" in str(cross)
+    module_paths = {"docs/modules/orion-routing.md", "docs/modules/vega-proof.md"}
+    check_sources(cross, module_paths, "module")
+    full = call_docs_tool_payload("get_docs_context", {
+        "question": "What is ModuleEvidenceContract?", "project_path": str(project), "scope": "all",
+    }, service)
+    check_sources(full, module_paths, "module")
+    project_only = call_docs_tool_payload("get_docs_context", {
+        "question": "Example architecture", "project_path": str(project), "scope": "project",
+    }, service)
+    check_sources(project_only, {"README.md"}, "project")
+    assert any("Two documented modules share a proof contract." in row["snippet"]
+               for row in project_only["sources"])
+    assert files(project) == before_files
+    assert database(service.config.index.db_path) == before_db
