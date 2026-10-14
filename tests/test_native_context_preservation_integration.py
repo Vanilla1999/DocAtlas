@@ -94,17 +94,23 @@ def _assert_trace_contract(records):
     flow = on[1]["projection_observation"]["returned_core_diagnostics"]["context_flow"]
     assert flow["schema_version"] == 1
     assert flow["event_limit"] == 256 and flow["source_limit"] == 64
-    assert flow["event_count"] == flow["recorded_events"] == len(flow["events"]) <= 256
-    assert flow["omitted_events"] == flow["serialization_omitted_events"] == flow["diagnostic_error_count"] == 0
-    assert [event["sequence"] for event in flow["events"]] == list(range(1, flow["event_count"] + 1))
+    assert flow["recorded_events"] == len(flow["events"]) <= 256
+    assert flow["event_count"] == flow["recorded_events"] + flow["omitted_events"]
+    assert flow["serialization_omitted_events"] == flow["diagnostic_error_count"] == 0
+    sequences = [event["sequence"] for event in flow["events"]]
+    assert sequences == sorted(set(sequences))
+    assert all(1 <= sequence <= flow["event_count"] for sequence in sequences)
+    # Native pools can exceed the bounded diagnostic preview. Such omissions
+    # must be exact and explicit, never mistaken for absent source evidence.
     boundaries = [event for event in flow["events"] if event["event"] == "boundary"]
     assert {"recheck.input", "recheck.output", "budget.input", "budget.output"} <= {
         event["stage"] for event in boundaries
     }
     for event in boundaries:
         assert event.get("observation") != "diagnostic_error", event
-        assert event["source_rows_omitted"] == event["serialization_omitted_source_rows"] == 0
-        assert event["source_count"] == len(event["rows"]) <= 64
+        assert event["serialization_omitted_source_rows"] == 0
+        assert len(event["rows"]) <= 64
+        assert event["source_count"] == len(event["rows"]) + event["source_rows_omitted"]
     # The log explains boundaries; it never supplies the task's expected fact.
 
 

@@ -118,7 +118,7 @@ class _RetrievalDispatcherPart01:
                 "exact_supplement": "explicit-query-only-v1",
                 "intent_rerank": "retriever-order-preserved-v2",
                 "expand": retrieval_expand,
-                "max_sections_per_source": None,
+                "max_sections_per_source": self.config.retrieval.max_sections_per_source,
             },
         })
         if q_active:
@@ -127,7 +127,8 @@ class _RetrievalDispatcherPart01:
                 "candidate_ceiling": ACQUISITION_CANDIDATES,
                 "estimated_token_ceiling": ACQUISITION_ESTIMATED_TOKENS,
                 "text_byte_ceiling": ACQUISITION_TEXT_BYTES,
-                "expansion": retrieval_expand or "none", "source_quota": None,
+                "expansion": retrieval_expand or "none",
+                "source_quota": self.config.retrieval.max_sections_per_source,
             })
 
         def finalized(result: DispatchResult) -> DispatchResult:
@@ -159,6 +160,9 @@ class _RetrievalDispatcherPart01:
             )
             acquired_count = len(chunks)
             chunks = self._filter_chunks(chunks, merged_filters)
+            # Keep the MCP pool independent of SDK limit/budget. Only an
+            # explicit host resource quota may bound a source here.
+            chunks = self._limit_sections_per_source(chunks, expand=retrieval_expand)
             for chunk in chunks:
                 chunk.metadata.setdefault("acquisition", {}).update({
                     "dispatcher_post_policy_rows": len(chunks),

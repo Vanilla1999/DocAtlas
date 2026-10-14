@@ -66,13 +66,13 @@ def test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls(tmp_p
         app = service.unified_context
         retrieve = app.get_docs_context
         raw_calls = []
-        calls = {"coverage": 0, "acquisition": 0}
-        coverage = runner.docs_context_projection.component_coverage_decision
+        calls = {"validation": 0, "acquisition": 0}
+        validate = runner.context_tools.validate_model_visible_projection
         dispatch = RetrievalDispatcher.run
 
-        def observe_coverage(*args, **kwargs):
-            calls["coverage"] += 1
-            return coverage(*args, **kwargs)
+        def observe_validation(*args, **kwargs):
+            calls["validation"] += 1
+            return validate(*args, **kwargs)
 
         def observe_acquisition(self, *args, **kwargs):
             calls["acquisition"] += 1
@@ -85,13 +85,13 @@ def test_query_trace_off_on_off_preserves_real_sources_and_retrieval_calls(tmp_p
 
         monkeypatch.setattr(app, "get_docs_context", observe_real_retrieval)
         monkeypatch.setattr(runner, "REPO_ROOT", root)
-        monkeypatch.setattr(runner.docs_context_projection, "component_coverage_decision", observe_coverage)
+        monkeypatch.setattr(runner.context_tools, "validate_model_visible_projection", observe_validation)
         monkeypatch.setattr(RetrievalDispatcher, "run", observe_acquisition)
         capsys.readouterr()
         off_first, snapshot_first = runner._call_with_snapshot(request, service, trace_enabled=False)
         assert len(raw_calls) == 1
         first_calls = dict(calls)
-        assert first_calls["coverage"] > 0 and first_calls["acquisition"] > 0
+        assert first_calls["validation"] > 0 and first_calls["acquisition"] > 0
         on, snapshot_on = runner._call_with_snapshot(request, service, trace_enabled=True)
         assert len(raw_calls) == 2
         assert calls == {key: count * 2 for key, count in first_calls.items()}

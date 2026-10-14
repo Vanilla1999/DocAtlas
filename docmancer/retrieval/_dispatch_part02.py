@@ -169,9 +169,20 @@ class _RetrievalDispatcherPart02:
     ) -> list[Any]:
         if (expand or "").lower() in {"adjacent", "page"}:
             return chunks
-        # Source identity is an access/provenance constraint, not a diversity
-        # quota. Preserve the native (or fused) rank under the global bound.
-        return chunks[:limit] if limit is not None else chunks
+        # An explicitly configured resource quota is not a relevance score.
+        # The default remains unset: no implicit diversity or authority policy.
+        quota = self.config.retrieval.max_sections_per_source
+        if quota is None:
+            return chunks[:limit] if limit is not None else chunks
+        counts: dict[str, int] = {}
+        selected = []
+        for chunk in chunks:
+            source = str(chunk.source)
+            if counts.get(source, 0) >= quota:
+                continue
+            counts[source] = counts.get(source, 0) + 1
+            selected.append(chunk)
+        return selected[:limit] if limit is not None else selected
 
     @staticmethod
     def _filter_chunks(chunks: list[Any], filters: dict | None) -> list[Any]:

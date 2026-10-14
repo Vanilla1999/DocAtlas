@@ -229,7 +229,18 @@ class ProjectionFlowTrace:
             state["event_count"] += 1
             if len(state["events"]) >= MAX_CONTEXT_FLOW_EVENTS:
                 state["omitted_events"] += 1
-                return None
+                # Retain the outer recheck/budget boundaries even when detailed
+                # per-row trial events exhaust the same fixed-size trace. Every
+                # displaced event stays counted; this never changes selection.
+                outer = {"recheck.input", "recheck.output", "budget.input", "budget.output"}
+                if kind != "boundary" or stage not in outer:
+                    return None
+                replace = next((index for index in range(len(state["events"]) - 1, -1, -1)
+                                if state["events"][index].get("event") != "boundary"
+                                or state["events"][index].get("stage") not in outer), None)
+                if replace is None:
+                    return None
+                del state["events"][replace]
             event = {"sequence": state["event_count"], "stage": stage, "event": kind, **fields}
             state["events"].append(event)
             return event

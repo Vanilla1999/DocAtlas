@@ -159,7 +159,7 @@ class RetrievalConfig(BaseSettings):
     budget: int | None = None
     limit: int | None = None
     max_sections_per_source: int | None = Field(
-        default=None, ge=1, description="Legacy parsing field; source quotas are no longer applied.",
+        default=None, ge=1, description="Explicit source quota; unset preserves native order without a quota. Explicit expansion bypasses it.",
     )
     model_config = SettingsConfigDict(env_prefix="DOCATLAS_RETRIEVAL_", extra="ignore")
 
