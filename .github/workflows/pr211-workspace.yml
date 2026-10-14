@@ -1,0 +1,182 @@
+name: PR211 isolated integration repair
+on:
+  push:
+    branches: [work/pr211-integration-20261014]
+permissions:
+  contents: read
+jobs:
+  assemble:
+    if: github.repository == 'Vanilla1999/DocAtlas' && github.ref == 'refs/heads/work/pr211-integration-20261014'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    outputs:
+      candidate: ${{ steps.commit.outputs.candidate }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Apply only pinned repair and publish separate candidate, never main or PR branch
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, pathlib, subprocess
+          def git(*args, **kwargs):
+              return subprocess.check_output(['git', *args], text=True, **kwargs).strip()
+          manifest = json.loads(pathlib.Path('.pr211-workspace/manifest.json').read_text())
+          base = manifest['base']
+          allowed = {'.pr211-workspace/apply.py', '.pr211-workspace/manifest.json', '.github/workflows/pr211-workspace.yml'}
+          assert set(git('diff', '--name-only', base, 'HEAD').splitlines()) == allowed
+          subprocess.run(['python', '.pr211-workspace/apply.py'], check=True)
+          results = pathlib.Path(os.environ['RUNNER_TEMP']) / 'assembly'
+          results.mkdir()
+          (results / 'manifest.json').write_text(json.dumps(manifest, indent=2))
+          git('add', '--', *manifest['candidate_sha256'])
+          git('rm', '-r', '--', '.pr211-workspace', '.github/workflows/pr211-workspace.yml')
+          tree = git('write-tree')
+          assert set(git('diff', '--name-only', base, tree).splitlines()) == set(manifest['candidate_sha256'])
+          git('diff', '--check', base, tree)
+          (results / 'repair.patch').write_text(git('diff', base, tree) + '\n')
+          author = dict(os.environ, GIT_AUTHOR_NAME='github-actions[bot]', GIT_AUTHOR_EMAIL='41898282+github-actions[bot]@users.noreply.github.com', GIT_COMMITTER_NAME='github-actions[bot]', GIT_COMMITTER_EMAIL='41898282+github-actions[bot]@users.noreply.github.com')
+          candidate = git('commit-tree', tree, '-p', base, '-m', 'fix: preserve bounded denials and restore real public integration evidence', env=author)
+          branch = 'work/pr211-candidate-' + os.environ['GITHUB_RUN_ID']
+          assert os.environ['GITHUB_REPOSITORY'] == 'Vanilla1999/DocAtlas'
+          auth = base64.b64encode(('x-access-token:' + os.environ['GH_TOKEN']).encode()).decode()
+          push_env = dict(os.environ, GIT_CONFIG_COUNT='1', GIT_CONFIG_KEY_0='http.https://github.com/.extraheader', GIT_CONFIG_VALUE_0='AUTHORIZATION: basic ' + auth)
+          subprocess.run(['git', 'push', 'origin', candidate + ':refs/heads/' + branch], env=push_env, check=True)
+          (results / 'candidate.txt').write_text(candidate + '\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('candidate=' + candidate + '\n')
+          print('Candidate:', candidate, 'Branch:', branch)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pr211-assembly-${{ github.run_id }}
+          path: ${{ runner.temp }}/assembly/
+          retention-days: 30
+          if-no-files-found: error
+  integration:
+    needs: assemble
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    env:
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_OFFLINE: '1'
+      PYTHONUNBUFFERED: '1'
+      PYTEST_DOCATLAS_ARTIFACT_DIR: ${{ runner.temp }}/proof/scenarios
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ needs.assemble.outputs.candidate }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Install frozen real runtime
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/proof"
+          git rev-parse HEAD > "$RUNNER_TEMP/proof/head.txt"
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev --extra embeddings-openai
+      - name: Execute existing source-native public integration and cold stdio regressions
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          .venv/bin/python -m pytest -v --tb=short -o junit_family=legacy \
+            tests/test_heuristic_removal_public_integration.py \
+            tests/test_public_surface_integration.py \
+            tests/test_prepared_retrieval_review_integration.py \
+            tests/test_native_context_preservation_integration.py \
+            tests/test_experimental_selection_modes_integration.py \
+            tests/test_context_budget_refusal_integration.py \
+            tests/test_docs_mcp_stdio_delivery.py::test_cold_smoke_helpers_prepare_retrieve_and_restart_real_source_stdio \
+            --junitxml="$RUNNER_TEMP/proof/source-native.xml"
+      - name: Replay unchanged original main-flow integration scenarios
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          .venv/bin/python -m pytest -q --tb=short -o junit_family=legacy \
+            tests/test_project_context_quality_v2_protocol.py \
+            tests/test_main_flow_logging_integration.py \
+            tests/test_retrieval_features.py::test_lexical_and_supplemental_paths_enforce_forbidden_sources \
+            tests/test_retrieval_features.py::test_lexical_compact_results_limit_sections_per_source_when_configured \
+            tests/test_retrieval_features.py::test_expand_bypasses_sections_per_source_cap \
+            tests/docs/test_host_scope_contract.py \
+            tests/test_docs_service.py::test_get_project_docs_never_returns_hash_mismatched_stale_content \
+            --basetemp="$RUNNER_TEMP/proof/main-flow" --junitxml="$RUNNER_TEMP/proof/main-flow.xml"
+      - name: Forty unchanged direct public MCP requests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/proof
+        run: PYTHONPATH=. .venv/bin/python eval/main_flow_comparison/run_extra40.py
+      - name: Separate unchanged literal lookup comparison
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        env:
+          EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/proof
+          EXTRA40_LOOKUP_ONLY: '1'
+        run: PYTHONPATH=. .venv/bin/python eval/main_flow_comparison/run_extra40.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pr211-public-repair-${{ needs.assemble.outputs.candidate }}
+          path: ${{ runner.temp }}/proof/
+          retention-days: 30
+          if-no-files-found: error
+  installed:
+    needs: assemble
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    env:
+      DOCATLAS_AUTO_VECTORS: '0'
+      DOCATLAS_OFFLINE: '1'
+      PYTHONUNBUFFERED: '1'
+      TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/installed-tokenizer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ needs.assemble.outputs.candidate }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Build and install exact candidate wheel outside checkout
+        id: install
+        run: |
+          mkdir -p "$RUNNER_TEMP/installed-proof"
+          git rev-parse HEAD > "$RUNNER_TEMP/installed-proof/head.txt"
+          python -m pip install uv==0.9.25
+          uv build --wheel --out-dir "$RUNNER_TEMP/candidate-wheel"
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/candidate-installed" uv sync --frozen --no-dev --no-install-project
+          uv pip install --python "$RUNNER_TEMP/candidate-installed/bin/python" --no-deps "$RUNNER_TEMP"/candidate-wheel/*.whl
+          "$RUNNER_TEMP/candidate-installed/bin/python" -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+      - name: Real installed MCP stdio smoke, outside source tree
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          script="$GITHUB_WORKSPACE/scripts/docs_mcp_stdio_smoke.py"
+          cd "$RUNNER_TEMP"
+          "$RUNNER_TEMP/candidate-installed/bin/python" -I "$script" > "$RUNNER_TEMP/installed-proof/stdio.log" 2>&1
+      - name: Frozen V40 strict acceptance, no expected-result changes
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          "$RUNNER_TEMP/candidate-installed/bin/python" -I eval/heuristic_removal/ci_acceptance.py \
+            --python "$RUNNER_TEMP/candidate-installed/bin/python" \
+            --wheel "$RUNNER_TEMP"/candidate-wheel/*.whl \
+            --output "$RUNNER_TEMP/installed-proof/v40"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: pr211-installed-repair-${{ needs.assemble.outputs.candidate }}
+          path: |
+            ${{ runner.temp }}/installed-proof/
+            ${{ runner.temp }}/candidate-wheel/
+          retention-days: 30
+          if-no-files-found: error

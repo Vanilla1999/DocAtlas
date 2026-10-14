@@ -1,0 +1,24 @@
+{
+  "base": "a5603fd8d9c44deea9e3ea99ff0953f4a9c24e1b",
+  "original_sha256": {
+    "docmancer/docs/application/experimental_context_finalization.py": "78e95d6c3d51d3eecb17277ee617a3f5e558875ef791ced69adf68803ba709b2",
+    "tests/test_native_context_preservation_integration.py": "b01db2f7b3851a6899a3a190c77b21a4cd265a5980b4f403f8e4db8ee02928ea",
+    "tests/test_experimental_selection_modes_integration.py": "53cae5f2cf6a5fb8166a50d0390dc2352a8e25496ff0200c3a6481a18785cedc",
+    "scripts/run_project_docs_self_host_gate.py": "aeeb675f44fc2c1709791ab9eee35a3711841e4e817e0339868a32cdc7cb5b92",
+    "scripts/docs_mcp_stdio_smoke.py": "0dc7e73483b3d11f8e4fb1a6390e3807fc92facd9818fd41150f8a9dffed1b92",
+    "tests/conftest.py": "b4e9c232b8a31d30e323ed265755df301e777b5f19411b63f1c500ea5b47e16e",
+    ".github/workflows/ci.yml": "3f508150e1cddff2d4f39c7f59fd65139599a4a770a9a78ea440118d2da021bd",
+    ".github/workflows/source-native-integration.yml": "4b6b335513986c1cdcd0f82fe48680db03ca59b563fa8275c61ed9fe268a562d"
+  },
+  "candidate_sha256": {
+    "docmancer/docs/application/experimental_context_finalization.py": "208ecfe3879722752ff29b892db1100609fc44b96c705cfd378d868c6cb76c08",
+    "tests/test_native_context_preservation_integration.py": "0dded637b8c642b71bd15263ddb63cd16b13293203663ebcc9386e03bfb8d139",
+    "tests/test_experimental_selection_modes_integration.py": "3fe47dba971d4892410a24c281155c444ca0d3abb934b7f2900a9e4b5f308bae",
+    "scripts/run_project_docs_self_host_gate.py": "53c84c5751db92133219f10529382f9ad0be2cff4f5a8158397974d4b522a5dc",
+    "scripts/docs_mcp_stdio_smoke.py": "07034f6bae878f0b28c1421c6a17248fcf27549abe5a9a241ce3a10e33e6eeb7",
+    "tests/conftest.py": "e231d91a7f83c92143d09308fe70601879997f5f1d04b261d563dd6d7e49b84e",
+    ".github/workflows/ci.yml": "2ca7e3f514bb75aa39129c877f7e8632e90ecc0b7187d2e5b13d1e0fba4961af",
+    ".github/workflows/source-native-integration.yml": "a18145b5141eb7a9538cc3957d493fe7d1f53fa8d24e1d86378c8bcbf7260022"
+  },
+  "test_policy": "Existing integration/public stdio scenarios only; no new unit/private-helper tests; no fixture/oracle changes; no skipped or removed test nodes."
+}
