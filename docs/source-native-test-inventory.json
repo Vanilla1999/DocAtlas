@@ -1,0 +1,914 @@
+{
+  "schema_version": 1,
+  "baseline": "317088c106f84aaf558ff22309306301249ab2ba",
+  "collection_only": true,
+  "product_tests_executed_by_inventory_step": 0,
+  "collected_cases": 1681,
+  "collected_modules": 191,
+  "unchanged_actual_collection": true,
+  "original_manifest_sha256": {
+    "tests/diagnostic_labels.action_packet_v4_a.json": "d3b1eb74c3d6c26359c81d4845da99294e2ddbf7b3361900fa4c58d9e9add848",
+    "tests/diagnostic_labels.action_packet_v4_b.json": "c4d639da5c7c575e54ea179d036647282009e5d7f6e39d91e271739dfa8f0322",
+    "tests/diagnostic_labels.action_packet_v4_c.json": "16342fe4d4d8f67fa82979b5ad15b3a0fa0ddec314ae4c0d64ce479c86263f19",
+    "tests/diagnostic_labels.action_packet_v4_delivery_b.json": "78af7259af584e7ea2c0f1af9ac8538a02680448786b8a85fe648bfe2ad2cd85",
+    "tests/diagnostic_labels.action_packet_v4_eval.json": "454a56e438d9d774c3880720bdf70e9bfef0fe0d323420601825a5ab3ca5d709",
+    "tests/diagnostic_labels.action_packet_v4_found_window_retention.json": "7f63f82803b51188456c1863c32c725f2634535ce430d2cb9b2b713aee8a9231",
+    "tests/diagnostic_labels.action_packet_v4_integrated.json": "ce88f0938a057eaddebe959096d8b1cfe65a46c9b87f91da72d393514fb26410",
+    "tests/diagnostic_labels.action_packet_v4_wire_version.json": "1f0268a40dc0757e28a8c0cfb26dea7900a7111a885b210f33701cab1caaf6d5",
+    "tests/diagnostic_labels.admission_contract.json": "f17f55b400b8a3fc00c12ad22fc5c616316396a74abad419e21e5c8529ec8efe",
+    "tests/diagnostic_labels.admission_local_binding_contract.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.admission_meaning_contract.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.agent_question_planning.json": "d8e1e6613254eb04e4cac814366d1223e01a3ed64644da5ca9dcbff3e38095bb",
+    "tests/diagnostic_labels.bound_table_qualification.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.compact_context.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.compact_docs_surface.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.compact_installed_skill.json": "399ce7b91be87f38b42fceda9bb32f96c4d24c385269f685f011184d0df37848",
+    "tests/diagnostic_labels.comparison_relation_query_planning.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.completion_guards.json": "7a63b6c1ada27f62f85af9f8c66292b2896a4d0790565fe7ab230b0af3d13b54",
+    "tests/diagnostic_labels.component_coverage.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.compound_context.json": "64a1827fc9c6f7c0f075843687c2996c8f7fa742aa91b246251797fc4ed83893",
+    "tests/diagnostic_labels.condition_lead.json": "f78828ec4ec30c96601e5beb31c91a0b91b4e2d72f4c1102d72e00e10d0a8906",
+    "tests/diagnostic_labels.context7_project_chat.json": "d8e1e6613254eb04e4cac814366d1223e01a3ed64644da5ca9dcbff3e38095bb",
+    "tests/diagnostic_labels.context_budget_refusal.json": "561511a60783da6986cebce11e58dc30c7088ec9bd3d2675819321b006524250",
+    "tests/diagnostic_labels.context_capture_integrity.json": "41c6ae72baeca199a7e75e2f303b438f09204af35e85ff1b2ce0470ac984339e",
+    "tests/diagnostic_labels.context_completion.json": "02b8449e8d8d1ec2751bf27830128d25a477155926e0d2a5bee05a30f0c7aa2e",
+    "tests/diagnostic_labels.context_loss_boundaries.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.context_preservation.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.context_quality.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.core34fc_static_guidance_no_access.json": "0c0ffdd162f626f5b0a9181f3e76ed00d66c2646373850f06d3040d4922a7e57",
+    "tests/diagnostic_labels.curated_merge.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.current_schema_lossless_recovery.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_admission.json": "d0b6485ce7b373ca8289bd7e67131b289ae9dc01e4aba3f951c074f36709e3ae",
+    "tests/diagnostic_labels.dictionary_exit_admission_literals.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_callable_residuals.json": "8365ff329f8ea33de8e2d59940d80b0be8e0f5f1a3cf68fb12e27c7a2284f170",
+    "tests/diagnostic_labels.dictionary_exit_code_context.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_completeness.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_corpus_policy.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_delivered_surfaces.json": "bdd79b84b261f2a4bab4f589f281da2203cc216a2f3b0bcbe7c94c525c241f3d",
+    "tests/diagnostic_labels.dictionary_exit_discovery_literals.json": "7f4efc7c6bbebdd0013b7cbeec7ca4ad7bc1a3f1a07dea8445409ff9a0439f67",
+    "tests/diagnostic_labels.dictionary_exit_dynamic_resources.json": "669be304e1ea09959e48dfbcbe2133b4f28c6700cc06f592ee8e86df73d6f393",
+    "tests/diagnostic_labels.dictionary_exit_finite_callers.json": "51b16f96924702a956dc5f4d1b7f1a3622410cbdfbecece1418ac2b1e1b770a7",
+    "tests/diagnostic_labels.dictionary_exit_finite_corpus.json": "2fa5a97e70eef8eb0df71a2f7d964d10bde62ff2b773051b5b578d8318a61aa0",
+    "tests/diagnostic_labels.dictionary_exit_finite_corrections.json": "8bb263d351b19f012b630ba166afd94985ff562b8d32d699a7018a3af808f9d7",
+    "tests/diagnostic_labels.dictionary_exit_indexed_mcp.json": "8572fd02acf697275366690856e62752e825f32311b6ecd5f3b1c8f3ba4d2cc8",
+    "tests/diagnostic_labels.dictionary_exit_inert_sdk_closure.json": "39b23c1b46497632919d740ed09197c7cb45d25b0759b446294c5edaee560c78",
+    "tests/diagnostic_labels.dictionary_exit_inert_security.json": "0cad0706964eaf4873054c5c60490e44a03d9e92ad7218376d7bb6388294a029",
+    "tests/diagnostic_labels.dictionary_exit_legacy_compilers.json": "7ca8632786c1daaf3d410d14d0a31ade632a702091e821fe4812c36019d6690a",
+    "tests/diagnostic_labels.dictionary_exit_literal_needs.json": "ba176d76e900874182db0cf66ffdc93bbe3c55cd74f67b5141a5016a37b1ebcd",
+    "tests/diagnostic_labels.dictionary_exit_literal_needs_mcp.json": "b6981abdd4bae8e6665e203ac7f475b3347b193e547a1781c728c5f9f1d477b4",
+    "tests/diagnostic_labels.dictionary_exit_local_callers.json": "8d441e33d29a84362d89dda5d3bc67402f98c799bbce80c1deab67a26922d7bd",
+    "tests/diagnostic_labels.dictionary_exit_local_entry_closure.json": "86805c47943437a310d416210b500011d57fdac1fc4dc494c41ba6f6ad99319f",
+    "tests/diagnostic_labels.dictionary_exit_local_membership.json": "0e497e98f682d47dd081facf8cf8499bb0de0a4b8b203e134abeb8f40e51171d",
+    "tests/diagnostic_labels.dictionary_exit_local_residuals.json": "7db5cdc2fb9ba86e65d81dc43c41db1c82b3ed882d58ac836e5449a6c65bdaaf",
+    "tests/diagnostic_labels.dictionary_exit_ownership_telemetry.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_packs_safety.json": "ea8247b49440b9d93ff2abed6f532c957f8a6d8aef686c9e6b240fa40563ff06",
+    "tests/diagnostic_labels.dictionary_exit_patch_boundary.json": "a76154cf050c781e890675d609326972c7bb4fe7744bd574e5206bc0a65e9262",
+    "tests/diagnostic_labels.dictionary_exit_patch_literals.json": "b7f38d737ad9f13190292b576efba8e848f90b85680dc5418ef130925dc41f89",
+    "tests/diagnostic_labels.dictionary_exit_patch_validation.json": "9774938c47a91631ece7e8ab434c2bd17f5e9fda17fcdd5a139611f451321c1e",
+    "tests/diagnostic_labels.dictionary_exit_projection.json": "80999618bbe90aeec56f99cddc860808498a45c4de9c7c19af2931905bc53380",
+    "tests/diagnostic_labels.dictionary_exit_public_request.json": "2f256b1a0ca35c4424df75e049c0fb32021b561881f371a29cb1c21326339846",
+    "tests/diagnostic_labels.dictionary_exit_read_routing.json": "6e936b722a8ff72d333a31960d18c8bcfe36802d918f7ccfa9ef97c527e4b5fa",
+    "tests/diagnostic_labels.dictionary_exit_read_tails.json": "eca943405ba35a634766f45b9c3f8d68de58c1b066e94fba1ccfe065306b9c05",
+    "tests/diagnostic_labels.dictionary_exit_reference_ranking.json": "9bd5a4d1c61eb18d3af27c63969ca54907fca8d405c6b2dccd748ba3e1f3ad2e",
+    "tests/diagnostic_labels.dictionary_exit_refresh_identity.json": "7594b4db1942a27d3c1a7e35766e5a2be5acd89573dc206794898d6387f4df63",
+    "tests/diagnostic_labels.dictionary_exit_residual_proofs.json": "47bc77d8d6e870adee7be3a0e464e0583371d2fe3c13833c7a970dec0afd4229",
+    "tests/diagnostic_labels.dictionary_exit_retrieval.json": "20ebd59c4404fc0c61f5a7f5afca146a7fab099fb19021a96bc024af60e5b804",
+    "tests/diagnostic_labels.dictionary_exit_retrieval_need_adapter.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.dictionary_exit_review_boundaries.json": "b0e65da1da64f5abd361f32ee49d4c552a198a11bc4fd3e71819091501bad487",
+    "tests/diagnostic_labels.dictionary_exit_selector_visibility.json": "8b423233b8618215b2c19187cb23dc50fdf48dd4de6d8dcc34c4e4de1a0a5d27",
+    "tests/diagnostic_labels.dictionary_exit_source_identity.json": "da1aa45b19ad9ea479d20c90592e67aff3c1118bf311dfca969b46469020af56",
+    "tests/diagnostic_labels.dictionary_exit_structural_units.json": "aee14db74884ffff908ce16352e4304835ef58dbbb8af5f3ac2e84a6298e3395",
+    "tests/diagnostic_labels.dictionary_exit_unit_helpers.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.direct_questions.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_context_budget_reserve.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.docs_context_read_next.json": "def0628d3576d1465493e819861afeb8564127218aa905adc64031d695766326",
+    "tests/diagnostic_labels.docs_initial_delivery.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_lossless_answer_projection.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_lossless_context_projection.json": "12e7ec380234c143e7eac0fd734f81b64bafbf880260930496abb1973149d62c",
+    "tests/diagnostic_labels.docs_lossless_facade.json": "721efc607f3dc5d21f636f382c2261fa1982bc3c92556f79f7a77522af627fbb",
+    "tests/diagnostic_labels.docs_lossless_projection.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_lossless_remaining_caps.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.docs_lossless_selection.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.document_local_rescue.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.documentation_audit.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.enumeration_terms.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.evidence_admission_sufficiency.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.evidence_quality_v2.json": "1cdce2b167bcf021ad52e1fc4853d48dac6653167d453ec5d4623ebc12ee742b",
+    "tests/diagnostic_labels.evidence_quality_v2_fixture_runtime.json": "d2c5f5fb42b1bad601ab1361d44f22924f4620c10d5c43713d90f6523dc0ad98",
+    "tests/diagnostic_labels.evidence_sets.json": "f56a4f1d020d9cc35f1c23ddaab9c8782f3e8f4cbe9e292987b1c1e1577da203",
+    "tests/diagnostic_labels.exact_document_fallback.json": "d8a0a77d7db401b665c69e2f3c804bf16a3be4bac2f86c12b0d536e3786657c7",
+    "tests/diagnostic_labels.experimental_selection_modes.json": "ee02b350de7f21cafc51ecded923348fb869f11c937150f6f7bb0714e56adb8c",
+    "tests/diagnostic_labels.frozen_fastembed_dependency.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.gap_directed_candidate_ranking.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.generic_context_workflows.json": "fe46fd65d8bf612341ad38c95ca22f409db651a05b19a39154baf42ac7079795",
+    "tests/diagnostic_labels.git_stdio.json": "e2850c49b847b3eca951ac7cef87ca92e6d0a6099f961f89f0619ba6f9b28a86",
+    "tests/diagnostic_labels.global_evidence.json": "0716a1efd690240807258a1ab00df5138973b12ee485ee2896797fdaae8fc7b0",
+    "tests/diagnostic_labels.grounded_mcp_session.json": "cc7bd6e74d9333441364ba5b2aa4939268635dac552ffe9bb26152fb40bc8e5d",
+    "tests/diagnostic_labels.heuristic_removal.json": "f67764fb466f2522d8161a7443e931d93dd2ca6b898db7d66e6377488b926831",
+    "tests/diagnostic_labels.host_evidence_control.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.host_match_priority.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.host_scope_planning.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.hyphenated_identity.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.independent_query_probes.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.installed_mcp_bootstrap_contract.json": "6f463a77428bf78c5c6963c14e8359abb1abc1851e7f66043b20611b18ca096f",
+    "tests/diagnostic_labels.joint_selection.json": "2d80ff3be11b6d25f5acaf896b35443ed3e7ae77b2c1f6a1797c0a526b7c5bf7",
+    "tests/diagnostic_labels.json": "d5050dc41b910f81ae77c35738d5de6b697eb5c92cfc3edbcd3509def0c84318",
+    "tests/diagnostic_labels.language_aware_context.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_ci_diagnostic.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_flow_experiment.json": "0f28ed1e8bcdcf84d0f5844546eace68a1e653b9188e40bf07fc23b6e415c86e",
+    "tests/diagnostic_labels.language_packing_experiment.json": "07521b8486770a769d8c407d4f0b0c29eec0b7487d8e1f1065fef2da19550237",
+    "tests/diagnostic_labels.language_packing_trace.json": "66da09925e280e8030a11a9774e904e07f0ed3aa87a7b4bf12fa06fa8863ccc9",
+    "tests/diagnostic_labels.language_pilot_io.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_pilot_review.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_pilot_v2.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_source_profile.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.language_trace_serialization.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.library_witness_diagnostics.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.list_introduction_atomicity.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.list_item_continuation_bridge.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.mcp_delivery_c.json": "78a46537d80ab12542d27dd3c5d6ad3a0c50c2a6c5e89a56a4259742d3305ad1",
+    "tests/diagnostic_labels.mcp_delivery_dispatch.json": "8b0265044a67d0be99407063c8f17451e0c64568116d1eea9df3e5ce0b4ddf19",
+    "tests/diagnostic_labels.mcp_delivery_member_transaction.json": "321423b94f07dfb4548557d4a6c50978ec714e9fc2819ae553038123b40c8a20",
+    "tests/diagnostic_labels.mcp_storage_native_spike.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.mcp_trusted_storage_lifecycle.json": "2ba1d8c47923ff5d86e8625f7766199de8e88101ee30595452263552d591ed0a",
+    "tests/diagnostic_labels.mixed_context_projection_contract.json": "32d6584064a8e7bd3e02fdffcd4c6583c4110c6cd2cb3fb1614a4f35c77c7971",
+    "tests/diagnostic_labels.native_context_preservation.json": "da9f3ff3412eaae42942281e5ece568a5da53d42f533f4489ad24007c0aa2469",
+    "tests/diagnostic_labels.nl_dictionary_removal_consumer_contract.json": "ff6b87642b1da13c4c30228c9ba2d8371697e75f26fc2d2c33fc738fd74d24bd",
+    "tests/diagnostic_labels.nl_dictionary_removal_literal_contract.json": "66e2711bf73f5a7930c843f4159022dd6bd1cf8951973d662208d4ef8423e6c0",
+    "tests/diagnostic_labels.nl_dictionary_removal_packet_contract.json": "df8017fcf289656339c878ae8da9f44158871b4d4b8ec7d9a9bd970b89a1a053",
+    "tests/diagnostic_labels.output_integrity.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.patch_context.json": "2f6e7e529fb6c0efeafd7e11ace4fbc6c249522b6746f0b3f54e885764d0e619",
+    "tests/diagnostic_labels.pr211_catalog_equivalence.json": "ae12a977e200ba079f70035a299e1280b9ad8620fc866664ad75a7e8d995ddf4",
+    "tests/diagnostic_labels.pre_hydration_source_policy.json": "c86574aba55fcb8c8080d63eb1c30bc2c4bc1655aa74f293fd2cca238f98e752",
+    "tests/diagnostic_labels.prepared_retrieval.json": "99835d5272d6da4e69a0a00ec0af006b38dac66f835a8c670d1b50910fb3ac22",
+    "tests/diagnostic_labels.prepared_retrieval_review.json": "9ada09242694ac272629c53c4ce6453502f7bf6b4d5ac68e234d1588340ca387",
+    "tests/diagnostic_labels.project_context_quality.json": "d8e1e6613254eb04e4cac814366d1223e01a3ed64644da5ca9dcbff3e38095bb",
+    "tests/diagnostic_labels.project_context_quality_acceptance.json": "05986a111a74b4c03bbee1667f77503bb6ef5f9513e532917f317e6f0e2d8767",
+    "tests/diagnostic_labels.project_context_quality_v2.json": "0695934e22d326a84780011b584f15eb99196a720d6eab5fb79e3ffb6eae6cca",
+    "tests/diagnostic_labels.project_docs_self_host_fixture.json": "bc653faa03300249877061c2d5953fe882e528af4f66b487e4a28b6bd82246eb",
+    "tests/diagnostic_labels.project_query_intent_contract.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.project_retrieval_alias.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.projection_boundaries.json": "1c8146e4f734d9b203df45f1b438caa581edda772700100a5042098428319a3e",
+    "tests/diagnostic_labels.projection_facade_hooks.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.public_surface_integration.json": "c40786fb4400ac755c3913a3921c39d81d915fbca73cf00d64acc125bc63329f",
+    "tests/diagnostic_labels.pydantic_direct.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.quantified_attribute_scope_isolation.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.query_blocks.json": "70509c30d9a30ecaec848ce1643a32dbe40112525f27ab9e972889a9a20fae55",
+    "tests/diagnostic_labels.query_planning.json": "fe33218326a1097b5f0b810209a676bf56d35cadd7c31bc85188d0fab4623c6f",
+    "tests/diagnostic_labels.query_planning_completion.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.query_planning_p5.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.read_packet_residuals.json": "c6f66b5ff9fe61e0f4b44cdfc2a0fc25df5800483e5c3a84393901bfd95c1b77",
+    "tests/diagnostic_labels.reader_view_boundaries.json": "308be345483d6797fb087229d96c18a1027f4ab1ff3d0c540a3e1ef05a43a35f",
+    "tests/diagnostic_labels.reader_views.json": "39cf181245866600e9216c16ad62a15aa30170f3a384c3233239afca51427c71",
+    "tests/diagnostic_labels.readme_neutral.json": "70d2f4362373e8be0f240f857fdfd3b22c723f39f5607026cdc09608b421a3bc",
+    "tests/diagnostic_labels.reference_binding.json": "9dce4bb74216a0db8c90ff72a00fbd19809eb9c214cc148e25eddc7f371489df",
+    "tests/diagnostic_labels.reference_hash_domains.json": "1abd403d3195477723399cc17844534b48d3952d010f0e16579bedfdde61490e",
+    "tests/diagnostic_labels.request_flow_lineage.json": "b338cddc7c50b66ccce2f5cd50ba32885d3cab2cf50a64f890c27552c61b7eab",
+    "tests/diagnostic_labels.request_source_facts.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.residual_paraphrase_query_planning.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.retrieval_diversity.json": "e3bada8c7b70a02ee93e162ca9897c0baf2fae2a0aabcb4e679d972613cc27f4",
+    "tests/diagnostic_labels.retrieval_only_host.json": "2066aef38718aa9aeb15cfb188b39b777245d73ea04a9c0b2a4a81c64a7fbf68",
+    "tests/diagnostic_labels.retrieval_recheck.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.retrieval_retention_boundaries.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.review_assignment_identity.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.review_boundary_semantics.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.review_capabilities.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.review_query_lineage.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.review_span_lineage.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.scope_span.json": "23f43c337db5af89f2315f93e00c23e83b202cd45137c01560e1f1d71be43138",
+    "tests/diagnostic_labels.script_recovery.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.seed_envelope.json": "2e6f53dd3892f7b888565aeaad82d9265e524d8366252fd9109ee8168b9b3a17",
+    "tests/diagnostic_labels.self_host_agent_contract_surface.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.semantic_density.json": "9080be2d3ef4608142983b0d8fb90abe9bea8aaa497aafed9cf31df79438444a",
+    "tests/diagnostic_labels.sentence_windows.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.service_fixture_isolation.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.source_continuation.json": "6f72834ebaafe922fce13c20f19f4f06c61eb5db8b62422268476043eb714568",
+    "tests/diagnostic_labels.source_item_integrity.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.source_recovery_targeting.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.source_valid_transfer.json": "89b966d8781bd00c9068a8112782901d4d112720dd15a8376384e549ec6f09aa",
+    "tests/diagnostic_labels.sqlite_phrase_ranking.json": "805bbe5c319aa35b774187da01538c7122d788ff5fb96c3e1b354054baed69a9",
+    "tests/diagnostic_labels.structural_behavior.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.support_retention.json": "cdfd653c492df70495a9baf9ed512f9faeb3304be305dfb59691794a38c976ac",
+    "tests/diagnostic_labels.systemic_retrieval_candidate_pool.json": "67c8a94a2a8f44878c1d9c357faf13d706308d654413fa6faa042e0771b658fa",
+    "tests/diagnostic_labels.unresolved_context_prefit.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.v13_v15.json": "66e897b2be4578d4771f240265806935ee3ba6836603f657f61ca48b6e7fa92f",
+    "tests/diagnostic_labels.v2_acceptance_gaps.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3",
+    "tests/diagnostic_labels.version_evidence.json": "8d60ed88301e48eeaa38762f82e984fae8a390e175129317689a191cb7322ee3"
+  },
+  "stale_entries": [
+    {
+      "module": "tests/test_action_packet_v4_contract.py",
+      "manifest": "tests/diagnostic_labels.action_packet_v4_a.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_action_packet_v4_selection.py",
+      "manifest": "tests/diagnostic_labels.action_packet_v4_b.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_action_packet_v4_workflow_surface.py",
+      "manifest": "tests/diagnostic_labels.action_packet_v4_delivery_b.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_admission_guard_composition.py",
+      "manifest": "tests/diagnostic_labels.admission_contract.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_admission_local_binding.py",
+      "manifest": "tests/diagnostic_labels.admission_contract.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_admission_meaning.py",
+      "manifest": "tests/diagnostic_labels.admission_contract.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_admission_relation_witnesses.py",
+      "manifest": "tests/diagnostic_labels.admission_contract.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_context_completion_guards.py",
+      "manifest": "tests/diagnostic_labels.completion_guards.json",
+      "previous_node_hash": "5dfe3007d719d58982955cbccbd4837ab2eebab5712d7a2ad0fe2b442ccf3ebb",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_docs_context_compound_projection.py",
+      "manifest": "tests/diagnostic_labels.compound_context.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_context_completion_followup.py",
+      "manifest": "tests/diagnostic_labels.context_completion.json",
+      "previous_node_hash": "a1ea969d07672fa520dbf0c93b78d29eab640f144cadc3c1e18ffc45b5e3a25b",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_admission.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_admission.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_callable_residuals.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_callable_residuals.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_delivered_surfaces.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_delivered_surfaces.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_dynamic_resources.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_dynamic_resources.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_inert_sdk_closure.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_inert_sdk_closure.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_legacy_compilers.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_legacy_compilers.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_literal_needs.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_literal_needs.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_read_routing.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_read_routing.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_reference_ranking.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_reference_ranking.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_residual_proofs.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_residual_proofs.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dictionary_exit_structural_units.py",
+      "manifest": "tests/diagnostic_labels.dictionary_exit_structural_units.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_docs_lossless_context_projection.py",
+      "manifest": "tests/diagnostic_labels.docs_lossless_context_projection.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_docs_lossless_facade.py",
+      "manifest": "tests/diagnostic_labels.docs_lossless_facade.json",
+      "previous_node_hash": "4557f7726a7c1b6e71d9620944875102c8ab37818599a15f0e550ed7ed22ac0a",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/evidence_quality_v2/test_cost_answers.py",
+      "manifest": "tests/diagnostic_labels.evidence_quality_v2.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_evidence_set_disposition.py",
+      "manifest": "tests/diagnostic_labels.evidence_sets.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_grounded_mcp_session.py",
+      "manifest": "tests/diagnostic_labels.grounded_mcp_session.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_joint_context_invariants.py",
+      "manifest": "tests/diagnostic_labels.joint_selection.json",
+      "previous_node_hash": "9d3d3c8533d731faee97a68b134cecdca6b74940a42f1d6621ff01e146bfd078",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_library_docs_service.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_mcp_boundary.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_project_context_service.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_project_doc_ranking.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_question_plan_v4.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_candidate_scoring.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_constraint_validation.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_contract_evaluator.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_cost_accuracy_analysis.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_docatlas_utilization.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_fixture_builder.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_patch_constraints_targeted_pilot.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task23_decision.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task23_external_context.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task23_report.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task33_first_executable_guard.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task33_validation.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task_level_harness.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_task_selection.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_agent_developer_contract_v2_ablation.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_agent_developer_first_divergence.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_answer_quality_gate.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_context.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_context7_parity_eval.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_context7_snapshot_benchmark.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_dartdoc_pub_ingestion.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_docs_fetch_policy.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_embeddings.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_fetcher_github.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_github_source_manifest.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_library_natural_language_retrieval.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_live_benchmark_isolation.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_live_benchmark_unified_dependency.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_mcp_credentials.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_mcp_paths.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_multilingual_retrieval_quality_protocol.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_network_guard.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_openai_embeddings.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_patch_constraint_validation_service.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_product_scope.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_public_docs_regression_gate.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_pytest_collection_hygiene.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_qdrant_store_unit.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_retrieval_fusion.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_robots.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_snippet_first_services.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_snippet_presentation.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_source_isolation_regression.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_source_search_edit_readiness.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_unified_docs_context_mcp_part02.py",
+      "manifest": "tests/diagnostic_labels.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_mcp_delivery_dispatch_boundary.py",
+      "manifest": "tests/diagnostic_labels.mcp_delivery_dispatch.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_patch_request_plan.py",
+      "manifest": "tests/diagnostic_labels.patch_context.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_pr211_catalog_equivalence.py",
+      "manifest": "tests/diagnostic_labels.pr211_catalog_equivalence.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_pre_hydration_source_policy.py",
+      "manifest": "tests/diagnostic_labels.pre_hydration_source_policy.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/docs/test_query_block_guards.py",
+      "manifest": "tests/diagnostic_labels.query_blocks.json",
+      "previous_node_hash": "d406c25f723eebcc8fa7a6d9fe30aad17d1392f336b4744e6fb7ee24fb015316",
+      "collected_cases": 0,
+      "source_exists": false,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/evidence_quality_v2/test_reader_view_contract_boundaries.py",
+      "manifest": "tests/diagnostic_labels.reader_view_boundaries.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/evidence_quality_v2/test_reader_views.py",
+      "manifest": "tests/diagnostic_labels.reader_views.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/evidence_quality_v2/test_reader_run_integrity.py",
+      "manifest": "tests/diagnostic_labels.reader_views.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_retrieval_diversity_policy.py",
+      "manifest": "tests/diagnostic_labels.retrieval_diversity.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_retrieval_only_host.py",
+      "manifest": "tests/diagnostic_labels.retrieval_only_host.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/task_level/test_actionability_projection.py",
+      "manifest": "tests/diagnostic_labels.semantic_density.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    },
+    {
+      "module": "tests/test_systemic_retrieval_candidate_pool.py",
+      "manifest": "tests/diagnostic_labels.systemic_retrieval_candidate_pool.json",
+      "previous_node_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "collected_cases": 0,
+      "source_exists": true,
+      "reason": "Absent from actual complete collection; no tests hidden by this reconciliation."
+    }
+  ],
+  "refreshed_node_hashes": [],
+  "note": "Metadata matches actual collected tests, not historical claimed coverage. No skip, deselection or xfail added. Empty pre-existing files do not count as runtime tests."
+}

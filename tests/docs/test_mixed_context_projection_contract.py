@@ -12,7 +12,7 @@ from unittest.mock import patch
 from docmancer.core.product_identity import ensure_owned_home
 from docmancer.core.member_read_store import MemberReadStore
 from docmancer.core.sqlite_store import SQLiteStore
-from docmancer.docs.application import mixed_context_projection, _docs_context_projection_core
+from docmancer.docs.application import mixed_context_projection, docs_context_projection
 from docmancer.docs.application.model_visible_projection import (
     _refresh_estimate, project_docs_answer, validate_model_visible_projection,
 )
@@ -275,7 +275,7 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
         with (patch.object(RetrievalDispatcher, "run", deny_io),
               patch.object(SQLiteStore, "_connect", deny_io),
               patch.object(MemberReadStore, "_connect", deny_io),
-              patch.object(_docs_context_projection_core, "attach_source_continuation_locators", deny_io)):
+              patch.object(docs_context_projection, "attach_source_continuation_locators", deny_io)):
             result, snapshot = project_docs_answer(**arguments)
         require(arguments["retrieval"] == preserved, "critical_mixed_replay_input_immutable")
         require(not validate_model_visible_projection(result, snapshot=snapshot),
@@ -471,7 +471,7 @@ def test_mixed_context_preserves_current_same_call_source_bindings(tmp_path):
                 with (patch.object(RetrievalDispatcher, "run", deny_io),
                       patch.object(SQLiteStore, "_connect", deny_io),
                       patch.object(MemberReadStore, "_connect", deny_io),
-                      patch.object(_docs_context_projection_core, "attach_source_continuation_locators", deny_io)):
+                      patch.object(docs_context_projection, "attach_source_continuation_locators", deny_io)):
                     result, snapshot = mixed_context_projection.retain_mixed_project_context(**carrier)
                 require(carrier == unchanged, "critical_mixed_replay_input_immutable", {"control": label})
                 if include_project:

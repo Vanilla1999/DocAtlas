@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "baseline": "f41885ba9a3396fca2db020936018e439c98dd2a",
+  "retired_private_implementation_suites": [
+    {
+      "path": "tests/docs/test_context_completion_followup.py",
+      "sha256": "5286d069e49a8b974ee2acbf2fb98613edea05be776b9efdb57b157c324ad420",
+      "test_functions": [
+        "test_shared_heading_metadata_does_not_evict_canonical_text"
+      ],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    },
+    {
+      "path": "tests/docs/test_context_completion_guards.py",
+      "sha256": "c25d44b3916678268adc96d065d4f8cbdf6e08daf24c525d4ffe8ce268004a73",
+      "test_functions": [
+        "test_original_prose_cannot_mint_inspection_or_answer_permission",
+        "test_injected_legacy_hint_has_no_current_query_authority",
+        "test_exact_inspection_range_keeps_both_facts_and_rechecks_policy",
+        "test_existing_requested_part_target_is_not_replaced",
+        "test_explicit_lookup_is_not_removed_to_enable_implicit_inspection",
+        "test_trial_reads_no_files_and_registers_no_resources"
+      ],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    },
+    {
+      "path": "tests/docs/test_docs_lossless_context_projection.py",
+      "sha256": "93f9360a22816c353a0170a39db365057b3d4c62bfe9a503aaf58164f9569fc0",
+      "test_functions": [],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    },
+    {
+      "path": "tests/docs/test_docs_lossless_facade.py",
+      "sha256": "2d2f114850a2431967b5118a13aeea7903bd347ea3c46ab745abfb176cae3bc0",
+      "test_functions": [
+        "test_large_facade_keeps_four_quotes_locators_and_real_issued_target",
+        "test_partial_facade_keeps_qualified_quote_and_honest_missing_lookup",
+        "test_target_binding_failures_do_not_evict_quotes_or_publish_dead_target",
+        "test_genuinely_issued_target_still_rechecks_current_snapshot_policy_and_expiry",
+        "test_attachment_helpers_do_not_spend_quote_budget_or_desync_locators"
+      ],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    },
+    {
+      "path": "tests/docs/test_joint_context_invariants.py",
+      "sha256": "9ae6c499152b9860237b0e10e4a74bf8efb9c2cf03e9fbac762bbbadcc30ff94",
+      "test_functions": [
+        "test_full_list_beats_incomplete_alternatives_without_answer_labels",
+        "test_draft_range_is_preserved_unless_its_bytes_are_delivered",
+        "test_invalid_identity_or_policy_never_expands",
+        "test_invalid_snapshot_never_expands",
+        "test_no_trial_reads_or_registers_resources_and_inputs_are_not_mutated",
+        "test_explicit_host_queries_remain_byte_equivalent",
+        "test_already_issued_uri_keeps_range_after_new_packet",
+        "test_contiguous_parent_retains_two_seed_occurrences_not_just_their_words",
+        "test_coalescing_rechecks_policy_of_every_retained_seed"
+      ],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    },
+    {
+      "path": "tests/docs/test_query_block_guards.py",
+      "sha256": "69b4d9775b35470d468c49cf39883beef20b2c4b84ed57401f4ea2818fa58839",
+      "test_functions": [
+        "test_supplement_never_invents_coverage_or_mutates_input",
+        "test_bad_source_cannot_supply_a_supplement",
+        "test_invalid_reference_cannot_supply_a_supplement",
+        "test_new_text_rechecks_inherited_forbidden_terms",
+        "test_evaluating_candidates_reads_no_files_or_registers_no_resources",
+        "test_explicit_host_lookup_is_not_silently_reinterpreted_for_supplements",
+        "test_adjacent_bridge_rebinds_without_a_fabricated_local_owner",
+        "test_bridge_refuses_to_skip_intervening_prose",
+        "test_own_subject_warning_remains_usable"
+      ],
+      "reason": "Direct private deleted joint/query-block/core-projector implementation; not the current source-native public runtime."
+    }
+  ],
+  "preserved_frozen_quality_inputs": [
+    "eval/main_flow_comparison",
+    "eval/prepared_model_comparison40"
+  ],
+  "note": "Not one-for-one coverage equivalence. Frozen factual delivery, strict-negative, installed stdio and mutation failures remain failures. No skip or xfail is added."
+}

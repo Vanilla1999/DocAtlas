@@ -3,14 +3,9 @@ from __future__ import annotations
 
 import pytest
 
-from docmancer.docs.application.docs_context_projection import (
-    _focused_snippet,
-    project_docs_context,
-)
 from docmancer.docs.application.model_visible_projection import (
     validate_model_visible_projection,
 )
-from tests.docs.test_docs_context_compound_projection import _host_lookup_context_retrieval
 
 
 def test_path_only_projection_uses_the_current_exact_topic_guard(tmp_path):

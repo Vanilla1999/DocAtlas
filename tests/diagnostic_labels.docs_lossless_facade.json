@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/docs/test_docs_lossless_facade.py": "behavioral"
-  },
+  "module_labels": {},
   "node_overrides": {},
-  "module_node_hashes": {
-    "tests/docs/test_docs_lossless_facade.py": "4557f7726a7c1b6e71d9620944875102c8ab37818599a15f0e550ed7ed22ac0a"
-  }
+  "module_node_hashes": {}
 }

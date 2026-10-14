@@ -2,7 +2,7 @@ name: Main flow context integration
 
 on:
   pull_request:
-    branches: [feature/main-flow-logging, fix/main-flow-context-delivery, eval/main-flow-extra40-20261012]
+    branches: [main, feature/main-flow-logging, fix/main-flow-context-delivery, eval/main-flow-extra40-20261012]
 
 permissions:
   contents: read
@@ -29,12 +29,14 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: python -m pip install -e ".[dev]"
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --extra dev
       - name: Real retrieval, public MCP, CLI and source isolation
         run: |
           mkdir -p "$RUNNER_TEMP/main-flow-proof"
           git rev-parse HEAD > "$RUNNER_TEMP/main-flow-proof/head.txt"
-          python -m pytest -q --tb=short -o junit_family=legacy \
+          .venv/bin/python -m pytest -q --tb=short -o junit_family=legacy \
             tests/test_project_context_quality_v2_protocol.py \
             tests/test_main_flow_logging_integration.py \
             tests/test_retrieval_features.py::test_lexical_and_supplemental_paths_enforce_forbidden_sources \
@@ -48,17 +50,17 @@ jobs:
         if: ${{ !cancelled() }}
         env:
           EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/main-flow-proof
-        run: PYTHONPATH=. python eval/main_flow_comparison/run_extra40.py
+        run: PYTHONPATH=. .venv/bin/python eval/main_flow_comparison/run_extra40.py
       - name: Paired lookup calls for twelve failed public MCP questions
         if: ${{ !cancelled() }}
         env:
           EXTRA40_ARTIFACT_DIR: ${{ runner.temp }}/main-flow-proof
           EXTRA40_LOOKUP_ONLY: "1"
-        run: PYTHONPATH=. python eval/main_flow_comparison/run_extra40.py
+        run: PYTHONPATH=. .venv/bin/python eval/main_flow_comparison/run_extra40.py
       - name: Summarize actual visible tokens
         if: ${{ !cancelled() }}
         run: |
-          python - <<'PY'
+          .venv/bin/python - <<'PY'
           import json, os
           from pathlib import Path
           from docmancer.docs.application.projection_tokenizer import projection_token_count

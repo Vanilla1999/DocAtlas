@@ -1,10 +1,6 @@
 {
-  "module_labels": {
-    "tests/docs/test_patch_request_plan.py": "behavioral"
-  },
-  "module_node_hashes": {
-    "tests/docs/test_patch_request_plan.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  },
+  "module_labels": {},
+  "module_node_hashes": {},
   "node_overrides": {},
   "schema_version": 1
 }

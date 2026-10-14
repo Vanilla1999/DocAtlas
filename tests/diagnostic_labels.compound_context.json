@@ -1,10 +1,8 @@
 {
   "module_labels": {
-    "tests/docs/test_docs_context_compound_projection.py": "behavioral",
     "tests/docs/test_documentation_query_plan.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_docs_context_compound_projection.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests/docs/test_documentation_query_plan.py": "3735f58de84ba525d74bec89efbcc707cf8e405fd961710ceb26f34a01c59e07"
   },
   "node_overrides": {},

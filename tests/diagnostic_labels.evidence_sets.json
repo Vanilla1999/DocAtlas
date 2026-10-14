@@ -1,12 +1,10 @@
 {
   "schema_version": 1,
   "module_labels": {
-    "tests/docs/test_evidence_set_disposition.py": "behavioral",
     "tests/docs/test_evidence_set_query_execution.py": "behavioral",
     "tests/docs/test_evidence_set_source_preparation.py": "behavioral"
   },
   "module_node_hashes": {
-    "tests/docs/test_evidence_set_disposition.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "tests/docs/test_evidence_set_query_execution.py": "248ad50b5b8b8511a3272173d6680d698f7b6b39d40fe4f26e3d063a0e0f1552",
     "tests/docs/test_evidence_set_source_preparation.py": "fea5056d2ea86019036567fd7df61f45fdc9c91a7aa12a3148b18cf77047bed5"
   },

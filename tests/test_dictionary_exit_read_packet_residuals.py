@@ -6,7 +6,6 @@ import re
 
 import pytest
 
-from docmancer.docs.application import _docs_context_projection_core as projection
 from docmancer.docs.application.action_packet import build_action_packet, validate_action_packet
 from docmancer.docs.application._action_packet_part01 import (
     _critical_fact_count, _extract_facts,
