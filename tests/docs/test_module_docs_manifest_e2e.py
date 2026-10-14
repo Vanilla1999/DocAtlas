@@ -114,7 +114,7 @@ def test_two_module_docs_manifest_sync_filter_and_public_mcp(tmp_path, monkeypat
             start, end = row["line_start"], row["line_end"]
             assert type(start) is int and type(end) is int
             assert 1 <= start <= end <= len(text.splitlines())
-            assert snippet in "\n".join(text.splitlines()[start - 1:end])
+            assert snippet in "".join(text.splitlines(keepends=True)[start - 1:end])
         assert delivered_paths == set(expected_paths), payload
         required_facts = {
             "README.md": "Two documented modules share a proof contract.",
