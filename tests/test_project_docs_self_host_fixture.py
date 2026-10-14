@@ -305,3 +305,34 @@ def test_self_host_fixture_restores_environment_and_preserves_original_repositor
     assert foreign.read_bytes() == b'foreign user database must not be adopted'
     assert {relative: (origin / relative).read_bytes() for relative in documents} == documents
     assert _git(origin, 'status', '--porcelain', '--untracked-files=no') == b''
+
+
+def test_frozen_catalog_only_changes_isolated_prepared_membership(tmp_path):
+    origin, documents = _checkout(tmp_path)
+    catalog = yaml.safe_load(documents['docatlas.project-docs.yaml'])
+    catalog['documents'] = [row for row in catalog['documents'] if row['path'] == 'docs/rules.md']
+    frozen = yaml.safe_dump(catalog, sort_keys=False).encode()
+    target = origin / 'eval/catalog.frozen.yaml'
+    target.write_bytes(frozen)
+    _git(origin, 'add', 'eval/catalog.frozen.yaml')
+    _git(origin, 'commit', '-m', 'independent frozen catalog fixture')
+    before_head = _git(origin, 'rev-parse', 'HEAD')
+    with fixture_module.self_host_fixture(origin, catalog_path=target) as fixture:
+        assert (fixture.root / 'docatlas.project-docs.yaml').read_bytes() == frozen
+        assert fixture.mutation['catalog_sha256'] == hashlib.sha256(frozen).hexdigest()
+        assert [row['path'] for row in fixture.mutation['documents']] == ['docs/rules.md']
+        assert fixture.verify_cold_read(_cold_read(fixture))
+        fixture.prepare()
+        assert fixture.provenance['preparation']['indexed_paths'] == ['docs/rules.md']
+        result = _cold_read(fixture)
+        assert result['sources'] and {row['path_or_url'] for row in result['sources']} == {'docs/rules.md'}
+        assert any('requires explicit preparation before a member write.' in row['snippet'] for row in result['sources'])
+        assert all(row['snippet'] in RULES.decode() for row in result['sources'])
+        assert result['answer_supported'] is False and result['edit_ready'] is False
+        delta = fixture.provenance['catalog_delta']
+        assert delta['scope'] == 'isolated_mirror_only'
+        assert delta['frozen_sha256'] == hashlib.sha256(frozen).hexdigest()
+    assert fixture.provenance['origin_unchanged_after_calls'] is True
+    assert _git(origin, 'rev-parse', 'HEAD') == before_head
+    assert {p: (origin / p).read_bytes() for p in documents} == documents
+    assert target.read_bytes() == frozen

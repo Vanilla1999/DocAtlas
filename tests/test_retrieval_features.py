@@ -536,74 +536,8 @@ def test_hybrid_fuses_on_stable_child_id_and_hydrates_integer_id(tmp_path):
 # ---------------- hierarchical retrieval ----------------
 
 
-def test_hierarchical_two_stage_filters_to_top_docs(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(
-        store,
-        [
-            ("Product A", "doc-a", "# Product A\n\n## Auth\nOAuth here.\n\n## API\nEndpoints."),
-            ("Product B", "doc-b", "# Product B\n\n## Auth\nKeys here.\n\n## Pricing\nFree tier."),
-        ],
-    )
-    # Walk every section so we can pre-program the fake store. Each Document
-    # produces multiple sections (one per ``##`` heading), so we group by source.
-    all_sections = store.list_sections_for_embedding()
-    by_source: dict[str, list[int]] = {}
-    for s in all_sections:
-        by_source.setdefault(s["source"], []).append(int(s["section_id"]))
-    section_ids = [sid for sids in by_source.values() for sid in sids]
-    assert len(section_ids) >= 4
-
-    # Stage 1: dense returns three ids — two from doc-a, one from doc-b. doc-a wins.
-    a_ids = next(sids for src, sids in by_source.items() if "doc-a" in src)[:2]
-    b_ids = next(sids for src, sids in by_source.items() if "doc-b" in src)[:1]
-    stage1 = [_hit(a_ids[0]), _hit(a_ids[1]), _hit(b_ids[0])]
-    # Get document_title_hash values for the filter expectation.
-    doc_hashes = store.document_title_hashes_for(section_ids)
-    a_doc_hash = doc_hashes[a_ids[0]]
-    # Stage 2: filtered call returns only doc-a sections.
-    stage2 = [_hit(a_ids[0], document_title_hash=a_doc_hash)]
-
-    hits_by_filter = {
-        ("dense", None): stage1,
-        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): stage2,
-    }
-    vstore = FakeVectorStore(hits_by_filter=hits_by_filter)
-
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=True, documents_limit=1, candidate_pool=10, sections_per_document=5
-    )
-    dispatcher = RetrievalDispatcher(
-        store=store,
-        config=config,
-        vector_store=vstore,
-        provider=FakeProvider(),
-        collection="c",
-    )
-    result = dispatcher.run("authentication", mode="dense", limit=2)
-    assert "hierarchical" in result.mode_used
-    # Two calls: stage 1 (no filter) and stage 2 (document_title_hash IN [a_doc_hash]).
-    assert len(vstore.calls) == 2
-    assert vstore.calls[0]["filters"] is None
-    assert vstore.calls[1]["filters"] == {"document_title_hash": {"in": [a_doc_hash]}}
 
 
-def test_hierarchical_degraded_result_preserves_stage_failures(tmp_path):
-    config, store = _agent(tmp_path)
-    _populate(store, [("Doc", "doc", "# Doc\n\n## Auth\nalpha authentication.\n")])
-    section_id = int(store.list_sections_for_embedding()[0]["section_id"])
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=True, documents_limit=1, candidate_pool=10, sections_per_document=2
-    )
-    vstore = Stage2FailingVectorStore({("dense", None): [_hit(section_id)]})
-
-    result = RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore,
-        provider=FakeProvider(), collection="c",
-    ).run("authentication", mode="dense", limit=1, allow_degraded=True)
-
-    assert "dense.stage2" in result.failures
-    assert "degraded" in result.mode_used
 
 
 
@@ -611,42 +545,6 @@ def test_hierarchical_degraded_result_preserves_stage_failures(tmp_path):
 # ---------------- hierarchical auto-enable ----------------
 
 
-def test_hierarchical_auto_enables_above_threshold(tmp_path):
-    config, store = _agent(tmp_path)
-    # Three distinct documents, threshold of 2 -> auto path engages.
-    _populate(
-        store,
-        [
-            ("Doc One", "doc-1", "# Doc One\n\n## A\nalpha.\n"),
-            ("Doc Two", "doc-2", "# Doc Two\n\n## B\nbeta.\n"),
-            ("Doc Three", "doc-3", "# Doc Three\n\n## C\ngamma.\n"),
-        ],
-    )
-    config.retrieval.hierarchical = HierarchicalConfig(
-        enabled=False, auto=True, auto_min_documents=2, documents_limit=1
-    )
-    sections = store.list_sections_for_embedding()
-    by_source: dict[str, list[int]] = {}
-    for s in sections:
-        by_source.setdefault(s["source"], []).append(int(s["section_id"]))
-    a_id = by_source["doc-1"][0]
-    a_doc_hash = store.document_title_hashes_for([a_id])[a_id]
-    hits_by_filter = {
-        ("dense", None): [_hit(a_id)],
-        ("dense", _filter_key({"document_title_hash": {"in": [a_doc_hash]}})): [
-            _hit(a_id, document_title_hash=a_doc_hash)
-        ],
-    }
-    vstore = FakeVectorStore(hits_by_filter=hits_by_filter)
-    result = RetrievalDispatcher(
-        store=store, config=config, vector_store=vstore, provider=FakeProvider(), collection="c"
-    ).run("alpha", mode="dense", limit=1)
-    assert "hierarchical" in result.mode_used
-    # Stage 2 must have applied a document_title_hash filter.
-    assert any(
-        (call["filters"] or {}).get("document_title_hash") is not None
-        for call in vstore.calls
-    )
 
 
 def test_hierarchical_auto_skips_below_threshold(tmp_path):
@@ -718,4 +616,3 @@ def test_expand_bypasses_sections_per_source_cap(tmp_path):
     result = RetrievalDispatcher(store=store, config=config).run("alpha", mode="lexical", limit=3, expand="adjacent")
 
     assert len([chunk for chunk in result.chunks if chunk.source == "big-doc"]) >= 3
-

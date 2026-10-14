@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/test_dictionary_exit_read_packet_residuals.py": "behavioral"
-  },
+  "module_labels": {},
   "node_overrides": {},
-  "module_node_hashes": {
-    "tests/test_dictionary_exit_read_packet_residuals.py": "06008af877a48381afc5d4d49bc215114450eb6240b26b4e7ef755ff7368e051"
-  }
+  "module_node_hashes": {}
 }

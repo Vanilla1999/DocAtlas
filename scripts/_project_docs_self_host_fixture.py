@@ -301,7 +301,7 @@ class SelfHostFixture:
 
 
 @contextmanager
-def self_host_fixture(origin: Path):
+def self_host_fixture(origin: Path, *, catalog_path: Path | None = None):
     """Keep mirror, sanitized environment and actual service alive for all reads."""
     origin = Path(origin)
     if not origin.is_absolute() or origin.resolve() != origin:
@@ -322,6 +322,24 @@ def self_host_fixture(origin: Path):
                 if policy.validate(root, config.index.db_path) or service._cold._service is not None:
                     raise ValueError("self-host requires fresh host-selected storage")
                 _bind_config(root, str(policy.db_path), provenance)
+                if catalog_path is not None:
+                    # Inputs select a preregistered corpus; no question/gold data enters here.
+                    selected = Path(catalog_path).absolute().relative_to(origin)
+                    files = {row["path"]: row for row in provenance["files"]}
+                    if selected.as_posix() not in files:
+                        raise ValueError("frozen catalog must be a tracked member of the origin")
+                    frozen = (root / selected).read_bytes()
+                    if _digest(frozen) != files[selected.as_posix()]["original_sha256"]:
+                        raise ValueError("frozen catalog bytes changed in mirror")
+                    original = (root / CATALOG_FILENAME).read_bytes()
+                    (root / CATALOG_FILENAME).write_bytes(frozen)
+                    provenance["catalog_delta"] = {
+                        "source_path": selected.as_posix(), "path": CATALOG_FILENAME,
+                        "original_sha256": _digest(original), "frozen_sha256": _digest(frozen),
+                        "scope": "isolated_mirror_only",
+                    }
+                    files[CATALOG_FILENAME]["mirror_sha256"] = _digest(frozen)
+                    provenance["mirror_manifest_sha256"] = _json_digest(provenance["files"])
                 catalog = read_project_docs_catalog(root)
                 if not catalog.present or not catalog.valid or catalog.roots or catalog.code_files or not catalog.entries:
                     raise ValueError("self-host requires the original finite docs-only catalog")
@@ -331,7 +349,7 @@ def self_host_fixture(origin: Path):
                 mutation = {
                     "operation": "sync_project_docs", "confirm": True,
                     "storage_path": str(policy.db_path), "expected_generation_id": None,
-                    "catalog_sha256": files[CATALOG_FILENAME]["original_sha256"],
+                    "catalog_sha256": _digest((root / CATALOG_FILENAME).read_bytes()),
                     "documents": [{"path": entry.path,
                                    "content_sha256": files[entry.path]["original_sha256"],
                                    "catalog_entry_hash": catalog_entry_hash(entry)} for entry in catalog.entries],

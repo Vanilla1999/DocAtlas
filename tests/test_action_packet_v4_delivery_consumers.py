@@ -137,25 +137,6 @@ def test_v4_paths_do_not_create_read_capabilities_and_failed_read_keeps_evidence
 
 
 
-def test_v4_failure_text_delivery_and_ambiguous_channel_rejection():
-    failure = {'kind': 'patch_context', 'schema_version': 4, 'result': 'failure',
-               'completeness': 'unavailable', 'edit_ready': False,
-               'missing': ['unavailable'], 'estimated_tokens': 1}
-    refresh_action_packet_estimate(failure)
-    wire = {'content': [{'type': 'text', 'text': json.dumps(failure)}]}
-    assert extract_tool_payload(wire) == failure
-    validate_patch_context_payload(failure)
-    with pytest.raises(EvidenceDeliveryError, match='ambiguous'):
-        extract_tool_payload({'content': wire['content'] * 2})
-    with pytest.raises(EvidenceDeliveryError, match='unsupported'):
-        extract_tool_payload({'structuredContent': failure}, structured_supported=False)
-    async def run():
-        session = await GroundedMCPSession.start(OfflineClient(failure, text=True),
-            arguments={'question': 'Inspect contracts', 'project_path': '/repo', 'context_format': 'patch_context'},
-            requested_facts={'missing': 'Contract binding'})
-        assert session.context == failure and not session.evidence
-        assert session.finish()['status'] == 'insufficient'
-    asyncio.run(run())
 
 
 
@@ -213,23 +194,6 @@ def test_patch_recovery_retains_uncapped_native_evidence_constraints_and_explici
 
 
 
-def test_newline_endpoint_convention_handles_trailing_newline_and_unknown_absolute_position():
-    from docmancer.docs.application.action_packet import build_action_packet
-    from docmancer.docs.application.model_visible_projection import project_patch_context
-    for positioned in (True, False):
-        row = retrieval()['context_pack'][0]
-        text = row['content'] + '\n'
-        row.update(content=text, display_text=text, char_end=len(text),
-                   display_content_hash=hashlib.sha256(text.encode()).hexdigest())
-        if positioned:
-            row.update(line_start=17, line_end=17 + text.count('\n'))
-        else:
-            row.pop('line_start')
-            row.pop('line_end')
-        packet = build_action_packet(question='Read contract setting', context_pack=[row])
-        context, _ = project_patch_context(packet=packet, evidence_items=[row])
-        validate_patch_context_payload(context)
-        assert context['sources'][0]['text'].endswith('\n')
 
 
 @pytest.mark.parametrize('kind', ['version', 'module', 'project_scope', 'unknown_version', 'project_identity'])

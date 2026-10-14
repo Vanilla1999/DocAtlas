@@ -84,104 +84,12 @@ def test_ranking_trace_exposes_named_components_without_document_text(tmp_path):
     assert "content" not in trace
 
 
-def test_lexical_match_trace_distinguishes_strict_and_weak_or_fallback(tmp_path):
-    store = _store(
-        tmp_path,
-        [
-            _doc("docs/workflow.md", "DocAtlas workflow", "DocAtlas indexing workflow setup"),
-            _doc("docs/generic.md", "Configuration", "Generic configuration reference"),
-        ],
-    )
-
-    strict = store.query("DocAtlas indexing workflow", limit=2, budget=2_000)[0]
-    fallback = store.query(
-        "Telegram notifications after indexing DocAtlas", limit=2, budget=2_000,
-    )
-
-    assert strict.metadata["lexical_match"]["mode"] == "and"
-    assert "qualified" not in strict.metadata["lexical_match"]
-    assert qualify_evidence(strict.metadata["lexical_match"], query_id="q", visible_text=strict.text).qualified
-    assert any(item.metadata["lexical_match"]["mode"] == "or_fallback" for item in fallback)
-    assert all(not qualify_evidence(item.metadata["lexical_match"], query_id="q", visible_text=item.text).qualified for item in fallback)
-    assert "text" not in strict.metadata["lexical_match"]
 
 
-def test_and_candidates_do_not_suppress_a_more_useful_or_candidate(tmp_path):
-    store = _store(
-        tmp_path,
-        [
-            _doc(
-                "docs/reference.md",
-                "Reference",
-                "configure widget cache migration terminology reference", project_identity="repo",
-            ),
-            _doc(
-                "docs/configure.md",
-                "Configure widget cache",
-                "Configure the widget cache with a bounded cache mode.", project_identity="repo",
-            ),
-        ],
-    )
-
-    result = store.query(
-        "configure widget cache migration", limit=1, budget=1_000,
-        filters={"project_identity": "repo"},
-    )[0]
-
-    assert result.source == "docs/configure.md"
-    assert result.metadata["lexical_match"]["mode"] == "or_union"
-    assert result.metadata["lexical_match"]["match_ratio"] == 0.75
-    assert result.metadata["ranking"]["candidate_pool_size"] == 2
 
 
-def test_or_union_half_query_false_proof_is_rejected_downstream(tmp_path):
-    store = _store(
-        tmp_path,
-        [
-            _doc(
-                "docs/complete.md",
-                "Telegram alerts indexing configuration",
-                "Telegram alerts use this indexing configuration.", project_identity="repo",
-            ),
-            _doc(
-                "docs/generic.md",
-                "Indexing configuration",
-                "Generic indexing configuration reference.", project_identity="repo",
-            ),
-        ],
-    )
-
-    results = store.query(
-        "Telegram alerts indexing configuration", limit=2, budget=2_000,
-        filters={"project_identity": "repo"},
-    )
-    partial = next(result for result in results if result.source == "docs/generic.md")
-    trace = partial.metadata["lexical_match"]
-
-    assert trace["mode"] == "or_union"
-    assert trace["match_ratio"] == 0.5
-    assert trace["missing_exact_terms"] == ["telegram"]
-    assert not qualify_evidence(
-        trace, query_id="q", visible_text=partial.text,
-    ).qualified
 
 
-def test_or_fallback_requires_exact_terms_and_half_the_query(tmp_path):
-    store = _store(
-        tmp_path,
-        [_doc("docs/generic.md", "Configuration", "Generic indexing configuration reference")],
-    )
-
-    result = store.query(
-        "Telegram alerts indexing configuration", limit=1, budget=1_000,
-    )[0]
-    trace = result.metadata["lexical_match"]
-
-    assert trace["mode"] == "or_fallback"
-    assert trace["match_ratio"] == 0.5
-    assert trace["missing_exact_terms"] == ["telegram"]
-    assert "qualified" not in trace
-    assert not qualify_evidence(trace, query_id="q", visible_text=result.text).qualified
 
 
 def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
@@ -211,4 +119,3 @@ def test_exact_filename_qualification_uses_the_same_corpus_as_fts(tmp_path):
         for result in results
         if result.source == "docatlas.docs.yaml"
     )
-

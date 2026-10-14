@@ -150,8 +150,8 @@ def _citations(payload: dict[str, object]) -> list[dict[str, object]]:
     return citations
 
 
-def _historical_paths() -> set[str]:
-    catalog = yaml.safe_load((REPO_ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8")) or {}
+def _historical_paths(catalog_path: Path | None = None) -> set[str]:
+    catalog = yaml.safe_load((catalog_path or REPO_ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8")) or {}
     return {
         str(row.get("path") or "")
         for row in catalog.get("documents") or ()
@@ -576,11 +576,12 @@ def run(
     *,
     cases: tuple[LiveCase, ...] = GOLD_CASES,
     negative_cases: tuple[str | LiveCase, ...] = NEGATIVE_CASES,
+    catalog_path: Path | None = None,
 ) -> dict[str, object]:
     errors: list[str] = []
     results: list[dict[str, object]] = []
-    historical_paths = _historical_paths()
-    with self_host_fixture(REPO_ROOT) as fixture:
+    historical_paths = _historical_paths(catalog_path)
+    with self_host_fixture(REPO_ROOT, **({"catalog_path": catalog_path} if catalog_path is not None else {})) as fixture:
         service = fixture.service
         setup_provenance = fixture.provenance
         preflight_question = cases[0].question if cases else "How do Project Docs work?"

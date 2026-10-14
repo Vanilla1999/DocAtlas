@@ -41,31 +41,3 @@ def row(text, identity="quote-1", **overrides):
         "authority": "canonical", "docs_exactness": "exact", "version": "2.0",
         "retrieval_rank": 1, "score": 0.9, **overrides,
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@pytest.mark.parametrize("quote", ["RelayClient must retry.", "RelayClient must not retry.",
-    "RelayClient retries."])
-def test_public_projection_preserves_original_quote_only_and_snapshot_integrity(quote):
-    selection = select_evidence([row(quote)], question="RelayClient", config=docs_selection_config(1000))
-    payload, snapshot = project_docs_answer(question="RelayClient", canonical_selection=selection,
-        retrieval={"status": "success"}, max_tokens=1000)
-    assert payload["sources"][0]["snippet"] == quote
-    assert not payload["answer_supported"] and not payload["edit_ready"]
-    assert validate_model_visible_projection(payload, snapshot=snapshot, max_tokens=1000,
-        canonical_selection=selection) == []

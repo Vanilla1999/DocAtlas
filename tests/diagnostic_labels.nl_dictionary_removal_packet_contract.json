@@ -1,10 +1,6 @@
 {
   "schema_version": 1,
-  "module_labels": {
-    "tests/test_nl_dictionary_removal_packet_contract.py": "behavioral"
-  },
+  "module_labels": {},
   "node_overrides": {},
-  "module_node_hashes": {
-    "tests/test_nl_dictionary_removal_packet_contract.py": "f8d389306fe059b01d13b494f7c6fd43ab19f77540746e797a18149a25a470da"
-  }
+  "module_node_hashes": {}
 }

@@ -5,6 +5,6 @@
   },
   "node_overrides": {},
   "module_node_hashes": {
-    "tests/evidence_quality_v2/test_measurement.py": "21c194e5ec6e6cc47a2a15ceb6b663e4958c61ae0b8391c55e7b2cfacf53400a"
+    "tests/evidence_quality_v2/test_measurement.py": "5fcb54b6b53bc6f7adc7832cd5b8cc7a0aeb15aaae5e09f34d4322b71593e189"
   }
 }

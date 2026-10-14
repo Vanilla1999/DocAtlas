@@ -18,6 +18,7 @@ CASES_PATH = CORPUS_DIR / "cases.json"
 MIGRATION_PATH = CORPUS_DIR / "migration-crosswalk.json"
 DIAGNOSTIC_PATH = CORPUS_DIR / "diagnostic.json"
 LOCK_PATH = CORPUS_DIR / "protocol.lock.json"
+CATALOG_PATH = CORPUS_DIR / "catalog.frozen.yaml"
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -72,7 +73,7 @@ def _witness_visible(witness: str, visible_text: str) -> bool:
 
 def _catalog() -> dict[str, dict[str, Any]]:
     """Resolve only finite explicit document identity, never recursive discovery."""
-    payload = yaml.safe_load((ROOT / "docatlas.project-docs.yaml").read_text(encoding="utf-8"))
+    payload = yaml.safe_load(CATALOG_PATH.read_text(encoding="utf-8"))
     if not isinstance(payload, dict) or payload.get("schema_version") != 1:
         raise ValueError("quality evaluation requires the explicit catalog schema")
     if payload.get("roots") or payload.get("code_files"):
@@ -100,7 +101,7 @@ def _payload() -> dict[str, Any]:
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
     for name, path in (
         ("cases", CASES_PATH), ("migration_crosswalk", MIGRATION_PATH),
-        ("diagnostic", DIAGNOSTIC_PATH), ("catalog", ROOT / "docatlas.project-docs.yaml"),
+        ("diagnostic", DIAGNOSTIC_PATH), ("catalog", CATALOG_PATH),
     ):
         if lock["files"][name] != _sha256(path):
             raise ValueError(f"v2 {name} hash does not match independent lock")
@@ -426,7 +427,7 @@ def run_live() -> dict[str, Any]:
     ) for row in runnable)
     production = run(cases=live_cases, negative_cases=tuple(LiveCase(
         case_id=row["id"], question=row["question"], scope=row["scope"], expected_kind="insufficient_evidence", relevant_paths=(),
-    ) for row in negatives))
+    ) for row in negatives), catalog_path=CATALOG_PATH)
     responses = {str(row["case_id"]): row.get("payload") or {"status": row.get("observed", {}).get("status"), "kind": row.get("observed", {}).get("kind"), "sources": [], "estimated_tokens": 0} for row in production["results"]}
     report = evaluate(responses)
     report["run_mode"] = "live_self_host"

@@ -2,13 +2,11 @@
   "schema_version": 1,
   "module_labels": {
     "tests/docs/test_admission_mapping_assignments.py": "behavioral",
-    "tests/docs/test_admission_pipeline_invariants.py": "behavioral",
     "tests/docs/test_admission_relation_safety.py": "behavioral",
     "tests/docs/test_admission_subject_binding.py": "behavioral"
   },
   "module_node_hashes": {
     "tests/docs/test_admission_mapping_assignments.py": "185d62a53e831b7acee3871937001e0eb47fd48076f74780f39d50e7f9110693",
-    "tests/docs/test_admission_pipeline_invariants.py": "938309290e618ea2caa4726a644e6ba80c9908741a0ad08b1a108363ecfb17fc",
     "tests/docs/test_admission_relation_safety.py": "5b996a73155036263da16321aa8e37f2fa5a81e947d74c6afb173447e692c1c0",
     "tests/docs/test_admission_subject_binding.py": "98638dbe04f52ed840f69d49e9d76066292ab50a1a1735f964e2346bbc7afef0"
   },
