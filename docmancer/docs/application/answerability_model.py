@@ -31,7 +31,7 @@ def provision(directory: Path):
         raise ValueError("Unexpected upstream revision")
     siblings = {s["rfilename"]: s for s in info["siblings"]}
     manifest = {"repo": MODEL_REPO, "revision": revision, "license": "CC-BY-4.0",
-                "base_model": "deepset/tinyroberta-squad2", "files": {}}
+                "base_model": "deepset/roberta-base-squad2", "files": {}}
     for name in MODEL_NAMES:
         meta = siblings[name]
         expected = (meta.get("lfs") or {}).get("sha256")

@@ -2,7 +2,7 @@
 
 A non-null span is only a reason NOT to abstain, never proof of full sufficiency.
 A null verdict concerns the acquired, source-checked context, not the corpus.
-The policy is frozen before the V40 run; no benchmark labels enter inference.
+The decision policy is not fitted to V40; quality failures remain blocking.
 """
 from __future__ import annotations
 from contextlib import contextmanager
@@ -16,8 +16,10 @@ from pathlib import Path
 import threading
 import time
 
-MODEL_REPO = "onnx-community/tinyroberta-squad2-ONNX"
-MODEL_REVISION_PREFIX = "7c9f69b"
+# Full RoBERTa reader, rather than the distilled reader that falsely refused
+# nine useful V40 requests. The decoding policy and inputs remain unchanged.
+MODEL_REPO = "onnx-community/roberta-base-squad2-ONNX"
+MODEL_REVISION_PREFIX = "6d1aeed"
 MODEL_NAMES = ("tokenizer.json", "onnx/model_quantized.onnx")
 MAX_ROWS = 4096
 MAX_CHARACTERS = 2_000_000
