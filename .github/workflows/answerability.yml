@@ -1,10 +1,10 @@
 name: Answerability installed MCP
 on:
-  push:
-    branches: [feat/context-answerability]
+  pull_request:
+    paths: ['docmancer/**', 'eval/answerability*', 'uv.lock', '.github/workflows/answerability.yml']
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
   installed-answerability:
     runs-on: ubuntu-latest
@@ -12,31 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
-          ref: ${{ github.sha }}
-      - name: Publish the reviewed integration hook on this feature branch only
-        if: hashFiles('eval/connect_answerability.py') != ''
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REF" = refs/heads/feat/context-answerability
-          python eval/connect_answerability.py
-          git config user.name 'DocAtlas integration'
-          git config user.email '41183994+Vanilla1999@users.noreply.github.com'
-          git rm eval/connect_answerability.py
-          git add docmancer/docs/interfaces/mcp/context_tools.py
-          git commit -m 'feat: apply local answerability before selection and resource issuance'
-          git push origin HEAD:refs/heads/feat/context-answerability
-      - name: Freeze exact source and remove Git credentials
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Freeze exact source
         run: |
           mkdir -p "$RUNNER_TEMP/answerability-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/answerability-evidence/head.txt"
           git diff --exit-code
-          git config --local --unset-all http.https://github.com/.extraheader || true
-          python -m compileall -q docmancer/docs/application/answerability.py docmancer/docs/application/answerability_model.py eval/answerability_integration.py
-      - name: Build installed CPU runtime; explicitly provision immutable model assets
+          python -m compileall -q docmancer/docs/application/answerability.py docmancer/docs/application/answerability_model.py eval/answerability_integration.py eval/answerability_controls.py
+      - name: Build installed CPU runtime and explicitly provision immutable model assets
         run: |
           docker build -f eval/answerability.Dockerfile -t docatlas-answerability .
           docker image inspect docatlas-answerability > "$RUNNER_TEMP/answerability-evidence/image.json"
       - name: Real offline stdio all40; hard 1.5GB limit including server and client
+        id: quality
         run: |
           set +e
           docker run --name answerability-check --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
@@ -47,6 +36,14 @@ jobs:
           docker inspect answerability-check > "$RUNNER_TEMP/answerability-evidence/container.json"
           echo "$rc" > "$RUNNER_TEMP/answerability-evidence/exit-code.txt"
           exit "$rc"
+      - name: Independent operational and abstention controls under same hard memory cap
+        if: always() && steps.quality.outcome != 'skipped'
+        run: |
+          docker run --rm --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/answerability-evidence:/evidence" --entrypoint /opt/venv/bin/python \
+            docatlas-answerability -I /repo/eval/answerability_controls.py \
+            --repo /repo --work /tmp/control-work --out /evidence/controls --qa-model /qa-model
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:
@@ -54,3 +51,49 @@ jobs:
           path: ${{ runner.temp }}/answerability-evidence/
           retention-days: 30
           if-no-files-found: error
+  portable-controls:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: '3.11'
+          - os: ubuntu-latest
+            python: '3.13'
+          - os: macos-15
+            python: '3.12'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Build non-editable package and explicitly provision assets
+        env:
+          UV_PROJECT_ENVIRONMENT: ${{ runner.temp }}/qa-runtime
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+        run: |
+          python -m pip install uv==0.9.25
+          uv sync --frozen --no-dev --no-install-project --python "$(command -v python)"
+          uv build --wheel --out-dir "$RUNNER_TEMP/wheels"
+          uv pip install --python "$RUNNER_TEMP/qa-runtime/bin/python" --no-deps "$RUNNER_TEMP/wheels/"*.whl
+          "$RUNNER_TEMP/qa-runtime/bin/python" -I -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+          "$RUNNER_TEMP/qa-runtime/bin/python" -I -m docmancer.docs.application.answerability_model "$RUNNER_TEMP/qa-model"
+      - name: Installed public stdio independent controls (native RSS, no hard container claim)
+        env:
+          TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
+          HF_HUB_OFFLINE: '1'
+        run: |
+          TESTED_SHA="$(git rev-parse HEAD)" "$RUNNER_TEMP/qa-runtime/bin/python" -I eval/answerability_controls.py \
+            --repo "$PWD" --work "$RUNNER_TEMP/control-work" --out "$RUNNER_TEMP/control-results" --qa-model "$RUNNER_TEMP/qa-model"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: answerability-${{ matrix.os }}-${{ matrix.python }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/control-results/
+          retention-days: 30
+          if-no-files-found: warn
