@@ -1,0 +1,65 @@
+name: MiniLM sections installed MCP
+on:
+  push:
+    branches: [feat/minilm-section-context]
+  pull_request:
+    paths:
+      - 'docmancer/**'
+      - 'eval/minilm_sections*'
+      - '.github/workflows/minilm-sections.yml'
+      - 'uv.lock'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  installed-sections:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+      # BEGIN one-time-patch
+      - name: Apply reviewed hooks and publish exact implementation on feature branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/feat/minilm-section-context' && hashFiles('eval/minilm-integration-hooks.patch') != ''
+        run: |
+          set -euo pipefail
+          git apply --check eval/minilm-integration-hooks.patch
+          git apply eval/minilm-integration-hooks.patch
+          git rm eval/minilm-integration-hooks.patch
+          git config user.name "DocAtlas integration"
+          git config user.email "41183994+Vanilla1999@users.noreply.github.com"
+          git add docmancer/docs/interfaces/mcp/context_tools.py docmancer/docs/application/context_json.py
+          git commit -m "feat: connect section selection and lossless compact delivery to public MCP"
+          git push origin HEAD:refs/heads/feat/minilm-section-context
+      # END one-time-patch
+      - name: Freeze tested revision and verify syntax
+        run: |
+          mkdir -p "$RUNNER_TEMP/sections-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/sections-evidence/head.txt"
+          git diff --exit-code
+          python -m compileall -q docmancer/docs/application/section_compression.py docmancer/docs/application/section_model.py eval/minilm_sections_integration.py
+      - name: Build installed CPU runtime and explicitly provision pinned model
+        run: docker build -f eval/minilm_sections.Dockerfile -t docatlas-minilm-sections .
+      - name: Real installed stdio MCP under 1GB, offline, all40 plus controls
+        id: acceptance
+        run: |
+          set +e
+          docker run --name docatlas-section-check --network none --cpus=2 \
+            --memory=1000000000 --memory-swap=1000000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/sections-evidence:/evidence" docatlas-minilm-sections \
+            --repo /repo --work /tmp/section-work --out /evidence/run --model /model
+          rc=$?
+          docker inspect docatlas-section-check > "$RUNNER_TEMP/sections-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/sections-evidence/exit-code.txt"
+          exit "$rc"
+      - name: Preserve actual client outputs, independent assessments and resource receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: minilm-sections-installed-${{ github.run_id }}
+          path: ${{ runner.temp }}/sections-evidence/
+          retention-days: 30
+          if-no-files-found: error
