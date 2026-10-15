@@ -88,6 +88,12 @@ jobs:
           TIKTOKEN_CACHE_DIR: ${{ runner.temp }}/tokenizer-cache
           HF_HUB_OFFLINE: '1'
         run: |
+          set -euo pipefail
+          # macOS's default /var path may traverse a symlink. Select a new private,
+          # canonical fixture root instead of weakening production storage policy.
+          private_tmp=$(mktemp -d "$RUNNER_TEMP/qa-private.XXXXXX")
+          chmod 700 "$private_tmp"
+          export TMPDIR=$(cd "$private_tmp" && pwd -P)
           TESTED_SHA="$(git rev-parse HEAD)" "$RUNNER_TEMP/qa-runtime/bin/python" -I eval/answerability_controls.py \
             --repo "$PWD" --work "$RUNNER_TEMP/control-work" --out "$RUNNER_TEMP/control-results" --qa-model "$RUNNER_TEMP/qa-model"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
