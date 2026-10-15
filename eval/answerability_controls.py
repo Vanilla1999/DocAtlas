@@ -33,7 +33,10 @@ SCENARIOS = {
     "observe_only": ("Who founded Aster?", "en", "observe"),
     "unknown_language": ("Какой порт использует Aster?", "ru", "enforce"),
     "missing_model": ("What port does Aster listen on?", "en", "enforce"),
-    "long_query": ("configuration " * 90, "en", "enforce"),
+    # The original long query matched no source and never reached QA. Keep that
+    # real boundary as its own case; use source-matching words for QA overflow.
+    "no_candidates": ("configuration " * 90, "en", "enforce"),
+    "long_query": ("What port does Aster listen on? " * 15, "en", "enforce"),
 }
 
 
@@ -53,6 +56,8 @@ def worker(args):
         request = {"question": question, "project_path": str(root), "scope": "project"}
         baseline = call_docs_tool_payload("get_docs_context", request, service)
         save(args.out / "baseline.json", baseline)
+        if args.scenario == "long_query":
+            assert baseline.get("sources"), "QA overflow control must reach the checked-source boundary"
         os.environ.update(DOCATLAS_CONTEXT_ABSTENTION=mode, DOCATLAS_ABSTENTION_LANGUAGE=language,
                           DOCATLAS_ABSTENTION_MODEL_DIR=str(args.qa_model if args.scenario != "missing_model" else args.work / "missing"))
         with observe_answerability() as receipts:
@@ -91,6 +96,9 @@ async def client(args):
             passed = response.isError and code == "answerability_query_limit" and not payload.get("sources")
         elif name == "absent":
             passed = not response.isError and payload.get("reason_code") == "answer_not_found_in_acquired_context" and payload.get("sources") == [] and not payload.get("read_next")
+        elif name == "no_candidates":
+            passed = not response.isError and payload == baseline and not payload.get("sources") and server["observations"] == []
+            passed = passed and payload.get("reason_code") != "answer_not_found_in_acquired_context"
         else:
             passed = not response.isError and payload == baseline and bool(payload.get("sources"))
             if name == "positive":
@@ -102,7 +110,7 @@ async def client(args):
                         "rss_peak_bytes": server["rss_peak_bytes"], "observations": server["observations"]})
         print(json.dumps(results[-1], ensure_ascii=False), flush=True)
     save(args.out / "SUMMARY.json", {"head": os.environ.get("TESTED_SHA"), "platform": sys.platform,
-        "python": sys.version, "results": results, "public_calls": 12, "preparations": 6,
+        "python": sys.version, "results": results, "public_calls": 2 * len(SCENARIOS), "preparations": len(SCENARIOS),
         "boundary": "installed wheel; real stdio MCP; independent synthetic source; no mocked model",
         "russian_semantic_accuracy": "NOT CLAIMED: unsupported-language pass-through only"})
     assert all(r["pass"] for r in results), "answerability controls failed"

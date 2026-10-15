@@ -1,0 +1,11 @@
+{
+  "repo": "onnx-community/tinyroberta-squad2-ONNX",
+  "revision": "7c9f69b7e6228375169a4553bcfa6639152e3a69",
+  "license": "CC-BY-4.0",
+  "base_model": "deepset/tinyroberta-squad2",
+  "files": {
+    "tokenizer.json": {"bytes": 3558647, "sha256": "7b62d797c95d1563d3467f48daad0eca3e150f2d587e7e687b557c9ef1b25473"},
+    "onnx/model_quantized.onnx": {"bytes": 82141214, "sha256": "4db70e7a019e32bf652fb9d30a5c24d18b6949fae2f1dd00d9fe6d43052b77cd"}
+  },
+  "provenance": "Verified by explicit provisioning on GitHub Actions run 38814467351 before any model inference; weight bytes not committed."
+}
