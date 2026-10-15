@@ -1,0 +1,56 @@
+name: Answerability installed MCP
+on:
+  push:
+    branches: [feat/context-answerability]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  installed-answerability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+      - name: Publish the reviewed integration hook on this feature branch only
+        if: hashFiles('eval/connect_answerability.py') != ''
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/feat/context-answerability
+          python eval/connect_answerability.py
+          git config user.name 'DocAtlas integration'
+          git config user.email '41183994+Vanilla1999@users.noreply.github.com'
+          git rm eval/connect_answerability.py
+          git add docmancer/docs/interfaces/mcp/context_tools.py
+          git commit -m 'feat: apply local answerability before selection and resource issuance'
+          git push origin HEAD:refs/heads/feat/context-answerability
+      - name: Freeze exact source and remove Git credentials
+        run: |
+          mkdir -p "$RUNNER_TEMP/answerability-evidence"
+          git rev-parse HEAD > "$RUNNER_TEMP/answerability-evidence/head.txt"
+          git diff --exit-code
+          git config --local --unset-all http.https://github.com/.extraheader || true
+          python -m compileall -q docmancer/docs/application/answerability.py docmancer/docs/application/answerability_model.py eval/answerability_integration.py
+      - name: Build installed CPU runtime; explicitly provision immutable model assets
+        run: |
+          docker build -f eval/answerability.Dockerfile -t docatlas-answerability .
+          docker image inspect docatlas-answerability > "$RUNNER_TEMP/answerability-evidence/image.json"
+      - name: Real offline stdio all40; hard 1.5GB limit including server and client
+        run: |
+          set +e
+          docker run --name answerability-check --network none --cpus=2 --memory=1500000000 --memory-swap=1500000000 \
+            -e TESTED_SHA="$(git rev-parse HEAD)" -e HF_HUB_OFFLINE=1 \
+            -v "$RUNNER_TEMP/answerability-evidence:/evidence" docatlas-answerability \
+            --repo /repo --work /tmp/answerability-work --out /evidence/run --model /model --qa-model /qa-model
+          rc=$?
+          docker inspect answerability-check > "$RUNNER_TEMP/answerability-evidence/container.json"
+          echo "$rc" > "$RUNNER_TEMP/answerability-evidence/exit-code.txt"
+          exit "$rc"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: answerability-${{ github.run_id }}
+          path: ${{ runner.temp }}/answerability-evidence/
+          retention-days: 30
+          if-no-files-found: error
