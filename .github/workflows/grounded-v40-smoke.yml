@@ -1,4 +1,4 @@
-name: Grounded V40 comparison (external comparator)
+name: Post-merge DocAtlas vs Grounded 40 (source evidence)
 on:
   push:
     branches: [fix/main-flow-compact-evidence]
@@ -6,34 +6,94 @@ on:
 permissions:
   contents: read
 jobs:
-  grounded-smoke:
+  compare-40:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 80
+    env:
+      PYTHONUNBUFFERED: '1'
+      PYTHONHASHSEED: '0'
+      DOCATLAS_OFFLINE: '1'
+      DOCATLAS_AUTO_VECTORS: '0'
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - name: Checkout pinned merged main (not trigger branch)
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
         with:
+          ref: 319b0e6ac55e7d454c8cb4c4c319c778c5473e7a
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: "22"
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
-          python-version: "3.12"
-      - name: Install pinned Grounded Docs
+          python-version: '3.12'
+      - name: Install exact merged source as isolated wheel
+        shell: bash
         run: |
+          set -euo pipefail
+          echo "EVAL_REPO=$PWD" >> "$GITHUB_ENV"
+          echo "EVAL_BASE=$RUNNER_TEMP/postmerge-wheel" >> "$GITHUB_ENV"
+          echo "EVAL_OUTPUT=$RUNNER_TEMP/grounded40-results/docatlas" >> "$GITHUB_ENV"
+          echo "TIKTOKEN_CACHE_DIR=$RUNNER_TEMP/postmerge-tokenizer" >> "$GITHUB_ENV"
+          python -m pip install uv==0.9.25
+          mkdir -p "$RUNNER_TEMP/postmerge-wheel/wheels" "$RUNNER_TEMP/postmerge-wheel/site"
+          uv build --wheel --out-dir "$RUNNER_TEMP/postmerge-wheel/wheels"
+          UV_PROJECT_ENVIRONMENT="$RUNNER_TEMP/postmerge-env" uv sync --frozen --no-dev --no-install-project
+          unzip -q "$RUNNER_TEMP/postmerge-wheel/wheels/"*.whl -d "$RUNNER_TEMP/postmerge-wheel/site"
+          "$RUNNER_TEMP/postmerge-env/bin/python" -c 'import tiktoken; tiktoken.get_encoding("o200k_base")'
+          test "$(git rev-parse HEAD)" = "319b0e6ac55e7d454c8cb4c4c319c778c5473e7a"
+      - name: Prepare the existing public-MCP driver for ALL 40 unchanged questions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          src = Path('reports/pr211-no-terminal-budget-20261015')
+          for name in ('run.py', 'assess.py'):
+              text = (src / name).read_text(encoding='utf-8')
+              text = text.replace("REPO = Path('/tmp/opencode/pr211-no-terminal-budget')", "REPO = Path(os.environ['EVAL_REPO'])" if name == 'run.py' else "REPO = Path(__import__('os').environ['EVAL_REPO'])")
+              text = text.replace("OUT = REPO / 'reports/pr211-no-terminal-budget-20261015'", "OUT = Path(os.environ['EVAL_OUTPUT'])" if name == 'run.py' else "OUT = Path(__import__('os').environ['EVAL_OUTPUT'])")
+              if name == 'run.py':
+                  text = text.replace("BASE = Path('/tmp/opencode/pr211-no-budget-runtime')", "BASE = Path(os.environ['EVAL_BASE'])")
+                  target = "if c['id'] in {'V40-P03', 'V40-E01'}"
+                  assert text.count(target) == 1, 'frozen V40 filter missing'
+                  text = text.replace(target, 'if True')
+              if "REPO = Path('/tmp/opencode/pr211-no-terminal-budget')" in text or "OUT = REPO / 'reports/pr211-no-terminal-budget-20261015'" in text:
+                  raise RuntimeError('unpatched driver path')
+              (Path(os.environ['RUNNER_TEMP']) / ('postmerge40-' + name)).write_text(text, encoding='utf-8')
+          print('40-case driver scripts created from merged-main audited MCP harness, oracle remains separate')
+          PY
+      - name: Execute 40 real DocAtlas installed-wheel public MCP requests
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/postmerge-env/bin/python" "$RUNNER_TEMP/postmerge40-run.py"
+      - name: Assess 40 DocAtlas outputs with unchanged independent oracle
+        shell: bash
+        if: success()
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/postmerge-env/bin/python" "$RUNNER_TEMP/postmerge40-assess.py" > "$RUNNER_TEMP/grounded40-results/docatlas/assessment-stdout.json"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        if: success()
+        with:
+          node-version: '22'
+      - name: Install pinned Grounded Docs 3.2.1
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
           mkdir -p "$RUNNER_TEMP/grounded-npm"
           npm install --prefix "$RUNNER_TEMP/grounded-npm" --no-audit --no-fund --no-save @arabold/docs-mcp-server@3.2.1
           "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" --version
-      - name: Index pinned sources and query all 40 Grounded questions
+      - name: Execute 40 Grounded questions at top-2 and top-5
+        if: success()
+        shell: bash
         run: |
-          python -m eval.grounded_v40.run \
-            --cli "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" \
-            --output "$RUNNER_TEMP/grounded-v40-full"
-      - name: Preserve exact stdout/stderr of Grounded
+          set -euo pipefail
+          python -m eval.grounded_v40.run --cli "$RUNNER_TEMP/grounded-npm/node_modules/.bin/docs-mcp-server" --output "$RUNNER_TEMP/grounded40-results/grounded" --limits 2 5
+      - name: Preserve both sets of exact outputs and receipts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: grounded-v40-full-${{ github.sha }}
-          path: ${{ runner.temp }}/grounded-v40-full/
-          retention-days: 14
-          if-no-files-found: warn
+          name: postmerge-319b0e6a-grounded40
+          path: ${{ runner.temp }}/grounded40-results/
+          retention-days: 30
+          if-no-files-found: error
