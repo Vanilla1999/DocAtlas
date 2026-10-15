@@ -508,7 +508,17 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 )
             _omit_nullable_reason_code(projection)
             _refresh_projection_estimate(projection)
+            section_compression_active = False
             if kind == "docs_context":
+                from docmancer.docs.application.section_compression import (
+                    enabled as section_compression_enabled, select_sections, encode_sections,
+                )
+                section_compression_active = section_compression_enabled()
+                if section_compression_active:
+                    projection, snapshot = select_sections(projection, snapshot, raw, question)
+                    # Price the complete compact packet before issuing references.
+                    # No window is dropped to make an oversized selection fit.
+                    encode_sections(projection)
                 # Keep every source-checked row; terminal first-fit is disabled.
                 # projection, snapshot = enforce_experimental_context_budget(projection, snapshot, raw)
                 if experimental_context_max_tokens() is not None and reader is not None and source_root:
@@ -525,7 +535,9 @@ def handle_context_tool(name: str, args: dict[str, Any], service: LibraryDocsSer
                 return _bad_request("invalid_model_visible_projection", "; ".join(validation_errors))
             _record_model_visible_bytes(result, raw, projection)
             _observe_same_call_diagnostics(service, raw, projection, selection_trace)
-            return projection
+            # All source/snapshot validation above sees the complete selected rows.
+            # Only the explicitly opted-in response uses the versioned compact shape.
+            return encode_sections(projection) if section_compression_active else projection
 
         selection_trace = {}
         retrieval_issues = bounded_patch_retrieval_issues(raw)
